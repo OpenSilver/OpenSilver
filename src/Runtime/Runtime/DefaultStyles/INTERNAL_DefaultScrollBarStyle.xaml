@@ -4,7 +4,162 @@
 
     <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
 
-    <!--<Style x:Key="DefaultScrollBarStyle" TargetType="ScrollBar">-->
+    <Style  x:Key="ScrollThumb" TargetType="Thumb">
+        <Setter Property="Background"
+                Value="#FF1F3B53" />
+        <Setter Property="Foreground"
+                Value="Black" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="BorderBrush"
+                Value="#FF718597" />
+        <Setter Property="Padding"
+                Value="3" />
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Center" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualState Name="Normal">
+                                </VisualState>
+                                <VisualState Name="PointerOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                                        <GradientStop Color="#F2FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#CCFFFFFF" Offset="0.625" />
+                                                        <GradientStop Color="#7FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
+                                                                       Storyboard.TargetName="BackgroundGradient">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                                        <GradientStop Color="#D8FFFFFF" Offset="0" />
+                                                        <GradientStop Color="#C6FFFFFF" Offset="0.375" />
+                                                        <GradientStop Color="#8CFFFFFF" Offset="0.625" />
+                                                        <GradientStop Color="#3FFFFFFF" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" Storyboard.TargetName="DisabledVisualElement" Storyboard.TargetProperty="Opacity" To=".55"/>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="Background"
+                                CornerRadius="3"
+                                Background="White"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <Grid Background="{TemplateBinding Background}"  Margin="1">
+                                <Border Opacity="0" x:Name="BackgroundAnimation" Background="#FF448DCA" />
+                                <Border x:Name="BackgroundGradient" >
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint=".7,0" EndPoint=".7,1">
+                                            <GradientStop Color="#FFFFFFFF" Offset="0" />
+                                            <GradientStop Color="#F9FFFFFF" Offset="0.375" />
+                                            <GradientStop Color="#E5FFFFFF" Offset="0.625" />
+                                            <GradientStop Color="#C6FFFFFF" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ContentPresenter x:Name="ContentPresenter"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              Content="{TemplateBinding Content}"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Border x:Name="DisabledVisualElement" CornerRadius="3" Background="#FFFFFFFF" Opacity="0" IsHitTestVisible="false" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ScrollButton" TargetType="Button">
+        <Setter Property="Background" Value="#FFE2E2E2"/>
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundPointerOver"/>
+                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Background" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundPressed"/>
+                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Background" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundDisabled"/>
+                                        <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Background" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="Background"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"/>
+                        <Border x:Name="BackgroundPointerOver"
+                                Background="#11000000"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Opacity="0"/>
+                        <Border x:Name="BackgroundPressed"
+                                Background="#22000000"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Opacity="0"/>
+                        <Border x:Name="BackgroundDisabled"
+                                Background="#33FFFFFF"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Opacity="0"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- End Static Resources -->
     <Style TargetType="ScrollBar">
         <Setter Property="Background" Value="#FFF1F1F1" />
         <Setter Property="Foreground" Value="#FF333333" />
@@ -26,15 +181,11 @@
                             <Button x:Name="HorizontalSmallIncrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowRight" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 2,1 L 5.5,4.5 L 2,8"/>
                             </Button>
-                            <Button x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" />
-                            <Button x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" />
-                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow">
-                                <Thumb.Template>
-                                    <ControlTemplate>
-                                        <Border Background="#FFBBBBBB"/>
-                                    </ControlTemplate>
-                                </Thumb.Template>
-                            </Thumb>
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" />
+                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow" Style="{StaticResource ScrollThumb}" />
+
+
                         </Canvas>
                         <Canvas x:Name="VerticalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
                             <Button x:Name="VerticalSmallDecrease" Padding="0" Cursor="Arrow">
@@ -43,15 +194,10 @@
                             <Button x:Name="VerticalSmallIncrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowBottom" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 1,2 L 4.5,5.5 L 8,2"/>
                             </Button>
-                            <Button x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" />
-                            <Button x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" />
-                            <Thumb x:Name="VerticalThumb" Background="#FFBBBBBB" Cursor="Arrow">
-                                <Thumb.Template>
-                                    <ControlTemplate>
-                                        <Border Background="#FFBBBBBB"/>
-                                    </ControlTemplate>
-                                </Thumb.Template>
-                            </Thumb>
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" />
+                            <Thumb x:Name="VerticalThumb"  Style="{StaticResource ScrollThumb}" Cursor="Arrow" />
+
                         </Canvas>
                     </Grid>
                 </ControlTemplate>
