@@ -1096,10 +1096,6 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultDatePickerStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
