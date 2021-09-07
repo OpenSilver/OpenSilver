@@ -899,9 +899,7 @@ namespace Windows.UI.Xaml.Controls
                     result = container;
                 }
             }
-#if WORKINPROGRESS
             this.PrepareContainerForItemOverride(result, item);
-#endif
             return result;
         }
 

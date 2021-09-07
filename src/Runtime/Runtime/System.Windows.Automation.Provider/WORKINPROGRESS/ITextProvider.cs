@@ -2,7 +2,6 @@
 using Windows.Foundation;
 #endif
 
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows.Automation.Provider
 #else
@@ -87,4 +86,3 @@ namespace Windows.UI.Xaml.Automation.Provider
 		ITextRangeProvider RangeFromPoint(Point screenLocation);
 	}
 }
-#endif

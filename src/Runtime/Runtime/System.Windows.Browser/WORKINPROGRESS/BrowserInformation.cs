@@ -15,8 +15,6 @@
 
 using System;
 
-#if WORKINPROGRESS
-
 namespace System.Windows.Browser
 {
 	[OpenSilver.NotImplemented]
@@ -82,5 +80,3 @@ namespace System.Windows.Browser
 
     }
 }
-
-#endif

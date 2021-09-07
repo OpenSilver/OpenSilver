@@ -20,6 +20,7 @@ using DotNetBrowser.DOM;
 using System;
 using System.Reflection;
 using System.Windows;
+using DotNetBrowser.WPF;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -42,9 +43,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             InjectPropertyValue("HtmlDocument", htmlDocument, coreAssembly);
         }
 
-        internal static void InjectWebControlDispatcherBeginInvoke(dynamic webControl, Assembly coreAssembly)
+        internal static void InjectWebControlDispatcherBeginInvoke(WPFBrowserView webControl, Assembly coreAssembly)
         {
             InjectPropertyValue("WebControlDispatcherBeginInvoke", new Action<Action>((method) => webControl.Dispatcher.BeginInvoke(method)), coreAssembly);
+        }
+
+        internal static void InjectWebControlDispatcherInvoke(WPFBrowserView webControl, Assembly coreAssembly)
+        {
+            InjectPropertyValue("WebControlDispatcherInvoke", new Action<Action, TimeSpan>((method, timeout) => webControl.Dispatcher.Invoke(method, timeout)), coreAssembly);
         }
 
         internal static void InjectJavaScriptExecutionHandler(dynamic javaScriptExecutionHandler, Assembly coreAssembly)

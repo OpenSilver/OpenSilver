@@ -48,11 +48,7 @@ namespace Windows.UI.Xaml.Controls
             Debug.Assert(viewer != null, "viewer should not be null!");
 
             offset += viewer.VerticalOffset;
-#if WORKINPROGRESS
             offset = Math.Max(Math.Min(offset, viewer.ExtentHeight), 0);
-#else
-            offset = Math.Max(Math.Min(offset, 0), 0);
-#endif
             viewer.ScrollToVerticalOffset(offset);
         }
 
@@ -66,11 +62,7 @@ namespace Windows.UI.Xaml.Controls
             Debug.Assert(viewer != null, "viewer should not be null!");
 
             offset += viewer.HorizontalOffset;
-#if WORKINPROGRESS
             offset = Math.Max(Math.Min(offset, viewer.ExtentWidth), 0);
-#else
-            offset = Math.Max(Math.Min(offset, 0), 0);
-#endif
             viewer.ScrollToHorizontalOffset(offset);
         }
 
@@ -121,11 +113,7 @@ namespace Windows.UI.Xaml.Controls
         public static void PageUp(this ScrollViewer viewer)
         {
             Debug.Assert(viewer != null, "viewer should not be null!");
-#if WORKINPROGRESS
             ScrollByVerticalOffset(viewer, -viewer.ViewportHeight);
-#else
-            ScrollByVerticalOffset(viewer, -0);
-#endif
         }
 
         /// <summary>
@@ -135,11 +123,7 @@ namespace Windows.UI.Xaml.Controls
         public static void PageDown(this ScrollViewer viewer)
         {
             Debug.Assert(viewer != null, "viewer should not be null!");
-#if WORKINPROGRESS
             ScrollByVerticalOffset(viewer, viewer.ViewportHeight);
-#else
-            ScrollByVerticalOffset(viewer, 0);
-#endif
         }
 
         /// <summary>
@@ -149,11 +133,7 @@ namespace Windows.UI.Xaml.Controls
         public static void PageLeft(this ScrollViewer viewer)
         {
             Debug.Assert(viewer != null, "viewer should not be null!");
-#if WORKINPROGRESS
             ScrollByHorizontalOffset(viewer, -viewer.ViewportWidth);
-#else
-            ScrollByHorizontalOffset(viewer, -0);
-#endif
         }
 
         /// <summary>
@@ -163,11 +143,7 @@ namespace Windows.UI.Xaml.Controls
         public static void PageRight(this ScrollViewer viewer)
         {
             Debug.Assert(viewer != null, "viewer should not be null!");
-#if WORKINPROGRESS
             ScrollByHorizontalOffset(viewer, viewer.ViewportWidth);
-#else
-            ScrollByHorizontalOffset(viewer, 0);
-#endif
         }
 
         /// <summary>
@@ -187,11 +163,7 @@ namespace Windows.UI.Xaml.Controls
         public static void ScrollToBottom(this ScrollViewer viewer)
         {
             Debug.Assert(viewer != null, "viewer should not be null!");
-#if WORKINPROGRESS
             viewer.ScrollToVerticalOffset(viewer.ExtentHeight);
-#else
-            viewer.ScrollToVerticalOffset(0);
-#endif
         }
 
         /// <summary>

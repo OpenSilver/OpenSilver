@@ -31,7 +31,6 @@ namespace System.ComponentModel.Composition.Hosting
             this.Initialize();
         }
 
-#if WORKINPROGRESS
         /// <summary>
         /// Initializes a new instance of the <see cref="DeploymentCatalog"/>
         /// class using the XAP file at the specified relative URI.
@@ -53,7 +52,6 @@ namespace System.ComponentModel.Composition.Hosting
         {
             this._uri = uri;
         }
-#endif
 
         /// <summary>
         /// Gets all the parts contained in the catalog.

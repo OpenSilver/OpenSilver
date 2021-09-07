@@ -18,7 +18,6 @@ using System.Collections.Generic;
 
 namespace System.Windows.Browser
 {
-#if WORKINPROGRESS
 	[OpenSilver.NotImplemented]
     public sealed partial class ScriptObjectCollection : ScriptObject, IEnumerable<ScriptObject>, IEnumerable
     {
@@ -60,5 +59,4 @@ namespace System.Windows.Browser
         #endregion
 
     }
-#endif
 }

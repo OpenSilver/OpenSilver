@@ -550,7 +550,6 @@ namespace Windows.UI.Xaml.Controls
             private set { this.SetValue(SelectionBoxItemTemplateProperty, value); }
         }
 
-#if WORKINPROGRESS
         /// <summary>
         /// Identifies the <see cref="ComboBox.IsSelectionBoxHighlighted"/> dependency property.
         /// </summary>
@@ -570,6 +569,5 @@ namespace Windows.UI.Xaml.Controls
             get { return (bool)this.GetValue(IsSelectionBoxHighlightedProperty); }
             private set { this.SetValue(IsSelectionBoxHighlightedProperty, value); }
         }
-#endif
     }
 }

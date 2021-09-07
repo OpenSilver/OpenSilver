@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows.Automation
 #else
@@ -23,4 +22,3 @@ namespace Windows.UI.Xaml.Automation
 		public static readonly AutomationProperty ExpandCollapseStateProperty;
 	}
 }
-#endif

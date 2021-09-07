@@ -25,7 +25,6 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-#if WORKINPROGRESS
 	//
 	// Summary:
 	//     Provides data for the System.Windows.UIElement.TextInput routed event.
@@ -61,5 +60,4 @@ namespace Windows.UI.Xaml.Input
         [OpenSilver.NotImplemented]
 		public TextComposition TextComposition { get; }
 	}
-#endif
 }

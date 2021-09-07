@@ -297,19 +297,11 @@ namespace Windows.UI.Xaml
         {
             get
             {
-#if WORKINPROGRESS
                 return Window.Current.Content;
-#else
-                return (Window.Current.Content as UIElement);
-#endif
             }
             set
             {
-#if WORKINPROGRESS
                 Window.Current.Content = value as FrameworkElement;
-#else
-                Window.Current.Content = value;
-#endif
             }
         }
 

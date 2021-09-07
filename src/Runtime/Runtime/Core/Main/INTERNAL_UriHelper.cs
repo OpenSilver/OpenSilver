@@ -448,8 +448,6 @@ namespace CSHTML5.Internal
         }
 //#endif
 
-
-#if WORKINPROGRESS
         public static Uri EnsureAbsoluteUri(string uriString)
         {
             if (uriString.ToLower().StartsWith("http://") || uriString.ToLower().StartsWith("https://"))
@@ -503,7 +501,6 @@ namespace CSHTML5.Internal
                 }
             }
         }
-#endif
 
         public static string GetJavaScriptCallingAssembly()
         {

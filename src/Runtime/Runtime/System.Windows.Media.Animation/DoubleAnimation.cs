@@ -39,7 +39,6 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public partial class DoubleAnimation : AnimationTimeline
     {
-#if WORKINPROGRESS
         public IEasingFunction EasingFunction
         {
             get { return (EasingFunctionBase)GetValue(EasingFunctionProperty); }
@@ -50,22 +49,6 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Identifies the EasingFunction dependency property.
         /// </summary>
         public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(IEasingFunction), typeof(DoubleAnimation), new PropertyMetadata(null));
-#else
-        /// <summary>
-        /// Gets or sets the easing function applied to this animation.
-        /// </summary>
-        public EasingFunctionBase EasingFunction
-        {
-            get { return (EasingFunctionBase)GetValue(EasingFunctionProperty); }
-            set { SetValue(EasingFunctionProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the EasingFunction dependency property.
-        /// </summary>
-        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register("EasingFunction", typeof(EasingFunctionBase), typeof(DoubleAnimation), new PropertyMetadata(null));
-
-#endif
 
         /// <summary>
         /// Gets or sets the animation's starting value.
@@ -278,7 +261,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ByProperty = DependencyProperty.Register("By", typeof(double?), typeof(DoubleAnimation), null);
         [OpenSilver.NotImplemented]
@@ -287,6 +269,5 @@ namespace Windows.UI.Xaml.Media.Animation
             get { return (double?)this.GetValue(ByProperty); }
             set { this.SetValue(ByProperty, value); }
         }
-#endif
     }
 }

@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using System;
 using System.ComponentModel;
 using OpenSilver.Tests;
@@ -136,5 +134,3 @@ namespace Windows.UI.Xaml.Media.Tests
         }
     }
 }
-
-#endif

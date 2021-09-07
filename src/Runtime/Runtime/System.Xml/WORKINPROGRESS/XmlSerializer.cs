@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-using System.IO;
+﻿using System.IO;
 
 namespace System.Xml.Serialization
 {
@@ -42,5 +40,3 @@ namespace System.Xml.Serialization
         }
     }
 }
-
-#endif

@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 
 namespace System.Windows.Media
@@ -21,5 +19,4 @@ namespace System.Windows.Media
 	}
 }
 
-#endif
 #endif

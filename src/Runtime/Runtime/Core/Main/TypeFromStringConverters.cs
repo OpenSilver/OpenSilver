@@ -91,18 +91,12 @@ namespace DotNetForHtml5.Core
                 return converter.ConvertFromInvariantString(s);
             }
 
-#if WORKINPROGRESS
             if (type.IsValueType)
             {
                 return Activator.CreateInstance(type);
             }
 
             return null;
-#else
-            throw new Exception(
-                $"Unable to find a converter from '{typeof(string)}' to '{type}'."
-            );
-#endif
         }
     }
 }

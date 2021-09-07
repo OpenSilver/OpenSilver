@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Collections.Generic;
 
 #if MIGRATION
@@ -29,4 +28,3 @@ namespace Windows.UI.Xaml
 		}
 	}
 }
-#endif

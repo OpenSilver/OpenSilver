@@ -33,7 +33,7 @@ namespace System.ServiceModel
     /// by client applications.
     /// </summary>
     public partial interface IClientChannel : IDisposable
-#if WORKINPROGRESS && !CSHTML5BLAZOR
+#if BRIDGE
         , IChannel
 #endif
 #if UNIMPLEMENTED_MEMBERS

@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows
 #else
@@ -41,4 +38,3 @@ namespace Windows.UI.Xaml
         Maximized = 2
     }
 }
-#endif

@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 namespace System.Windows.Media.Effects
 {
     public enum SamplingMode
@@ -8,4 +7,3 @@ namespace System.Windows.Media.Effects
         Bilinear = 2
     }
 }
-#endif

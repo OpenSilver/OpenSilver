@@ -29,7 +29,6 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-#if WORKINPROGRESS
     [ContentProperty("Children")]
     [OpenSilver.NotImplemented]
     public sealed partial class GeometryGroup : Geometry
@@ -134,5 +133,4 @@ namespace Windows.UI.Xaml.Media
                 typeof(GeometryGroup), 
                 null);
     }
-#endif
 }

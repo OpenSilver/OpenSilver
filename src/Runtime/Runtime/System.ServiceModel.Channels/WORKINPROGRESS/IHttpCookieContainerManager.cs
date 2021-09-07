@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-using System.Net;
+﻿using System.Net;
 
 namespace System.ServiceModel.Channels
 {
@@ -21,5 +19,3 @@ namespace System.ServiceModel.Channels
         CookieContainer CookieContainer { get; set; }
     }
 }
-
-#endif

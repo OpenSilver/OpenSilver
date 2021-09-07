@@ -29,9 +29,6 @@ namespace Windows.UI.Xaml.Media.Animation
                                                                                                         typeof(EasingDoubleKeyFrame),
                                                                                                         new PropertyMetadata(null));
 
-        
-
-#if WORKINPROGRESS
         public IEasingFunction EasingFunction
         {
             get
@@ -43,22 +40,6 @@ namespace Windows.UI.Xaml.Media.Animation
                 SetValue(EasingFunctionProperty, value);
             }
         }
-#else
-        /// <summary>
-        /// EasingFunction
-        /// </summary>
-        public EasingFunctionBase EasingFunction
-        {
-            get
-            {
-                return (EasingFunctionBase)GetValue(EasingFunctionProperty);
-            }
-            set
-            {
-                SetValue(EasingFunctionProperty, value);
-            }
-        }
-#endif
 
         internal override EasingFunctionBase INTERNAL_GetEasingFunction()
         {

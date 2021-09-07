@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 using System.Security;
 
 namespace System.Windows.Browser
@@ -44,5 +42,3 @@ namespace System.Windows.Browser
 		}
 	}
 }
-
-#endif

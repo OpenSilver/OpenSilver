@@ -21,7 +21,6 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>
     /// This class is used as part of a ColorKeyFrameCollection in
     /// conjunction with a KeyFrameColorAnimation to animate a
@@ -51,5 +50,4 @@ namespace Windows.UI.Xaml.Media.Animation
             set => SetValue(KeySplineProperty, value);
         }
     }
-#endif
 }

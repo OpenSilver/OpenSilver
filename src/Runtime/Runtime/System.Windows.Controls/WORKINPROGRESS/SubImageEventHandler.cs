@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Controls
 {
@@ -16,5 +14,4 @@ namespace System.Windows.Controls
 	//     The event data.
 	public delegate void SubImageEventHandler(object sender, SubImageRoutedEventArgs e);
 }
-#endif
 #endif

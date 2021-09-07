@@ -47,13 +47,11 @@ namespace System.Windows
             }
         }
 
-#if WORKINPROGRESS
 		[OpenSilver.NotImplemented]
         public OutOfBrowserSettings OutOfBrowserSettings { get; private set; }
 
 		[OpenSilver.NotImplemented]
         public AssemblyPartCollection Parts { get; private set; }
-#endif
 
         #region not implemented
 

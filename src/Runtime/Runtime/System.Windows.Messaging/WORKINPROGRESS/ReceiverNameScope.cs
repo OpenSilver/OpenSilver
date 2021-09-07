@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 namespace System.Windows.Messaging
 {
 	//
@@ -18,5 +16,3 @@ namespace System.Windows.Messaging
 		Global = 1
 	}
 }
-
-#endif

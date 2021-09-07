@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using System;
 
 #if MIGRATION
@@ -375,4 +373,3 @@ namespace Windows.UI.Xaml.Media
         #endregion Dependency Properties
     }
 }
-#endif

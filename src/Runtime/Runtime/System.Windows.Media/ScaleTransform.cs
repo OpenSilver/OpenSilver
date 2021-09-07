@@ -175,18 +175,11 @@ namespace Windows.UI.Xaml.Media
             get
             {
                 Matrix m = new Matrix();
-
-#if WORKINPROGRESS
                 m.ScaleAt(ScaleX, ScaleY, CenterX, CenterY);
-#else
-                m.ScaleAt(ScaleX, ScaleY, 0.0, 0.0);
-#endif
-
                 return m;
             }
         }
 
-#if WORKINPROGRESS
         /// <summary>
         /// Identifies the <see cref="ScaleTransform.CenterX"/> dependency property.
         /// </summary>
@@ -230,6 +223,5 @@ namespace Windows.UI.Xaml.Media
             get { return (double)this.GetValue(CenterYProperty); }
             set { this.SetValue(CenterYProperty, value); }
         }
-#endif
     }
 }

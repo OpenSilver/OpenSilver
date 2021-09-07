@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-#if MIGRATION
+﻿#if MIGRATION
 namespace System.Windows.Media.Animation
 #else
 namespace Windows.UI.Xaml.Media.Animation
@@ -71,5 +69,3 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
     }
 }
-
-#endif

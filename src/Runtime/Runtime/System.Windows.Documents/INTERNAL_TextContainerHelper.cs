@@ -40,7 +40,6 @@ namespace Windows.UI.Xaml.Documents
             {
                 container = new INTERNAL_TextContainerSpan((Span)parent);
             }
-#if WORKINPROGRESS
             else if (parent is RichTextBlock)
             {
                 container = new INTERNAL_TextContainerRichTextBlock((RichTextBlock)parent);
@@ -53,7 +52,6 @@ namespace Windows.UI.Xaml.Documents
             {
                 container = new INTERNAL_TextContainerSection((Section)parent);
             }
-#endif
             return container;
         }
     }

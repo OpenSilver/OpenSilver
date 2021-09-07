@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.UI.Xaml;
 #endif
@@ -21,5 +19,3 @@ namespace System.Windows.Interactivity
 		protected sealed override Type AssociatedObjectTypeConstraint { get; }
 	}
 }
-
-#endif

@@ -9,7 +9,6 @@ namespace System.Resources
 {
 #if BRIDGE
 
-    //#if WORKINPROGRESS
     /// <summary>
     /// Provides convenient access to culture-specific resources at run time.
     /// </summary>
@@ -426,7 +425,5 @@ namespace System.Resources
         //protected virtual ResourceSet InternalGetResourceSet(CultureInfo culture, bool createIfNotExists, bool tryParents);
         #endregion
     }
-    //#endif
-
 #endif
 }

@@ -290,7 +290,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 #endif
-#if WORKINPROGRESS
         private static Orientation GetDockOrientation(Dock dock)
         {
             return dock == Dock.Left || dock == Dock.Right ? Orientation.Horizontal : Orientation.Vertical;
@@ -382,6 +381,5 @@ namespace Windows.UI.Xaml.Controls
 
             return finalSize;
         }
-#endif
     }
 }

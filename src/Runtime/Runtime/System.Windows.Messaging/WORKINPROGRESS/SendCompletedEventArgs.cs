@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace System.Windows.Messaging
 {
@@ -59,4 +57,3 @@ namespace System.Windows.Messaging
         public string Response { get; }
     }
 }
-#endif

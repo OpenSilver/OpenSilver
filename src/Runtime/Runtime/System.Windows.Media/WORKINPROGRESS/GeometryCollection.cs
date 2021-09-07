@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -68,5 +66,3 @@ namespace Windows.UI.Xaml.Media
         }
     }
 }
-
-#endif

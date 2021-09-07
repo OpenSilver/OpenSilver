@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Input
 #else
@@ -40,5 +37,3 @@ namespace Windows.UI.Xaml.Input
         Touch = 2
     }
 }
-
-#endif

@@ -26,7 +26,6 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-#if WORKINPROGRESS
     [OpenSilver.NotImplemented]
 #if MIGRATION
     public partial class MouseWheelEventArgs : MouseEventArgs
@@ -37,5 +36,4 @@ namespace Windows.UI.Xaml.Input
         [OpenSilver.NotImplemented]
         public int Delta { get; private set; }
     }
-#endif
 }

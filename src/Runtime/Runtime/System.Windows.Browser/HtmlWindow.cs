@@ -36,11 +36,7 @@ using Windows.UI.Xaml;
 
 namespace System.Windows.Browser
 {
-#if WORKINPROGRESS
     public sealed partial class HtmlWindow : HtmlObject
-#else
-    public sealed partial class HtmlWindow
-#endif
     {
         public HtmlWindow()
         {
@@ -102,9 +98,7 @@ namespace System.Windows.Browser
             return CSHTML5.Interop.ExecuteJavaScript(string.Format("eval(\"{0}\")", code)); //Note: this probably doesn't work on multiline code 
         }
 
-#if WORKINPROGRESS
 		[OpenSilver.NotImplemented]
         public string CurrentBookmark { get; set; }
-#endif
     }
 }

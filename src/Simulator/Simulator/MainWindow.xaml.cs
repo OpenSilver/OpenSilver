@@ -977,6 +977,7 @@ Click OK to continue.";
                 InteropHelpers.InjectDOMDocument(MainWebBrowser.Browser.GetDocument(), _coreAssembly);
                 InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
                 InteropHelpers.InjectWebControlDispatcherBeginInvoke(MainWebBrowser, _coreAssembly);
+                InteropHelpers.InjectWebControlDispatcherInvoke(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
                 InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
                 InteropHelpers.InjectWebClientFactory(_coreAssembly);
@@ -1036,6 +1037,7 @@ Click OK to continue.";
                         InteropHelpers.InjectDOMDocument(MainWebBrowser.Browser.GetDocument(), _coreAssembly);
                         InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
                         InteropHelpers.InjectWebControlDispatcherBeginInvoke(MainWebBrowser, _coreAssembly);
+                        InteropHelpers.InjectWebControlDispatcherInvoke(MainWebBrowser, _coreAssembly);
                         InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
                         InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
                         InteropHelpers.InjectWebClientFactory(_coreAssembly);

@@ -262,7 +262,6 @@ namespace Windows.UI.Xaml.Controls
             }
 #endif
         }
-#if WORKINPROGRESS
 #region Not supported yet
 
         [OpenSilver.NotImplemented]
@@ -276,6 +275,5 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #endregion
-#endif
     }
 }

@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System;
 
 #if MIGRATION
@@ -76,4 +73,3 @@ namespace Windows.UI.Xaml.Controls
         #endregion public ClickMode PopupButtonMode
     }
 }
-#endif

@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 namespace System.Windows.Messaging
 {
 	//
@@ -58,5 +56,3 @@ namespace System.Windows.Messaging
 		public string SenderDomain { get; }
 	}
 }
-
-#endif

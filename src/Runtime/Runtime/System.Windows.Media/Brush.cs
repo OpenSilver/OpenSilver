@@ -130,7 +130,6 @@ namespace Windows.UI.Xaml.Media
             return result;
         }
 
-#if WORKINPROGRESS
         #region Transform, RelativeTransform (Not supported yet)
         /// <summary>Identifies the <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property. </summary>
         /// <returns>The <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property identifier.</returns>
@@ -159,6 +158,5 @@ namespace Windows.UI.Xaml.Media
             set { SetValue(TransformProperty, value); }
         }
         #endregion
-#endif
     }
 }

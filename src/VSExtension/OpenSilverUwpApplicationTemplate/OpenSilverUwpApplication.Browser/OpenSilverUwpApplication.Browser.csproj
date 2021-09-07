@@ -15,6 +15,10 @@
     <PackageReference Include="$ext_opensilverpackagename$" Version="$ext_opensilverpackageversion$" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <DisableImplicitNamespaceImports>True</DisableImplicitNamespaceImports>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\$ext_safeprojectname$\$ext_safeprojectname$.csproj" />
   </ItemGroup>

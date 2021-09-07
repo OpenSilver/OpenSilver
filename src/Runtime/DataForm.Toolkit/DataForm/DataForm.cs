@@ -21,7 +21,7 @@ using System.Reflection;
 using System.Windows.Markup;
 
 #if MIGRATION
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 using System.Windows.Automation.Peers;
 #endif
 using System.Windows.Controls.Common;
@@ -30,7 +30,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 #else
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 using Windows.UI.Xaml.Automation.Peers;
 #endif
 using Windows.UI.Xaml.Controls.Common;
@@ -3008,10 +3008,8 @@ namespace Windows.UI.Xaml.Controls
                                         {
                                             this._editingElements.Add(datePicker);
                                         }
-#if WORKINPROGRESS
                                         datePicker.CalendarOpened -= new RoutedEventHandler(this.OnDatePickerCalendarOpened);
                                         datePicker.CalendarOpened += new RoutedEventHandler(this.OnDatePickerCalendarOpened);
-#endif
                                     }
                                 }
                             }
@@ -3190,7 +3188,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
         /// <summary>
         /// Returns an automation peer for this DataForm.
         /// </summary>
@@ -3430,7 +3428,7 @@ namespace Windows.UI.Xaml.Controls
                 return false;
             }
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
             FrameworkElementAutomationPeer elementPeer = FrameworkElementAutomationPeer.CreatePeerForElement(element) as FrameworkElementAutomationPeer;
 
             if (elementPeer != null)
@@ -3695,9 +3693,7 @@ namespace Windows.UI.Xaml.Controls
                     DatePicker datePicker = editingElement as DatePicker;
                     if (datePicker != null)
                     {
-#if WORKINPROGRESS
                         datePicker.CalendarOpened -= new RoutedEventHandler(this.OnDatePickerCalendarOpened);
-#endif
                     }
                 }
             }
@@ -5252,19 +5248,11 @@ namespace Windows.UI.Xaml.Controls
                             propertyInfo != null ? propertyInfo.PropertyType : null,
                             bindingExpression.ParentBinding.Converter,
                             bindingExpression.ParentBinding.ConverterParameter,
-#if WORKINPROGRESS
 #if MIGRATION
                             bindingExpression.ParentBinding.ConverterCulture ?? (textBox.Language != null ? new CultureInfo(textBox.Language.IetfLanguageTag) : CultureInfo.CurrentCulture));
 #else
                             bindingExpression.ParentBinding.ConverterLanguage != null ? new CultureInfo(bindingExpression.ParentBinding.ConverterLanguage) :
                                 (textBox.Language != null ? new CultureInfo(textBox.Language.IetfLanguageTag) : CultureInfo.CurrentCulture));
-#endif
-#else
-#if MIGRATION
-                            bindingExpression.ParentBinding.ConverterCulture ?? CultureInfo.CurrentCulture);
-#else
-                            bindingExpression.ParentBinding.ConverterLanguage != null ? new CultureInfo(bindingExpression.ParentBinding.ConverterLanguage) : CultureInfo.CurrentCulture);
-#endif
 #endif
                     }
                 }

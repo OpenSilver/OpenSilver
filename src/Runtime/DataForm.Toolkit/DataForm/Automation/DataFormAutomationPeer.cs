@@ -7,8 +7,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if WORKINPROGRESS
-
 #if MIGRATION
 using System.Windows.Controls;
 #else
@@ -82,5 +80,3 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
     }
 }
-
-#endif

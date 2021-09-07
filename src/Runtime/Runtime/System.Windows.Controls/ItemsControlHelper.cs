@@ -219,11 +219,7 @@ namespace Windows.UI.Xaml.Controls
             // Scroll vertically
             double verticalOffset = scrollHost.VerticalOffset;
             double verticalDelta = 0;
-#if WORKINPROGRESS
             double hostBottom = scrollHost.ViewportHeight;
-#else
-            double hostBottom = 0;
-#endif
             double itemBottom = itemRect.Bottom;
             if (hostBottom < itemBottom)
             {
@@ -240,11 +236,7 @@ namespace Windows.UI.Xaml.Controls
             // Scroll horizontally
             double horizontalOffset = scrollHost.HorizontalOffset;
             double horizontalDelta = 0;
-#if WORKINPROGRESS
             double hostRight = scrollHost.ViewportWidth;
-#else
-            double hostRight = 0;
-#endif
             double itemRight = itemRect.Right;
             if (hostRight < itemRight)
             {

@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System.Runtime.CompilerServices;
 
 #if MIGRATION
@@ -37,5 +34,3 @@ namespace Windows.UI.Xaml.Navigation
     //[TypeForwardedFrom("System.Windows.Controls.Navigation, Version=2.0.5.0, Culture=Neutral, PublicKeyToken=31bf3856ad364e35")]
     public delegate void NavigatingCancelEventHandler(object sender, NavigatingCancelEventArgs e);
 }
-
-#endif

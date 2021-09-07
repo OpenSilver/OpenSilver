@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CSHTML5.Internal;
 
 #if MIGRATION
@@ -137,5 +135,3 @@ namespace Windows.UI.Xaml
 #endif
     }
 }
-
-#endif

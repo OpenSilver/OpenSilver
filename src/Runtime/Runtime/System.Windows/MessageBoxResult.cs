@@ -38,7 +38,6 @@ namespace Windows.UI.Xaml
         /// The user clicked the Cancel button or pressed ESC.
         /// </summary>
         Cancel = 2,
-#if WORKINPROGRESS
         /// <summary>
         /// The dialog box return value is
         /// Yes (usually sent from a button labeled Yes).
@@ -51,6 +50,5 @@ namespace Windows.UI.Xaml
         /// </summary>
         [OpenSilver.NotImplemented]
         No,
-#endif
     }
 }

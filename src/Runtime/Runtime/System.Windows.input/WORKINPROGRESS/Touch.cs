@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System;
 
 #if MIGRATION
@@ -14,4 +13,3 @@ namespace Windows.UI.Xaml.Input
 		public static event TouchFrameEventHandler FrameReported;
 	}
 }
-#endif

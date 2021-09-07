@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 using System.Windows;
 
 #if MIGRATION
@@ -40,5 +38,3 @@ namespace Windows.UI.Xaml.Controls
 		}
 	}
 }
-
-#endif

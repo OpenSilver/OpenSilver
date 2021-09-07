@@ -1,5 +1,4 @@
-﻿#if WORKINPROGRESS
-#if MIGRATION
+﻿#if MIGRATION
 
 namespace System.ServiceModel.Channels
 {
@@ -9,5 +8,4 @@ namespace System.ServiceModel.Channels
     }
 }
 
-#endif
 #endif

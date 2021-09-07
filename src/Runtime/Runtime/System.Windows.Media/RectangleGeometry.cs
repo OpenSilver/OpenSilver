@@ -80,7 +80,6 @@ namespace Windows.UI.Xaml.Media
                 typeof(RectangleGeometry), 
                 new PropertyMetadata(Rect.Empty));
 
-#if WORKINPROGRESS
         /// <summary>
         /// Gets or sets the x-radius of the ellipse that is used to round the corners of
         /// the rectangle.
@@ -134,6 +133,5 @@ namespace Windows.UI.Xaml.Media
                 typeof(double),
                 typeof(RectangleGeometry),
                 new PropertyMetadata(0d));
-#endif
     }
 }

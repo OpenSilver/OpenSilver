@@ -1692,7 +1692,6 @@ element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
 
 #endregion
 
-#if WORKINPROGRESS
 #region SelectionBackground
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectionBackgroundProperty = DependencyProperty.Register("SelectionBackground", typeof(Brush), typeof(TextBox), null);
@@ -1710,7 +1709,6 @@ element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
 
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
-#endif
 
         protected override Size MeasureOverride(Size availableSize)
         {

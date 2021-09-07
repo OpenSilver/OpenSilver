@@ -23,7 +23,6 @@ using System.IO;
 
 namespace System.Net
 {
-#if WORKINPROGRESS
     public partial class OpenWriteCompletedEventArgs //: AsyncCompletedEventArgs
     {
         #region Not supported yet
@@ -42,5 +41,4 @@ namespace System.Net
         }
         #endregion
     }
-#endif
 }

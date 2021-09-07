@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -42,5 +39,3 @@ namespace Windows.UI.Xaml
         public bool Handled { get; set; }
     }
 }
-
-#endif

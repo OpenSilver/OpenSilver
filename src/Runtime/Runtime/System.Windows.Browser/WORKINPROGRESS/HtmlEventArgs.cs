@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 
 namespace System.Windows.Browser
 {
-#if WORKINPROGRESS
 	[OpenSilver.NotImplemented]
     public partial class HtmlEventArgs : EventArgs
     {
@@ -73,5 +72,4 @@ namespace System.Windows.Browser
         }
         #endregion
     }
-#endif
 }

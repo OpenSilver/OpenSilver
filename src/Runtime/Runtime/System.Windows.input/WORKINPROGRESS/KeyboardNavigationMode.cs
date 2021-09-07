@@ -21,7 +21,6 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-#if WORKINPROGRESS
     // Summary:
     //     Specifies the tabbing behavior across tab stops for a Silverlight tabbing
     //     sequence within a container.
@@ -41,5 +40,4 @@ namespace Windows.UI.Xaml.Input
         //     once.
         Once = 2,
     }
-#endif
 }

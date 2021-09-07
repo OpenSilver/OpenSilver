@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-#if MIGRATION
+﻿#if MIGRATION
 namespace System.Windows
 #else
 namespace Windows.UI.Xaml
@@ -22,4 +20,3 @@ namespace Windows.UI.Xaml
 		Third
 	}
 }
-#endif

@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 using System.Windows.Media;
 #else
@@ -94,4 +92,3 @@ namespace Windows.UI.Xaml.Shapes
 		}
 	}
 }
-#endif

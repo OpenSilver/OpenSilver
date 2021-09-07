@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Automation.Text
 #else
@@ -21,4 +19,3 @@ namespace Windows.UI.Xaml.Automation.Text
         End = 1
     }
 }
-#endif

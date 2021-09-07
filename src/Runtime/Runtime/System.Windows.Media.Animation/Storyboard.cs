@@ -188,10 +188,8 @@ namespace Windows.UI.Xaml.Media.Animation
             // Note: we use a Dispatcher in order to ensure that the page is fully loaded when starting the animation.
             .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
             {
-#if WORKINPROGRESS
                 try
                 {
-#endif
                     if (!this._isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
                     {
                         Guid guid = Guid.NewGuid();
@@ -210,13 +208,11 @@ namespace Windows.UI.Xaml.Media.Animation
 
                         StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
                     }
-#if WORKINPROGRESS
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
                 }
-#endif
             });
         }
 
@@ -455,7 +451,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public ClockState GetCurrentState()
         {
@@ -488,8 +483,6 @@ namespace Windows.UI.Xaml.Media.Animation
         {
 
         }
-#endif
-
     }
 
     /// <summary>

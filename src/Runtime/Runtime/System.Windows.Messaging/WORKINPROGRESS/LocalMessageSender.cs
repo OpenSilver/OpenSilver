@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-namespace System.Windows.Messaging
+﻿namespace System.Windows.Messaging
 {
     /// <summary>
     /// Represents the sending end of a local messaging channel between two Silverlight-based
@@ -129,4 +127,3 @@ namespace System.Windows.Messaging
         }
     }
 }
-#endif

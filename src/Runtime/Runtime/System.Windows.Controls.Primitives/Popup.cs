@@ -693,13 +693,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 Canvas.SetZIndex(_popupRoot, ++_currentZIndex);
             }
         }
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public void SetWindow(Window associatedWindow)
         {
 
         }
-#endif
         protected override Size MeasureOverride(Size availableSize)
         {
             return new Size();

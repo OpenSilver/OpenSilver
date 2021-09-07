@@ -12,16 +12,11 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5;
 using System;
 
 #if MIGRATION
-#if WORKINPROGRESS
 namespace System.Windows.Interop
-#else
-namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
-#endif
 #else
 namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
 #endif
@@ -160,8 +155,6 @@ if (requestMethod) {
             this.Resized?.Invoke(this, EventArgs.Empty);
         }
 
-#if WORKINPROGRESS
-
         // Summary:
         //     Gets or sets a value that indicates the behavior of full-screen mode.
         //
@@ -174,6 +167,5 @@ if (requestMethod) {
         /// </summary>
         [OpenSilver.NotImplemented]
         public event EventHandler Zoomed;
-#endif
     }
 }

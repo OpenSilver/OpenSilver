@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 using System.Windows;
 using System;
@@ -50,5 +49,4 @@ namespace System.Windows.Media.Effects
 
     }
 }
-#endif
 #endif

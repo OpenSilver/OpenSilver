@@ -1128,8 +1128,6 @@ context.restore();
 
         #endregion
 
-#if WORKINPROGRESS
-
         /// <summary>
         /// Gets or sets a PenLineCap enumeration value that specifies how the ends of
         /// a dash are drawn.
@@ -1154,7 +1152,6 @@ context.restore();
                 typeof(PenLineCap), 
                 typeof(Shape), 
                 new PropertyMetadata(PenLineCap.Flat));
-#endif
 
         protected override Size MeasureOverride(Size availableSize)
         {

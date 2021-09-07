@@ -211,7 +211,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event RoutedEventHandler Opened;
 
-#if WORKINPROGRESS
 #region Not supported yet
         /// <summary>Gets or sets the visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />.</summary>
         /// <returns>The visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />. The default is null.</returns>
@@ -254,7 +253,6 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), null);
 #endregion
-#endif
 
         //-----------------------
         // HORIZONTALOFFSET

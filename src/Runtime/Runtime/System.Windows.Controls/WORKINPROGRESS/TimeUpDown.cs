@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System;
 using System.Globalization;
 
@@ -316,4 +313,3 @@ namespace Windows.UI.Xaml.Controls
 
     }
 }
-#endif

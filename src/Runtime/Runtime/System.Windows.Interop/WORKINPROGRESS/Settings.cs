@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System;
 
 #if MIGRATION
@@ -43,4 +42,3 @@ namespace Windows.UI.Xaml.Interop
 		}
 	}
 }
-#endif

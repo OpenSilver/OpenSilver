@@ -273,7 +273,6 @@ namespace Windows.UI.Xaml
 
 #if RECURSIVE_CONSTRUCTION_FIXED
 #else
-#if WORKINPROGRESS
         /// <summary>
         /// Gets or sets the content of the Window.
         /// </summary>
@@ -294,28 +293,6 @@ namespace Windows.UI.Xaml
             var window = (Window)d;
             window.OnContentChanged(e.OldValue, e.NewValue);
         }
-#else
-        /// <summary>
-        /// Gets or sets the content of the Window.
-        /// </summary>
-        public object Content
-        {
-            get { return (object)GetValue(ContentProperty); }
-            set { SetValue(ContentProperty, value); }
-        }
-        /// <summary>
-        /// Identifies the Content dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(object), typeof(Window), new PropertyMetadata(null, Content_Changed)
-        { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        static internal void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var window = (Window)d;
-            window.OnContentChanged(e.OldValue, e.NewValue);
-        }
-#endif
 #endif
 
 #if RECURSIVE_CONSTRUCTION_FIXED
@@ -444,7 +421,6 @@ namespace Windows.UI.Xaml
 
         #endregion
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public bool IsActive { get; private set; }
         [OpenSilver.NotImplemented]
@@ -479,7 +455,7 @@ namespace Windows.UI.Xaml
         {
 
         }
-#endif
+
         private void CalculateWindowLayout()
         {
             if (Current.INTERNAL_VisualChildrenInformation == null)

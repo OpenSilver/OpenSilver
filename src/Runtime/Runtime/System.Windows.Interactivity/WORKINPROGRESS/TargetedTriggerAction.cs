@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.UI.Xaml;
 #endif
@@ -54,5 +52,3 @@ namespace System.Windows.Interactivity
 		}
 	}
 }
-
-#endif

@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 using System.IO;
 using System.Security;
 
@@ -102,5 +100,3 @@ namespace Windows.UI.Xaml.Controls
         }
     }
 }
-
-#endif

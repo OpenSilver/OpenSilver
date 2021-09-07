@@ -13,8 +13,6 @@
 \*====================================================================================*/
 
 
-#if WORKINPROGRESS
-
 namespace System.IO.IsolatedStorage
 {
     public sealed partial class IsolatedStorageSettings
@@ -26,5 +24,3 @@ namespace System.IO.IsolatedStorage
         }
     }
 }
-
-#endif

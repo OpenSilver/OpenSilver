@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 using System.Collections.Generic;
 
@@ -121,5 +119,4 @@ namespace System.Windows.Media
 		}
 	}
 }
-#endif
 #endif

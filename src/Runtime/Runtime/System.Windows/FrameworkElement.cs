@@ -816,8 +816,14 @@ namespace Windows.UI.Xaml
 
 #endregion
 
+        public event EventHandler LayoutUpdated;
+
+        protected override void OnLayoutUpdated()
+        {
+            LayoutUpdated?.Invoke(this, new EventArgs());
+        }
+
 #region Work in progress
-#if WORKINPROGRESS
 #region Triggers
 
         [OpenSilver.NotImplemented]
@@ -838,9 +844,6 @@ namespace Windows.UI.Xaml
                 new PropertyMetadata(new TriggerCollection()));
 
 #endregion
-
-        [OpenSilver.NotImplemented]
-        public event EventHandler LayoutUpdated;
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FlowDirectionProperty =
@@ -887,7 +890,6 @@ namespace Windows.UI.Xaml
             set { this.SetValue(LanguageProperty, value); }
         }
 
-#endif
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             // Skip when loading or changed on TextMeasurement Div.

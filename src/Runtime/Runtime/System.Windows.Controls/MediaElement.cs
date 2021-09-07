@@ -926,11 +926,9 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public event RoutedEventHandler MediaOpened;
         [OpenSilver.NotImplemented]
         public event EventHandler<ExceptionRoutedEventArgs> MediaFailed;
-#endif
     }
 }

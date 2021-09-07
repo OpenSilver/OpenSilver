@@ -3,8 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-#if WORKINPROGRESS
-
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -649,4 +647,3 @@ namespace Windows.UI.Xaml.Controls
 //#endif
     }
 }
-#endif

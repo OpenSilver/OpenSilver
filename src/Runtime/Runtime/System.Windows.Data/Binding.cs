@@ -208,29 +208,9 @@ namespace Windows.UI.Xaml.Data
 
         internal Binding Clone()
         {
-#if WORKINPROGRESS
             Binding b = new Binding();
             this.CopyTo(b);
             return b;
-#else
-            Binding b =  new Binding(Path.Path);
-            b.Converter = Converter;
-#if MIGRATION
-            b.ConverterCulture = ConverterCulture;
-#else
-            b.ConverterLanguage = ConverterLanguage;
-#endif
-            b.ConverterParameter = ConverterParameter;
-            b.ElementName = ElementName; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
-            b._mode = _mode;
-            b._wasModeSetByUserRatherThanDefaultValue = _wasModeSetByUserRatherThanDefaultValue;
-            b.RelativeSource = RelativeSource; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
-            b.Source = Source;
-            b.UpdateSourceTrigger = UpdateSourceTrigger;
-            b.StringFormat = StringFormat;
-            b._isInStyle = _isInStyle;
-            return b;
-#endif
         }
 
         private void CopyTo(Binding target)

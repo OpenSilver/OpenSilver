@@ -289,11 +289,9 @@ namespace CSHTML5.Internal
         /// <param name="action">The action to execute before flushing the pending JS code.</param>
         public static void RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(Action action)
         {
-#if WORKINPROGRESS
             try
             { 
-#endif
-            if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
+                if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
                 {
                     //-----------------------------
                     // This means that we have already planned an auto-flush, so we do
@@ -318,14 +316,12 @@ namespace CSHTML5.Internal
                     // After the action has finished execution, let's flush all the pending JavaScript calls if any:
                     ExecutePendingJavaScriptCode("AUTO-FLUSH");
                 }
-#if WORKINPROGRESS
             }
             catch (Exception e)
             {
                 Application.Current.OnUnhandledException(e, false);
             } 
-#endif
         }
 #endif
     }
-        }
+}
