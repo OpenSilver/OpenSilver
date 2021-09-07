@@ -78,7 +78,7 @@
   <!--============================================================
   Add the Compilation directive "OPENSILVER":
   ============================================================-->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
     <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
   </PropertyGroup>
   
