@@ -65,6 +65,13 @@ namespace DotNetForHtml5.Core
         }
         // internal static dynamic WebControlDispatcherBeginInvoke => webControl;
 
+        // Invoke of the WebControl's Dispatcher
+        public static Action<Action, TimeSpan> WebControlDispatcherInvoke
+        {
+            set;
+            internal get;
+        }
+
 #if CSHTML5NETSTANDARD
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler 
         { 

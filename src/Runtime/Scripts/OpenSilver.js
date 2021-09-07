@@ -62,7 +62,7 @@ document.getElementsByTagName('head')[0].appendChild(velocityScript);
 
 window.onCallBack = (function() {
 	const opensilver = "OpenSilver";
-	const opensilver_js_callback = "OnCallbackFromJavaScript";
+	const opensilver_js_callback = "OnCallbackFromJavaScriptBrowser";
 	const opensilver_js_error_callback = "OnCallbackFromJavaScriptError";
 	
 	function prepareCallbackArgs (args) {
@@ -99,9 +99,12 @@ window.onCallBack = (function() {
 	}
 	
 	return {
-		OnCallbackFromJavaScript : function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) { 
-			let formattedArgs = prepareCallbackArgs(callbackArgsObject); 
-			DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs);
+		OnCallbackFromJavaScript : function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue) {
+			let formattedArgs = prepareCallbackArgs(callbackArgsObject);
+			const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
+			if (returnValue) {
+				return res;
+			}
 		},
 		
 		OnCallbackFromJavaScriptError : function (idWhereCallbackArgsAreStored) {

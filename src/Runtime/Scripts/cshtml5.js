@@ -291,16 +291,20 @@ document.addEventListenerSafe = function (element, method, func) {
 	}
 }
 
-document.eventCallback = function (callbackId, arguments) {
+document.eventCallback = function (callbackId, arguments, sync) {
 	const argsArray = arguments;
 	const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
 	document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
-	setTimeout(
-		function() 
-		{{
-		   window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray);
-		}}
-		, 1);
+	if (sync) {
+		return window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, true);
+	} else {
+		setTimeout(
+			function()
+			{{
+				window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, false);
+			}}
+			, 1);
+	}
 }
 
 document.callScriptSafe = function (referenceId, javaScriptToExecute, errorCallBackId) {
@@ -798,7 +802,7 @@ if (!Array.from) {
 
             // 16. Let k be 0.
             var k = 0;
-            // 17. Repeat, while k < len (also steps a - h)
+            // 17. Repeat, while k < len (also steps a - h)
             var kValue;
             while (k < len) {
                 kValue = items[k];
@@ -829,7 +833,7 @@ if (!Array.from) {
     function createShiftArr(step) {
 
         var space = '    ';
-	
+
         if ( isNaN(parseInt(step)) ) {  // argument is string
             space = step;
         } else { // argument is integer
@@ -928,8 +932,7 @@ if (!Array.from) {
                                             if( ar[ix].search(/xmlns:/) > -1  || ar[ix].search(/xmlns=/) > -1) {
                                                 str += shift[deep]+ar[ix];
                                                 withNamespace = 2;
-                                            } 
-			
+                                            }
                                             else {
                                                 str += ar[ix];
                                             }
