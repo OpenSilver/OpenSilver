@@ -120,6 +120,10 @@ namespace Windows.UI.Xaml
         private Size layoutLastSize;
         private bool layoutProcessing;
 
+        // Save settings of automatic size for measurement when it cannot get stretched size from parent.
+        private bool isAutoWidth = false;
+        private bool isAutoHeight = false;
+
         private int disableMeasureInvalidationRequests;
         private IDisposable disableMeasureInvalidationToken;
         private int visualLevel;
@@ -1410,13 +1414,26 @@ document.ondblclick = null;
         private void Render()
         {
             if (IsCustomLayoutRoot)
-                return;
+            {
+                IsRendered = true;
+                RenderedVisualBounds = VisualBounds;
 
-            if (this.INTERNAL_VisualParent != null && this.INTERNAL_VisualParent as Canvas != null)
+                if (this.isAutoWidth)
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_InnerDomElement).width = VisualBounds.Width.ToInvariantString() + "px";
+
+                if (this.isAutoHeight)
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_InnerDomElement).height = VisualBounds.Height.ToInvariantString() + "px";
                 return;
+            }
 
             if (this as Window == null && this as PopupRoot == null)
             {
+                UIElement parent = (UIElement)(this as FrameworkElement)?.INTERNAL_VisualParent;
+                if (parent != null && parent.IsCustomLayoutRoot && this.IsRendered == false)
+                {
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).display = "block";
+                }
+
                 INTERNAL_HtmlDomStyleReference uiStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement);
                 if (RenderedVisualBounds.Equals(VisualBounds) == false)
                 {
@@ -1548,17 +1565,56 @@ document.ondblclick = null;
 
         private void BeginUpdateCustomLayout()
         {
+            Size savedLastSize = layoutLastSize;
             layoutMeasuredSize = layoutLastSize;
+
+            FrameworkElement fe = this as FrameworkElement;
+
+            if (isFirstRendering)
+            {
+                if (Double.IsNaN(fe.Width) && layoutMeasuredSize.Width == 0)
+                    isAutoWidth = true;
+                if (Double.IsNaN(fe.Height) && layoutMeasuredSize.Height == 0)
+                    isAutoHeight = true;
+            }
+            else
+            {
+                // If it's automated size, it should be same with rendered
+                if (isAutoWidth && layoutMeasuredSize.Width != RenderedVisualBounds.Width)
+                    isAutoWidth = false;
+
+                if (isAutoHeight && layoutMeasuredSize.Height != RenderedVisualBounds.Height)
+                    isAutoHeight = false;
+            }
+
+            if (isAutoWidth)
+                layoutMeasuredSize.Width = double.PositiveInfinity;
+            if (isAutoHeight)
+                layoutMeasuredSize.Height = double.PositiveInfinity;
+
+            if (IsRendered && PreviousAvailableSize.IsClose(layoutMeasuredSize))
+            {
+                layoutProcessing = false;
+                return;
+            }
+
             Measure(layoutMeasuredSize);
 
-            if (layoutMeasuredSize != layoutLastSize)
+            if (isAutoWidth)
+                layoutMeasuredSize.Width = this.DesiredSize.Width;
+
+            if (isAutoHeight)
+                layoutMeasuredSize.Height = this.DesiredSize.Height;
+
+
+            if (savedLastSize != layoutLastSize)
             {
                 BeginUpdateCustomLayout();
                 return;
             }
 
             Arrange(new Rect(layoutMeasuredSize));
-            if (layoutMeasuredSize != layoutLastSize)
+            if (savedLastSize != layoutLastSize)
             {
                 BeginUpdateCustomLayout();
                 return;

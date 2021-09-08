@@ -619,6 +619,13 @@ if(nextSibling != undefined) {
                 child.isFirstRendering = true;
             }
 
+            if (parent.IsCustomLayoutRoot)
+            {
+                // Set display none to get exact size from SizeChanged event
+                // It would return zero size when it needs calculation of automatic size.
+                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).display = "none";
+            }
+
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Prepare the child", t2);
 #endif

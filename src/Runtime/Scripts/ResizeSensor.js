@@ -201,8 +201,8 @@
 
             var dirty, rafId;
             var size = getElementSize(element);
-            var lastWidth = 0;
-            var lastHeight = 0;
+            var lastWidth = -1;
+            var lastHeight = -1;
             var initialHiddenCheck = true;
             var lastAnimationFrame = 0;
 
@@ -282,6 +282,9 @@
 
             // Fix for custom Elements
             requestAnimationFrame(reset);
+
+            // Raise sizechanged event when it has (0, 0)
+            globalWindow.setTimeout(onScroll, 100);
         }
 
         forEachElement(element, function(elem){

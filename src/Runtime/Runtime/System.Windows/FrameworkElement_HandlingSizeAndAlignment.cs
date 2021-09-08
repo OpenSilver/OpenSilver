@@ -1622,7 +1622,7 @@ namespace Windows.UI.Xaml
 
         #region SizeChanged
 
-        Size _valueOfLastSizeChanged = new Size(0d, 0d);
+        Size _valueOfLastSizeChanged = Size.Empty;
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
         private object _resizeSensor;
 
@@ -1677,7 +1677,7 @@ namespace Windows.UI.Xaml
                 {
                     if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                     {
-                        _valueOfLastSizeChanged = new Size(0d, 0d);
+                        _valueOfLastSizeChanged = Size.Empty;
                         object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
                         this._resizeSensor = sensor;
                     }
@@ -1708,7 +1708,7 @@ namespace Windows.UI.Xaml
                     {
                         if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                         {
-                            _valueOfLastSizeChanged = new Size(0d, 0d);
+                            _valueOfLastSizeChanged = Size.Empty;
                             object sensor = CSHTML5.Interop.ExecuteJavaScript(@"new ResizeSensor($0, $1)", this.INTERNAL_OuterDomElement, (Action<string>)this.HandleSizeChanged);
                             this._resizeSensor = sensor;
                         } 
