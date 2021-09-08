@@ -84,7 +84,7 @@ namespace OpenSilver.TemplateWizards
                 }
             }
 
-            replacementsDictionary.Add("$opensilverpackageversion$", "1.0.0-alpha-020");
+            replacementsDictionary.Add("$opensilverpackageversion$", "1.0.0-beta.1.22");
         }
 
         public bool ShouldAddProjectItem(string filePath)
