@@ -46,6 +46,7 @@
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
+    <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
@@ -973,7 +974,6 @@
     <Compile Include="System.Windows.Media\Color.cs" />
     <Compile Include="System.Windows.Media\ColorConverter.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />

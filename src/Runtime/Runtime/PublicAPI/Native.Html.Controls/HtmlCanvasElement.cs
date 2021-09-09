@@ -258,7 +258,7 @@ namespace CSHTML5.Native.Html.Controls
         [Obsolete]
         public Brush Stroke
         {
-            get { return (Brush)this.StrokeColor; }
+            get { return new SolidColorBrush(this.StrokeColor); }
             set
             {
                 if (value is SolidColorBrush)
@@ -272,7 +272,7 @@ namespace CSHTML5.Native.Html.Controls
         [Obsolete]
         public Brush Background
         {
-            get { return (Brush)this.FillColor; }
+            get { return new SolidColorBrush(this.FillColor); }
             set
             {
                 if (value is SolidColorBrush)
@@ -286,7 +286,7 @@ namespace CSHTML5.Native.Html.Controls
         [Obsolete]
         public Brush Fill
         {
-            get { return (Brush)this.FillColor; }
+            get { return new SolidColorBrush(this.FillColor); }
             set
             {
                 if (value is SolidColorBrush)

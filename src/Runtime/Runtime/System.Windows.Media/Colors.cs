@@ -170,7 +170,37 @@ namespace Windows.UI
             White = unchecked((int)0xFFFFFFFF),
             WhiteSmoke = unchecked((int)0xFFF5F5F5),
             Yellow = unchecked((int)0xFFFFFF00),
-            YellowGreen = unchecked((int)0xFF9ACD32)
+            YellowGreen = unchecked((int)0xFF9ACD32),
+        }
+
+        internal static string MatchColor(string colorString, out bool isKnownColor, out bool isNumericColor, out bool isScRgbColor)
+        {
+            string trimmedString = colorString.Trim();
+
+            if (((trimmedString.Length == 4) ||
+                (trimmedString.Length == 5) ||
+                (trimmedString.Length == 7) ||
+                (trimmedString.Length == 9)) &&
+                (trimmedString[0] == '#'))
+            {
+                isNumericColor = true;
+                isScRgbColor = false;
+                isKnownColor = false;
+            }
+            else if (trimmedString.StartsWith("sc#", StringComparison.Ordinal))
+            {
+                isNumericColor = false;
+                isScRgbColor = true;
+                isKnownColor = false;
+            }
+            else
+            {
+                isNumericColor = false;
+                isScRgbColor = false;
+                isKnownColor = true;
+            }
+
+            return trimmedString;
         }
 
         /// <summary>

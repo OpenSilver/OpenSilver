@@ -62,7 +62,7 @@ namespace Windows.UI.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Hex_Should_Return_Color()
+        public void ConvertFrom_Hex8_Should_Return_Color_1()
         {
             Converter.ConvertFrom("#FFF5F5F5")
                 .Should()
@@ -70,9 +70,113 @@ namespace Windows.UI.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_NamedColor_Should_Return_Color()
+        public void ConvertFrom_Hex8_Should_Return_Color_2()
+        {
+            Converter.ConvertFrom("   #FfF5f5F5   ")
+                .Should()
+                .Be(Colors.WhiteSmoke);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Hex6_Should_Return_Color_1()
+        {
+            Converter.ConvertFrom("#F5F5F5")
+                .Should()
+                .Be(Colors.WhiteSmoke);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Hex6_Should_Return_Color_2()
+        {
+            Converter.ConvertFrom("    #f5F5f5 ")
+                .Should()
+                .Be(Colors.WhiteSmoke);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Hex4_Should_Return_Color_1()
+        {
+            Converter.ConvertFrom("#9ABC")
+                .Should()
+                .Be(Color.FromArgb((byte)(9 * 16 + 9), (byte)(10 * 16 + 10), (byte)(11 * 16 + 11), (byte)(12 * 16 + 12)));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Hex4_Should_Return_Color_2()
+        {
+            Converter.ConvertFrom("#9Abc  ")
+                .Should()
+                .Be(Color.FromArgb((byte)(9 * 16 + 9), (byte)(10 * 16 + 10), (byte)(11 * 16 + 11), (byte)(12 * 16 + 12)));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Hex3_Should_Return_Color_1()
+        {
+            Converter.ConvertFrom("#ABC")
+                .Should()
+                .Be(Color.FromArgb((byte)255, (byte)(10 * 16 + 10), (byte)(11 * 16 + 11), (byte)(12 * 16 + 12)));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Hex3_Should_Return_Color_2()
+        {
+            Converter.ConvertFrom("    #AbC")
+                .Should()
+                .Be(Color.FromArgb((byte)255, (byte)(10 * 16 + 10), (byte)(11 * 16 + 11), (byte)(12 * 16 + 12)));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Sc4_Should_Return_Color_1()
+        {
+            Converter.ConvertFrom("sc#0.5, 0.6, 0.7, 0.8")
+                .Should()
+                .Be(Color.FromScRgb(0.5f, 0.6f, 0.7f, 0.8f));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Sc4_Should_Return_Color_2()
+        {
+            Converter.ConvertFrom(" sc#0.5, 0.6, 0.7, 0.8   ")
+                .Should()
+                .Be(Color.FromScRgb(0.5f, 0.6f, 0.7f, 0.8f));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Sc3_Should_Return_Color_1()
+        {
+            Converter.ConvertFrom("sc#0.6, 0.7, 0.8")
+                .Should()
+                .Be(Color.FromScRgb(1.0f, 0.6f, 0.7f, 0.8f));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Sc3_Should_Return_Color_2()
+        {
+            Converter.ConvertFrom(" sc#    0.6   0.7,   .8   ")
+                .Should()
+                .Be(Color.FromScRgb(1.0f, 0.6f, 0.7f, 0.8f));
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Sc_Should_Throw_FormatException()
+        {
+            Assert.ThrowsException<FormatException>(
+                () => Converter.ConvertFrom("SC#0.5, 1.0, 0.0, 1.0")
+            );
+        }
+
+        [TestMethod]
+        public void ConvertFrom_NamedColor_Should_Return_Color_1()
         {
             Converter.ConvertFrom("Yellow")
+                .Should()
+                .Be(Colors.Yellow);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_NamedColor_Should_Return_Color_2()
+        {
+            Converter.ConvertFrom("   yELlow")
                 .Should()
                 .Be(Colors.Yellow);
         }

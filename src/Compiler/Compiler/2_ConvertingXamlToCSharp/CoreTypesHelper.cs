@@ -127,69 +127,173 @@ namespace DotNetForHtml5.Compiler
 
         private static string ConvertToColor(string source, string destinationType)
         {
-            string stringValue = source.Trim();
+            const int s_zeroChar = (int)'0';
+            const int s_aLower = (int)'a';
+            const int s_aUpper = (int)'A';
 
-            if (stringValue.Length > 0)
+            string MatchColor(string colorString, out bool isKnownColor, out bool isNumericColor, out bool isScRgbColor)
             {
-                if (stringValue[0] == '#')
-                {
-                    string tokens = stringValue.Substring(1);
-                    if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
-                    {
-                        tokens = "FF" + tokens;
-                    }
+                string trimmedString = colorString.Trim();
 
-                    if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.InvariantInfo, out int color))
-                    {
-                        return string.Format(
-                            CultureInfo.InvariantCulture,
-                            "new {0}() {{ A = (byte){1}, R = (byte){2}, G = (byte){3}, B = (byte){4} }}",
-                            destinationType,
-                            (color >> 0x18) & 0xff,
-                            (color >> 0x10) & 0xff,
-                            (color >> 8) & 0xff,
-                            color & 0xff
-                        );
-                    }
+                if (((trimmedString.Length == 4) ||
+                    (trimmedString.Length == 5) ||
+                    (trimmedString.Length == 7) ||
+                    (trimmedString.Length == 9)) &&
+                    (trimmedString[0] == '#'))
+                {
+                    isNumericColor = true;
+                    isScRgbColor = false;
+                    isKnownColor = false;
                 }
-                else if (stringValue.StartsWith("sc#", StringComparison.Ordinal))
+                else if (trimmedString.StartsWith("sc#", StringComparison.Ordinal))
                 {
-                    string tokens = stringValue.Substring(3);
-
-                    char[] separators = new char[1] { ',' };
-                    string[] words = tokens.Split(separators);
-                    float[] values = new float[4];
-                    for (int i = 0; i < 3; i++)
-                    {
-                        values[i] = Convert.ToSingle(words[i], CultureInfo.InvariantCulture);
-                    }
-                    if (words.Length == 4)
-                    {
-                        values[3] = Convert.ToSingle(words[3], CultureInfo.InvariantCulture);
-                        return string.Format(
-                            CultureInfo.InvariantCulture,
-                            "{0}.FromScRgb((float){1}, (float){2}, (float){3}, (float){4})",
-                            destinationType, values[0], values[1], values[2], values[3]
-                        );
-                    }
-                    else
-                    {
-                        return string.Format(
-                            CultureInfo.InvariantCulture,
-                            "{0}.FromScRgb((float){1}, (float){2}, (float){3}, (float){4})",
-                            destinationType, 1.0f, values[0], values[1], values[2]
-                        );
-                    }
+                    isNumericColor = false;
+                    isScRgbColor = true;
+                    isKnownColor = false;
                 }
                 else
                 {
-                    if (Enum.TryParse(stringValue, true, out ColorsEnum namedColor))
+                    isNumericColor = false;
+                    isScRgbColor = false;
+                    isKnownColor = true;
+                }
+
+                return trimmedString;
+            }
+
+            int ParseHexChar(char c)
+            {
+                int intChar = (int)c;
+
+                if ((intChar >= s_zeroChar) && (intChar <= (s_zeroChar + 9)))
+                {
+                    return (intChar - s_zeroChar);
+                }
+
+                if ((intChar >= s_aLower) && (intChar <= (s_aLower + 5)))
+                {
+                    return (intChar - s_aLower + 10);
+                }
+
+                if ((intChar >= s_aUpper) && (intChar <= (s_aUpper + 5)))
+                {
+                    return (intChar - s_aUpper + 10);
+                }
+                throw new FormatException("Token is not valid.");
+            }
+
+            string ParseHexColor(string trimmedColor)
+            {
+                int a, r, g, b;
+                a = 255;
+
+                if (trimmedColor.Length > 7)
+                {
+                    a = ParseHexChar(trimmedColor[1]) * 16 + ParseHexChar(trimmedColor[2]);
+                    r = ParseHexChar(trimmedColor[3]) * 16 + ParseHexChar(trimmedColor[4]);
+                    g = ParseHexChar(trimmedColor[5]) * 16 + ParseHexChar(trimmedColor[6]);
+                    b = ParseHexChar(trimmedColor[7]) * 16 + ParseHexChar(trimmedColor[8]);
+                }
+                else if (trimmedColor.Length > 5)
+                {
+                    r = ParseHexChar(trimmedColor[1]) * 16 + ParseHexChar(trimmedColor[2]);
+                    g = ParseHexChar(trimmedColor[3]) * 16 + ParseHexChar(trimmedColor[4]);
+                    b = ParseHexChar(trimmedColor[5]) * 16 + ParseHexChar(trimmedColor[6]);
+                }
+                else if (trimmedColor.Length > 4)
+                {
+                    a = ParseHexChar(trimmedColor[1]);
+                    a = a + a * 16;
+                    r = ParseHexChar(trimmedColor[2]);
+                    r = r + r * 16;
+                    g = ParseHexChar(trimmedColor[3]);
+                    g = g + g * 16;
+                    b = ParseHexChar(trimmedColor[4]);
+                    b = b + b * 16;
+                }
+                else
+                {
+                    r = ParseHexChar(trimmedColor[1]);
+                    r = r + r * 16;
+                    g = ParseHexChar(trimmedColor[2]);
+                    g = g + g * 16;
+                    b = ParseHexChar(trimmedColor[3]);
+                    b = b + b * 16;
+                }
+
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}.FromArgb((byte){1}, (byte){2}, (byte){3}, (byte){4})",
+                    destinationType, a, r, g, b
+                );
+            }
+
+            string ParseScRgbColor(string trimmedColor)
+            {
+                if (!trimmedColor.StartsWith("sc#", StringComparison.Ordinal))
+                {
+                    throw new FormatException("Token is not valid.");
+                }
+
+                string tokens = trimmedColor.Substring(3, trimmedColor.Length - 3);
+
+                char[] separator = new char[2] { ',', ' ' };
+                string[] split = tokens.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+                if (split.Length == 3)
+                {
+                    return string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}.FromScRgb({1}F, {2}F, {3}F, {4}F)",
+                        destinationType,
+                        1.0f,
+                        Convert.ToSingle(split[0], CultureInfo.InvariantCulture),
+                        Convert.ToSingle(split[1], CultureInfo.InvariantCulture),
+                        Convert.ToSingle(split[2], CultureInfo.InvariantCulture)
+                    );
+                }
+                else if (split.Length == 4)
+                {
+                    return string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}.FromScRgb({1}F, {2}F, {3}F, {4}F)",
+                        destinationType,
+                        Convert.ToSingle(split[0], CultureInfo.InvariantCulture),
+                        Convert.ToSingle(split[1], CultureInfo.InvariantCulture),
+                        Convert.ToSingle(split[2], CultureInfo.InvariantCulture),
+                        Convert.ToSingle(split[3], CultureInfo.InvariantCulture)
+                    );
+                }
+
+                throw new FormatException("Token is not valid.");
+            }
+
+            string ParseColor(string colorString)
+            {
+                string trimmedColor = MatchColor(
+                    colorString, out bool isPossibleKnowColor, out bool isNumericColor, out bool isScRgbColor
+                );
+
+                //Is it a number?
+                if (isNumericColor)
+                {
+                    return ParseHexColor(trimmedColor);
+                }
+                else if (isScRgbColor)
+                {
+                    return ParseScRgbColor(trimmedColor);
+                }
+                else
+                {
+                    Debug.Assert(isPossibleKnowColor);
+
+                    if (Enum.TryParse(trimmedColor, true, out ColorsEnum namedColor))
                     {
                         int color = (int)namedColor;
 
                         return string.Format(
                             CultureInfo.InvariantCulture,
-                            "new {0}() {{ A = (byte){1}, R = (byte){2}, G = (byte){3}, B = (byte){4} }}",
+                            "{0}.FromArgb((byte){1}, (byte){2}, (byte){3}, (byte){4})",
                             destinationType,
                             (color >> 0x18) & 0xff,
                             (color >> 0x10) & 0xff,
@@ -198,11 +302,13 @@ namespace DotNetForHtml5.Compiler
                         );
                     }
                 }
+
+                throw GetConvertException(colorString, destinationType);
             }
 
-            throw GetConvertException(source, destinationType);
+            return ParseColor(source);
         }
-
+        
         private static string ConvertToDoubleCollection(string source, string destinationType)
         {
             string[] split = source.Split(new char[2] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
