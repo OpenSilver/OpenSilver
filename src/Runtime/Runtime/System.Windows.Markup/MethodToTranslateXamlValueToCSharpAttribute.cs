@@ -13,8 +13,12 @@
 \*====================================================================================*/
 
 
+using System.ComponentModel;
+
 namespace System.Windows.Markup
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This will be removed. Do not use.")]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, AllowMultiple = false, Inherited = true)]
     public partial class MethodToTranslateXamlValueToCSharpAttribute : Attribute
     {
