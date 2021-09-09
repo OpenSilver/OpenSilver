@@ -158,7 +158,8 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Returns enumerator to logical children
         /// </summary>
-        /*protected*/ internal virtual IEnumerator LogicalChildren
+        /*protected*/
+        internal virtual IEnumerator LogicalChildren
         {
             get { return null; }
         }
@@ -254,7 +255,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#region Resources
+        #region Resources
 
         /// <summary>
         ///     Check if resource is not empty.
@@ -328,8 +329,8 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        
-#endregion
+
+        #endregion
 
         /// <summary>
         /// Gets a value that indicates whether this element is in the Visual Tree, that is, if it has been loaded for presentation.
@@ -431,7 +432,8 @@ namespace Windows.UI.Xaml
 
                 // we only apply the template if no template has been
                 // rendered already for this control.
-                if (this.TemplateChild == null)
+                // or it is textbox ( to create EditableContent div when switching tabs )
+                if (this.TemplateChild == null || this is TextBox)
                 {
                     visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
                     if (visualChild != null)
@@ -474,7 +476,7 @@ namespace Windows.UI.Xaml
         protected virtual void OnApplyTemplate()
 #endif
         {
-            
+
         }
 
         // Note: the returned Size is unused for now.
@@ -527,7 +529,7 @@ namespace Windows.UI.Xaml
             return BindingOperations.GetBindingExpression(this, dp);
         }
 
-#region Cursor
+        #region Cursor
 
         // Returns:
         //     The cursor to display. The default value is defined as null per this dependency
@@ -549,9 +551,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public static readonly DependencyProperty CursorProperty =
             DependencyProperty.Register(
-                nameof(Cursor), 
-                typeof(Cursor), 
-                typeof(FrameworkElement), 
+                nameof(Cursor),
+                typeof(Cursor),
+                typeof(FrameworkElement),
                 new PropertyMetadata((object)null)
                 {
                     MethodToUpdateDom = Cursor_MethodToUpdateDom,
@@ -757,9 +759,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public static readonly DependencyProperty NameProperty =
             DependencyProperty.Register(
-                nameof(Name), 
-                typeof(string), 
-                typeof(FrameworkElement), 
+                nameof(Name),
+                typeof(string),
+                typeof(FrameworkElement),
                 new PropertyMetadata(string.Empty)
                 {
                     MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
@@ -771,9 +773,9 @@ namespace Windows.UI.Xaml
             INTERNAL_HtmlDomManager.SetDomElementAttribute(fe.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
         }
 
-#endregion
+        #endregion
 
-#region DataContext
+        #region DataContext
 
         /// <summary>
         /// Gets or sets the data context for a FrameworkElement when it participates
@@ -788,7 +790,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the <see cref="FrameworkElement.DataContext"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty DataContextProperty = 
+        public static readonly DependencyProperty DataContextProperty =
             DependencyProperty.Register(
                 nameof(DataContext),
                 typeof(object),
@@ -814,7 +816,7 @@ namespace Windows.UI.Xaml
         /// <summary>Occurs when the data context for this element changes. </summary>
         public event DependencyPropertyChangedEventHandler DataContextChanged;
 
-#endregion
+        #endregion
 
         public event EventHandler LayoutUpdated;
 
@@ -823,8 +825,8 @@ namespace Windows.UI.Xaml
             LayoutUpdated?.Invoke(this, new EventArgs());
         }
 
-#region Work in progress
-#region Triggers
+        #region Work in progress
+        #region Triggers
 
         [OpenSilver.NotImplemented]
         public TriggerCollection Triggers
@@ -843,7 +845,7 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 new PropertyMetadata(new TriggerCollection()));
 
-#endregion
+        #endregion
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FlowDirectionProperty =
@@ -893,7 +895,7 @@ namespace Windows.UI.Xaml
         internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             // Skip when loading or changed on TextMeasurement Div.
-            if (this.INTERNAL_OuterDomElement == null || 
+            if (this.INTERNAL_OuterDomElement == null ||
                 Application.Current.TextMeasurementService.IsTextMeasureDivID(
                     ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
             {
@@ -901,7 +903,7 @@ namespace Windows.UI.Xaml
             }
 
             var metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
-            
+
             if (metadata != null)
             {
                 if (metadata.AffectsMeasure)
@@ -1047,11 +1049,11 @@ namespace Windows.UI.Xaml
 
             availableSize.Width = Math.Max(0, availableSize.Width - Margin.Left - Margin.Right);
             availableSize.Height = Math.Max(0, availableSize.Height - Margin.Top - Margin.Bottom);
-            
+
             availableSize = size.Combine(availableSize).Bounds(MinSize, MaxSize);
 
             Size measuredSize = MeasureOverride(availableSize);
-            
+
             var w = Math.Max(0, Math.Min(availableSize.Width, measuredSize.Width));
             var h = Math.Max(0, Math.Min(availableSize.Height, measuredSize.Height));
             measuredSize = new Size(w, h);
@@ -1085,9 +1087,9 @@ namespace Windows.UI.Xaml
             return new Size();
         }
 
-#endregion Work in progress
+        #endregion Work in progress
 
-#region Tag
+        #region Tag
 
         /// <summary>
         /// Gets or sets an arbitrary object value that can be used to store custom information
@@ -1104,14 +1106,14 @@ namespace Windows.UI.Xaml
         /// </summary>
         public static readonly DependencyProperty TagProperty =
             DependencyProperty.Register(
-                nameof(Tag), 
-                typeof(object), 
-                typeof(FrameworkElement), 
+                nameof(Tag),
+                typeof(object),
+                typeof(FrameworkElement),
                 new PropertyMetadata((object)null));
 
-#endregion
+        #endregion
 
-#region Handling Styles
+        #region Handling Styles
 
         [Obsolete("Use DefaultStyleKey")]
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
@@ -1139,8 +1141,8 @@ namespace Windows.UI.Xaml
         /// </summary>
         public static readonly DependencyProperty StyleProperty =
             DependencyProperty.Register(
-                nameof(Style), 
-                typeof(Style), 
+                nameof(Style),
+                typeof(Style),
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnStyleChanged));
 
@@ -1181,7 +1183,7 @@ namespace Windows.UI.Xaml
                 // we don't unset the value directly to prevent from potientially
                 // firing the DependencyPropertyChanged callback twice.                
                 Dictionary<DependencyProperty, object> oldStylePropertyValues = oldStyle.EffectiveValues;
-                IEnumerable<DependencyProperty> removedProperties = 
+                IEnumerable<DependencyProperty> removedProperties =
                     oldStylePropertyValues
                         .Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
                         .Select(kp => kp.Key);
@@ -1307,7 +1309,7 @@ namespace Windows.UI.Xaml
             return DependencyProperty.UnsetValue;
         }
 
-#region DefaultStyleKey
+        #region DefaultStyleKey
 
         // Indicates if the ThemeStyle is being re-evaluated
         internal bool IsThemeStyleUpdateInProgress
@@ -1346,9 +1348,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public static readonly DependencyProperty DefaultStyleKeyProperty =
             DependencyProperty.Register(
-                nameof(DefaultStyleKey), 
-                typeof(object), 
-                typeof(FrameworkElement), 
+                nameof(DefaultStyleKey),
+                typeof(object),
+                typeof(FrameworkElement),
                 new PropertyMetadata(null, OnThemeStyleKeyChanged));
 
         private static void OnThemeStyleKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -1488,7 +1490,7 @@ namespace Windows.UI.Xaml
                 // we don't unset the value directly to prevent from potientially
                 // firing the DependencyPropertyChanged callback twice.
                 Dictionary<DependencyProperty, object> oldStylePropertyValues = oldThemeStyle.EffectiveValues;
-                IEnumerable<DependencyProperty> removedProperties = 
+                IEnumerable<DependencyProperty> removedProperties =
                     oldStylePropertyValues
                         .Where(kp => newStylePropertyValues == null || !newStylePropertyValues.ContainsKey(kp.Key))
                         .Select(kp => kp.Key);
@@ -1522,11 +1524,11 @@ namespace Windows.UI.Xaml
             get { return _themeStyleCache; }
         }
 
-#endregion DefaultStyleKey
+        #endregion DefaultStyleKey
 
-#endregion Handling Styles
+        #endregion Handling Styles
 
-#region Loaded/Unloaded events
+        #region Loaded/Unloaded events
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
@@ -1552,9 +1554,9 @@ namespace Windows.UI.Xaml
                 Unloaded(this, new RoutedEventArgs());
         }
 
-#endregion
+        #endregion
 
-#region BindingValidationError event
+        #region BindingValidationError event
 
         internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
 
@@ -1606,9 +1608,9 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-#endregion
+        #endregion
 
-#region ---------- INameScope implementation ----------
+        #region ---------- INameScope implementation ----------
         //note: copy from UserControl
         Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
@@ -1675,12 +1677,12 @@ namespace Windows.UI.Xaml
         }
 
 
-#endregion
+        #endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
-            if (HasImplicitStyleFromResources && 
+            if (HasImplicitStyleFromResources &&
                 (!HasResources || !Resources.Contains(GetType())))
             {
                 HasStyleInvalidated = false;
@@ -1702,7 +1704,7 @@ namespace Windows.UI.Xaml
             // Fetch the implicit style
             // If this element's ResourceDictionary contains the
             // implicit style, it has already been retrieved.
-            if (!HasImplicitStyleFromResources || 
+            if (!HasImplicitStyleFromResources ||
                 (!HasResources || !Resources.Contains(GetType())))
             {
                 HasStyleInvalidated = false;
