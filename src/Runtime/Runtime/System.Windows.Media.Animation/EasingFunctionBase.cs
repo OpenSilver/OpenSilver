@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Provides the base class for all the easing functions.
     /// </summary>
-    public abstract partial class EasingFunctionBase : DependencyObject, IEasingFunction
+    public abstract partial class EasingFunctionBase : Freezable, IEasingFunction
     {
         /// <summary>
         /// Gets or sets a value that specifies how the animation interpolates.

@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,20 +12,15 @@
 *  
 \*====================================================================================*/
 
-using System;
 
 #if MIGRATION
-namespace System.Windows.Data
+namespace System.Windows.Media.Animation
 #else
-namespace Windows.UI.Xaml.Data
+namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public abstract class BindingExpressionBase : Expression
+    [OpenSilver.NotImplemented]
+    public abstract partial class ThicknessAnimationBase : AnimationTimeline
     {
-        internal BindingExpressionBase() { }
-
-        [OpenSilver.NotImplemented]
-        // Using Binding instead of BindingBase due to BindingOperations.SetBinding doing the same
-        public Binding ParentBindingBase { get; }
     }
 }

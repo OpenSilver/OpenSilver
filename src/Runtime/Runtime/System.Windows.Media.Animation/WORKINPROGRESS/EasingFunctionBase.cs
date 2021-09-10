@@ -8,7 +8,7 @@ namespace Windows.UI.Xaml.Media.Animation
 	// Summary:
 	//     Provides the base class for all the easing functions. You can create your own
 	//     custom easing functions by inheriting from this class.
-	public abstract partial class EasingFunctionBase : DependencyObject, IEasingFunction
+	public abstract partial class EasingFunctionBase : Freezable, IEasingFunction
 	{
 #if OPENSILVER
 		//

@@ -1,6 +1,21 @@
-#if MIGRATION
-using System.Windows;
-using System;
+
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Media.Effects
 {
@@ -45,8 +60,11 @@ namespace System.Windows.Media.Effects
         {
             return null;
         }
-        
 
+        [OpenSilver.NotImplemented]
+        public ShaderEffect CloneCurrentValue()
+        {
+            return default(ShaderEffect);
+        }
     }
 }
-#endif

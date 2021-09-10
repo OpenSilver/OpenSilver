@@ -95,5 +95,11 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             return 0d;
         }
+
+        [OpenSilver.NotImplemented]
+        protected override Freezable CreateInstanceCore()
+        {
+            return default(Freezable);
+        }
     }
 }

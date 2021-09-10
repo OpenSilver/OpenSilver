@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,20 +12,16 @@
 *  
 \*====================================================================================*/
 
-using System;
 
 #if MIGRATION
-namespace System.Windows.Data
+namespace System.Windows
 #else
-namespace Windows.UI.Xaml.Data
+namespace Windows.UI.Xaml
 #endif
 {
-    public abstract class BindingExpressionBase : Expression
+    [OpenSilver.NotImplemented]
+    public abstract class Freezable : DependencyObject
     {
-        internal BindingExpressionBase() { }
-
-        [OpenSilver.NotImplemented]
-        // Using Binding instead of BindingBase due to BindingOperations.SetBinding doing the same
-        public Binding ParentBindingBase { get; }
+        protected abstract Freezable CreateInstanceCore();
     }
 }

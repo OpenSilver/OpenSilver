@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 
 #if MIGRATION
@@ -280,11 +281,15 @@ namespace Windows.UI.Xaml
             }
         }
 
+        public Collection<object> PathParameters { get; }
+
+        [OpenSilver.NotImplemented]
+        // The parameters are stored but their use in resolution is not implemented yet
         public PropertyPath(string path, params object[] pathParameters) : this(path)
         {
             if (pathParameters != null && pathParameters.Length > 0)
             {
-                throw new ArgumentOutOfRangeException("pathParameters");
+                PathParameters = new ObservableCollection<object>(pathParameters);
             }
         }
     }

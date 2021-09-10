@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,20 +12,22 @@
 *  
 \*====================================================================================*/
 
+
 using System;
 
 #if MIGRATION
-namespace System.Windows.Data
+namespace System.Windows.Media
 #else
-namespace Windows.UI.Xaml.Data
+namespace Windows.UI.Xaml.Media
 #endif
 {
-    public abstract class BindingExpressionBase : Expression
+    [OpenSilver.NotImplemented]
+    public sealed partial class PixelFormat : IEquatable<PixelFormat>
     {
-        internal BindingExpressionBase() { }
-
         [OpenSilver.NotImplemented]
-        // Using Binding instead of BindingBase due to BindingOperations.SetBinding doing the same
-        public Binding ParentBindingBase { get; }
+        public bool Equals(PixelFormat other)
+        {
+            return default(bool);
+        }
     }
 }

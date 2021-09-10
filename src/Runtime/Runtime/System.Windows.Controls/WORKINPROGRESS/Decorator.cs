@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,20 +12,17 @@
 *  
 \*====================================================================================*/
 
-using System;
 
 #if MIGRATION
-namespace System.Windows.Data
+namespace System.Windows.Controls
 #else
-namespace Windows.UI.Xaml.Data
+namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public abstract class BindingExpressionBase : Expression
+    [OpenSilver.NotImplemented]
+    public partial class Decorator : FrameworkElement
     {
-        internal BindingExpressionBase() { }
-
         [OpenSilver.NotImplemented]
-        // Using Binding instead of BindingBase due to BindingOperations.SetBinding doing the same
-        public Binding ParentBindingBase { get; }
+        public virtual UIElement Child { get; set; }
     }
 }

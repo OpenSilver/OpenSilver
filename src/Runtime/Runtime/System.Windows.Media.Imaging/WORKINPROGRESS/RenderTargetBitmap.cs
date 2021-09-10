@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,20 +12,24 @@
 *  
 \*====================================================================================*/
 
-using System;
 
 #if MIGRATION
-namespace System.Windows.Data
+namespace System.Windows.Media.Imaging
 #else
-namespace Windows.UI.Xaml.Data
+namespace Windows.UI.Xaml.Media.Imaging
 #endif
 {
-    public abstract class BindingExpressionBase : Expression
+    [OpenSilver.NotImplemented]
+    public sealed partial class RenderTargetBitmap : BitmapSource
     {
-        internal BindingExpressionBase() { }
+        [OpenSilver.NotImplemented]
+        public RenderTargetBitmap(int pixelWidth, int pixelHeight, double dpiX, double dpiY, PixelFormat pixelFormat)
+        {
+        }
 
         [OpenSilver.NotImplemented]
-        // Using Binding instead of BindingBase due to BindingOperations.SetBinding doing the same
-        public Binding ParentBindingBase { get; }
+        public void Render(Visual visual)
+        {
+        }
     }
 }

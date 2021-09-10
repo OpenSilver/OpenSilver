@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,20 +12,26 @@
 *  
 \*====================================================================================*/
 
-using System;
 
 #if MIGRATION
-namespace System.Windows.Data
+namespace System.Windows.Media.Animation
 #else
-namespace Windows.UI.Xaml.Data
+namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    public abstract class BindingExpressionBase : Expression
+    [OpenSilver.NotImplemented]
+    public partial class Int32KeyFrame : Freezable, IKeyFrame
     {
-        internal BindingExpressionBase() { }
+        [OpenSilver.NotImplemented]
+        public KeyTime KeyTime { get; set; }
 
         [OpenSilver.NotImplemented]
-        // Using Binding instead of BindingBase due to BindingOperations.SetBinding doing the same
-        public Binding ParentBindingBase { get; }
+        public object Value { get; set; }
+
+        [OpenSilver.NotImplemented]
+        protected override Freezable CreateInstanceCore()
+        {
+            return default(Freezable);
+        }
     }
 }

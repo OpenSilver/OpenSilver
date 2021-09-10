@@ -115,6 +115,12 @@ namespace Windows.UI.Xaml
 		{
 			return default(AutomationPeer);
 		}
+
+        [OpenSilver.NotImplemented]
+        public object GetAnimationBaseValue(DependencyProperty dp)
+        {
+            return default(object);
+        }
 #endif
     }
 }
