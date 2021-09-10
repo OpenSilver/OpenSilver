@@ -120,6 +120,10 @@ document.onkeyup = function (evt) {
     document.refreshKeyModifiers(evt);
 };
 
+document.isRunningOpenSilver = false;
+document.isRunningInTheSimulator = false;
+document.jsCallBackFunctionsReference = new Array();
+
 document.jsObjRef = new Array();
 document.callbackCounterForSimulator = 0;
 
@@ -289,6 +293,18 @@ document.addEventListenerSafe = function (element, method, func) {
 	if (element){
 		element.addEventListener(method, func);
 	}
+}
+
+document.getCallbackFunc = function (callbackId, sync) {
+    if (document.jsCallBackFunctionsReference[callbackId] === undefined) {
+        document.jsCallBackFunctionsReference[callbackId] = function () {
+            return document.eventCallback(callbackId,
+                (document.isRunningOpenSilver == false || document.isRunningInTheSimulator == false) ? Array.prototype.slice.call(arguments) : arguments,
+                sync);
+        }
+    }
+
+    return document.jsCallBackFunctionsReference[callbackId];
 }
 
 document.eventCallback = function (callbackId, arguments, sync) {

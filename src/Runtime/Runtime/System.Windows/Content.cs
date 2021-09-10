@@ -29,6 +29,16 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 
         internal Content(bool hookupEvents)
         {
+            if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+                CSHTML5.Interop.ExecuteJavaScript("document.isRunningInTheSimulator = true");
+            else
+                CSHTML5.Interop.ExecuteJavaScript("document.isRunningInTheSimulator = false");
+
+#if OPENSILVER
+            CSHTML5.Interop.ExecuteJavaScript("document.isRunningOpenSilver = true");
+#else
+            CSHTML5.Interop.ExecuteJavaScript("document.isRunningOpenSilver = false");
+#endif
             if (hookupEvents)
             {
                 // Hooks the FullScreenChanged event
