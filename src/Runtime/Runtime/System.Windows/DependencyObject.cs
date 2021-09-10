@@ -593,5 +593,11 @@ namespace Windows.UI.Xaml
 
             return accessAllowed;
         }
+
+        [OpenSilver.NotImplemented]
+        public object GetAnimationBaseValue(DependencyProperty dp)
+        {
+            return default(object);
+        }
     }
 }
