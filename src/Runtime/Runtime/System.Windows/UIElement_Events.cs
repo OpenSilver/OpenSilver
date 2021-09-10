@@ -813,13 +813,41 @@ namespace Windows.UI.Xaml
         [OpenSilver.NotImplemented]
         public event PointerEventHandler PointerWheelChanged;
 #endif
-
+        /// <summary>
+        /// Identifies the <see cref="TextInput"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputEvent = new RoutedEvent("TextInputEvent");
+
+        /// <summary>
+        /// Identifies the <see cref="TextInputStart"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputStartEvent = new RoutedEvent("TextInputStartEvent");
+
+        /// <summary>
+        /// Identifies the <see cref="TextInputUpdate"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputUpdateEvent = new RoutedEvent("TextInputUpdateEvent");
 
+        /// <summary>
+        /// Occurs when a UI element gets text in a device-independent manner.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public event TextCompositionEventHandler TextInput;
+
+        /// <summary>
+        /// Occurs when a UI element initially gets text in a device-independent manner.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public event TextCompositionEventHandler TextInputStart;
+
+        /// <summary>
+        /// Occurs when text continues to be composed via an input method editor (IME).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event TextCompositionEventHandler TextInputUpdate;
 
 #endregion
 
