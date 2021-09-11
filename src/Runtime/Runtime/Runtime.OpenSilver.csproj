@@ -53,6 +53,7 @@
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\DataTrigger.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\PropertyChangedTrigger.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\StoryboardAction.cs" />
+		<Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
 		<Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
 		<Compile Include="OpenSilver\Internal\Parsers.cs" />
 		<Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
@@ -148,6 +149,7 @@
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\TreeViewAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\TreeViewItemAutomationPeer.cs" />
+		<Compile Include="System.Windows.Controls\TextBoxView.cs" />
 		<Compile Include="System.Windows.Controls\CalendarExtensions.cs" />
 		<Compile Include="System.Windows.Controls\DatePickerFormat.cs" />
 		<Compile Include="System.Windows.Controls\InteractionHelper.cs" />
