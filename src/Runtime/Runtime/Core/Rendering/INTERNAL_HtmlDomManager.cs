@@ -103,8 +103,9 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             else
             {
-                string javaScriptCodeToExecute = $@"var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)domNode).UniqueIdentifier}"");
-                                                           element.parentNode.removeChild(element);";
+                string javaScriptCodeToExecute = $@"
+                    var element = document.getElementById(""{((INTERNAL_HtmlDomElementReference)domNode).UniqueIdentifier}"");
+                    if (element) element.parentNode.removeChild(element);";
                 ExecuteJavaScript(javaScriptCodeToExecute, commentForDebugging); // IMPORTANT: This cannot be replaced by "INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode" because the element may no longer be in the tree when we try to remove it (cf. issues we had with the Grid on 2015.08.26)
                 if (((INTERNAL_HtmlDomElementReference)domNode).Parent != null)
                 {
