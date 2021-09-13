@@ -1409,9 +1409,7 @@ namespace Windows.UI.Xaml.Controls
                         ((FrameworkElement)_currentEditionElement).DataContext = null; //Note: this is here because we had to set the DataContext locally for this element (since it is directly put in the grid and not in a DataGridCell)
                         _mainGrid.Children.Remove(_currentEditionElement);
                     }
-#if WORKINPROGRESS
                     CellEditEnded?.Invoke(this, new DataGridCellEditEndedEventArgs(_currentCell.Column, new DataGridRow() { DataContext = _currentCell.DataContext }, DataGridEditAction.Commit));
-#endif
                 }
                 _currentCell = null;
                 _currentEditionElement = null;

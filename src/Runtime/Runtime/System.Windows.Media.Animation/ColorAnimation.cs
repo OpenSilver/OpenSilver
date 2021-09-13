@@ -399,7 +399,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ByProperty = DependencyProperty.Register("By", typeof(Color?), typeof(ColorAnimation), null);
         [OpenSilver.NotImplemented]
@@ -408,6 +407,5 @@ namespace Windows.UI.Xaml.Media.Animation
             get { return (Color?)this.GetValue(ByProperty); }
             set { this.SetValue(ByProperty, value); }
         }
-#endif
     }
 }

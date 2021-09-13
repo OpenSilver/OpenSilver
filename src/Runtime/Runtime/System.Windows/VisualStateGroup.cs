@@ -74,8 +74,6 @@ namespace Windows.UI.Xaml
             } 
         } 
 
-#if WORKINPROGRESS
-
         private IList<VisualTransition> _transitions;
 
         /// <summary>
@@ -93,8 +91,6 @@ namespace Windows.UI.Xaml
                 return this._transitions;
             }
         }
-#endif
-
         internal VisualState GetState(string stateName)
         {
             for (int stateIndex = 0; stateIndex < States.Count; ++stateIndex)

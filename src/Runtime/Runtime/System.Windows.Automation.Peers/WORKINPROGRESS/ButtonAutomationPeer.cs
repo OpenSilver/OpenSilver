@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System;
 using System.Windows.Controls;
 
@@ -83,4 +82,3 @@ namespace Windows.UI.Xaml.Automation.Peers
 		}
 	}
 }
-#endif

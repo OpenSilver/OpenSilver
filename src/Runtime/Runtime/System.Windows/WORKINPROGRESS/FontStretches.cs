@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.UI.Xaml;
 #endif
@@ -86,4 +84,3 @@ namespace System.Windows
 		public static FontStretch UltraExpanded { get; }
 	}
 }
-#endif

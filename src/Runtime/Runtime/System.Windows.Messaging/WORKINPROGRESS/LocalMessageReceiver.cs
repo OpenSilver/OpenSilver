@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 using System.Collections.Generic;
 using System.Security;
 
@@ -158,5 +156,3 @@ namespace System.Windows.Messaging
 		}
 	}
 }
-
-#endif

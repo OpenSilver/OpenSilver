@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 
 using System.Security;
@@ -159,5 +157,4 @@ namespace System.Windows
 	}
 }
 
-#endif
 #endif

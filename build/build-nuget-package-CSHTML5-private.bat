@@ -20,15 +20,6 @@ echo.
 nuget.exe pack nuspec\CSHTML5.nuspec -OutputDirectory "output/CSHTML5" -Properties "PackageId=CSHTML5.Migration;Target=CSHTML5.Migration;PackageVersion=2.0.0-private%PackageVersion%;Configuration=Migration;AssembliesPrefix=CSHTML5.Migration;CompilerPrefix=SLMigration.CSharpXamlForHtml5"
 
 echo. 
-echo %ESC%[95mBuilding %ESC%[0mMigration.WorkInProgress %ESC%[95mconfiguration%ESC%[0m
-echo. 
-msbuild ../src/CSHTML5.sln -p:Configuration=Migration.WorkInProgress -clp:ErrorsOnly
-echo. 
-echo %ESC%[95mPacking %ESC%[0mCSHTML5.Migration.WorkInProgress %ESC%[95mNuGet package%ESC%[0m
-echo. 
-nuget.exe pack nuspec\CSHTML5.nuspec -OutputDirectory "output/CSHTML5" -Properties "PackageId=CSHTML5.Migration.WorkInProgress;Target=CSHTML5.Migration";PackageVersion=2.0.0-private%PackageVersion%;Configuration=Migration.WorkInProgress;AssembliesPrefix=CSHTML5.Migration;CompilerPrefix=SLMigration.CSharpXamlForHtml5"
-
-echo. 
 echo %ESC%[95mBuilding %ESC%[0mDebug %ESC%[95mconfiguration%ESC%[0m
 echo. 
 msbuild ../src/CSHTML5.sln -p:Configuration=Debug -clp:ErrorsOnly

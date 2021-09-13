@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Documents
 #else
@@ -106,4 +104,3 @@ namespace Windows.UI.Xaml.Documents
 		internal abstract string GetContainerText();
 	}
 }
-#endif

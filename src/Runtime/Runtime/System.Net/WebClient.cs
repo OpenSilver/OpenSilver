@@ -912,16 +912,6 @@ namespace System.Net
         ////     or all of the data.
         //public event DownloadProgressChangedEventHandler DownloadProgressChanged;
 
-
-
-
-
-
-
-
-
-
-#if WORKINPROGRESS
         //
         // Summary:
         //     Occurs when an asynchronous operation to open a stream containing a resource
@@ -935,7 +925,6 @@ namespace System.Net
         //     resource completes.
 		[OpenSilver.NotImplemented]
         public event OpenWriteCompletedEventHandler OpenWriteCompleted;
-#endif
         ////
         //// Summary:
         ////     Occurs when an asynchronous data-upload operation completes.
@@ -1353,7 +1342,6 @@ namespace System.Net
         ////     error occurred while opening the stream.
         //public void OpenReadAsync(Uri address);
         ////
-#if WORKINPROGRESS
         // Summary:
         //     Opens a readable stream containing the specified resource. This method does
         //     not block the calling thread.
@@ -1379,7 +1367,6 @@ namespace System.Net
         {
 
         }
-#endif
         ////
         ////
         //// Returns:
@@ -1477,7 +1464,6 @@ namespace System.Net
         ////     is invalid.-or- An error occurred while opening the stream.
         //public Stream OpenWrite(Uri address, string method);
         ////
-#if WORKINPROGRESS
         // Summary:
         //     Opens a stream for writing data to the specified resource. This method does
         //     not block the calling thread.
@@ -1494,7 +1480,6 @@ namespace System.Net
         {
 
         }
-#endif
         ////
         //// Summary:
         ////     Opens a stream for writing data to the specified resource. This method does

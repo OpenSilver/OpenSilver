@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System.Globalization;
 
 #if MIGRATION
@@ -43,4 +40,3 @@ namespace Windows.UI.Xaml.Controls
         string[] GetTimeParseFormats(CultureInfo culture);
     }
 }
-#endif

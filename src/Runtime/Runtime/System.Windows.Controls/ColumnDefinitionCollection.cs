@@ -28,7 +28,6 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-#if WORKINPROGRESS
     public sealed partial class ColumnDefinitionCollection : PresentationFrameworkCollection<ColumnDefinition>
     {
         #region Data
@@ -209,11 +208,4 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion
     }
-#else
-    /// <exclude/>
-    public sealed partial class ColumnDefinitionCollection : ObservableCollection<ColumnDefinition> //IList<ColumnDefinition>, IEnumerable<ColumnDefinition>
-    {
-
-    }
-#endif
 }

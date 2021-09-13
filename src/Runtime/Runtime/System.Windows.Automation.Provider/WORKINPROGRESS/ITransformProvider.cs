@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows.Automation.Provider
 #else
@@ -78,4 +77,3 @@ namespace Windows.UI.Xaml.Automation.Provider
 		void Rotate(double degrees);
 	}
 }
-#endif

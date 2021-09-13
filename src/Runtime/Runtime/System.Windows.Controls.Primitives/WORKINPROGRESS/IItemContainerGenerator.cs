@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Windows.Controls;
 using System;
 using System.Windows;
@@ -133,4 +132,3 @@ namespace Windows.UI.Xaml.Controls.Primitives
         Error
     }
 }
-#endif

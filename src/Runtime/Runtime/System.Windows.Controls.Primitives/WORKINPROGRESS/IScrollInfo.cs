@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -15,4 +13,3 @@ namespace Windows.UI.Xaml.Controls.Primitives
 		Rect MakeVisible(UIElement visual, Rect rectangle);
 	}
 }
-#endif

@@ -22,7 +22,6 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>
     /// This class is used to animate a Color property value along a set
     /// of key frames.
@@ -101,5 +100,4 @@ namespace Windows.UI.Xaml.Media.Animation
             _targetName = Storyboard.GetTargetName(this);
         }
     }
-#endif
 }

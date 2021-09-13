@@ -90,9 +90,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public Rect Bounds { get; private set; }
-#endif
     }
 }

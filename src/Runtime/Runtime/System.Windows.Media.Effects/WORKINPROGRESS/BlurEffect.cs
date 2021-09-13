@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.UI.Xaml;
 #endif
@@ -50,5 +48,3 @@ namespace System.Windows.Media.Effects
 		}
 	}
 }
-
-#endif

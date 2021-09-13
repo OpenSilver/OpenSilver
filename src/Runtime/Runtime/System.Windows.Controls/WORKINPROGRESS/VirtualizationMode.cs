@@ -21,7 +21,6 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-#if WORKINPROGRESS
     // Summary:
     //     Specifies the method the System.Windows.Controls.VirtualizingStackPanel uses
     //     to manage virtualizing its child items.
@@ -35,5 +34,4 @@ namespace Windows.UI.Xaml.Controls
         //     Reuse the item containers.
         Recycling = 1,
     }
-#endif
 }

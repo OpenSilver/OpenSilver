@@ -1,6 +1,5 @@
 using System;
 
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows.Automation
 #else
@@ -29,4 +28,3 @@ namespace Windows.UI.Xaml.Automation
 		Multiple = 2
 	}
 }
-#endif

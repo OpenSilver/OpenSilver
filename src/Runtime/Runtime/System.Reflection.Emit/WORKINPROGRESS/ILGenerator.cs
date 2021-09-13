@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 
 using System.Security;
 
@@ -274,4 +273,3 @@ namespace System.Reflection.Emit
     }
 }
 
-#endif

@@ -31,23 +31,11 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>$(BinFolder)\Debug\CSHTML5.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">
-    <AssemblyName>CSHTML5</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>$(BinFolder)\Debug.WorkInProgress\CSHTML5.xml</DocumentationFile>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">
     <AssemblyName>CSHTML5.Migration</AssemblyName>
     <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION</DefineConstants>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>$(BinFolder)\Migration\CSHTML5.Migration.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">
-    <AssemblyName>CSHTML5.Migration</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;MIGRATION;WORKINPROGRESS</DefineConstants>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>$(BinFolder)\Migration.WorkInProgress\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Core\Main\DescendentsWalker.cs" />
@@ -58,6 +46,7 @@
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
+    <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
@@ -985,7 +974,6 @@
     <Compile Include="System.Windows.Media\Color.cs" />
     <Compile Include="System.Windows.Media\ColorConverter.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />
-    <Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />
@@ -1141,9 +1129,7 @@
   <ItemGroup>
     <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' ">..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
       <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' ">..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -1153,7 +1139,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
-  <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />
-  <Import Project="..\..\packages\CSHTML5.Migration.WorkInProgress.2.0.0-alpha69-089\build\CSHTML5.Migration.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU' " />
 </Project>

@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Documents
 #else
@@ -23,5 +21,3 @@ namespace Windows.UI.Xaml.Documents
 		Forward = 1
 	}
 }
-
-#endif

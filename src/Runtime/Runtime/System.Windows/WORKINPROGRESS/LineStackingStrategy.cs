@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows
 #else
@@ -28,5 +26,3 @@ namespace Windows.UI.Xaml
 		BaselineToBaseline = 2
 	}
 }
-
-#endif

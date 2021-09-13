@@ -7,7 +7,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Configurations>SL;SL.WorkInProgress;UWP;UWP.WorkInProgress</Configurations>
+		<Configurations>SL;UWP</Configurations>
 		<Platforms>AnyCPU</Platforms>
 		<AssemblyName>OpenSilver</AssemblyName>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -21,19 +21,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;WORKINPROGRESS;WCF_STACK;GD_WIP</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;GD_WIP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
 		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER;WORKINPROGRESS</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -62,6 +54,7 @@
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\PropertyChangedTrigger.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\StoryboardAction.cs" />
 		<Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
+		<Compile Include="OpenSilver\Internal\Parsers.cs" />
 		<Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
@@ -82,6 +75,7 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
+		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Media\ColorConverter.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
@@ -330,7 +324,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="System.Windows\FrameworkPropertyMetadata.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\Color.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
 		<Compile Include="System\WORKINPROGRESS\AppDomainExtensions.cs" />
 		<Compile Include="System.Collections.Generic\WORKINPROGRESS\SynchronizedReadOnlyCollection.cs" />
@@ -1099,7 +1092,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\WindowResizeEdge.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\AssemblyPart.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\AssemblyPartCollection.cs" />
-		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\Colors.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSIgnoreAttribute.cs" />
 		<Compile Include="__COMPATIBILITY__\JSIL.Meta.dll ASSEMBLY\JSIL.Meta\JSReplacementAttribute.cs" />
@@ -1252,8 +1244,6 @@
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
 	<Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
-	<Import Project="..\..\packages\OpenSilver.WorkInProgress.$(OpenSilverVersion)\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
 	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
-	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
 
 </Project>

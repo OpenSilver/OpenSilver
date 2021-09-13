@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 using System;
 using System.Windows.Markup;
 
@@ -53,4 +51,3 @@ namespace Windows.UI.Xaml.Media
 		}
 	}
 }
-#endif

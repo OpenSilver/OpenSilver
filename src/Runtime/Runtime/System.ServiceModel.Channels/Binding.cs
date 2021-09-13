@@ -34,10 +34,8 @@ namespace System.ServiceModel.Channels
     /// </summary>
     public partial class Binding
     {
-#if WORKINPROGRESS
         public TimeSpan ReceiveTimeout { get; set; }
         public TimeSpan SendTimeout { get; set; }
-#endif
     }
 }
 

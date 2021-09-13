@@ -111,7 +111,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 GoToState(VisualStates.StateUnselected);
             }
-#if WORKINPROGRESS
             if (IsFocused)
             {
                 GoToState(VisualStates.StateFocused);
@@ -120,7 +119,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 GoToState(VisualStates.StateUnfocused);
             }
-#endif
         }
     }
 }

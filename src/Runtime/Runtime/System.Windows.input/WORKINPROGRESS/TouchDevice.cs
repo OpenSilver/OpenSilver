@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Windows;
 using System;
 
@@ -39,4 +38,3 @@ namespace Windows.UI.Xaml.Input
 		}
 	}
 }
-#endif

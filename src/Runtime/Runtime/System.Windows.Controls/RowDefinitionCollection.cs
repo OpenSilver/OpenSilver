@@ -28,7 +28,6 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-#if WORKINPROGRESS
     /// <exclude/>
     public sealed partial class RowDefinitionCollection : PresentationFrameworkCollection<RowDefinition>
     {
@@ -210,11 +209,4 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion
     }
-#else
-    /// <exclude/>
-    public sealed partial class RowDefinitionCollection : ObservableCollection<RowDefinition> //IList<RowDefinition>, IEnumerable<RowDefinition>
-    {
-        
-    }
-#endif
 }

@@ -19,8 +19,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if WORKINPROGRESS
-
 #if MIGRATION
 namespace System.Windows.Input
 #else
@@ -34,4 +32,3 @@ namespace Windows.UI.Xaml.Input
         public TabletDeviceType DeviceType { get; private set; }
     }
 }
-#endif

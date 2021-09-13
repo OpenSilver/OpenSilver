@@ -178,7 +178,6 @@ namespace System.ComponentModel.Tests
                 .BeOfType<TransformConverter>();
         }
 
-#if WORKINPROGRESS
         [TestMethod]
         public void GetConverter_When_CacheMode()
         {
@@ -188,7 +187,6 @@ namespace System.ComponentModel.Tests
                 .And
                 .BeOfType<CacheModeConverter>();
         }
-#endif
 
         [TestMethod]
         public void GetConverter_When_CornerRadius()
@@ -280,7 +278,6 @@ namespace System.ComponentModel.Tests
                 .BeOfType<ThicknessConverter>();
         }
 
-#if WORKINPROGRESS
         [TestMethod]
         public void GetConverter_When_FontStretch()
         {
@@ -290,7 +287,6 @@ namespace System.ComponentModel.Tests
                 .And
                 .BeOfType<FontStretchConverter>();
         }
-#endif
 
 #if MIGRATION
 

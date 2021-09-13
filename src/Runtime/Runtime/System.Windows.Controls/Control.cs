@@ -1054,7 +1054,6 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             VisualStateManager.GoToState(this, state, true);
         }
 
-#if WORKINPROGRESS
 #if MIGRATION
         //
         // Summary:
@@ -1155,7 +1154,6 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
 
         }
-#endif
         protected override Size MeasureOverride(Size availableSize)
         {
             IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);

@@ -53,9 +53,6 @@ namespace OpenSilver.TemplateWizards
                     case OpenSilverBuildType.Stable:
                         replacementsDictionary.Add("$opensilverpackagename$", "OpenSilver");
                         break;
-                    case OpenSilverBuildType.WorkInProgress:
-                        replacementsDictionary.Add("$opensilverpackagename$", "OpenSilver.WorkInProgress");
-                        break;
                 }
             }
             else if (openSilverAPI == "UWP")
@@ -64,9 +61,6 @@ namespace OpenSilver.TemplateWizards
                 {
                     case OpenSilverBuildType.Stable:
                         replacementsDictionary.Add("$opensilverpackagename$", "OpenSilver.UWPCompatible");
-                        break;
-                    case OpenSilverBuildType.WorkInProgress:
-                        replacementsDictionary.Add("$opensilverpackagename$", "OpenSilver.UWPCompatible"); //TODO: change this when we have a UWP WorkInProgress package
                         break;
                 }
             }
@@ -85,7 +79,7 @@ namespace OpenSilver.TemplateWizards
                         break;
                     case BlazorVersion.Net6:
                         replacementsDictionary.Add("$blazortargetframework$", "net6.0");
-                        replacementsDictionary.Add("$blazorpackagesversion$", "6.0.0-preview.5.21301.17");
+                        replacementsDictionary.Add("$blazorpackagesversion$", "6.0.0-preview.7.*");
                         break;
                 }
             }

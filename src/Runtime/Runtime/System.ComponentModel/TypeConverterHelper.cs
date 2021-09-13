@@ -260,10 +260,8 @@ namespace System.ComponentModel
                 [typeof(FontStyle)] = new FontStyleConverter(),
                 [typeof(TextDecorationCollection)] = new TextDecorationCollectionConverter(),
 #endif
-#if WORKINPROGRESS
                 [typeof(CacheMode)] = new CacheModeConverter(),
                 [typeof(FontStretch)] = new FontStretchConverter(),
-#endif
             };
         }
 

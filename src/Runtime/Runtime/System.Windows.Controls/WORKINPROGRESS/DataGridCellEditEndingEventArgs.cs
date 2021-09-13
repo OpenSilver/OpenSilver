@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System.ComponentModel;
 
 #if MIGRATION
@@ -86,4 +83,3 @@ namespace Windows.UI.Xaml.Controls
         public DataGridRow Row { get; }
     }
 }
-#endif

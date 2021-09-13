@@ -271,9 +271,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <param name="dependencyProperty">The identifier of the dependency property to set.</param>
         /// <param name="value">The new local value.</param>
-#if WORKINPROGRESS
         [Obsolete("Use SetCurrentValue")]
-#endif
         public void SetLocalValue(DependencyProperty dependencyProperty, object value)
         {
             this.SetCurrentValue(dependencyProperty, value);
@@ -581,7 +579,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public bool CheckAccess()
         {
@@ -596,6 +593,5 @@ namespace Windows.UI.Xaml
 
             return accessAllowed;
         }
-#endif
-        }
+    }
 }

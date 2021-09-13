@@ -22,7 +22,6 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>Provides a base class for specific animation key-frame techniques that define an animation segment with a <see cref="T:System.Windows.Media.Color" /> target value. Derived classes each provide a different key-frame interpolation method for a <see cref="T:System.Windows.Media.Color" /> value that is provided for a <see cref="T:System.Windows.Media.Animation.ColorAnimationUsingKeyFrames" /> animation. </summary>
     [OpenSilver.NotImplemented]
     public abstract partial class ColorKeyFrame : DependencyObject, IKeyFrame
@@ -55,5 +54,4 @@ namespace Windows.UI.Xaml.Media.Animation
             set { this.Value = (Color)value; }
         }
     }
-#endif
 }

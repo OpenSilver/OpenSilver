@@ -94,9 +94,9 @@ namespace System.ServiceModel
     /// await soapClient.AddOrUpdateToDoAsync(todo);
     /// </code>
     /// </example>
-#if WORKINPROGRESS && !CSHTML5BLAZOR
+#if BRIDGE
     public abstract partial class CSHTML5_ClientBase<TChannel> : ICommunicationObject where TChannel : class
-#else
+#elif OPENSILVER
     public abstract partial class CSHTML5_ClientBase<TChannel> /*: ICommunicationObject, IDisposable*/ where TChannel : class
 #endif
     {
@@ -552,11 +552,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     out headers,
                     out request);
 
-#if WORKINPROGRESS
                 Uri address = INTERNAL_UriHelper.EnsureAbsoluteUri(_addressOfService);
-#else
-                Uri address = new Uri(_addressOfService);
-#endif
 
                 // Make the actual web service call
                 _webRequestHelper_JSVersion.MakeRequest(
@@ -1834,7 +1830,6 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
         #region work in progress
 
-#if WORKINPROGRESS && (!CSHTML5BLAZOR || WORKINPROGRESS)
         #region Not Supported Stuff
 
         //    /// <summary>
@@ -1946,9 +1941,8 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
 
         #endregion
-#endif
 
-#if WORKINPROGRESS && !CSHTML5BLAZOR
+#if BRIDGE
         #region ICommunicationObject methods
 
 		[OpenSilver.NotImplemented]

@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System;
 using System.Collections;
 using System.Windows.Resources;
@@ -96,5 +93,3 @@ namespace Windows.UI.Xaml
         }
     }
 }
-
-#endif

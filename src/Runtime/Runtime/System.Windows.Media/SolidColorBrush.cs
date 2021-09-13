@@ -30,9 +30,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Paints an area with a solid color.
     /// </summary>
-#if WORKINPROGRESS // "ContentProperty" is marked as WORKINPROGRESS because it has not been tested yet.
     [ContentProperty("Color")]
-#endif
     public sealed partial class SolidColorBrush : Brush, ICanConvertToCSSValue, ICloneOnAnimation
     {
         bool _isAlreadyAClone = false;

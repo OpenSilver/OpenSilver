@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows.Printing
 #else
@@ -39,4 +38,3 @@ namespace Windows.UI.Xaml.Printing
 		}
 	}
 }
-#endif

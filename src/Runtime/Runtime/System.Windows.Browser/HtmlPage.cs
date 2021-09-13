@@ -26,9 +26,7 @@ namespace System.Windows.Browser
     {
         static HtmlWindow _initWindow;
         static HtmlDocument _initDocument;
-#if WORKINPROGRESS
         static HtmlElement _initPlugin;
-#endif
         /// <summary>
         /// Gets the browser's window object.
         /// </summary>
@@ -58,8 +56,6 @@ namespace System.Windows.Browser
                 return _initDocument;
             }
         }
-
-#if WORKINPROGRESS
 
 		[OpenSilver.NotImplemented]
         public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
@@ -115,7 +111,7 @@ namespace System.Windows.Browser
 
             foreach (var method in methods)
             {
-                CSHTML5.Interop.ExecuteJavaScript("window[$0][$1] = function () { $2(...arguments); }", scriptKey, method.Name, (Action<CSHTML5.Types.INTERNAL_JSObjectReference>)(jsObjectReference =>
+                CSHTML5.Interop.ExecuteJavaScript("window[$0][$1] = function () { return $2(...arguments); }", scriptKey, method.Name, (Func<CSHTML5.Types.INTERNAL_JSObjectReference, object>)(jsObjectReference =>
                 {
                     var parameters = method.GetParameters();
                     var args = new object[parameters.Length];
@@ -124,10 +120,9 @@ namespace System.Windows.Browser
                         jsObjectReference.ArrayIndex = i;
                         args[i] = (jsObjectReference.IsNull() || jsObjectReference.IsUndefined()) ? null : Convert.ChangeType(jsObjectReference, parameters[i].ParameterType);
                     }
-                    method.Invoke(instance, args);
+                    return method.Invoke(instance, args);
                 }));
             }
         }
-#endif
     }
 }

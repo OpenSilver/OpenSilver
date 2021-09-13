@@ -59,11 +59,7 @@ namespace Windows.UI.Xaml.Controls.Common
         {
             if (element != null)
             {
-#if WORKINPROGRESS
                 DependencyObject focusedDependencyObject = FocusManager.GetFocusedElement() as DependencyObject;
-#else
-                DependencyObject focusedDependencyObject = null;
-#endif
                 while (focusedDependencyObject != null)
                 {
                     if (focusedDependencyObject == element)

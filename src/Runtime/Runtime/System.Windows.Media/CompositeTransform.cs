@@ -426,13 +426,8 @@ namespace Windows.UI.Xaml.Media
         {
             get
             {
-#if WORKINPROGRESS
                 double centerX = this.CenterX;
                 double centerY = this.CenterY;
-#else
-                double centerX = 0.0;
-                double centerY = 0.0;
-#endif
                 bool hasCenter = centerX != 0 || centerY != 0;
 
                 // 1. Scale

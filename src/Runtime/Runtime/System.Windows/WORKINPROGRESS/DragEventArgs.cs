@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -69,5 +66,3 @@ namespace Windows.UI.Xaml
         }
     }
 }
-
-#endif

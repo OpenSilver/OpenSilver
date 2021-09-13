@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 namespace System.Windows.Interactivity
 {
 	[OpenSilver.NotImplemented]
@@ -21,5 +19,3 @@ namespace System.Windows.Interactivity
 		}
 	}
 }
-
-#endif

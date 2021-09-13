@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(Name = VisualStates.StateBusy, GroupName = VisualStates.GroupBusyStatus)]
     [TemplateVisualState(Name = VisualStates.StateVisible, GroupName = VisualStates.GroupVisibility)]
     [TemplateVisualState(Name = VisualStates.StateHidden, GroupName = VisualStates.GroupVisibility)]
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
     [StyleTypedProperty(Property = "OverlayStyle", StyleTargetType = typeof(Rectangle))]
 #if false
     [StyleTypedProperty(Property = "ProgressBarStyle", StyleTargetType = typeof(ProgressBar))]

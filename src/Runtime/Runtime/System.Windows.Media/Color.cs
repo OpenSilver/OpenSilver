@@ -11,12 +11,9 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
-using Bridge;
-#endif
-
 using System;
 using System.Globalization;
+using System.Text;
 using OpenSilver.Internal;
 
 #if !MIGRATION
@@ -32,206 +29,370 @@ namespace Windows.UI
     /// <summary>
     /// Describes a color in terms of alpha, red, green, and blue channels.
     /// </summary>
-#if WORKINPROGRESS
-    public partial struct Color : IFormattable
-#else
-    public partial struct Color //todo: this is supposed to inherit from IFormattable
-#endif
+    public struct Color : IFormattable
     {
+        internal static Color INTERNAL_ConvertFromInt32(int argb)
+        {
+            Color c1 = new Color();
+
+            c1.sRgbColor.a = (byte)((argb >> 0x18) & 0xff);
+            c1.sRgbColor.r = (byte)((argb >> 0x10) & 0xff);
+            c1.sRgbColor.g = (byte)((argb >> 8) & 0xff);
+            c1.sRgbColor.b = (byte)(argb & 0xff);
+
+            return c1;
+        }
+
+        ///<summary>
+        /// FromScRgb
+        ///</summary>
+        public static Color FromScRgb(float a, float r, float g, float b)
+        {
+            Color c1 = new Color();
+
+            if (a < 0.0f)
+            {
+                a = 0.0f;
+            }
+            else if (a > 1.0f)
+            {
+                a = 1.0f;
+            }
+
+            c1.sRgbColor.a = (byte)((a * 255.0f) + 0.5f);
+            c1.sRgbColor.r = ScRgbTosRgb(r);
+            c1.sRgbColor.g = ScRgbTosRgb(g);
+            c1.sRgbColor.b = ScRgbTosRgb(b);
+
+            return c1;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Color"/> structure by using the specified sRGB
+        /// alpha channel and color channel values.
+        /// </summary>
+        /// <param name="a">
+        /// The alpha channel, <see cref="A"/>, of the new color. The value
+        /// must be between 0 and 255.
+        /// </param>
+        /// <param name="r">
+        /// The red channel, <see cref="R"/>, of the new color. The value must
+        /// be between 0 and 255.
+        /// </param>
+        /// <param name="g">
+        /// The green channel, <see cref="G"/>, of the new color. The value
+        /// must be between 0 and 255.
+        /// </param>
+        /// <param name="b">
+        /// The blue channel, <see cref="B"/>, of the new color. The value must
+        /// be between 0 and 255.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Color"/> structure with the specified values.
+        /// </returns>
+        public static Color FromArgb(byte a, byte r, byte g, byte b)
+        {
+            Color c1 = new Color();
+     
+            c1.sRgbColor.a = a;
+            c1.sRgbColor.r = r;
+            c1.sRgbColor.g = g;
+            c1.sRgbColor.b = b;
+
+            return c1;
+        }
+
+        ///<summary>
+        /// Color - sRgb legacy interface, assumes Rgb values are sRgb
+        ///</summary>
+        public static Color FromRgb(byte r, byte g, byte b)
+        {
+            Color c1 = Color.FromArgb(0xff, r, g, b);
+            return c1;
+        }
+
+        /// <summary>
+        /// Gets a hash code for the current <see cref="Color"/> structure.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="Color"/> structure.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return this.sRgbColor.GetHashCode();
+        }
+
+        /// <summary>
+        /// Creates a string representation of the color using the ARGB channels in hex notation.
+        /// </summary>
+        /// <returns>
+        /// The string representation of the color.
+        /// </returns>
+        public override string ToString()
+        {
+            // Delegate to the internal method which implements all ToString calls.
+            return ConvertToString(null, null);
+        }
+
+        /// <summary>
+        /// Creates a string representation of the color by using the ARGB channels and the
+        /// specified format provider.
+        /// </summary>
+        /// <param name="provider">
+        /// Culture-specific formatting information.
+        /// </param>
+        /// <returns>
+        /// The string representation of the color.
+        /// </returns>
+        public string ToString(IFormatProvider provider)
+        {
+            // Delegate to the internal method which implements all ToString calls.
+            return ConvertToString(null, provider);
+        }
+
+        /// <summary>
+        /// Creates a string representation of this object based on the format string
+        /// and IFormatProvider passed in.
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        string IFormattable.ToString(string format, IFormatProvider provider)
+        {
+            // Delegate to the internal method which implements all ToString calls.
+            return ConvertToString(format, provider);
+        }
+
+        /// <summary>
+        /// Creates a string representation of this object based on the format string 
+        /// and IFormatProvider passed in.  
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        internal string ConvertToString(string format, IFormatProvider provider)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (format == null)
+            {
+                sb.Append(string.Format(provider, "#{0:X2}", this.sRgbColor.a));
+                sb.Append(string.Format(provider, "{0:X2}", this.sRgbColor.r));
+                sb.Append(string.Format(provider, "{0:X2}", this.sRgbColor.g));
+                sb.Append(string.Format(provider, "{0:X2}", this.sRgbColor.b));
+            }
+            else
+            {
+                // Helper to get the numeric list separator for a given culture.
+                char separator = TokenizerHelper.GetNumericListSeparator(provider);
+
+                sb.Append(
+                    string.Format(
+                        provider,
+                        "sc#{1:" + format + "}{0} {2:" + format + "}{0} {3:" + format + "}{0} {4:" + format + "}",
+                        separator, sRgbColor.a, sRgbColor.r, sRgbColor.g, sRgbColor.b
+                    )
+                );
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Tests whether the specified <see cref="Color"/> structure is identical
+        /// to the current color.
+        /// </summary>
+        /// <param name="color">
+        /// The <see cref="Color"/> structure to compare to the current <see cref="Color"/>
+        /// structure.
+        /// </param>
+        /// <returns>
+        /// true if the specified <see cref="Color"/> structure is identical to the
+        /// current <see cref="Color"/> structure; otherwise, false.
+        /// </returns>
+        public bool Equals(Color color)
+        {
+            return this == color;
+        }
+
+        /// <summary>
+        /// Tests whether the specified object is a <see cref="Color"/> structure
+        /// and is equivalent to the current color.
+        /// </summary>
+        /// <param name="o">
+        /// The object to compare to the current <see cref="Color"/> structure.
+        /// </param>
+        /// <returns>
+        /// true if the specified object is a <see cref="Color"/> structure and is
+        /// identical to the current <see cref="Color"/> structure; otherwise, false.
+        /// </returns>
+        public override bool Equals(object o)
+        {
+            if (o is Color)
+            {
+                Color color = (Color)o;
+
+                return (this == color);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Tests whether two <see cref="Color"/> structures are identical.
+        /// </summary>
+        /// <param name="color1">
+        /// The first <see cref="Color"/> structure to compare.
+        /// </param>
+        /// <param name="color2">
+        /// The second <see cref="Color"/> structure to compare.
+        /// </param>
+        /// <returns>
+        /// true if color1 and color2 are exactly identical; otherwise, false.
+        /// </returns>
+        public static bool operator ==(Color color1, Color color2)
+        {
+            if (color1.sRgbColor.r != color2.sRgbColor.r)
+            {
+                return false;
+            }
+
+            if (color1.sRgbColor.g != color2.sRgbColor.g)
+            {
+                return false;
+            }
+
+            if (color1.sRgbColor.b != color2.sRgbColor.b)
+            {
+                return false;
+            }
+
+            if (color1.sRgbColor.a != color2.sRgbColor.a)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Tests whether two <see cref="Color"/> structures are not identical.
+        /// </summary>
+        /// <param name="color1">
+        /// The first <see cref="Color"/> structure to compare.
+        /// </param>
+        /// <param name="color2">
+        /// The second <see cref="Color"/> structure to compare.
+        /// </param>
+        /// <returns>
+        /// true if color1 and color2 are not equal; otherwise, false.
+        /// </returns>
+        public static bool operator !=(Color color1, Color color2)
+        {
+            return (!(color1 == color2));
+        }
+
         /// <summary>
         /// Gets or sets the sRGB alpha channel value of the color.
         /// </summary>
-        public byte A { get; set; }
+        /// <returns>
+        /// The sRGB alpha channel value of the color, as a value between 0 and 255.
+        /// </returns>
+        public byte A
+        {
+            get
+            {
+                return sRgbColor.a;
+            }
+            set
+            {
+                sRgbColor.a = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the sRGB blue channel value of the color.
         /// </summary>
-        public byte B { get; set; }
+        /// <returns>
+        /// The sRGB blue channel value, as a value between 0 and 255.
+        /// </returns>
+        public byte R
+        {
+            get
+            {
+                return sRgbColor.r;
+            }
+            set
+            {
+                sRgbColor.r = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the sRGB green channel value of the color.
         /// </summary>
-        public byte G { get; set; }
+        /// <returns>
+        /// The sRGB green channel value, as a value between 0 and 255.
+        /// </returns>
+        public byte G
+        {
+            get
+            {
+                return sRgbColor.g;
+            }
+            set
+            {
+                sRgbColor.g = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the sRGB red channel value of the color.
         /// </summary>
-        public byte R { get; set; }
-
-        /// <summary>
-        /// Creates a new Windows.UI.Color structure by using the specified sRGB alpha
-        /// channel and color channel values.
-        /// </summary>
-        /// <param name="a">
-        /// The alpha channel, Windows.UI.Color.A, of the new color. The value must be
-        /// between 0 and 255.
-        /// </param>
-        /// <param name="r">
-        /// The red channel, Windows.UI.Color.R, of the new color. The value must be
-        /// between 0 and 255.
-        /// </param>
-        /// <param name="g">
-        /// The green channel, Windows.UI.Color.G, of the new color. The value must be
-        /// between 0 and 255.
-        /// </param>
-        /// <param name="b">
-        /// The blue channel, Windows.UI.Color.B, of the new color. The value must be
-        /// between 0 and 255.
-        /// </param>
-        /// <returns>A Windows.UI.Color structure with the specified values.</returns>
-        public static Color FromArgb(byte a, byte r, byte g, byte b)
+        /// <returns>
+        /// The sRGB red channel value, as a value between 0 and 255.
+        /// </returns>
+        public byte B
         {
-            return new Color()
+            get
             {
-                A = a,
-                R = r,
-                G = g,
-                B = b
-            };
-        }
-
-        public static Color FromScRgb(float a, float r, float g, float b)
-        {
-            return new Color()
-            {
-                A = (byte)(a * 255f),
-                R = ScRgbTosRgb(r),
-                G = ScRgbTosRgb(g),
-                B = ScRgbTosRgb(b),
-            };
-        }
-
-        private static byte ScRgbTosRgb(float val)
-        {
-            if (!(val > 0.0))       // Handles NaN case too
-            {
-                return (0);
+                return sRgbColor.b;
             }
-            else if (val <= 0.0031308)
+            set
             {
-                return ((byte)((255.0f * val * 12.92f) + 0.5f));
+                sRgbColor.b = value;
             }
-            else if (val < 1.0)
-            {
-                return ((byte)((255.0f * ((1.055f * (float)Math.Pow((double)val, (1.0 / 2.4))) - 0.055f)) + 0.5f));
-            }
-            else
-            {
-                return (255);
-            }
-        }
-
-        internal string INTERNAL_ToHtmlString(double opacity)
-        {
-            return string.Format(CultureInfo.InvariantCulture,
-                "rgba({0}, {1}, {2}, {3})",
-                this.R, this.G, this.B, opacity * this.A / 255d);
-        }
-
-        internal static object INTERNAL_ConvertFromString(string colorString)
-        {
-            return Parse(colorString, null);
-        }
-
-        internal static Color Parse(string source, IFormatProvider provider)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            string stringValue = source.Trim();
-
-            if (stringValue.Length > 0)
-            {
-                if (stringValue[0] == '#')
-                {
-                    string tokens = stringValue.Substring(1);
-                    if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
-                    {
-                        tokens = "FF" + tokens;
-                    }
-
-#if NETSTANDARD
-                    int color;
-                    if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.GetInstance(provider), out color))
-                    {
-                        return INTERNAL_ConvertFromInt32(color);
-                    }
-#elif BRIDGE
-                    int color;
-                    if (CSHTML5.Interop.IsRunningInTheSimulator)
-                    {
-                        color = INTERNAL_BridgeWorkarounds.HexToInt_SimulatorOnly(tokens);
-                    }
-                    else
-                    {
-                        color = Script.Write<int>("parseInt({0}, 16);", tokens);
-                    }
-
-                    return INTERNAL_ConvertFromInt32(color);
-#endif
-                }
-                else if (stringValue.StartsWith("sc#", StringComparison.Ordinal))
-                {
-                    string tokens = stringValue.Substring(3);
-
-                    char[] separators = new char[1] { ',' };
-                    string[] words = tokens.Split(separators);
-                    float[] values = new float[4];
-                    for (int i = 0; i < 3; i++)
-                    {
-                        values[i] = Convert.ToSingle(words[i]);
-                    }
-                    if (words.Length == 4)
-                    {
-                        values[3] = Convert.ToSingle(words[3]);
-                        return Color.FromScRgb(values[0], values[1], values[2], values[3]);
-                    }
-                    else
-                    {
-                        return Color.FromScRgb(1.0f, values[0], values[1], values[2]);
-                    }
-                }
-                else
-                {
-                    // Check if the color is a named color
-                    Colors.INTERNAL_ColorsEnum namedColor;
-                    if (Enum.TryParse(stringValue, true, out namedColor))
-                    {
-                        return INTERNAL_ConvertFromInt32((int)namedColor);
-                    }
-                }
-            }
-
-            throw new FormatException($"Invalid color: '{source}'");
-        }
-
-        internal static Color Parse(string source)
-        {
-            return Parse(source, CultureInfo.InvariantCulture);
-        }
-
-        internal static Color INTERNAL_ConvertFromInt32(int colorAsInt32)
-        {
-            return new Color()
-            {
-                A = (byte)((colorAsInt32 >> 0x18) & 0xff),
-                R = (byte)((colorAsInt32 >> 0x10) & 0xff),
-                G = (byte)((colorAsInt32 >> 8) & 0xff),
-                B = (byte)(colorAsInt32 & 0xff)
-            };
         }
 
         internal string INTERNAL_ToHtmlStringForVelocity()
         {
-            return string.Format("#{0}{1}{2}", 
-                R.ToInvariantString("X2"), 
-                G.ToInvariantString("X2"), 
+            return string.Format("#{0}{1}{2}",
+                R.ToInvariantString("X2"),
+                G.ToInvariantString("X2"),
                 B.ToInvariantString("X2"));
         }
 
-        public static explicit operator Brush(Color color)  // explicit Color to Brush conversion operator
+        internal string INTERNAL_ToHtmlString(double opacity)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "rgba({0}, {1}, {2}, {3})",
+                this.R, this.G, this.B, opacity * this.A / 255d
+            );
+        }
+
+        internal static object INTERNAL_ConvertFromString(string color)
+        {
+            return Parsers.ParseColor(color, null);
+        }
+
+        public static explicit operator Brush(Color color)
         {
             /********************************************************
             This method is here to support the following use:
@@ -254,67 +415,35 @@ namespace Windows.UI
             return new SolidColorBrush(color);
         }
 
-        public override string ToString()
+        ///<summary>
+        /// private helper function to set context values from a color value with a set context and ScRgb values
+        ///</summary>
+        ///
+        private static byte ScRgbTosRgb(float val)
         {
-            return string.Format("#{0}{1}{2}{3}", 
-                A.ToInvariantString("X2"), 
-                R.ToInvariantString("X2"), 
-                G.ToInvariantString("X2"), 
-                B.ToInvariantString("X2"));
-        }
-
-        public override int GetHashCode()
-        {
-            return BitConverter.ToInt32(new byte[] { A, R, G, B }, 0); //A.GetHashCode() ^ R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode();
-        }
-
-        public bool Equals(Color color)
-        {
-            return this == color;
-        }
-
-        public override bool Equals(object o)
-        {
-            if (o is Color)
+            if (!(val > 0.0))       // Handles NaN case too
             {
-                Color color = (Color)o;
-
-                return (this == color);
+                return (0);
+            }
+            else if (val <= 0.0031308)
+            {
+                return ((byte)((255.0f * val * 12.92f) + 0.5f));
+            }
+            else if (val < 1.0)
+            {
+                return ((byte)((255.0f * ((1.055f * (float)Math.Pow((double)val, (1.0 / 2.4))) - 0.055f)) + 0.5f));
             }
             else
             {
-                return false;
+                return (255);
             }
         }
 
-        public static bool operator ==(Color color1, Color color2)
+        private struct MILColor
         {
-            if (color1.R != color2.R)
-            {
-                return false;
-            }
-
-            if (color1.G != color2.G)
-            {
-                return false;
-            }
-
-            if (color1.B != color2.B)
-            {
-                return false;
-            }
-
-            if (color1.A != color2.A)
-            {
-                return false;
-            }
-
-            return true;
+            public byte a, r, g, b;
         }
 
-        public static bool operator !=(Color color1, Color color2)
-        {
-            return !(color1 == color2);
-        }
+        private MILColor sRgbColor;
     }
 }

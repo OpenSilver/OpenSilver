@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows
 #else
@@ -23,4 +22,3 @@ namespace Windows.UI.Xaml
 		public static readonly string FileDrop;
 	}
 }
-#endif

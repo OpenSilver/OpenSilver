@@ -22,7 +22,6 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>Represents a collection of <see cref="T:System.Windows.Media.Animation.ColorKeyFrame" /> objects that can be individually accessed by index. </summary>
     [OpenSilver.NotImplemented]
     public sealed partial class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
@@ -62,5 +61,4 @@ namespace Windows.UI.Xaml.Media.Animation
             this.SetItemDependencyObjectInternal(index, keyFrame);
         }
     }
-#endif
 }

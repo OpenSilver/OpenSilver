@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-#if MIGRATION
+﻿#if MIGRATION
 namespace System.Windows.Documents
 #else
 namespace Windows.UI.Xaml.Documents
@@ -12,5 +10,3 @@ namespace Windows.UI.Xaml.Documents
 		public string TargetName { get; set; }
 	}
 }
-
-#endif

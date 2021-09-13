@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
 using System;
 using System.Collections.Specialized;
 
@@ -96,4 +94,3 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// </summary>
     public delegate void ItemsChangedEventHandler(object sender, ItemsChangedEventArgs e);
 }
-#endif

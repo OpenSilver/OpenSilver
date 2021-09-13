@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 using System.Windows.Automation.Text;
 #else
@@ -272,4 +270,3 @@ namespace Windows.UI.Xaml.Automation.Provider
 		void Select();
 	}
 }
-#endif

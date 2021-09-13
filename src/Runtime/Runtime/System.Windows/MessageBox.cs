@@ -141,7 +141,7 @@ namespace Windows.UI.Xaml
                 }
                 else if (button == MessageBoxButton.OKCancel)
                 {
-                    isOK = (bool)CSHTML5.Interop.ExecuteJavaScript("confirm($0)", messageIncludingTitleIfAny);
+                    isOK = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("confirm($0)", messageIncludingTitleIfAny));
                 }
                 else
                 {

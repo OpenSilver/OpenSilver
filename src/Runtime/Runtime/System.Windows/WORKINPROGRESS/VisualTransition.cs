@@ -27,7 +27,6 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-#if WORKINPROGRESS
     #region Not supported yet
     /// <summary>
     /// Defines a transition between VisualStates.
@@ -63,5 +62,4 @@ namespace Windows.UI.Xaml
         public string From { get; set; }
     }
     #endregion
-#endif
 }

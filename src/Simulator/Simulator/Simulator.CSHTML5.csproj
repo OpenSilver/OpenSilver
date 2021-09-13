@@ -27,23 +27,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
-    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
     <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU'">
-    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;WORKINPROGRESS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>

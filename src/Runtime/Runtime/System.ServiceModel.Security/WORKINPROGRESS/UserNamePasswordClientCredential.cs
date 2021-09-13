@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 namespace System.ServiceModel.Security
 {
     //
@@ -25,4 +24,3 @@ namespace System.ServiceModel.Security
         public string UserName { get; set; }
     }
 }
-#endif

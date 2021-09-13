@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
@@ -154,7 +154,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static object CoerceValue(DependencyObject d, object baseValue)
         {
             RangeBase rangeBase = (RangeBase)d;
-            double returnValue = baseValue is double ? (double)baseValue : double.NaN;
+            double returnValue = baseValue is double ? (double)baseValue : Convert.ToDouble(baseValue);
             double minimum = rangeBase.Minimum;
             if (!double.IsNaN(minimum) && returnValue < minimum)
             {

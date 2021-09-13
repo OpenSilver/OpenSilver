@@ -39,7 +39,6 @@ namespace Windows.UI.Xaml.Documents
             return;
         }
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CharacterSpacingProperty = 
             DependencyProperty.Register(
@@ -54,6 +53,5 @@ namespace Windows.UI.Xaml.Documents
             get { return (int)this.GetValue(CharacterSpacingProperty); }
             set { this.SetValue(CharacterSpacingProperty, value); }
         }
-#endif
     }
 }

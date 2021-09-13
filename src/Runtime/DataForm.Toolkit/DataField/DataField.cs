@@ -17,17 +17,13 @@ using System.Reflection;
 using System.Windows.Markup;
 
 #if MIGRATION
-#if WORKINPROGRESS
 using System.Windows.Automation;
-#endif
 using System.Windows.Controls.Common;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 #else
-#if WORKINPROGRESS
 using Windows.UI.Xaml.Automation;
-#endif
 using Windows.UI.Xaml.Controls.Common;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
@@ -1485,11 +1481,9 @@ namespace Windows.UI.Xaml.Controls
                 this.DescriptionViewer.Target = this.Content;
             }
 
-#if WORKINPROGRESS
             AutomationProperties.SetLabeledBy(this.Content, this.InternalLabel);
             AutomationProperties.SetIsRequiredForForm(this.Content, this.InternalLabel.IsRequired);
             AutomationProperties.SetHelpText(this.Content, this.DescriptionViewer.Description);
-#endif
 
             this._lostFocusFired.Clear();
             this.UpdateBindingsOnElement(this.Content);

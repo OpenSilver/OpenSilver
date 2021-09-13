@@ -117,18 +117,11 @@ namespace Windows.UI.Xaml.Media
             get
             {
                 Matrix m = new Matrix();
-
-#if WORKINPROGRESS
                 m.RotateAt(Angle, CenterX, CenterY);
-#else
-                m.RotateAt(Angle, 0.0, 0.0);
-#endif
-
                 return m;
             }
         }
 
-#if WORKINPROGRESS
         /// <summary>
         /// Gets or sets the x-coordinate of the rotation center point.
         /// The default is 0.
@@ -166,6 +159,5 @@ namespace Windows.UI.Xaml.Media
                 typeof(double), 
                 typeof(RotateTransform), 
                 new PropertyMetadata(0.0));
-#endif
     }
 }

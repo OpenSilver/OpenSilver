@@ -12,9 +12,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-#if WORKINPROGRESS && MIGRATION
+
+#if MIGRATION
 using System.Windows.Interop;
 #endif
 
@@ -66,8 +66,6 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             }
         }
 
-#if WORKINPROGRESS
-        
         //// Summary:
         ////     Gets the background color value that was applied to the Silverlight plug-in
         ////     as part of instantiation settings.
@@ -137,6 +135,5 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         //// Returns:
         ////     true if the version can be supported by the installation; otherwise, false.
         //public bool IsVersionSupported(string versionStr);
-#endif
     }
 }

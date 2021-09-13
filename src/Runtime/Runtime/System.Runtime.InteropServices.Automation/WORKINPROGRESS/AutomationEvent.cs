@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 
 namespace System.Runtime.InteropServices.Automation
@@ -43,5 +42,4 @@ namespace System.Runtime.InteropServices.Automation
 	}
 }
 
-#endif
 #endif

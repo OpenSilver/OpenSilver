@@ -615,7 +615,6 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             return Duration.Automatic;
         }
-#if WORKINPROGRESS
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SpeedRatioProperty = DependencyProperty.Register("SpeedRatio", typeof(double), typeof(Timeline), new PropertyMetadata(1d));
@@ -644,6 +643,5 @@ namespace Windows.UI.Xaml.Media.Animation
             get { return (FillBehavior)this.GetValue(FillBehaviorProperty); }
             set { this.SetValue(FillBehaviorProperty, value); }
         }
-#endif
     }
 }

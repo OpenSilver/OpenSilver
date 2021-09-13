@@ -21,7 +21,6 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
     /// <summary>
     /// This class is used as part of a ByteKeyFrameCollection in
     /// conjunction with a KeyFrameByteAnimation to animate a
@@ -49,5 +48,4 @@ namespace Windows.UI.Xaml.Media.Animation
             return base.INTERNAL_GetEasingFunction();
         }
     }
-#endif
 }

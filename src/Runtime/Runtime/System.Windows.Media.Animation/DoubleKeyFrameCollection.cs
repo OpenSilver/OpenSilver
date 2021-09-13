@@ -27,13 +27,8 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-#if WORKINPROGRESS
     public sealed partial class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
-#else
-    public sealed partial class DoubleKeyFrameCollection : List<DoubleKeyFrame>
-#endif
     {
-#if WORKINPROGRESS
         internal override void AddOverride(DoubleKeyFrame keyFrame)
         {
             this.AddDependencyObjectInternal(keyFrame);
@@ -68,6 +63,5 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             this.SetItemDependencyObjectInternal(index, keyFrame);
         }
-#endif
     }
 }

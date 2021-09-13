@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 namespace System.Windows.Interactivity
 {
     public abstract partial class TriggerAction
@@ -35,5 +32,3 @@ namespace System.Windows.Interactivity
         }
     }
 }
-
-#endif

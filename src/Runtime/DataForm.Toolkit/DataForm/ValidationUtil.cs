@@ -64,11 +64,9 @@ namespace Windows.UI.Xaml.Controls
             copy.TargetNullValue = source.TargetNullValue;
             copy.UpdateSourceTrigger = source.UpdateSourceTrigger;
             copy.ValidatesOnExceptions = source.ValidatesOnExceptions;
-#if WORKINPROGRESS
             copy.BindsDirectlyToSource = source.BindsDirectlyToSource;
             copy.ValidatesOnDataErrors = source.ValidatesOnDataErrors;
             copy.ValidatesOnNotifyDataErrors = source.ValidatesOnNotifyDataErrors;
-#endif
 
             // Binding keeps track of which of the three setters for
             // ElementName, RelativeSource, and Source have been called.

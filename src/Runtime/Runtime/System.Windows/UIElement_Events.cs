@@ -786,8 +786,6 @@ namespace Windows.UI.Xaml
 
         #region Wheel event
 
-#if WORKINPROGRESS
-
 #if MIGRATION
         /// <summary>
         /// Identifies the <see cref="UIElement.MouseWheel"/> routed event.
@@ -815,15 +813,41 @@ namespace Windows.UI.Xaml
         [OpenSilver.NotImplemented]
         public event PointerEventHandler PointerWheelChanged;
 #endif
-
+        /// <summary>
+        /// Identifies the <see cref="TextInput"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputEvent = new RoutedEvent("TextInputEvent");
+
+        /// <summary>
+        /// Identifies the <see cref="TextInputStart"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputStartEvent = new RoutedEvent("TextInputStartEvent");
+
+        /// <summary>
+        /// Identifies the <see cref="TextInputUpdate"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputUpdateEvent = new RoutedEvent("TextInputUpdateEvent");
 
+        /// <summary>
+        /// Occurs when a UI element gets text in a device-independent manner.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public event TextCompositionEventHandler TextInput;
+
+        /// <summary>
+        /// Occurs when a UI element initially gets text in a device-independent manner.
+        /// </summary>
+        [OpenSilver.NotImplemented]
         public event TextCompositionEventHandler TextInputStart;
 
-#endif
+        /// <summary>
+        /// Occurs when text continues to be composed via an input method editor (IME).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event TextCompositionEventHandler TextInputUpdate;
 
 #endregion
 
@@ -2141,11 +2165,7 @@ namespace Windows.UI.Xaml
             }
             else
             {
-#if WORKINPROGRESS
-                Console.WriteLine(string.Format("The following routed event cannot be used in the AddHandler method: {0} - Please contact support.", routedEvent));
-#else
                 throw new NotSupportedException(string.Format("The following routed event cannot be used in the AddHandler method: {0} - Please contact support.", routedEvent));
-#endif
             }
         }
 

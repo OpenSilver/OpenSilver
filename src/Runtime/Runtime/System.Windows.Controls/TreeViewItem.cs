@@ -18,7 +18,7 @@ using Windows.UI.Xaml.Input;
 using Windows.System;
 #endif
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 #if MIGRATION
 using System.Windows.Automation.Peers;
 #else
@@ -311,14 +311,14 @@ namespace Windows.UI.Xaml.Controls
             TreeViewItem source = d as TreeViewItem;
             bool isExpanded = (bool)e.NewValue;
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
             // Notify any automation peers of the expansion change
             TreeViewItemAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(source) as TreeViewItemAutomationPeer;
             if (peer != null)
             {
                 peer.RaiseExpandCollapseAutomationEvent((bool)e.OldValue, isExpanded);
             }
-#endif // WORKINPROGRESS && OPENSILVER
+#endif // OPENSILVER
 
             // Raise the Expanded and Collapsed events
             RoutedEventArgs args = new RoutedEventArgs();
@@ -409,14 +409,14 @@ namespace Windows.UI.Xaml.Controls
 
             source.Select(isSelected);
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
             // Notify any automation peers of the selection change
             TreeViewItemAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(source) as TreeViewItemAutomationPeer;
             if (peer != null)
             {
                 peer.RaiseAutomationIsSelectedChanged(isSelected);
             }
-#endif // WORKINPROGRESS && OPENSILVER
+#endif // OPENSILVER
 
             RoutedEventArgs args = new RoutedEventArgs();
             if (isSelected)
@@ -669,7 +669,7 @@ namespace Windows.UI.Xaml.Controls
             Interaction = new InteractionHelper(this);
         }
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
         /// <summary>
         /// Returns a
         /// <see cref="TreeViewItemAutomationPeer" />
@@ -685,7 +685,7 @@ namespace Windows.UI.Xaml.Controls
         {
             return new TreeViewItemAutomationPeer(this);
         }
-#endif // WORKINPROGRESS && OPENSILVER
+#endif // OPENSILVER
 
         #region Templating
         /// <summary>
@@ -1337,17 +1337,9 @@ namespace Windows.UI.Xaml.Controls
 
                 // Some keys (e.g. Left/Right) need to be translated in RightToLeft mode
 #if MIGRATION
-#if WORKINPROGRESS
                 Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, e.Key);
 #else
-                Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection.LeftToRight, e.Key);
-#endif
-#else
-#if WORKINPROGRESS
                 VirtualKey invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, e.Key);                
-#else
-                VirtualKey invariantKey = InteractionHelper.GetLogicalKey(FlowDirection.LeftToRight, e.Key);                
-#endif
 #endif
                 // We ignore the Control modifier key because it is used
                 // specifically for scrolling which is implemented in the
@@ -1366,7 +1358,7 @@ namespace Windows.UI.Xaml.Controls
                         // collapsed.
                         if (!TreeView.IsControlKeyDown && CanExpandOnInput && IsExpanded)
                         {
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
                             if (FocusManager.GetFocusedElement() != this)
 #else
                             if (null != this)

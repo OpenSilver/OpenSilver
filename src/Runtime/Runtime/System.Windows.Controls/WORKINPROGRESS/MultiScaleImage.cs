@@ -1,5 +1,3 @@
-#if WORKINPROGRESS
-
 #if MIGRATION
 using System.Collections.ObjectModel;
 using System.Windows.Automation.Peers;
@@ -477,5 +475,4 @@ namespace System.Windows.Controls
 		}
 	}
 }
-#endif
 #endif

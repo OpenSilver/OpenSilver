@@ -112,11 +112,9 @@ namespace System
             set { Window.Current.INTERNAL_PositionsWatcher.INTERNAL_WatchInterval = value; }
         }
 
-#if WORKINPROGRESS
         [OpenSilver.NotImplemented]
         public bool EnableAutoZoom { get; set; }
         [OpenSilver.NotImplemented]
         public bool Windowless { get; private set; }
-#endif
     }
 }

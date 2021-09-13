@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 #if MIGRATION
 namespace System.Windows.Automation.Provider
 #else
@@ -29,4 +28,3 @@ namespace Windows.UI.Xaml.Automation.Provider
 		IRawElementProviderSimple[] GetRowHeaderItems();
 	}
 }
-#endif

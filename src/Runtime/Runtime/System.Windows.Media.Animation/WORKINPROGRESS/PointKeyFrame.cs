@@ -1,6 +1,4 @@
-﻿#if WORKINPROGRESS
-
-#if !MIGRATION
+﻿#if !MIGRATION
 using Windows.Foundation;
 #endif
 
@@ -77,5 +75,3 @@ namespace Windows.UI.Xaml.Media.Animation
         }
     }
 }
-
-#endif

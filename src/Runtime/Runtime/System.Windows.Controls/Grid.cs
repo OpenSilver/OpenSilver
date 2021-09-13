@@ -116,13 +116,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (_columnDefinitionsOrNull == null)
                 {
-#if WORKINPROGRESS
                     _columnDefinitionsOrNull = new ColumnDefinitionCollection(this);
                     _columnDefinitionsOrNull.CollectionChangedInternal += ColumnDefinitions_CollectionChanged;
-#else
-                    _columnDefinitionsOrNull = new ColumnDefinitionCollection();
-                    _columnDefinitionsOrNull.CollectionChanged += ColumnDefinitions_CollectionChanged;
-#endif
                 }
                 return _columnDefinitionsOrNull;
             }
@@ -130,14 +125,6 @@ namespace Windows.UI.Xaml.Controls
 
         void ColumnDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-#if !WORKINPROGRESS
-            if (e.NewItems != null)
-            {
-                foreach (ColumnDefinition columnDefinition in e.NewItems)
-                    columnDefinition.Parent = this;
-            }
-#endif
-
             bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
             if (isCSSGrid)
             {
@@ -170,13 +157,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (_rowDefinitionsOrNull == null)
                 {
-#if WORKINPROGRESS
                     _rowDefinitionsOrNull = new RowDefinitionCollection(this);
                     _rowDefinitionsOrNull.CollectionChangedInternal += RowDefinitions_CollectionChanged;
-#else
-                    _rowDefinitionsOrNull = new RowDefinitionCollection();
-                    _rowDefinitionsOrNull.CollectionChanged += RowDefinitions_CollectionChanged;
-#endif
                 }
                 return _rowDefinitionsOrNull;
             }
@@ -184,13 +166,6 @@ namespace Windows.UI.Xaml.Controls
 
         void RowDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-#if !WORKINPROGRESS
-            if (e.NewItems != null)
-            {
-                foreach (RowDefinition rowDefinition in e.NewItems)
-                    rowDefinition.Parent = this;
-            }
-#endif
             bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
             if (isCSSGrid)
             {
@@ -656,6 +631,9 @@ namespace Windows.UI.Xaml.Controls
 
         internal void LocallyManageChildrenChanged()
         {
+            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                return;
+
 #if PERFSTAT
             var t0 = Performance.now();
 #endif

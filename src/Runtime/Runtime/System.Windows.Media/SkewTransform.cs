@@ -180,13 +180,8 @@ namespace Windows.UI.Xaml.Media
 
                 double angleX = AngleX;
                 double angleY = AngleY;
-#if WORKINPROGRESS
                 double centerX = CenterX;
                 double centerY = CenterY;
-#else
-                double centerX = 0.0;
-                double centerY = 0.0;
-#endif
 
                 bool hasCenter = centerX != 0 || centerY != 0;
 

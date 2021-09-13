@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -79,4 +76,3 @@ namespace Windows.UI.Xaml.Controls
         }
     }
 }
-#endif

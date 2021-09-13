@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 using System.ComponentModel;
 
 #if MIGRATION
@@ -64,5 +62,3 @@ namespace Windows.UI.Xaml.Data
         public bool ValidatesOnDataErrors { get; set; }
     }
 }
-
-#endif

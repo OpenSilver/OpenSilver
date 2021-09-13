@@ -1,5 +1,4 @@
-﻿#if WORKINPROGRESS
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -68,5 +67,3 @@ namespace System.Reflection.Emit
         }
     }
 }
-
-#endif

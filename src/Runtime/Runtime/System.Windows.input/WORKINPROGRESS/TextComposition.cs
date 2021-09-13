@@ -25,7 +25,6 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-#if WORKINPROGRESS
 	//
 	// Summary:
 	//     Represents a composition related to text input which includes the composition
@@ -42,5 +41,4 @@ namespace Windows.UI.Xaml.Input
         [OpenSilver.NotImplemented]
 		public string CompositionText { get; }
 	}
-#endif
 }

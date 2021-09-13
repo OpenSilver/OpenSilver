@@ -11,7 +11,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-#if WORKINPROGRESS
 
 #if MIGRATION
 using System.Windows.Data;
@@ -89,4 +88,3 @@ namespace Windows.UI.Xaml.Controls
 
     }
 }
-#endif

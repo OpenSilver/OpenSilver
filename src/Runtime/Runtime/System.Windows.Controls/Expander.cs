@@ -6,7 +6,7 @@
 using System;
 using System.Globalization;
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
 #if MIGRATION
 using System.Windows.Automation.Peers;
 #else
@@ -208,7 +208,7 @@ namespace Windows.UI.Xaml.Controls
             Expander ctrl = (Expander)d;
             bool isExpanded = (bool)e.NewValue;
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
             // Notify any automation peers of the expansion change
             ExpanderAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(ctrl) as ExpanderAutomationPeer;
             if (peer != null)
@@ -270,7 +270,7 @@ namespace Windows.UI.Xaml.Controls
             Interaction.OnApplyTemplateBase();
         }
 
-#if WORKINPROGRESS && OPENSILVER
+#if OPENSILVER
         /// <summary>
         /// Returns a
         /// <see cref="ExpanderAutomationPeer" />
@@ -306,18 +306,10 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Some keys (e.g. Left/Right) need to be translated in RightToLeft mode
-#if WORKINPROGRESS
 #if MIGRATION
             Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, e.Key);
 #else
             System.VirtualKey invariantKey = InteractionHelper.GetLogicalKey(FlowDirection, e.Key);
-#endif
-#else
-#if MIGRATION
-            Key invariantKey = InteractionHelper.GetLogicalKey(FlowDirection.LeftToRight, e.Key);
-#else
-            System.VirtualKey invariantKey = InteractionHelper.GetLogicalKey(FlowDirection.LeftToRight, e.Key);
-#endif
 #endif
 
             bool isExpanded = IsExpanded;

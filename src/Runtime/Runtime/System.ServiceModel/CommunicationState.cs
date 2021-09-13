@@ -21,7 +21,6 @@ using System;
 
 namespace System.ServiceModel
 {
-#if WORKINPROGRESS
     // Summary:
     //     Defines the states in which an System.ServiceModel.ICommunicationObject can
     //     exist.
@@ -56,5 +55,4 @@ namespace System.ServiceModel
         //     from which it cannot recover and from which it is no longer usable.
         Faulted = 5,
     }
-#endif
 }
