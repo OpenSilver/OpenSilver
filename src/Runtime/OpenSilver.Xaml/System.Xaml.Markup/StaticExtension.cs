@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text;
+using System.Windows.Markup;
 
 namespace System.Xaml.Markup
 {

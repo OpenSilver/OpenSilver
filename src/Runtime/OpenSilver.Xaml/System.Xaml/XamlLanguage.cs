@@ -27,6 +27,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Markup;
 using System.Xaml.Markup;
 
 namespace System.Xaml

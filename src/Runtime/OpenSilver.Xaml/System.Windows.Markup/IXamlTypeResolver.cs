@@ -22,15 +22,12 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace System.Xaml.Markup
+namespace System.Windows.Markup
 {
-	public interface IProvideValueTarget
+	public interface IXamlTypeResolver
 	{
-		object TargetObject { get; }
-		object TargetProperty { get; }
+		Type Resolve(string qualifiedTypeName);
 	}
 }
