@@ -2163,6 +2163,11 @@ namespace Windows.UI.Xaml
             {
                 LostFocusEventManager.Add((RoutedEventHandler)handler, handledEventsToo: handledEventsToo);
             }
+            else if (routedEvent == UIElement.TextInputUpdateEvent ||
+                     routedEvent == UIElement.TextInputEvent ||
+                     routedEvent == UIElement.TextInputStartEvent)
+            {
+            }
             else
             {
                 throw new NotSupportedException(string.Format("The following routed event cannot be used in the AddHandler method: {0} - Please contact support.", routedEvent));
