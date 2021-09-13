@@ -356,11 +356,11 @@
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\MessageState.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\RequestContext.cs" />
 		<Compile Include="System.ServiceModel.Security\WORKINPROGRESS\UserNamePasswordClientCredential.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\ApplicationServiceContext.cs" />
+		<Compile Include="System.Windows\ApplicationServiceContext.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\DataFormats.cs" />
 		<Compile Include="System.Windows\DependencyObjectCollection_1.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationLifetimeAware.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\IApplicationService.cs" />
+		<Compile Include="System.Windows\IApplicationService.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\INativeCollectionWrapper.cs" />
 		<Compile Include="System.Windows\NullableBoolConverter.cs" />
 		<Compile Include="System.Windows\StyleTypedPropertyAttribute.cs" />

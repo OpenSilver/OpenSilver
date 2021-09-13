@@ -152,6 +152,8 @@ namespace Windows.UI.Xaml
 #endif
                 .INTERNAL_GetCurrentDispatcher().BeginInvoke((Action)(() =>
             {
+                StartAppServices();
+
                 // Raise the "Startup" event:
                 if (this.Startup != null)
                     Startup(this, new StartupEventArgs());
@@ -160,6 +162,24 @@ namespace Windows.UI.Xaml
                 this.OnLaunched(new LaunchActivatedEventArgs());
             }));
 
+        }
+
+        private void StartAppServices()
+        {
+            foreach (IApplicationService appService in ApplicationLifetimeObjects)
+            {
+                if (appService != null)
+                {
+                    try
+                    {
+                        appService.StartService(new ApplicationServiceContext());
+                    }
+                    catch (Exception ex)
+                    {
+                        OnUnhandledException(ex, false);
+                    }
+                }
+            }
         }
 
 #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
