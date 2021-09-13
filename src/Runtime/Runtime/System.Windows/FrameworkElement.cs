@@ -432,8 +432,7 @@ namespace Windows.UI.Xaml
 
                 // we only apply the template if no template has been
                 // rendered already for this control.
-                // or it is textbox ( to create EditableContent div when switching tabs )
-                if (this.TemplateChild == null || this is TextBox)
+                if (this.TemplateChild == null)
                 {
                     visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
                     if (visualChild != null)
