@@ -97,7 +97,11 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
     <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
     <Compile Include="System.Windows.Controls\TextBoxView.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />

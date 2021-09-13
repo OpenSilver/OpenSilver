@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.ObjectModel;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -633,5 +634,45 @@ namespace Windows.UI.Xaml.Controls
         //     Occurs when a row edit has been committed or canceled.
         [OpenSilver.NotImplemented]
         public event EventHandler<DataGridRowEditEndedEventArgs> RowEditEnded;
+
+        /// <summary>
+        /// Gets or sets the style that is used when rendering the row group header.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public ObservableCollection<Style> RowGroupHeaderStyles
+        {
+            get
+            {
+                return new ObservableCollection<Style>();
+            }
+        }
+
+        #region AreRowGroupHeadersFrozen
+        /// <summary>
+        /// Gets or sets a value that indicates whether the row group header sections
+        /// remain fixed at the width of the display area or can scroll horizontally.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public bool AreRowGroupHeadersFrozen
+        {
+            get { return (bool)GetValue(AreRowGroupHeadersFrozenProperty); }
+            set { SetValue(AreRowGroupHeadersFrozenProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the AreRowDetailsFrozen dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty AreRowGroupHeadersFrozenProperty =
+            DependencyProperty.Register(
+                "AreRowGroupHeadersFrozen",
+                typeof(bool),
+                typeof(DataGrid),
+                new PropertyMetadata(true, OnAreRowGroupHeadersFrozenPropertyChanged));
+
+        private static void OnAreRowGroupHeadersFrozenPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+        #endregion AreRowGroupHeadersFrozen
     }
 }

@@ -241,5 +241,40 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Accordion),
                 new PropertyMetadata(null));
         #endregion public DataTemplate ContentTemplate
+
+        #region public ExpandDirection ExpandDirection
+        /// <summary>
+        /// Gets or sets the ExpandDirection property of each 
+        /// AccordionItem in the Accordion control and the direction in which
+        /// the Accordion does layout.
+        /// </summary>
+        /// <remarks>Setting the ExpandDirection will set the expand direction 
+        /// on the accordionItems.</remarks>
+        public ExpandDirection ExpandDirection
+        {
+            get { return (ExpandDirection)GetValue(ExpandDirectionProperty); }
+            set { SetValue(ExpandDirectionProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the ExpandDirection dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ExpandDirectionProperty =
+            DependencyProperty.Register(
+                "ExpandDirection",
+                typeof(ExpandDirection),
+                typeof(Accordion),
+                new PropertyMetadata(ExpandDirection.Down, OnExpandDirectionPropertyChanged));
+
+        /// <summary>
+        /// ExpandDirectionProperty property changed handler.
+        /// </summary>
+        /// <param name="d">Accordion that changed its ExpandDirection.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnExpandDirectionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            
+        }
+        #endregion public ExpandDirection ExpandDirection
     }
 }
