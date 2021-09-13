@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -63,10 +64,10 @@ namespace Windows.UI
 
             if (null == s)
             {
-                throw new ArgumentException(string.Format("The object passed to '{0}' is not a valid type.", "ConvertFrom"), "value");
+                throw new ArgumentException(string.Format("The object passed to '{0}' is not a valid type.", "ConvertFrom"), nameof(value));
             }
 
-            return Color.Parse(s, culture);
+            return Parsers.ParseColor(s, culture);
         }
 
         /// <summary>
@@ -92,7 +93,7 @@ namespace Windows.UI
             {
                 if (value is Color color)
                 {
-                    return color.ToString();
+                    return color.ToString(culture);
                 }
             }
 

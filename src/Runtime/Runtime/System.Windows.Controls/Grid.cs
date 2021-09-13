@@ -631,6 +631,9 @@ namespace Windows.UI.Xaml.Controls
 
         internal void LocallyManageChildrenChanged()
         {
+            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                return;
+
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
