@@ -69,6 +69,12 @@ namespace DotNetForHtml5.Compiler
             bool isSLMigration,
             ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
+            // Get general information about the class:
+            string className, namespaceStringIfAny, baseType;
+            bool hasCodeBehind;
+            GetClassInformationFromXaml(doc, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain,
+                out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
+
             HashSet<string> listOfAllTheTypesUsedInThisXamlFile = new HashSet<string>();
             List<string> resultingFieldsForNamedElements = new List<string>();
             List<string> resultingMethods = new List<string>();
@@ -81,7 +87,22 @@ namespace DotNetForHtml5.Compiler
                 string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
                     namespaceName, localTypeName, assemblyNameIfAny, true);
 
-                listOfAllTheTypesUsedInThisXamlFile.Add(elementTypeInCSharp);
+                if (hasCodeBehind ||
+                    elementTypeInCSharp.StartsWith("global::"))
+                {
+                    // if hasCodeBehing is true, we have a namespace so we can assume that 
+                    // the type is either fully specified or that it is in the current
+                    // namespace.
+                    // Otherwise, we only take fully specified types (because we are in the
+                    // global namespace).
+                    listOfAllTheTypesUsedInThisXamlFile.Add(elementTypeInCSharp);
+                }
+
+                if (!hasCodeBehind)
+                {
+                    // No code behind, no need to create fields for elementd with an x:Name
+                    continue;
+                }
 
                 XAttribute xNameAttr = element.Attributes().FirstOrDefault(attr => IsAttributeTheXNameAttribute(attr));
                 if (xNameAttr != null && GetRootOfCurrentNamescopeForCompilation(element).Parent == null)
@@ -100,12 +121,6 @@ namespace DotNetForHtml5.Compiler
                     }
                 }
             }
-
-            // Get general information about the class:
-            string className, namespaceStringIfAny, baseType;
-            bool hasCodeBehind;
-            GetClassInformationFromXaml(doc, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain,
-                out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
 
             // Create the "IntializeComponent()" method:
             string initializeComponentMethod = CreateInitializeComponentMethod(null, new List<string>(0), null, null,

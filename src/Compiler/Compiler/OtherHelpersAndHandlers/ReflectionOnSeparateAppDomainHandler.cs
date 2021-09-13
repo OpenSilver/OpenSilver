@@ -913,11 +913,6 @@ namespace DotNetForHtml5.Compiler
             public XName GetCSharpEquivalentOfXamlTypeAsXName(string namespaceName, string localTypeName, string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
             {
                 //todo: in this method, we assume that the alias will be global, which will be false if the user chose something else --> find the right alias.
-
-                // Ensure that "ifTypeNotFoundTryGuessing" is always false if the namespace is not a CLR namespace. In fact, in that case, we are unable to guess:
-                if (ifTypeNotFoundTryGuessing && isNamespaceAnXmlNamespace(namespaceName))
-                    ifTypeNotFoundTryGuessing = false;
-
                 // Find the type:
                 Type type = FindType(namespaceName, localTypeName, assemblyNameIfAny, doNotRaiseExceptionIfNotFound: ifTypeNotFoundTryGuessing);
                 if (type == null)
@@ -925,7 +920,8 @@ namespace DotNetForHtml5.Compiler
                     if (ifTypeNotFoundTryGuessing)
                     {
                         // Try guessing:
-                        return XName.Get(!string.IsNullOrEmpty(namespaceName) ? namespaceName + "." + localTypeName : localTypeName, "global::");
+
+                        return XName.Get(localTypeName, string.IsNullOrEmpty(namespaceName) ? "" : namespaceName);
                     }
                     else
                     {
@@ -949,14 +945,6 @@ namespace DotNetForHtml5.Compiler
                 // which will be false if the user chose something else --> find
                 // the right alias.
 
-                // Ensure that "ifTypeNotFoundTryGuessing" is always false if the
-                // namespace is not a CLR namespace. In fact, in that case, we are
-                // unable to guess
-                if (isNamespaceAnXmlNamespace(namespaceName))
-                {
-                    ifTypeNotFoundTryGuessing = false;
-                }
-
                 // Distinguish between system types (String, Double...) and other types
                 if (SystemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
                 {
@@ -974,12 +962,21 @@ namespace DotNetForHtml5.Compiler
                         if (ifTypeNotFoundTryGuessing)
                         {
                             // Try guessing
-                            return string.Format(
-                                "global::{0}{1}{2}",
-                                namespaceName, 
-                                string.IsNullOrEmpty(namespaceName) ? string.Empty : ".", 
-                                localTypeName
-                            );
+
+                            if (isNamespaceAnXmlNamespace(namespaceName))
+                            {
+                                // Attempt to find the type in the current namespace
+                                return localTypeName;
+                            }
+                            else
+                            {
+                                return string.Format(
+                                    "global::{0}{1}{2}",
+                                    namespaceName,
+                                    string.IsNullOrEmpty(namespaceName) ? string.Empty : ".",
+                                    localTypeName
+                                );
+                            }
                         }
                         else
                         {
