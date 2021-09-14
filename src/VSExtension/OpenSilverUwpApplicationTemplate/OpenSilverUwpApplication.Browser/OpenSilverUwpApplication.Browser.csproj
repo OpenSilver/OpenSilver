@@ -6,7 +6,7 @@
     <OpenSilverType>4</OpenSilverType>
 	<PublishTrimmed>true</PublishTrimmed>
 	<!-- Uncomment to enable AOT compilation when publishing -->
-	<!--<RunAOTCompilation Condition="'$(IsSecondPass)'=='True'">true</RunAOTCompilation>-->
+	<!--<RunAOTCompilation Condition="'$(IsSecondPass)'!='True'">true</RunAOTCompilation>-->
   </PropertyGroup>
 
   <ItemGroup>

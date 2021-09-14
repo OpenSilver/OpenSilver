@@ -38,12 +38,16 @@ namespace OpenSilver.TemplateWizards
             string openSilverAPI = openSilverInfo.Element(defaultNamespace + "Api").Value;
             string openSilverType = openSilverInfo.Element(defaultNamespace + "Type").Value;
 
+
             AppConfigurationWindow window = new AppConfigurationWindow(openSilverType);
 
-            bool? result = window.ShowDialog();
-            if (!result.HasValue || !result.Value)
+            if (openSilverType != "Library") // In the case of a class Library, the user has no other choices to make so we do not show the app configuration window.
             {
-                throw new WizardBackoutException("OpenSilver project creation was cancelled by user");
+                bool? result = window.ShowDialog();
+                if (!result.HasValue || !result.Value)
+                {
+                    throw new WizardBackoutException("OpenSilver project creation was cancelled by user");
+                }
             }
 
             if (openSilverAPI == "Silverlight")
@@ -83,6 +87,7 @@ namespace OpenSilver.TemplateWizards
                         break;
                 }
             }
+
 
             replacementsDictionary.Add("$opensilverpackageversion$", "1.0.0-beta.1.22");
         }
