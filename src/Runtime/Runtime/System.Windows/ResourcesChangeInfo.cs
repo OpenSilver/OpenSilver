@@ -262,37 +262,34 @@ namespace Windows.UI.Xaml
         // determine whether this change affects implicit data templates
         internal void SetIsImplicitDataTemplateChange()
         {
-            // todo: uncomment once implicit DataTemplates are supported
-            // (and DataTemplateKey)
+            bool isImplicitDataTemplateChange = (IsCatastrophicDictionaryChange ||
+                                                (_key is DataTemplateKey));
 
-            //bool isImplicitDataTemplateChange = (IsCatastrophicDictionaryChange ||
-            //                                    (_key is DataTemplateKey));
+            if (!isImplicitDataTemplateChange && _oldDictionaries != null)
+            {
+                foreach (ResourceDictionary rd in _oldDictionaries)
+                {
+                    if (rd.HasImplicitDataTemplates)
+                    {
+                        isImplicitDataTemplateChange = true;
+                        break;
+                    }
+                }
+            }
 
-            //if (!isImplicitDataTemplateChange && _oldDictionaries != null)
-            //{
-            //    foreach (RealResourceDictionary rd in _oldDictionaries)
-            //    {
-            //        if (rd.HasImplicitDataTemplates)
-            //        {
-            //            isImplicitDataTemplateChange = true;
-            //            break;
-            //        }
-            //    }
-            //}
+            if (!isImplicitDataTemplateChange && _newDictionaries != null)
+            {
+                foreach (ResourceDictionary rd in _newDictionaries)
+                {
+                    if (rd.HasImplicitDataTemplates)
+                    {
+                        isImplicitDataTemplateChange = true;
+                        break;
+                    }
+                }
+            }
 
-            //if (!isImplicitDataTemplateChange && _newDictionaries != null)
-            //{
-            //    foreach (RealResourceDictionary rd in _newDictionaries)
-            //    {
-            //        if (rd.HasImplicitDataTemplates)
-            //        {
-            //            isImplicitDataTemplateChange = true;
-            //            break;
-            //        }
-            //    }
-            //}
-
-            //IsImplicitDataTemplateChange = isImplicitDataTemplateChange;
+            IsImplicitDataTemplateChange = isImplicitDataTemplateChange;
         }
 
         #endregion Operations

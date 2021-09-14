@@ -291,6 +291,23 @@ namespace Windows.UI.Xaml
             }
         }
 
+        //
+        // Internal routine only look up in application resources
+        //
+        internal object FindResourceInternal(object resourceKey)
+        {
+            ResourceDictionary resources = _resources;
+
+            if (resources == null)
+            {
+                return null;
+            }
+            else
+            {
+                return resources[resourceKey];
+            }
+        }
+
         /// <summary>
         /// Invoked when the application is launched. Override this method to perform
         /// application initialization and to display initial content in the associated

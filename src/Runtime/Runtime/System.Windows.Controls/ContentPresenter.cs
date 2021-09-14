@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Windows.Markup;
 using System.Diagnostics;
@@ -37,55 +35,34 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Displays the content of a <see cref="ContentControl"/>.
     /// </summary>
-    [ContentProperty("Content")]
+    [ContentProperty(nameof(Content))]
     public partial class ContentPresenter : FrameworkElement
     {
-        #region Data
-
         private DataTemplate _templateCache;
-
-        private static readonly DataTemplate _defaultTemplate;
-        private static readonly DataTemplate _uiElementTemplate;
-
-        #endregion Data
-
-        #region Constructor
+        private bool _templateIsCurrent;
 
         static ContentPresenter()
         {
             // Default template
-            DataTemplate template = new DataTemplate();
-            template._methodToInstantiateFrameworkTemplate = owner =>
-            {
-                TemplateInstance templateInstance = new TemplateInstance();
-
-                TextBlock textBlock = new TextBlock();
-                textBlock.SetBinding(TextBlock.TextProperty, new Binding(""));
-
-                templateInstance.TemplateContent = textBlock;
-
-                return templateInstance;
-            };
+            DataTemplate template = new DefaultTemplate();
             template.Seal();
-            _defaultTemplate = template;
+            DefaultContentTemplate = template;
 
             // Default template when content is UIElement.
             template = new UseContentTemplate();
             template.Seal();
-            _uiElementTemplate = template;
+            UIElementContentTemplate = template;
         }
-
-        public ContentPresenter()
-        {
-
-        }
-
-        #endregion Constructor
-
-        #region Dependency Properties
 
         /// <summary>
-        /// Identifies the Content dependency property.
+        /// Initializes a new instance of the <see cref="ContentPresenter"/> class.
+        /// </summary>
+        public ContentPresenter()
+        {
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Content"/> dependency property
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
             DependencyProperty.Register(
@@ -102,52 +79,63 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public object Content
         {
-            get { return this.GetValue(ContentProperty); }
-            set { this.SetValue(ContentProperty, value); }
+            get { return GetValue(ContentProperty); }
+            set { SetValue(ContentProperty, value); }
         }
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ContentPresenter cp = (ContentPresenter)d;
-            bool reevaluateTemplate;
+            ContentPresenter ctrl = (ContentPresenter)d;
 
-            if (cp.ContentTemplate != null)
+            // if we're already marked to reselect the template, there's nothing more to do
+            if (!ctrl._templateIsCurrent)
+                return;
+
+            bool mismatch;
+
+            if (ctrl.ContentTemplate != null)
             {
-                reevaluateTemplate = false; // explicit template - do not re-apply
+                mismatch = false; // explicit template - do not re-apply
             }
-            else if (cp.Template == UIElementContentTemplate)
+            else if (ctrl.Template == UIElementContentTemplate)
             {
-                reevaluateTemplate = true; // direct template - always re-apply
-                cp.Template = null; // and release the old content so it can be re-used elsewhere
+                mismatch = true; // direct template - always re-apply
+                ctrl.Template = null; // and release the old content so it can be re-used elsewhere
+            }
+            else if (ctrl.Template == DefaultContentTemplate)
+            {
+                mismatch = true; // default template - always re-apply
             }
             else
             {
-                Debug.Assert(cp.Template == null ||
-                             cp.Template == DefaultContentTemplate);
-                reevaluateTemplate = true; // default template - always re-apply
+                // implicit template - re-apply if content type changed
+                Type oldDataType = e.OldValue?.GetType();
+                Type newDataType = e.NewValue?.GetType();
+
+                mismatch = (oldDataType != newDataType);
             }
 
-            if (e.NewValue is UIElement)
+            // if the content and (old) template don't match, reselect the template
+            if (mismatch)
             {
-                // If we're using the content directly, clear the data context.
-                // The content expects to inherit.
-                cp.ClearValue(DataContextProperty);
-            }
-            else
-            {
-                // set data context to the content, so that the template can bind to
-                // properties of the content.
-                cp.DataContext = e.NewValue;
+                ctrl._templateIsCurrent = false;
             }
 
-            if (reevaluateTemplate)
+            // keep the DataContext in sync with Content
+            if (ctrl._templateIsCurrent && ctrl.Template != UIElementContentTemplate)
             {
-                cp.ReevaluateTemplate();
+                ctrl.DataContext = e.NewValue;
+            }
+
+            if (VisualTreeHelper.GetParent(ctrl) != null)
+            {
+                ctrl.InvalidateMeasureInternal();
             }
         }
 
         /// <summary>
-        /// Identifies the ContentTemplate dependency property.
+        /// Identifies the <see cref="ContentTemplate"/> dependency
+        /// property.
         /// </summary>
         public static readonly DependencyProperty ContentTemplateProperty =
             DependencyProperty.Register(
@@ -165,14 +153,22 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public DataTemplate ContentTemplate
         {
-            get { return (DataTemplate)this.GetValue(ContentTemplateProperty); }
-            set { this.SetValue(ContentTemplateProperty, value); }
+            get { return (DataTemplate)GetValue(ContentTemplateProperty); }
+            set { SetValue(ContentTemplateProperty, value); }
         }
 
         private static void OnContentTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ContentPresenter cp = (ContentPresenter)d;
-            cp.ReevaluateTemplate();
+            ContentPresenter ctrl = (ContentPresenter)d;
+            ctrl._templateIsCurrent = false;
+
+            // if ContentTemplate is really changing, remove the old template
+            ctrl.Template = null;
+
+            if (VisualTreeHelper.GetParent(ctrl) != null)
+            {
+                ctrl.InvalidateMeasureInternal();
+            }
         }
 
         /// <summary>
@@ -190,25 +186,21 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private DataTemplate Template
         {
-            get { return this._templateCache; }
-            set { this.SetValue(TemplateProperty, value); }
+            get { return _templateCache; }
+            set { SetValue(TemplateProperty, value); }
         }
 
         // Property invalidation callback invoked when TemplateProperty is invalidated
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ContentPresenter cp = (ContentPresenter)d;
-            FrameworkElement.UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+            UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
             if (VisualTreeHelper.GetParent(cp) != null)
             {
                 cp.InvalidateMeasureInternal();
             }
         }
-
-        #endregion Dependency Properties
-
-        #region Internal Properties
 
         // Internal Helper so the FrameworkElement could see this property
         internal override FrameworkTemplate TemplateInternal
@@ -223,25 +215,67 @@ namespace Windows.UI.Xaml.Controls
             set { _templateCache = (DataTemplate)value; }
         }
 
-        internal static DataTemplate DefaultContentTemplate
+        internal static DataTemplate DefaultContentTemplate { get; }
+
+        internal static DataTemplate UIElementContentTemplate { get; }
+
+        internal override void OnPreApplyTemplate()
         {
-            get
+            base.OnPreApplyTemplate();
+
+            if (!_templateIsCurrent)
             {
-                return _defaultTemplate;
+                EnsureTemplate();
+                _templateIsCurrent = true;
             }
         }
 
-        internal static DataTemplate UIElementContentTemplate
+        private void EnsureTemplate()
         {
-            get
+            DataTemplate oldTemplate = Template;
+            DataTemplate newTemplate = null;
+
+            for (_templateIsCurrent = false; !_templateIsCurrent;)
             {
-                return _uiElementTemplate;
+                // normally this loop will execute exactly once.  The only exception
+                // is when setting the DataContext causes the ContentTemplate or
+                // ContentTemplateSelector to change, presumably because they are
+                // themselves data-bound (see bug 128119).  In that case, we need
+                // to call ChooseTemplate again, to pick up the new template.
+                // We detect this case because _templateIsCurrent is reset to false
+                // in OnContentTemplate[Selector]Changed, causing a second iteration
+                // of the loop.
+                _templateIsCurrent = true;
+                newTemplate = ChooseTemplate();
+
+                // if the template is changing, it's important that the code that cleans
+                // up the old template runs while the CP's DataContext is still set to
+                // the old Content.  The way to get this effect is:
+                //      a. change the template to null
+                //      b. change the data context
+                //      c. change the template to the new value
+
+                if (oldTemplate != newTemplate)
+                {
+                    Template = null;
+                }
+
+                if (newTemplate != UIElementContentTemplate)
+                {
+                    // set data context to the content, so that the template can bind to
+                    // properties of the content.
+                    DataContext = Content;
+                }
+                else
+                {
+                    // If we're using the content directly, clear the data context.
+                    // The content expects to inherit.
+                    ClearValue(DataContextProperty);
+                }
             }
+
+            Template = newTemplate;
         }
-
-        #endregion Internal Properties
-
-        #region Private Methods
 
         /// <summary>
         /// Return the template to use.  This may depend on the Content, or
@@ -261,41 +295,205 @@ namespace Windows.UI.Xaml.Controls
         /// </remarks>
         private DataTemplate ChooseTemplate()
         {
-            object content = this.Content;
-            DataTemplate template = this.ContentTemplate;
+            DataTemplate template = null;
+            object content = Content;
 
-            // default templates
+            // ContentTemplate has first stab
+            template = ContentTemplate;
+
+            // no ContentTemplate set, try the default templates
             if (template == null)
             {
-                if (content is UIElement)
+                // Lookup template for typeof(Content) in resource dictionaries.
+                if (content != null)
                 {
-                    template = UIElementContentTemplate;
+                    template = (DataTemplate)FindTemplateResourceInternal(this, content);
                 }
-                else
+
+                // default templates for well known types
+                if (template == null)
                 {
-                    template = DefaultContentTemplate;
+                    if (content is UIElement)
+                    {
+                        template = UIElementContentTemplate;
+                    }
+                    else
+                    {
+                        template = DefaultContentTemplate;
+                    }
                 }
             }
 
             return template;
         }
 
-        private void ReevaluateTemplate()
+        //  Searches through resource dictionaries to find a DataTemplate
+        //  that matches the type of the 'item' parameter.  Failing an exact
+        //  match of the type, return something that matches one of its parent
+        //  types.
+        internal static object FindTemplateResourceInternal(DependencyObject target, object item)
         {
-            DataTemplate newTemplate = this.ChooseTemplate();
-
-            if (this.Template != newTemplate)
+            // Data styling doesn't apply to UIElement.
+            if (item == null || (item is UIElement))
             {
-                this.Template = newTemplate;
+                return null;
             }
+
+            Type dataType = item.GetType();
+
+            List<DataTemplateKey> keys = new List<DataTemplateKey>();
+
+            // construct the list of acceptable keys, in priority ord
+            int exactMatch = 1;    // number of entries that count as an exact match
+
+            // add compound keys for the dataType and all its base types
+            while (dataType != null)
+            {
+                keys.Add(new DataTemplateKey(dataType));
+
+                dataType = dataType.BaseType;
+                if (dataType == typeof(object)) // don't search for Object - perf (Note: Silverlight also includes object)
+                {
+                    dataType = null;
+                }
+            }
+
+            int bestMatch = keys.Count; // index of best match so far
+
+            // Search the parent chain
+            object resource = FindTemplateResourceInTree(target, keys, exactMatch, ref bestMatch);
+
+            if (bestMatch >= exactMatch)
+            {
+                // Exact match not found in the parent chain.  Try App Resources.
+                object appResource = FindTemplateResourceFromApp(target, keys, exactMatch, ref bestMatch);
+
+                if (appResource != null)
+                    resource = appResource;
+            }
+
+            return resource;
+        }
+
+        // Find a data template resource
+        private static object FindTemplateResourceFromApp(
+            DependencyObject target,
+            List<DataTemplateKey> keys,
+            int exactMatch,
+            ref int bestMatch)
+        {
+            object resource = null;
+            int k;
+
+            Application app = Application.Current;
+            if (app != null)
+            {
+                // If the element is rooted to a Window and App exists, defer to App.
+                for (k = 0; k < bestMatch; ++k)
+                {
+                    object appResource = app.FindResourceInternal(keys[k]);
+                    if (appResource != null)
+                    {
+                        bestMatch = k;
+                        resource = appResource;
+
+                        if (bestMatch < exactMatch)
+                            return resource;
+                    }
+                }
+            }
+
+            return resource;
+        }
+
+        // Search the parent chain for a DataTemplate in a ResourceDictionary.
+        private static object FindTemplateResourceInTree(
+            DependencyObject target,
+            List<DataTemplateKey> keys,
+            int exactMatch,
+            ref int bestMatch)
+        {
+            Debug.Assert(target != null, "Don't call FindTemplateResource with a null target object");
+
+            ResourceDictionary table;
+            object resource = null;
+
+            FrameworkElement fe = target as FrameworkElement;
+
+            while (fe != null)
+            {
+                object candidate;
+
+                // -------------------------------------------
+                //  Lookup ResourceDictionary on the current instance
+                // -------------------------------------------
+
+                // Fetch the ResourceDictionary
+                // for the given target element
+                table = fe.HasResources ? fe.Resources : null;
+                if (table != null)
+                {
+                    candidate = FindBestMatchInResourceDictionary(table, keys, exactMatch, ref bestMatch);
+                    if (candidate != null)
+                    {
+                        resource = candidate;
+                        if (bestMatch < exactMatch)
+                        {
+                            // Exact match found, stop here.
+                            return resource;
+                        }
+                    }
+                }
+
+                // -------------------------------------------
+                //  Find the next parent instance to lookup
+                // -------------------------------------------
+
+                // Get Framework Parent (priority to logical parent)
+                fe = (fe.Parent ?? VisualTreeHelper.GetParent(fe)) as FrameworkElement;
+            }
+
+            return resource;
+        }
+
+        // Given a ResourceDictionary and a set of keys, try to find the best
+        //  match in the resource dictionary.
+        private static object FindBestMatchInResourceDictionary(
+            ResourceDictionary table,
+            List<DataTemplateKey> keys,
+            int exactMatch,
+            ref int bestMatch)
+        {
+            object resource = null;
+            int k;
+
+            // Search target element's ResourceDictionary for the resource
+            if (table != null)
+            {
+                for (k = 0; k < bestMatch; ++k)
+                {
+                    object candidate = table[keys[k]];
+                    if (candidate != null)
+                    {
+                        resource = candidate;
+                        bestMatch = k;
+
+                        // if we found an exact match, no need to continue
+                        if (bestMatch < exactMatch)
+                            return resource;
+                    }
+                }
+            }
+
+            return resource;
         }
 
         internal void PrepareContentPresenter(object item, DataTemplate template)
         {
             if (item != this)
             {
-                this.ContentTemplate = template;
-                this.Content = item;
+                ContentTemplate = template;
+                Content = item;
             }
         }
 
@@ -303,32 +501,57 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this != item)
             {
-                this.ClearValue(ContentProperty);
+                ClearValue(ContentProperty);
             }
         }
-
-        #endregion Internal Methods
-
-        #region Private classes
 
         private class UseContentTemplate : DataTemplate
         {
             public UseContentTemplate()
             {
-                this._methodToInstantiateFrameworkTemplate = owner =>
+                SetMethodToInstantiateFrameworkTemplate(container =>
                 {
                     TemplateInstance template = new TemplateInstance();
 
-                    FrameworkElement root = ((ContentPresenter)owner).Content as FrameworkElement;
+                    FrameworkElement root = ((ContentPresenter)container).Content as FrameworkElement;
 
                     template.TemplateContent = root;
 
                     return template;
-                };
+                });
             }
         }
 
-        #endregion Private classes
+        private class DefaultTemplate : DataTemplate
+        {
+            public DefaultTemplate()
+            {
+                SetMethodToInstantiateFrameworkTemplate(container =>
+                {
+                    TemplateInstance template = new TemplateInstance();
+
+                    ContentPresenter cp = (ContentPresenter)container;
+                    FrameworkElement result = DefaultExpansion(cp.Content, cp);
+
+                    template.TemplateContent = result;
+
+                    return template;
+                });
+            }
+
+            private FrameworkElement DefaultExpansion(object content, ContentPresenter container)
+            {
+                if (content == null)
+                {
+                    return null;
+                }
+
+                TextBlock textBlock = new TextBlock();
+                textBlock.SetBinding(TextBlock.TextProperty, new Binding());
+
+                return textBlock;
+            }
+        }
 
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -340,10 +563,10 @@ namespace Windows.UI.Xaml.Controls
                 return elementChild.DesiredSize;
             }
 
-            if (this.Content == null)
+            if (Content == null)
                 return new Size();
 
-            Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
+            Size actualSize = new Size(double.IsNaN(Width) ? ActualWidth : Width, double.IsNaN(Height) ? ActualHeight : Height);
             return actualSize;
         }
 
@@ -355,6 +578,7 @@ namespace Windows.UI.Xaml.Controls
                 UIElement elementChild = ((UIElement)childElements.ElementAt(0));
                 elementChild.Arrange(new Rect(finalSize));
             }
+
             return finalSize;
         }
     }

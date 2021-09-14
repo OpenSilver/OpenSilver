@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml.Controls;
-#endif
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -33,15 +25,62 @@ namespace Windows.UI.Xaml
     /// </summary>
     public partial class DataTemplate : FrameworkTemplate
     {
-        /// <summary>
-        /// Initializes a new instance of the DataTemplate class.
-        /// </summary>
-        public DataTemplate() : base() { }
+        private Type _dataType;
 
         /// <summary>
-        /// Creates the System.Windows.UIElement objects in the System.Windows.DataTemplate.
+        /// Initializes a new instance of the <see cref="DataTemplate"/> class without initializing
+        /// the <see cref="DataType"/> property.
         /// </summary>
-        /// <returns>The root System.Windows.UIElement of the System.Windows.DataTemplate.</returns>
+        public DataTemplate() { }
+
+        /// <summary>
+        /// Gets or sets the type for which this <see cref="DataTemplate"/> is intended.
+        /// </summary>
+        /// <returns>
+        /// The type of object to which this template is applied.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// When setting this property, the specified value is not of type <see cref="Type"/>.
+        /// </exception>
+        public Type DataType
+        {
+            get
+            {
+                return this._dataType;
+            }
+            set
+            {
+#if MIGRATION
+                Exception ex = System.Windows.DataTemplateKey.ValidateDataType(value, nameof(value));
+#else
+                Exception ex = Windows.UI.Xaml.DataTemplateKey.ValidateDataType(value, nameof(value));
+#endif
+                if (ex != null)
+                {
+                    throw ex;
+                }
+
+                this._dataType = value;
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object DataTemplateKey
+        {
+            get
+            {
+                return this.DataType != null ?
+                       new DataTemplateKey(this.DataType) :
+                       null;
+            }
+        }
+
+        /// <summary>
+        /// Creates the <see cref="UIElement"/> objects in the <see cref="DataTemplate"/>.
+        /// </summary>
+        /// <returns>
+        /// The root <see cref="UIElement"/> of the <see cref="DataTemplate"/>.
+        /// </returns>
         public DependencyObject LoadContent()
         {
             return this.INTERNAL_InstantiateFrameworkTemplate();

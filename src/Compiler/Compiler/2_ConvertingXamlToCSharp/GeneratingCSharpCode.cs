@@ -348,6 +348,7 @@ namespace DotNetForHtml5.Compiler
                                         enumerableType: enumerableType,
                                         codeToAccessTheEnumerable: codeToAccessTheEnumerable,
                                         elementThatContainsTheChildrenToAdd: element,
+                                        isSLMigration: isSLMigration,
                                         reflectionOnSeparateAppDomain: reflectionOnSeparateAppDomain);
                                 }
                                 else
@@ -1202,6 +1203,7 @@ dependencyPropertyPath);
                                 enumerableType: enumerableType,
                                 codeToAccessTheEnumerable: elementUniqueNameOrThisKeyword,
                                 elementThatContainsTheChildrenToAdd: element,
+                                isSLMigration: isSLMigration,
                                 reflectionOnSeparateAppDomain: reflectionOnSeparateAppDomain);
                         }
                         else
@@ -1814,7 +1816,14 @@ var {4} = {2}.GetValue({1});
             None, Collection, Dictionary
         }
 
-        static void GenerateCodeForAddingChildrenToCollectionOrDictionary(Stack<string> codeStack, StringBuilder stringBuilder, EnumerableType enumerableType, string codeToAccessTheEnumerable, XElement elementThatContainsTheChildrenToAdd, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        private static void GenerateCodeForAddingChildrenToCollectionOrDictionary(
+            Stack<string> codeStack,
+            StringBuilder stringBuilder,
+            EnumerableType enumerableType,
+            string codeToAccessTheEnumerable,
+            XElement elementThatContainsTheChildrenToAdd,
+            bool isSLMigration,
+            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
             List<XElement> children = elementThatContainsTheChildrenToAdd.Elements().ToList();
             List<string> childrenCode = PopElementsFromStackAndReadThemInReverseOrder(codeStack, children.Count).ToList();
@@ -1848,9 +1857,18 @@ var {4} = {2}.GetValue({1});
                             bool isImplicitStyle;
                             bool isImplicitDataTemplate;
                             string childKey = GetElementXKey(child, reflectionOnSeparateAppDomain, out isImplicitStyle, out isImplicitDataTemplate);
-                            if (isImplicitStyle || isImplicitDataTemplate)
+                            if (isImplicitStyle)
                             {
                                 stringBuilder.AppendLine(string.Format("{0}[typeof({1})] = {2};", codeToAccessTheEnumerable, childKey, childUniqueName));
+                            }
+                            else if (isImplicitDataTemplate)
+                            {
+                                string key = string.Format(
+                                    "new global::{0}.DataTemplateKey(typeof({1}))",
+                                    isSLMigration ? "System.Windows" : "Windows.UI.Xaml",
+                                    childKey);
+
+                                stringBuilder.AppendLine(string.Format("{0}[{1}] = {2};", codeToAccessTheEnumerable, key, childUniqueName));
                             }
                             else
                             {
