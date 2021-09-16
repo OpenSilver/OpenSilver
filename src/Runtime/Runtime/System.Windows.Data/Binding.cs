@@ -236,7 +236,7 @@ namespace Windows.UI.Xaml.Data
         /// <summary>
         /// Do not use this property.
         /// </summary>
-        /// <exclude/>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateInstance TemplateOwner { get; set; }
 
 #region Validation
