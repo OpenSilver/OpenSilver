@@ -682,10 +682,14 @@ namespace Windows.UI.Xaml.Data
                 }
             }
 
-            // Some hard-coded conversions: //todo: generalize this system by implementing "TypeConverter" and "TypeConverterAttribute"
-            if (targetType == typeof(Color) && value is SolidColorBrush scb) //eg. binding "Border.Background" to "DropShadowEffect.Color"
+            // Check for converters
+            if (value != null)
             {
-                value = scb.Color;
+                var converter = System.ComponentModel.TypeConverterHelper.GetConverter(value.GetType());
+                if (converter != null && converter.CanConvertTo(targetType))
+                {
+                    value = converter.ConvertTo(value, targetType);
+                }
             }
 
             return value;

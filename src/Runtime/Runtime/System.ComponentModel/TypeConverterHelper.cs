@@ -64,6 +64,10 @@ namespace System.ComponentModel
         private static Dictionary<Type, TypeConverter> OverriddenTypeConverters { get; } =
             GetOverriddenTypeConverters();
 
+        // Type Data defined converter cache
+        private static Dictionary<Type, TypeConverter> TypeDataConverters = new Dictionary<Type, TypeConverter>();
+
+
         public static TypeConverter GetConverter(Type type)
         {
             TypeConverter converter = null;
@@ -160,16 +164,21 @@ namespace System.ComponentModel
 
         private static TypeConverter GetTypeConverterFromTypeData(Type type)
         {
-            for (Type t = type; t != null; t = t.BaseType)
+            if (!TypeDataConverters.ContainsKey(type))
             {
-                TypeConverter converter = GetTypeData(t, true).GetConverter();
-                if (converter != NullConverter)
+                TypeDataConverters[type] = null;
+                for (Type t = type; t != null; t = t.BaseType)
                 {
-                    return converter;
+                    TypeConverter converter = GetTypeData(t, true).GetConverter();
+                    if (converter != NullConverter)
+                    {
+                        TypeDataConverters[type] = converter;
+                        break;
+                    }
                 }
             }
 
-            return null;
+            return TypeDataConverters[type];
         }
 
         private static ReflectedTypeData GetTypeData(Type type, bool createIfNeeded)
