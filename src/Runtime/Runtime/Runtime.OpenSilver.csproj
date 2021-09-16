@@ -323,7 +323,7 @@
 		<Compile Include="System.Windows\ResourceDictionaryCollection.cs" />
 		<Compile Include="System.Windows\ResourcesChangeInfo.cs" />
 		<Compile Include="System.Windows\TreeWalkHelper.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\ApplicationLifetimeObjectsCollection.cs" />
+		<Compile Include="OpenSilver\Internal\ApplicationLifetimeObjectsCollection.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\DragEventHandler.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontEastAsianLanguage.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontEastAsianWidths.cs" />

@@ -31,17 +31,16 @@ using System.Collections;
 using System.Collections.Generic;
 
 #if MIGRATION
-namespace System.Windows
+using System.Windows;
 #else
-namespace Windows.UI.Xaml
+using Windows.UI.Xaml;
 #endif
 
+namespace OpenSilver.Internal
 {
-
 	internal class ApplicationLifetimeObjectsCollection : IList
 	{
-
-		private List<object> list = new List<object>();
+		private readonly List<object> list = new List<object>();
 		private bool read_only;
 
 		public object this[int index]
@@ -52,7 +51,7 @@ namespace Windows.UI.Xaml
 			}
 			set
 			{
-				list[index] = value;
+				throw new NotSupportedException();
 			}
 		}
 
@@ -81,11 +80,18 @@ namespace Windows.UI.Xaml
 			get { return read_only; }
 		}
 
-
 		public int Add(object value)
 		{
+			if (!(value is IApplicationService))
+            {
+				throw new NotSupportedException("Element declared as Application Service does not implement IApplicationService interface.");
+            }
+
 			if (IsReadOnly)
+            {
 				throw new NotSupportedException();
+			}
+
 			// we can add only before application startup (i.e. parsing time)
 			list.Add(value);
 			return Count - 1;
@@ -94,11 +100,6 @@ namespace Windows.UI.Xaml
 		public void Clear()
 		{
 			throw new NotImplementedException();
-		}
-
-		public void Close()
-		{
-			read_only = true;
 		}
 
 		public bool Contains(object value)
@@ -134,6 +135,11 @@ namespace Windows.UI.Xaml
 		public IEnumerator GetEnumerator()
 		{
 			return list.GetEnumerator();
+		}
+
+		internal void Close()
+		{
+			read_only = true;
 		}
 	}
 }

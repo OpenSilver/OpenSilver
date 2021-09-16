@@ -46,6 +46,7 @@
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
+    <Compile Include="OpenSilver\Internal\ApplicationLifetimeObjectsCollection.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
@@ -956,7 +957,6 @@
     <Compile Include="System.Windows\Window.cs" />
     <Compile Include="System.Windows\WindowSizeChangedEventHandler.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\Application.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\ApplicationLifetimeObjectsCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\AssemblyPart.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\AssemblyPartCollection.cs" />

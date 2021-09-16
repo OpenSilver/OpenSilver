@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,26 +11,22 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using CSHTML5.Internal;
 using System;
-using System.Xml.Serialization;
-using System.Runtime.Serialization;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Resources;
 using System.IO;
 using System.Text;
-using System.Reflection;
+using CSHTML5;
+using CSHTML5.Internal;
 using DotNetForHtml5.Core;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using System.Windows.Media;
 #else
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Core;
@@ -51,8 +46,10 @@ namespace Windows.UI.Xaml
     /// </summary>
     public partial class Application
     {
-        static Dictionary<string, string> _resourcesCache = null;
-        INTERNAL_XamlResourcesHandler _xamlResourcesHandler = new INTERNAL_XamlResourcesHandler();
+        private static Dictionary<string, string> _resourcesCache = null;
+        private ApplicationLifetimeObjectsCollection lifetime_objects;
+        private Window _mainWindow;
+        private ResourceDictionary _resources;
 
         // Says if App.Resources has any implicit styles
         internal bool HasImplicitStylesInResources { get; set; }
@@ -62,10 +59,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         public static Application Current { get; set; }
 
-        internal INTERNAL_XamlResourcesHandler XamlResourcesHandler { get { return _xamlResourcesHandler; } }
-
-        Window _mainWindow;
-        ResourceDictionary _resources;
+        internal INTERNAL_XamlResourcesHandler XamlResourcesHandler { get; } = new INTERNAL_XamlResourcesHandler();
 
         internal ITextMeasurementService TextMeasurementService { get; private set; }
       
@@ -162,6 +156,19 @@ namespace Windows.UI.Xaml
                 this.OnLaunched(new LaunchActivatedEventArgs());
             }));
 
+        }
+
+        public IList ApplicationLifetimeObjects
+        {
+            get
+            {
+                if (lifetime_objects == null)
+                {
+                    lifetime_objects = new ApplicationLifetimeObjectsCollection();
+                }
+
+                return lifetime_objects;
+            }
         }
 
         private void StartAppServices()
@@ -457,10 +464,8 @@ namespace Windows.UI.Xaml
         /// </returns>
         public object TryFindResource(object resourceKey)
         {
-            return _xamlResourcesHandler.TryFindResource(resourceKey);
+            return XamlResourcesHandler.TryFindResource(resourceKey);
         }
-
-
 
         // Exceptions:
         //   System.ArgumentNullException:

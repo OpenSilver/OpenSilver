@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml
         //
         //   T:System.UnauthorizedAccessException:
         //     The current thread is not the user interface (UI) thread.
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public WindowCollection Windows { get; }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Windows.UI.Xaml
 
         internal void OnUnhandledException(Exception exception, bool handled)
         {
-            if(UnhandledException != null)
+            if (UnhandledException != null)
             {
                 UnhandledException(this, new ApplicationUnhandledExceptionEventArgs(exception, handled));
             }
@@ -64,29 +64,16 @@ namespace Windows.UI.Xaml
         //#endif
         //        }
 
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public bool IsRunningOutOfBrowser
         {
             get { return false; }
         }
 
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public bool HasElevatedPermissions { get; set; }
 
-        ApplicationLifetimeObjectsCollection lifetime_objects;
-        public IList ApplicationLifetimeObjects {
-            get 
-            {
-                if(lifetime_objects == null)
-                {
-                    lifetime_objects = new ApplicationLifetimeObjectsCollection();
-                }
-
-                return lifetime_objects; 
-            } 
-        }
-
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
         {
             return null;
