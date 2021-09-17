@@ -680,15 +680,20 @@ namespace Windows.UI.Xaml.Data
                 {
                     HandleException(ex);
                 }
-            }
-
-            // Check for converters
-            if (value != null)
+            } 
+            else if (value != null)
             {
-                var converter = System.ComponentModel.TypeConverterHelper.GetConverter(value.GetType());
-                if (converter != null && converter.CanConvertTo(targetType))
+                try
                 {
-                    value = converter.ConvertTo(value, targetType);
+                    var converter = System.ComponentModel.TypeConverterHelper.GetConverter(value.GetType());
+                    if (converter != null && converter.CanConvertTo(targetType))
+                    {
+                        value = converter.ConvertTo(value, targetType);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleException(ex);
                 }
             }
 
