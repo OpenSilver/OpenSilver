@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="ThrowWarningOnWIP">
 
   <!--
   /*===================================================================================
@@ -26,7 +26,14 @@
   <PropertyGroup Condition="'$(DefineSilverlight)'=='true'">
     <DefineConstants>$(DefineConstants);SILVERLIGHT;</DefineConstants>
   </PropertyGroup>
-  
+
+
+	<Target Name="ThrowWarningOnWIP" Condition="'$(IsSecondPass)'=='True' And !$(DefineConstants.Contains(IGNORE_WIP_WARNING))">
+		<Warning Text="The OpenSilver.WorkInProgress package is deprecated and will not be updated anymore. Use the OpenSilver package instead. Visit the following page for more information: https://opensilver.net/permalinks/wip_discontinued.aspx" />
+		<Exec Condition="'$(IsSecondPass)'=='True' And '$(UseRazorBuildServer)' == '' And !$(DefineConstants.Contains(IGNORE_WIP_WARNING))"
+      Command="explorer.exe http://localhost:63797/permalinks/wip_discontinued.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+	</Target>
+	
   <!--============================================================
   IMPORT THE MAIN TARGET FILE
   ============================================================-->
