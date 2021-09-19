@@ -216,6 +216,7 @@ namespace CSHTML5.Internal
         public string zIndex { set { SetStylePropertyValue("zIndex", value); } }
         public string gridArea { set { SetStylePropertyValue("gridArea", value); } }
         public string visibility { set { SetStylePropertyValue("visibility", value); } }
+        public string clip { set { SetStylePropertyValue("clip", value); } }
 
         //-----------------------------------------------------------------------
         // Usage stats for To-Do Calendar (number of types each property is set):
