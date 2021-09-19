@@ -400,7 +400,7 @@ namespace Windows.UI.Xaml.Controls
 
 #endif                      // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 
                             // decimals at the most.
-                            return (Math.Floor((double)value * 1000) / 1000).ToInvariantString() + "px"; 
+                            return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString() + "px"; 
                         },
                         Name = new List<string> { "fontSize" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
