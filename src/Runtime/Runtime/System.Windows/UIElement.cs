@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Media.Effects;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -291,7 +292,7 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                throw new NotImplementedException("Only RectangleGeometry is supported for now.");
+                Debug.WriteLine("Only RectangleGeometry is supported for now.");
             }
         }
 
