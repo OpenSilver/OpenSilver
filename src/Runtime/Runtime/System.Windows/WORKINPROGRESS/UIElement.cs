@@ -101,33 +101,16 @@ namespace Windows.UI.Xaml
                                         typeof(UIElement), 
                                         null);
 
-
-
-		[OpenSilver.NotImplemented]
-        public Geometry Clip
-        {
-            get { return (Geometry)GetValue(ClipProperty); }
-            set { SetValue(ClipProperty, value); }
-        }
-
-		[OpenSilver.NotImplemented]
-        public static readonly DependencyProperty ClipProperty = 
-            DependencyProperty.Register("Clip", 
-                                        typeof(Geometry), 
-                                        typeof(UIElement), 
-                                        null);
-
-
 #if OPENSILVER
-		//
-		// Summary:
-		//     When implemented in a derived class, returns class-specific System.Windows.Automation.Peers.AutomationPeer
-		//     implementations for the Silverlight automation infrastructure.
-		//
-		// Returns:
-		//     The class-specific System.Windows.Automation.Peers.AutomationPeer subclass to
-		//     return.
-		[OpenSilver.NotImplemented]
+        //
+        // Summary:
+        //     When implemented in a derived class, returns class-specific System.Windows.Automation.Peers.AutomationPeer
+        //     implementations for the Silverlight automation infrastructure.
+        //
+        // Returns:
+        //     The class-specific System.Windows.Automation.Peers.AutomationPeer subclass to
+        //     return.
+        [OpenSilver.NotImplemented]
 		protected virtual AutomationPeer OnCreateAutomationPeer()
 		{
 			return default(AutomationPeer);

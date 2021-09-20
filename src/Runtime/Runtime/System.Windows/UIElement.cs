@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Media.Effects;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -249,6 +250,53 @@ namespace Windows.UI.Xaml
 
 #endregion
 
+#region Clip
+
+        public Geometry Clip
+        {
+            get { return (Geometry)GetValue(ClipProperty); }
+            set { SetValue(ClipProperty, value); }
+        }
+
+        public static readonly DependencyProperty ClipProperty =
+            DependencyProperty.Register("Clip",
+                                        typeof(Geometry),
+                                        typeof(UIElement),
+                                        new PropertyMetadata(null)
+                                        {
+                                            MethodToUpdateDom = Clip_MethodToUpdateDom,
+                                        });
+
+        private static void Clip_MethodToUpdateDom(DependencyObject d, object newValue)
+        {
+            // Only RectangleGeometry is supported for now
+            if (newValue != null && newValue is RectangleGeometry)
+            {
+                UIElement uiElement = (UIElement)d;
+                var outerDomElement = uiElement.INTERNAL_OuterDomElement;
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
+                RectangleGeometry val = (RectangleGeometry)newValue;
+
+                // Get elements width and height
+                double width = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetWidth"));
+                double height = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetHeight"));
+
+                // CSS rect property has the following format - rect(<top>, <right>, <bottom>, <left>)
+                double top = val.Rect.Y;
+                double right = val.Rect.Width + val.Rect.X;
+                double bottom = val.Rect.Height + val.Rect.Y;
+                double left = val.Rect.X;
+
+                string rect = "rect(" + top + "px, " + right + "px" + ", " + bottom + "px, " + left + "px)";
+                style.clip = rect;
+            }
+            else
+            {
+                Debug.WriteLine("Only RectangleGeometry is supported for now.");
+            }
+        }
+
+#endregion
 
         /// <summary>
         /// When overriden, creates the dom elements designed to represent an instance of an UIElement and defines the place where its child(ren) will be added.
