@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Browser;
@@ -103,7 +104,7 @@ namespace System.Windows.Browser
         /// </exception>
         public static void RegisterScriptableObject(string scriptKey, object instance)
         {
-            CSHTML5.Interop.ExecuteJavaScript("window[$0]={};", scriptKey);
+            OpenSilver.Interop.ExecuteJavaScript("window[$0]={};", scriptKey);
 
             var methods = instance.GetType().GetMethods()
                 .Where(m => m.GetCustomAttributes(typeof(ScriptableMemberAttribute), false).Length > 0)
@@ -111,7 +112,7 @@ namespace System.Windows.Browser
 
             foreach (var method in methods)
             {
-                CSHTML5.Interop.ExecuteJavaScript("window[$0][$1] = function () { return $2(...arguments); }", scriptKey, method.Name, (Func<CSHTML5.Types.INTERNAL_JSObjectReference, object>)(jsObjectReference =>
+                OpenSilver.Interop.ExecuteJavaScript("window[$0][$1] = function () { return $2(...arguments); }", scriptKey, method.Name, (Func<CSHTML5.Types.INTERNAL_JSObjectReference, object>)(jsObjectReference =>
                 {
                     var parameters = method.GetParameters();
                     var args = new object[parameters.Length];
@@ -122,6 +123,33 @@ namespace System.Windows.Browser
                     }
                     return method.Invoke(instance, args);
                 }));
+            }
+
+            var events = instance.GetType().GetEvents()
+                .Where(e => e.GetCustomAttributes(typeof(ScriptableMemberAttribute), false).Length > 0)
+                .ToArray();
+
+            foreach (var eventInfo in events)
+            {
+                var es = new EventSubscriber(scriptKey, eventInfo.Name);
+#if BRIDGE
+                //Bridge.Net does not support EventHandlerType.
+                var eventHandlerType = eventInfo.AddMethod.GetParameters()[0].ParameterType;
+#else
+                var eventHandlerType = eventInfo.EventHandlerType;
+#endif
+
+                var methodName = "OnRaisedBridgeNet";
+                var method = eventHandlerType.GetMethod("Invoke");
+                if (method != null)
+                {
+                    //We are in OpenSilver or in the Simulator
+                    methodName = "OnRaised" + method.GetParameters().Length;
+                }
+
+                var d = Delegate.CreateDelegate(eventHandlerType, es,
+                    es.GetType().GetMethods().First(mi => mi.Name == methodName));
+                eventInfo.AddEventHandler(instance, d);
             }
         }
     }
