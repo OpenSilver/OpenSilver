@@ -715,6 +715,12 @@ document.functionToCompareWordForFilter = function (wordToCompare) {
     }
 }
 
+function callScriptableObjectEvent(scriptableObjectName, eventName, passedArgs) {
+    var scriptableObj = window[scriptableObjectName];
+    if (scriptableObj && scriptableObj[eventName]) {
+        scriptableObj[eventName].apply(scriptableObj, passedArgs);
+    }
+}
 
 //------------------------------
 // SCRDOC POLYFILL (cf. https://github.com/jugglinmike/srcdoc-polyfill )
