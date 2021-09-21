@@ -53,13 +53,11 @@ namespace Windows.UI.Xaml.Data
         internal bool INTERNAL_ForceValidateOnNextSetValue = false;
         internal bool IsUpdating;
         private bool _isAttaching;
-        private readonly PropertyPathWalker propertyPathWalker;
         private IPropertyChangedListener _propertyListener;
         private DynamicValueConverter _dynamicConverter;
-
-        private readonly string computedPath;
-        private readonly bool isDataContextBound;
         private object _bindingSource;
+
+        private readonly PropertyPathWalker _propertyPathWalker;
 
         internal BindingExpression(Binding binding, DependencyObject target, DependencyProperty property)
             : this(binding, property)
@@ -72,32 +70,14 @@ namespace Windows.UI.Xaml.Data
             ParentBinding = binding;
             TargetProperty = property;
 
-            if (binding.ElementName == null && binding.Source == null && binding.RelativeSource == null) //this means that it is bound to current DataContext.
-            {
-                isDataContextBound = true;
-                //we change the Binding so that when it is bound to the DataContext, we handle it the same way as 
-
-                string str = ParentBinding.Path.Path;
-                if (!string.IsNullOrWhiteSpace(str) && !((str = str.Trim()) == "."))
-                {
-                    computedPath = "DataContext." + str;
-                }
-                else
-                {
-                    computedPath = "DataContext";
-                }
-            }
-            else
-            {
-                computedPath = ParentBinding.Path?.Path ?? string.Empty;
-            }
-
-            var walker = propertyPathWalker = new PropertyPathWalker(computedPath, false);
+            bool isDataContextBound = binding.ElementName == null && binding.Source == null && binding.RelativeSource == null;
+            string path = ParentBinding.Path?.Path ?? string.Empty;
+            
+            var walker = _propertyPathWalker = new PropertyPathWalker(path, isDataContextBound);
             if (binding.Mode != BindingMode.OneTime)
             {
                 walker.Listen(this);
             }
-
         }
 
         /// <summary>
@@ -155,7 +135,7 @@ namespace Windows.UI.Xaml.Data
         {
             object value;
 
-            if (propertyPathWalker.IsPathBroken)
+            if (_propertyPathWalker.IsPathBroken)
             {
                 //------------------------
                 // BROKEN PATH
@@ -169,7 +149,7 @@ namespace Windows.UI.Xaml.Data
                 // NON-BROKEN PATH
                 //------------------------
 
-                value = propertyPathWalker.ValueInternal;
+                value = _propertyPathWalker.ValueInternal;
 
                 if (ParentBinding.Converter != null)
                 {
@@ -231,7 +211,7 @@ namespace Windows.UI.Xaml.Data
             // FindSource should find the source now. Otherwise, the PropertyPathNodes
             // shoud do the work (their properties will change when the source will
             // become available)
-            propertyPathWalker.Update(_bindingSource);
+            _propertyPathWalker.Update(_bindingSource);
 
             //Listen to changes on the Target if the Binding is TwoWay:
             if (ParentBinding.Mode == BindingMode.TwoWay)
@@ -262,7 +242,7 @@ namespace Windows.UI.Xaml.Data
                 _propertyListener = null;
             }
 
-            propertyPathWalker.Update(null);
+            _propertyPathWalker.Update(null);
 
             Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
             Target = null;
@@ -285,12 +265,12 @@ namespace Windows.UI.Xaml.Data
         {
             if (ParentBinding.ValidatesOnExceptions && ParentBinding.ValidatesOnLoad)
             {
-                if (!propertyPathWalker.IsPathBroken)
+                if (!_propertyPathWalker.IsPathBroken)
                 {
                     INTERNAL_ForceValidateOnNextSetValue = false;
                     try
                     {
-                        PropertyPathNode node = (PropertyPathNode)propertyPathWalker.FinalNode;
+                        IPropertyPathNode node = _propertyPathWalker.FinalNode;
                         node.SetValue(node.Value); //we set the source property to its own value to check whether it causes an exception, in which case the value is not valid.
                     }
                     catch (Exception e) //todo: put the content of this catch in a method which will be called here and in UpdateSourceObject (OR put the whole try/catch in the method and put the Value to set as parameter).
@@ -318,7 +298,7 @@ namespace Windows.UI.Xaml.Data
             FindSource();
             if (_bindingSource != null)
             {
-                propertyPathWalker.Update(_bindingSource);
+                _propertyPathWalker.Update(_bindingSource);
             }
 
             //Target.SetValue(Property, this); // Read note below
@@ -380,26 +360,14 @@ namespace Windows.UI.Xaml.Data
 
         internal void UpdateSourceObject(object value)
         {
-            if (propertyPathWalker.IsPathBroken)
+            if (_propertyPathWalker.IsPathBroken)
                 return;
 
-            PropertyPathNode node = (PropertyPathNode)propertyPathWalker.FinalNode;
+            IPropertyPathNode node = _propertyPathWalker.FinalNode;
             bool oldIsUpdating = IsUpdating;
 
             object convertedValue = value;
-            Type expectedType = null;
-            if (node.DependencyProperty != null)
-            {
-                expectedType = node.DependencyProperty.PropertyType;
-            }
-            else if (node.PropertyInfo != null)
-            {
-                expectedType = node.PropertyInfo.PropertyType;
-            }
-            else if (node.FieldInfo != null)
-            {
-                expectedType = node.FieldInfo.FieldType;
-            }
+            Type expectedType = node.Type;
 
             try
             {
@@ -576,8 +544,21 @@ namespace Windows.UI.Xaml.Data
 
         private void FindSource()
         {
-            if (isDataContextBound)
+            if (ParentBinding.Source != null)
             {
+                _bindingSource = ParentBinding.Source;
+            }
+            else if (ParentBinding.ElementName != null)
+            {
+                _bindingSource = (Target as FrameworkElement)?.FindName(ParentBinding.ElementName);
+            }
+            else if (ParentBinding.RelativeSource != null)
+            {
+                _bindingSource = FindRelativeSource(this);
+            }
+            else
+            {
+                // DataContext
                 if (Target is FrameworkElement targetFE)
                 {
                     DependencyObject contextElement = targetFE;
@@ -589,6 +570,7 @@ namespace Windows.UI.Xaml.Data
                     {
                         contextElement = targetFE.Parent;
                     }
+
                     _bindingSource = contextElement;
                 }
                 else
@@ -597,51 +579,36 @@ namespace Windows.UI.Xaml.Data
                     _bindingSource = Target.InheritedParent;
                 }
             }
-            else if (ParentBinding.Source != null)
+        }
+        
+        private static object FindRelativeSource(BindingExpression expr)
+        {
+            RelativeSource relativeSource = expr.ParentBinding.RelativeSource;
+            switch (relativeSource.Mode)
             {
-                _bindingSource = ParentBinding.Source;
-            }
-            else if (ParentBinding.ElementName != null)
-            {
-                // we should not arrive here
-                // todo: fix this so that an ElementName can be set programmatically
-                if (Target is FrameworkElement targetFE)
-                {
-                    _bindingSource = targetFE.FindName(ParentBinding.ElementName);
-                }
-                else
-                {
-                    _bindingSource = null;
-                }
-            }
-            else if (ParentBinding.RelativeSource != null)
-            {
-                var relativeSource = ParentBinding.RelativeSource;
-                switch (relativeSource.Mode)
-                {
-                    case RelativeSourceMode.Self:
-                        _bindingSource = Target;
-                        break;
-                    case RelativeSourceMode.TemplatedParent:
-                        if (ParentBinding.TemplateOwner != null)
-                        {
-                            _bindingSource = ParentBinding.TemplateOwner.TemplateOwner;
-                        }
-                        else
-                        {
-                            // todo: find out why we enter here in Client_TUI.
-                            Debug.WriteLine("ERROR: ParentBinding.TemplateOwner is null.");
-                            _bindingSource = null;
-                        }
-                        break;
-                    case RelativeSourceMode.FindAncestor:
-                        _bindingSource = FindAncestor(Target, relativeSource);
-                        break;
-                }
+                case RelativeSourceMode.Self:
+                    return expr.Target;
+
+                case RelativeSourceMode.TemplatedParent:
+                    if (expr.ParentBinding.TemplateOwner != null)
+                    {
+                        return expr.ParentBinding.TemplateOwner.TemplateOwner;
+                    }
+                    
+                    // todo: find out why we enter here in Client_TUI.
+                    Debug.WriteLine("ERROR: ParentBinding.TemplateOwner is null.");
+                    return null;
+
+                case RelativeSourceMode.FindAncestor:
+                    return FindAncestor(expr.Target, relativeSource);
+
+                case RelativeSourceMode.None:
+                default:
+                    return null;
             }
         }
 
-        private object FindAncestor(DependencyObject target, RelativeSource relativeSource)
+        private static object FindAncestor(DependencyObject target, RelativeSource relativeSource)
         {
             // todo: support bindings in style setters and then remove the following test.
             // To reproduce the issue:

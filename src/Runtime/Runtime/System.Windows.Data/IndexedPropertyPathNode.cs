@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections;
+using System.Globalization;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Data
@@ -27,40 +22,84 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal partial class IndexedPropertyPathNode : PropertyPathNode
+    internal sealed class IndexedPropertyPathNode : PropertyPathNode
     {
-        //Note: limitations of this class (that I could think of)
-        //      - If the source object's type defines this[...] in different ways, it will not work (see comments in the GetMethod method in this class).
-        //      - If it defines this[..] only with multiple parameters, it will not work
-        //      - We will not know when the element changes outside of this class because we cannot have a listener on a method's call (so it the developper calls theSourceItem[XXX] = val, nothing will happen in this class).
-        //
-        //  The first two limitations are due to the fact that neither Type.GetMethod(string name, BindingFlags bindingAttr, Type[] parameterTypes) nor MethodInfo.ParameterTypes are implemented in Bridge so we cannot know the amount and the type of the parameters of the method.
-        //  For now, I have decided to only support one parameter, otherwise it would become much more complicated (index comes as a string so we would need to check whether there are commas, how many, and I think it could still be considered as only one parameter: a string with commas in it).
+        private readonly string _index;
+        private int? _intIndex;
+        private PropertyInfo _indexer;
 
-        //Note: The BindsDirectlyToSource from the StandardPropertyPathNode class would always be considered true in this class.
-        readonly string _index = null;
-        object _parsedIndex = null;
-        MethodInfo _setMethod = null;
-        MethodInfo _getMethod = null;
+        private static readonly PropertyInfo _iListIndexer = GetIListIndexer();
 
         internal IndexedPropertyPathNode(string index)
         {
-            this._index = index;
+            _index = index;
+        }
+
+        internal override Type TypeImpl
+        {
+            get
+            {
+                if (_indexer != null)
+                {
+                    return _indexer.PropertyType;
+                }
+
+                return null;
+            }
+        }
+
+        private object Index
+        {
+            get
+            {
+                if (_intIndex.HasValue)
+                {
+                    return _intIndex.Value;
+                }
+
+                return _index;
+            }
+        }
+
+        internal override void OnSourceChanged(object oldvalue, object newValue)
+        {
+            // todo: (?) find out how to have a listener here since it
+            // is a method and not a DependencyProperty (get_Item and
+            // set_Item). I guess it would be nice to be able to attach
+            // to calls on set_item and handle it from there.
+            _indexer = null;
+            _intIndex = null;
+
+            if (newValue != null)
+            {
+                FindIndexer(newValue.GetType());
+            }
         }
 
         internal override void SetValue(object value)
         {
-            if (this._setMethod != null)
+            if (_indexer != null)
             {
-                this.TryInvokeSetMethod(this._parsedIndex, value);
+                TryInvokeSetMethod(value);
             }
         }
 
-        private bool TryInvokeSetMethod(object index, object value)
+        internal override void UpdateValue()
+        {
+            if (_indexer != null)
+            {
+                if (TryInvokeGetMethod(out object result))
+                {
+                    UpdateValueAndIsBroken(result, false);
+                }
+            }
+        }
+
+        private bool TryInvokeSetMethod(object value)
         {
             try
             {
-                this._setMethod.Invoke(this.Source, new object[] { index, value });
+                _indexer.SetValue(Source, value, new object[1] { Index });
                 return true;
             }
             catch
@@ -69,24 +108,11 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        internal override void UpdateValue()
-        {
-            if (this._getMethod != null)
-            {
-                object result;
-                if (this.TryInvokeGetMethod(this._parsedIndex, out result))
-                {
-                    this.UpdateValueAndIsBroken(result, this.CheckIsBroken(true));
-                }
-                // else should we do something to say it is broken ?
-            }
-        }
-
-        private bool TryInvokeGetMethod(object index, out object result)
+        private bool TryInvokeGetMethod(out object result)
         {
             try
             {
-                result = this._getMethod.Invoke(this.Source, new object[] { index });
+                result = _indexer.GetValue(Source, new object[1] { Index });
                 return true;
             }
             catch
@@ -96,65 +122,104 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        internal override void OnSourceChanged(object oldvalue, object newValue)
+#if NETSTANDARD
+        private void FindIndexer(Type type)
         {
-            //todo: (?) find out how to have a listener here since it is a method and not a DependencyProperty (get_Item and set_Item). I guess it would be nice to be able to attach to calls on set_item and handle it from there.
-            if (this.Source != null)
+            // 1 - Look for an Int32 indexer
+            // 2 - Look for a String indexer
+            // 3 - Use indexer from IList if the Binding source implement the interface
+            foreach (MemberInfo member in type.GetDefaultMembers())
             {
-                if (newValue != null)
+                if (!(member is PropertyInfo property))
+                    continue;
+
+                ParameterInfo[] parameters = property.GetIndexParameters();
+                if (parameters.Length != 1)
+                    continue;
+
+                if (parameters[0].ParameterType == typeof(int))
                 {
-                    this.GetIndexerInfo(newValue.GetType());
+                    if (int.TryParse(_index, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
+                    {
+                        _indexer = property;
+                        _intIndex = value;
+                        break;
+                    }
                 }
+                else if (parameters[0].ParameterType == typeof(string))
+                {
+                    _indexer = property;
+                    _intIndex = null;
+                    // Do not exit the loop because we can still find an Int32 indexer,
+                    // which takes priority over this one.
+                }
+            }
+
+            if (_indexer == null)
+            {
+                if (type is IList)
+                {
+                    _indexer = _iListIndexer;
+                    _intIndex = int.Parse(_index, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                }
+            }
+           
+            if (_indexer == null)
+            {
+                throw new NotSupportedException("Only String and Int32 indexers with one parameters are supported.");
             }
         }
 
-        private PropertyInfo GetIndexer(Type type)
+        private static PropertyInfo GetIListIndexer()
         {
-            PropertyInfo singleParameterIndexer = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(property =>
-            {
-                return property.GetMethod != null && property.GetIndexParameters().Length == 1;
-            });
-            if (singleParameterIndexer == null)
-            {
-                throw new NotSupportedException("Indexers with multiple parameters are not supported yet for Binding.");
-            }
-            return singleParameterIndexer;
+            return typeof(IList).GetDefaultMembers()[0] as PropertyInfo;
         }
-
-        private void GetIndexerInfo(Type sourceType)
+#elif BRIDGE
+        private void FindIndexer(Type type)
         {
-            PropertyInfo indexer = this.GetIndexer(sourceType);
-            this.PrepareIndexForIndexer(indexer);
-            if (indexer != null)
+            foreach (PropertyInfo property in type.GetProperties())
             {
-                this._getMethod = indexer.GetMethod;
-                this._setMethod = indexer.SetMethod;
-            }
-            else
-            {
-                this._getMethod = null;
-                this._setMethod = null;
-            }
-        }
+                ParameterInfo[] parameters = property.GetIndexParameters();
+                if (parameters.Length != 1)
+                    continue;
 
-        private void PrepareIndexForIndexer(PropertyInfo indexer)
-        {
-            Type indexType = indexer.GetIndexParameters().First().ParameterType;
-            try
-            {
-                this._parsedIndex = Convert.ChangeType(this._index, indexType);
-            }
-            catch (Exception)
-            {
-                if (TypeFromStringConverters.CanTypeBeConverted(indexType))
+                if (parameters[0].ParameterType == typeof(int))
                 {
-                    this._parsedIndex = TypeFromStringConverters.ConvertFromInvariantString(indexType, this._index); //todo: maybe in try / catch ?
+                    if (int.TryParse(_index, out int value))
+                    {
+                        _indexer = property;
+                        _intIndex = value;
+                        break;
+                    }
                 }
-                else
+                else if (parameters[0].ParameterType == typeof(string))
                 {
-                    this._parsedIndex = this._index; //todo: maybe null ?
+                    _indexer = property;
+                    _intIndex = null;
+                    // Do not exit the loop because we can still find an Int32 indexer,
+                    // which takes priority over this one.
                 }
             }
+
+            if (_indexer == null)
+            {
+                if (type is IList)
+                {
+                    _indexer = _iListIndexer;
+                    _intIndex = int.Parse(_index);
+                }
+            }
+
+            if (_indexer == null)
+            {
+                throw new NotSupportedException("Only String and Int32 indexers with one parameters are supported.");
+            }
         }
+
+        private static PropertyInfo GetIListIndexer()
+        {
+            return typeof(IList).GetProperty("Item");
+        }
+#endif
     }
 }

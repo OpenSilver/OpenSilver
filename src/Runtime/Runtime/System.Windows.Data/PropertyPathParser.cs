@@ -47,7 +47,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
         {
             var type = PropertyNodeType.None;
             var path = this.Path;
-            if (path.Length == 0)
+            if (path.Length == 0 || path == ".")
             {
                 typeName = null;
                 propertyName = null;

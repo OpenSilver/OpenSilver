@@ -133,6 +133,7 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
+    <Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
@@ -1161,8 +1162,8 @@
   <ItemGroup>
     <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">..\..\packages\CSHTML5.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-		<HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
-	</Reference>  
+      <HintPath Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' ">..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\lib\net40\Bridge.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bridge.TypesThatWillBeForwarded\Bridge.TypesThatWillBeForwarded.CSHTML5.csproj">
@@ -1170,6 +1171,6 @@
       <Name>Bridge.TypesThatWillBeForwarded.CSHTML5</Name>
     </ProjectReference>
   </ItemGroup>
-	<Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
-	<Import Project="..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />
+  <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
+  <Import Project="..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />
 </Project>

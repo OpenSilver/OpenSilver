@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 #if MIGRATION
 using CSHTML5.Internal.System.Windows.Data;
 #else
@@ -29,136 +25,141 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    class PropertyPathWalker : IPropertyPathNodeListener
+    internal class PropertyPathWalker : IPropertyPathNodeListener
     {
-        string Path;
-        bool IsDataContextBound;
-        object Source;
-        internal object ValueInternal;
-        internal IPropertyPathNode FirstNode = null; //first node of the chained list of the nodes
-        internal IPropertyPathNode FinalNode = null;
+        private readonly string _path;
+        private readonly bool _isDataContextBound;
+        private readonly IPropertyPathNode _firstNode;
         private IPropertyPathWalkerListener _listener;
-
+        private object _source;
 
         internal PropertyPathWalker(string path, bool isDatacontextBound)
         {
-            Path = path;
-            StandardPropertyPathNode lastNode;
-            IsDataContextBound = isDatacontextBound;
+            _path = path;
+            _isDataContextBound = isDatacontextBound;
 
-            if (string.IsNullOrEmpty(path) || path == ".")
+            if (_isDataContextBound)
             {
-                //bindsDirectlyToSource set to true means that the binding is directly made to the source (--> there is no path)
-                lastNode = new StandardPropertyPathNode(); //what to put in there ?
-                FirstNode = lastNode;
-                FinalNode = lastNode;
+                _firstNode = new DependencyPropertyNode(FrameworkElement.DataContextProperty);
+            }
+
+            ParsePath(_path, out IPropertyPathNode head, out IPropertyPathNode tail);
+
+            if (_firstNode == null)
+            {
+                _firstNode = head ?? new StandardPropertyPathNode();
             }
             else
             {
-                PropertyNodeType type;
-                var parser = new PropertyPathParser(path);
-                string typeName;
-                string propertyName;
-                string index;
-                //IPropertyPathNode node;
-                while ((type = parser.Step(out typeName, out propertyName, out index)) != PropertyNodeType.None)
-                {
-                    //we make node advance (when it is not the first step, otherwise it stays at null)
-                    //node = FinalNode;
-
-                    //var isViewProperty = false;
-                    //boolean isViewProperty = CollectionViewProperties.Any (prop => prop.Name == propertyName);
-                    //          static readonly PropertyInfo[] CollectionViewProperties = typeof (ICollectionView).GetProperties ();
-                    
-                    switch (type) {
-                        case PropertyNodeType.AttachedProperty:
-                        case PropertyNodeType.Property:
-                            if (FinalNode == null)
-                            {
-                                FinalNode = new StandardPropertyPathNode(typeName, propertyName);
-                            }
-                            else
-                            {
-                                FinalNode.Next = new StandardPropertyPathNode(typeName, propertyName);
-                            }
-                            break;
-                        case PropertyNodeType.Indexed:
-                            //throw new NotImplementedException("Indexed properties are not supported yet.");
-                            //todo: when we will handle the indexed properties, uncomment the following
-#if GD_WIP
-                            if (FinalNode == null)
-                            {
-                                FinalNode = new IndexedPropertyPathNode(index);
-                            }
-                            else
-                            {
-                                FinalNode.Next = new IndexedPropertyPathNode(index);
-                            }
-#else
-                            FinalNode.Next = new IndexedPropertyPathNode(index);
-#endif
-                            break;
-                        default:
-                            break;
-                    }
-
-                    if(FirstNode == null)
-                        FirstNode = FinalNode;
-
-                    if (FinalNode.Next != null)
-                    {
-                        FinalNode = FinalNode.Next;
-                    }
-                }
+                _firstNode.Next = head;
             }
 
-            this.FinalNode.Listen(this);
+            FinalNode = tail ?? _firstNode;
+
+            FinalNode.Listen(this);
         }
 
-        internal void Listen(IPropertyPathWalkerListener listener ) { this._listener = listener; }
-        internal void Unlisten(IPropertyPathWalkerListener listener)
-        {
-            if (this._listener == listener)
-                this._listener = null;
-        }
+        internal IPropertyPathNode FinalNode { get; }
 
-        internal void Update(object source) {
-            this.Source = source;
-            this.FirstNode.SetSource(source);
-        }
+        internal object ValueInternal { get; private set; }
 
         internal bool IsPathBroken
         {
             get
             {
-                var path = this.Path;
-                if (this.IsDataContextBound && (path == null || path.Length < 1))
+                string path = _path;
+                if (_isDataContextBound && (path == null || path.Length < 1))
+                {
                     return false;
+                }
 
-                var node = this.FirstNode;
-                while (node != null) {
+                IPropertyPathNode node = _firstNode;
+                while (node != null)
+                {
                     if (node.IsBroken)
+                    {
                         return true;
+                    }
+
                     node = node.Next;
                 }
+
                 return false;
             }
+        }
+
+        internal void Listen(IPropertyPathWalkerListener listener)
+        {
+            _listener = listener;
+        }
+
+        internal void Unlisten(IPropertyPathWalkerListener listener)
+        {
+            if (_listener == listener)
+            {
+                _listener = null;
+            }
+        }
+
+        internal void Update(object source)
+        {
+            _source = source;
+            _firstNode.SetSource(source);
         }
 
         void IPropertyPathNodeListener.IsBrokenChanged(IPropertyPathNode node)
         {
             ValueInternal = node.Value;
-            var listener = _listener;
+            IPropertyPathWalkerListener listener = _listener;
             if (listener != null)
+            {
                 listener.IsBrokenChanged();
+            }
         }
 
         void IPropertyPathNodeListener.ValueChanged(IPropertyPathNode node)
         {
             ValueInternal = node.Value;
-            var listener = _listener;
+            IPropertyPathWalkerListener listener = _listener;
             if (listener != null)
+            {
                 listener.ValueChanged();
+            }
+        }
+
+        private void ParsePath(string path, out IPropertyPathNode head, out IPropertyPathNode tail)
+        {
+            head = null;
+            tail = null;
+
+            var parser = new PropertyPathParser(path);
+            PropertyNodeType type;
+
+            while ((type = parser.Step(out string typeName, out string propertyName, out string index)) != PropertyNodeType.None)
+            {
+                IPropertyPathNode node;
+                switch (type)
+                {
+                    case PropertyNodeType.AttachedProperty:
+                    case PropertyNodeType.Property:
+                        node = new StandardPropertyPathNode(typeName, propertyName);
+                        break;
+                    case PropertyNodeType.Indexed:
+                        node = new IndexedPropertyPathNode(index);
+                        break;
+                    default:
+                        throw new InvalidOperationException();
+                }
+
+                if (head == null)
+                {
+                    head = tail = node;
+                    continue;
+                }
+
+                tail.Next = node;
+                tail = node;
+            }
         }
     }
 }
