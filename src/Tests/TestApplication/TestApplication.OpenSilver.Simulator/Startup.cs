@@ -8,7 +8,7 @@ namespace TestApplication.OpenSilver.Simulator
         [STAThread]
         static int Main(string[] args)
         {
-            return SimulatorLauncher.Start();
+            return SimulatorLauncher.Start(typeof(App));
         }
     }
 }
