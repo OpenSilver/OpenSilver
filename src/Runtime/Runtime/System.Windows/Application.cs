@@ -25,6 +25,7 @@ using OpenSilver.Internal;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 #else
