@@ -413,6 +413,33 @@ namespace Windows.UI.Xaml.Controls
             tb.UpdateVisualStates();
         }
 
+        public string SelectedText
+        {
+            get
+            {
+                int selectionStartIndex; int selectionLength;
+                if (_textViewHost != null)
+                {
+                    _textViewHost.View.NEW_GET_SELECTION(out selectionStartIndex, out selectionLength);
+                    return Text.Substring(selectionStartIndex, selectionLength);
+                }
+
+                return "";
+            }
+            set
+            {
+                int selectionStartIndex; int selectionLength;
+                if (_textViewHost != null)
+                {
+                    _textViewHost.View.NEW_GET_SELECTION(out selectionStartIndex, out selectionLength);
+                    string text = this.Text.Substring(0, selectionStartIndex) + value + this.Text.Substring(selectionStartIndex + selectionLength);
+                    this.Text = text;
+                    _textViewHost.View.NEW_SET_SELECTION(selectionStartIndex + value.Length, selectionStartIndex + value.Length);
+                }
+            }
+        }
+
+
         public int SelectionStart
         {
             get
@@ -671,9 +698,6 @@ namespace Windows.UI.Xaml.Controls
             get { return (Brush)GetValue(SelectionBackgroundProperty); }
             set { SetValue(SelectionBackgroundProperty, value); }
         }
-
-        [OpenSilver.NotImplemented]
-        public string SelectedText { get; set; }
 
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
