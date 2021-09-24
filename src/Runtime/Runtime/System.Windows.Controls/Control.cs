@@ -1069,6 +1069,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 #endif
 
+#if MIGRATION
         /// <summary>Called before the <see cref="E:System.Windows.UIElement.MouseWheel" /> event occurs to provide handling for the event in a derived class without attaching a delegate. </summary>
         /// <param name="e">A <see cref="T:System.Windows.Input.MouseWheelEventArgs" /> that contains the event data.</param>
         [OpenSilver.NotImplemented]
@@ -1076,6 +1077,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
 
         }
+#endif
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TabNavigationProperty = 

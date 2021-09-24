@@ -400,6 +400,152 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        #region PointerWheelChanged event (or MouseWheel)
+
+#if MIGRATION
+        /// <summary>
+        /// Identifies the <see cref="UIElement.MouseWheel"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent MouseWheelEvent = new RoutedEvent("MouseWheelEvent");
+#else
+        /// <summary>
+        /// Identifies the <see cref="UIElement.PointerWheelChanged"/> routed event.
+        /// </summary>
+        public static readonly RoutedEvent PointerWheelChangedEvent = new RoutedEvent("PointerWheelChangedEvent");
+#endif
+
+
+#if MIGRATION
+        INTERNAL_EventManager<MouseWheelEventHandler, MouseWheelEventArgs> _pointerWheelChangedEventManager;
+        INTERNAL_EventManager<MouseWheelEventHandler, MouseWheelEventArgs> PointerWheelChangedEventManager
+#else
+        INTERNAL_EventManager<PointerEventHandler, PointerRoutedEventArgs> _pointerWheelChangedEventManager;
+        INTERNAL_EventManager<PointerEventHandler, PointerRoutedEventArgs> PointerWheelChangedEventManager
+#endif
+        {
+            get
+            {
+                if (_pointerWheelChangedEventManager == null)
+                {
+#if MIGRATION
+                    _pointerWheelChangedEventManager = new INTERNAL_EventManager<MouseWheelEventHandler, MouseWheelEventArgs>(() => this.INTERNAL_OuterDomElement, "wheel", ProcessOnPointerWheelChangedEvent);
+#else
+                    _pointerWheelChangedEventManager = new INTERNAL_EventManager<PointerEventHandler, PointerRoutedEventArgs>(() => this.INTERNAL_OuterDomElement, "wheel", (jsEventArg) =>
+                    {
+                        ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerWheelChanged, (Action<PointerRoutedEventArgs>)OnPointerWheelChanged_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: false, checkForDivsThatAbsorbEvents: false, refreshClickCount: false);
+                    });
+
+#endif
+                }
+                return _pointerWheelChangedEventManager;
+
+            }
+        }
+
+#if MIGRATION
+        /// <summary>
+        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
+        /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
+        /// </summary>
+        public event MouseWheelEventHandler MouseWheel
+#else
+        /// <summary>
+        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
+        /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
+        /// </summary>
+        public event PointerEventHandler PointerWheelChanged
+#endif
+        {
+            add
+            {
+                PointerWheelChangedEventManager.Add(value);
+            }
+            remove
+            {
+                PointerWheelChangedEventManager.Remove(value);
+            }
+        }
+
+        /// <summary>
+        /// Raises the PointerWheelChanged event
+        /// </summary>
+        /// <param name="eventArgs">The arguments for the event.</param>
+#if MIGRATION
+        protected virtual void OnMouseWheel(MouseWheelEventArgs eventArgs)
+#else
+        protected virtual void OnPointerWheelChanged(PointerRoutedEventArgs eventArgs)
+#endif
+        {
+            if (_pointerWheelChangedEventManager == null)
+                return;
+#if MIGRATION
+            foreach (MouseWheelEventHandler handler in _pointerWheelChangedEventManager.Handlers.ToList<MouseWheelEventHandler>())
+#else
+            foreach (PointerEventHandler handler in _pointerWheelChangedEventManager.Handlers.ToList<PointerEventHandler>())
+#endif
+            {
+                if (eventArgs.Handled)
+                    break;
+                handler(this, eventArgs);
+            }
+        }
+
+#if MIGRATION
+        void OnMouseWheel_ForHandledEventsToo(MouseWheelEventArgs eventArgs)
+#else
+        void OnPointerWheelChanged_ForHandledEventsToo(PointerRoutedEventArgs eventArgs)
+#endif
+        {
+            if (_pointerWheelChangedEventManager == null)
+                return;
+#if MIGRATION
+            foreach (MouseWheelEventHandler handler in _pointerWheelChangedEventManager.HandlersForHandledEventsToo.ToList<MouseWheelEventHandler>())
+#else
+            foreach (PointerEventHandler handler in _pointerWheelChangedEventManager.HandlersForHandledEventsToo.ToList<PointerEventHandler>())
+#endif
+            {
+                handler(this, eventArgs);
+            }
+        }
+
+#if MIGRATION
+        /// <summary>
+        /// Raises the Tapped event
+        /// </summary>
+        void ProcessOnPointerWheelChangedEvent(object jsEventArg)
+        {
+            var eventArgs = new MouseWheelEventArgs()
+            {
+                INTERNAL_OriginalJSEventArg = jsEventArg,
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+            };
+
+            if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
+            {
+                // Fill the position of the pointer and the key modifiers:
+                eventArgs.FillEventArgs(this, jsEventArg);
+
+                //fill the Mouse Wheel delta:
+                eventArgs.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
+
+                // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
+                if (!eventArgs.Handled)
+                {
+                    OnMouseWheel(eventArgs);
+                }
+                OnMouseWheel_ForHandledEventsToo(eventArgs);
+
+                if (eventArgs.Handled)
+                {
+                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                }
+            }
+        }
+#endif
+
+        #endregion
+
+
         #region Pointer released event
 
 #if MIGRATION
@@ -784,35 +930,8 @@ namespace Windows.UI.Xaml
         #endregion
 
 
-        #region Wheel event
+        #region Text events
 
-#if MIGRATION
-        /// <summary>
-        /// Identifies the <see cref="UIElement.MouseWheel"/> routed event.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly RoutedEvent MouseWheelEvent = new RoutedEvent("MouseWheelEvent");
-
-        /// <summary>
-        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
-        /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public event MouseWheelEventHandler MouseWheel;
-#else
-        /// <summary>
-        /// Identifies the <see cref="UIElement.PointerWheelChanged"/> routed event.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly RoutedEvent PointWheelEvent = new RoutedEvent("PointWheelEvent");
-
-        /// <summary>
-        /// Occurs when the user rotates the mouse wheel while the mouse pointer is over
-        /// a <see cref="UIElement"/>, or the <see cref="UIElement"/> has focus.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public event PointerEventHandler PointerWheelChanged;
-#endif
         /// <summary>
         /// Identifies the <see cref="TextInput"/> routed event.
         /// </summary>
@@ -1721,7 +1840,6 @@ namespace Windows.UI.Xaml
                     INTERNAL_OriginalJSEventArg = jsEventArg,
                     Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
             };
-
                 if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
                 {
                     eventArgs.Handled = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
@@ -1858,6 +1976,16 @@ namespace Windows.UI.Xaml
                 _rightTappedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseRightButtonUp", methodParameters);
             }
             //
+            methodParameters = new Type[] { typeof(MouseWheelEventArgs) };
+            if (_pointerWheelChangedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnMouseWheel", methodParameters))
+            {
+                var v = PointerWheelChangedEventManager; //forces the creation of the event manager.
+            }
+            if (_pointerWheelChangedEventManager != null)
+            {
+                _pointerWheelChangedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnMouseWheel", methodParameters);
+            }
+            //
             methodParameters = new Type[] { typeof(KeyEventArgs) };
             if (_keyDownEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnKeyDown", methodParameters))
             {
@@ -1937,6 +2065,14 @@ namespace Windows.UI.Xaml
             {
                 _pointerExitedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnPointerExited", methodParameters);
             }
+            if (_pointerWheelChangedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnPointerExited", methodParameters))
+            {
+                var v = PointerWheelChangedEventManager; //forces the creation of the event manager.
+            }
+            if (_pointerWheelChangedEventManager != null)
+            {
+                _pointerWheelChangedEventManager.AttachToDomEvents(this, typeof(UIElement), "OnPointerWheelChanged", methodParameters);
+            }
             methodParameters = new Type[] { typeof(TappedRoutedEventArgs) };
             if (_tappedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnTapped", methodParameters))
             {
@@ -2013,6 +2149,10 @@ namespace Windows.UI.Xaml
             if (_pointerExitedEventManager != null)
             {
                 _pointerExitedEventManager.DetachFromDomEvents();
+            }
+            if (_pointerWheelChangedEventManager != null)
+            {
+                _pointerWheelChangedEventManager.DetachFromDomEvents();
             }
             if (_tappedEventManager != null)
             {
@@ -2129,12 +2269,18 @@ namespace Windows.UI.Xaml
                 MouseRightButtonDownEventManager.Add((MouseButtonEventHandler)handler, handledEventsToo: handledEventsToo);
             }
 #endif
-#if GD_WIP
+#if MIGRATION
             else if (routedEvent == UIElement.MouseWheelEvent)
-            {
-                
-            }
+#else
+            else if (routedEvent == UIElement.PointerWheelChangedEvent)
 #endif
+            {
+#if MIGRATION
+                PointerWheelChangedEventManager.Add((MouseWheelEventHandler)handler, handledEventsToo: handledEventsToo);
+#else
+                PointerWheelChangedEventManager.Add((PointerEventHandler)handler, handledEventsToo: handledEventsToo);
+#endif
+            }
 #if MIGRATION
             else if (routedEvent == UIElement.MouseRightButtonUpEvent)
 #else
@@ -2254,12 +2400,18 @@ namespace Windows.UI.Xaml
                 
             }
 #endif
-#if GD_WIP
+#if MIGRATION
             else if (routedEvent == UIElement.MouseWheelEvent)
-            {
-                
-            }
+#else
+            else if (routedEvent == UIElement.PointerWheelChangedEvent)
 #endif
+            {
+#if MIGRATION
+                PointerWheelChangedEventManager.Remove((MouseWheelEventHandler)handler);
+#else
+                PointerWheelChangedEventManager.Remove((PointerEventHandler)handler);
+#endif
+            }
 #if MIGRATION
             else if (routedEvent == UIElement.MouseRightButtonUpEvent)
 #else

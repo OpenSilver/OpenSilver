@@ -1000,6 +1000,7 @@
     <Compile Include="System.Windows.Media\Color.cs" />
     <Compile Include="System.Windows.Media\ColorConverter.cs" />
     <Compile Include="System.Windows.Media\Colors.cs" />
+    <Compile Include="Windows.UI.Input\PointerPointProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bridge.json" />
