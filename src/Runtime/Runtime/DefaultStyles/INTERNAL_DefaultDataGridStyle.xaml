@@ -96,12 +96,14 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Grid x:Name="PART_MainGrid"
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <Grid x:Name="PART_MainGrid"
                               Grid.Row="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" x:Name="PART_HeadersRow" />
-                            </Grid.RowDefinitions>
-                        </Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" x:Name="PART_HeadersRow" />
+                                </Grid.RowDefinitions>
+                            </Grid>
+                        </ScrollViewer>
                         <DataPager x:Name="PART_Pager" 
                                    Grid.Row="1"
                                    PageSize="{TemplateBinding PageSize}"
