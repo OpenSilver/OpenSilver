@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,64 +11,122 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.UI.Xaml;
 #endif
+
 namespace System.Windows
 {
     /// <summary>
-    /// Provides application part and localization information in the application
-    /// manifest when deploying a Silverlight-based application.
+    /// Provides application part and localization information in the application manifest
+    /// when deploying a Silverlight-based application.
     /// </summary>
-    public sealed partial class Deployment : DependencyObject
+    public sealed class Deployment : DependencyObject
     {
-        private Deployment() { } //Note: There is normally a public parameterless constructor but I'm assuming it works like the Current property so we keep this private for now.
-        static Deployment _deployment = null;
+        private static Deployment _current;
 
         /// <summary>
-        /// Gets the current System.Windows.Deployment object.
+        /// Initializes a new instance of the <see cref="Deployment"/> class.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="Current"/> property has already been initialized.
+        /// </exception>
+        public Deployment()
+        {
+            if (_current != null)
+            {
+                throw new InvalidOperationException();
+            }
+            
+            SetDeployment(this);
+        }
+
+        /// <summary>
+        /// Gets the current <see cref="Deployment"/> object.
         /// </summary>
         public static Deployment Current
         {
             get
             {
-                if (_deployment == null)
+                if (_current == null)
                 {
-                    _deployment = new Deployment();
+                    _ = new Deployment();
                 }
-                return _deployment;
+
+                return _current;
             }
         }
 
-		[OpenSilver.NotImplemented]
+        /// <summary>
+        /// Identifies the <see cref="EntryPointAssembly"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty EntryPointAssemblyProperty =
+            DependencyProperty.Register(
+                nameof(EntryPointAssembly),
+                typeof(string),
+                typeof(Deployment),
+                null);
+
+        /// <summary>
+        /// Gets a string name that identifies which part in the <see cref="Deployment"/>
+        /// is the entry point assembly.
+        /// </summary>
+        /// <returns>
+        /// A string that names the assembly that should be used as the entry point assembly.
+        /// This is expected to be the name of one of the assemblies you specified as an
+        /// <see cref="AssemblyPart"/>.
+        /// </returns>
+        public string EntryPointAssembly => (string)GetValue(EntryPointAssemblyProperty);
+
+        /// <summary>
+        /// Identifies the <see cref="EntryPointType"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty EntryPointTypeProperty =
+            DependencyProperty.Register(
+                nameof(EntryPointType),
+                typeof(string),
+                typeof(Deployment),
+                null);
+
+        /// <summary>
+        /// Gets a string that identifies the namespace and type name of the class that contains
+        /// the <see cref="Application"/> entry point for your application.
+        /// </summary>
+        /// <returns>
+        /// The namespace and type name of the class that contains the <see cref="Application"/>
+        /// entry point.
+        /// </returns>
+        public string EntryPointType => (string)GetValue(EntryPointTypeProperty);
+
+        private static void SetDeployment(Deployment deployment)
+        {
+            Application app = Application.Current;
+            if (app != null)
+            {
+                Type appType = app.GetType();
+
+#if NETSTANDARD
+                deployment.SetValue(EntryPointAssemblyProperty, appType.Assembly.GetName().Name);
+#elif BRIDGE
+                deployment.SetValue(EntryPointAssemblyProperty, string.Concat(appType.Assembly.FullName.TakeWhile(c => c != ',')));
+#endif
+                deployment.SetValue(EntryPointTypeProperty, appType.FullName);
+
+                _current = deployment;
+            }
+        }
+
+        [OpenSilver.NotImplemented]
         public OutOfBrowserSettings OutOfBrowserSettings { get; private set; }
 
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public AssemblyPartCollection Parts { get; private set; }
 
-        #region not implemented
+#region not implemented
 
-        //// Summary:
-        ////     Identifies the System.Windows.Deployment.EntryPointAssembly dependency property.
-        ////
-        //// Returns:
-        ////     The identifier for the System.Windows.Deployment.EntryPointAssembly dependency
-        ////     property.
-        //public static readonly DependencyProperty EntryPointAssemblyProperty;
-        ////
-        //// Summary:
-        ////     Identifies the System.Windows.Deployment.EntryPointType dependency property.
-        ////
-        //// Returns:
-        ////     The identifier for the System.Windows.Deployment.EntryPointType dependency
-        ////     property.
-        //public static readonly DependencyProperty EntryPointTypeProperty;
         ////
         //// Summary:
         ////     Identifies the System.Windows.Deployment.ExternalCallersFromCrossDomain dependency
@@ -119,35 +176,6 @@ namespace System.Windows
         ////     The identifier for the System.Windows.Deployment.RuntimeVersion dependency
         ////     property.
         //public static readonly DependencyProperty RuntimeVersionProperty;
-
-        //// Summary:
-        ////     Initializes a new instance of the System.Windows.Deployment class.
-        ////
-        //// Exceptions:
-        ////   System.InvalidOperationException:
-        ////     The System.Windows.Deployment.Current property has already been initialized.
-        //public Deployment();
-
-
-        ////
-        //// Summary:
-        ////     Gets a string name that identifies which part in the System.Windows.Deployment
-        ////     is the entry point assembly.
-        ////
-        //// Returns:
-        ////     A string that names the assembly that should be used as the entry point assembly.
-        ////     This is expected to be the name of one of the assemblies you specified as
-        ////     an System.Windows.AssemblyPart.
-        //public string EntryPointAssembly { get; }
-        ////
-        //// Summary:
-        ////     Gets a string that identifies the namespace and type name of the class that
-        ////     contains the System.Windows.Application entry point for your application.
-        ////
-        //// Returns:
-        ////     The namespace and type name of the class that contains the System.Windows.Application
-        ////     entry point.
-        //public string EntryPointType { get; }
         ////
         //// Summary:
         ////     Gets a value that indicates the level of access that cross-domain callers
@@ -238,7 +266,7 @@ namespace System.Windows
         //[SecurityCritical]
         //public static void SetCurrentApplication(Application application);
 
-        #endregion
+#endregion
     }
 }
 
