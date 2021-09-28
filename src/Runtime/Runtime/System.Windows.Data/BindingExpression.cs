@@ -568,7 +568,7 @@ namespace Windows.UI.Xaml.Data
                     //      This enables <X DataContext="{Binding...}"/>
                     if (TargetProperty == FrameworkElement.DataContextProperty)
                     {
-                        contextElement = targetFE.Parent;
+                        contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
                     }
 
                     _bindingSource = contextElement;
