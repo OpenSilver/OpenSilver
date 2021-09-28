@@ -170,6 +170,17 @@ namespace OpenSilver.Internal.Data
                                                        canConvertFrom, targetToSource && canConvertTo);
             }
 
+            // if nothing worked and the target type is String, use a new TypeConverter (which will
+            // simply call ToString)
+            if (targetType == typeof(string))
+            {
+                typeConverter = new TypeConverter();
+                canConvertTo = true;
+                canConvertFrom = false;
+
+                return new SourceDefaultValueConverter(typeConverter, sourceType, targetType, false, true);
+            }
+
             // nothing worked, give up
             return null;
         }
