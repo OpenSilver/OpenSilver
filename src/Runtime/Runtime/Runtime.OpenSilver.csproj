@@ -86,6 +86,7 @@
 		<Compile Include="System.ComponentModel\ReflectedPropertyData.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
 		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
+		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />

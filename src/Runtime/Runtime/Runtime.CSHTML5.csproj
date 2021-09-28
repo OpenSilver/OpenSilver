@@ -143,6 +143,7 @@
     <Compile Include="System.Windows.Interactivity\TriggerCollection.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
+    <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
     <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
