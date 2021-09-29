@@ -55,7 +55,8 @@ namespace Windows.UI.Xaml
                 }
                 else if (_originalJSEventArg != null)
                 {
-                    object jsTarget = CSHTML5.Interop.ExecuteJavaScript(@"$0.target || $0.srcElement", _originalJSEventArg);
+                    string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(_originalJSEventArg);
+                    object jsTarget = CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.target || {sEvent}.srcElement");
                     UIElement correspondingUiElementIfFound = INTERNAL_HtmlDomManager.GetUIElementFromDomElement(jsTarget); //Note: already handles the possibility that "jsTarget" is null or undefined.
                     return correspondingUiElementIfFound;
                 }

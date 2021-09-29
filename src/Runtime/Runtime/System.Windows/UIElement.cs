@@ -287,8 +287,8 @@ namespace Windows.UI.Xaml
                 RectangleGeometry val = (RectangleGeometry)newValue;
 
                 // Get elements width and height
-                double width = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetWidth"));
-                double height = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetHeight"));
+                //double width = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetWidth"));
+                //double height = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetHeight"));
 
                 // CSS rect property has the following format - rect(<top>, <right>, <bottom>, <left>)
                 double top = val.Rect.Y;
@@ -1017,63 +1017,7 @@ namespace Windows.UI.Xaml
                 else
                 {
                     string uid = ((INTERNAL_HtmlDomElementReference)element).UniqueIdentifier;
-                    string javaScriptCodeToExecute = $@"
-     document.onmouseup = function(e) {{
-        if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}
-     document.onmouseover = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }} 
-    document.onmousedown = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                       
-     document.onmouseout = function(e) {{   
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                            
-     document.onmousemove = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                                    
-     document.onclick = function(e) {{   
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                                     
-     document.oncontextmenu = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                                      
-     document.ondblclick = function(e) {{   
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}";
+                    string javaScriptCodeToExecute = $@"document.rerouteMouseEvents(""{uid}"")";
                     INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
                 }
                 return true;
@@ -1235,8 +1179,7 @@ document.ondblclick = null;
                 // Note: "none" disables scrolling, pinching and other gestures.
                 // It is supposed to not have any effect on the "TouchStart",
                 // "TouchMove", and "TouchEnd" events.
-                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1",
-                    element.INTERNAL_OuterDomElement, (bool)e.NewValue ? "auto" : "none");
+                CSHTML5.Interop.ExecuteJavaScript($@"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(element.INTERNAL_OuterDomElement)}.style.touchAction = ""{((bool)e.NewValue ? "auto" : "none")}""");
             }
         }
 
@@ -1302,8 +1245,10 @@ document.ondblclick = null;
                 // ------- SIMULATOR -------
 
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
-                                                                        outerDivOfThisControl, outerDivOfReferenceVisual));
+                string sOuterDivOfControl = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
+                string sOuterDivOfReferenceVisual = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
+                string concatenated = Convert.ToString(
+                    CSHTML5.Interop.ExecuteJavaScript($"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)"));
                 int sepIndex = concatenated.IndexOf('|');
                 string offsetLeftAsString = concatenated.Substring(0, sepIndex);
                 string offsetTopAsString = concatenated.Substring(sepIndex + 1);

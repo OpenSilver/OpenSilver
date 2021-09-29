@@ -1,7 +1,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Globalization;
-
+using OpenSilver.Internal;
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -72,11 +72,28 @@ namespace Windows.UI.Xaml
         private string measureTextBoxElementID;
         private string measureTextBlockElementID;
 
+        private double savedTextBlockFontSize;
+        private string savedTextBlockFontFamily;
+        private FontStyle savedTextBlockFontStyle;
+        private FontWeight savedTextBlockFontWeight;
+        private TextWrapping savedTextBlockTextWrapping;
+        private Thickness savedTextBlockPadding;
 
         public TextMeasurementService()
         {
             measureTextBoxElementID = "";
             measureTextBlockElementID = "";
+
+            savedTextBlockFontSize = 0;
+            savedTextBlockFontFamily = "";
+#if OPENSILVER
+            savedTextBlockFontStyle = new FontStyle(-1);
+#else
+            savedTextBlockFontStyle = new FontStyle();
+#endif
+            savedTextBlockFontWeight.Weight = 0;
+            savedTextBlockTextWrapping = TextWrapping.NoWrap;
+            savedTextBlockPadding = new Thickness(double.NegativeInfinity);
         }
 
         public void CreateMeasurementText(UIElement parent)
@@ -116,7 +133,10 @@ namespace Windows.UI.Xaml
             textBlockDivStyle.width = "";
             textBlockDivStyle.top = "100px";
             textBlockDivStyle.borderWidth = "1";
+            textBlockDivStyle.whiteSpace = "pre";
+            associatedTextBlock.Text = "A";
             measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.measureTextBlockElement=$0", textBlockReference);
         }
 
         public bool IsTextMeasureDivID(string id)
@@ -191,39 +211,80 @@ namespace Windows.UI.Xaml
             {
                 return new Size();
             }
-
-            associatedTextBlock.Text = String.IsNullOrEmpty(text) ? "A" : text;
-            associatedTextBlock.FontFamily = fontFamily;
-            associatedTextBlock.FontStyle = style;
-            associatedTextBlock.FontWeight = weight;
-            //associatedTextBlock.FontStretch = stretch;
-            associatedTextBlock.Padding = padding;
-            associatedTextBlock.FontSize = fontSize;
-
-            associatedTextBlock.TextWrapping = wrapping;
-
+#if OPENSILVER
+            string strText = String.IsNullOrEmpty(text) ? "A" : INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text);
+#elif BRIDGE
+            string strText = String.IsNullOrEmpty(text) ? "A" : text;
+#endif
+            string strFontSize = (Math.Floor(fontSize * 1000) / 1000).ToString(CultureInfo.InvariantCulture) + "px";
+            string strFontFamily = fontFamily != null ? INTERNAL_FontsHelper.LoadFont(fontFamily.Source, (UIElement)associatedTextBlock) : "-";
+            string strFontStyle = style.ToString().ToLower();
+            string strFontWeight = weight.Weight.ToInvariantString();
+            string strTextWrapping = wrapping == TextWrapping.Wrap ? "pre-wrap" : "pre";
+            string strPadding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
+            string strWidth = "";
+            string strMaxWidth = "";
             if (double.IsNaN(maxWidth) || double.IsInfinity(maxWidth))
             {
-                textBlockDivStyle.width = "";
-                textBlockDivStyle.maxWidth = "";
+                strWidth = "";
+                strMaxWidth = "";
             }
             else
             {
-                textBlockDivStyle.width = maxWidth.ToString(CultureInfo.InvariantCulture) + "px";
-                textBlockDivStyle.maxWidth = maxWidth.ToString(CultureInfo.InvariantCulture) + "px";
+                strWidth = maxWidth.ToInvariantString() + "px";
+                strMaxWidth = maxWidth.ToInvariantString() + "px";
             }
 
-            // On Simulator, it needs time to get actualwidth and actualheight
+            if (savedTextBlockFontSize == fontSize)
+                strFontSize = "";
+            else
+                savedTextBlockFontSize = fontSize;
+
+            if (savedTextBlockFontFamily == strFontFamily)
+                strFontFamily = "";
+            else
+                savedTextBlockFontFamily = strFontFamily;
+
+            if (savedTextBlockFontStyle == style)
+                strFontStyle = "";
+            else
+                savedTextBlockFontStyle = style;
+
+            if (savedTextBlockFontWeight == weight)
+                strFontWeight = "";
+            else
+                savedTextBlockFontWeight = weight;
+
+            if (savedTextBlockTextWrapping == wrapping)
+                strTextWrapping = "";
+            else
+                savedTextBlockTextWrapping = wrapping;
+
+            if (savedTextBlockPadding == padding)
+                strPadding = "";
+            else
+                savedTextBlockPadding = padding;
+
+            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{strText}"",""{strFontSize}"",""{strFontFamily}"",""{strFontStyle}"",""{strFontWeight}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
 #if OPENSILVER
-            if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
+            string strTextSize = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript(javaScriptCodeToExecute));
+#elif BRIDGE
+            string strTextSize = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("eval($0)", javaScriptCodeToExecute));
 #endif
+            Size measuredSize;
+            int sepIndex = strTextSize != null ? strTextSize.IndexOf('|') : -1;
+            if (sepIndex > -1)
             {
-                global::System.Threading.Thread.Sleep(20);
+                double actualWidth = double.Parse(strTextSize.Substring(0, sepIndex), CultureInfo.InvariantCulture);
+                double actualHeight = double.Parse(strTextSize.Substring(sepIndex + 1), CultureInfo.InvariantCulture);
+                measuredSize = new Size(actualWidth + 1, actualHeight);
+            }
+            else
+            {
+                measuredSize = new Size(0, 0);
             }
 
-            return new Size(associatedTextBlock.ActualWidth + 1, associatedTextBlock.ActualHeight);
+            return measuredSize;
         }
     }
 }

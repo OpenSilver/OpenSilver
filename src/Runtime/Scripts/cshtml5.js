@@ -122,6 +122,7 @@ document.onkeyup = function (evt) {
 
 document.jsObjRef = new Array();
 document.callbackCounterForSimulator = 0;
+document.measureTextBlockElement = null;
 
 document.reroute = function reroute(e, elem, shiftKey) {
     shiftKey = shiftKey || false;
@@ -213,6 +214,11 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
         parentElement = document.getElementById(parentElement);
     }
 
+    if (parentElement == null) {
+        console.log('createElement is failed becaused of the removed parent.');
+        return;
+    }
+
 	if(index < 0 || index >= parentElement.children.length)	{
 		parentElement.appendChild(newElement);
 	}
@@ -277,6 +283,9 @@ document.setDomAttribute = function (id, propertyName, value) {
 }
 
 document.removeEventListenerSafe = function (element, method, func) {
+    if (typeof element == 'string') {
+        element = document.getElementById(element);
+    }
 	if (element){
 		element.removeEventListener(method, func);
 	}
@@ -323,6 +332,158 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
 	argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
 	document.jsObjRef[idWhereErrorCallbackArgsAreStored] = argsArr;
 	window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
+}
+
+document.rerouteMouseEvents = function (id) {
+    document.onmouseup = function(e) {
+        if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    }
+    document.onmouseover = function(e) {
+       if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    } 
+    document.onmousedown = function(e) {
+       if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    }                       
+     document.onmouseout = function(e) {   
+       if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    }                            
+    document.onmousemove = function(e) {
+       if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    }                                    
+    document.onclick = function(e) {   
+       if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    }                                     
+    document.oncontextmenu = function(e) {
+       if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    }                                      
+    document.ondblclick = function(e) {   
+       if(e.doNotReroute == undefined)
+        {
+               var element = document.getElementByIdSafe(id);
+               document.reroute(e, element);
+        }
+    }
+}
+
+document.setVisualBounds = function(id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
+    var element = document.getElementByIdSafe(id);
+    if (element)
+    {
+        element.style.left = left + "px";
+        element.style.top = top + "px";
+        element.style.width = width + "px";
+        element.style.height = height + "px";
+        
+        if (bSetAbsolutePosition) {
+            element.style.position = "absolute";
+        }
+        if (bSetZeroMargin) {
+            element.style.margin = "0";
+        }
+        if (bSetZeroPadding) {
+            element.style.padding = "0";
+        }
+    }
+}
+
+document.setPosition = function(id, left, top, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
+    var element = document.getElementByIdSafe(id);
+    if (element)
+    {
+        element.style.left = left + "px";
+        element.style.top = top + "px";
+        
+        if (bSetAbsolutePosition) {
+            element.style.position = "absolute";
+        }
+        if (bSetZeroMargin) {
+            element.style.margin = "0";
+        }
+        if (bSetZeroPadding) {
+            element.style.padding = "0";
+        }
+    }
+}
+
+document.measureTextBlock = function(text, fontSize, fontFamily, fontStyle, fontWeight, textWrapping, padding, width, maxWidth) {
+    var element = document.measureTextBlockElement;
+    if (element)
+    {
+        var runElement = element.firstElementChild;
+        if (runElement != null) {
+            runElement.innerText = text;
+            runElement.style.fontSize = fontSize;
+            runElement.style.fontWeight = fontWeight;
+        }
+
+        if (fontSize.length > 0) {
+            element.style.fontSize = fontSize;
+        }
+        if (fontFamily.length > 0) {
+            if (fontFamily === "-") {
+                fontFamily = "";
+            }
+            element.style.fontFamily = fontFamily;
+        }
+        if (fontStyle.length > 0) {
+            element.style.fontStyle = fontStyle;
+        }
+        if (fontWeight.length > 0) {
+            element.style.fontWeight = fontWeight;
+        }
+        if (textWrapping.length > 0) {
+            element.style.whiteSpace = textWrapping;
+        }
+        if (padding.length > 0) {
+            element.style.boxSizing = "border-box";
+            element.style.padding = padding;
+        }
+
+        element.style.width = width;
+        element.style.maxWidth = maxWidth;
+
+        return element.offsetWidth + "|" + element.offsetHeight;
+    }
+
+    return "0|0";
+}
+
+document.setContentString = function(id, text, removeTextWrapping) {
+    var el = document.getElementByIdSafe(id);
+    if (el)
+    {
+        el.innerText = text;
+        if (removeTextWrapping)
+            el.style.whiteSpace = "nowrap";
+    };
 }
 
 window.ViewInteropErrors = function () {
