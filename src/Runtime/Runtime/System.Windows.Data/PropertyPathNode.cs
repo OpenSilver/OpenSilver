@@ -41,7 +41,8 @@ namespace Windows.UI.Xaml.Data
         internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
         {
             bool emitBrokenChanged = IsBroken != isBroken;
-            bool emitValueChanged = Value != newValue;
+            bool emitValueChanged = Value != newValue // reference equals works well for immutable types, like strings for example 
+                || Value is System.Collections.ICollection;//Partial workaround: If the Value is a collection, then we cannot asume that the collection has not been changed only by doing a reference equals.
 
             IsBroken = isBroken;
             Value = newValue;
