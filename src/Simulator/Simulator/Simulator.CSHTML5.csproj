@@ -125,6 +125,7 @@
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Interop\BrowserResultConverter.cs" />
     <Compile Include="Interop\ClipboardHandler.cs" />
     <Compile Include="Interop\SimulatorProxy.cs" />
     <Compile Include="Interop\WebClientFactory.cs" />
@@ -194,7 +195,7 @@
     </Compile>
     <Page Include="Debugging\ChromiumDevTools.xaml">
       <SubType>Designer</SubType>
-		<Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
       <SubType>Designer</SubType>

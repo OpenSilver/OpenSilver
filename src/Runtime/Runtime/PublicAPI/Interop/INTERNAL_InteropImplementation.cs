@@ -302,21 +302,7 @@ namespace CSHTML5
             else
 #endif
             {
-                dynamic res = obj;
-                int resInt;
-
-                if (res.IsString())
-                    return res.AsString().Value;
-                else if (res.IsBool())
-                    return res.AsBoolean().Value;
-                else if (res.IsNumber())
-                    return res.AsNumber().Value;
-                else if (int.TryParse(res.ToString(), out resInt))
-                    return resInt;
-                else if (res.IsNull())
-                    return null;
-                else
-                    return res;
+                return DotNetForHtml5.Core.INTERNAL_Simulator.ConvertBrowserResult(obj);
             }
         }
 
