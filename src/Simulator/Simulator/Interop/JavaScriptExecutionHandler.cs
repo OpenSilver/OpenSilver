@@ -24,20 +24,28 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
     public class JavaScriptExecutionHandler
     {
-        WPFBrowserView _webControl;
-        string _lastExecutedJavaScriptCode;
-        List<string> _fullLogOfExecutedJavaScriptCode = new List<string>();
+        private bool _webControlDisposed = false;
+        private WPFBrowserView _webControl;
+        private string _lastExecutedJavaScriptCode;
+        private List<string> _fullLogOfExecutedJavaScriptCode = new List<string>();
 
         public JavaScriptExecutionHandler(WPFBrowserView webControl)
         {
             _webControl = webControl;
+            webControl.DisposeEvent += WebControl_DisposeEvent;
+            webControl.Browser.DisposeEvent += WebControl_DisposeEvent;
+        }
+
+        private void WebControl_DisposeEvent(object sender, DotNetBrowser.Events.DisposeEventArgs e)
+        {
+            _webControlDisposed = true;
         }
 
         // Called via reflection by the "INTERNAL_HtmlDomManager" class of the "Core" project.
         public void ExecuteJavaScript(string javaScriptToExecute)
         {
             // This prevents interop calls from throwing an exception if they are called after the simulator started closing
-            if (_webControl.IsDisposed || _webControl.Browser.IsDisposed())
+            if (_webControlDisposed)
                 return;
             _lastExecutedJavaScriptCode = javaScriptToExecute;
             _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
@@ -48,7 +56,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         public object ExecuteJavaScriptWithResult(string javaScriptToExecute)
         {
             // This prevents interop calls from throwing an exception if they are called after the simulator started closing
-            if (_webControl.IsDisposed || _webControl.Browser.IsDisposed())
+            if (_webControlDisposed)
                 return null;
             _lastExecutedJavaScriptCode = javaScriptToExecute;
             _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
