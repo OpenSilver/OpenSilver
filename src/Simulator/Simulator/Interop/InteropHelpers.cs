@@ -53,6 +53,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             InjectPropertyValue("WebControlDispatcherInvoke", new Action<Action, TimeSpan>((method, timeout) => webControl.Dispatcher.Invoke(method, timeout)), coreAssembly);
         }
 
+        internal static void InjectConvertBrowserResult(Func<object, object> func, Assembly coreAssembly)
+        {
+            InjectPropertyValue("ConvertBrowserResult", func, coreAssembly);
+        }
+
         internal static void InjectJavaScriptExecutionHandler(dynamic javaScriptExecutionHandler, Assembly coreAssembly)
         {
 #if OPENSILVER
