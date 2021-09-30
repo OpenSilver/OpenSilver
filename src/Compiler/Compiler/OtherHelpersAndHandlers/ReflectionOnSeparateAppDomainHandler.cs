@@ -1576,6 +1576,18 @@ namespace DotNetForHtml5.Compiler
                     throw new Exception(ASSEMBLY_NOT_IN_LIST_OF_LOADED_ASSEMBLIES);
             }
 
+            private string GetExtension(string str)
+            {
+                try
+                {
+                    return Path.GetExtension(str);
+                }
+                catch
+                {
+                    //It is possible that resource does not have an extension
+                    return null;
+                }
+            }
 
             public Dictionary<string, byte[]> GetManifestResources(string assemblySimpleName, HashSet<string> supportedExtensionsLowerCase)
             {
@@ -1584,7 +1596,7 @@ namespace DotNetForHtml5.Compiler
                     var assembly = _loadedAssemblySimpleNameToAssembly[assemblySimpleName];
 
                     var manifestResourceNames = assembly.GetManifestResourceNames();
-                    var resourceFiles = (from fn in manifestResourceNames where supportedExtensionsLowerCase.Contains(Path.GetExtension(fn.ToLower())) select fn).ToArray();
+                    var resourceFiles = (from fn in manifestResourceNames where supportedExtensionsLowerCase.Contains(GetExtension(fn.ToLower())) select fn).ToArray();
                     var result = new Dictionary<string, byte[]>();
 
                     foreach (var resourceFile in resourceFiles)
