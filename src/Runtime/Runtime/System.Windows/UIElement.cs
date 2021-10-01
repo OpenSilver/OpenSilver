@@ -269,8 +269,17 @@ namespace Windows.UI.Xaml
 
         private static void Clip_MethodToUpdateDom(DependencyObject d, object newValue)
         {
+            if (newValue == null)
+            {
+                UIElement uiElement = (UIElement)d;
+                var outerDomElement = uiElement.INTERNAL_OuterDomElement;
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
+                style.clip = "";
+                return;
+            }
+
             // Only RectangleGeometry is supported for now
-            if (newValue != null && newValue is RectangleGeometry)
+            if (newValue is RectangleGeometry)
             {
                 UIElement uiElement = (UIElement)d;
                 var outerDomElement = uiElement.INTERNAL_OuterDomElement;
@@ -287,7 +296,7 @@ namespace Windows.UI.Xaml
                 double bottom = val.Rect.Height + val.Rect.Y;
                 double left = val.Rect.X;
 
-                string rect = "rect(" + top + "px, " + right + "px" + ", " + bottom + "px, " + left + "px)";
+                string rect = "rect(" + top.ToInvariantString() + "px, " + right.ToInvariantString() + "px" + ", " + bottom.ToInvariantString() + "px, " + left.ToInvariantString() + "px)";
                 style.clip = rect;
             }
             else
