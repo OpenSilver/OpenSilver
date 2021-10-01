@@ -26,7 +26,6 @@ namespace Windows.UI.Xaml.Data
 {
     internal partial interface IPropertyPathNodeListener
     {
-        void IsBrokenChanged(IPropertyPathNode node);
         void ValueChanged(IPropertyPathNode node);
     }
 }

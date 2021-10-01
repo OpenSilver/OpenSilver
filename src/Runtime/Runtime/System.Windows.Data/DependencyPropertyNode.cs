@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Data
     internal sealed class DependencyPropertyNode : PropertyPathNode
     {
         private readonly DependencyProperty _dp;
-        private IPropertyChangedListener _dataContextListener;
+        private IPropertyChangedListener _dpListener;
 
         internal DependencyPropertyNode(DependencyProperty dp)
         {
@@ -55,17 +55,17 @@ namespace Windows.UI.Xaml.Data
 
         internal override void OnSourceChanged(object oldvalue, object newValue)
         {
-            IPropertyChangedListener listener = _dataContextListener;
+            IPropertyChangedListener listener = _dpListener;
             if (listener != null)
             {
-                _dataContextListener = null;
+                _dpListener = null;
                 listener.Detach();
             }
 
             DependencyObject sourceDO = SourceDO;
             if (sourceDO != null)
             {
-                _dataContextListener = INTERNAL_PropertyStore.ListenToChanged(
+                _dpListener = INTERNAL_PropertyStore.ListenToChanged(
                     sourceDO, _dp, OnPropertyChanged
                 );
             }

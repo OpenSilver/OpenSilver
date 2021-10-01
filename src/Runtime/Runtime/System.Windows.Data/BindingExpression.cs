@@ -248,8 +248,6 @@ namespace Windows.UI.Xaml.Data
             Target = null;
         }
 
-        void IPropertyPathWalkerListener.IsBrokenChanged() { Refresh(); }
-
         void IPropertyPathWalkerListener.ValueChanged() { Refresh(); }
 
         /// <summary>

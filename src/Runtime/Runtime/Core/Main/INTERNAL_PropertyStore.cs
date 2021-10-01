@@ -867,7 +867,7 @@ namespace CSHTML5.Internal
             List<IPropertyChangedListener> listeners = storage.PropertyListeners;
             if (listeners == null)
             {
-                listeners = storage.PropertyListeners = new List<IPropertyChangedListener>();
+                listeners = storage.PropertyListeners = new List<IPropertyChangedListener>(1);
             }
 
             PropertyChangedListener listener = new PropertyChangedListener(storage, updateSourceCallback);

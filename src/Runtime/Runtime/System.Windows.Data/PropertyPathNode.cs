@@ -40,27 +40,13 @@ namespace Windows.UI.Xaml.Data
 
         internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
         {
-            bool emitBrokenChanged = IsBroken != isBroken;
-            bool emitValueChanged = Value != newValue;
-
             IsBroken = isBroken;
             Value = newValue;
 
-            if (emitValueChanged)
+            IPropertyPathNodeListener listener = _nodeListener;
+            if (listener != null)
             {
-                IPropertyPathNodeListener listener = _nodeListener;
-                if (listener != null)
-                {
-                    listener.ValueChanged(this);
-                }
-            }
-            else if (emitBrokenChanged)
-            {
-                IPropertyPathNodeListener listener = _nodeListener;
-                if (listener != null)
-                {
-                    listener.IsBrokenChanged(this);
-                }
+                listener.ValueChanged(this);
             }
         }
 
@@ -74,18 +60,19 @@ namespace Windows.UI.Xaml.Data
 
         void IPropertyPathNode.SetSource(object source)
         {
-            if (source == null || source != Source)
+            object oldSource = Source;
+            Source = source;
+
+            if (oldSource != Source)
             {
-                object oldSource = Source;
-                Source = source;
-
                 OnSourceChanged(oldSource, Source);
-                UpdateValue();
+            }
 
-                if (Next != null)
-                {
-                    Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value);
-                }
+            UpdateValue();
+
+            if (Next != null)
+            {
+                Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value);
             }
         }
 

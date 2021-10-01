@@ -107,16 +107,6 @@ namespace Windows.UI.Xaml.Data
             _firstNode.SetSource(source);
         }
 
-        void IPropertyPathNodeListener.IsBrokenChanged(IPropertyPathNode node)
-        {
-            ValueInternal = node.Value;
-            IPropertyPathWalkerListener listener = _listener;
-            if (listener != null)
-            {
-                listener.IsBrokenChanged();
-            }
-        }
-
         void IPropertyPathNodeListener.ValueChanged(IPropertyPathNode node)
         {
             ValueInternal = node.Value;
