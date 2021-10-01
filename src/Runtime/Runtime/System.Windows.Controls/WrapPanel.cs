@@ -89,7 +89,22 @@ namespace Windows.UI.Xaml.Controls
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(wrapPanel))
             {
                 //todo: change all the wrappers of the children to set their style.display to inline-block
-                INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(wrapPanel).textAlign = "left";
+                var el = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(wrapPanel);
+                switch(wrapPanel.HorizontalAlignment)
+                {
+                    case HorizontalAlignment.Left:
+                        el.textAlign = "left";
+                        break;
+                    case HorizontalAlignment.Right:
+                        el.textAlign = "right";
+                        break;
+                    case HorizontalAlignment.Center:
+                        el.textAlign = "center";
+                        break;
+                    default:
+                        el.textAlign = "left";
+                        break;
+                }
             }
         }
 
