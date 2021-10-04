@@ -131,25 +131,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal override bool EnablePointerEventsCore
-        {
-            get
-            {
-#if MIGRATION
-                // In Silverlight, it appears that UserControl does not support mouse events
-                // because its Background property is ignored.
-                return false;
-#else
-                // We only check the Background property even if BorderBrush not null and 
-                // BorderThickness > 0 is a sufficient condition to enable pointer events 
-                // on the borders of the control.
-                // There is no way right now to differentiate the Background and BorderBrush 
-                // as they are both defined on the same DOM element.
-                return Background != null;
-#endif
-            }
-        }
-
         internal override FrameworkTemplate TemplateCache
         {
             get { return UseContentTemplate; }

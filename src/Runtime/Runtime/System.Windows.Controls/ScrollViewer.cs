@@ -51,6 +51,16 @@ namespace Windows.UI.Xaml.Controls
             get { return null; }
         }
 
+        // Note: we need to force this to true because template are disabled
+        // for ScrollViewers.
+        internal override bool EnablePointerEventsCore
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         /*
         public bool BringIntoViewOnFocusChange { get; set; }
         public static DependencyProperty BringIntoViewOnFocusChangeProperty { get; }

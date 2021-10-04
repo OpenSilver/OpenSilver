@@ -89,16 +89,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected bool DisableBaseControlHandlingOfVisualStates = false;
 
-        internal override bool EnablePointerEventsCore
-        {
-            get
-            {
-                // Note: this should always be false, but we return true to prevent issue with
-                // controls that do not have template (like ScrollViewer).
-                return true;
-            }
-        }
-
         //-----------------------
         // ISENABLED (OVERRIDE)
         //-----------------------

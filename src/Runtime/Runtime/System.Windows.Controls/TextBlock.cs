@@ -66,6 +66,14 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
+        internal override bool EnablePointerEventsCore
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         /// <summary>
         /// Get or Set the Text property
         /// </summary>
