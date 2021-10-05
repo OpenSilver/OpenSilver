@@ -421,12 +421,29 @@ namespace Windows.UI.Xaml
             {
                 ((Transform)e.OldValue).INTERNAL_UnapplyTransform();
                 ((Transform)e.OldValue).INTERNAL_parent = null;
+
+                if (e.OldValue is TransformGroup transformGroup)
+                {
+                    foreach (Transform child in transformGroup.Children)
+                    {
+                        child.INTERNAL_parent = null;
+                    }
+                }
             }
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
             {
                 if (newValue != null)
                 {
                     newValue.INTERNAL_parent = uiElement;
+
+                    if (newValue is TransformGroup transformGroup)
+                    {
+                        foreach (Transform child in transformGroup.Children)
+                        {
+                            child.INTERNAL_parent = uiElement;
+                        }
+                    }
+
                     newValue.INTERNAL_ApplyTransform();
 
                     // Ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS:
