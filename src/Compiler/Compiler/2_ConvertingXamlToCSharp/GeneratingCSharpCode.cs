@@ -876,6 +876,35 @@ else
                             }
                         }
 
+                        // Determine if the element is a collection or a dictionary:
+                        EnumerableType enumerableType = EnumerableType.None;
+                        if (GettingInformationAboutXamlTypes.IsElementADictionary(element, reflectionOnSeparateAppDomain))
+                            enumerableType = EnumerableType.Dictionary;
+                        else if (GettingInformationAboutXamlTypes.IsElementACollection(element, reflectionOnSeparateAppDomain))
+                            enumerableType = EnumerableType.Collection;
+
+                        if (enumerableType == EnumerableType.Collection || enumerableType == EnumerableType.Dictionary)
+                        {
+                            // Add the children to the collection/dictionary:
+                            GenerateCodeForAddingChildrenToCollectionOrDictionary(
+                                codeStack: codeStack,
+                                stringBuilder: stringBuilder,
+                                enumerableType: enumerableType,
+                                codeToAccessTheEnumerable: elementUniqueNameOrThisKeyword,
+                                elementThatContainsTheChildrenToAdd: element,
+                                isSLMigration: isSLMigration,
+                                reflectionOnSeparateAppDomain: reflectionOnSeparateAppDomain);
+                        }
+                        else
+                        {
+                            // Add the code of the children elements:
+                            int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
+                            foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
+                            {
+                                stringBuilder.AppendLine(childCode);
+                            }
+                        }
+
                         // Add the attributes:
                         foreach (XAttribute attribute in element.Attributes())
                         {
@@ -1192,35 +1221,6 @@ dependencyPropertyPath);
                                         }
                                     }
                                 }
-                            }
-                        }
-
-                        // Determine if the element is a collection or a dictionary:
-                        EnumerableType enumerableType = EnumerableType.None;
-                        if (GettingInformationAboutXamlTypes.IsElementADictionary(element, reflectionOnSeparateAppDomain))
-                            enumerableType = EnumerableType.Dictionary;
-                        else if (GettingInformationAboutXamlTypes.IsElementACollection(element, reflectionOnSeparateAppDomain))
-                            enumerableType = EnumerableType.Collection;
-
-                        if (enumerableType == EnumerableType.Collection || enumerableType == EnumerableType.Dictionary)
-                        {
-                            // Add the children to the collection/dictionary:
-                            GenerateCodeForAddingChildrenToCollectionOrDictionary(
-                                codeStack: codeStack,
-                                stringBuilder: stringBuilder,
-                                enumerableType: enumerableType,
-                                codeToAccessTheEnumerable: elementUniqueNameOrThisKeyword,
-                                elementThatContainsTheChildrenToAdd: element,
-                                isSLMigration: isSLMigration,
-                                reflectionOnSeparateAppDomain: reflectionOnSeparateAppDomain);
-                        }
-                        else
-                        {
-                            // Add the code of the children elements:
-                            int childrenCount = element.Elements().Count(); //todo-performance: find a more performant way to count the children?
-                            foreach (var childCode in PopElementsFromStackAndReadThemInReverseOrder<string>(codeStack, childrenCount)) // Note: this is supposed to not raise OutOfIndex because child nodes are supposed to have added code to the stack.
-                            {
-                                stringBuilder.AppendLine(childCode);
                             }
                         }
 
