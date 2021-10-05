@@ -105,6 +105,10 @@
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTrigger.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ItemsControlDragDropTarget.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ListBoxDragDropTarget.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewDragDropTarget.cs" />
+		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\EasingPointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
@@ -200,6 +204,7 @@
 		<Compile Include="System.Windows.Media\Polygon.cs" />
 		<Compile Include="System.Windows\Expression.cs" />
 		<Compile Include="System.Windows\TemplateBindingExtension.cs" />
+		<Compile Include="System.Windows\WORKINPROGRESS\CheckAndDownloadUpdateCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontCapitals.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />

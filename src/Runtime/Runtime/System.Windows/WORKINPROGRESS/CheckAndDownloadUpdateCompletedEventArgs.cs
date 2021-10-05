@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,18 +12,21 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Browser
+using System;
+
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
-	[OpenSilver.NotImplemented]
-    public sealed class HtmlPopupWindowOptions
+    [OpenSilver.NotImplemented]
+    public sealed class CheckAndDownloadUpdateCompletedEventArgs : EventArgs
     {
-		[OpenSilver.NotImplemented]
-        public bool Menubar { get; set; }
-		[OpenSilver.NotImplemented]
-        public bool Status { get; set; }
         [OpenSilver.NotImplemented]
-        public bool Resizeable { get; set; }
+        public bool UpdateAvailable { get; }
+
         [OpenSilver.NotImplemented]
-        public bool Toolbar { get; set; }
+        public Exception Error { get; }
     }
 }

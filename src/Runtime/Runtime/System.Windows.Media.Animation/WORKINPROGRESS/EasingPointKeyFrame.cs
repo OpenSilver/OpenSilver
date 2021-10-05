@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,18 +12,15 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Browser
+
+#if MIGRATION
+namespace System.Windows.Media.Animation
+#else
+namespace Windows.UI.Xaml.Media.Animation
+#endif
 {
-	[OpenSilver.NotImplemented]
-    public sealed class HtmlPopupWindowOptions
+    [OpenSilver.NotImplemented]
+    public sealed partial class EasingPointKeyFrame : PointKeyFrame
     {
-		[OpenSilver.NotImplemented]
-        public bool Menubar { get; set; }
-		[OpenSilver.NotImplemented]
-        public bool Status { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Resizeable { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Toolbar { get; set; }
     }
 }
