@@ -149,8 +149,6 @@ namespace Windows.UI.Xaml.Controls
 
 #region ---------- INameScope implementation ----------
 
-        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string,object>();
-
         /// <summary>
         /// Finds the UIElement with the specified name.
         /// </summary>
