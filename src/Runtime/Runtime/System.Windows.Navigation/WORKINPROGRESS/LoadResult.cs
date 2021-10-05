@@ -12,39 +12,32 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-using System.Windows.Navigation;
-#else
+
+#if !MIGRATION
 using System;
-using Windows.UI.Xaml.Navigation;
 #endif
 
 #if MIGRATION
-namespace System.Windows.Controls
+namespace System.Windows.Navigation
 #else
-namespace Windows.UI.Xaml.Controls
+namespace Windows.UI.Xaml.Navigation
 #endif
 {
-    public partial class Frame : ContentControl, INavigate
+    [OpenSilver.NotImplemented]
+    public class LoadResult
     {
-        [OpenSilver.NotImplemented]
-        public Uri CurrentSource { get; private set; }
+        public object LoadedContent { get; private set; }
+
+        public Uri RedirectUri { get; private set; }
 
         [OpenSilver.NotImplemented]
-        public event NavigatingCancelEventHandler Navigating;
-
-        [OpenSilver.NotImplemented]
-        public event NavigationStoppedEventHandler NavigationStopped;
-
-        /// <summary>
-        /// Reloads the current page.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public void Refresh()
+        public LoadResult(object loadedContent)
         {
         }
 
         [OpenSilver.NotImplemented]
-        public INavigationContentLoader ContentLoader { get; set; }
+        public LoadResult(Uri redirectUri)
+        {
+        }
     }
 }

@@ -12,11 +12,9 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-using System.Windows.Navigation;
-#else
+
+#if !MIGRATION
 using System;
-using Windows.UI.Xaml.Navigation;
 #endif
 
 #if MIGRATION
@@ -25,26 +23,36 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public partial class Frame : ContentControl, INavigate
+    [OpenSilver.NotImplemented]
+    public class FloatableWindow : ContentControl
     {
         [OpenSilver.NotImplemented]
-        public Uri CurrentSource { get; private set; }
+        public bool? DialogResult { get; set; }
 
         [OpenSilver.NotImplemented]
-        public event NavigatingCancelEventHandler Navigating;
-
-        [OpenSilver.NotImplemented]
-        public event NavigationStoppedEventHandler NavigationStopped;
-
-        /// <summary>
-        /// Reloads the current page.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public void Refresh()
+        protected virtual void OnClosed(EventArgs e)
         {
         }
 
         [OpenSilver.NotImplemented]
-        public INavigationContentLoader ContentLoader { get; set; }
+        public Panel ParentLayoutRoot { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public ResizeMode ResizeMode { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public void ShowDialog()
+        {
+        }
+
+        public event EventHandler Closed;
+
+        [OpenSilver.NotImplemented]
+        public void Close()
+        {
+        }
+
+        [OpenSilver.NotImplemented]
+        public object Title { get; set; }
     }
 }

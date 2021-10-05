@@ -16,12 +16,19 @@ using System;
 using System.Collections;
 using System.Windows.Resources;
 
+#if !MIGRATION
+using System.Windows;
+#endif
+
 #if MIGRATION
 namespace System.Windows
 #else
 namespace Windows.UI.Xaml
 #endif
 {
+    public delegate void CheckAndDownloadUpdateCompletedEventHandler(object sender,
+        CheckAndDownloadUpdateCompletedEventArgs e);
+
     /// <summary>
     /// Encapsulates the app and its available services.
     /// </summary>
@@ -77,6 +84,13 @@ namespace Windows.UI.Xaml
         public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
         {
             return null;
+        }
+
+        public event CheckAndDownloadUpdateCompletedEventHandler CheckAndDownloadUpdateCompleted;
+
+        [OpenSilver.NotImplemented]
+        public void CheckAndDownloadUpdateAsync()
+        {
         }
     }
 }

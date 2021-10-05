@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using System;
+using System.IO;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -32,6 +33,23 @@ namespace Windows.UI.Xaml.Controls
         public void Stop()
         {
             throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        public TimeSpan BufferingTime { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public event RoutedEventHandler MediaEnded;
+
+        [OpenSilver.NotImplemented]
+        public TimeSpan Position { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public Duration NaturalDuration { get; }
+
+        [OpenSilver.NotImplemented]
+        public void SetSource(Stream stream)
+        {
         }
     }
 }

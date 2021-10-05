@@ -12,12 +12,8 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-using System.Windows.Navigation;
-#else
-using System;
-using Windows.UI.Xaml.Navigation;
-#endif
+
+using System.Collections;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -25,26 +21,15 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public partial class Frame : ContentControl, INavigate
+    [OpenSilver.NotImplemented]
+    public class PopulatedEventArgs : RoutedEventArgs
     {
         [OpenSilver.NotImplemented]
-        public Uri CurrentSource { get; private set; }
-
-        [OpenSilver.NotImplemented]
-        public event NavigatingCancelEventHandler Navigating;
-
-        [OpenSilver.NotImplemented]
-        public event NavigationStoppedEventHandler NavigationStopped;
-
-        /// <summary>
-        /// Reloads the current page.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public void Refresh()
+        public PopulatedEventArgs(IEnumerable data)
         {
         }
 
         [OpenSilver.NotImplemented]
-        public INavigationContentLoader ContentLoader { get; set; }
+        public IEnumerable Data { get; private set; }
     }
 }

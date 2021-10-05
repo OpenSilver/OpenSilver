@@ -137,5 +137,10 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnDropDownOpening(RoutedPropertyChangingEventArgs<bool> e)
         {
         }
+
+        [OpenSilver.NotImplemented]
+        protected virtual void OnPopulated(PopulatedEventArgs e)
+        {
+        }
     }
 }
