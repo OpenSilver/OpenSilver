@@ -1610,7 +1610,7 @@ namespace Windows.UI.Xaml
 
 #region ---------- INameScope implementation ----------
         //note: copy from UserControl
-        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
+        protected Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
 
         /// <summary>
         /// Finds the UIElement with the specified name. Returns null if not found.
