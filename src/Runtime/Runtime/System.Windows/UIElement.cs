@@ -286,10 +286,6 @@ namespace Windows.UI.Xaml
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
                 RectangleGeometry val = (RectangleGeometry)newValue;
 
-                // Get elements width and height
-                double width = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetWidth"));
-                double height = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(outerDomElement, "offsetHeight"));
-
                 // CSS rect property has the following format - rect(<top>, <right>, <bottom>, <left>)
                 double top = val.Rect.Y;
                 double right = val.Rect.Width + val.Rect.X;
@@ -1017,63 +1013,7 @@ namespace Windows.UI.Xaml
                 else
                 {
                     string uid = ((INTERNAL_HtmlDomElementReference)element).UniqueIdentifier;
-                    string javaScriptCodeToExecute = $@"
-     document.onmouseup = function(e) {{
-        if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}
-     document.onmouseover = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }} 
-    document.onmousedown = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                       
-     document.onmouseout = function(e) {{   
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                            
-     document.onmousemove = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                                    
-     document.onclick = function(e) {{   
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                                     
-     document.oncontextmenu = function(e) {{
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}                                      
-     document.ondblclick = function(e) {{   
-       if(e.doNotReroute == undefined)
-        {{
-               var element = document.getElementByIdSafe(""{uid}"");
-               document.reroute(e, element);
-        }}
-    }}";
+                    string javaScriptCodeToExecute = $@"document.rerouteMouseEvents(""{uid}"")";
                     INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
                 }
                 return true;
