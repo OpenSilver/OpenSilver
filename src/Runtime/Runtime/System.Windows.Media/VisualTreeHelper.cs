@@ -252,6 +252,69 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
+        /// <summary>
+        /// Retrieves a set of objects that are located within a specified point of an object's coordinate space. Note: the current implementation only returns the top-most element.
+        /// </summary>
+        /// <param name="intersectingPoint">The point to use as the determination point.</param>
+        /// <param name="subtree">The object to search within.</param>
+        /// <returns>An enumerable set of UIElement objects that are determined to be located
+        /// in the visual tree composition at the specified point and within the specified
+        /// subtree and it's AllowDrop property true.  Note: the current implementation only returns the top-most element.</returns>
+        public static IEnumerable<UIElement> FindElementsInHostCoordinatesThatAllowsDrop(Point intersectingPoint, UIElement subtree)
+        {
+            var elementAtCoordinates = FindElementInHostCoordinates(intersectingPoint);
+
+            if (elementAtCoordinates != null)
+            {
+                if (subtree == null)
+                {
+                    return new List<UIElement>() { elementAtCoordinates };
+                }
+                else
+                {
+                    //-------------
+                    // Here, it means that neither the result nor the subtree are null.
+                    // So we verify that the result is in the subtree.
+                    //-------------
+                    bool found = elementAtCoordinates.AllowDrop;
+                    // Walk up the visual tree until we find the subtree root:
+                    UIElement current = elementAtCoordinates as UIElement;
+                    while (current != null)
+                    {
+                        if (!found && current.AllowDrop)
+                        {
+                            elementAtCoordinates = current;
+                            found = true;
+                        }
+
+                        if (current == subtree)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            current = current.INTERNAL_VisualParent as UIElement;
+                        }
+                    }
+
+                    bool elementIsInSubtree = (current != null);
+
+                    if (elementIsInSubtree && found)
+                    {
+                        return new List<UIElement>() { elementAtCoordinates };
+                    }
+                    else
+                    {
+                        return new List<UIElement>();
+                    }
+                }
+            }
+            else
+            {
+                return new List<UIElement>();
+            }
+        }
+
         private static bool TryGetChildrenUsingContentProperty(DependencyObject depObj, out List<DependencyObject> children)
         {
             Type depObjType = depObj.GetType();
