@@ -14,8 +14,10 @@
 
 
 #if MIGRATION
+using System.Windows;
 using System.Windows.Input;
 #else
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -39,6 +41,30 @@ namespace System.Windows
             {
                 return (Pointer.INTERNAL_captured != null);
             }
+        }
+
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty AllowDropProperty =
+            DependencyProperty.Register(
+            "AllowDrop",
+            typeof(bool),
+            typeof(DragDrop),
+            new PropertyMetadata(false, AllowDropPropertyChanged));
+
+        [OpenSilver.NotImplemented]
+        private static void AllowDropPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+
+        [OpenSilver.NotImplemented]
+        public static bool GetAllowDrop(UIElement element)
+        {
+            return false;
+        }
+
+        [OpenSilver.NotImplemented]
+        public static void SetAllowDrop(UIElement element, bool value)
+        {
         }
     }
 }

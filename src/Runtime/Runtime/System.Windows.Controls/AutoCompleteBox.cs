@@ -850,6 +850,16 @@ namespace Windows.UI.Xaml.Controls
 #else
         public event RoutedEventHandler DropDownOpened;
 #endif
+
+        /// <summary>
+        /// Occurs when the drop-down portion of the ComboBox is closing.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+#if MIGRATION
+        public event RoutedPropertyChangingEventHandler<bool> DropDownClosing;
+#else
+        public event RoutedEventHandler DropDownClosing;
+#endif
         #endregion
     }
 

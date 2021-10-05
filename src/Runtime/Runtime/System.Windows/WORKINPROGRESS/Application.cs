@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System;
 using System.Collections;
 using System.Windows.Resources;
@@ -77,6 +78,11 @@ namespace Windows.UI.Xaml
         public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
         {
             return null;
+        }
+
+        [OpenSilver.NotImplemented]
+        public static void LoadComponent(object component, Uri resourceLocator)
+        {
         }
     }
 }

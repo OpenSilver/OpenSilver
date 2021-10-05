@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,18 +12,13 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Browser
+
+#if MIGRATION
+namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-	[OpenSilver.NotImplemented]
-    public sealed class HtmlPopupWindowOptions
-    {
-		[OpenSilver.NotImplemented]
-        public bool Menubar { get; set; }
-		[OpenSilver.NotImplemented]
-        public bool Status { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Resizeable { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Toolbar { get; set; }
-    }
+    [OpenSilver.NotImplemented]
+    public delegate void RoutedPropertyChangingEventHandler<T>(object sender, RoutedPropertyChangingEventArgs<T> e);
 }

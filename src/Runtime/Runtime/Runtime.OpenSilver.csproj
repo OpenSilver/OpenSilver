@@ -101,6 +101,11 @@
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ThicknessKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ThicknessKeyFrameCollection.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\RenderTargetBitmap.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ItemsControlDragDropTarget.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ListBoxDragDropTarget.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RoutedPropertyChangingEventHandler.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewDragDropTarget.cs" />
+		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\EasingPointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\Brushes.cs" />
