@@ -82,6 +82,15 @@ namespace CSHTML5
         }
 
         /// <summary>
+        /// Allows calling JavaScript code from within C#.
+        /// </summary>
+        /// <param name="javascript">The JavaScript code to execute.</param>
+        internal static void ExecuteJavaScriptFastAsync(string javascript)
+        {
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(javascript);
+        }
+
+        /// <summary>
         /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
         /// </summary>
         /// <param name="value">The value to unbox.</param>

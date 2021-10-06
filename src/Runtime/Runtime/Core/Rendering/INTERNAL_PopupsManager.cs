@@ -112,18 +112,17 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
             // Create a DIV for the PopupRoot in the DOM tree:
             //--------------------------------------
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync(
-@"
+            CSHTML5.Interop.ExecuteJavaScriptFastAsync(
+$@"
 var popupRoot = document.createElement('div');
-popupRoot.setAttribute('id', $0);
+popupRoot.setAttribute('id', ""{uniquePopupRootIdentifier}"");
 popupRoot.style.position = 'absolute';
 popupRoot.style.width = '100%';
 popupRoot.style.height = '100%';
 popupRoot.style.overflowX = 'hidden';
 popupRoot.style.overflowY = 'hidden';
 popupRoot.style.pointerEvents = 'none';
-$1.appendChild(popupRoot);
-", uniquePopupRootIdentifier, parentWindow.INTERNAL_RootDomElement);
+{INTERNAL_InteropImplementation.GetVariableStringForJS(parentWindow.INTERNAL_RootDomElement)}.appendChild(popupRoot);");
 
             //--------------------------------------
             // Get the PopupRoot DIV:
@@ -138,7 +137,7 @@ $1.appendChild(popupRoot);
 #endif
                 popupRootDiv = new INTERNAL_HtmlDomElementReference(uniquePopupRootIdentifier, null);
             else
-                popupRootDiv = Interop.ExecuteJavaScriptAsync("document.getElementByIdSafe($0)", uniquePopupRootIdentifier);
+                popupRootDiv = Interop.ExecuteJavaScriptAsync($@"document.getElementByIdSafe(""{uniquePopupRootIdentifier}"")");
 
             //--------------------------------------
             // Create the C# class that points to the PopupRoot DIV:
@@ -189,11 +188,10 @@ $1.appendChild(popupRoot);
                 // Remove from the DOM:
                 //--------------------------------------
 
-                CSHTML5.Interop.ExecuteJavaScriptAsync(
-@"
-var popupRoot = document.getElementByIdSafe($0);
-$1.removeChild(popupRoot);
-", uniquePopupRootIdentifier, parentWindow.INTERNAL_RootDomElement);
+                CSHTML5.Interop.ExecuteJavaScriptFastAsync(
+$@"
+var popupRoot = document.getElementByIdSafe(""{uniquePopupRootIdentifier}"");
+{INTERNAL_InteropImplementation.GetVariableStringForJS(parentWindow.INTERNAL_RootDomElement)}.removeChild(popupRoot);");
 
                 //--------------------------------------
                 // Remove from the list of popups:

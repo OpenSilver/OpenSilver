@@ -154,23 +154,22 @@ namespace CSHTML5.Internal
 #if OPTIMIZATION_LOG
                         Console.WriteLine("[OPTIMIZATION] Calling setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
-                        CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(
-                            javascript: "setTimeout($0, 1)",
-                            runAsynchronously: false,
-                            noImpactOnPendingJSCode: true,
-                            variables: new object[]
+                        string action = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                            (Action)(() =>
                             {
-                                (Action)(() =>
-                                {
 #if OPTIMIZATION_LOG
                                     Console.WriteLine("[OPTIMIZATION] Executing setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
-                                    if (_isDispatcherPending) // We check again, because in the meantime the dispatcher can be cancelled in case of a forced execution of the pending JS code, for example when making a JavaScript execution that "returns a value".
-                                    {
-                                        ExecutePendingJavaScriptCode("SETTIMEOUT COMPLETED");
-                                    }
-                                })
-                            }
+                                if (_isDispatcherPending) // We check again, because in the meantime the dispatcher can be cancelled in case of a forced execution of the pending JS code, for example when making a JavaScript execution that "returns a value".
+                                {
+                                    ExecutePendingJavaScriptCode("SETTIMEOUT COMPLETED");
+                                }
+                            })
+                        );
+                        CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(
+                            javascript: $"setTimeout({action}, 1)",
+                            runAsynchronously: false,
+                            noImpactOnPendingJSCode: true
                         );
                     }
                 }
