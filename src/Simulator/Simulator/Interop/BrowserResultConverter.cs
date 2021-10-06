@@ -25,7 +25,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             if (!(obj is JSValue res))
                 return null;
 
-            if (res.IsNull() || res.IsUndefined())
+            if (res.IsNull())// || res.IsUndefined()) //Note: res.IsUndefined has been specifically added but for some reason, it makes the Simulator freeze in CSHTML5 so we'll remove it for now. Keeping this note here so we konw.
                 return null;
 
             if (res.IsString())
