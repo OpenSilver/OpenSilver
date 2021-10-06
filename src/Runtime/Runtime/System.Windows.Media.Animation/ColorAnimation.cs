@@ -261,11 +261,12 @@ namespace Windows.UI.Xaml.Media.Animation
 
 
                         object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
-
+                        string sNewObj = INTERNAL_InteropImplementation.GetVariableStringForJS(newObj);
                         if (AnimationHelpers.IsValueNull(from)) //todo: when using Bridge, I guess we would want to directly use "from == null" since it worked in the first place (I think).
                         {
                             if (!(cssValue is Dictionary<string, object>))
                             {
+                                string sCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
                                 foreach (string csspropertyName in cssEquivalent.Name)
                                 {
                                     //todo: check the note below once the clone will work properly (a value set through velocity is not set in c#, which makes the clone take the former value).
@@ -274,7 +275,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                     //      Therefore, we no longer go in the animation from the previous color to the new one but from no color to the new one
                                     if (csspropertyName != "background") //todo: when we will be able to use velocity for linearGradientBrush, we will need another solution here.
                                     {
-                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
+                                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewObj}[""{csspropertyName}""] = {sCssValue};");
                                     }
                                 }
                             }
@@ -289,7 +290,8 @@ namespace Windows.UI.Xaml.Media.Animation
                                     //      Therefore, we no longer go in the animation from the previous color to the new one but from no color to the new one
                                     if (csspropertyName != "background") //todo: when we will be able to use velocity for linearGradientBrush, we will need another solution here.
                                     {
-                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValueAsDictionary[csspropertyName]);
+                                        string sValue = INTERNAL_InteropImplementation.GetVariableStringForJS(cssValueAsDictionary[csspropertyName]);
+                                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewObj}[""{csspropertyName}""] = {sValue};");
                                     }
                                 }
                             }
@@ -315,7 +317,9 @@ namespace Windows.UI.Xaml.Media.Animation
                                     {
                                         currentFromCssValue = ((Dictionary<string, object>)fromCssValue)[csspropertyName];
                                     }
-                                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = [$2, $3];", newObj, csspropertyName, currentCssValue, currentFromCssValue);
+                                    string sCurrentCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(currentCssValue);
+                                    string sCurrentFromCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(currentFromCssValue);
+                                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewObj}[""{csspropertyName}""] = [{sCurrentCssValue}, {sCurrentFromCssValue}];");
                                 }
                             }
                         }
@@ -369,7 +373,8 @@ namespace Windows.UI.Xaml.Media.Animation
                                 if (cssEquivalent.DomElement != null)
                                 {
                                     cssEquivalentExists = true;
-                                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                    string sDomElement = INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
+                                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"Velocity({sDomElement}, ""stop"", ""{specificGroupName}"");");
                                 }
                             }
                         }
@@ -383,7 +388,8 @@ namespace Windows.UI.Xaml.Media.Animation
                             if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
                             {
                                 cssEquivalentExists = true;
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                                string sDomElement = INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
+                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"Velocity({sDomElement}, ""stop"", ""{specificGroupName}"");");
                             }
                         }
                     }

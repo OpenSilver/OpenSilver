@@ -186,7 +186,7 @@ namespace Windows.UI.Xaml.Shapes
                     }
 
                     // A call to "context.beginPath" is required on IE and Edge for the figures to be drawn properly (cf. ZenDesk #971):
-                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d').beginPath()", _canvasDomElement);
+                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext('2d').beginPath()");
 
                     var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
 

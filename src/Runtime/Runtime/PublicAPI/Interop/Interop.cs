@@ -83,6 +83,22 @@ namespace OpenSilver
         }
 
         /// <summary>
+        /// Execute JavaScript code without document.callScriptSafe
+        /// </summary>
+        public static void ExecuteJavaScriptFastAsync(string javascript)
+        {
+#if OPENSILVER
+            if (CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
+#elif BRIDGE
+            if (CSHTML5.Interop.IsRunningInTheSimulator)
+#endif
+                CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true);
+            else
+                INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javascript);
+        }
+        
+
+        /// <summary>
         /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
         /// </summary>
         /// <param name="value">The value to unbox.</param>
