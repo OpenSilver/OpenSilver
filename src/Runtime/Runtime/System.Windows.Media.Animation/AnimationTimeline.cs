@@ -107,12 +107,12 @@ namespace Windows.UI.Xaml.Media.Animation
 
         }
 
-        internal override void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false)
+        internal override void Stop(DependencyObject depObj, string groupName, bool revertToFormerValue = false)
         {
             if (_isInitialized)
             {
                 _cancelledAnimation = revertToFormerValue;
-                base.Stop(frameworkElement, groupName, revertToFormerValue);
+                base.Stop(depObj, groupName, revertToFormerValue);
                 StopAnimation(groupName);
                 if (revertToFormerValue)
                 {

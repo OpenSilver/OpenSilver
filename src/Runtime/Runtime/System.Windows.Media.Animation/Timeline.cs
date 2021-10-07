@@ -271,7 +271,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 Completed(this, new EventArgs());
         }
 
-        internal virtual void Stop(FrameworkElement frameworkElement, string groupName, bool revertToFormerValue = false)
+        internal virtual void Stop(DependencyObject depObj, string groupName, bool revertToFormerValue = false)
         {
             _animationTimer.Stop();
             if (_beginTimeTimer != null)
@@ -280,9 +280,9 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal void Stop(FrameworkElement frameworkElement, bool revertToFormerValue)
+        internal void Stop(DependencyObject depObj, bool revertToFormerValue)
         {
-            Stop(frameworkElement, "visualStateGroupName", revertToFormerValue: revertToFormerValue); //visualStateGroupName is the default name for a programatically started storyboard.
+            Stop(depObj, "visualStateGroupName", revertToFormerValue: revertToFormerValue); //visualStateGroupName is the default name for a programatically started storyboard.
         }
 
         /// <summary>
@@ -303,7 +303,11 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
 
-        internal void GetTargetElementAndPropertyInfo(FrameworkElement targetParent, out DependencyObject target, out PropertyPath propertyPath, bool isTargetParentTheTarget = false)
+        internal void GetTargetElementAndPropertyInfo(
+            DependencyObject targetParent, 
+            out DependencyObject target, 
+            out PropertyPath propertyPath, 
+            bool isTargetParentTheTarget = false)
         {
             propertyPath = Storyboard.GetTargetProperty(this);
 
@@ -317,13 +321,13 @@ namespace Windows.UI.Xaml.Media.Animation
                 if (targetBeforePath == null)
                 {
                     string targetName = Storyboard.GetTargetName(this);
-                    if (targetParent is Control)
+                    if (targetParent is Control control)
                     {
-                        targetBeforePath = ((Control)targetParent).GetTemplateChild(targetName);
+                        targetBeforePath = control.GetTemplateChild(targetName);
                     }
-                    else
+                    else if (targetParent is FrameworkElement fe)
                     {
-                        targetBeforePath = (DependencyObject)targetParent.FindName(targetName);
+                        targetBeforePath = (DependencyObject)fe.FindName(targetName);
                     }
                 }
             }
@@ -339,23 +343,31 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal void GetPropertyPathAndTargetBeforePath(FrameworkElement targetParent, out DependencyObject targetBeforePath, out PropertyPath propertyPath, bool isTargetParentTheTarget = false)
+        internal void GetPropertyPathAndTargetBeforePath(
+            DependencyObject targetParent, 
+            out DependencyObject targetBeforePath, 
+            out PropertyPath propertyPath, 
+            bool isTargetParentTheTarget = false)
         {
             string targetName = Storyboard.GetTargetName(this);
             propertyPath = Storyboard.GetTargetProperty(this);
-            if (!isTargetParentTheTarget && targetName != null) //If the targetName is null, the target has to be the targetParent.
+            if (!isTargetParentTheTarget && targetName != null)
             {
-                if (targetParent is Control)
+                if (targetParent is Control control)
                 {
-                    targetBeforePath = ((Control)targetParent).GetTemplateChild(targetName);
-                    if (targetBeforePath == null && targetParent.Name == targetName) //if we didn't find the target, it might be that targetParent IS the target.
+                    targetBeforePath = control.GetTemplateChild(targetName);
+                    if (targetBeforePath == null && control.Name == targetName)
                     {
                         targetBeforePath = targetParent;
                     }
                 }
+                else if (targetParent is FrameworkElement fe)
+                {
+                    targetBeforePath = (DependencyObject)fe.FindName(targetName);
+                }
                 else
                 {
-                    targetBeforePath = (DependencyObject)targetParent.FindName(targetName);
+                    targetBeforePath = null;
                 }
             }
             else
@@ -564,9 +576,9 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
                 else
                 {
-                    if (this is Storyboard)
+                    if (this is Storyboard storyboard)
                     {
-                        ((Storyboard)this).Stop(parameters.Target);
+                        storyboard.Stop();
                     }
                     else
                     {

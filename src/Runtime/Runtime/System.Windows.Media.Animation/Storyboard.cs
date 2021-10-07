@@ -371,7 +371,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public void Stop(FrameworkElement frameworkElement)
         {
-            ((Timeline)this).Stop(frameworkElement, revertToFormerValue: true);
+            Stop(frameworkElement, revertToFormerValue: true);
             foreach (Timeline timeLine in _children)
             {
                 timeLine.Stop(frameworkElement, revertToFormerValue: true);
@@ -436,17 +436,14 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 foreach (Timeline timeLine in _children)
                 {
-                    DependencyObject target = Storyboard.GetTarget(timeLine);
-                    if (target is FrameworkElement)
-                    {
-                        parameters.Target = (FrameworkElement)target;
-                        timeLine.Completed -= timeLine_Completed;
-                        timeLine.Completed += timeLine_Completed;
-                        parameters.VisualStateGroupName = "visualStateGroupName";
-                        parameters.IsTargetParentTheTarget = false;
-                        bool isTimelineSingleLoop = timeLine.RepeatBehavior.HasCount && timeLine.RepeatBehavior.Count == 1;
-                        timeLine.StartFirstIteration(parameters, isTimelineSingleLoop, BeginTime);
-                    }
+                    DependencyObject target = GetTarget(timeLine);
+                    parameters.Target = target;
+                    timeLine.Completed -= timeLine_Completed;
+                    timeLine.Completed += timeLine_Completed;
+                    parameters.VisualStateGroupName = "visualStateGroupName";
+                    parameters.IsTargetParentTheTarget = false;
+                    bool isTimelineSingleLoop = timeLine.RepeatBehavior.HasCount && timeLine.RepeatBehavior.Count == 1;
+                    timeLine.StartFirstIteration(parameters, isTimelineSingleLoop, BeginTime);
                 }
             }
         }
@@ -490,7 +487,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     internal partial class IterationParameters
     {
-        internal FrameworkElement Target;
+        internal DependencyObject Target;
         internal Guid Guid;
         internal bool UseTransitions;
         internal string VisualStateGroupName;
