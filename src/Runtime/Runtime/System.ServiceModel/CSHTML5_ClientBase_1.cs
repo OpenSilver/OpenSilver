@@ -1155,7 +1155,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
 
                 if (serviceContractAttr != null)
                 {
-                    if (!string.IsNullOrEmpty(serviceContractAttr.Namespace) &&
+                    if (serviceContractAttr.Namespace != null &&
                         serviceContractAttr.Namespace != "http://tempuri.org") // default value if namespace is not set explicitly.
                     {
                         interfaceTypeNamespace = serviceContractAttr.Namespace;
