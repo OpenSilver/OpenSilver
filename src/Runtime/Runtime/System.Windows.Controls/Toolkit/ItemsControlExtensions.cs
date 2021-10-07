@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,15 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Media;
+using System.Windows.Controls.Primitives;
+#else
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Controls.Primitives;
 #endif
@@ -39,17 +36,17 @@ namespace Windows.UI.Xaml.Controls
     /// <QualityBand>Experimental</QualityBand>
     public static partial class ItemsControlExtensions
     {
-        ///// <summary>
-        ///// Gets the Panel that contains the containers of an ItemsControl.
-        ///// </summary>
-        ///// <param name="control">The ItemsControl.</param>
-        ///// <returns>
-        ///// The Panel that contains the containers of an ItemsControl, or null
-        ///// if the Panel could not be found.
-        ///// </returns>
-        ///// <exception cref="T:System.ArgumentNullException">
-        ///// <paramref name="control" /> is null.
-        ///// </exception>
+        /// <summary>
+        /// Gets the Panel that contains the containers of an ItemsControl.
+        /// </summary>
+        /// <param name="control">The ItemsControl.</param>
+        /// <returns>
+        /// The Panel that contains the containers of an ItemsControl, or null
+        /// if the Panel could not be found.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="control" /> is null.
+        /// </exception>
         public static Panel GetItemsHost(this ItemsControl control)
         {
             if (control == null)
@@ -77,18 +74,18 @@ namespace Windows.UI.Xaml.Controls
             return null;
         }
 
-        ///// <summary>
-        ///// Gets the ScrollViewer that contains the containers of an
-        ///// ItemsControl.
-        ///// </summary>
-        ///// <param name="control">The ItemsControl.</param>
-        ///// <returns>
-        ///// The ScrollViewer that contains the containers of an ItemsControl, or
-        ///// null if a ScrollViewer could not be found.
-        ///// </returns>
-        ///// <exception cref="T:System.ArgumentNullException">
-        ///// <paramref name="control" /> is null.
-        ///// </exception>
+        /// <summary>
+        /// Gets the ScrollViewer that contains the containers of an
+        /// ItemsControl.
+        /// </summary>
+        /// <param name="control">The ItemsControl.</param>
+        /// <returns>
+        /// The ScrollViewer that contains the containers of an ItemsControl, or
+        /// null if a ScrollViewer could not be found.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="control" /> is null.
+        /// </exception>
         public static ScrollViewer GetScrollHost(this ItemsControl control)
         {
             if (control == null)
