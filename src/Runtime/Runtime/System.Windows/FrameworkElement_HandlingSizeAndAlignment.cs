@@ -347,6 +347,8 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
+            if (fe.IsUnderCustomLayout)
+                return;
 
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
                 && fe.Visibility != Visibility.Collapsed)

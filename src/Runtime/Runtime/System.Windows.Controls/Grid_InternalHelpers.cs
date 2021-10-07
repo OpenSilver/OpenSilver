@@ -431,6 +431,9 @@ namespace Windows.UI.Xaml.Controls
 
         internal static void RefreshAllRowsHeight_CSSVersion(Grid grid, List<ColumnDefinition> normalizedColumnDefinitions = null, List<RowDefinition> normalizedRowDefinitions = null)
         {
+            if (grid.IsUnderCustomLayout)
+                return;
+
             //Note: when arriving here, we have already checked that the Grid is in the Visual Tree.
 
             // Create a string that defines the columns:
@@ -728,6 +731,9 @@ namespace Windows.UI.Xaml.Controls
 
         internal static void RefreshAllColumnsWidth_CSSVersion(Grid grid, List<ColumnDefinition> normalizedColumnDefinitions = null, List<RowDefinition> normalizedRowDefinitions = null)
         {
+            if (grid.IsUnderCustomLayout)
+                return;
+
             //Note: when arriving here, we have already checked that the Grid is in the Visual Tree.
 
             // Create a string that defines the columns:

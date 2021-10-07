@@ -327,16 +327,7 @@ else
             {
                 // Note: this is intended to be called by the simulator only:
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElement).UniqueIdentifier;
-                string javaScriptCodeToExecute = $@"
-var element = document.getElementByIdSafe(""{ uniqueIdentifier}"");
-if (element)
-{{
-    element.innerText = ""{EscapeStringForUseInJavaScript(content)}"";
-    if ({removeTextWrapping.ToString().ToLower()})
-    {{
-        element.style.whiteSpace = ""nowrap"";
-    }}
-}}";
+                string javaScriptCodeToExecute = $@"document.setContentString(""{ uniqueIdentifier}"",""{EscapeStringForUseInJavaScript(content)}"",{removeTextWrapping.ToString().ToLower()})";
                 INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
             }
 
@@ -656,14 +647,22 @@ element.remove({1});
             else
             {
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
-                string settingProperties = string.Empty;
+                string javaScriptCodeToExecute;
                 var value = ConvertToStringToUseInJavaScriptCode(attributeValue);
-                foreach (string propertyName in propertyCSSNames)
+                if (propertyCSSNames.Count == 1)
                 {
-                    settingProperties += $"element.style.{propertyName} = {value};";
+                    javaScriptCodeToExecute = $@"document.setDomStyle(""{uniqueIdentifier}"", ""{propertyCSSNames[0]}"", {value})";
                 }
-                string javaScriptCodeToExecute =
-                    $@"var element = document.getElementByIdSafe(""{uniqueIdentifier}"");if (element) {{ {settingProperties} }};";
+                else
+                {
+                    string settingProperties = string.Empty;
+                    foreach (string propertyName in propertyCSSNames)
+                    {
+                        settingProperties += $"element.style.{propertyName} = {value};";
+                    }
+                    javaScriptCodeToExecute =
+                        $@"var element = document.getElementById(""{uniqueIdentifier}"");if (element) {{ {settingProperties} }};";
+                }
 
                 if (forceSimulatorExecuteImmediately)
                     ExecuteJavaScript(javaScriptCodeToExecute);
@@ -1304,19 +1303,12 @@ parentElement.appendChild(child);";
 #if OPENSILVER
         internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
         {
-            string position = bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "";
-            string margin = bSetZeroMargin ? "element.style.margin=\"0\";" : "";
-            string padding = bSetZeroPadding ? "element.style.padding=\"0\";" : "";
-            string javaScriptCodeToExecute = $@"
-var element = document.getElementByIdSafe(""{style.Uid}"");
-if (element)
-{{
-element.style.left = ""{visualBounds.Left.ToString(CultureInfo.InvariantCulture)}px"";
-element.style.top = ""{visualBounds.Top.ToString(CultureInfo.InvariantCulture)}px"";
-element.style.width = ""{visualBounds.Width.ToString(CultureInfo.InvariantCulture)}px"";
-element.style.height = ""{visualBounds.Height.ToString(CultureInfo.InvariantCulture)}px"";
-{position}{margin}{padding}
-}}";
+            string left = $"{visualBounds.Left.ToInvariantString("0.##")}";
+            string top = $"{visualBounds.Top.ToInvariantString("0.##")}";
+            string width = $"{visualBounds.Width.ToInvariantString("0.##")}";
+            string height = $"{visualBounds.Height.ToInvariantString("0.##")}";
+
+            string javaScriptCodeToExecute = $@"document.setVisualBounds(""{style.Uid}"",{left},{top},{width},{height},{(bSetPositionAbsolute ? "1": "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
@@ -1345,17 +1337,10 @@ element.style.height = ""{visualBounds.Height.ToString(CultureInfo.InvariantCult
 #if OPENSILVER
         internal static void SetPosition(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
         {
-            string position = bSetPositionAbsolute ? "element.style.position=\"absolute\";" : "";
-            string margin = bSetZeroMargin ? "element.style.margin=\"0\";" : "";
-            string padding = bSetZeroPadding ? "element.style.padding=\"0\";" : "";
-            string javaScriptCodeToExecute = $@"
-var element = document.getElementByIdSafe(""{style.Uid}"");
-if (element)
-{{
-element.style.left = ""{visualBounds.Left.ToString(CultureInfo.InvariantCulture)}px"";
-element.style.top = ""{visualBounds.Top.ToString(CultureInfo.InvariantCulture)}px"";
-{position}{margin}{padding}
-}}";
+            string left = $"{visualBounds.Left.ToInvariantString("0.##")}";
+            string top = $"{visualBounds.Top.ToInvariantString("0.##")}";
+
+            string javaScriptCodeToExecute = $@"document.setPosition(""{style.Uid}"",{left},{top},{(bSetPositionAbsolute ? "1" : "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
