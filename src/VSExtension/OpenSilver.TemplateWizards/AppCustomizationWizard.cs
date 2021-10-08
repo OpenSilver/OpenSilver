@@ -83,13 +83,13 @@ namespace OpenSilver.TemplateWizards
                         break;
                     case BlazorVersion.Net6:
                         replacementsDictionary.Add("$blazortargetframework$", "net6.0");
-                        replacementsDictionary.Add("$blazorpackagesversion$", "6.0.0-preview.7.*");
+                        replacementsDictionary.Add("$blazorpackagesversion$", "6.0.0-rc.1.*");
                         break;
                 }
             }
 
 
-            replacementsDictionary.Add("$opensilverpackageversion$", "1.0.0-beta.1.22");
+            replacementsDictionary.Add("$opensilverpackageversion$", "1.0.0");
         }
 
         public bool ShouldAddProjectItem(string filePath)
