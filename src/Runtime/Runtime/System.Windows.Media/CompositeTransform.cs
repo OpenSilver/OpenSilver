@@ -50,7 +50,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(ScaleX), 
                 typeof(double), 
                 typeof(CompositeTransform), 
-                new PropertyMetadata(1d)
+                new PropertyMetadata(1d, OnScaleXChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -74,6 +74,11 @@ namespace Windows.UI.Xaml.Media
                     }
                 });
 
+        private static void OnScaleXChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((CompositeTransform)d).RaiseTransformChanged();
+        }
+
         /// <summary>
         /// Gets or sets the y-axis scale factor. You can use this property to stretch
         /// or shrink an object vertically. The default is 1.
@@ -92,7 +97,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(ScaleY), 
                 typeof(double), 
                 typeof(CompositeTransform), 
-                new PropertyMetadata(1d)
+                new PropertyMetadata(1d, OnScaleYChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -116,6 +121,11 @@ namespace Windows.UI.Xaml.Media
                     }
                 });
 
+        private static void OnScaleYChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((CompositeTransform)d).RaiseTransformChanged();
+        }
+
         /// <summary>
         /// Gets or sets the x-axis skew angle, which is measured in degrees counterclockwise
         /// from the y-axis. A skew transform can be useful for creating the illusion
@@ -135,7 +145,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(SkewX), 
                 typeof(double), 
                 typeof(CompositeTransform), 
-                new PropertyMetadata(0d)
+                new PropertyMetadata(0d, OnSkewXChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -159,6 +169,11 @@ namespace Windows.UI.Xaml.Media
                     }
                 });
 
+        private static void OnSkewXChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((CompositeTransform)d).RaiseTransformChanged();
+        }
+
         /// <summary>
         /// Gets or sets the y-axis skew angle, which is measured in degrees counterclockwise
         /// from the x-axis. A skew transform can be useful for creating the illusion
@@ -178,7 +193,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(SkewY), 
                 typeof(double), 
                 typeof(CompositeTransform), 
-                new PropertyMetadata(0d)
+                new PropertyMetadata(0d, OnSkewYChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -202,6 +217,11 @@ namespace Windows.UI.Xaml.Media
                     }
                 });
 
+        private static void OnSkewYChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((CompositeTransform)d).RaiseTransformChanged();
+        }
+
         /// <summary>
         /// Gets or sets the angle, in degrees, of clockwise rotation. The default is 0.
         /// </summary>
@@ -210,6 +230,7 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(RotationProperty); }
             set { SetValue(RotationProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Rotation dependency property.
         /// </summary>
@@ -218,7 +239,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(Rotation), 
                 typeof(double), 
                 typeof(CompositeTransform), 
-                new PropertyMetadata(0d)
+                new PropertyMetadata(0d, OnRotationChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -242,6 +263,11 @@ namespace Windows.UI.Xaml.Media
                     }
                 });
 
+        private static void OnRotationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((CompositeTransform)d).RaiseTransformChanged();
+        }
+
         /// <summary>
         /// Gets or sets the distance to translate along the x-axis.
         /// </summary>
@@ -259,7 +285,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(TranslateX), 
                 typeof(double), 
                 typeof(CompositeTransform), 
-                new PropertyMetadata(0d)
+                new PropertyMetadata(0d, OnTranslateXChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -283,6 +309,11 @@ namespace Windows.UI.Xaml.Media
                     }
                 });
 
+        private static void OnTranslateXChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((CompositeTransform)d).RaiseTransformChanged();
+        }
+
         /// <summary>
         /// Gets or sets the distance to translate (move) an object along the y-axis. The default is 0.
         /// </summary>
@@ -291,6 +322,7 @@ namespace Windows.UI.Xaml.Media
             get { return (double)GetValue(TranslateYProperty); }
             set { SetValue(TranslateYProperty, value); }
         }
+
         /// <summary>
         /// Identifies the TranslateY dependency property
         /// </summary>
@@ -299,7 +331,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(TranslateY), 
                 typeof(double), 
                 typeof(CompositeTransform), 
-                new PropertyMetadata(0d)
+                new PropertyMetadata(0d, OnTranslateYChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -322,6 +354,11 @@ namespace Windows.UI.Xaml.Media
                         return null;
                     }
                 });
+
+        private static void OnTranslateYChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((CompositeTransform)d).RaiseTransformChanged();
+        }
 
         private void ApplyCSSChanges(double scaleX, double scaleY, double skewX, double skewY, double rotation, double translateX, double translateY)
         {

@@ -67,7 +67,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(Matrix),
                 typeof(Matrix),
                 typeof(MatrixTransform),
-                new PropertyMetadata(Matrix.Identity)
+                new PropertyMetadata(Matrix.Identity, OnMatrixChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -93,6 +93,11 @@ namespace Windows.UI.Xaml.Media
                         return null;
                     }
                 });
+
+        private static void OnMatrixChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((MatrixTransform)d).RaiseTransformChanged();
+        }
 
         internal override Matrix ValueInternal => this.Matrix;
 

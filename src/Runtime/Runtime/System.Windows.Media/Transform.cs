@@ -98,5 +98,12 @@ namespace Windows.UI.Xaml.Media
         // Must be implemented by the concrete class:
         internal abstract void INTERNAL_ApplyTransform();
         internal abstract void INTERNAL_UnapplyTransform();
+
+        internal event EventHandler Changed;
+
+        internal void RaiseTransformChanged()
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

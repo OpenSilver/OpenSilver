@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml.Media
                 nameof(Angle), 
                 typeof(double), 
                 typeof(RotateTransform), 
-                new PropertyMetadata(0d)
+                new PropertyMetadata(0d, OnAngleChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -76,6 +76,11 @@ namespace Windows.UI.Xaml.Media
                         return null;
                     }
                 });
+
+        private static void OnAngleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((RotateTransform)d).RaiseTransformChanged();
+        }
 
         private void ApplyCSSChanges(double angle)
         {

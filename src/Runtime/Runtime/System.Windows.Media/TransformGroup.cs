@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,11 @@
 *  
 \*====================================================================================*/
 
-
+using System;
 using System.Windows.Markup;
-using CSHTML5.Internal;
 using System.Collections.Generic;
 using System.Globalization;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.Foundation;
-#endif
-
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -43,6 +35,7 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public TransformGroup()
         {
+            Changed += (o, e) => INTERNAL_ApplyTransform();
         }
 
         /// <summary>
@@ -75,7 +68,17 @@ namespace Windows.UI.Xaml.Media
                 nameof(Children), 
                 typeof(TransformCollection), 
                 typeof(TransformGroup), 
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(null, OnChildrenChanged));
+
+        private static void OnChildrenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TransformGroup transformGroup = (TransformGroup)d;
+            TransformCollection oldValue = (TransformCollection)e.OldValue;
+            TransformCollection newValue = (TransformCollection)e.NewValue;
+            
+            oldValue?.SetParentTransform(null);
+            newValue?.SetParentTransform(transformGroup);
+        }
 
         internal override Matrix ValueInternal
         {
