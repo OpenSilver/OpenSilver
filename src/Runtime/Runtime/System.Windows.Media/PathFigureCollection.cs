@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,13 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml.Shapes;
-#else
+
+#if MIGRATION
 using System.Windows.Shapes;
+#else
+using Windows.UI.Xaml.Shapes;
 #endif
 
 #if MIGRATION
@@ -37,85 +32,49 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class PathFigureCollection : PresentationFrameworkCollection<PathFigure>
     {
-        #region Data
-
         private Path _parentPath;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance that is empty.
         /// </summary>
-        public PathFigureCollection()
+        public PathFigureCollection() : base(false)
         {
-
         }
 
         /// <summary>
         /// Initializes a new instance that is empty and has the specified initial capacity.
         /// </summary>
         /// <param name="capacity">int - The number of elements that the new list is initially capable of storing.</param>
-        public PathFigureCollection(int capacity) : base(capacity)
+        public PathFigureCollection(int capacity) : base(capacity, false)
         {
-
         }
 
         /// <summary>
         /// Creates a PathFigureCollection with all of the same elements as collection
         /// </summary>
-        public PathFigureCollection(IEnumerable<PathFigure> figures) : base(figures)
+        public PathFigureCollection(IEnumerable<PathFigure> figures) : base(figures, false)
         {
-
         }
-
-        #endregion
-
-        #region Overriden Methods
 
         internal override void AddOverride(PathFigure figure)
         {
-            if (figure == null)
-            {
-                throw new ArgumentNullException("figure");
-            }
             figure.SetParentPath(this._parentPath);
             this.AddDependencyObjectInternal(figure);
-            this.NotifyCollectionChanged();
-        }
-
-        internal override bool RemoveOverride(PathFigure figure)
-        {
-            if (this.RemoveDependencyObjectInternal(figure))
-            {
-                figure.SetParentPath(null);
-                this.NotifyCollectionChanged();
-                return true;
-            }
-            return false;
+            this.NotifyParent();
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            if (index < 0 || index >= this.CountInternal)
-            {
-                throw new ArgumentOutOfRangeException("index");
-            }
             this.GetItemInternal(index).SetParentPath(null);
             this.RemoveAtDependencyObjectInternal(index);
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
 
         internal override void InsertOverride(int index, PathFigure figure)
         {
-            if (figure == null)
-            {
-                throw new ArgumentNullException("figure");
-            }
             figure.SetParentPath(this._parentPath);
             this.InsertDependencyObjectInternal(index, figure);
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
 
         internal override void ClearOverride()
@@ -124,8 +83,9 @@ namespace Windows.UI.Xaml.Media
             {
                 figure.SetParentPath(null);
             }
+
             this.ClearDependencyObjectInternal();
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
 
         internal override PathFigure GetItemOverride(int index)
@@ -139,12 +99,8 @@ namespace Windows.UI.Xaml.Media
             oldItem.SetParentPath(null);
             figure.SetParentPath(this._parentPath);
             this.SetItemDependencyObjectInternal(index, figure);
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
-
-        #endregion
-
-        #region Internal Methods
 
         internal void SetParentPath(Path path)
         {
@@ -158,14 +114,12 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        private void NotifyCollectionChanged()
+        private void NotifyParent()
         {
             if (this._parentPath != null)
             {
                 this._parentPath.ScheduleRedraw();
             }
         }
-
-        #endregion
     }
 }

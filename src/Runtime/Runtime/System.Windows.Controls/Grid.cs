@@ -117,7 +117,7 @@ namespace Windows.UI.Xaml.Controls
                 if (_columnDefinitionsOrNull == null)
                 {
                     _columnDefinitionsOrNull = new ColumnDefinitionCollection(this);
-                    _columnDefinitionsOrNull.CollectionChangedInternal += ColumnDefinitions_CollectionChanged;
+                    _columnDefinitionsOrNull.CollectionChanged += ColumnDefinitions_CollectionChanged;
                 }
                 return _columnDefinitionsOrNull;
             }
@@ -158,7 +158,7 @@ namespace Windows.UI.Xaml.Controls
                 if (_rowDefinitionsOrNull == null)
                 {
                     _rowDefinitionsOrNull = new RowDefinitionCollection(this);
-                    _rowDefinitionsOrNull.CollectionChangedInternal += RowDefinitions_CollectionChanged;
+                    _rowDefinitionsOrNull.CollectionChanged += RowDefinitions_CollectionChanged;
                 }
                 return _rowDefinitionsOrNull;
             }

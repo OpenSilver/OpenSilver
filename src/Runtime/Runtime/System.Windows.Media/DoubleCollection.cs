@@ -26,7 +26,9 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
-        public DoubleCollection() { }
+        public DoubleCollection() : base(false) 
+        { 
+        }
 
         public static DoubleCollection Parse(string source)
         {
@@ -65,11 +67,6 @@ namespace Windows.UI.Xaml.Media
         internal override void RemoveAtOverride(int index)
         {
             this.RemoveAtInternal(index);
-        }
-
-        internal override bool RemoveOverride(double value)
-        {
-            return this.RemoveInternal(value);
         }
 
         internal override double GetItemOverride(int index)

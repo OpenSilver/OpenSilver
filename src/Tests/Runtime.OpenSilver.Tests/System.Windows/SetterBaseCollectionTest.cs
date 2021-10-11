@@ -71,13 +71,6 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void SetterBaseCollection_Remove_Null()
-        {
-            var sbc = new SetterBaseCollection();
-            Assert.ThrowsException<ArgumentNullException>(() => sbc.Remove(null));
-        }
-
-        [TestMethod]
         public void SetterBaseCollection_Set_Item_Null()
         {
             var sbc = new SetterBaseCollection();

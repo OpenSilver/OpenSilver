@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using System;
 using System.Collections;
@@ -134,21 +132,17 @@ namespace Windows.UI.Xaml
 
     internal class VisualStatesCollection : PresentationFrameworkCollection<VisualState>
     {
-        private readonly VisualStateGroup group;
+        private readonly VisualStateGroup _group;
 
-        internal VisualStatesCollection(VisualStateGroup group)
+        internal VisualStatesCollection(VisualStateGroup group) : base(false)
         {
             Debug.Assert(group != null, "group should not be null !"); 
-            this.group = group;
+            this._group = group;
         }
 
         internal override void AddOverride(VisualState value)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException("value");
-            }
-            value.INTERNAL_Group = this.group;
+            value.INTERNAL_Group = this._group;
             this.AddDependencyObjectInternal(value);
         }
 
@@ -158,6 +152,7 @@ namespace Windows.UI.Xaml
             {
                 state.INTERNAL_Group = null;
             }
+
             this.ClearDependencyObjectInternal();
         }
 
@@ -168,48 +163,18 @@ namespace Windows.UI.Xaml
 
         internal override void InsertOverride(int index, VisualState value)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException("value");
-            }
-            value.INTERNAL_Group = this.group;
+            value.INTERNAL_Group = this._group;
             this.InsertDependencyObjectInternal(index, value);
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            if (index < 0 || index >= this.CountInternal)
-            {
-                throw new ArgumentOutOfRangeException("index");
-            }
             this.GetItemInternal(index).INTERNAL_Group = null;
             this.RemoveAtDependencyObjectInternal(index);
         }
 
-        internal override bool RemoveOverride(VisualState value)
-        {
-            int index = this.IndexOf(value);
-            if (index > -1)
-            {
-                value.INTERNAL_Group = null;
-                this.RemoveAtDependencyObjectInternal(index);
-                return true;
-            }
-            return false;
-        }
-
         internal override void SetItemOverride(int index, VisualState value)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException("value");
-            }
-
-            if (index < 0 || index >= this.CountInternal - 1)
-            {
-                throw new ArgumentOutOfRangeException("index");
-            }
-
             this.GetItemInternal(index).INTERNAL_Group = null;
             this.SetItemDependencyObjectInternal(index, value);
         }

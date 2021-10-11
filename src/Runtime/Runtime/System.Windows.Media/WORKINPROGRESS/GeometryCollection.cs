@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,13 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-#if MIGRATION
-using System.Windows.Media.Animation;
-#else
-using Windows.UI.Xaml.Media.Animation;
-#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -30,6 +22,10 @@ namespace Windows.UI.Xaml.Media
     [OpenSilver.NotImplemented]
     public sealed partial class GeometryCollection : PresentationFrameworkCollection<Geometry>
     {
+        public GeometryCollection() : base(false)
+        {
+        }
+
         internal override void AddOverride(Geometry value)
         {
             this.AddDependencyObjectInternal(value);
@@ -48,11 +44,6 @@ namespace Windows.UI.Xaml.Media
         internal override void RemoveAtOverride(int index)
         {
             this.RemoveAtDependencyObjectInternal(index);
-        }
-
-        internal override bool RemoveOverride(Geometry value)
-        {
-            return this.RemoveDependencyObjectInternal(value);
         }
 
         internal override Geometry GetItemOverride(int index)

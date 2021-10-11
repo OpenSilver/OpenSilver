@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,6 +21,10 @@ namespace Windows.UI.Xaml.Media
 {
     public sealed partial class TransformCollection : PresentationFrameworkCollection<Transform>
     {
+        public TransformCollection() : base(false)
+        {
+        }
+
         internal override void AddOverride(Transform value)
         {
             this.AddDependencyObjectInternal(value);
@@ -45,11 +43,6 @@ namespace Windows.UI.Xaml.Media
         internal override void RemoveAtOverride(int index)
         {
             this.RemoveAtDependencyObjectInternal(index);
-        }
-
-        internal override bool RemoveOverride(Transform value)
-        {
-            return this.RemoveDependencyObjectInternal(value);
         }
 
         internal override Transform GetItemOverride(int index)

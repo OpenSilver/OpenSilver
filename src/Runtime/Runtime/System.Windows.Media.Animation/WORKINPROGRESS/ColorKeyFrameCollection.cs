@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -22,10 +19,17 @@ namespace System.Windows.Media.Animation
 namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
-    /// <summary>Represents a collection of <see cref="T:System.Windows.Media.Animation.ColorKeyFrame" /> objects that can be individually accessed by index. </summary>
+    /// <summary>
+    /// Represents a collection of <see cref="ColorKeyFrame" /> objects 
+    /// that can be individually accessed by index. 
+    /// </summary>
     [OpenSilver.NotImplemented]
     public sealed partial class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
     {
+        public ColorKeyFrameCollection() : base(false)
+        {
+        }
+
         internal override void AddOverride(ColorKeyFrame keyFrame)
         {
             this.AddDependencyObjectInternal(keyFrame);
@@ -44,11 +48,6 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override void RemoveAtOverride(int index)
         {
             this.RemoveAtDependencyObjectInternal(index);
-        }
-
-        internal override bool RemoveOverride(ColorKeyFrame keyFrame)
-        {
-            return this.RemoveDependencyObjectInternal(keyFrame);
         }
 
         internal override ColorKeyFrame GetItemOverride(int index)

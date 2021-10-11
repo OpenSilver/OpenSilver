@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Shapes;
 #else
@@ -38,91 +32,57 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public sealed partial class PathSegmentCollection : PresentationFrameworkCollection<PathSegment>
     {
-        #region Data
-
         private Path _parentPath;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance that is empty.
         /// </summary>
-        public PathSegmentCollection()
+        public PathSegmentCollection() : base(false)
         {
-
         }
 
         /// <summary>
         /// Initializes a new instance that is empty and has the specified initial capacity.
         /// </summary>
         /// <param name="capacity"> int - The number of elements that the new list is initially capable of storing. </param>
-        public PathSegmentCollection(int capacity) : base(capacity)
+        public PathSegmentCollection(int capacity) : base(capacity, false)
         {
-
         }
 
         /// <summary>
         /// Creates a PathSegmentCollection with all of the same elements as collection
         /// </summary>
-        public PathSegmentCollection(IEnumerable<PathSegment> segments) : base(segments)
+        public PathSegmentCollection(IEnumerable<PathSegment> segments) : base(segments, false)
         {
-
         }
-
-        #endregion
-
-        #region Overriden Methods
 
         internal override void AddOverride(PathSegment segment)
         {
-            if (segment == null)
-            {
-                throw new ArgumentNullException("value");
-            }
             if (this._parentPath != null)
             {
                 segment.SetParentPath(this._parentPath);
             }
-            this.AddDependencyObjectInternal(segment);
-            this.NotifyCollectionChanged();
-        }
 
-        internal override bool RemoveOverride(PathSegment segment)
-        {
-            if (this.RemoveDependencyObjectInternal(segment))
-            {
-                segment.SetParentPath(null);
-                this.NotifyCollectionChanged();
-                return true;
-            }
-            return false;
+            this.AddDependencyObjectInternal(segment);
+            this.NotifyParent();
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            if (index < 0 || index >= this.Count)
-            {
-                throw new ArgumentOutOfRangeException("index");
-            }
             this.GetItemInternal(index).SetParentPath(null);
             this.RemoveAtDependencyObjectInternal(index);
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
 
         internal override void InsertOverride(int index, PathSegment segment)
         {
-            if (segment == null)
-            {
-                throw new ArgumentNullException("value");
-            }
             if (this._parentPath != null)
             {
                 segment.SetParentPath(this._parentPath);
             }
+
             this.InsertDependencyObjectInternal(index, segment);
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
 
         internal override void ClearOverride()
@@ -131,8 +91,9 @@ namespace Windows.UI.Xaml.Media
             {
                 segment.SetParentPath(null);
             }
+
             this.ClearDependencyObjectInternal();
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
 
         internal override PathSegment GetItemOverride(int index)
@@ -148,13 +109,10 @@ namespace Windows.UI.Xaml.Media
                 oldItem.SetParentPath(null);
                 segment.SetParentPath(this._parentPath);
             }
+
             this.SetItemDependencyObjectInternal(index, segment);
-            this.NotifyCollectionChanged();
+            this.NotifyParent();
         }
-
-        #endregion
-
-        #region Internal Methods
 
         internal void SetParentPath(Path path)
         {
@@ -168,48 +126,12 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        private void NotifyCollectionChanged()
+        private void NotifyParent()
         {
             if (this._parentPath != null)
             {
                 this._parentPath.ScheduleRedraw();
             }
         }
-
-        #endregion
     }
-
-#if no
-    /// <summary>
-    /// Represents a collection of PathSegment objects that can be individually accessed
-    /// by index.
-    /// </summary>
-    public sealed partial class PathSegmentCollection : List<PathSegment>// IList<PathSegment>, IEnumerable<PathSegment>
-    {
-        /// <summary>
-        /// Initializes a new instance of the PathSegmentCollection class.
-        /// </summary>
-        public PathSegmentCollection()
-        {
-
-        }
-
-        /// <summary>
-        /// Initializes a new instance that is empty and has the specified initial capacity.
-        /// </summary>
-        /// <param name="capacity"> int - The number of elements that the new list is initially capable of storing. </param>
-        public PathSegmentCollection(int capacity) : base(capacity)
-        {
-
-        }
-
-        internal void SetParentPath(Path path)
-        {
-            foreach (PathSegment segment in this)
-            {
-                segment.SetParentPath(path);
-            }
-        }
-    }
-#endif
 }
