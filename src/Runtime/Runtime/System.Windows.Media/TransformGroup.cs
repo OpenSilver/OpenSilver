@@ -31,13 +31,27 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    /// <summary>
+    /// Represents a composite <see cref="Transform"/> composed of other <see cref="Transform"/>
+    /// objects.
+    /// </summary>
     [ContentProperty(nameof(Children))]
     public sealed partial class TransformGroup : Transform
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransformGroup"/> class.
+        /// </summary>
         public TransformGroup()
         {
         }
-        
+
+        /// <summary>
+        /// Gets or sets the collection of child <see cref="Transform"/> objects.
+        /// </summary>
+        /// <returns>
+        /// The collection of child <see cref="Transform"/> objects. The default is
+        /// an empty collection.
+        /// </returns>
         public TransformCollection Children
         {
             get
@@ -53,6 +67,9 @@ namespace Windows.UI.Xaml.Media
             set { SetValue(ChildrenProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="Children"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty ChildrenProperty =
             DependencyProperty.Register(
                 nameof(Children), 
@@ -60,7 +77,7 @@ namespace Windows.UI.Xaml.Media
                 typeof(TransformGroup), 
                 new PropertyMetadata((object)null));
 
-        internal override Matrix Value
+        internal override Matrix ValueInternal
         {
             get
             {
@@ -70,11 +87,11 @@ namespace Windows.UI.Xaml.Media
                     return new Matrix();
                 }
 
-                Matrix transform = children[0].Value;
+                Matrix transform = children[0].ValueInternal;
 
                 for (int i = 1; i < children.Count; i++)
                 {
-                    transform = Matrix.Multiply(transform, children[i].Value);
+                    transform = Matrix.Multiply(transform, children[i].ValueInternal);
                 }
 
                 return transform;
@@ -99,7 +116,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (this.INTERNAL_parent != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this.INTERNAL_parent))
             {
-                ApplyCSSChanges(this.Value);
+                ApplyCSSChanges(this.ValueInternal);
             }
         }
 

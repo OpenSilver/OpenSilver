@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
         ///<summary>
         /// Return the current transformation value.
         ///</summary>
-        internal abstract Matrix Value { get; }
+        internal abstract Matrix ValueInternal { get; }
 
         /// <summary>
         /// Attempts to transform the specified point and returns a value that indicates
@@ -50,14 +50,14 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public override bool TryTransform(Point inPoint, out Point outPoint)
         {
-            Matrix m = this.Value;
+            Matrix m = ValueInternal;
             outPoint = m.Transform(inPoint);
             return true;
         }
 
         public override Rect TransformBounds(Rect rect)
         {
-            Matrix matrix = Value;
+            Matrix matrix = ValueInternal;
             MatrixUtil.TransformRect(ref rect, ref matrix);
             return rect;
         }
@@ -72,7 +72,7 @@ namespace Windows.UI.Xaml.Media
         {
             get
             {
-                Matrix matrix = Value;
+                Matrix matrix = ValueInternal;
                 if (!matrix.HasInverse)
                 {
                     return null;

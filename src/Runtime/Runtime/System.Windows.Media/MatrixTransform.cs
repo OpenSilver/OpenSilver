@@ -94,7 +94,7 @@ namespace Windows.UI.Xaml.Media
                     }
                 });
 
-        internal override Matrix Value => this.Matrix;
+        internal override Matrix ValueInternal => this.Matrix;
 
         private void ApplyCSSChanges(Matrix matrix)
         {

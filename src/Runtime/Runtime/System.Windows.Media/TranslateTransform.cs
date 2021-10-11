@@ -168,7 +168,7 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
-        internal override Matrix Value
+        internal override Matrix ValueInternal
         {
             get
             {

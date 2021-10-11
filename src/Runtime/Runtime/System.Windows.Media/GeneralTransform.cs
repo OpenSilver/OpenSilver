@@ -68,6 +68,7 @@ namespace Windows.UI.Xaml.Media
             {
                 throw new InvalidOperationException("Could not transform");
             }
+
             return transformedPoint;
         }
 
