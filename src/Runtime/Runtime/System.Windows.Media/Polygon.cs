@@ -108,7 +108,7 @@ namespace Windows.UI.Xaml.Shapes
 		{
 			return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
 		}
-
+		
 		override internal protected void Redraw()
 		{
 			if (Points.Count < 2)
@@ -146,6 +146,12 @@ namespace Windows.UI.Xaml.Shapes
 			if (Stretch == Stretch.None)
 			{
 				ApplyMarginToFixNegativeCoordinates(_marginOffsets);
+			}
+
+			// Element has been removed prevent redraw
+			if (! IsStillInDOM())
+			{
+				return;
 			}
 
 			object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDomElement);
