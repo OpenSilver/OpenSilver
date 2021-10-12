@@ -117,7 +117,10 @@ namespace DotNetForHtml5.Compiler
                             fieldModifier = fieldModifierAttr.Value?.ToLower() ?? "private";
                         }
 
-                        resultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementTypeInCSharp, name));
+                        // add '@' to handle cases where x:Name is a forbidden word (for instance 'this'
+                        // or any other c# keyword)
+                        string fieldName = "@" + name;
+                        resultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementTypeInCSharp, fieldName));
                     }
                 }
             }
@@ -902,6 +905,7 @@ else
                                         //-------------
 
                                         string name = attributeValue;
+
                                         // Add the code to register the name, etc.
                                         if (isElementInRootNamescope && !reflectionOnSeparateAppDomain.IsAssignableFrom(
                                                 namespaceSystemWindows,
@@ -915,9 +919,13 @@ else
                                             {
                                                 fieldModifier = (attr.Value ?? "").ToLower();
                                             }
-                                            resultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementTypeInCSharp, name));
+
+                                            // add '@' to handle cases where x:Name is a forbidden word (for instance 'this'
+                                            // or any other c# keyword)
+                                            string fieldName = "@" + name;
+                                            resultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementTypeInCSharp, fieldName));
                                             //resultingFindNameCalls.Add(string.Format("{0} = ({1})this.FindName(\"{2}\");", name, elementTypeInCSharp, name));
-                                            resultingFindNameCalls.Add(string.Format("{0} = {1};", name, elementUniqueNameOrThisKeyword));
+                                            resultingFindNameCalls.Add(string.Format("{0} = {1};", fieldName, elementUniqueNameOrThisKeyword));
                                             stringBuilder.AppendLine(string.Format("this.RegisterName(\"{0}\", {1});", name, elementUniqueNameOrThisKeyword));
                                         }
                                         else if (elementThatIsRootOfTheCurrentNamescope.Name == DefaultXamlNamespace + "ControlTemplate")
