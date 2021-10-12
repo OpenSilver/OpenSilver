@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +19,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using CSHTML5.Internal;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -287,51 +285,10 @@ namespace Windows.UI.Xaml.Controls
         /// The named element from the template, if the element is found. Can return
         /// null if no element with name childName was found in the template.
         /// </returns>
-        protected internal DependencyObject GetTemplateChild(string childName)
+        protected internal new DependencyObject GetTemplateChild(string childName)
         {
-            return (DependencyObject)this.TryFindTemplateChildFromName(childName);
+            return base.GetTemplateChild(childName);
         }
-#region ---------- INameScope implementation ----------
-        //note: copy from UserControl
-        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
-
-        /// <summary>
-        /// Finds the UIElement with the specified name. Returns null if not found.
-        /// </summary>
-        /// <param name="name">The name to look for.</param>
-        /// <returns>The object with the specified name if any; otherwise null.</returns>
-        private object TryFindTemplateChildFromName(string name)
-        {
-            //todo: see if this fits to the behaviour it should have.
-            if (_nameScopeDictionary.ContainsKey(name))
-                return _nameScopeDictionary[name];
-            else
-                return null;
-        }
-
-        public void RegisterName(string name, object scopedElement)
-        {
-            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
-                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
-
-            _nameScopeDictionary[name] = scopedElement;
-        }
-
-        public void UnregisterName(string name)
-        {
-            if (!_nameScopeDictionary.ContainsKey(name))
-                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
-
-            _nameScopeDictionary.Remove(name);
-        }
-
-        void ClearRegisteredNames()
-        {
-            _nameScopeDictionary.Clear();
-        }
-
-
-        #endregion
 
         /// <summary>
         /// Identifies the <see cref="Panel.IsItemsHost"/> dependency property.

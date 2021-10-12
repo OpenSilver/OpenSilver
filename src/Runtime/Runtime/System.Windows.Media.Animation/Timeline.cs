@@ -321,13 +321,13 @@ namespace Windows.UI.Xaml.Media.Animation
                 if (targetBeforePath == null)
                 {
                     string targetName = Storyboard.GetTargetName(this);
-                    if (targetParent is Control control)
-                    {
-                        targetBeforePath = control.GetTemplateChild(targetName);
-                    }
-                    else if (targetParent is FrameworkElement fe)
+                    if (targetParent is FrameworkElement fe)
                     {
                         targetBeforePath = (DependencyObject)fe.FindName(targetName);
+                        if (targetBeforePath == null && targetParent is Control control)
+                        {
+                            targetBeforePath = control.GetTemplateChild(targetName);
+                        }
                     }
                 }
             }
@@ -353,17 +353,17 @@ namespace Windows.UI.Xaml.Media.Animation
             propertyPath = Storyboard.GetTargetProperty(this);
             if (!isTargetParentTheTarget && targetName != null)
             {
-                if (targetParent is Control control)
-                {
-                    targetBeforePath = control.GetTemplateChild(targetName);
-                    if (targetBeforePath == null && control.Name == targetName)
-                    {
-                        targetBeforePath = targetParent;
-                    }
-                }
-                else if (targetParent is FrameworkElement fe)
+                if (targetParent is FrameworkElement fe)
                 {
                     targetBeforePath = (DependencyObject)fe.FindName(targetName);
+                    if (targetBeforePath == null && targetParent is Control control)
+                    {
+                        targetBeforePath = control.GetTemplateChild(targetName);
+                        if (targetBeforePath == null && control.Name == targetName)
+                        {
+                            targetBeforePath = targetParent;
+                        }
+                    }
                 }
                 else
                 {

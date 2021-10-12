@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Markup;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Media;
-#endif
-
-#if !FOR_DESIGN_TIME && !MIGRATION
 using Windows.UI.Xaml.Markup;
 #endif
 
@@ -41,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     /// existing controls and provides its own logic.
     /// </summary>
     [ContentProperty("Content")]
-    public partial class UserControl : Control, INameScope
+    public partial class UserControl : Control
     {
         /// <summary> 
         /// Returns enumerator to logical children.
@@ -66,7 +60,7 @@ namespace Windows.UI.Xaml.Controls
         {
             // UseContentTemplate
             ControlTemplate template = new ControlTemplate();
-            template._methodToInstantiateFrameworkTemplate = (owner) =>
+            template.SetMethodToInstantiateFrameworkTemplate((owner) =>
             {
                 TemplateInstance instance = new TemplateInstance();
 
@@ -74,7 +68,7 @@ namespace Windows.UI.Xaml.Controls
                 instance.TemplateContent = ((UserControl)owner).Content as FrameworkElement;
 
                 return instance;
-            };
+            });
             template.Seal();
 
             UseContentTemplate = template;
@@ -146,40 +140,5 @@ namespace Windows.UI.Xaml.Controls
         {
             get;
         }
-
-#region ---------- INameScope implementation ----------
-
-        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string,object>();
-
-        /// <summary>
-        /// Finds the UIElement with the specified name.
-        /// </summary>
-        /// <param name="name">The name to look for.</param>
-        /// <returns>The object with the specified name if any; otherwise null.</returns>
-        public new object FindName(string name)
-        {
-            if (_nameScopeDictionary.ContainsKey(name))
-                return _nameScopeDictionary[name];
-            else
-                return null;
-        }
-
-        public void RegisterName(string name, object scopedElement)
-        {
-            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
-                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
-
-            _nameScopeDictionary[name] = scopedElement;
-        }
-
-        public void UnregisterName(string name)
-        {
-            if (!_nameScopeDictionary.ContainsKey(name))
-                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
-
-            _nameScopeDictionary.Remove(name);
-        }
-
-#endregion
     }
 }

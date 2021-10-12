@@ -750,8 +750,6 @@ namespace Windows.UI.Xaml.Controls
             Control control = (Control)d;
             FrameworkElement.UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            control.ClearRegisteredNames();
-
             if (VisualTreeHelper.GetParent(control) != null)
             {
                 control.InvalidateMeasureInternal();
@@ -771,9 +769,9 @@ namespace Windows.UI.Xaml.Controls
         /// The named element from the template, if the element is found. Can return
         /// null if no element with name childName was found in the template.
         /// </returns>
-        protected internal DependencyObject GetTemplateChild(string childName)
+        protected internal new DependencyObject GetTemplateChild(string childName)
         {
-            return (DependencyObject)this.TryFindTemplateChildFromName(childName);
+            return base.GetTemplateChild(childName);
         }
 
         internal void RaiseOnApplyTemplate()

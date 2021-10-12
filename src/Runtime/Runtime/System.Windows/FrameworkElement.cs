@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +18,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Markup;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -720,25 +721,82 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Retrieves an object that has the specified identifier name.
         /// </summary>
-        /// <param name="name">The name of the requested object.</param>
+        /// <param name="name">
+        /// The name of the requested object.
+        /// </param>
         /// <returns>
-        /// The requested object. This can be null if no matching object was found in
-        /// the current XAML namescope.
+        /// The requested object. This can be null if no matching object was found in the
+        /// current XAML namescope.
         /// </returns>
         public object FindName(string name)
         {
             if (name == null)
-                throw new ArgumentNullException("name");
-
-            if (this is INameScope)
-                return ((INameScope)this).FindName(name);
-            else if (INTERNAL_VisualParent != null)
             {
-                if (INTERNAL_VisualParent is FrameworkElement)
-                    return ((FrameworkElement)INTERNAL_VisualParent).FindName(name);
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            INameScope nameScope = FindScope(this);
+            if (nameScope != null)
+            {
+                return nameScope.FindName(name);
             }
 
             return null;
+        }
+
+        internal static INameScope FindScope(DependencyObject d)
+        {
+            while (d != null)
+            {
+                INameScope nameScope = NameScope.GetNameScope(d);
+                if (nameScope != null)
+                {
+                    return nameScope;
+                }
+
+                d = (d as FrameworkElement)?.Parent;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        ///     Retrieves the element in the VisualTree of thie element that corresponds to
+        ///     the element with the given childName in this element's style definition
+        /// </summary>
+        /// <param name="childName">the Name to find the matching element for</param>
+        /// <returns>The Named element.  Null if no element has this Name.</returns>
+        internal DependencyObject GetTemplateChild(string childName)
+        {
+            return FindScope(TemplateChild)?.FindName(childName) as DependencyObject;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void RegisterName(string name, object scopedElement)
+        {
+            INameScope nameScope = FindScope(this);
+            if (nameScope != null)
+            {
+                nameScope.RegisterName(name, scopedElement);
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("No NameScope found to {1} the Name '{0}'.", name, "register"));
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void UnregisterName(string name)
+        {
+            INameScope nameScope = FindScope(this);
+            if (nameScope != null)
+            {
+                nameScope.UnregisterName(name);
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("No NameScope found to {1} the Name '{0}'.", name, "unregister"));
+            }
         }
 
         /// <summary>
@@ -753,7 +811,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the <see cref="FrameworkElement.Name"/> dependency property.
+        /// Identifies the <see cref="Name"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty NameProperty =
             DependencyProperty.Register(
@@ -1606,75 +1664,6 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-#endregion
-
-#region ---------- INameScope implementation ----------
-        //note: copy from UserControl
-        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
-
-        /// <summary>
-        /// Finds the UIElement with the specified name. Returns null if not found.
-        /// </summary>
-        /// <param name="name">The name to look for.</param>
-        /// <returns>The object with the specified name if any; otherwise null.</returns>
-        internal object TryFindTemplateChildFromName(string name)
-        {
-            //todo: see if this fits to the behaviour it should have.
-            if (_nameScopeDictionary.ContainsKey(name))
-                return _nameScopeDictionary[name];
-            else
-                return null;
-        }
-
-        public void RegisterName(string name, object scopedElement)
-        {
-            //
-            // Note: this part is disabled because of namescope has issues.
-            // Currently elements with an x:Name attribute in xaml which are not 
-            // are stored in the same dictionary as elements with an x:Name coming
-            // from a ControlTemplate.
-            // For example, this following xaml code will throw an exception :
-            //
-            // <ContentControl xmlns="...">  <!-- note: this ContentControl is the root of the XAML page -->
-            //   <ContentControl.Template>
-            //     <ControlTemplate TargetType="ContentControl">
-            //       <ContentPresenter x:Name="content" />
-            //     </ControlTemplate>
-            //   </ContentControl.Template>
-            //   <TextBlock x:Name="content"
-            //              Text="Hello" />
-            // </ContentControl>
-            //
-#if false
-            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
-                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
-#endif
-
-            _nameScopeDictionary[name] = scopedElement;
-        }
-
-#if BRIDGE
-        // find "COMMENT 26.03.2020" at the beginning of this class for the reason of the existence of the method below:
-        private void registerName(string name, object scopedElement)
-        {
-            RegisterName(name, scopedElement);
-        }
-#endif
-
-        public void UnregisterName(string name)
-        {
-            if (!_nameScopeDictionary.ContainsKey(name))
-                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
-
-            _nameScopeDictionary.Remove(name);
-        }
-
-        internal void ClearRegisteredNames()
-        {
-            _nameScopeDictionary.Clear();
-        }
-
-
 #endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()

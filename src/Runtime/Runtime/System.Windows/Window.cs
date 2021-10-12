@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,40 +11,21 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using CSHTML5.Internal;
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Globalization;
+using CSHTML5.Internal;
 
 #if MIGRATION
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Markup;
-using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Markup;
 using Windows.UI.Core;
 using Windows.Foundation;
 #endif
-
 
 #if MIGRATION
 namespace System.Windows
@@ -60,7 +40,7 @@ namespace Windows.UI.Xaml
 #if RECURSIVE_CONSTRUCTION_FIXED
     public partial class Window : ContentControl
 #else
-    public partial class Window : FrameworkElement, INameScope
+    public partial class Window : FrameworkElement
 #endif
     {
         /// <summary>
@@ -295,53 +275,13 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-#if RECURSIVE_CONSTRUCTION_FIXED
-#else
-        #region ---------- INameScope implementation ----------
-
-        Dictionary<string, object> _nameScopeDictionary = new Dictionary<string, object>();
-
-        /// <summary>
-        /// Finds the UIElement with the specified name.
-        /// </summary>
-        /// <param name="name">The name to look for.</param>
-        /// <returns>The object with the specified name if any; otherwise null.</returns>
-        public new object FindName(string name)
-        {
-            if (_nameScopeDictionary.ContainsKey(name))
-                return _nameScopeDictionary[name];
-            else
-                return null;
-        }
-
-        public void RegisterName(string name, object scopedElement)
-        {
-            if (_nameScopeDictionary.ContainsKey(name) && _nameScopeDictionary[name] != scopedElement)
-                throw new ArgumentException(string.Format("Cannot register duplicate name '{0}' in this scope.", name));
-
-            _nameScopeDictionary[name] = scopedElement;
-        }
-
-        public void UnregisterName(string name)
-        {
-            if (!_nameScopeDictionary.ContainsKey(name))
-                throw new ArgumentException(string.Format("Name '{0}' was not found.", name));
-
-            _nameScopeDictionary.Remove(name);
-        }
-
-        #endregion
-#endif
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("true")]
-#else
-        [Template("true")]
-#endif
+#if BRIDGE
+        [Bridge.Template("true")]
         private static bool IsRunningInJavaScript()
         {
             return false;
         }
+#endif
 
         /// <summary>
         /// Attempts to activate the application window by bringing it to the foreground

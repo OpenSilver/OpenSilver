@@ -15,6 +15,14 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 
+#if MIGRATION
+using System.Windows;
+using System.Windows.Markup;
+#else
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Markup;
+#endif
+
 namespace OpenSilver.Internal.Xaml
 {
     /// <summary>
@@ -87,6 +95,22 @@ namespace OpenSilver.Internal.Xaml
             throw new InvalidOperationException(
                 $"Failed to create a '{property.PropertyType}' from the text '{xamlValue}'."
             );
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void InitializeNameScope(DependencyObject dependencyObject)
+        {
+            NameScope.SetNameScope(dependencyObject, new NameScope());
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void RegisterName(DependencyObject dependencyObject, string name, object scopedElement)
+        {
+            INameScope nameScope = FrameworkElement.FindScope(dependencyObject);
+            if (nameScope != null)
+            {
+                nameScope.RegisterName(name, scopedElement);
+            }
         }
     }
 }

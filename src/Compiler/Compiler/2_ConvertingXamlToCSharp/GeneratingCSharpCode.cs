@@ -126,7 +126,7 @@ namespace DotNetForHtml5.Compiler
             }
 
             // Create the "IntializeComponent()" method:
-            string initializeComponentMethod = CreateInitializeComponentMethod(null, new List<string>(0), null, null,
+            string initializeComponentMethod = CreateInitializeComponentMethod(null, new List<string>(0), null, null, null,
                 isSLMigration, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot);
 
             resultingMethods.Add(initializeComponentMethod);
@@ -288,12 +288,18 @@ namespace DotNetForHtml5.Compiler
                                         namescopeRootToStoryboardsAdditionalCode));
                                 string additionalCodeToPlaceAtTheEndOfTheMethod = markupExtensionsAdditionalCode + Environment.NewLine + storyboardsAdditionalCode;
 
+                                string templateNameScope = CreateNameScope(
+                                    childUniqueName,
+                                    GetNameToUniqueNameDictionary(frameworkTemplateRoot, namescopeRootToNameToUniqueNameDictionary)
+                                );
+
                                 string dataTemplateMethod = CreateDataTemplateLambda(codeToInstantiateTheDataTemplate,
                                     frameworkTemplateUniqueName,
                                     childUniqueName,
                                     templateInstanceUniqueName,
                                     objectsToInstantiateAtTheBeginningOfTheDataTemplate,
                                     additionalCodeToPlaceAtTheEndOfTheMethod,
+                                    templateNameScope,
                                     namespaceSystemWindows);
                                 // Create the code that sets the "MethodToInstantiateDataTemplate":
                                 string codeToSetTheMethod = string.Format("{0}.SetMethodToInstantiateFrameworkTemplate({1});", frameworkTemplateUniqueName, dataTemplateMethod);
@@ -926,12 +932,6 @@ else
                                             resultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementTypeInCSharp, fieldName));
                                             //resultingFindNameCalls.Add(string.Format("{0} = ({1})this.FindName(\"{2}\");", name, elementTypeInCSharp, name));
                                             resultingFindNameCalls.Add(string.Format("{0} = {1};", fieldName, elementUniqueNameOrThisKeyword));
-                                            stringBuilder.AppendLine(string.Format("this.RegisterName(\"{0}\", {1});", name, elementUniqueNameOrThisKeyword));
-                                        }
-                                        else if (elementThatIsRootOfTheCurrentNamescope.Name == DefaultXamlNamespace + "ControlTemplate")
-                                        {
-                                            stringBuilder.AppendLine(string.Format("templateOwner_{0}.RegisterName(\"{1}\", {2});", GetUniqueName(elementThatIsRootOfTheCurrentNamescope), name, elementUniqueNameOrThisKeyword));
-                                            //resultingFindNameCalls.Add(string.Format("{0} = {1};", name, elementUniqueNameOrThisKeyword));
                                         }
 
                                         // We also set the Name property on the object itself, if the XAML was "Name=..." or (if the XAML was x:Name=... AND the Name property exists in the object).    (Note: setting the Name property on the object is useful for example in <VisualStateGroup Name="Pressed"/> where the parent control looks at the name of its direct children:
@@ -1269,8 +1269,28 @@ dependencyPropertyPath);
             bool isClassTheApplicationClass = IsClassTheApplicationClass(baseType);
             string additionalCodeToPlaceAtTheBeginningOfInitializeComponent = (isClassTheApplicationClass ? codeToPutInTheInitializeComponentOfTheApplicationClass : "") + objectsToInstantiateEarly;
             string additionalCodeToPlaceAtTheEndOfInitializeComponent = markupExtensionsAdditionalCodeForElementsInRootNamescope + Environment.NewLine + storyboardsAdditionalCodeForElementsInRootNamescope;
+            string nameScope = null;
+            if (hasCodeBehind &&
+                reflectionOnSeparateAppDomain.IsAssignableFrom(namespaceSystemWindows, "DependencyObject",
+                    doc.Root.Name.NamespaceName, doc.Root.Name.LocalName))
+            {
+                nameScope = CreateNameScope(
+                    "this",
+                    GetNameToUniqueNameDictionary(doc.Root, namescopeRootToNameToUniqueNameDictionary)
+                );
+            }
 
-            string initializeComponentMethod = CreateInitializeComponentMethod(codeToWorkWithTheRootElement, resultingFindNameCalls, additionalCodeToPlaceAtTheBeginningOfInitializeComponent, additionalCodeToPlaceAtTheEndOfInitializeComponent, isSLMigration, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot);
+            string initializeComponentMethod = CreateInitializeComponentMethod(
+                codeToWorkWithTheRootElement, 
+                resultingFindNameCalls, 
+                additionalCodeToPlaceAtTheBeginningOfInitializeComponent, 
+                additionalCodeToPlaceAtTheEndOfInitializeComponent,
+                nameScope,
+                isSLMigration, 
+                assemblyNameWithoutExtension, 
+                fileNameWithPathRelativeToProjectRoot
+            );
+            
             resultingMethods.Insert(0, initializeComponentMethod);
 
             // Add a contructor if there is no code behind:
@@ -2013,10 +2033,20 @@ var {4} = {2}.GetValue({1});
             return elementTypeInCSharp;
         }
 
-        static string CreateInitializeComponentMethod(string codeToWorkWithTheRootElement, List<string> findNameCalls, string codeToPlaceAtTheBeginningOfInitializeComponent, string codeToPlaceAtTheEndOfInitializeComponent, bool isSLMigration, string assemblyNameWithoutExtension, string fileNameWithPathRelativeToProjectRoot)
+        private static string CreateInitializeComponentMethod(
+            string codeToWorkWithTheRootElement, 
+            List<string> findNameCalls, 
+            string codeToPlaceAtTheBeginningOfInitializeComponent, 
+            string codeToPlaceAtTheEndOfInitializeComponent, 
+            string nameScope,
+            bool isSLMigration, 
+            string assemblyNameWithoutExtension, 
+            string fileNameWithPathRelativeToProjectRoot)
         {
             string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-            string method = @"
+            string findNameCallsMerged = string.Join("\r\n", findNameCalls);
+
+            return $@"
         private bool _contentLoaded;
         public void InitializeComponent()
         {{
@@ -2025,86 +2055,47 @@ var {4} = {2}.GetValue({1});
             _contentLoaded = true;
 
 #pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-            if (this is {4})
+            if (this is {uiElementFullyQualifiedTypeName})
             {{
-                (({4})(object)this).XamlSourcePath = @""{5}\{6}"";
+                (({uiElementFullyQualifiedTypeName})(object)this).XamlSourcePath = @""{assemblyNameWithoutExtension}\{fileNameWithPathRelativeToProjectRoot}"";
             }}
 #pragma warning restore 0184
 
-{0}
+{codeToPlaceAtTheBeginningOfInitializeComponent}
 
-{1}
+{codeToWorkWithTheRootElement}
 
-{2}
+{findNameCallsMerged}
 
-{3}    
+{nameScope}
+
+{codeToPlaceAtTheEndOfInitializeComponent}    
         }}
 ";
-            string findNameCallsMerged = string.Join("\r\n", findNameCalls);
-
-            return string.Format(method, codeToPlaceAtTheBeginningOfInitializeComponent, codeToWorkWithTheRootElement, findNameCallsMerged, codeToPlaceAtTheEndOfInitializeComponent, uiElementFullyQualifiedTypeName, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot);
         }
 
-        private static string CreateDataTemplateLambda(string codeToInstantiateTheDataTemplate, string dataTemplateUniqueName, string childUniqueName, string templateInstanceUniqueName, string codeToPlaceAtTheBeginningOfTheMethod, string additionalCodeToPlaceAtTheEndOfTheMethod, string namespaceSystemWindows)
+        private static string CreateDataTemplateLambda(
+            string codeToInstantiateTheDataTemplate, 
+            string dataTemplateUniqueName, 
+            string childUniqueName, 
+            string templateInstanceUniqueName, 
+            string codeToPlaceAtTheBeginningOfTheMethod, 
+            string additionalCodeToPlaceAtTheEndOfTheMethod, 
+            string nameScope,
+            string namespaceSystemWindows)
         {
-            string lambda = @"templateOwner_{1} => 
+            return $@"templateOwner_{dataTemplateUniqueName} => 
 {{
-var {2} = new {0}.TemplateInstance();
-{2}.TemplateOwner = templateOwner_{1};
-{6}
-{3}
-{4}
-{2}.TemplateContent = {5};
-return {2};
+var {templateInstanceUniqueName} = new {namespaceSystemWindows}.TemplateInstance();
+{templateInstanceUniqueName}.TemplateOwner = templateOwner_{dataTemplateUniqueName};
+{codeToPlaceAtTheBeginningOfTheMethod}
+{codeToInstantiateTheDataTemplate}
+{additionalCodeToPlaceAtTheEndOfTheMethod}
+{nameScope}
+{templateInstanceUniqueName}.TemplateContent = {childUniqueName};
+return {templateInstanceUniqueName};
 }}";
-
-            /*
-                        @"templateOwner_{"dataTemplateUniqueName"} => 
-                        {
-                            var {"dataTemplateUniqueName"} = new {"namespaceSystemWindows"}.TemplateInstance();
-                            {"templateInstanceUniqueName"}.TemplateOwner = templateOwner_{"dataTemplateUniqueName"};
-                            {"codeToPlaceAtTheBeginningOfTheMethod"}
-                            {"codeToInstantiateTheDataTemplate"}
-                            {"additionalCodeToPlaceAtTheEndOfTheMethod"}
-                            {"templateInstanceUniqueName"}.TemplateContent = {"childUniqueName"};
-                            return {"templateInstanceUniqueName"};
-                        }";
-            */
-
-            return string.Format(lambda,
-                                 namespaceSystemWindows,
-                                 dataTemplateUniqueName,
-                                 templateInstanceUniqueName,
-                                 codeToInstantiateTheDataTemplate,
-                                 additionalCodeToPlaceAtTheEndOfTheMethod,
-                                 childUniqueName,
-                                 codeToPlaceAtTheBeginningOfTheMethod);
         }
-
-        //        static string CreateDataTemplateMethod(string codeToInstantiateTheDataTemplate, string dataTemplateUniqueName, string childUniqueName, string templateInstanceUniqueName, string additionalCodeToPlaceAtTheEndOfTheMethod, string namespaceSystemWindows, string namespaceSystemWindowsControls)
-        //        {
-        //            string method = @"
-        //        private {0}.TemplateInstance Instantiate_{1}({6}.Control templateOwner)
-        //        {{
-        //var {2} = new {0}.TemplateInstance();
-        //{2}.TemplateOwner = templateOwner;
-        //{3}
-
-        //{4}
-        //{2}.TemplateContent = {5};
-        //return {2};
-        //        }}
-        //";
-        //            return string.Format(
-        //                method,
-        //                namespaceSystemWindows,
-        //                dataTemplateUniqueName,
-        //                templateInstanceUniqueName,
-        //                codeToInstantiateTheDataTemplate,
-        //                additionalCodeToPlaceAtTheEndOfTheMethod,
-        //                childUniqueName,
-        //                namespaceSystemWindowsControls);
-        //        }
 
         static string GetUniqueName(XElement element)
         {
@@ -2542,17 +2533,13 @@ public static void Main()
             bool isKnownCoreType, 
             bool isKnownSystemType)
         {
-            string Escape(string stringValue)
-            {
-                return string.Concat("@\"", stringValue.Replace("\"", "\"\""), "\"");
-            }
-
             return string.Format(
-                "global::OpenSilver.Internal.Xaml.RuntimeHelpers.GetPropertyValue<{0}>(typeof({1}), {2}, {3}, () => {4})",
+                "{0}.GetPropertyValue<{1}>(typeof({2}), {3}, {4}, () => {5})",
+                RuntimeHelperClass,
                 propertyType,
                 propertyDeclaringType,
-                Escape(propertyName),
-                Escape(value),
+                EscapeString(propertyName),
+                EscapeString(value),
                 ConvertFromInvariantString(value, propertyType, isKnownCoreType, isKnownSystemType)
             );
         }
@@ -2567,5 +2554,29 @@ public static void Main()
 
             return false;
         }
+
+        private static string CreateNameScope(string nameScopeRoot, Dictionary<string, string> nameMap)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"{RuntimeHelperClass}.InitializeNameScope({nameScopeRoot});");
+
+            if (nameMap != null)
+            {
+                foreach (var kp in nameMap)
+                {
+                    sb.AppendLine($"{RuntimeHelperClass}.RegisterName({nameScopeRoot}, {EscapeString(kp.Key)}, {kp.Value});");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private static string EscapeString(string stringValue)
+        {
+            return string.Concat("@\"", stringValue.Replace("\"", "\"\""), "\"");
+        }
+
+        private const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
     }
 }

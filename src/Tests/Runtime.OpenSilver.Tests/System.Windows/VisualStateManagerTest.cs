@@ -13,6 +13,7 @@
 using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -206,6 +207,8 @@ namespace Windows.UI.Xaml.Tests
                  * <local:MyControl1>
                  */
 
+                NameScope.SetNameScope(this, new NameScope());
+
                 InnerControl = new InnerControl() { Name = "InnerControl" };
 
                 // Emulate a template
@@ -354,6 +357,8 @@ namespace Windows.UI.Xaml.Tests
                  *   </local:MyControl2.Template>
                  * <local:MyControl2>
                  */
+
+                NameScope.SetNameScope(this, new NameScope());
 
                 InnerControl = new InnerControl() { Name = "InnerControl" };
 
