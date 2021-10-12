@@ -559,15 +559,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 --remainingIterations;
                 if (remainingIterations <= 0)
                 {
-                    if (this is Storyboard)
-                    {
-                        ((Storyboard)this).Stop(parameters.Target);
-                    }
-                    else
-                    {
-                        Stop(parameters.Target, revertToFormerValue: false);
-                    }
-
+                    Stop(parameters.Target, revertToFormerValue: false);
                     INTERNAL_RaiseCompletedEvent();
                 }
                 else
