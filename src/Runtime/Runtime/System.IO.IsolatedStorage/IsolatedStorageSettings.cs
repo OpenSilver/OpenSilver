@@ -35,6 +35,11 @@ using System.Windows;
 #else
 using Windows.UI.Xaml;
 #endif
+#if OPENSILVER
+using OpenSilver;
+#else
+using CSHTML5;
+#endif
 
 namespace System.IO.IsolatedStorage
 {
@@ -84,6 +89,7 @@ namespace System.IO.IsolatedStorage
         //[JSIL.Meta.JSReplacement("window.localStorage")]
         dynamic GetLocalStorage()
         {
+#if !OPENSILVER
             if (IsRunningInJavascript())
             {
 #if !BRIDGE
@@ -118,8 +124,12 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             }
             else
             {
-                return INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window.localStorage");
+#endif
+                //Note: The whole part in the #if !OPENSILVER above only serves to throw an exception when in IE or Edge if we are on a local file system (ie url starts with c:\ or similar). It should be useless in OpenSilver and can most definitely be simplified in Bridge.
+                return Interop.ExecuteJavaScript("window.localStorage");
+#if !OPENSILVER
             }
+#endif
         }
 
         string GetKeysFirstPart()
@@ -274,10 +284,10 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             get
             {
-                if (IsRunningInJavascript())
+                if (!Interop.IsRunningInTheSimulator)
                 {
                     dynamic localStorage = GetLocalStorage();
-                    return localStorage[GetKeysFirstPart() + key];
+                    return Convert.ChangeType((Interop.ExecuteJavaScript("$0[$1]", localStorage, GetKeysFirstPart() + key)),typeof(object));
                 }
                 else
                 {
@@ -286,10 +296,11 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             }
             set
             {
-                if (IsRunningInJavascript())
+                if (!Interop.IsRunningInTheSimulator)
                 {
                     dynamic localStorage = GetLocalStorage();
-                    localStorage[GetKeysFirstPart() + key] = value;
+                    string applicationSpecificKey = GetKeysFirstPart() + key;
+                    Interop.ExecuteJavaScript("$0[$1] = $2", localStorage, GetKeysFirstPart() + key, value);
                 }
                 else
                 {
@@ -406,10 +417,11 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         /// <returns>true if the specified key is found; otherwise, false.</returns>
         public bool TryGetValue<T>(string key, out T value)
         {
-            if (IsRunningInJavascript())
+            if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
-                var temp = (localStorage.getItem(GetKeysFirstPart() + key));
+                var temp = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key);
+                //var temp = (localStorage.getItem(GetKeysFirstPart() + key));
                 if (temp == null)
                 {
                     value = default(T);
@@ -417,7 +429,8 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
                 }
                 else
                 {
-                    value = temp;
+                    value = Convert.ChangeType(temp, typeof(T));
+                    //value = temp;
                     return true;
                 }
             }
@@ -467,7 +480,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             }
         }
 
-        #region for the interfaces that we remove for now
+#region for the interfaces that we remove for now
         //public void Add(KeyValuePair<string, object> item)
         //{
         //    throw new NotImplementedException();
@@ -594,6 +607,6 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         //{
         //    get { throw new NotImplementedException(); }
         //}
-        #endregion
+#endregion
     }
 }
