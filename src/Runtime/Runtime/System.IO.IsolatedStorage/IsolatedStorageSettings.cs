@@ -70,13 +70,13 @@ namespace System.IO.IsolatedStorage
         string _fullApplicationName = null;
 
 #if !BRIDGE
-        [JSReplacement("true")]
+        //[JSReplacement("true")]
 #else
         [Template("true")]
 #endif
         static bool IsRunningInJavascript() //must be static to work properly
         {
-            return false;
+            return !Interop.IsRunningInTheSimulator;
         }
 
 #if !BRIDGE
@@ -87,7 +87,7 @@ namespace System.IO.IsolatedStorage
         static dynamic GetUndefined() { return null; } //must be static to work properly
 
         //[JSIL.Meta.JSReplacement("window.localStorage")]
-        dynamic GetLocalStorage()
+        object GetLocalStorage()
         {
 #if !OPENSILVER
             if (IsRunningInJavascript())
@@ -125,11 +125,24 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             else
             {
 #endif
-                //Note: The whole part in the #if !OPENSILVER above only serves to throw an exception when in IE or Edge if we are on a local file system (ie url starts with c:\ or similar). It should be useless in OpenSilver and can most definitely be simplified in Bridge.
-                return Interop.ExecuteJavaScript("window.localStorage");
+            //Note: The whole part in the #if !OPENSILVER above only serves to throw an exception when in IE or Edge if we are on a local file system (ie url starts with c:\ or similar). It should be useless in OpenSilver and can most definitely be simplified in Bridge.
+            return Interop.ExecuteJavaScript("window.localStorage");
 #if !OPENSILVER
             }
 #endif
+        }
+
+
+        private int GetLength()
+        {
+            object localStorage = GetLocalStorage();
+            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.length", localStorage));
+        }
+
+        private string GetKey(int index)
+        {
+            object localStorage = GetLocalStorage();
+            return Convert.ToString(Interop.ExecuteJavaScript("$0.key($1)", localStorage, index));
         }
 
         string GetKeysFirstPart()
@@ -172,12 +185,14 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             {
                 if (IsRunningInJavascript())
                 {
-                    dynamic localStorage = GetLocalStorage();
-                    int length = localStorage.length;
+                    object localStorage = GetLocalStorage();
+                    int length = GetLength();
+
                     int count = 0;
                     for (int i = 0; i < length; ++i)
                     {
-                        if (localStorage.key(i).startsWith(GetKeysFirstPart()))
+                        string temp = GetKey(i);
+                        if (temp.StartsWith(GetKeysFirstPart()))
                         {
                             ++count;
                         }
@@ -203,15 +218,18 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             {
                 if (IsRunningInJavascript())
                 {
-                    dynamic localStorage = GetLocalStorage();
+                    object localStorage = GetLocalStorage();
                     List<string> keysList = new List<string>();
-                    int length = localStorage.length;
+                    int length = GetLength();
+
                     int lengthOfPartToRemoveFromKey = (GetKeysFirstPart()).Length;
                     for (int i = 0; i < length; ++i)
                     {
-                        if (localStorage.key(i).startsWith(GetKeysFirstPart()))
+                        string temp = GetKey(i);
+
+                        if (temp.StartsWith(GetKeysFirstPart()))
                         {
-                            keysList.Add(localStorage.key(i).substring(lengthOfPartToRemoveFromKey));
+                            keysList.Add(temp.Substring(lengthOfPartToRemoveFromKey));
                         }
                     }
                     return keysList;
@@ -246,15 +264,14 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             {
                 if (IsRunningInJavascript())
                 {
-                    dynamic localStorage = GetLocalStorage();
                     List<object> valuesList = new List<object>();
-                    int length = localStorage.length;
+                    int length = GetLength();
                     for (int i = 0; i < length; ++i)
                     {
-                        string str = localStorage.key(i);
-                        if (str.StartsWith(GetKeysFirstPart()))
+                        string temp = GetKey(i);
+                        if (temp.StartsWith(GetKeysFirstPart()))
                         {
-                            valuesList.Add(localStorage[str]);
+                            valuesList.Add(this[temp].ToString());
                         }
                     }
                     return valuesList;
@@ -270,7 +287,6 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
                 }
             }
         }
-
         /// <summary>
         /// Gets or sets the value associated with the specified key.
         /// </summary>
@@ -286,8 +302,8 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             {
                 if (!Interop.IsRunningInTheSimulator)
                 {
-                    dynamic localStorage = GetLocalStorage();
-                    return Convert.ChangeType((Interop.ExecuteJavaScript("$0[$1]", localStorage, GetKeysFirstPart() + key)),typeof(object));
+                    object localStorage = GetLocalStorage();
+                    return Interop.ExecuteJavaScript("$0[$1]", localStorage, GetKeysFirstPart() + key);
                 }
                 else
                 {
@@ -298,7 +314,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             {
                 if (!Interop.IsRunningInTheSimulator)
                 {
-                    dynamic localStorage = GetLocalStorage();
+                    object localStorage = GetLocalStorage();
                     string applicationSpecificKey = GetKeysFirstPart() + key;
                     Interop.ExecuteJavaScript("$0[$1] = $2", localStorage, GetKeysFirstPart() + key, value);
                 }
@@ -318,8 +334,8 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             if (IsRunningInJavascript())
             {
-                dynamic localStorage = GetLocalStorage();
-                localStorage[GetKeysFirstPart() + key] = value;
+                object localStorage = GetLocalStorage();
+                Interop.ExecuteJavaScript("$0[$1] = $2", localStorage, GetKeysFirstPart() + key, value);
             }
             else
             {
@@ -336,11 +352,11 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             if (IsRunningInJavascript())
             {
-                dynamic localStorage = GetLocalStorage();
+                object localStorage = GetLocalStorage();
                 List<string> keys = (List<string>)Keys;
                 foreach (string key in keys)
                 {
-                    localStorage.removeItem(GetKeysFirstPart() + key);
+                    Interop.ExecuteJavaScript("$0.removeItem($1)", localStorage, GetKeysFirstPart() + key);
                 }
             }
             else
@@ -359,8 +375,10 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             if (IsRunningInJavascript())
             {
-                dynamic localStorage = GetLocalStorage();
-                return (localStorage.getItem(GetKeysFirstPart() + key) != null);
+                object localStorage = GetLocalStorage();
+                var temp = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key);
+
+                return (temp != null);
             }
             else
             {
@@ -377,12 +395,12 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             if (IsRunningInJavascript())
             {
-                dynamic localStorage = GetLocalStorage();
-                if ((localStorage.getItem(GetKeysFirstPart() + key) == null))
+                object localStorage = GetLocalStorage();
+                if (Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key) == null)
                 {
                     return false;
                 }
-                localStorage.removeItem(GetKeysFirstPart() + key);
+                Interop.ExecuteJavaScript("$0.removeItem($1)", localStorage, GetKeysFirstPart() + key);
                 return true;
             }
             else
@@ -419,9 +437,8 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             if (!Interop.IsRunningInTheSimulator)
             {
-                dynamic localStorage = GetLocalStorage();
+                object localStorage = GetLocalStorage();
                 var temp = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key);
-                //var temp = (localStorage.getItem(GetKeysFirstPart() + key));
                 if (temp == null)
                 {
                     value = default(T);
@@ -429,8 +446,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
                 }
                 else
                 {
-                    value = Convert.ChangeType(temp, typeof(T));
-                    //value = temp;
+                    value = (T)Convert.ChangeType(temp, typeof(T), Globalization.CultureInfo.InvariantCulture);
                     return true;
                 }
             }
@@ -463,11 +479,11 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             if (IsRunningInJavascript())
             {
-                dynamic localStorage = GetLocalStorage();
+                object localStorage = GetLocalStorage();
                 List<string> keys = (List<string>)Keys;
                 foreach (string key in keys)
                 {
-                    string item = localStorage.getItem(GetKeysFirstPart() + key);
+                    object item = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key);
                     yield return new KeyValuePair<string, object>(key, item);
                 }
             }
@@ -480,7 +496,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             }
         }
 
-#region for the interfaces that we remove for now
+        #region for the interfaces that we remove for now
         //public void Add(KeyValuePair<string, object> item)
         //{
         //    throw new NotImplementedException();
@@ -607,6 +623,6 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         //{
         //    get { throw new NotImplementedException(); }
         //}
-#endregion
+        #endregion
     }
 }
