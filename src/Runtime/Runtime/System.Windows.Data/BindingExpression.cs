@@ -12,12 +12,8 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Collections;
 using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using OpenSilver.Internal.Data;
 
 #if MIGRATION
@@ -72,7 +68,7 @@ namespace Windows.UI.Xaml.Data
 
             bool isDataContextBound = binding.ElementName == null && binding.Source == null && binding.RelativeSource == null;
             string path = ParentBinding.Path?.Path ?? string.Empty;
-            
+
             var walker = _propertyPathWalker = new PropertyPathWalker(path, isDataContextBound);
             if (binding.Mode != BindingMode.OneTime)
             {
@@ -141,7 +137,14 @@ namespace Windows.UI.Xaml.Data
                 // BROKEN PATH
                 //------------------------
 
-                value = UseFallbackValue();
+                if (_propertyPathWalker.IsDataContextBound)
+                {
+                    value = UseTargetNullValue();
+                }
+                else
+                {
+                    value = UseFallbackValue();
+                }
             }
             else
             {
@@ -149,36 +152,43 @@ namespace Windows.UI.Xaml.Data
                 // NON-BROKEN PATH
                 //------------------------
 
-                value = _propertyPathWalker.ValueInternal;
+                value = GetConvertedValue(_propertyPathWalker.ValueInternal);
+            }
 
-                if (ParentBinding.Converter != null)
-                {
+            return value;
+        }
+
+        private object GetConvertedValue(object rawValue)
+        {
+            object value = rawValue;
+
+            if (ParentBinding.Converter != null)
+            {
 #if MIGRATION
-                    value = ParentBinding.Converter.Convert(value, dp.PropertyType, ParentBinding.ConverterParameter, ParentBinding.ConverterCulture);
+                value = ParentBinding.Converter.Convert(value, TargetProperty.PropertyType, ParentBinding.ConverterParameter, ParentBinding.ConverterCulture);
 #else
-                    value = ParentBinding.Converter.Convert(value, dp.PropertyType, ParentBinding.ConverterParameter, ParentBinding.ConverterLanguage);
+                value = ParentBinding.Converter.Convert(value, TargetProperty.PropertyType, ParentBinding.ConverterParameter, ParentBinding.ConverterLanguage);
 #endif
-                    if (value == DependencyProperty.UnsetValue)
-                    {
-                        value = ParentBinding.FallbackValue ?? GetDefaultValue();
-                    }
-                }
-
-                if (value == null)
-                {
-                    value = ParentBinding.TargetNullValue;
-                }
-                else
-                {
-                    value = ApplyStringFormat(value);
-                }
-
-                value = ConvertValueIfNecessary(value, dp.PropertyType);
-
                 if (value == DependencyProperty.UnsetValue)
                 {
-                    value = UseFallbackValue();
+                    value = ParentBinding.FallbackValue ?? GetDefaultValue();
                 }
+            }
+
+            if (value == null)
+            {
+                value = ParentBinding.TargetNullValue;
+            }
+            else
+            {
+                value = ApplyStringFormat(value);
+            }
+
+            value = ConvertValueImplicitly(value, TargetProperty.PropertyType);
+
+            if (value == DependencyProperty.UnsetValue)
+            {
+                value = UseFallbackValue();
             }
 
             return value;
@@ -447,21 +457,27 @@ namespace Windows.UI.Xaml.Data
             }
         } 
 
-        private object ConvertValueIfNecessary(object value, Type targetType)
+        private object ConvertValueImplicitly(object value, Type targetType)
+        {
+            if (IsValidValue(value, targetType))
+            {
+                return value;
+            }
+
+            return UseDynamicConverter(value, targetType);
+        }
+
+        private static bool IsValidValue(object value, Type targetType)
         {
             if (value != null)
             {
-                Type sourceType = value.GetType();
-                if (sourceType == targetType || targetType.IsAssignableFrom(sourceType))
-                {
-                    return value;
-                }
+                return targetType.IsAssignableFrom(value.GetType());
             }
 
-            return ConvertHelper(value, targetType);
+            return false;
         }
 
-        private object ConvertHelper(object value, Type targetType)
+        private object UseDynamicConverter(object value, Type targetType)
         {
             object convertedValue;
             try
@@ -481,13 +497,29 @@ namespace Windows.UI.Xaml.Data
             return convertedValue;
         }
 
+        private object UseTargetNullValue()
+        {
+            object value;
+
+            if (ParentBinding.TargetNullValue != null)
+            {
+                value = GetConvertedValue(null);
+            }
+            else
+            {
+                value = GetDefaultValue();
+            }
+
+            return value;
+        }
+
         private object UseFallbackValue()
         {
             object value = DependencyProperty.UnsetValue;
 
             if (ParentBinding.FallbackValue != null)
             {
-                value = ConvertValueIfNecessary(ParentBinding.FallbackValue, TargetProperty.PropertyType);
+                value = ConvertValueImplicitly(ParentBinding.FallbackValue, TargetProperty.PropertyType);
             }
             
             if (value == DependencyProperty.UnsetValue)

@@ -49,7 +49,8 @@ namespace Windows.UI.Xaml.Data
             DependencyObject sourceDO = SourceDO;
             if (sourceDO != null)
             {
-                UpdateValueAndIsBroken(sourceDO.GetValue(_dp), false);
+                object value = sourceDO.GetValue(_dp);
+                UpdateValueAndIsBroken(value, value == null);
             }
         }
 

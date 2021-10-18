@@ -59,6 +59,8 @@ namespace Windows.UI.Xaml.Data
             FinalNode.Listen(this);
         }
 
+        internal bool IsDataContextBound => _isDataContextBound;
+
         internal IPropertyPathNode FinalNode { get; }
 
         internal object ValueInternal { get; private set; }
@@ -67,12 +69,6 @@ namespace Windows.UI.Xaml.Data
         {
             get
             {
-                string path = _path;
-                if (_isDataContextBound && (path == null || path.Length < 1))
-                {
-                    return false;
-                }
-
                 IPropertyPathNode node = _firstNode;
                 while (node != null)
                 {
