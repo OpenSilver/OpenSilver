@@ -191,9 +191,9 @@ namespace Windows.UI.Xaml.Shapes
                     context.lineTo(x + width - radiusX, y);
                     context.ellipse(x + width - radiusX, y + radiusY, radiusX, radiusY, Math.PI, Math.PI / 2, Math.PI);
                     context.lineTo(x + width, y + height - radiusY);
-                    context.ellipse(x + width - radiusX, y + width - radiusY, radiusX, radiusY, Math.PI, Math.PI, 3 * Math.PI / 2);
+                    context.ellipse(x + width - radiusX, y + height - radiusY, radiusX, radiusY, Math.PI, Math.PI, 3 * Math.PI / 2);
                     context.lineTo(x + radiusX, y + height);
-                    context.ellipse(x + radiusX, y + width - radiusY, radiusX, radiusY, Math.PI, 3 * Math.PI / 2, 2 * Math.PI);
+                    context.ellipse(x + radiusX, y + height - radiusY, radiusX, radiusY, Math.PI, 3 * Math.PI / 2, 2 * Math.PI);
                     context.lineTo(x, y + radiusY);
                     context.ellipse(x + radiusX, y + radiusY, radiusX, radiusY, Math.PI, 2 * Math.PI, Math.PI / 2);
                 }
