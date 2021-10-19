@@ -181,11 +181,11 @@
       Importance="normal"/>
     <Message
       Condition="'$(IsSecondPass)'!='True'"
-      Text="OpenSilver Pass 1"
+      Text="OpenSilver Pass 1. Assembly name - $(AssemblyName)"
       Importance="normal"/>
     <Message
       Condition="'$(IsSecondPass)'=='True'"
-      Text="OpenSilver Pass 2"
+      Text="OpenSilver Pass 2. Assembly name - $(AssemblyName)"
       Importance="normal"/>
 
     <!--============================================================
@@ -548,11 +548,11 @@
                 Text="Copying resources from &quot;$(MSBuildThisFileDirectory)&quot; to &quot;$(BaseIntermediateOutputPath)..\wwwroot\libs\&quot;"
                 Importance="normal"/>-->
     
-    <Message  Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
+    <Message  Condition="'$(IsBrowserProject)' == 'true'"
                 Text="Copying OpenSilver's required js/css libraries."
                 Importance="normal"/>
 
-    <Copy Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
+    <Copy Condition="'$(IsBrowserProject)' == 'true'"
         SourceFiles="@(MySourceFiles)"
         SkipUnchangedFiles="true"
         DestinationFolder="$(BaseIntermediateOutputPath)..\wwwroot\libs\"
@@ -566,10 +566,10 @@
     </PropertyGroup>
 
     <!--============================================================
-      ResourceExtractorAndCopier (only during Pass 2)
+      ResourceExtractorAndCopier (only during Pass 1)
       ============================================================-->
     <ResourcesExtractorAndCopier
-      Condition="'$(IsSecondPass)'=='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
+      Condition="'$(IsSecondPass)'!='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
       SourceAssembly="$(ResourcesSourceLocation)\$(AssemblyName).dll"
       OutputRootPath="$(ResourcesRootOutput)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
@@ -588,7 +588,7 @@
       Launch the second pass (only during Pass 1)
       ============================================================-->
     <MSBuild
-      Condition="'$(IsSecondPass)'!='True'"
+      Condition="'$(IsSecondPass)'!='True' And '$(IsBrowserProject)'!='true'"
       Projects="$(MSBuildProjectFile)"
       Properties="IsSecondPass=True;EnableBridgeCompilation=True"
       />
