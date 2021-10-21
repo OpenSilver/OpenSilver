@@ -22,14 +22,6 @@ namespace Windows.UI.Xaml.Controls
 {
     public partial class DataGridColumn
     {
-        /// <summary>
-        /// Gets or sets a property name, or a period-delimited hierarchy of property names, that indicates the member to sort by.
-        /// </summary>
-        /// <returns>
-        /// The path to the data-item member to sort by.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public string SortMemberPath { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the user can change the column display position by dragging the column header.
@@ -53,19 +45,6 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         [OpenSilver.NotImplemented]
         public bool CanUserResize
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether the user can sort the column by clicking the column header.
-        /// </summary>
-        /// <returns>
-        /// true if the user can sort the column; false if the user cannot sort the column.
-        /// The default is the current <see cref="P:System.Windows.Controls.DataGrid.CanUserSortColumns" /> property value.
-        /// </returns>
-        [OpenSilver.NotImplemented]
-        public bool CanUserSort
         {
             get; set;
         }

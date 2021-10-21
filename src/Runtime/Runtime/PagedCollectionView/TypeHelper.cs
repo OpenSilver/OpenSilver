@@ -239,7 +239,7 @@ namespace Windows.UI.Xaml.Common
         /// <param name="propertyPath">Property path.</param>
         /// <param name="index">Set to the index if return value is an indexer, otherwise null.</param>
         /// <returns>PropertyInfo for either a property or an indexer.</returns>
-        private static PropertyInfo GetPropertyOrIndexer(this Type type, string propertyPath, out object[] index)
+        internal static PropertyInfo GetPropertyOrIndexer(this Type type, string propertyPath, out object[] index)
         {
             index = null;
             if (string.IsNullOrEmpty(propertyPath) || propertyPath[0] != LeftIndexerToken)
@@ -342,7 +342,7 @@ namespace Windows.UI.Xaml.Common
         /// </summary>
         /// <param name="propertyPath">Path to split.</param>
         /// <returns>List of property substrings.</returns>
-        private static List<string> SplitPropertyPath(string propertyPath)
+        internal static List<string> SplitPropertyPath(string propertyPath)
         {
             List<string> propertyPaths = new List<string>();
             if (!string.IsNullOrEmpty(propertyPath))

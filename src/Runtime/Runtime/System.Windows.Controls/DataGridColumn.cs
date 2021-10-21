@@ -14,10 +14,15 @@
 
 
 using CSHTML5.Internal;
+using System;
+using System.ComponentModel;
+using System.Linq;
 #if MIGRATION
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
 #endif
 
 #if MIGRATION
@@ -64,6 +69,76 @@ namespace Windows.UI.Xaml.Controls
             {
                 column._header.Content = e.NewValue;
             }
+        }
+
+        /// <summary>
+        /// Holds the name of the member to use for sorting, if not using the default.
+        /// </summary>
+        public string SortMemberPath
+        {
+            get;
+            set;
+        }
+
+        internal DataGrid OwningGrid
+        {
+            get;
+            set;
+        }
+
+        internal bool? CanUserSortInternal
+        {
+            get;
+            set;
+        }
+        public bool CanUserSort
+        {
+            get
+            {
+                if (this.CanUserSortInternal.HasValue)
+                {
+                    return this.CanUserSortInternal.Value;
+                }
+                else if (this.OwningGrid != null)
+                {
+                    string propertyPath = GetSortPropertyName();
+                    Type propertyType = this.OwningGrid.DataConnection.DataType.GetNestedType(propertyPath);
+
+                    // if the type is nullable, then we will compare the non-nullable type
+                    if (Common.TypeHelper.IsNullableType(propertyType))
+                    {
+                        propertyType = Common.TypeHelper.GetNonNullableType(propertyType);
+                    }
+
+                    // return whether or not the property type can be compared
+                    return (typeof(IComparable).IsAssignableFrom(propertyType)) ? true : false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            set
+            {
+                this.CanUserSortInternal = value;
+            }
+        }
+
+        internal string GetSortPropertyName()
+        {
+            string result = this.SortMemberPath;
+
+            if (String.IsNullOrEmpty(result))
+            {
+                DataGridBoundColumn boundColumn = this as DataGridBoundColumn;
+                PropertyPath memberPath = ((Binding)boundColumn.Binding).Path;
+                if (boundColumn != null && boundColumn.Binding != null && memberPath != null)
+                {
+                    result = memberPath.Path;
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -326,7 +401,21 @@ namespace Windows.UI.Xaml.Controls
 
         private void Header_OnClick(object sender, RoutedEventArgs e)
         {
-            //todo: sort
+            if (CanUserSort)
+            {
+                DataGridColumnHeader header = sender as DataGridColumnHeader;
+                string column = header.Content.ToString();
+                var s = _parent.PagedView.SortDescriptions.Where(x => x.PropertyName == column).FirstOrDefault();
+
+                var direction = ListSortDirection.Ascending;
+                if (s != null)
+                {
+                    direction = s.Direction == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+                }
+
+                _parent.PagedView.SortDescriptions.Clear();
+                _parent.PagedView.SortDescriptions.Add(new PropertySortDescription(column, direction));
+            }
         }
 
         internal DataGridColumnHeader GetHeader()
@@ -381,14 +470,14 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A new, read-only element that is bound to the column's <see cref="P:System.Windows.Controls.DataGridBoundColumn.Binding" /> property value.
         /// </returns>
-        protected abstract FrameworkElement GenerateElement(DataGridCell cell, object dataItem); 
+        protected abstract FrameworkElement GenerateElement(DataGridCell cell, object dataItem);
 
         internal FrameworkElement GenerateElementInternal(DataGridCell cell, object dataItem)
         {
             return GenerateElement(cell, dataItem);
         }
 
-        internal virtual void EnterEditionMode(DataGridCell dataGridCell) 
+        internal virtual void EnterEditionMode(DataGridCell dataGridCell)
         {
         }
 
