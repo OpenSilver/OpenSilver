@@ -46,7 +46,7 @@ class ResizeObserverAdapter {
     observe(element, callback) {
 
         this.observer.observe(element);
-        this.callbacks[element] = debounce(callback, 100);
+        this.callbacks[element.id] = debounce(callback, 100);
     }
 
     unobserve(element) {
@@ -58,8 +58,7 @@ class ResizeObserverAdapter {
     onResize(resizedElements) {
 
         for (const element of resizedElements) {
-
-            this.callbacks[element.target](element.contentRect.width + '|' + element.contentRect.height);
+            this.callbacks[element.target.id](element.contentRect.width + '|' + element.contentRect.height);
         }
     }
 }
