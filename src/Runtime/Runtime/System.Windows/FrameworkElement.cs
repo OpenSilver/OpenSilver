@@ -972,9 +972,11 @@ namespace Windows.UI.Xaml
 
             Point visualOffset = new Point(alignedOffset.X - containingRect.Location.X, alignedOffset.Y - containingRect.Location.Y);
 
+            VisualBounds = new Rect(visualOffset, arrangedSize);
+
             // Call SizeChanged event handlers
             if (!this.IsCustomLayoutRoot)
-                this.HandleSizeChanged(arrangedSize);
+                this.HandleSizeChanged(new Size(VisualBounds.Width, VisualBounds.Height));
 
             if (isFirstRendering)
             {
