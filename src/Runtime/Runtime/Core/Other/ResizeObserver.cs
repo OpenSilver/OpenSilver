@@ -111,8 +111,8 @@ namespace CSHTML5.Internal
         private class ResizeObserver : IResizeObserver
         {
             private const string CREATE_OBSERVER_JS = "new ResizeObserverAdapter()";
-            private const string ADD_OBSERVER_JS_TEMPLATE = "$0.observe($1, $2)";
-            private const string REMOVE_OBSERVER_JS_TEMPLATE = "$0.unobserve($1)";
+            private const string ADD_OBSERVER_JS_TEMPLATE = "{0}.observe({1}, {2})";
+            private const string REMOVE_OBSERVER_JS_TEMPLATE = "{0}.unobserve({1})";
 
             // Holds the reference to the observer js object.
             private readonly object _observerJsReference;
@@ -122,19 +122,23 @@ namespace CSHTML5.Internal
             /// </summary>
             public ResizeObserver()
             {
-                this._observerJsReference = Interop.ExecuteJavaScript(CREATE_OBSERVER_JS);
+                this._observerJsReference = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(Interop.ExecuteJavaScript(CREATE_OBSERVER_JS));
             }
 
             /// <inheritdoc />
             public void Observe(object elementReference, Action<Size> callback)
             {
-                Interop.ExecuteJavaScript(ADD_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference, new Action<string>((string arg) => callback(ParseSize(arg))));
+                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
+                string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(new Action<string>((string arg) => callback(ParseSize(arg))));
+
+                Interop.ExecuteJavaScript(string.Format(ADD_OBSERVER_JS_TEMPLATE, this._observerJsReference, sElement, sAction));
             }
 
             /// <inheritdoc />
             public void Unobserve(object elementReference)
             {
-                Interop.ExecuteJavaScript(REMOVE_OBSERVER_JS_TEMPLATE, this._observerJsReference, elementReference);
+                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
+                Interop.ExecuteJavaScript(string.Format(REMOVE_OBSERVER_JS_TEMPLATE, this._observerJsReference, sElement));
             }
         }
     }
