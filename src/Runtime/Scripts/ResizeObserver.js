@@ -44,21 +44,26 @@ class ResizeObserverAdapter {
     }
 
     observe(element, callback) {
-
-        this.observer.observe(element);
-        this.callbacks[element.id] = debounce(callback, 100);
+        if (element && element.id) {
+            this.observer.observe(element);
+            this.callbacks[element.id] = debounce(callback, 100);
+        }
     }
 
     unobserve(element) {
-
-        this.observer.unobserve(element);
-        delete this.callbacks[element];
+        if (element && element.id) {
+            this.observer.unobserve(element);
+            delete this.callbacks[element.id];
+        }
     }
 
     onResize(resizedElements) {
 
         for (const element of resizedElements) {
-            this.callbacks[element.target.id](element.contentRect.width + '|' + element.contentRect.height);
+            if (this.callbacks[element.target.id])
+            {
+                this.callbacks[element.target.id](element.contentRect.width + '|' + element.contentRect.height);
+            }
         }
     }
 }

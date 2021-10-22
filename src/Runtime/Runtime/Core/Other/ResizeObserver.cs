@@ -38,7 +38,7 @@ namespace CSHTML5.Internal
             }
             else
             {
-                return new ResizeObserver();
+                return ResizeObserver.Instance;
             }
         }
 
@@ -114,13 +114,16 @@ namespace CSHTML5.Internal
             private const string ADD_OBSERVER_JS_TEMPLATE = "{0}.observe({1}, {2})";
             private const string REMOVE_OBSERVER_JS_TEMPLATE = "{0}.unobserve({1})";
 
+            private static ResizeObserver _instance;
+            public static ResizeObserver Instance => _instance ?? (_instance = new ResizeObserver());
+
             // Holds the reference to the observer js object.
             private readonly object _observerJsReference;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ResizeObserver"/>.
             /// </summary>
-            public ResizeObserver()
+            private ResizeObserver()
             {
                 this._observerJsReference = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(Interop.ExecuteJavaScript(CREATE_OBSERVER_JS));
             }
