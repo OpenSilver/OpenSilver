@@ -131,7 +131,11 @@ $1.appendChild(popupRoot);
 
             object popupRootDiv;
 
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
             if (Interop.IsRunningInTheSimulator)
+#endif
                 popupRootDiv = new INTERNAL_HtmlDomElementReference(uniquePopupRootIdentifier, null);
             else
                 popupRootDiv = Interop.ExecuteJavaScriptAsync("document.getElementByIdSafe($0)", uniquePopupRootIdentifier);

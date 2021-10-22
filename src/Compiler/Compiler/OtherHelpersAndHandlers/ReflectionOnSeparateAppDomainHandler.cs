@@ -110,11 +110,6 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.GetContentPropertyName(namespaceName, localTypeName, assemblyNameIfAny);
         }
 
-        public bool DoesTypeContainAttributeToConvertDirectContent(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-        {
-            return _marshalledObject.DoesTypeContainAttributeToConvertDirectContent(namespaceName, localTypeName, assemblyNameIfAny);
-        }
-
         public bool IsPropertyAttached(string propertyName, string declaringTypeNamespaceName, string declaringTypeLocalName, string parentNamespaceName, string parentLocalTypeName, string declaringTypeAssemblyIfAny = null)
         {
             return _marshalledObject.IsPropertyAttached(propertyName, declaringTypeNamespaceName, declaringTypeLocalName, parentNamespaceName, parentLocalTypeName, declaringTypeAssemblyIfAny);
@@ -205,9 +200,9 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.IsTypeAnEnum(namespaceName, localTypeName, assemblyNameIfAny);
         }
 
-        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+        public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out string returnValueAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
         {
-            _marshalledObject.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
+            _marshalledObject.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out returnValueAssemblyName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
         public void GetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
@@ -215,9 +210,9 @@ namespace DotNetForHtml5.Compiler
             _marshalledObject.GetMethodInfo(methodName, namespaceName, localTypeName, out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
-        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
+        public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
         {
-            _marshalledObject.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, out propertyNamespaceName, out propertyLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny, isAttached: isAttached);
+            _marshalledObject.GetPropertyOrFieldTypeInfo(propertyOrFieldName, namespaceName, localTypeName, out propertyNamespaceName, out propertyLocalTypeName, out propertyAssemblyName, out isTypeString, out isTypeEnum, assemblyNameIfAny, isAttached: isAttached);
         }
 
         public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
@@ -335,13 +330,24 @@ namespace DotNetForHtml5.Compiler
             /// <returns>The assembly simple name</returns>
             public string LoadAssembly(string assemblyPath, bool loadReferencedAssembliesToo, bool isBridgeBasedVersion, bool isCoreAssembly, string nameOfAssembliesThatDoNotContainUserCode, bool skipReadingAttributesFromAssemblies)
             {
+                bool alreadyLoaded = _loadedAssemblyPathToAssembly.ContainsKey(assemblyPath);
+
                 // Load the specified assembly and process it if not already done:
                 Assembly assembly = LoadAndProcessAssemblyFromPath(assemblyPath, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: isCoreAssembly, skipReadingAttributesFromAssemblies: skipReadingAttributesFromAssemblies);
 
-                // Also load the referenced assemblies too if instructed to do so:
                 if (loadReferencedAssembliesToo)
                 {
-                    LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies);
+                    LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode);
+                }
+
+                // Also load the referenced assemblies too if instructed to do so:
+                if (!skipReadingAttributesFromAssemblies && !alreadyLoaded)
+                {
+                    ReadXmlnsDefinitionAttributes(assembly, isBridgeBasedVersion);
+                    if (loadReferencedAssembliesToo)
+                    {
+                        ReadXmlnsAttributesFromReferencedAssemblies(assembly, isBridgeBasedVersion);
+                    }
                 }
 
                 string assemblySimpleName = assembly.GetName().Name;
@@ -369,10 +375,19 @@ namespace DotNetForHtml5.Compiler
                                 simpleNameOfAssembliesProcessedDuringRecursion.Add(referencedAssemblySimpleName);
 
                                 // Recursion:
-                                LoadAndProcessReferencedAssemblies(referencedAssembly, referencedAssemblyFolder, isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies, whatElseToDoWithTheReferencedAssembly);
+                                LoadAndProcessReferencedAssemblies(referencedAssembly, referencedAssemblyFolder, isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, whatElseToDoWithTheReferencedAssembly);
+                                if (!skipReadingAttributesFromAssemblies)
+                                {
+                                    ReadXmlnsAttributesFromReferencedAssemblies(referencedAssembly, isBridgeBasedVersion);
+                                }
                             }
                         };
-                LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies, whatElseToDoWithTheReferencedAssembly);
+
+                LoadAndProcessReferencedAssemblies(assembly, Path.GetDirectoryName(assemblyPath), isBridgeBasedVersion, nameOfAssembliesThatDoNotContainUserCode, whatElseToDoWithTheReferencedAssembly);
+                if (!skipReadingAttributesFromAssemblies)
+                {
+                    ReadXmlnsAttributesFromReferencedAssemblies(assembly, isBridgeBasedVersion);
+                }
 
                 assemblySimpleNames = new List<string>(simpleNameOfAssembliesProcessedDuringRecursion);
             }
@@ -389,7 +404,21 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            void LoadAndProcessReferencedAssemblies(Assembly assembly, string originalAssemblyFolder, bool isBridgeBasedVersion, string nameOfAssembliesThatDoNotContainUserCode, bool skipReadingAttributesFromAssemblies, ReferencedAssemblyLoadedDelegate whatElseToDoWithTheReferencedAssembly = null)
+            private void ReadXmlnsAttributesFromReferencedAssemblies(Assembly assembly, bool isBridgeBasedVersion)
+            {
+                var referencedAssemblies = assembly.GetReferencedAssemblies();
+
+                Assembly referencedAssembly;
+                foreach (var referencedAssemblyName in referencedAssemblies)
+                {
+                    if (_loadedAssemblySimpleNameToAssembly.TryGetValue(referencedAssemblyName.Name, out referencedAssembly))
+                    {
+                        ReadXmlnsDefinitionAttributes(referencedAssembly, isBridgeBasedVersion);
+                    }
+                }
+            }
+
+            void LoadAndProcessReferencedAssemblies(Assembly assembly, string originalAssemblyFolder, bool isBridgeBasedVersion, string nameOfAssembliesThatDoNotContainUserCode, ReferencedAssemblyLoadedDelegate whatElseToDoWithTheReferencedAssembly = null)
             {
                 // Skip the assembly if it is not a user assembly:
                 HashSet<string> assembliesToSkipLowercase;
@@ -491,17 +520,10 @@ namespace DotNetForHtml5.Compiler
 #endif
                             }
 #endif
-                            if (referencedAssembly != null)
-                            {
-                                if (!skipReadingAttributesFromAssemblies)
-                                {
-                                    ReadXmlnsDefinitionAttributes(referencedAssembly, isBridgeBasedVersion);
-                                }
-                            }
                         }
 
                         if (referencedAssembly != null)
-                        { 
+                        {
                             // Remember the assembly simple name:
                             string assemblySimpleName = referencedAssemblyName.Name;
                             _loadedAssemblySimpleNameToAssembly[assemblySimpleName] = referencedAssembly;
@@ -555,8 +577,7 @@ namespace DotNetForHtml5.Compiler
                     assembly = Assembly.LoadFrom(assemblyPath);
 #endif
 
-#endif
-
+#endif                  
                     // Remember the assembly if it is a core assembly:
                     if (isCoreAssembly && !_coreAssemblies.Contains(assembly))
                     {
@@ -564,17 +585,13 @@ namespace DotNetForHtml5.Compiler
                     }
 
                     _loadedAssemblyPathToAssembly[assemblyPath] = assembly;
-                    _loadedAssemblySimpleNameToAssembly[assembly.GetName().Name] = assembly; // Note: this line is here in order to be done before "ProcessLoadedAssembly" (though such order may not be necessarily required)
-                    if (!skipReadingAttributesFromAssemblies)
-                    {
-                        ReadXmlnsDefinitionAttributes(assembly, isBridgeBasedVersion);
-                    }
                 }
                 else
                 {
                     assembly = _loadedAssemblyPathToAssembly[assemblyPath];
-                    _loadedAssemblySimpleNameToAssembly[assembly.GetName().Name] = assembly;
                 }
+
+                _loadedAssemblySimpleNameToAssembly[assembly.GetName().Name] = assembly; // Note: this line is here in order to be done before "ProcessLoadedAssembly" (though such order may not be necessarily required)
 
                 return assembly;
             }
@@ -765,23 +782,19 @@ namespace DotNetForHtml5.Compiler
 
             Type FindType(string namespaceName, string localTypeName, string filterAssembliesAndRetainOnlyThoseThatHaveThisName = null, bool doNotRaiseExceptionIfNotFound = false)
             {
-                Type type;
-
                 // Fix the namespace:
-                if (namespaceName.ToLower().StartsWith("using:"))
+                if (namespaceName.StartsWith("using:", StringComparison.CurrentCultureIgnoreCase))
                 {
                     namespaceName = namespaceName.Substring("using:".Length);
                 }
-                else if (namespaceName.ToLower().StartsWith("clr-namespace:"))
+                else if (namespaceName.StartsWith("clr-namespace:", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    string ns;
-                    string assemblyNameIfAny;
-                    GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(namespaceName, out ns, out assemblyNameIfAny);
+                    GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(namespaceName, out var ns, out var assemblyNameIfAny);
                     namespaceName = ns;
                     GettingInformationAboutXamlTypes.FixNamespaceForCompatibility(ref assemblyNameIfAny, ref namespaceName);
                 }
 
-                if (namespaceName.ToLower().StartsWith("global::")) // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style namespace (cf. section that handles Binding in "GeneratingCSharpCode.cs")
+                if (namespaceName.StartsWith("global::", StringComparison.CurrentCultureIgnoreCase)) // Note: normally in XAML there is no "global::", but we may enter this method passing a C#-style namespace (cf. section that handles Binding in "GeneratingCSharpCode.cs")
                 {
                     namespaceName = namespaceName.Substring("global::".Length);
                 }
@@ -796,76 +809,53 @@ namespace DotNetForHtml5.Compiler
                 string fullTypeNameWithNamespaceInsideBraces = !string.IsNullOrEmpty(namespaceName) ? "{" + namespaceName + "}" + localTypeName : localTypeName;
 
                 // Start by looking in the cache dictionary:
-                if (!_typeNameToType.TryGetValue(fullTypeNameWithNamespaceInsideBraces, out type))
+                if (_typeNameToType.TryGetValue(fullTypeNameWithNamespaceInsideBraces, out var type))
                 {
-                    // Look for the type in all loaded assemblies:
-                    string assemblyNameWhereTheTypeWasFound = string.Empty;
-                    string fullTypeNameFound = string.Empty;
-                    foreach (var assemblyKeyValuePair in _loadedAssemblySimpleNameToAssembly)
+                    return type;
+                }
+
+                // Look for the type in all loaded assemblies:
+                foreach (var assemblyKeyValuePair in _loadedAssemblySimpleNameToAssembly)
+                {
+                    string assemblySimpleName = assemblyKeyValuePair.Key;
+                    Assembly assembly = assemblyKeyValuePair.Value;
+                    if (filterAssembliesAndRetainOnlyThoseThatHaveThisName == null
+                        || assemblySimpleName == filterAssembliesAndRetainOnlyThoseThatHaveThisName)
                     {
-                        string assemblySimpleName = assemblyKeyValuePair.Key;
-                        Assembly assembly = assemblyKeyValuePair.Value;
-                        if (filterAssembliesAndRetainOnlyThoseThatHaveThisName == null
-                            || assemblySimpleName == filterAssembliesAndRetainOnlyThoseThatHaveThisName)
+                        List<string> namespacesToLookInto = new List<string>();
+
+                        // If the namespace is a XML namespace (eg. "{http://schemas.microsoft.com/winfx/2006/xaml/presentation}"), we should iterate through all the corresponding CLR namespaces:
+                        if (isNamespaceAnXmlNamespace(namespaceName))
                         {
-                            List<string> namespacesToLookInto = new List<string>();
-
-                            // If the namespace is a XML namespace (eg. "{http://schemas.microsoft.com/winfx/2006/xaml/presentation}"), we should iterate through all the corresponding CLR namespaces:
-                            if (isNamespaceAnXmlNamespace(namespaceName))
+                            namespacesToLookInto.AddRange(GetClrNamespacesFromXmlNamespace(assemblySimpleName, namespaceName));
+                        }
+                        else
+                        {
+                            namespacesToLookInto.Add(namespaceName);
+                        }
+                                
+                        // Search for the type:
+                        foreach (var namespaceToLookInto in namespacesToLookInto)
+                        {
+                            string fullTypeNameToFind = namespaceToLookInto + "." + localTypeName;
+                            var typeIfFound = assembly.GetType(fullTypeNameToFind);
+                            if (typeIfFound == null)
                             {
-                                foreach (var clrNamespace in GetClrNamespacesFromXmlNamespace(assemblySimpleName, namespaceName))
-                                    namespacesToLookInto.Add(clrNamespace);
+                                //try to find a matching nested type.
+                                fullTypeNameToFind = namespaceToLookInto + "+" + localTypeName;
+                                typeIfFound = assembly.GetType(fullTypeNameToFind);
                             }
-                            else
-                                namespacesToLookInto.Add(namespaceName);
 
-                            // Search for the type:
-                            foreach (var namespaceToLookInto in namespacesToLookInto)
+                            if (typeIfFound != null)
                             {
-                                string fullTypeNameToFind = namespaceToLookInto + "." + localTypeName;
-                                var typeIfFound = assembly.GetType(fullTypeNameToFind);
-                                if (typeIfFound != null)
-                                {
-                                    if (type != null)
-                                    {
-                                        //throw new Exception(string.Format("Ambiguous type declaration: the type \"{0}\" is declared at multiple locations. The type \"{1}\" defined in the assembly \"{2}\" appears to have the same identifier as the type \"{3}\" defined in the assembly \"{4}\".", fullTypeNameWithNamespaceInsideBraces, fullTypeNameToFind, assemblySimpleName, fullTypeNameFound, assemblyNameWhereTheTypeWasFound));
-                                        if (string.CompareOrdinal(typeIfFound.Namespace, type.Namespace) == -1)
-                                            type = typeIfFound;
-                                    }
-
-                                    type = typeIfFound;
-                                    assemblyNameWhereTheTypeWasFound = assemblySimpleName;
-                                    fullTypeNameFound = fullTypeNameToFind;
-                                }
-                                else
-                                {
-                                    //try to find a matching nested type.
-                                    fullTypeNameToFind = namespaceToLookInto + "+" + localTypeName;
-                                    typeIfFound = assembly.GetType(fullTypeNameToFind);
-                                    {
-                                        if (typeIfFound != null)
-                                        {
-                                            if (type != null)
-                                            {
-                                                //throw new Exception(string.Format("Ambiguous type declaration: the type \"{0}\" is declared at multiple locations. The type \"{1}\" defined in the assembly \"{2}\" appears to have the same identifier as the type \"{3}\" defined in the assembly \"{4}\".", fullTypeNameWithNamespaceInsideBraces, fullTypeNameToFind, assemblySimpleName, fullTypeNameFound, assemblyNameWhereTheTypeWasFound));
-                                                if (string.CompareOrdinal(typeIfFound.Namespace, type.Namespace) == -1)
-                                                    type = typeIfFound;
-                                            }
-                                            type = typeIfFound;
-                                            assemblyNameWhereTheTypeWasFound = assemblySimpleName;
-                                            fullTypeNameFound = fullTypeNameToFind;
-                                        }
-                                    }
-                                }
+                                _typeNameToType.Add(fullTypeNameWithNamespaceInsideBraces, typeIfFound);
+                                return typeIfFound;
                             }
                         }
                     }
-                    // Add the type to the cache for later reuse:
-                    if (type != null)
-                        _typeNameToType.Add(fullTypeNameWithNamespaceInsideBraces, type);
                 }
 
-                if (type == null && !doNotRaiseExceptionIfNotFound)
+                if (!doNotRaiseExceptionIfNotFound)
                     throw new wpf::System.Windows.Markup.XamlParseException(
                         "Type not found: \"" + localTypeName + "\""
                         + (!string.IsNullOrEmpty(namespaceName) ? " in namespace: \"" + namespaceName + "\"" : "")
@@ -873,24 +863,6 @@ namespace DotNetForHtml5.Compiler
                         + ".");
 
                 return type;
-            }
-
-            public bool DoesTypeContainAttributeToConvertDirectContent(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
-            {
-                var type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-
-                // Attempt to get the instance of the attribute if any:
-#if BRIDGE || CSHTML5BLAZOR
-                Type supportsDirectContentViaTypeFromStringConvertersAttributeType = this.FindType("System.Windows.Markup", "SupportsDirectContentViaTypeFromStringConvertersAttribute");
-#else
-                Type supportsDirectContentViaTypeFromStringConvertersAttributeType = typeof(DotNetForHtml5Core::System.Windows.Markup.SupportsDirectContentViaTypeFromStringConvertersAttribute);
-#endif
-                var attribute = Attribute.GetCustomAttribute(type, supportsDirectContentViaTypeFromStringConvertersAttributeType);
-
-                if (attribute != null)
-                    return true;
-                else
-                    return false;
             }
 
             public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
@@ -936,11 +908,6 @@ namespace DotNetForHtml5.Compiler
             public XName GetCSharpEquivalentOfXamlTypeAsXName(string namespaceName, string localTypeName, string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
             {
                 //todo: in this method, we assume that the alias will be global, which will be false if the user chose something else --> find the right alias.
-
-                // Ensure that "ifTypeNotFoundTryGuessing" is always false if the namespace is not a CLR namespace. In fact, in that case, we are unable to guess:
-                if (ifTypeNotFoundTryGuessing && isNamespaceAnXmlNamespace(namespaceName))
-                    ifTypeNotFoundTryGuessing = false;
-
                 // Find the type:
                 Type type = FindType(namespaceName, localTypeName, assemblyNameIfAny, doNotRaiseExceptionIfNotFound: ifTypeNotFoundTryGuessing);
                 if (type == null)
@@ -948,7 +915,8 @@ namespace DotNetForHtml5.Compiler
                     if (ifTypeNotFoundTryGuessing)
                     {
                         // Try guessing:
-                        return XName.Get(!string.IsNullOrEmpty(namespaceName) ? namespaceName + "." + localTypeName : localTypeName, "global::");
+
+                        return XName.Get(localTypeName, string.IsNullOrEmpty(namespaceName) ? "" : namespaceName);
                     }
                     else
                     {
@@ -962,39 +930,60 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            public string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false)
+            public string GetCSharpEquivalentOfXamlTypeAsString(
+                string namespaceName, 
+                string localTypeName, 
+                string assemblyNameIfAny = null, 
+                bool ifTypeNotFoundTryGuessing = false)
             {
-                //todo: in this method, we assume that the alias will be global, which will be false if the user chose something else --> find the right alias.
+                // todo: in this method, we assume that the alias will be global,
+                // which will be false if the user chose something else --> find
+                // the right alias.
 
-                // Ensure that "ifTypeNotFoundTryGuessing" is always false if the namespace is not a CLR namespace. In fact, in that case, we are unable to guess:
-                if (isNamespaceAnXmlNamespace(namespaceName))
-                    ifTypeNotFoundTryGuessing = false;
-
-                // Distinguish between system types (String, Double...) and other types:
-                if (SystemTypesHelper.IsSupportedSystemType(namespaceName, localTypeName, assemblyNameIfAny))
+                // Distinguish between system types (String, Double...) and other types
+                if (SystemTypesHelper.IsSupportedSystemType($"{namespaceName}.{localTypeName}", assemblyNameIfAny))
                 {
-                    return SystemTypesHelper.GetCSharpEquivalentOfXamlType(namespaceName, localTypeName, assemblyNameIfAny);
+                    return SystemTypesHelper.GetFullTypeName(namespaceName, localTypeName, assemblyNameIfAny);
                 }
                 else
                 {
                     // Find the type:
-                    Type type = FindType(namespaceName, localTypeName, assemblyNameIfAny, doNotRaiseExceptionIfNotFound: ifTypeNotFoundTryGuessing);
+                    Type type = FindType(
+                        namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing
+                    );
+
                     if (type == null)
                     {
                         if (ifTypeNotFoundTryGuessing)
                         {
-                            // Try guessing:
-                            return "global::" + (!string.IsNullOrEmpty(namespaceName) ? namespaceName + "." + localTypeName : localTypeName);
+                            // Try guessing
+
+                            if (isNamespaceAnXmlNamespace(namespaceName))
+                            {
+                                // Attempt to find the type in the current namespace
+                                return localTypeName;
+                            }
+                            else
+                            {
+                                return string.Format(
+                                    "global::{0}{1}{2}",
+                                    namespaceName,
+                                    string.IsNullOrEmpty(namespaceName) ? string.Empty : ".",
+                                    localTypeName
+                                );
+                            }
                         }
                         else
                         {
-                            throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Type \"{0}\" not found in namespace \"{1}\".", localTypeName, namespaceName));
+                            throw new wpf::System.Windows.Markup.XamlParseException(
+                                $"Type '{localTypeName}' not found in namespace '{namespaceName}'."
+                            );
                         }
                     }
                     else
                     {
-                        // Use information from the type:
-                        return "global::" + type.ToString();
+                        // Use information from the type
+                        return $"global::{type}";
                     }
                 }
             }
@@ -1192,11 +1181,12 @@ namespace DotNetForHtml5.Compiler
                 return elementType.IsEnum;
             }
 
-            public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+            public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out string returnValueAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
             {
                 var type = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
                 returnValueNamespaceName = this.BuildPropertyPathRecursively(type);
                 returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(type);
+                returnValueAssemblyName = type.Assembly.GetName().Name;
                 isTypeString = (type == typeof(string));
                 isTypeEnum = (type.IsEnum);
             }
@@ -1216,11 +1206,12 @@ namespace DotNetForHtml5.Compiler
                 isTypeEnum = methodInfo.ReturnType.IsEnum;
             }
 
-            public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
+            public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
             {
                 var type = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, isAttached: isAttached);
                 propertyNamespaceName = this.BuildPropertyPathRecursively(type);
                 propertyLocalTypeName = GetTypeNameIncludingGenericArguments(type);
+                propertyAssemblyName = type.Assembly.GetName().Name;
                 isTypeString = (type == typeof(string));
                 isTypeEnum = (type.IsEnum);
             }
@@ -1428,7 +1419,7 @@ namespace DotNetForHtml5.Compiler
                 }
 
                 indexOfLastDot = nameOfTypeToAssignTo.LastIndexOf('.');
-                if(indexOfLastDot == -1)
+                if (indexOfLastDot == -1)
                 {
                     typeOfElementToAssignTo = FindType(nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo);
                 }
@@ -1585,6 +1576,18 @@ namespace DotNetForHtml5.Compiler
                     throw new Exception(ASSEMBLY_NOT_IN_LIST_OF_LOADED_ASSEMBLIES);
             }
 
+            private string GetExtension(string str)
+            {
+                try
+                {
+                    return Path.GetExtension(str);
+                }
+                catch
+                {
+                    //It is possible that resource does not have an extension
+                    return null;
+                }
+            }
 
             public Dictionary<string, byte[]> GetManifestResources(string assemblySimpleName, HashSet<string> supportedExtensionsLowerCase)
             {
@@ -1593,7 +1596,7 @@ namespace DotNetForHtml5.Compiler
                     var assembly = _loadedAssemblySimpleNameToAssembly[assemblySimpleName];
 
                     var manifestResourceNames = assembly.GetManifestResourceNames();
-                    var resourceFiles = (from fn in manifestResourceNames where supportedExtensionsLowerCase.Contains(Path.GetExtension(fn.ToLower())) select fn).ToArray();
+                    var resourceFiles = (from fn in manifestResourceNames where supportedExtensionsLowerCase.Contains(GetExtension(fn.ToLower())) select fn).ToArray();
                     var result = new Dictionary<string, byte[]>();
 
                     foreach (var resourceFile in resourceFiles)

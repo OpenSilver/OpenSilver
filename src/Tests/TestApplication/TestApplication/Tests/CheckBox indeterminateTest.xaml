@@ -1,0 +1,14 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.CheckBox_indeterminateTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <CheckBox x:Name="TestIndeterminateCheckBox1" IsThreeState="False" Content="Without Indeterminate mode"/>
+        <TextBlock Text="{Binding ElementName=TestIndeterminateCheckBox1, Path=IsChecked, TargetNullValue=NULL}"/>
+        <CheckBox x:Name="TestIndeterminateCheckBox2" IsThreeState="True" Content="With Indeterminate mode"/>
+        <TextBlock Text="{Binding ElementName=TestIndeterminateCheckBox2, Path=IsChecked, TargetNullValue=NULL}"/>
+    </StackPanel>
+</sdk:Page>

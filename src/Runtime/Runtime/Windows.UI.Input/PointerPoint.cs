@@ -82,6 +82,16 @@ namespace Windows.UI.Input
             internal set { _position = value; }
         }
 
+        PointerPointProperties _properties = new PointerPointProperties();
+        /// <summary>
+        /// Gets extended information about the input pointer.
+        /// </summary>
+        public PointerPointProperties Properties
+        {
+            get { return _properties; }
+            internal set { _properties = value; }
+        }
+
         //
         // Summary:
         //     Gets extended information about the input pointer.

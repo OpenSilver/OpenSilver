@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.Composition.Primitives;
 
-#if WORKINPROGRESS
 namespace System.ComponentModel.Composition
 {
     //
@@ -61,4 +60,3 @@ namespace System.ComponentModel.Composition
         }
     }
 }
-#endif

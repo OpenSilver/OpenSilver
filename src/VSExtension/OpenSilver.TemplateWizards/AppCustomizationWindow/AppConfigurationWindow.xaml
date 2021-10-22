@@ -15,19 +15,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Width="200" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <StackPanel Margin="10">
-                <TextBlock Margin="5" Text="OpenSilver build type"/>
-                <ComboBox x:Name="BuildTypeComboBox">
-                    <ComboBoxItem IsSelected="True">OpenSilver</ComboBoxItem>
-                    <ComboBoxItem>OpenSilver.WorkInProgress</ComboBoxItem>
-                </ComboBox>
-            </StackPanel>
-
             <StackPanel Margin="10" x:Name="BlazorVersionStackPanel">
-                <TextBlock Margin="5" Text="Blazor version"/>
+                <TextBlock Margin="5" Text="Blazor version:"/>
                 <ComboBox x:Name="BlazorVersionComboBox">
                     <ComboBoxItem IsSelected="True">.NET 5</ComboBoxItem>
-                    <ComboBoxItem>.NET 6 (preview)</ComboBoxItem>
+                    <ComboBoxItem>.NET 6 RC1 (SDK required)</ComboBoxItem>
                 </ComboBox>
             </StackPanel>
         </StackPanel>

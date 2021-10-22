@@ -3,6 +3,5 @@
     public enum OpenSilverBuildType
     {
         Stable,
-        WorkInProgress
     }
 }

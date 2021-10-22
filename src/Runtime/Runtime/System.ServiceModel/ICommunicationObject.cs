@@ -21,7 +21,6 @@ using System;
 
 namespace System.ServiceModel
 {
-#if WORKINPROGRESS
     // Summary:
     //     Defines the contract for the basic state machine for all communication-oriented
     //     objects in the system, including channels, the channel managers, factories,
@@ -279,5 +278,4 @@ namespace System.ServiceModel
         //     and has entered the System.ServiceModel.CommunicationState.Faulted state.
         void Open(TimeSpan timeout);
     }
-#endif
 }

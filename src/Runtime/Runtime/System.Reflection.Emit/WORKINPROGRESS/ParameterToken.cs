@@ -1,4 +1,3 @@
-#if WORKINPROGRESS
 using System.Runtime.InteropServices;
 
 namespace System.Reflection.Emit
@@ -111,4 +110,3 @@ namespace System.Reflection.Emit
 		}
 	}
 }
-#endif

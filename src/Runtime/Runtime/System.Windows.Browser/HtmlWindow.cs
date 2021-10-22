@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,40 +11,17 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CSHTML5;
-using DotNetForHtml5.Core;
-
-#if MIGRATION
-using System.Windows;
-#else
-using Windows.UI.Xaml;
-#endif
 
 namespace System.Windows.Browser
 {
-#if WORKINPROGRESS
     public sealed partial class HtmlWindow : HtmlObject
-#else
-    public sealed partial class HtmlWindow
-#endif
     {
         public HtmlWindow()
         {
 
         }
+
         /// <summary>
         /// Opens the specified page in the specified browser instance, with the indicated user interface features.
         /// </summary>
@@ -54,23 +30,25 @@ namespace System.Windows.Browser
         /// <param name="targetFeatures"></param>
         public void Navigate(Uri navigateToUri, string target = "_self", string targetFeatures = "")
         {
-            if (navigateToUri != null && target != null && targetFeatures!=null)
+            if (navigateToUri != null && target != null && targetFeatures != null)
             {
                 if (target != "_search")
                 {
 #if !CSHTML5NETSTANDARD
                     // The Simulator cannot open a URL in another window/tab:
-                    if (target == "_blank" && CSHTML5.Interop.IsRunningInTheSimulator)
+                    if (target == "_blank" && OpenSilver.Interop.IsRunningInTheSimulator)
                     {
-                        INTERNAL_Simulator.SimulatorProxy.NavigateToUrlInNewBrowserWindow(navigateToUri.ToString());
+                        DotNetForHtml5.Core.INTERNAL_Simulator.SimulatorProxy.NavigateToUrlInNewBrowserWindow(navigateToUri.ToString());
                     }
                     else
                     {
 #endif
-                        if (target == "")
-                            target = "_self";
+                    if (target == "")
+                    {
+                        target = "_self";
+                    }
 
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"window.open($0, $1, $2)", navigateToUri.ToString(), target, targetFeatures);
+                    OpenSilver.Interop.ExecuteJavaScriptAsync(@"window.open($0, $1, $2)", navigateToUri.ToString(), target, targetFeatures);
 #if !CSHTML5NETSTANDARD
                     }
 #endif
@@ -92,19 +70,55 @@ namespace System.Windows.Browser
         /// </summary>
         /// <param name="code">Javascript code.</param>
         /// <returns>The results of the JavaScript engine's evaluation of the string in the code parameter.</returns>
-#if !BRIDGE
-        [JSReplacement("eval($code)")]
-#else
+#if BRIDGE
         [Bridge.Script("eval(code)")]
 #endif
         public object Eval(string code)
         {
-            return CSHTML5.Interop.ExecuteJavaScript(string.Format("eval(\"{0}\")", code)); //Note: this probably doesn't work on multiline code 
+            return OpenSilver.Interop.ExecuteJavaScript("eval($0)", code);
         }
 
-#if WORKINPROGRESS
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public string CurrentBookmark { get; set; }
+
+        /// <summary>
+        /// Displays a dialog box that contains an application-defined message.
+        /// </summary>
+        /// <param name="alertText">
+        /// The text to display.
+        /// </param>
+#if BRIDGE
+        [Bridge.Template("alert(alertText)")]
 #endif
+        public void Alert(string alertText)
+        {
+            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                OpenSilver.Interop.ExecuteJavaScript("alert($0)", alertText);
+            }
+        }
+
+        /// <summary>
+        /// Displays a confirmation dialog box that contains an optional message as well
+        /// as OK and Cancel buttons.
+        /// </summary>
+        /// <param name="confirmText">
+        /// The text to display.
+        /// </param>
+        /// <returns>
+        /// true if the user clicked the OK button; otherwise, false.
+        /// </returns>
+#if BRIDGE
+        [Bridge.Template("confirm(confirmText)")]
+#endif
+        public bool Confirm(string confirmText)
+        {
+            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                return Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("confirm($0)", confirmText));
+            }
+
+            return false;
+        }
     }
 }

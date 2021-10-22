@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,409 +12,128 @@
 *  
 \*====================================================================================*/
 
-
-
 extern alias wpf;
+
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DotNetForHtml5.Compiler
 {
     internal static class ConvertingStringToValue
     {
-        internal static string ConvertStringToValue(string elementTypeInCSharp, string valueAsString)
+        public static string ConvertFromInvariantString(string type, string source)
         {
-            string result = null;
-            string trimmedValueAsString = valueAsString.Trim();
-            string nonNullableElementTypeInCSharp = elementTypeInCSharp;
-            bool goThroughSwitch = true;
-            if (elementTypeInCSharp.StartsWith("global::System.Nullable<"))
+            string value = source.Trim();
+
+            if (IsNullableType(type, out string underlyingType))
             {
-                nonNullableElementTypeInCSharp = elementTypeInCSharp.Substring(24, elementTypeInCSharp.Length - 25); //24 is the length of "global::System.Nullable<" then +1 to also remove the '>' at the end.
-                if (trimmedValueAsString == "null")
+                if (value == "null")
                 {
-                    result = "null";
-                    goThroughSwitch = false;
+                    return "null";
                 }
             }
-            if (goThroughSwitch)
+            
+            string result;
+            
+            switch (underlyingType)
             {
-                switch (nonNullableElementTypeInCSharp)
-                {
-                    //Thickness first because it seems to be the most often used type.
-                    case "global::Windows.UI.Xaml.Thickness":
-                    case "global::System.Windows.Thickness":
-                        result = PrepareStringForThicknessOrCornerRadius(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.UI.Xaml.Media.Brush":
-                    case "global::System.Windows.Media.Brush":
-                        result = PrepareStringForBrush(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.UI.Color":
-                    case "global::System.Windows.Media.Color":
-                        result = PrepareStringForColor(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.UI.Xaml.Media.Animation.KeyTime":
-                    case "global::System.Windows.Media.Animation.KeyTime":
-                        result = PrepareStringForKeyTime(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.UI.Xaml.CornerRadius":
-                    case "global::System.Windows.CornerRadius":
-                        result = PrepareStringForThicknessOrCornerRadius(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::System.Windows.Input.Cursor":
-                        result = PrepareStringForCursor(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.UI.Xaml.Duration":
-                    case "global::System.Windows.Duration":
-                        result = PrepareStringForDuration(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.UI.Xaml.GridLength":
-                    case "global::System.Windows.GridLength":
-                        result = PrepareStringForGridLength(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.UI.Xaml.PropertyPath":
-                    case "global::System.Windows.PropertyPath":
-                        result = PrepareStringForPropertyPath(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::Windows.Foundation.Point":
-                    case "global::System.Windows.Point":
-                        result = PrepareStringForPoint(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::System.Boolean":
-                        result = PrepareStringForBoolean(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::System.Byte":
-                    case "global::System.Int16":
-                    case "global::System.Int32":
-                    case "global::System.SByte":
-                    case "global::System.UInt16":
-                    case "global::System.UInt32":
-                    case "global::System.UInt64":
-                        //Note: for numeric types, removing the quotation marks is sufficient (+ potential additional letter to tell the actual type because casts from int to double for example causes an exception).
-                        result = trimmedValueAsString;
-                        break;
-                    case "global::System.Decimal":
-                        result = PrepareStringForNumericType(trimmedValueAsString, 'M');
-                        break;
-                    case "global::System.Int64":
-                        result = PrepareStringForNumericType(trimmedValueAsString, 'L');
-                        break;
-                    case "global::System.Single":
-                        result = PrepareStringForNumericType(trimmedValueAsString, 'F');
-                        break;
-                    case "global::System.Double": //Special case: doubles can be "Auto" which is translated as double.NaN
-                        result = PrepareStringForDouble(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    case "global::System.Char":
-                        //replace the double quotes (") with single quotes ('):
-                        result = "'" + trimmedValueAsString + "'";
-                        break;
-                    case "global::System.String":
-                    case "global::System.Object":
-                        result = PrepareStringForString(nonNullableElementTypeInCSharp, valueAsString);
-                        break;
-                    default:
-                        //return after escaping (note: we use valueAsString and not trimmedValueAsString because it can be a string that starts or ends with spaces):
-                        result = string.Format("({0})global::DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(typeof({0}), {1})",
-                        nonNullableElementTypeInCSharp,
-                        GetQuotedVerbatimString(valueAsString)); // Note: we use verbatim string (ie. a string that starts with "@") so that the only character we have to escape is the quote (we need to double it).
-                        break;
-                }
+                case "global::System.SByte":
+                case "global::System.UInt16":
+                case "global::System.UInt32":
+                case "global::System.UInt64":
+                    // Note: for numeric types, removing the quotation marks is sufficient
+                    // (+ potential additional letter to tell the actual type because casts
+                    // from int to double for example causes an exception).
+                    result = value;
+                    break;
+
+                case "global::System.Decimal":
+                    result = PrepareStringForDecimal(value);
+                    break;
+
+                case "global::System.Char":
+                    result = PrepareStringForChar(value);
+                    break;
+
+                case "global::System.Object":
+                    result = PrepareStringForString(source);
+                    break;
+
+                default:
+                    // return after escaping (note: we use value and not stringValue
+                    // because it can be a string that starts or ends with spaces)
+                    result = CoreTypesHelper.ConvertFromInvariantStringHelper(
+                        source,
+                        underlyingType
+                    );
+                    break;
             }
 
             return result;
+        }
+
+        private static string PrepareStringForChar(string source)
+        {
+            return string.Concat("'", source, "'");
+        }
+
+        private static string PrepareStringForDecimal(string source)
+        {
+            string value = source.ToLower();
+
+            if (value.EndsWith("m"))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            if (value.EndsWith("."))
+            {
+                value = value.Substring(0, value.Length - 1);
+            }
+
+            if (value.Length == 0)
+            {
+                value = "0";
+            }
+
+            return $"{value}M";
+        }
+
+        internal static string PrepareStringForString(string source)
+        {
+            // "{}" is used to escape '{' (when used at the beginning of the string)
+            string value = source.StartsWith("{}") ? source.Substring(2) : source;
+
+            // Note: we use verbatim string (ie. a string that starts with "@") so
+            // that the only character we have to escape is the quote (we need to
+            // double it).
+            return GetQuotedVerbatimString(value);
+        }
+
+        private static bool IsNullableType(string type, out string underlyingType)
+        {
+            if (type.StartsWith("global::System.Nullable<"))
+            {
+                // skips "global::System.Nullable<" and then remove 
+                // the trailing '>' at the end
+                underlyingType = type.Substring(24, type.Length - 25);
+                return true;
+            }
+
+            underlyingType = type;
+            return false;
         }
 
         /// <summary>
-        /// Adds @" at the beginning of the string and a " at the end, and escapes the quotation marks within by doubling them (turns the content of the string into a Verbatim string)
-        /// Transforming strings from: "stringContent with a \" in it." into: "@\"stringContent with a \"\" in it.\""
+        /// Adds @" at the beginning of the string and a " at the end, and escapes the 
+        /// quotation marks within by doubling them (turns the content of the string 
+        /// into a Verbatim string)
+        /// Transforming strings from: "stringContent with a \" in it." into: 
+        /// "@\"stringContent with a \"\" in it.\""
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        static string GetQuotedVerbatimString(string str)
+        private static string GetQuotedVerbatimString(string s)
         {
-            return "@\"" + str.Replace("\"", "\"\"") + "\"";
+            return "@\"" + s.Replace("\"", "\"\"") + "\"";
         }
-
-        static string PrepareStringForThicknessOrCornerRadius(string elementTypeInCSharp, string valueAsString)
-        {
-            //Note: the way to generate the code for Thickness and CornerRadius is exactly the same but the meanings are different so be careful when modifying this method. It was initially made with Thickness in mind.
-
-            string result;
-            //Now it looks like "left,top, right bottom" (we may or may not have additional spaces or commas.
-            string[] values = valueAsString.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (values.Length == 1)
-            {
-                result = string.Format("new {0}({1})", elementTypeInCSharp, values[0]);
-            }
-            else
-            {
-                string left = values[0]; //topLeft in the case of the CornerRadius
-                string right = values[0]; //bottomRight in the case of the CornerRadius
-                string top = values[1]; //topRight in the case of the CornerRadius
-                string bottom = values[1]; //bottomLeft in the case of the CornerRadius
-
-                if (values.Length == 4) //Note: in the case of CornerRadius, this should always be true if we arrive here.
-                {
-                    right = values[2];
-                    bottom = values[3];
-                }
-                result = string.Format("new {0}({1}, {2}, {3}, {4})", elementTypeInCSharp, left, top, right, bottom);
-            }
-            return result;
-        }
-
-        static string PrepareStringForGridLength(string elementTypeInCSharp, string valueAsString)
-        {
-            string lowercaseFullValueAsString = valueAsString.ToLower();
-            string resultValueAsString;
-            string resultTypeAsString;
-            string globalTypeNameSpace = elementTypeInCSharp.Substring(0, elementTypeInCSharp.LastIndexOf('.')); // todo-perf: If we decide to pass isSLMigration as parameter of ConvertStringToValue, use it here with hard-coded strings rather than getting it from the string for the type.
-            if (lowercaseFullValueAsString.EndsWith("*"))
-            {
-                string lowercaseValue = lowercaseFullValueAsString.Substring(0, lowercaseFullValueAsString.Length - 1);
-                double value;
-                if (lowercaseValue == "")
-                {
-                    resultValueAsString = "1.0";
-                }
-                else if (double.TryParse(lowercaseValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out value))
-                {
-                    resultValueAsString = lowercaseValue;
-                }
-                else
-                    throw new wpf::System.Windows.Markup.XamlParseException("Could not generate GridLength instantiation from string: " + valueAsString);
-                resultTypeAsString = globalTypeNameSpace + ".GridUnitType.Star";
-            }
-            else if (lowercaseFullValueAsString == "auto")
-            {
-                resultValueAsString = "1.0";
-                resultTypeAsString = globalTypeNameSpace + ".GridUnitType.Auto";
-            }
-            else
-            {
-                double value;
-                if (double.TryParse(lowercaseFullValueAsString, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out value))
-                {
-                    resultValueAsString = lowercaseFullValueAsString;
-                    resultTypeAsString = globalTypeNameSpace + ".GridUnitType.Pixel";
-                }
-                else
-                    throw new wpf::System.Windows.Markup.XamlParseException("Could not generate GridLength instantiation from string: " + valueAsString);
-            }
-            return String.Format("new {0}({1}, {2})", elementTypeInCSharp, resultValueAsString, resultTypeAsString);
-        }
-
-        static string PrepareStringForPropertyPath(string elementTypeInCSharp, string valueAsString)
-        {
-            return string.Format("new {0}({1})", elementTypeInCSharp, GetQuotedVerbatimString(valueAsString));
-        }
-
-        static string PrepareStringForPoint(string elementTypeInCSharp, string valueAsString)
-        {
-            string[] splittedString = valueAsString.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (splittedString.Length == 2)
-            {
-                double x = 0d;
-                double y = 0d;
-
-                bool isParseOK = double.TryParse(splittedString[0], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out x);
-                isParseOK = isParseOK && double.TryParse(splittedString[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out y);
-
-                if (isParseOK)
-                    return string.Format("new {0}({1}, {2})", elementTypeInCSharp, x.ToString(System.Globalization.CultureInfo.InvariantCulture), y.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            }
-            throw new wpf::System.Windows.Markup.XamlParseException("Could not generate Point instantiation from string: \"" + valueAsString + "\".");
-        }
-
-        static string PrepareStringForBoolean(string elementTypeInCSharp, string valueAsString)
-        {
-            return valueAsString.ToLower();
-        }
-
-        static string PrepareStringForDouble(string elementTypeInCSharp, string valueAsString)
-        {
-            string trimmedString = valueAsString.Trim();
-
-            if (trimmedString.ToLower() == "auto" || trimmedString.ToLower() == "nan")
-            {
-                return "global::System.Double.NaN";
-            }
-            else if (trimmedString.ToLower() == "infinity")
-            {
-                return "global::System.Double.PositiveInfinity";
-            }
-            else if (trimmedString.ToLower() == "-infinity")
-            {
-                return "global::System.Double.NegativeInfinity";
-            }
-            else
-            {
-                if (trimmedString == ".")
-                {
-                    return "0D";
-                }
-                else if (trimmedString.EndsWith("."))
-                {
-                    return PrepareStringForNumericType(trimmedString.Substring(0, trimmedString.Length - 1), 'D');
-                }
-                else
-                {
-                    return PrepareStringForNumericType(trimmedString, 'D');
-                }
-            }
-        }
-
-        private static string PrepareStringForNumericType(string value, char code)
-        {
-            if (value[value.Length - 1] != code)
-            {
-                return value + code;
-            }
-            return value;
-        }
-
-        internal static string PrepareStringForString(string elementTypeInCSharp, string valueAsString)
-        {
-            string value = valueAsString.StartsWith("{}") ? valueAsString.Substring(2) : valueAsString; // "{}" is used to escape '{' (when used at the beginning of the string)
-            return GetQuotedVerbatimString(value); // Note: we use verbatim string (ie. a string that starts with "@") so that the only character we have to escape is the quote (we need to double it).
-        }
-
-        static string PrepareStringForColor(string elementTypeInCSharp, string valueAsString)
-        {
-            string trimmedString = valueAsString.Trim();
-            if (!string.IsNullOrEmpty(trimmedString) && (trimmedString[0] == '#'))
-            {
-                string tokens = trimmedString.Substring(1);
-                if (tokens.Length == 6) // This is becaue XAML is tolerant when the user has forgot the alpha channel (eg. #DDDDDD for Gray).
-                    tokens = "FF" + tokens;
-
-                int color;
-                if (int.TryParse(tokens, NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out color))
-                {
-                    return string.Format("new {0}() {{ A = (byte){1}, R = (byte){2}, G = (byte){3}, B = (byte){4} }}",
-                        elementTypeInCSharp,
-                        (color >> 0x18) & 0xff,
-                        (color >> 0x10) & 0xff,
-                        (color >> 8) & 0xff,
-                        color & 0xff);
-                }
-            }
-            else if (trimmedString != null && trimmedString.StartsWith("sc#", StringComparison.Ordinal))
-            {
-                string tokens = trimmedString.Substring(3);
-
-                char[] separators = new char[1] { ',' };
-                string[] words = tokens.Split(separators);
-                float[] values = new float[4];
-                for (int i = 0; i < 3; i++)
-                {
-                    values[i] = Convert.ToSingle(words[i]);
-                }
-                if (words.Length == 4)
-                {
-                    values[3] = Convert.ToSingle(words[3]);
-                    return string.Format("{0}.FromScRgb((float){1}, (float){2}, (float){3}, (float){4})",
-                        elementTypeInCSharp,
-                        values[0], values[1], values[2], values[3]);
-                }
-                else
-                {
-                    return string.Format("{0}.FromScRgb((float){1}, (float){2}, (float){3}, (float){4})",
-                        elementTypeInCSharp,
-                        1.0f, values[0], values[1], values[2]);
-                }
-            }
-            else
-            {
-                ColorsEnum namedColor;
-                if (Enum.TryParse(trimmedString, true, out namedColor))
-                {
-                    int color = (int)namedColor;
-                    return string.Format("new {0}() {{ A = (byte){1}, R = (byte){2}, G = (byte){3}, B = (byte){4} }}",
-                        elementTypeInCSharp,
-                        (color >> 0x18) & 0xff,
-                        (color >> 0x10) & 0xff,
-                        (color >> 8) & 0xff,
-                        color & 0xff);
-                }
-            }
-            throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Invalid color: {0}", valueAsString));
-        }
-
-        static string PrepareStringForBrush(string elementTypeInCSharp, string valueAsString)
-        {
-            string brushNamespace = elementTypeInCSharp.Substring(0, elementTypeInCSharp.LastIndexOf('.'));
-            string colorNamespace = brushNamespace == "global::System.Windows.Media" ? brushNamespace : "global::Windows.UI"; //the namespace for the Color class is the same as for Brush in SL but not in WPF
-            return string.Format("new {0}.SolidColorBrush({1})", brushNamespace, PrepareStringForColor(colorNamespace + ".Color", valueAsString));
-        }
-
-        static string PrepareStringForKeyTime(string elementTypeInCSharp, string valueAsString)
-        {
-            try
-            {
-                if (valueAsString == "Uniform")
-                {
-                    throw new wpf::System.Windows.Markup.XamlParseException("The Value \"Uniform\" for keyTime is not supported yet.");
-                }
-                else if (valueAsString == "Paced")
-                {
-                    throw new wpf::System.Windows.Markup.XamlParseException("The Value \"Paced\" for keyTime is not supported yet.");
-                }
-                else if (valueAsString.EndsWith("%"))
-                {
-                    throw new wpf::System.Windows.Markup.XamlParseException("The percentage values for keyTime are not supported yet.");
-                }
-                else
-                {
-                    TimeSpan timeSpan = TimeSpan.Parse(valueAsString);
-                    return string.Format("{0}.FromTimeSpan(new global::System.TimeSpan({1}L))", elementTypeInCSharp, timeSpan.Ticks);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new wpf::System.Windows.Markup.XamlParseException("Invalid KeyTime: " + valueAsString, ex);
-            }
-        }
-
-        static string PrepareStringForCursor(string elementTypeInCSharp, string valueAsString)
-        {
-            // For cursors, it's easy: use the Cursors class that gives an easy access to the possible values, and use the string as is to serve as the accessor
-            // Note: If we want to accept it as a non-case-sensitive thing (accepting hand instead of Hand), we will need to add some code to recognise the thing (I guess using System.Windows.Forms.Cursors).
-            // todo: Once the different types of ways to define a cursor are implemented, this will need some changes accordingly.
-            return string.Format("{0}s.{1}", elementTypeInCSharp, valueAsString);
-        }
-
-        static string PrepareStringForDuration(string elementTypeInCSharp, string valueAsString)
-        {
-            if (valueAsString.ToLower() == "forever")
-                return elementTypeInCSharp + ".Forever";
-            if (valueAsString.ToLower() == "automatic")
-                return elementTypeInCSharp + ".Automatic";
-            TimeSpan timeSpan = TimeSpan.Parse(valueAsString);
-            return string.Format("new {0}(new global::System.TimeSpan({1}L))", elementTypeInCSharp, timeSpan.Ticks); ;
-        }
-
-
-        //Types added and quickly tested:
-        //  - Thickness
-        //  - CornerRadius
-        //  - GridLength
-        //  - KeyTime
-        //  - Brush
-        //  - Cursor
-
-        //Types added kinda tested:
-        //  - Point
-        //  - Color
-        //  - PropertyPath
-
-        //Types added not tested:
 
         //Types to add to the switch (probably):
         //
@@ -572,5 +290,30 @@ namespace DotNetForHtml5.Compiler
         WhiteSmoke = unchecked((int)0xFFF5F5F5),
         Yellow = unchecked((int)0xFFFFFF00),
         YellowGreen = unchecked((int)0xFF9ACD32)
+    }
+
+    //
+    // IMPORTANT: if you add or remove entries in this Enum, you must update
+    // accordingly the file "FontWeights.cs" in the Runtime project.
+    //
+    internal enum FontweightsEnum : ushort
+    {
+        Black = 900,
+        Bold = 700,
+        DemiBold = 600,
+        ExtraBlack = 900, //note: the value should be 950 but it is not supported in html5
+        ExtraBold = 800,
+        ExtraLight = 200,
+        Heavy = 900,
+        Light = 300,
+        Medium = 500,
+        Normal = 400,
+        Regular = 400,
+        SemiBold = 600,
+        SemiLight = 300, //note: the value should be 350 (I think) but it is not supported in html5
+        Thin = 100,
+        UltraBlack = 900, //note: the value should be 950 but it is not supported in html5
+        UltraBold = 800,
+        UltraLight = 200
     }
 }

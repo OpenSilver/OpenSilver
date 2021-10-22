@@ -207,7 +207,6 @@ namespace TypeScriptDefinitionsSupport
             return Convert.ToInt32(Interop.ExecuteJavaScript("$0.indexOf($1)", this.UnderlyingJSInstance, value));
         }
 
-#if WORKINPROGRESS
         public void Insert(int index, T item)
         {
             if (index < 0 || index > this.Count)
@@ -239,32 +238,6 @@ namespace TypeScriptDefinitionsSupport
 
             Interop.ExecuteJavaScriptAsync("$0.splice($1, 0, $2)", this.UnderlyingJSInstance, index, value);
         }
-#else
-        public void Insert(int index, T item)
-        {
-            if (index < 0 || index >= this.Count)
-                throw new ArgumentOutOfRangeException();
-
-            object value;
-
-            if (item == null)
-                value = null;
-            else if (typeof(IJSObject).IsAssignableFrom(typeof(T)))
-                value = ((IJSObject)(object)item).UnderlyingJSInstance;
-            else
-                value = item;
-            // ----------------
-            // Disabled this portion of code because it doesn't work well once translated into js,
-            // instead the value is directly cast and return, will throw anyway if it's not compatible
-            // ----------------
-            //else if (JSObject.Helper_IsBuiltInType<T>())
-            //    value = item;
-            //else
-            //    throw new Exception("The generic type parameter '" + typeof(T).Name + "' is not a built-in type or a JSObject.");
-
-            Interop.ExecuteJavaScriptAsync("$0.splice($1, 0, $2)", this.UnderlyingJSInstance, index, value);
-        }
-#endif
 
         public bool Remove(T item)
         {

@@ -21,7 +21,6 @@ using System.ServiceModel;
 
 namespace System.ServiceModel.Channels
 {
-#if WORKINPROGRESS
     // Summary:
     //     Defines the basic interface that all channel objects must implement. It requires
     //     that they implement the state machine interface shared by all communication
@@ -41,5 +40,4 @@ namespace System.ServiceModel.Channels
         //     The typed object T requested if it is present or null if it is not.
         T GetProperty<T>() where T : class;
     }
-#endif
 }

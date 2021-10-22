@@ -12,9 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
-
 namespace System.Windows.Markup
 {
 	[OpenSilver.NotImplemented]
@@ -30,5 +27,3 @@ namespace System.Windows.Markup
         }
     }
 }
-
-#endif

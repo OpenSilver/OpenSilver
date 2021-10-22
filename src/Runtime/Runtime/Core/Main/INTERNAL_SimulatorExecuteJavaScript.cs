@@ -57,7 +57,8 @@ namespace CSHTML5.Internal
         {
             if (!noImpactOnPendingJSCode)
             {
-                AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
+                if (EnableInteropLogging)
+                    AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
 
                 string aggregatedPendingJavaScriptCode = ReadAndClearAggregatedPendingJavaScriptCode();
 
@@ -86,7 +87,8 @@ namespace CSHTML5.Internal
 #endif
         internal static void ExecuteJavaScriptAsync(string javaScriptToExecute, string commentForDebugging = null)
         {
-            AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
+            if (EnableInteropLogging)
+                AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
 
             if (!_disableAsyncJavaScriptExecution)
             {
@@ -211,6 +213,9 @@ namespace CSHTML5.Internal
 #endif
             lock (_pendingAsyncJavaScriptToExecute)
             {
+                if (_pendingAsyncJavaScriptToExecute.Count == 0)
+                    return null;
+
                 string aggregatedPendingJavaScriptCode = string.Join("\r\n", _pendingAsyncJavaScriptToExecute.ToList());
                 _pendingAsyncJavaScriptToExecute.Clear();
                 return aggregatedPendingJavaScriptCode;
@@ -239,8 +244,6 @@ namespace CSHTML5.Internal
                     + Environment.NewLine
                     + "//---- END INTEROP (" + reasonForPerformingTheCallNow + ") ----";
             }
-            else
-                javaScriptToExecute = Environment.NewLine + javaScriptToExecute + Environment.NewLine;
 
             try
             {
@@ -286,11 +289,9 @@ namespace CSHTML5.Internal
         /// <param name="action">The action to execute before flushing the pending JS code.</param>
         public static void RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(Action action)
         {
-#if WORKINPROGRESS
             try
             { 
-#endif
-            if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
+                if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
                 {
                     //-----------------------------
                     // This means that we have already planned an auto-flush, so we do
@@ -315,14 +316,12 @@ namespace CSHTML5.Internal
                     // After the action has finished execution, let's flush all the pending JavaScript calls if any:
                     ExecutePendingJavaScriptCode("AUTO-FLUSH");
                 }
-#if WORKINPROGRESS
             }
             catch (Exception e)
             {
                 Application.Current.OnUnhandledException(e, false);
             } 
-#endif
         }
 #endif
     }
-        }
+}

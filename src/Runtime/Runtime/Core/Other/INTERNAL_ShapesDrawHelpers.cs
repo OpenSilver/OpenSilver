@@ -36,8 +36,8 @@ namespace CSHTML5.Internal
             var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             //divStyle.overflow = "hidden";
             divStyle.lineHeight = "0"; // Line height is not needed in shapes because it causes layout issues.
-            divStyle.width = "100%";
-            divStyle.height = "100%";
+            //divStyle.width = "100%";
+            //divStyle.height = "100%";
             divStyle.fontSize = "0px"; //this allows this div to be as small as we want (for some reason in Firefox, what contains a canvas has a height of at least about (1 + 1/3) * fontSize)
             canvasDomElement = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("canvas", div, associatedUIElement);
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);
@@ -112,49 +112,69 @@ namespace CSHTML5.Internal
                 sizeToApply.Height = frameworkElementHeight + 1;
                 style.height = sizeToApply.Height.ToInvariantString() + "px";
             }
-            
-            //We apply the size defined earlier (size either by the Width and/or Height of the Shape (when they are set) or by the width and/or height of its content):
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
 
-            canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px"; // The "sizeToApply" is the size that the shape would take if it was not constrained by the parent framework element.
-            canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
-
-            // Get the framework element size after the initial rendering:
             if (frameworkElementWidthWasSpecified && frameworkElementHeightWasSpecified)
             {
                 shapeActualSize = new Size(frameworkElementWidth, frameworkElementHeight);
+
+                //We apply the size defined earlier (size either by the Width and/or Height of the Shape (when they are set) or by the width and/or height of its content):
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
+
+                canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px"; // The "sizeToApply" is the size that the shape would take if it was not constrained by the parent framework element.
+                canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
             }
             else
             {
                 if (frameworkElement.IsUnderCustomLayout == false)
+                {
+                    //We apply the size defined earlier (size either by the Width and/or Height of the Shape (when they are set) or by the width and/or height of its content):
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
+
+                    canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px"; // The "sizeToApply" is the size that the shape would take if it was not constrained by the parent framework element.
+                    canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
+
                     shapeActualSize = frameworkElement.INTERNAL_GetActualWidthAndHeight(); //Note: in case that the framework element is constrained, it won't take the size of its canvas2d content, so we then resize the canvas2d content so that the shape stretches.
+
+                    if (!frameworkElementWidthWasSpecified)
+                    {
+                        canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + 1); //todo: add StrokeThickness instead of +1?
+                    }
+                    if (!frameworkElementHeightWasSpecified)
+                    {
+                        canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + 1); //todo: add StrokeThickness instead of +1?
+                    }
+                }
                 else
+                {
                     shapeActualSize = frameworkElement.VisualBounds.Size;
 
-                if (frameworkElementWidthWasSpecified)
-                    shapeActualSize.Width = frameworkElementWidth;
-                if (frameworkElementHeightWasSpecified)
-                    shapeActualSize.Height = frameworkElementHeight;
-            }
+                    if (!frameworkElementWidthWasSpecified)
+                    {
+                        canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + 1); //todo: add StrokeThickness instead of +1?
+                    }
+                    else
+                    {
+                        shapeActualSize.Width = frameworkElementWidth;
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
+                        canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px";
+                    }
 
-            if (!frameworkElementWidthWasSpecified || !frameworkElementHeightWasSpecified)
-            {
-                // Here is the trick:
-                //  the element should try to get the size ("separately" in width and height) that is closest to its prefered size (which has been defined in sizeToApply).
-                //  to do that, we put the canvas at the prefered size, then we make it take the size of the container (the container is the div that contains the canvas, it is also the Shape's OuterDomElement):
-                //      - the first step will make the container take the size it is allowed to that is closest to the prefered size of the element
-                //      - the second step will change the canvas' size to the container's size so that the canvas also takes the allowed size closest to its prefered size.
-
-                if (!frameworkElementWidthWasSpecified)
-                {
-                    canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + 1); //todo: add StrokeThickness instead of +1?
-                }
-                if (!frameworkElementHeightWasSpecified)
-                {
-                    canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + 1); //todo: add StrokeThickness instead of +1?
+                    if (!frameworkElementHeightWasSpecified)
+                    {
+                        canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + 1); //todo: add StrokeThickness instead of +1?
+                    }
+                    else
+                    {
+                        shapeActualSize.Height = frameworkElementHeight;
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
+                        canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
+                    }
                 }
             }
 

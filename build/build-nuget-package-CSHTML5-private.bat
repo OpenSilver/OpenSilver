@@ -7,31 +7,22 @@ set /p PackageVersion="%ESC%[92mCSHTML5 version:%ESC%[0m 2.0.0-private"
 echo. 
 echo %ESC%[95mRestoring NuGet packages%ESC%[0m
 echo. 
-nuget restore ../src/CSHTML5.sln
-nuget restore ../src/VSExtension/VSExtension.CSHTML5.sln -MSBuildVersion 14
+nuget restore ../src/CSHTML5.sln -v quiet
+nuget restore ../src/VSExtension/VSExtension.CSHTML5.sln -MSBuildVersion 14 -v quiet
 
 echo. 
 echo %ESC%[95mBuilding %ESC%[0mMigration %ESC%[95mconfiguration%ESC%[0m
 echo. 
-msbuild ../src/CSHTML5.sln -p:Configuration=Migration
+msbuild ../src/CSHTML5.sln -p:Configuration=Migration -clp:ErrorsOnly
 echo. 
 echo %ESC%[95mPacking %ESC%[0mCSHTML5.Migration %ESC%[95mNuGet package%ESC%[0m
 echo. 
 nuget.exe pack nuspec\CSHTML5.nuspec -OutputDirectory "output/CSHTML5" -Properties "PackageId=CSHTML5.Migration;Target=CSHTML5.Migration;PackageVersion=2.0.0-private%PackageVersion%;Configuration=Migration;AssembliesPrefix=CSHTML5.Migration;CompilerPrefix=SLMigration.CSharpXamlForHtml5"
 
 echo. 
-echo %ESC%[95mBuilding %ESC%[0mMigration.WorkInProgress %ESC%[95mconfiguration%ESC%[0m
-echo. 
-msbuild ../src/CSHTML5.sln -p:Configuration=Migration.WorkInProgress
-echo. 
-echo %ESC%[95mPacking %ESC%[0mCSHTML5.Migration.WorkInProgress %ESC%[95mNuGet package%ESC%[0m
-echo. 
-nuget.exe pack nuspec\CSHTML5.nuspec -OutputDirectory "output/CSHTML5" -Properties "PackageId=CSHTML5.Migration.WorkInProgress;Target=CSHTML5.Migration";PackageVersion=2.0.0-private%PackageVersion%;Configuration=Migration.WorkInProgress;AssembliesPrefix=CSHTML5.Migration;CompilerPrefix=SLMigration.CSharpXamlForHtml5"
-
-echo. 
 echo %ESC%[95mBuilding %ESC%[0mDebug %ESC%[95mconfiguration%ESC%[0m
 echo. 
-msbuild ../src/CSHTML5.sln -p:Configuration=Debug
+msbuild ../src/CSHTML5.sln -p:Configuration=Debug -clp:ErrorsOnly
 echo. 
 echo %ESC%[95mPacking %ESC%[0mCSHTML5 %ESC%[95mNuGet package%ESC%[0m
 echo. 

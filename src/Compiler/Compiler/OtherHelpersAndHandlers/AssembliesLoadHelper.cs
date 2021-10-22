@@ -18,13 +18,33 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace DotNetForHtml5.Compiler
 {
     internal static class AssembliesLoadHelper
     {
+        /// <summary>
+        /// This collection represents the Core assemblies in the loading order.
+        /// </summary>
+        internal static IReadOnlyCollection<string> CoreAssembliesNames { get; } = new Collection<string>()
+        {
+#if CSHTML5BLAZOR
+            Constants.OPENSILVER_XAML_ASSEMBLY_NAME,
+#endif
+            GetCoreAssemblyName(),
+        };
+
+        internal static bool IsCoreAssembly(string assemblyPath)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(assemblyPath);
+
+            return CoreAssembliesNames.Any(assemblyName => assemblyName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         /// <summary>
         /// Ensures that the core CSHTML5 assembly is the first among the provided list of assemblies.
         /// This is useful to ensure that types such as "XmlnsDefinitionAttribute" are resolved.

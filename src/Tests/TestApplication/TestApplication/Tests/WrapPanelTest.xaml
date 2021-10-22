@@ -1,0 +1,26 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.WrapPanelTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:tk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <tk:WrapPanel Orientation="Horizontal" Background="#DDDDDD">
+            <Border Width="50" Height="50" Background="Red"/>
+            <Border Width="50" Height="50" Background="Beige"/>
+            <Border Width="50" Height="50" Background="Cornsilk"/>
+            <Border Width="50" Height="50" Background="DarkSlateGray"/>
+            <Border Width="50" Height="50" Background="Goldenrod"/>
+            <Border Width="50" Height="50" Background="NavajoWhite"/>
+            <Border Width="50" Height="50" Background="HotPink"/>
+            <Border Width="50" Height="50" Background="PaleTurquoise"/>
+            <Border Width="50" Height="50" Background="Purple"/>
+            <Border Width="50" Height="50" Background="PowderBlue"/>
+            <Border Width="50" Height="50" Background="Cyan"/>
+            <Border Width="50" Height="50" Background="IndianRed"/>
+            <Border Width="50" Height="50" Background="SeaShell"/>
+        </tk:WrapPanel>
+    </StackPanel>
+</sdk:Page>

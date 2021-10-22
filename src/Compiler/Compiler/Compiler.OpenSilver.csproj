@@ -11,22 +11,16 @@
     <RootNamespace>DotNetForHtml5.Compiler</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
     <NoWarn>CS1591</NoWarn>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION;MIGRATION</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;SILVERLIGHTCOMPATIBLEVERSION;MIGRATION;WORKINPROGRESS</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;WORKINPROGRESS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Compiler.Common\Compiler.Common.OpenSilver.csproj">
@@ -44,22 +38,6 @@
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
-      <HintPath>..\..\packages\Mono.Cecil.0.9.5.0\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="PresentationFramework">
       <Aliases>wpf</Aliases>
     </Reference>
@@ -77,6 +55,7 @@
     <Compile Include="1_CheckingProjectConformity\CheckingThatAnAssemblyCanBeReferenced.cs" />
     <Compile Include="1_CheckingProjectConformity\CheckingThatNoAssemblyReferenceIsMissing.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
+    <Compile Include="2_ConvertingXamlToCSharp\CoreTypesHelper.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\FixingPropertiesOrder.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\FixingVisualStatesName.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ProcessingHtmlPresenterNodes.cs" />
@@ -145,7 +124,7 @@
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
     <Compile Include="Loggers\LoggerThatUsesConsoleWriteLine.cs" />
     <Compile Include="OtherHelpersAndHandlers\FileHelpers.cs" />
-    <Compile Include="2_ConvertingXamlToCSharp\InsertingImplicitNodesAndNoDirectTextContent.cs" />
+    <Compile Include="2_ConvertingXamlToCSharp\InsertingImplicitNodes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingXamlToCSharp.cs" />
     <Compile Include="6_CreatingAndCopyingSupportHtmlAndJavaScriptFiles\WrappingOutputFiles_JSILversion.cs" />
@@ -165,6 +144,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Mono.Cecil">
+      <Version>0.9.5</Version>
+    </PackageReference>
     <PackageReference Include="NuGet.Build.Tasks.Pack">
       <Version>5.9.1</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -172,9 +154,6 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent Condition=" '$(Configuration)' != 'BridgeSLMigration' ">“$(SolutionDir)ExternalTools\Dotfuscator\Dotfuscator.exe” /in:”$(TargetPath)” /out:”$(TargetDir)\Dotfuscator”</PostBuildEvent>
-  </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>rem rmdir ”$(TargetDir)\Dotfuscator” /s /q</PreBuildEvent>
   </PropertyGroup>

@@ -1,0 +1,25 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.BehaviorTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:local="clr-namespace:TestApplication"
+           xmlns:interaction="http://schemas.microsoft.com/expression/2010/interactivity"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <Border BorderBrush="Gray" BorderThickness="2" Margin="3" HorizontalAlignment="Left">
+            <StackPanel Width="250">
+                <TextBlock Text="Testing Behavior:"/>
+                <TextBlock TextWrapping="Wrap">The TextBoxes should display a text when empty and out of focus.</TextBlock>
+                <TextBox x:Name="TestBehaviorTextBox" Foreground="Green"/>
+                <TextBox x:Name="TestBehaviorTextBox2">
+                    <interaction:Interaction.Behaviors>
+                        <local:HintBehavior Text="This is where you are supposed to type" HintForeground="Blue"/>
+                    </interaction:Interaction.Behaviors>
+                </TextBox>
+                <Button Content="OK" Click="TestBehaviorButton_Click"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</sdk:Page>

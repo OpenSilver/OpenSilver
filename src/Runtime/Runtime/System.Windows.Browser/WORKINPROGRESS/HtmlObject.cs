@@ -11,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-#if WORKINPROGRESS
-
 namespace System.Windows.Browser
 {
     /// <summary>
@@ -143,5 +141,3 @@ namespace System.Windows.Browser
         }
     }
 }
-
-#endif

@@ -25,30 +25,21 @@ md temp
 echo. 
 echo %ESC%[95mRestoring NuGet packages%ESC%[0m
 echo. 
-nuget restore ../src/OpenSilver.sln
+nuget restore ../src/OpenSilver.sln -v quiet
 
 echo. 
 echo %ESC%[95mBuilding %ESC%[0mSL %ESC%[95mconfiguration%ESC%[0m
 echo. 
-msbuild slnf/OpenSilver.slnf -p:Configuration=SL -restore
+msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
 echo. 
 echo %ESC%[95mPacking %ESC%[0mOpenSilver %ESC%[95mNuGet package%ESC%[0m
 echo. 
 nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=1.0.0-private-%PackageVersion%;Configuration=SL;Target=OpenSilver"
 
 echo. 
-echo %ESC%[95mBuilding %ESC%[0mSL.WorkInProgress %ESC%[95mconfiguration%ESC%[0m
-echo. 
-msbuild slnf/OpenSilver.slnf -p:Configuration=SL.WorkInProgress -restore
-echo. 
-echo %ESC%[95mPacking %ESC%[0mOpenSilver.WorkInProgress %ESC%[95mNuGet package%ESC%[0m
-echo. 
-nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver.WorkInProgress;PackageVersion=1.0.0-private-%PackageVersion%;Configuration=SL.WorkInProgress;Target=OpenSilver"
-
-echo. 
 echo %ESC%[95mBuilding %ESC%[0mUWP %ESC%[95mconfiguration%ESC%[0m
 echo. 
-msbuild slnf/OpenSilver.slnf -p:Configuration=UWP -restore
+msbuild slnf/OpenSilver.slnf -p:Configuration=UWP -clp:ErrorsOnly -restore
 echo. 
 echo %ESC%[95mPacking %ESC%[0mOpenSilver.UWPCompatible %ESC%[95mNuGet package%ESC%[0m
 echo. 

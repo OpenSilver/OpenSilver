@@ -22,9 +22,7 @@ using System.ComponentModel;
 
 namespace System.Net
 {
-#if WORKINPROGRESS
     public partial class OpenReadCompletedEventArgs //: AsyncCompletedEventArgs
     {
     }
-#endif
 }

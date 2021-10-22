@@ -96,7 +96,7 @@ namespace CSHTML5.Internal
                 PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
 
                 global::System.Diagnostics.Debug.Assert(typeMetadata != null && typeMetadata.Inherits,
-                                                        string.Format("{0} is not an inherited property.", dependencyProperty.Name));
+                                                        $"{dependencyProperty.Name} is not an inherited property.");
 
                 // Create the storage:
                 storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
@@ -867,7 +867,7 @@ namespace CSHTML5.Internal
             List<IPropertyChangedListener> listeners = storage.PropertyListeners;
             if (listeners == null)
             {
-                listeners = storage.PropertyListeners = new List<IPropertyChangedListener>();
+                listeners = storage.PropertyListeners = new List<IPropertyChangedListener>(1);
             }
 
             PropertyChangedListener listener = new PropertyChangedListener(storage, updateSourceCallback);

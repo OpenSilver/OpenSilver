@@ -1,0 +1,395 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.GradientBrushes.LinearGradientBrushTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <Border Background="LightGray" BorderBrush="Gray" BorderThickness="2" Margin="10" Padding="5">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Right"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,.5" EndPoint="1,.5">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Down"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint=".5,0" EndPoint=".5,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Left"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="1,.5" EndPoint="0,.5">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Up"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint=".5,1" EndPoint=".5,0">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Shape 0 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint="0,.5" EndPoint="1,.5">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="45 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="(0.5,0) to (1,1)"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="1,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="90 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint=".5,0" EndPoint=".5,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="135 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="180 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint="1,.5" EndPoint="0,.5">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="225 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint="1,1" EndPoint="0,0">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="270 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint=".5,1" EndPoint=".5,0">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="315 deg"/>
+                        <Ellipse Width="30" Height="30">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </StackPanel>
+                </StackPanel>
+
+
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Border 0 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,.5" EndPoint="1,.5">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="45 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="(0.5,0) to (1,1)"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="1,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="90 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint=".5,0" EndPoint=".5,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="135 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,1">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="180 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="1,.5" EndPoint="0,.5">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="225 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="1,1" EndPoint="0,0">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="270 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint=".5,1" EndPoint=".5,0">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="315 deg"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Same start and end"/>
+                        <Border Width="30" Height="30">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0.5,0.5" EndPoint="0.5,0.5">
+                                    <GradientStopCollection>
+                                        <GradientStop Color="Blue"/>
+                                        <GradientStop Color="Red" Offset=".3"/>
+                                        <GradientStop Color="Green" Offset=".6"/>
+                                        <GradientStop Color="Blue" Offset="1"/>
+                                    </GradientStopCollection>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <TextBlock Text="Programmatically"/>
+                        <Border x:Name="BorderForLinearGradientBrush" Width="30" Height="30"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                        <TextBlock Text="SpreadMode.Repeat (Shape)"/>
+                        <Rectangle Width="150" Height="75" Stroke="Black" HorizontalAlignment="Left">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0.5,0.6" EndPoint="0.7,0.8" SpreadMethod="Repeat">
+                                    <GradientStop Color="White" Offset="0" />
+                                    <GradientStop Color="Red" Offset="0.6" />
+                                    <GradientStop Color="#333333" Offset="1" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </StackPanel>
+                    <StackPanel Margin="10,0,0,0">
+                        <TextBlock Text="SpreadMode.Repeat (Border)"/>
+                        <Border Width="150" Height="75" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0.5,0.6" EndPoint="0.7,0.8" SpreadMethod="Repeat">
+                                    <GradientStop Color="White" Offset="0" />
+                                    <GradientStop Color="Red" Offset="0.6" />
+                                    <GradientStop Color="#333333" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</sdk:Page>

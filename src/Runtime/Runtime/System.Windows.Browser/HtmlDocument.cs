@@ -22,11 +22,7 @@ using CSHTML5;
 
 namespace System.Windows.Browser
 {
-#if WORKINPROGRESS
     public sealed partial class HtmlDocument : HtmlObject
-#else
-    public sealed partial class HtmlDocument
-#endif
     {
         public HtmlDocument()
         {
@@ -73,7 +69,6 @@ namespace System.Windows.Browser
                 return returnValue;
             }
         }
-#if WORKINPROGRESS
         //
         // Summary:
         //     Gets a single browser element.
@@ -99,7 +94,6 @@ namespace System.Windows.Browser
         {
             return null;
         }
-#endif
 
         /// <summary>
         /// Gets or sets the browser's cookie string. If the browser does not have a 

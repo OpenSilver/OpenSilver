@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -299,8 +300,30 @@ namespace DotNetForHtml5.Compiler
             //Replace the inheritance to ClientBase with an inheritance to CSHTML5_ClientBase
             finalText = finalText.Replace("System.ServiceModel.ClientBase<", "System.ServiceModel.CSHTML5_ClientBase<");
 
+            finalText = FixBasicHttpBinding(finalText);
+
             return finalText;
 
+        }
+
+        private static string FixBasicHttpBinding(string text)
+        {
+            return string.Join(Environment.NewLine,
+                //\r\n for non-Unix platforms, or \n for Unix platforms
+                text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).SelectMany(l =>
+                {
+                    var res = new List<string>();
+                    if (l.Contains("new System.ServiceModel.BasicHttpBinding()"))
+                    {
+                        res.Add("#if OPENSILVER");
+                        res.Add("return new System.ServiceModel.Channels.CustomBinding();");
+                        res.Add("#endif");
+                    }
+
+                    res.Add(l);
+
+                    return res;
+                }));
         }
 
         private static bool FixBlock(ref string block, string interfaceType, /*int indexOfBeginningOfBlock,*/string inputText, Regex regex, string detectedToken, string endpointCode, string soapVersion)

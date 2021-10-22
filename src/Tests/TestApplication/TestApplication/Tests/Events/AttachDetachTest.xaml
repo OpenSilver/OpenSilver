@@ -1,0 +1,15 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.Events.AttachDetachTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <Canvas Width="200" Height="200" Background="#DDDDDD">
+            <Button Width="100" Height="50" Content="Attach Click" Background="#DDDDDD" Canvas.Left="0" Canvas.Top="0" Click="TestAttachClickButton_Click"/>
+            <Button Width="100" Height="50" Content="Detach Click" Background="#DDDDDD" Canvas.Left="100" Canvas.Top="0" Click="TestDetachClickButton_Click"/>
+            <Button x:Name="ClickMeButton" Width="200" Height="50" Content="Click me" Canvas.Left="0" Canvas.Top="50" Background="#DDDDDD"/>
+        </Canvas>
+    </StackPanel>
+</sdk:Page>

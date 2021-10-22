@@ -27,23 +27,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.WorkInProgress|AnyCPU'">
-    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;BRIDGE;WORKINPROGRESS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration|AnyCPU'">
     <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
     <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Migration.WorkInProgress|AnyCPU'">
-    <AssemblyName>CSharpXamlForHtml5.Simulator</AssemblyName>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHTCOMPATIBLEVERSION;BRIDGE;WORKINPROGRESS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
@@ -139,6 +125,7 @@
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Interop\BrowserResultConverter.cs" />
     <Compile Include="Interop\ClipboardHandler.cs" />
     <Compile Include="Interop\SimulatorProxy.cs" />
     <Compile Include="Interop\WebClientFactory.cs" />
@@ -208,7 +195,7 @@
     </Compile>
     <Page Include="Debugging\ChromiumDevTools.xaml">
       <SubType>Designer</SubType>
-		<Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
       <SubType>Designer</SubType>

@@ -6,7 +6,7 @@
     <OpenSilverType>4</OpenSilverType>
 	<PublishTrimmed>true</PublishTrimmed>
 	<!-- Uncomment to enable AOT compilation when publishing -->
-	<!--<RunAOTCompilation Condition="'$(IsSecondPass)'=='True'">true</RunAOTCompilation>-->
+	<!--<RunAOTCompilation Condition="'$(IsSecondPass)'!='True'">true</RunAOTCompilation>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +14,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$ext_blazorpackagesversion$" PrivateAssets="all" />
     <PackageReference Include="$ext_opensilverpackagename$" Version="$ext_opensilverpackageversion$" />
   </ItemGroup>
+
+  <PropertyGroup>
+     <DisableImplicitNamespaceImports>True</DisableImplicitNamespaceImports>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\$ext_safeprojectname$\$ext_safeprojectname$.csproj" />

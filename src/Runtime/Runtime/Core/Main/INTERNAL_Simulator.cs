@@ -65,12 +65,20 @@ namespace DotNetForHtml5.Core
         }
         // internal static dynamic WebControlDispatcherBeginInvoke => webControl;
 
+        // Invoke of the WebControl's Dispatcher
+        public static Action<Action, TimeSpan> WebControlDispatcherInvoke
+        {
+            set;
+            internal get;
+        }
+
 #if CSHTML5NETSTANDARD
-        public static IJavaScriptExecutionHandler JavaScriptExecutionHandler 
-        { 
+        public static IJavaScriptExecutionHandler JavaScriptExecutionHandler
+        {
             get;
-            set; 
+            set;
         } // Intended to be injected when the app is initialized.
+
 #endif
 
 #if CSHTML5NETSTANDARD
@@ -165,5 +173,7 @@ namespace DotNetForHtml5.Core
             }
         }
 #endif
+
+        public static Func<object, object> ConvertBrowserResult { get; set; }
     }
 }

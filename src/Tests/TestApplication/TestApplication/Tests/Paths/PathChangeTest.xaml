@@ -1,0 +1,94 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.Paths.PathChangeTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:tk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <Border Background="LightGray" BorderBrush="Gray" BorderThickness="2" Margin="10" Padding="5">
+            <StackPanel Orientation="Vertical">
+                <Canvas Width="300" Height="200" Background="Ivory">
+                    <Rectangle Fill="LightBlue" Width="{Binding ElementName=path1, Path=Width}" Height="{Binding ElementName=path1, Path=Height}" Stroke="Black" StrokeThickness="1"/>
+                    <Path x:Name="path1"
+                      Width="200"
+                      Height="100"
+                      Stroke="Black"
+                      Fill="Gray"
+                      StrokeThickness="2"
+                      Stretch="Uniform"
+                    Data="M 10,100 L 10,300 300,-200 300,100">
+                    </Path>
+                </Canvas>
+                <!--SLDISABLED-->
+                <!--<Button Content="Redraw" Click="RedrawPath_Click"/>-->
+                <tk:WrapPanel Orientation="Horizontal">
+                    <Button Content="Width" Click="TestChangePathWidth_Click" Margin="2"/>
+                    <Button Content="Height" Click="TestChangePathHeight_Click" Margin="2"/>
+                    <Button Content="Fill" Click="TestChangePathFill_Click" Margin="2"/>
+                    <Button Content="Stretch" Click="TestChangePathStretch_Click" Margin="2"/>
+                    <Button Content="Stroke" Click="TestChangePathStroke_Click" Margin="2"/>
+                    <Button Content="StrokeThickness" Click="TestChangePathStrokeThickness_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="EllipseGeometry" Click="TestEllipseGeometry_Click" Margin="2"/>
+                    <Button Content="LineGeometry" Click="TestLineGeometry_Click" Margin="2"/>
+                    <Button Content="PathGeometry" Click="TestPathGeometry_Click" Margin="2"/>
+                </StackPanel>
+                <tk:WrapPanel x:Name="EllipseGeometryButtons" Visibility="Collapsed">
+                    <Button Content="Center" Click="TestEllipseCenter_Click" Margin="2"/>
+                    <Button Content="RadiusX" Click="TestEllipseRadiusX_Click" Margin="2"/>
+                    <Button Content="RadiusY" Click="TestEllipseRadiusY_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="LineGeometryButtons" Visibility="Collapsed">
+                    <Button Content="StartPoint" Click="TestLineStartPoint_Click" Margin="2"/>
+                    <Button Content="EndPoint" Click="TestLineEndPoint_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathGeometryButtons" Visibility="Collapsed">
+                    <Button Content="FillRule" Click="TestPathFillRule_Click" Margin="2"/>
+                    <Button Content="IsClosed" Click="TestPathIsClosed_Click" Margin="2"/>
+                    <Button Content="IsFilled" Click="TestPathIsFilled_Click" Margin="2"/>
+                    <Button Content="StartPoint" Click="TestPathStartPoint_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathGeometrySegmentTypeButtons" Visibility="Collapsed">
+                    <Button Content="Arc" Click="TestPathArc_Click" Margin="2"/>
+                    <Button Content="Line" Click="TestPathLine_Click" Margin="2"/>
+                    <Button Content="Bezier" Click="TestPathBezier_Click" Margin="2"/>
+                    <Button Content="QuadraticBezier" Click="TestPathQuadratic_Click" Margin="2"/>
+                    <Button Content="PolyLine" Click="TestPathPolyLine_Click" Margin="2"/>
+                    <Button Content="PolyBezier" Click="TestPathPolyBezier_Click" Margin="2"/>
+                    <Button Content="PolyQuadraticBezier" Click="TestPathPolyQuadratic_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathArcButtons" Visibility="Collapsed">
+                    <Button Content="Arc IsLargeArc" Click="TestArcSegmentIsLargeArc_Click" Margin="2"/>
+                    <Button Content="Arc Point" Click="TestArcSegmentPoint_Click" Margin="2"/>
+                    <Button Content="Arc RotationAngle" Click="TestArcSegmentRotationAngle_Click" Margin="2"/>
+                    <Button Content="Arc Size" Click="TestArcSegmentSize_Click" Margin="2"/>
+                    <Button Content="Arc SweepDirection" Click="TestArcSegmentSweepDirection_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathBezierButtons" Visibility="Collapsed">
+                    <Button Content="Bezier Point1" Click="TestBezierPoint1_Click" Margin="2"/>
+                    <Button Content="Bezier Point2" Click="TestBezierPoint2_Click" Margin="2"/>
+                    <Button Content="Bezier Point3" Click="TestBezierPoint3_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathLineButtons" Visibility="Collapsed">
+                    <Button Content="line Point" Click="TestLinePoint_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathPolyBezierButtons" Visibility="Collapsed">
+                    <Button Content="PolyBezierSegment Points" Click="TestPolyBezierSegmentPoints_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathPolyLineButtons" Visibility="Collapsed">
+                    <Button Content="PolyLineSegment Points" Click="TestPolyLineSegmentPoints_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathPolyQuadraticButtons" Visibility="Collapsed">
+                    <Button Content="PolyQuadraticBezierSegment Points" Click="TestPolyQuadraticBezierSegmentPoints_Click" Margin="2"/>
+                </tk:WrapPanel>
+                <tk:WrapPanel x:Name="PathQuadraticButtons" Visibility="Collapsed">
+                    <Button Content="QuadraticBezier Point1" Click="TestQuadraticBezierPoint1_Click" Margin="2"/>
+                    <Button Content="QuadraticBezier Point2" Click="TestQuadraticBezierPoint2_Click" Margin="2"/>
+                </tk:WrapPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</sdk:Page>

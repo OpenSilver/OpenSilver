@@ -1,3 +1,40 @@
+ /**
+  * The throttle pattern is more suitable for events that are triggered many times in a short period of time. 
+  * This technique is normally used to control scrolling, resizing and mouse-related events. 
+  * By using throttle, we can filter repeated executions of an event handler, enforcing a minimum wait time between calls.
+  * 
+  * @param {Function} callback 
+  * @param {Number} interval 
+*/
+function throttle(callback, interval) {
+    let enableCall = true;
+
+    return function(...args) {
+      if (!enableCall) return;
+
+      enableCall = false;
+      callback.apply(this, args);
+      setTimeout(() => enableCall = true, interval);
+    }
+}
+
+/**
+ * The debounce pattern delays the calling of the event handler until a pause happens. 
+ * This technique is commonly used in search boxes with a suggest drop-down list. 
+ * By applying this pattern, we can prevent unnecessary requests to the backend while the user is typing.
+ * 
+ * @param {Function} callback 
+ * @param {Number} interval 
+ */
+ function debounce(callback, interval) {
+    let debounceTimeoutId;
+
+    return function(...args) {
+      clearTimeout(debounceTimeoutId);
+      debounceTimeoutId = setTimeout(() => callback.apply(this, args), interval);
+    };
+}
+
 class ResizeObserverAdapter {
 
     constructor() {
@@ -9,7 +46,7 @@ class ResizeObserverAdapter {
     observe(element, callback) {
 
         this.observer.observe(element);
-        this.callbacks[element] = callback;
+        this.callbacks[element] = debounce(callback, 100);
     }
 
     unobserve(element) {

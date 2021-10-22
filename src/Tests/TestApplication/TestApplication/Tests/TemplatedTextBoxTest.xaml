@@ -1,0 +1,129 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.TemplatedTextBoxTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <sdk:Page.Resources>
+        <Style x:Key="TextBoxStyle1" TargetType="TextBox">
+            <!--<Setter Property="Background" Value="#FFE2E2E2"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>-->
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="OuterBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="4"
+                                CornerRadius="15">
+                            <!--<VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="FocusStates">
+                                    <VisualState Name="UnFocused">
+                                    </VisualState>
+                                    <VisualState Name="Focused">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="OuterBorder">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#11000000"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="ContentElement">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#11000000"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>-->
+                            <ContentPresenter x:Name="ContentElement"
+                                                  Margin="{TemplateBinding Padding}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </sdk:Page.Resources>
+    <StackPanel Orientation="Vertical">
+        <Grid Width="600" Background="LightGray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <!-- Testing Foreground -->
+            <Border Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,1"/>
+            <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBlock Text="Not templated:"/>
+            </Border>
+            <Border Grid.Row="0" Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2">
+                <TextBlock Text="Templated:"/>
+            </Border>
+            <Border Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBlock Text="Foreground:"/>
+            </Border>
+            <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBox Text="Test" Background="White" Foreground="Green"/>
+            </Border>
+            <Border Grid.Row="1" Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2">
+                <TextBox Style="{StaticResource TextBoxStyle1}" Text="Test" Background="White" Foreground="Green"/>
+            </Border>
+            <!-- Testing MaxWidth/MaxHeight -->
+            <Border Grid.Row="2" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBlock Text="MaxWidth/MaxHeight:"/>
+            </Border>
+            <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBox Text="Test" Background="White" MaxWidth="80" MaxHeight="50" TextWrapping="Wrap"/>
+            </Border>
+            <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2">
+                <TextBox Style="{StaticResource TextBoxStyle1}" Text="Test" Background="White" MaxWidth="30" MaxHeight="20" TextWrapping="Wrap"/>
+            </Border>
+            <!-- Testing AcceptsReturn -->
+            <Border Grid.Row="3" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBlock Text="AcceptsReturn:"/>
+            </Border>
+            <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBox Text="Test" Background="White" AcceptsReturn="True"/>
+            </Border>
+            <Border Grid.Row="3" Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2">
+                <TextBox Style="{StaticResource TextBoxStyle1}" Text="Test" Background="White" AcceptsReturn="True"/>
+            </Border>
+            <!-- Testing MaxLength -->
+            <Border Grid.Row="4" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBlock Text="MaxLength:"/>
+            </Border>
+            <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,1" Padding="2">
+                <TextBox Text="Test" Background="White" MaxLength="10"/>
+            </Border>
+            <Border Grid.Row="4" Grid.Column="2" BorderBrush="Black" BorderThickness="0,0,0,1" Padding="2">
+                <TextBox Style="{StaticResource TextBoxStyle1}" Text="Test" Background="White" MaxLength="10"/>
+            </Border>
+            <!-- Testing SelectAll -->
+            <Border Grid.Row="5" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                <StackPanel Orientation="Vertical">
+                    <Button Content="SelectAll (normal):" Click="ButtonTestNormalTextBoxSelectAll_Click"/>
+                    <Button Content="SelectAll (templated):" Click="ButtonTestTemplatedTextBoxSelectAll_Click"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Row="5" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,1,0" Padding="2">
+                <TextBox x:Name="SelectAllTestNormalTextBox" Text="Test" Background="White"/>
+            </Border>
+            <Border Grid.Row="5" Grid.Column="2" Padding="2">
+                <TextBox x:Name="SelectAllTestTemplatedTextBox" Style="{StaticResource TextBoxStyle1}" Text="Test" Background="White"/>
+            </Border>
+        </Grid>
+    </StackPanel>
+</sdk:Page>

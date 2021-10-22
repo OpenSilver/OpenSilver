@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Browser;
@@ -26,9 +27,7 @@ namespace System.Windows.Browser
     {
         static HtmlWindow _initWindow;
         static HtmlDocument _initDocument;
-#if WORKINPROGRESS
         static HtmlElement _initPlugin;
-#endif
         /// <summary>
         /// Gets the browser's window object.
         /// </summary>
@@ -58,8 +57,6 @@ namespace System.Windows.Browser
                 return _initDocument;
             }
         }
-
-#if WORKINPROGRESS
 
 		[OpenSilver.NotImplemented]
         public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
@@ -105,11 +102,55 @@ namespace System.Windows.Browser
         /// <exception cref="T:System.ArgumentNullException">
         /// <paramref name="scriptKey" /> or <paramref name="instance" /> is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public static void RegisterScriptableObject(string scriptKey, object instance)
         {
-        }
+            OpenSilver.Interop.ExecuteJavaScript("window[$0]={};", scriptKey);
+
+            var methods = instance.GetType().GetMethods()
+                .Where(m => m.GetCustomAttributes(typeof(ScriptableMemberAttribute), false).Length > 0)
+                .ToArray();
+
+            foreach (var method in methods)
+            {
+                OpenSilver.Interop.ExecuteJavaScript("window[$0][$1] = function () { return $2(...arguments); }", scriptKey, method.Name, (Func<CSHTML5.Types.INTERNAL_JSObjectReference, object>)(jsObjectReference =>
+                {
+                    var parameters = method.GetParameters();
+                    var args = new object[parameters.Length];
+                    for (var i = 0; i < args.Length; i++)
+                    {
+                        jsObjectReference.ArrayIndex = i;
+                        args[i] = (jsObjectReference.IsNull() || jsObjectReference.IsUndefined()) ? null : Convert.ChangeType(jsObjectReference, parameters[i].ParameterType);
+                    }
+                    return method.Invoke(instance, args);
+                }));
+            }
+
+            var events = instance.GetType().GetEvents()
+                .Where(e => e.GetCustomAttributes(typeof(ScriptableMemberAttribute), false).Length > 0)
+                .ToArray();
+
+            foreach (var eventInfo in events)
+            {
+                var es = new EventSubscriber(scriptKey, eventInfo.Name);
+#if BRIDGE
+                //Bridge.Net does not support EventHandlerType.
+                var eventHandlerType = eventInfo.AddMethod.GetParameters()[0].ParameterType;
+#else
+                var eventHandlerType = eventInfo.EventHandlerType;
 #endif
 
+                var methodName = "OnRaisedBridgeNet";
+                var method = eventHandlerType.GetMethod("Invoke");
+                if (method != null)
+                {
+                    //We are in OpenSilver or in the Simulator
+                    methodName = "OnRaised" + method.GetParameters().Length;
+                }
+
+                var d = Delegate.CreateDelegate(eventHandlerType, es,
+                    es.GetType().GetMethods().First(mi => mi.Name == methodName));
+                eventInfo.AddEventHandler(instance, d);
+            }
+        }
     }
 }

@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-public class INTERNAL_BridgeWorkarounds
+public static class INTERNAL_BridgeWorkarounds
 {
     public static string GetAssemblyNameWithoutCallingGetNameMethod(Assembly assembly)
     {
@@ -293,6 +293,38 @@ public class INTERNAL_BridgeWorkarounds
     static bool IsRunningInTheSimulator()
     {
         return true;
+    }
+
+    public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo)
+    {
+        if (propertyInfo == null)
+        {
+            throw new ArgumentNullException(nameof(propertyInfo));
+        }
+
+        MethodInfo getMethod = propertyInfo.GetMethod;
+        if (getMethod != null && getMethod.IsPublic)
+        {
+            return getMethod;
+        }
+        
+        return null;
+    }
+
+    public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo)
+    {
+        if (propertyInfo == null)
+        {
+            throw new ArgumentNullException(nameof(propertyInfo));
+        }
+
+        MethodInfo setMethod = propertyInfo.SetMethod;
+        if (setMethod != null && setMethod.IsPublic)
+        {
+            return setMethod;
+        }
+
+        return null;
     }
 }
 #endif

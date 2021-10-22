@@ -10,8 +10,6 @@
 *  
 \*====================================================================================*/
 
-
-#if WORKINPROGRESS
 #if MIGRATION
 
 namespace System.Windows.Interactivity
@@ -32,5 +30,4 @@ namespace System.Windows.Interactivity
     }
 }
 
-#endif
 #endif

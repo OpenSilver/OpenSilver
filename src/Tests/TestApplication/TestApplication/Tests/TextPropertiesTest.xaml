@@ -1,0 +1,31 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.TextPropertiesTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Vertical" Background="White">
+            <!--
+                <TextBlock Text="FontWeight = Thin" FontWeight="Thin" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = ExtraLight" FontWeight="ExtraLight" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = UltraLight (same as ExtraLight)" FontWeight="UltraLight" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = Light" FontWeight="Light" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = SemiLight" FontWeight="SemiLight" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = Normal" FontWeight="Normal" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = Regular(same as Normal)" FontWeight="Regular" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = Medium" FontWeight="Medium" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = SemiBold" FontWeight="SemiBold" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = DemiBold(same as SemiBold)" FontWeight="DemiBold" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = Bold" FontWeight="Bold" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = ExtraBold" FontWeight="ExtraBold" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = UltraBold(same as Extrabold)" FontWeight="UltraBold" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = Black" FontWeight="Black" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = Heavy(same as Black)" FontWeight="Heavy" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = ExtraBlack" FontWeight="ExtraBlack" FontFamily="Segoe UI" FontSize="30"/>
+                <TextBlock Text="FontWeight = UltraBlack(same as ExtraBlack)" FontWeight="UltraBlack" FontFamily="Segoe UI" FontSize="30"/>
+                -->
+        </StackPanel>
+    </StackPanel>
+</sdk:Page>

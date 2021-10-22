@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -122,9 +123,22 @@ namespace DotNetForHtml5.Compiler
                     // Retrieve paths of referenced .dlls and load them:
                     HashSet<string> referencePaths = (referencePathsString != null) ? new HashSet<string>(referencePathsString.Split(';')) : new HashSet<string>();
 
-                    referencePaths.RemoveWhere(s => !s.ToLower().EndsWith(".dll") || s.Contains("DotNetBrowser") || s.ToLower().EndsWith(@"\bridge.dll"));
+                    referencePaths.RemoveWhere(s => !s.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase) || s.Contains("DotNetBrowser") || s.EndsWith(@"\bridge.dll", StringComparison.InvariantCultureIgnoreCase));
 
-                    foreach (string referencedAssembly in AssembliesLoadHelper.EnsureCoreAssemblyIsFirstInList(referencePaths)) // Note: we ensure that the Core assembly is loaded first so that types such as "XmlnsDefinitionAttribute" are known when loading the other assemblies.
+                    var coreAssembliesPaths = referencePaths.Where(AssembliesLoadHelper.IsCoreAssembly).ToArray();
+
+                    // Note: we ensure that the Core assemblies are loaded first so that types such as "XmlnsDefinitionAttribute" are known when loading the other assemblies.
+                    foreach (var coreAssemblyName in AssembliesLoadHelper.CoreAssembliesNames)
+                    {
+                        var coreAssemblyPath = coreAssembliesPaths.FirstOrDefault(path => coreAssemblyName.Equals(Path.GetFileNameWithoutExtension(path), StringComparison.InvariantCultureIgnoreCase));
+                        if (coreAssemblyPath != null)
+                        {
+                            reflectionOnSeparateAppDomain.LoadAssembly(coreAssemblyPath, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: false);
+                            referencePaths.Remove(coreAssemblyPath);
+                        }
+                    }
+
+                    foreach (string referencedAssembly in referencePaths)
                     {
                         reflectionOnSeparateAppDomain.LoadAssembly(referencedAssembly, loadReferencedAssembliesToo: false, isBridgeBasedVersion: isBridgeBasedVersion, isCoreAssembly: false, nameOfAssembliesThatDoNotContainUserCode: nameOfAssembliesThatDoNotContainUserCode, skipReadingAttributesFromAssemblies: false);
                     }
