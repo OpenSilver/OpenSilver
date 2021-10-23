@@ -1,15 +1,15 @@
 ﻿
 
 /*===================================================================================
-* 
+*
 *   Copyright (c) Userware/OpenSilver.net
-*      
+*
 *   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
 *   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
+*
 *   As stated in the MIT license, "the above copyright notice and this permission
 *   notice shall be included in all copies or substantial portions of the Software."
-*  
+*
 \*====================================================================================*/
 
 
@@ -113,29 +113,6 @@ namespace Windows.UI.Xaml.Navigation
         }
 
         #endregion INavigationContentLoader implementation
-
-        static bool IsNullOrUndefined(object jsObject)
-        {
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                if (jsObject == null)
-                    return true;
-#if CSHTML5NETSTANDARD
-                return false;
-#else
-                if (!(jsObject is JSValue))
-                    return false;
-                JSValue value = ((JSValue)jsObject);
-                return value.IsNull() || value.IsUndefined();
-#endif
-            }
-            else
-                return Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
-        }
 
         static void GetXamlFileAssociatedClassInstancierName(string pagePathAndName, out string assemblyName, out string instancierName)
         {
@@ -274,54 +251,21 @@ namespace Windows.UI.Xaml.Navigation
                 string assemblyName;
                 string instancierName;
                 GetXamlFileAssociatedClassInstancierName(pagePathAndName, out assemblyName, out instancierName); //this method should only accept .xaml files (imo), it returns the name of the class we generated during the compilation, built from the assembly(gotten from either the uri, or the startingAssembly) and the file name.
-#if BRIDGE
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(assembly) == assemblyName)
+
+                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    Type type = assembly.GetType(instancierName);
-                    if (type != null)
+                    if (assembly.GetName().Name == assemblyName)
                     {
-                        MethodInfo methodInfo = type.GetMethod("Instantiate");
-                        return methodInfo.Invoke(null, null);
-                    }
-                    break;
-                }
-            }
-#else
-#if OPENSILVER
-                if (true)
-#elif BRIDGE
-                if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-                {
-                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        if (assembly.GetName().Name == assemblyName)
+                        Type type = assembly.GetType(instancierName);
+                        if (type != null)
                         {
-                            Type type = assembly.GetType(instancierName);
-                            if (type != null)
-                            {
-                                MethodInfo methodInfo = type.GetMethod("Instantiate");
-                                result.Content = methodInfo.Invoke(null, null);
-                                return;
-                            }
-                            break;
+                            MethodInfo methodInfo = type.GetMethod("Instantiate");
+                            result.Content = methodInfo.Invoke(null, null);
+                            return;
                         }
+                        break;
                     }
                 }
-                else
-                {
-                    object assembly = CSHTML5.Interop.ExecuteJavaScript(@"JSIL.GetAssembly($0, true)", assemblyName);
-                    object type = CSHTML5.Interop.ExecuteJavaScript(@"JSIL.GetTypeFromAssembly($0, $1)", assembly, instancierName);
-                    if (!IsNullOrUndefined(type))
-                    {
-                        object method = CSHTML5.Interop.ExecuteJavaScript(@"$0.GetMethod('Instantiate')", type);
-                        result.Content = CSHTML5.Interop.ExecuteJavaScript("$0.Invoke(null, null)", method);
-                        return;
-                    }
-                }
-#endif
             }
             catch (Exception ex)
             {
