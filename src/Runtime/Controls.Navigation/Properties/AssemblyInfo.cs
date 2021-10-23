@@ -1,11 +1,17 @@
-//-----------------------------------------------------------------------
-// <copyright company="Microsoft">
-//      (c) Copyright Microsoft Corporation.
-//      This source is subject to the Microsoft Public License (Ms-PL).
-//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
-//      All other rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+
+
+/*===================================================================================
+*
+*   Copyright (c) Userware/OpenSilver.net
+*
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*
+\*====================================================================================*/
+
 
 using System;
 using System.Reflection;
@@ -39,8 +45,10 @@ using System.Windows.Markup;
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "sdk")]
 #if MIGRATION
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Controls")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Navigation")]
 #else
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "Windows.UI.Xaml.Controls")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "Windows.UI.Xaml.Navigation")]
 #endif
 
 [assembly: NeutralResourcesLanguageAttribute("en-us")]

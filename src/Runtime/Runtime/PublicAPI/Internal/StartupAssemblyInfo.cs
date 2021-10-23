@@ -40,7 +40,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        internal static string StartupAssemblyShortName
+        public static string StartupAssemblyShortName
         {
             get
             {
