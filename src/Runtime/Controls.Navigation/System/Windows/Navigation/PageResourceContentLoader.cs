@@ -8,10 +8,15 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Markup;
+using System.Windows.Resources;
+using OpenSilver.Internal.Navigation;
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -26,11 +31,33 @@ namespace Windows.UI.Xaml.Navigation
     {
         #region Static fields and constants
 
+#if SL_TOOLKIT
         private static readonly Regex XClassRegex = new Regex(".*x:Class=\"(.*?)\"", RegexOptions.CultureInvariant);
+#endif
 
         #endregion
 
         #region Methods
+
+        private static string GetEntryPointAssemblyPartSource()
+        {
+#if SL_TOOLKIT
+            string assemblyPartSource = null;
+
+            foreach (AssemblyPart ap in Deployment.Current.Parts)
+            {
+                if (ap.Source.Substring(0, ap.Source.Length - 4) == Deployment.Current.EntryPointAssembly)
+                {
+                    assemblyPartSource = ap.Source;
+                    break;
+                }
+            }
+
+            return assemblyPartSource.Substring(0, assemblyPartSource.Length - 4);
+#else
+            return Deployment.Current.EntryPointAssembly;
+#endif
+        }
 
         #region INavigationContentLoader implementation
 
@@ -86,7 +113,7 @@ namespace Windows.UI.Xaml.Navigation
             PageResourceContentLoaderAsyncResult result = asyncResult as PageResourceContentLoaderAsyncResult;
             if (result == null)
             {
-                throw new InvalidOperationException(String.Format("Wrong kind of {0} passed in.  The {0} passed in should only come from {1}.", "IAsyncResult", "PageResourceContentLoader.BeginLoad"));
+                throw new InvalidOperationException(String.Format(Resource.PageResourceContentLoader_WrongIAsyncResult, "IAsyncResult", "PageResourceContentLoader.BeginLoad"));
             }
             if (result.Exception != null)
             {
@@ -109,45 +136,283 @@ namespace Windows.UI.Xaml.Navigation
 
         #endregion INavigationContentLoader implementation
 
-        static void GetXamlFileAssociatedClassInstancierName(string pagePathAndName, out string assemblyName, out string instancierName)
+#if SL_TOOLKIT
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We need to catch all exceptions to ensure we raise events in error cases instead, per design.")]
+        private static void BeginLoad_OnUIThread(AsyncCallback userCallback, PageResourceContentLoaderAsyncResult result)
         {
-            string uriAsString = pagePathAndName;
-            //we make sure we have an absolute uri:
-            string absoluteSourceUri = "";
-            assemblyName = "";
-            string[] splittedUri = uriAsString.Split(';');
-            if (splittedUri.Length == 1)
+            if (result.Exception != null)
             {
-                assemblyName = CSHTML5.Internal.StartupAssemblyInfo.StartupAssemblyShortName;
-                if (uriAsString.StartsWith("/"))
+                result.IsCompleted = true;
+                userCallback(result);
+                return;
+            }
+
+            try
+            {
+                string pagePathAndName = UriParsingHelper.InternalUriGetBaseValue(result.Uri);
+
+                string xaml = GetLocalXaml(pagePathAndName);
+
+                if (String.IsNullOrEmpty(xaml))
                 {
-                    absoluteSourceUri = "/" + assemblyName + ";component" + uriAsString;
+                    result.Exception = new InvalidOperationException(
+                                        String.Format(
+                                            CultureInfo.CurrentCulture,
+                                            Resource.PageResourceContentLoader_NoXAMLWasFound,
+                                            pagePathAndName));
+                    return;
+                }
+
+                string classString = GetXClass(xaml);
+
+                if (String.IsNullOrEmpty(classString))
+                {
+                    try
+                    {
+                        result.Content = XamlReader.Load(xaml);
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Exception = new InvalidOperationException(
+                                            String.Format(
+                                                CultureInfo.CurrentCulture,
+                                                Resource.PageResourceContentLoader_XAMLWasUnloadable,
+                                                pagePathAndName),
+                                            ex);
+                        return;
+                    }
                 }
                 else
                 {
-                    absoluteSourceUri = "/" + assemblyName + ";component/" + uriAsString;
+                    // If it does have an x:Class attribute, then it has a
+                    // code-behind, so get the CLR type of the XAML instead.
+                    Type t = GetTypeFromAnyLoadedAssembly(classString);
+
+                    if (t == null)
+                    {
+                        result.Exception = new InvalidOperationException(String.Format(
+                                            CultureInfo.CurrentCulture,
+                                            Resource.PageResourceContentLoader_TheTypeSpecifiedInTheXClassCouldNotBeFound,
+                                            classString,
+                                            pagePathAndName));
+                        return;
+                    }
+
+                    result.Content = Activator.CreateInstance(t);
+                    return;
                 }
             }
-            else if (splittedUri.Length == 2)
+            catch (Exception ex)
             {
-                assemblyName = splittedUri[0];
-                if (assemblyName.StartsWith("/"))
+                result.Exception = ex;
+            }
+            finally
+            {
+                result.IsCompleted = true;
+                if (userCallback != null)
                 {
-                    assemblyName = assemblyName.Substring(1);
+                    userCallback(result);
                 }
-                absoluteSourceUri = uriAsString;
+            }
+        }
+
+        /// <summary>
+        /// Returns the XAML string of the page at the given path.
+        /// If that page cannot be found (path does not exist, etc.)
+        /// then it returns null.
+        /// </summary>
+        /// <param name="pagePathAndName">The path and name of the XAML (with the ".xaml" included)</param>
+        /// <returns>See summary</returns>
+        private static string GetLocalXaml(string pagePathAndName)
+        {
+            string assemblyPartSource = null;
+            string pagePathAndNameWithoutAssembly = null;
+
+            if (!pagePathAndName.Contains(UriParsingHelper.ComponentDelimiter))
+            {
+                assemblyPartSource = GetEntryPointAssemblyPartSource();
+                pagePathAndNameWithoutAssembly = pagePathAndName;
             }
             else
             {
-                throw new Exception("Class name badly formatted.");
+                string[] pagePathAndNameParts = pagePathAndName.Split(new string[] { UriParsingHelper.ComponentDelimiterWithoutSlash }, StringSplitOptions.RemoveEmptyEntries);
+                if (pagePathAndNameParts.Length != 2)
+                {
+                    throw new InvalidOperationException(Resource.PageResourceContentLoader_InvalidComponentSyntax);
+                }
+                assemblyPartSource = pagePathAndNameParts[0];
+                pagePathAndNameWithoutAssembly = pagePathAndNameParts[1];
             }
-            instancierName = GenerateClassNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
+
+            if (String.IsNullOrEmpty(assemblyPartSource))
+            {
+                return null;
+            }
+
+            // In case the Uri contains international characters (ex: 完全采用统.xaml), we need to escape them.
+            // because Application.GetResourceStream expects an escaped Uri.
+            pagePathAndNameWithoutAssembly = Uri.EscapeUriString(pagePathAndNameWithoutAssembly);
+            assemblyPartSource = Uri.EscapeUriString(assemblyPartSource);
+
+            StreamResourceInfo sri = Application.GetResourceStream(new Uri(assemblyPartSource +
+                                                                           UriParsingHelper.ComponentDelimiterWithoutSlash +
+                                                                           pagePathAndNameWithoutAssembly,
+                                                                           UriKind.Relative));
+            if (sri == null)
+            {
+                return null;
+            }
+
+            using (StreamReader reader = new StreamReader(sri.Stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
-        static string GenerateClassNameFromAbsoluteUri_ForRuntimeAccess(string absoluteSourceUri)
+        private static string GetXClass(string xaml)
+        {
+            Match m = XClassRegex.Match(xaml);
+
+            if (m == Match.Empty)
+            {
+                return null;
+            }
+            else
+            {
+                return m.Groups[1].Value;
+            }
+        }
+
+        private static Type GetTypeFromAnyLoadedAssembly(string typeName)
+        {
+            Type t = null;
+
+            foreach (AssemblyPart ap in Deployment.Current.Parts)
+            {
+                StreamResourceInfo sri = Application.GetResourceStream(new Uri(ap.Source, UriKind.Relative));
+                if (sri != null)
+                {
+                    Assembly theAssembly = new AssemblyPart().Load(sri.Stream);
+                    if (theAssembly != null)
+                    {
+                        t = Type.GetType(
+                                        typeName + "," + theAssembly,
+                                        false /* don't throw on error, just return null */);
+                    }
+                }
+                if (t != null)
+                {
+                    break;
+                }
+            }
+
+            return t;
+        }
+#else
+        private static void BeginLoad_OnUIThread(AsyncCallback userCallback, PageResourceContentLoaderAsyncResult result)
+        {
+            if (result.Exception != null)
+            {
+                result.IsCompleted = true;
+                userCallback(result);
+                return;
+            }
+
+            try
+            {
+                string pagePathAndName = UriParsingHelper.InternalUriGetBaseValue(result.Uri);
+
+                Type factoryType = GetXamlPageFactoryType(pagePathAndName);
+
+                if (factoryType == null)
+                {
+                    result.Exception = new InvalidOperationException(
+                                        String.Format(
+                                            CultureInfo.CurrentCulture,
+                                            Resource.PageResourceContentLoader_NoXAMLWasFound,
+                                            pagePathAndName));
+                    return;
+                }
+
+                try
+                {
+                    result.Content = factoryType.GetMethod("Instantiate").Invoke(null, null);
+                }
+                catch (Exception ex)
+                {
+                    result.Exception = new InvalidOperationException(
+                                            String.Format(
+                                                CultureInfo.CurrentCulture,
+                                                Resource.PageResourceContentLoader_XAMLWasUnloadable,
+                                                pagePathAndName),
+                                            ex);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Exception = ex;
+            }
+            finally
+            {
+                result.IsCompleted = true;
+                if (userCallback != null)
+                {
+                    userCallback(result);
+                }
+            }
+        }
+
+        private static Type GetXamlPageFactoryType(string pagePathAndName)
+        {
+            if (!GetXamlPagePath(pagePathAndName, out string assemblyPartSource, out string pagePathAndNameWithoutAssembly))
+            {
+                return null;
+            }
+
+            string factoryTypeName = GetXamlPageFactoryTypeName("/" + assemblyPartSource + UriParsingHelper.ComponentDelimiterWithoutSlash + pagePathAndNameWithoutAssembly);
+
+            return Type.GetType(string.Concat(factoryTypeName, ", ", assemblyPartSource));
+        }
+
+        private static bool GetXamlPagePath(string pagePathAndName, out string assemblyPartSource, out string pagePathAndNameWithoutAssembly)
+        {
+            assemblyPartSource = null;
+            pagePathAndNameWithoutAssembly = null;
+
+            if (!pagePathAndName.Contains(UriParsingHelper.ComponentDelimiter))
+            {
+                assemblyPartSource = GetEntryPointAssemblyPartSource();
+                pagePathAndNameWithoutAssembly = pagePathAndName;
+            }
+            else
+            {
+                string[] pagePathAndNameParts = pagePathAndName.Split(new string[] { UriParsingHelper.ComponentDelimiterWithoutSlash }, StringSplitOptions.RemoveEmptyEntries);
+                if (pagePathAndNameParts.Length != 2)
+                {
+                    throw new InvalidOperationException(Resource.PageResourceContentLoader_InvalidComponentSyntax);
+                }
+                assemblyPartSource = pagePathAndNameParts[0];
+                pagePathAndNameWithoutAssembly = pagePathAndNameParts[1];
+            }
+
+            if (String.IsNullOrEmpty(assemblyPartSource))
+            {
+                return false;
+            }
+
+            // In case the Uri contains international characters (ex: 完全采用统.xaml), we need to escape them.
+            // because Application.GetResourceStream expects an escaped Uri.
+            pagePathAndNameWithoutAssembly = Uri.EscapeUriString(pagePathAndNameWithoutAssembly);
+            assemblyPartSource = Uri.EscapeUriString(assemblyPartSource);
+
+            return true;
+        }
+
+        private static string GetXamlPageFactoryTypeName(string pagePath)
         {
             // Convert to TitleCase (so that when we remove the spaces, it is easily readable):
-            string className = MakeTitleCase(absoluteSourceUri);
+            string className = MakeTitleCase(pagePath);
 
             // If file name contains invalid chars, remove them:
             className = Regex.Replace(className, @"\W", "ǀǀ"); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
@@ -166,35 +431,35 @@ namespace Windows.UI.Xaml.Navigation
             return className;
         }
 
-        static string MakeTitleCase(string str)
+        private static string MakeTitleCase(string str)
         {
             string result = "";
             string lowerStr = str.ToLower();
             int length = str.Length;
             bool makeUpper = true;
             int lastCopiedIndex = -1;
-            //****************************
-            //HOW THIS WORKS:
-            //
-            //  We go through all the characters of the string.
-            //  If any is not an alphanumerical character, we make the next alphanumerical character uppercase.
-            //  To do so, we copy the string (on which we call toLower) bit by bit into a new variable,
-            //  each bit being the part between two uppercase characters, and while inserting the uppercase version of the character between each bit.
-            //  then we add the end of the string.
-            //****************************
+            /****************************
+            * HOW THIS WORKS
+            *
+            * We go through all the characters of the string.
+            * If any is not an alphanumerical character, we make the next alphanumerical character uppercase.
+            * To do so, we copy the string (on which we call toLower) bit by bit into a new variable,
+            * each bit being the part between two uppercase characters, and while inserting the
+            * uppercase version of the character between each bit. then we add the end of the string.
+            *****************************/
 
             for (int i = 0; i < length; ++i)
             {
                 char ch = lowerStr[i];
-                if (ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '0')
+                if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '0'))
                 {
-                    if (makeUpper && ch >= 'a' && ch <= 'z') //if we have a letter, we make it uppercase. otherwise, it is a number so we let it as is.
+                    if (makeUpper && ch >= 'a' && ch <= 'z')
                     {
-                        if (!(lastCopiedIndex == -1 && i == 0)) //except this very specific case, we should never have makeUpper at true while i = lastCopiedindex + 1 (since we made lowerStr[lastCopiedindex] into an uppercase letter.
+                        if (!(lastCopiedIndex == -1 && i == 0))
                         {
-                            result += lowerStr.Substring(lastCopiedIndex + 1, i - lastCopiedIndex - 1); //i - lastCopied - 1 because we do not want to copy the current index since we want to make it uppercase:
+                            result += lowerStr.Substring(lastCopiedIndex + 1, i - lastCopiedIndex - 1);
                         }
-                        result += (char)(ch - 32); //32 is the difference between the lower case and the upper case, meaning that (char)('a' - 32) --> 'A'.
+                        result += (char)(ch - 32);
                         lastCopiedIndex = i;
                     }
                     makeUpper = false;
@@ -204,90 +469,25 @@ namespace Windows.UI.Xaml.Navigation
                     makeUpper = true;
                 }
             }
-            //we copy the rest of the string:
+
             if (lastCopiedIndex < length - 1)
             {
                 result += str.Substring(lastCopiedIndex + 1);
             }
             return result;
-
-
-            //bool isFirst = true;
-            //string[] spaceSplittedString = str.Split(' ');
-            //foreach (string s in spaceSplittedString)
-            //{
-            //    if (isFirst)
-            //    {
-            //        isFirst = false;
-            //    }
-            //    else
-            //    {
-            //        result += " ";
-            //    }
-            //    result += MakeFirstCharUpperAndRestLower(s);
-            //}
-            //return result;
         }
-
-#if SL_TOOLKIT
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We need to catch all exceptions to ensure we raise events in error cases instead, per design.")]
 #endif
-        private static void BeginLoad_OnUIThread(AsyncCallback userCallback, PageResourceContentLoaderAsyncResult result)
-        {
-            if (result.Exception != null)
-            {
-                result.IsCompleted = true;
-                userCallback(result);
-                return;
-            }
 
-            try
-            {
-                string pagePathAndName = UriParsingHelper.InternalUriGetBaseValue(result.Uri);
+        #endregion Methods
 
-                string assemblyName;
-                string instancierName;
-                GetXamlFileAssociatedClassInstancierName(pagePathAndName, out assemblyName, out instancierName); //this method should only accept .xaml files (imo), it returns the name of the class we generated during the compilation, built from the assembly(gotten from either the uri, or the startingAssembly) and the file name.
-
-                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    if (assembly.GetName().Name == assemblyName)
-                    {
-                        Type type = assembly.GetType(instancierName);
-                        if (type != null)
-                        {
-                            MethodInfo methodInfo = type.GetMethod("Instantiate");
-                            result.Content = methodInfo.Invoke(null, null);
-                            return;
-                        }
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Exception = ex;
-            }
-            finally
-            {
-                result.IsCompleted = true;
-                if (userCallback != null)
-                {
-                    userCallback(result);
-                }
-            }
-        }
-
-#endregion Methods
-
-#region Nested Classes
+        #region Nested Classes
 
         private class PageResourceContentLoaderAsyncResult : IAsyncResult
         {
             private object _asyncState;
             private bool _isCompleted;
 
-#region Constructors
+            #region Constructors
 
             /// <summary>
             /// Constructs an instance of the <see cref="PageResourceContentLoaderAsyncResult"/>
@@ -300,9 +500,9 @@ namespace Windows.UI.Xaml.Navigation
                 this.Uri = uri;
             }
 
-#endregion
+            #endregion
 
-#region IAsyncResult Members
+            #region IAsyncResult Members
 
             public object AsyncState
             {
@@ -325,9 +525,9 @@ namespace Windows.UI.Xaml.Navigation
                 internal set { this._isCompleted = value; }
             }
 
-#endregion
+            #endregion
 
-#region Properties
+            #region Properties
 
             internal Uri Uri { get; set; }
 
@@ -335,9 +535,9 @@ namespace Windows.UI.Xaml.Navigation
 
             internal object Content { get; set; }
 
-#endregion
+            #endregion
         }
 
-#endregion
+        #endregion
     }
 }
