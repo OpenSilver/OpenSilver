@@ -92,9 +92,9 @@
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Media\ColorConverter.cs" />
 		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationMode.cs" />
+		<Compile Include="System.Windows.Navigation\NavigatingCancelEventArgs.cs" />
+		<Compile Include="System.Windows.Navigation\NavigatingCancelEventHandler.cs" />
+		<Compile Include="System.Windows.Navigation\NavigationMode.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows.input\CursorConverter.cs" />
 		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
