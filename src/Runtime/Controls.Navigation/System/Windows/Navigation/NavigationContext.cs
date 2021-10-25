@@ -1,17 +1,11 @@
-﻿
-
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +22,7 @@ namespace Windows.UI.Xaml.Navigation
     /// <QualityBand>Preview</QualityBand>
     public sealed class NavigationContext
     {
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Default constructor.
@@ -39,9 +33,9 @@ namespace Windows.UI.Xaml.Navigation
             this.QueryString = queryString;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets a dictionary of query string values.
@@ -52,6 +46,6 @@ namespace Windows.UI.Xaml.Navigation
             private set;
         }
 
-        #endregion Properties
+#endregion Properties
     }
 }

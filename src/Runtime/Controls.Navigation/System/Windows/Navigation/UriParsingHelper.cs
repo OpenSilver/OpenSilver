@@ -1,24 +1,18 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Windows.Browser;
-
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -28,7 +22,7 @@ namespace Windows.UI.Xaml.Navigation
 {
     internal static class UriParsingHelper
     {
-        #region Static fields and constants
+#region Static fields and constants
 
         internal const string QueryStringDelimiter = "?";
         private const string ValueDelimiter = "=";
@@ -45,11 +39,11 @@ namespace Windows.UI.Xaml.Navigation
         internal const string ComponentDelimiterWithoutSlash = ";component";
         internal static readonly int ComponentDelimiterWithoutSlashLength = ComponentDelimiterWithoutSlash.Length;
 
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
 
-        #region Methods acting on internal Uris
+#region Methods acting on internal Uris
 
         private static Uri MakeAbsolute(Uri baseUri)
         {
@@ -137,7 +131,7 @@ namespace Windows.UI.Xaml.Navigation
 
             return finalString;
         }
-
+    
         internal static Uri InternalUriMerge(Uri baseUri, Uri newUri)
         {
             Guard.ArgumentNotNull(newUri, "newUri");
@@ -364,8 +358,8 @@ namespace Windows.UI.Xaml.Navigation
             return new Uri(sb.ToString(), UriKind.Relative);
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }

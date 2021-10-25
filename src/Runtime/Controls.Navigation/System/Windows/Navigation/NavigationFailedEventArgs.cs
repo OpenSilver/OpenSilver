@@ -1,23 +1,19 @@
-﻿
-
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -26,12 +22,12 @@ namespace Windows.UI.Xaml.Navigation
 #endif
 {
     /// <summary>
-    /// Event arguments used by the <see cref="System.Windows.Controls.Frame.NavigationFailed"/> and <see cref="NavigationService.NavigationFailed"/> events.
+    /// Event arguments used by the <see cref="Frame.NavigationFailed"/> and <see cref="NavigationService.NavigationFailed"/> events.
     /// </summary>
     /// <QualityBand>Stable</QualityBand>
     public sealed class NavigationFailedEventArgs : EventArgs
     {
-        #region All Constructors
+#region All Constructors
 
         /// <summary>
         /// Constructs a set of event arguments
@@ -44,9 +40,9 @@ namespace Windows.UI.Xaml.Navigation
             this.Exception = error;
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets the Uri that failed to be navigated to
@@ -65,6 +61,6 @@ namespace Windows.UI.Xaml.Navigation
         /// </summary>
         public bool Handled { get; set; }
 
-        #endregion
+#endregion
     }
 }

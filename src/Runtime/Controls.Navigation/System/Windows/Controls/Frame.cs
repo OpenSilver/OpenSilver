@@ -1,25 +1,28 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.ComponentModel;
 using System.Globalization;
+using OpenSilver.Internal.Navigation;
+
+#if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Common;
 using System.Windows.Controls.Primitives;
 using System.Windows.Navigation;
-using Resource = OpenSilver.Internal.Controls.Navigation.Resource;
+#else
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Controls.Common;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Navigation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -36,26 +39,26 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = Frame.PART_FramePreviousButton, Type = typeof(ButtonBase))]
     public class Frame : ContentControl, INavigate
     {
-        #region Static Fields and Constants
+#region Static Fields and Constants
 
         private const string PART_FrameNextButton = "NextButton";
         private const string PART_FramePreviousButton = "PrevButton";
         private const int DefaultCacheSize = 10;
 
-        #endregion
+#endregion
 
-        #region Fields
+#region Fields
 
         private ButtonBase _nextButton;
         private ButtonBase _previousButton;
-        private NavigationService _navigationService;   
+        private NavigationService _navigationService;
         private bool _loaded;
         private bool _updatingSourceFromNavigationService;
         private Uri _deferredNavigation;
 
-        #endregion  Fields
+#endregion  Fields
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Frame" /> class. 
@@ -67,9 +70,9 @@ namespace Windows.UI.Xaml.Controls
             this._navigationService = new NavigationService(this);
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Events
+#region Events
 
         /// <summary>
         /// Occurs when the content that is being navigated to has been found and is available.
@@ -117,11 +120,11 @@ namespace Windows.UI.Xaml.Controls
             remove { this._navigationService.FragmentNavigation -= value; }
         }
 
-        #endregion Events
+#endregion Events
 
-        #region Dependency Properties
+#region Dependency Properties
 
-        #region Source Dependency Property
+#region Source Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the Source property.
@@ -179,9 +182,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region JournalOwnership Dependency Property
+#region JournalOwnership Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the JournalOwnership property.
@@ -220,9 +223,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region CanGoBack Dependency Property
+#region CanGoBack Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the CanGoBack property.
@@ -243,9 +246,9 @@ namespace Windows.UI.Xaml.Controls
             internal set { this.SetValueNoCallback(CanGoBackProperty, value); }
         }
 
-        #endregion
+#endregion
 
-        #region CanGoForward Dependency Property
+#region CanGoForward Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the CanGoForward property.
@@ -266,9 +269,9 @@ namespace Windows.UI.Xaml.Controls
             internal set { this.SetValueNoCallback(CanGoForwardProperty, value); }
         }
 
-        #endregion
+#endregion
 
-        #region CurrentSource Dependency Property
+#region CurrentSource Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the CurrentSource property.
@@ -294,9 +297,9 @@ namespace Windows.UI.Xaml.Controls
             internal set { this.SetValueNoCallback(CurrentSourceProperty, value); }
         }
 
-        #endregion
+#endregion
 
-        #region UriMapper Dependency Property
+#region UriMapper Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the UriMapper property.
@@ -318,9 +321,9 @@ namespace Windows.UI.Xaml.Controls
             set { this.SetValue(UriMapperProperty, value); }
         }
 
-        #endregion
+#endregion
 
-        #region ContentLoader Dependency Property
+#region ContentLoader Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the ContentLoader property.
@@ -361,9 +364,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region CacheSize Dependency Property
+#region CacheSize Dependency Property
 
         /// <summary>
         /// The DependencyProperty for the CacheSize property.
@@ -407,20 +410,20 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         internal NavigationService NavigationService
         {
             get { return this._navigationService; }
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         internal static bool IsInDesignMode()
         {
@@ -466,7 +469,7 @@ namespace Windows.UI.Xaml.Controls
             this._navigationService.GoForward();
         }
 
-        /// <summary>ur
+        /// <summary>
         /// Navigates to the content specified by the uniform resource identifier (URI).
         /// </summary>
         /// <param name="source">The URI representing a page to display in the frame.</param>
@@ -487,7 +490,11 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Called when the template generation for the visual tree is created.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 
@@ -647,6 +654,6 @@ namespace Windows.UI.Xaml.Controls
             this.GoBack();
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

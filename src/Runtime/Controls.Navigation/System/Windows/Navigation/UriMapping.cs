@@ -1,22 +1,17 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Resource = OpenSilver.Internal.Controls.Navigation.Resource;
+using OpenSilver.Internal.Navigation;
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -30,7 +25,7 @@ namespace Windows.UI.Xaml.Navigation
     /// <QualityBand>Preview</QualityBand>
     public sealed class UriMapping
     {
-        #region Fields
+#region Fields
 
         private static readonly Regex _conversionRegex = new Regex("(?<ConversionCapture>{.*?})", RegexOptions.ExplicitCapture);
         private Uri _uri;
@@ -45,9 +40,9 @@ namespace Windows.UI.Xaml.Navigation
         private List<string> _mappedUriIdentifiers;
         private bool _initialized;
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets or sets the original URI value or pattern.
@@ -83,9 +78,9 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         private bool UriTemplateContainsSameIdentifierTwice(Uri uri, out Regex uriRegex)
         {
@@ -322,6 +317,6 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion
+#endregion
     }
 }

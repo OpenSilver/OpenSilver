@@ -1,23 +1,18 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
-
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows.Markup;
-using Resource = OpenSilver.Internal.Controls.Navigation.Resource;
+using OpenSilver.Internal.Navigation;
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -26,14 +21,14 @@ namespace Windows.UI.Xaml.Navigation
 #endif
 {
     /// <summary>
-    /// Default UriMapperBase implementation that uses a List of UriMapping
+    /// Default UriMapperBase implementation that uses a List of UriMapping 
     /// objects to map and transform URI values.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
     [ContentProperty("UriMappings")]
     public sealed class UriMapper : UriMapperBase
     {
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Default constructor.
@@ -43,9 +38,9 @@ namespace Windows.UI.Xaml.Navigation
             this.UriMappings = new Collection<UriMapping>();
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets a list of UriMapping objects.
@@ -56,9 +51,9 @@ namespace Windows.UI.Xaml.Navigation
             private set;
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         /// <summary>
         /// Maps a given URI and returns a mapped URI.
@@ -95,6 +90,6 @@ namespace Windows.UI.Xaml.Navigation
             return uri;
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

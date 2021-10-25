@@ -1,20 +1,22 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Windows.Browser;
+
+#if MIGRATION
 using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -28,13 +30,13 @@ namespace Windows.UI.Xaml.Navigation
     /// <seealso cref="Journal"/>
     internal sealed class JournalEntry : DependencyObject
     {
-        #region Fields
+#region Fields
 
         private Uri _source;
 
-        #endregion Fields
+#endregion Fields
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Default constructor.
@@ -49,9 +51,9 @@ namespace Windows.UI.Xaml.Navigation
             this._source = uri;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Name Attached Property
+#region Name Attached Property
 
         /// <summary>
         /// An attached dependency property used to specify a name for a journal entry, which may be reflected in the browser window
@@ -111,9 +113,9 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion
+#endregion
 
-        #region NavigationContext Attached Property
+#region NavigationContext Attached Property
 
         /// <summary>
         /// An attached dependency property used to specify a <see cref="NavigationContext"/> for a piece of content which
@@ -152,9 +154,9 @@ namespace Windows.UI.Xaml.Navigation
             obj.SetValue(NavigationContextProperty, navigationContext);
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets or sets the Uri that for this journal entry
@@ -173,6 +175,6 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion Properties
+#endregion Properties
     }
 }

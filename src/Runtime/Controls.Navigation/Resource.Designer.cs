@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpenSilver.Internal.Controls.Navigation {
+namespace OpenSilver.Internal.Navigation {
     using System;
     
     

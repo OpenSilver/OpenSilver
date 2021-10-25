@@ -1,18 +1,13 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.Collections.Generic;
 
 #if MIGRATION
@@ -29,15 +24,15 @@ namespace Windows.UI.Xaml.Navigation
 {
     internal sealed class NavigationCache : DependencyObject
     {
-        #region Fields
+#region Fields
 
         private int _cacheSize;
         private Dictionary<string, Page> _cachePages;
         private List<string> _cachePagesMRU;
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         //This property is for testing purposes only
         internal int CachePagesSize { get { return this._cachePages.Count; } }
@@ -58,9 +53,9 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion
+#endregion
 
-        #region NavigationCacheMode Attached Property
+#region NavigationCacheMode Attached Property
 
         internal static readonly DependencyProperty NavigationCacheModeProperty =
             DependencyProperty.RegisterAttached(
@@ -81,9 +76,9 @@ namespace Windows.UI.Xaml.Navigation
             depObj.SetValue(NavigationCacheModeProperty, navigationCacheMode);
         }
 
-        #endregion
+#endregion
 
-        #region Constructor
+#region Constructor
 
         internal NavigationCache(int initialCacheSize)
         {
@@ -92,9 +87,9 @@ namespace Windows.UI.Xaml.Navigation
             this._cachePagesMRU = new List<string>(this._cacheSize);
         }
 
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
 
         internal void ChangeCacheSize(int newCacheSize)
         {
@@ -147,6 +142,6 @@ namespace Windows.UI.Xaml.Navigation
             this._cachePages.Remove(uri);
         }
 
-        #endregion
+#endregion
     }
 }

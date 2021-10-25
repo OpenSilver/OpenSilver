@@ -1,22 +1,23 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+
+#if MIGRATION
 using System.Windows;
 using System.Windows.Media;
+#else
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls.Common
@@ -54,7 +55,7 @@ namespace Windows.UI.Xaml.Controls.Common
     /// </summary>
     internal static class DependencyObjectExtensions
     {
-        #region Static Methods
+#region Static Methods
 
         public static void SetValueNoCallback(this DependencyObject obj, DependencyProperty property, object value)
         {
@@ -74,6 +75,6 @@ namespace Windows.UI.Xaml.Controls.Common
             return DependencyObjectExtensionProperties.GetAreHandlersSuspended(obj);
         }
 
-        #endregion Static Methods
+#endregion Static Methods
     }
 }

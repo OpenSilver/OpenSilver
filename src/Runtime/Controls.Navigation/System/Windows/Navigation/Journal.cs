@@ -1,30 +1,21 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Browser;
-
-#if MIGRATION
 using System.Windows.Interop;
-#else
-using Windows.UI.Xaml.Interop;
-#endif
-
-using Resource = OpenSilver.Internal.Controls.Navigation.Resource;
+using OpenSilver.Internal.Navigation;
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -37,7 +28,7 @@ namespace Windows.UI.Xaml.Navigation
     /// </summary>
     internal class Journal
     {
-        #region Fields
+#region Fields
 
         /// <summary>
         /// Synchronization lock object.
@@ -65,10 +56,10 @@ namespace Windows.UI.Xaml.Navigation
         /// The event handler constructed here will use a weak reference to self in order to allow for this instance to be collected.
         /// </remarks>
         private EventHandler<NavigationStateChangedEventArgs> _weakRefEventHandler;
+        
+#endregion Fields
 
-        #endregion Fields
-
-        #region Constructors & Destructor
+#region Constructors & Destructor
 
         internal Journal(bool useNavigationState)
         {
@@ -80,7 +71,7 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        //
+        // 
 
 
 
@@ -93,15 +84,15 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         internal event EventHandler<JournalEventArgs> Navigated;
 
-        #endregion Events
+#endregion Events
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets a value indicating whether or not this journal instance is
@@ -158,9 +149,9 @@ namespace Windows.UI.Xaml.Navigation
             get { return this._forwardStack; }
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         /// <summary>
         /// Adds a new JournalEntry to the history stack.
@@ -191,7 +182,7 @@ namespace Windows.UI.Xaml.Navigation
         }
 
         /// <summary>
-        /// Forces the Journal to check for deep-link values in
+        /// Forces the Journal to check for deep-link values in 
         /// the browser address URI.
         /// </summary>
         /// <returns>
@@ -215,7 +206,7 @@ namespace Windows.UI.Xaml.Navigation
         }
 
         /// <summary>
-        /// Navigates the Journal instance back to the previous
+        /// Navigates the Journal instance back to the previous 
         /// JournalEntry item in the history stack.
         /// </summary>
         /// <remarks>
@@ -243,7 +234,7 @@ namespace Windows.UI.Xaml.Navigation
         }
 
         /// <summary>
-        /// Navigates the Journal instance forward to the next
+        /// Navigates the Journal instance forward to the next 
         /// JournalEntry item in the history stack.
         /// </summary>
         /// <remarks>
@@ -427,6 +418,6 @@ namespace Windows.UI.Xaml.Navigation
             this.OnNavigated(currentEntry.Name, currentEntry.Source, mode);
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

@@ -1,22 +1,17 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
-
+using System.Windows;
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -234,7 +229,9 @@ namespace Windows.UI.Xaml.Navigation
             //return result;
         }
 
+#if SL_TOOLKIT
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We need to catch all exceptions to ensure we raise events in error cases instead, per design.")]
+#endif
         private static void BeginLoad_OnUIThread(AsyncCallback userCallback, PageResourceContentLoaderAsyncResult result)
         {
             if (result.Exception != null)
@@ -281,16 +278,16 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion Methods
+#endregion Methods
 
-        #region Nested Classes
+#region Nested Classes
 
         private class PageResourceContentLoaderAsyncResult : IAsyncResult
         {
             private object _asyncState;
             private bool _isCompleted;
 
-            #region Constructors
+#region Constructors
 
             /// <summary>
             /// Constructs an instance of the <see cref="PageResourceContentLoaderAsyncResult"/>
@@ -303,9 +300,9 @@ namespace Windows.UI.Xaml.Navigation
                 this.Uri = uri;
             }
 
-            #endregion
+#endregion
 
-            #region IAsyncResult Members
+#region IAsyncResult Members
 
             public object AsyncState
             {
@@ -328,9 +325,9 @@ namespace Windows.UI.Xaml.Navigation
                 internal set { this._isCompleted = value; }
             }
 
-            #endregion
+#endregion
 
-            #region Properties
+#region Properties
 
             internal Uri Uri { get; set; }
 
@@ -338,9 +335,9 @@ namespace Windows.UI.Xaml.Navigation
 
             internal object Content { get; set; }
 
-            #endregion
+#endregion
         }
 
-        #endregion
+#endregion
     }
 }

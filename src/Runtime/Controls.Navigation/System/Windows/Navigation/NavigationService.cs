@@ -1,24 +1,25 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Browser;
+using OpenSilver.Internal.Navigation;
+
+#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
-using Resource = OpenSilver.Internal.Controls.Navigation.Resource;
+#else
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Navigation
@@ -32,7 +33,7 @@ namespace Windows.UI.Xaml.Navigation
     /// <QualityBand>Stable</QualityBand>
     public sealed class NavigationService
     {
-        #region Fields
+#region Fields
 
         private bool _journalIsAddingHistoryPoint;
         private Frame _host;
@@ -44,9 +45,9 @@ namespace Windows.UI.Xaml.Navigation
         private NavigationOperation _currentNavigation;
         private Dictionary<string, Page> _cacheRequiredPages = new Dictionary<string, Page>();
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Internal class used to host content and handles all navigations
@@ -60,9 +61,9 @@ namespace Windows.UI.Xaml.Navigation
             this._host = nav;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Events
+#region Events
 
         /// <summary>
         /// Occurs when the an exception is raised during navigation.
@@ -92,9 +93,9 @@ namespace Windows.UI.Xaml.Navigation
         /// </summary>
         public event FragmentNavigationEventHandler FragmentNavigation;
 
-        #endregion
+#endregion
 
-        #region NavigationService Attached Property
+#region NavigationService Attached Property
 
         /// <summary>
         /// Attached DependencyProperty. It gives an element the NavigationService of the navigation container it's in.
@@ -118,9 +119,9 @@ namespace Windows.UI.Xaml.Navigation
             return dependencyObject.GetValue(NavigationServiceProperty) as NavigationService;
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         internal Journal Journal
         {
@@ -203,9 +204,9 @@ namespace Windows.UI.Xaml.Navigation
             get { return this._journal.CanGoBack; }
         }
 
-        #endregion
+#endregion
 
-        #region Methods
+#region Methods
 
         internal void InitializeJournal()
         {
@@ -434,7 +435,6 @@ namespace Windows.UI.Xaml.Navigation
             return true;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The exception should always be caught and used to raise a failure event instead.")]
         private void ContentLoader_BeginLoad_Callback(IAsyncResult result)
         {
             DependencyObject content = null;
@@ -708,7 +708,7 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #region Event handlers
+#region Event handlers
 
         /// <summary>
         /// Raises the Navigated event synchronously.
@@ -830,11 +830,11 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Nested Classes, Structs
+#region Nested Classes, Structs
 
         /// <summary>
         /// Class used within the Frame to manage navigation operations.
@@ -912,6 +912,6 @@ namespace Windows.UI.Xaml.Navigation
             }
         }
 
-        #endregion Nested Classes, Structs
+#endregion Nested Classes, Structs
     }
 }

@@ -1,21 +1,20 @@
-﻿
-
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 using System.ComponentModel;
 using System.Windows.Markup;
+
+#if MIGRATION
 using System.Windows.Navigation;
+#else
+using Windows.UI.Xaml.Navigation;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -29,7 +28,7 @@ namespace Windows.UI.Xaml.Controls
     /// <QualityBand>Stable</QualityBand>
     public class Page : UserControl
     {
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.Page" /> class. 
@@ -38,9 +37,9 @@ namespace Windows.UI.Xaml.Controls
         {
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets an object that contains information about the navigation request.
@@ -78,9 +77,9 @@ namespace Windows.UI.Xaml.Controls
             set { NavigationCache.SetNavigationCacheMode(this, value); }
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         internal void InternalOnFragmentNavigation(FragmentNavigationEventArgs e)
         {
@@ -164,6 +163,6 @@ namespace Windows.UI.Xaml.Controls
             return;
         }
         
-        #endregion
+#endregion
     }
 }

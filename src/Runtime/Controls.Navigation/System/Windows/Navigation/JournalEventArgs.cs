@@ -1,19 +1,15 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
+using System;
 
-
-#if MIGRATION
+#if  MIGRATION
 namespace System.Windows.Navigation
 #else
 namespace Windows.UI.Xaml.Navigation
@@ -24,7 +20,7 @@ namespace Windows.UI.Xaml.Navigation
     /// </summary>
     internal sealed class JournalEventArgs : EventArgs
     {
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Default constructor.
@@ -41,9 +37,9 @@ namespace Windows.UI.Xaml.Navigation
             this.NavigationMode = mode;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets a value containing the journal event name.
@@ -72,6 +68,6 @@ namespace Windows.UI.Xaml.Navigation
             private set;
         }
 
-        #endregion Properties
+#endregion Properties
     }
 }

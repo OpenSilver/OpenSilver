@@ -1,17 +1,11 @@
-
-
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
 using System;
 using System.Reflection;
@@ -41,8 +35,12 @@ using System.Windows.Markup;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
+#if false
+[assembly: CLSCompliant(true)]
+#endif
 
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "sdk")]
+
 #if MIGRATION
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Controls")]
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Navigation")]
@@ -64,3 +62,13 @@ using System.Windows.Markup;
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("2.0.5.0")]
 [assembly: AssemblyFileVersion("4.0.40413.2002")]
+
+#if false
+// Type-forwarding the types that used to be defined in this assembly and are now
+// defined in core's System.Windows.dll assembly.
+[assembly: TypeForwardedTo(typeof(System.Windows.Navigation.NavigationEventArgs))]
+[assembly: TypeForwardedTo(typeof(System.Windows.Navigation.NavigatingCancelEventHandler))]
+[assembly: TypeForwardedTo(typeof(System.Windows.Navigation.NavigatedEventHandler))]
+[assembly: TypeForwardedTo(typeof(System.Windows.Navigation.NavigatingCancelEventArgs))]
+[assembly: TypeForwardedTo(typeof(System.Windows.Navigation.NavigationMode))]
+#endif

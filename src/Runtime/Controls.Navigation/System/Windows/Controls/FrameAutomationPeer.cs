@@ -1,21 +1,23 @@
-﻿
+﻿//-----------------------------------------------------------------------
+// <copyright company="Microsoft">
+//      (c) Copyright Microsoft Corporation.
+//      This source is subject to the Microsoft Public License (Ms-PL).
+//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+//      All other rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
 
-/*===================================================================================
-*
-*   Copyright (c) Userware/OpenSilver.net
-*
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*
-\*====================================================================================*/
-
-
+#if MIGRATION
 using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
     /// <summary>
     /// Exposes Frame types to UI Automation.
@@ -32,7 +34,7 @@ namespace System.Windows.Automation.Peers
         {
         }
 
-        #region AutomationPeer overrides
+#region AutomationPeer overrides
 
         /// <summary>
         /// Gets the control type for the element that is associated with the UI
@@ -81,6 +83,6 @@ namespace System.Windows.Automation.Peers
             return name;
         }
 
-        #endregion AutomationPeer overrides
+#endregion AutomationPeer overrides
     }
 }
