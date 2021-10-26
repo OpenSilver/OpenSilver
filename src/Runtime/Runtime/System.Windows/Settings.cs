@@ -47,6 +47,13 @@ namespace System
 
         public bool EnableWebRequestsLogging { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value determining whether or not to use the resizeSensor.js library
+        /// instead of the ResizeObserver API to listen for size change event in Html.
+        /// </summary>
+        /// <remarks>Should probably be removed once we get the ResizeObserver fully working.</remarks>
+        public bool UseResizeSensor { get; set; }
+
 
 
         public bool EnableInteropLogging
