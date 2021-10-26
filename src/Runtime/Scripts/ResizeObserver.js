@@ -38,7 +38,6 @@ function throttle(callback, interval) {
 class ResizeObserverAdapter {
 
     constructor() {
-
         this.observer = new ResizeObserver(entries => this.onResize(entries));
         this.callbacks = {};
     }
@@ -58,10 +57,8 @@ class ResizeObserverAdapter {
     }
 
     onResize(resizedElements) {
-
         for (const element of resizedElements) {
-            if (this.callbacks[element.target.id])
-            {
+            if (this.callbacks[element.target.id]) {
                 this.callbacks[element.target.id](element.contentRect.width + '|' + element.contentRect.height);
             }
         }
