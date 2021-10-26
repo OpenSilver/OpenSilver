@@ -93,6 +93,10 @@
 		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Media\ColorConverter.cs" />
+		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
+		<Compile Include="System.Windows.Navigation\NavigatingCancelEventArgs.cs" />
+		<Compile Include="System.Windows.Navigation\NavigatingCancelEventHandler.cs" />
+		<Compile Include="System.Windows.Navigation\NavigationMode.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows.input\CursorConverter.cs" />
 		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
@@ -323,7 +327,6 @@
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextOptions.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextRenderingMode.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\VisualTreeHelper.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationContext.cs" />
 		<Compile Include="System.Windows\ResourceDictionaryCollection.cs" />
 		<Compile Include="System.Windows\ResourcesChangeInfo.cs" />
 		<Compile Include="System.Windows\TreeWalkHelper.cs" />
@@ -638,10 +641,6 @@
 		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
 		<Compile Include="System.Windows.Media.Effects\DropShadowEffect.cs" />
 		<Compile Include="System.Windows.Media.Effects\Effect.cs" />
-		<Compile Include="System.Windows.Navigation\JournalOwnership.cs" />
-		<Compile Include="System.Windows.Navigation\UriMapper.cs" />
-		<Compile Include="System.Windows.Navigation\UriMapperBase.cs" />
-		<Compile Include="System.Windows.Navigation\UriMapping.cs" />
 		<Compile Include="System.Windows.Resources\StreamResourceInfo.cs" />
 		<Compile Include="System.Windows\Clipboard.cs" />
 		<Compile Include="System.Windows\DataObject.cs" />
@@ -766,7 +765,6 @@
 		<Compile Include="System.Windows.Controls\DragEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\Expander.cs" />
 		<Compile Include="System.Windows.Controls\ExtendedRoutedEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\Frame.cs" />
 		<Compile Include="System.Windows.Controls\Grid.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter.Data.cs" />
@@ -797,7 +795,6 @@
 		<Compile Include="System.Windows.Controls\MenuItem.cs" />
 		<Compile Include="System.Windows.Controls\NumericUpDown.cs" />
 		<Compile Include="System.Windows.Controls\Orientation.cs" />
-		<Compile Include="System.Windows.Controls\Page.cs" />
 		<Compile Include="System.Windows.Controls\Panel.cs" />
 		<Compile Include="System.Windows.Controls\PanelDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBox.cs" />
@@ -839,9 +836,7 @@
 		<Compile Include="System.Windows.Controls\Viewbox.cs" />
 		<Compile Include="System.Windows.Controls\VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\WebView.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Frame.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Page.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
 		<Compile Include="System.Windows.Controls\WrapPanel.cs" />
 		<Compile Include="System.Windows.Data\Binding.cs" />
@@ -1003,14 +998,6 @@
 		<Compile Include="System.Windows.Media\RectangleGeometry.cs" />
 		<Compile Include="System.Windows.Navigation\NavigatedEventHandler.cs" />
 		<Compile Include="System.Windows.Navigation\NavigationEventArgs.cs" />
-		<Compile Include="System.Windows.Navigation\NavigationFailedEventArgs.cs" />
-		<Compile Include="System.Windows.Navigation\NavigationFailedEventHandler.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationMode.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationService.cs" />
-		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationStoppedEventHandler.cs" />
 		<Compile Include="System.Windows.Shapes\Ellipse.cs" />
 		<Compile Include="System.Windows.Shapes\Line.cs" />
 		<Compile Include="System.Windows.Shapes\Path.cs" />

@@ -25,14 +25,16 @@
   </metadata>
   <files>
     <!-- OpenSilver runtime -->
-	<file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.dll" target="lib/netstandard2.0/OpenSilver.Xaml.dll" />
-	<file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.pdb" target="lib/netstandard2.0/OpenSilver.Xaml.pdb" />
+    <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.dll" target="lib/netstandard2.0/OpenSilver.Xaml.dll" />
+    <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.pdb" target="lib/netstandard2.0/OpenSilver.Xaml.pdb" />
     <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.dll" target="lib/netstandard2.0/OpenSilver.dll" />
-	<file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.pdb" target="lib/netstandard2.0/OpenSilver.pdb" />
-	<file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" />
-	<file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" />
-	<file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.dll" />
-	<file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" />
+    <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.pdb" target="lib/netstandard2.0/OpenSilver.pdb" />
+    <file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" />
+    <file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" />
+    <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.dll" />
+    <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" />
+    <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.dll" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.dll" />
+    <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.pdb" />
 
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" />

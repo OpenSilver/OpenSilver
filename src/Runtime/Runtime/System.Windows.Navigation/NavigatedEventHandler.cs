@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 #if MIGRATION
 namespace System.Windows.Navigation
 #else
@@ -26,7 +18,8 @@ namespace Windows.UI.Xaml.Navigation
 #endif
 {
     /// <summary>
-    /// Represents the method that will handle the Navigated event.
+    /// Represents the method that will handle the <c>NavigationService.Navigated</c>
+    /// event.
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The data for the event.</param>

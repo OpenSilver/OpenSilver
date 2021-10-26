@@ -1,0 +1,82 @@
+<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>OpenSilver.Controls.Navigation</AssemblyName>
+    <RootNamespace>System.Windows.Navigation</RootNamespace>
+    <Configurations>SL;UWP</Configurations>
+    <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
+    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+    <OpenSilverVersion>1.0.0</OpenSilverVersion>
+    <Optimize>true</Optimize>
+    <DefineSilverlight>true</DefineSilverlight>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;MIGRATION</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="System\Windows\Controls\Common\DependencyObjectExtensions.cs" />
+    <Compile Include="System\Windows\Navigation\INavigationContentLoader.cs" />
+    <Compile Include="System\Windows\Navigation\LoadResult.cs" />
+    <Compile Include="System\Windows\Navigation\NavigationCacheMode.cs" />
+    <Compile Include="System\Windows\Navigation\FragmentNavigationEventArgs.cs" />
+    <Compile Include="System\Windows\Navigation\Guard.cs" />
+    <Compile Include="System\Windows\Navigation\NavigationCache.cs" />
+    <Compile Include="System\Windows\Navigation\NavigationContext.cs" />
+    <Compile Include="System\Windows\Navigation\NavigationDelegates.cs" />
+    <Compile Include="System\Windows\Navigation\NavigationFailedEventArgs.cs" />
+    <Compile Include="System\Windows\Controls\Frame.cs" />
+    <Compile Include="System\Windows\Controls\FrameAutomationPeer.cs" />
+    <Compile Include="System\Windows\Controls\Page.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="System\Windows\Navigation\PageResourceContentLoader.cs" />
+    <Compile Include="System\Windows\Navigation\Journal.cs" />
+    <Compile Include="System\Windows\Navigation\JournalEntry.cs" />
+    <Compile Include="System\Windows\Navigation\JournalEventArgs.cs" />
+    <Compile Include="System\Windows\Navigation\JournalOwnership.cs" />
+    <Compile Include="System\Windows\Navigation\NavigationService.cs" />
+    <Compile Include="System\Windows\Navigation\UriMapperBase.cs" />
+    <Compile Include="System\Windows\Navigation\UriMapper.cs" />
+    <Compile Include="System\Windows\Navigation\UriMapping.cs" />
+    <Compile Include="System\Windows\Navigation\UriParsingHelper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Internal.Navigation</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
+  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+
+</Project>

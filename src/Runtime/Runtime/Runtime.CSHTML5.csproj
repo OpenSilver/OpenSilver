@@ -150,6 +150,9 @@
     <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
     <Compile Include="System.Windows.Media\TransformConverter.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
+    <Compile Include="System.Windows.Navigation\NavigatingCancelEventArgs.cs" />
+    <Compile Include="System.Windows.Navigation\NavigatingCancelEventHandler.cs" />
+    <Compile Include="System.Windows.Navigation\NavigationMode.cs" />
     <Compile Include="System.Windows\ApplicationServiceContext.cs" />
     <Compile Include="System.Windows\DataTemplateKey.cs" />
     <Compile Include="System.Windows\FontStretchConverter.cs" />
@@ -242,7 +245,6 @@
     <Compile Include="System.Windows\Expression.cs" />
     <Compile Include="System.Windows.Data\IndexedEnumerable.cs" />
     <Compile Include="System.Windows.Data\INTERNAL_PagedCollectionView.cs" />
-    <Compile Include="System.Windows.Controls\WORKINPROGRESS\Toolkit\ItemsControlExtensions.cs" />
     <Compile Include="System.Windows.Data\ListCollectionView.cs" />
     <Compile Include="System.Windows.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\Block.cs" />
@@ -884,10 +886,7 @@
     <Compile Include="System.Windows.Navigation\NavigationEventArgs.cs" />
     <Compile Include="System.Windows.Navigation\NavigationFailedEventArgs.cs" />
     <Compile Include="System.Windows.Navigation\NavigationFailedEventHandler.cs" />
-    <Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigatingCancelEventArgs.cs" />
-    <Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigatingCancelEventHandler.cs" />
     <Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationContext.cs" />
-    <Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationMode.cs" />
     <Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationService.cs" />
     <Compile Include="System.Windows.Navigation\WORKINPROGRESS\NavigationStoppedEventHandler.cs" />
     <Compile Include="System.Windows.Shapes\Ellipse.cs" />
