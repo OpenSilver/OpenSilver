@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -83,154 +77,216 @@ namespace Windows.UI.Xaml.Data
     public partial class Binding : BindingBase
     {
         internal bool _isInStyle;
+        private IValueConverter _converter;
+#if MIGRATION
+        private CultureInfo _culture;
+#else
+        private string _culture;
+#endif
+        private object _converterParameter;
+        private string _elementName;
+        private BindingMode _mode = BindingMode.OneWay;
+        private PropertyPath _path;
+        private RelativeSource _relativeSource;
+        private object _source;
+        private UpdateSourceTrigger _updateSourceTrigger;
+        private bool _validatesOnExceptions;
+        private bool _notifyOnValidationError;
+        private bool _bindsDirectlyToSource;
+        private bool _validatesOnNotifyDataErrors;
+        private bool _validatesOnDataErrors;
 
         /// <summary>
-        /// Initializes a new instance of the Binding class.
+        /// Initializes a new instance of the <see cref="Binding"/> class.
         /// </summary>
-        public Binding() { }
+        public Binding() 
+        {
+            Path = new PropertyPath(string.Empty);
+        }
+
         /// <summary>
-        /// Initializes a new instance of the Binding class with the given path.
+        /// Initializes a new instance of the <see cref="Binding"/> class with an initial
+        /// property path for the data source.
         /// </summary>
-        /// <param name="path">The path to the source of the binding.</param>
+        /// <param name="path">
+        /// The initial property path for the source of the binding.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// path is null.
+        /// </exception>
         public Binding(string path)
         {
-            if(!string.IsNullOrWhiteSpace(path))
-                Path = new PropertyPath(path);
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            Path = new PropertyPath(path);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Binding"/> class with initial
+        /// property values copied from the specified <see cref="Binding"/>.
+        /// </summary>
+        /// <param name="original">
+        /// The <see cref="Binding"/> to copy.
+        /// </param>
+        public Binding(Binding original)
+        {
+            if (original != null)
+            {
+                FallbackValue = original.FallbackValue;
+                TargetNullValue = original.TargetNullValue;
+                StringFormat = original.StringFormat;
+
+                _isInStyle = original._isInStyle;
+                _converter = original._converter;
+#if MIGRATION
+                _culture = original._culture;
+#else
+                _culture = original._culture;
+#endif
+                _converterParameter = original._converterParameter;
+                _elementName = original._elementName;
+                _mode = original._mode;
+                _path = original._path;
+                _relativeSource = original._relativeSource;
+                _source = original._source;
+                _updateSourceTrigger = original._updateSourceTrigger;
+                _validatesOnExceptions = original._validatesOnExceptions;
+                _notifyOnValidationError = original._notifyOnValidationError;
+                _bindsDirectlyToSource = original._bindsDirectlyToSource;
+                _validatesOnNotifyDataErrors = original._validatesOnNotifyDataErrors;
+                _validatesOnDataErrors = original._validatesOnDataErrors;
+
+                _wasModeSetByUserRatherThanDefaultValue = original._wasModeSetByUserRatherThanDefaultValue;
+            }
+    }
 
         /// <summary>
         /// Gets or sets the converter object that is called by the binding engine to
         /// modify the data as it is passed between the source and target, or vice versa.
         /// Returns the IValueConverter object that modifies the data.
         /// </summary>
-        public IValueConverter Converter { get; set; }
+        public IValueConverter Converter
+        {
+            get { return _converter; }
+            set { CheckSealed(); _converter = value; }
+        }
 
 #if MIGRATION
         /// <summary>
         /// Gets or sets the culture to be used by the Binding.Converter.
         /// Returns the System.Globalization.CultureInfo used by the Binding.Converter.
         /// </summary>
-        public CultureInfo ConverterCulture { get; set; }
+        public CultureInfo ConverterCulture
+        {
+            get { return _culture; }
+            set { CheckSealed(); _culture = value; }
+        }
 #else
         /// <summary>
         /// Gets or sets a value that names the language to pass to any converter specified
         /// by the Converter property.
         /// Returns a string that names a language. Interpretation of this value is ultimately up to the converter logic.
         /// </summary>
-        public string ConverterLanguage { get; set; }
+        public string ConverterLanguage
+        {
+            get { return _culture; }
+            set { CheckSealed(); _culture = value; }
+        }
 #endif
 
         /// <summary>
         /// Gets or sets a parameter that can be used in the Converter logic.
         /// Returns a parameter to be passed to the Converter. This can be used in the conversion logic. The default is null.
         /// </summary>
-        public object ConverterParameter { get; set; }
+        public object ConverterParameter
+        {
+            get { return _converterParameter; }
+            set { CheckSealed(); _converterParameter = value; }
+        }
 
         /// <summary>
         /// Gets or sets the name of the element to use as the binding source for the Binding.
         /// Returns the value of the Name property or x:Name attribute for the element to bind to. The default is null.
         /// </summary>
-        public string ElementName { get; set; }
+        public string ElementName
+        {
+            get { return _elementName; }
+            set { CheckSealed(); _elementName = value; }
+        }
 
-        BindingMode _mode = BindingMode.OneWay;
         /// <summary>
         /// Gets or sets a value that indicates the direction of the data flow in the binding.
         /// Returns one of the BindingMode values.
         /// </summary>
         public BindingMode Mode
         {
-            get
+            get { return _mode; }
+            set 
             {
-                return _mode;
-            }
-            set
-            {
+                CheckSealed();
                 _wasModeSetByUserRatherThanDefaultValue = true;
                 _mode = value;
             }
         }
 
-        bool _wasModeSetByUserRatherThanDefaultValue = false; // This is used by the DataGrid due to its behavior when end-user explicitely specifies a "OneWay" binding for one of the columns or if we still have the default value. In fact, if the binding mode is "OneWay", we need to know if it is the default value or if that value has been explicitely set by the user. The behavior is different: the DataGrid will replace the default "OneWay" mode with "TwoWay" unless the user has explicitely set the mode to "OneWay".
+        // This is used by the DataGrid due to its behavior when end-user explicitely specifies a
+        // "OneWay" binding for one of the columns or if we still have the default value. In fact,
+        // if the binding mode is "OneWay", we need to know if it is the default value or if that
+        // value has been explicitely set by the user. The behavior is different: the DataGrid will
+        // replace the default "OneWay" mode with "TwoWay" unless the user has explicitely set the
+        // mode to "OneWay".
+        private bool _wasModeSetByUserRatherThanDefaultValue = false;
+        
         internal bool INTERNAL_WasModeSetByUserRatherThanDefaultValue()
         {
             return _wasModeSetByUserRatherThanDefaultValue;
         }
 
-        PropertyPath _path;
         /// <summary>
         /// Gets or sets the path to the binding source property.
         /// Returns the property path for the source of the binding.
         /// </summary>
         public PropertyPath Path
         {
-            get
-            {
-                if (_path == null)
-                {
-                    _path = new PropertyPath("");
-                }
-                return _path;
-            }
-            set
-            {
-                _path = value;
-            }
+            get { return _path; }
+            set { CheckSealed(); _path = value; }
         }
 
         /// <summary>
         /// Gets or sets the binding source by specifying its location relative to the position of the binding target.
         /// Returns the relative location of the binding source to use. The default is null.
         /// </summary>
-        public RelativeSource RelativeSource { get; set; }
+        public RelativeSource RelativeSource
+        {
+            get { return _relativeSource; }
+            set { CheckSealed(); _relativeSource = value; }
+        }
 
-        object _source;
         /// <summary>
         /// Gets or sets the data source for the binding.
         /// Returns the source object that contains the data for the binding.
         /// </summary>
         public object Source
         {
-            get
-            {
-                return _source;
-            }
-            set
-            {
-                _source = value;
-            }
+            get { return _source; }
+            set { CheckSealed(); _source = value; }
         }
 
         /// <summary>
         /// Update type
         /// </summary>
-        public UpdateSourceTrigger UpdateSourceTrigger { get; set; }
-
+        public UpdateSourceTrigger UpdateSourceTrigger
+        {
+            get { return _updateSourceTrigger; }
+            set { CheckSealed(); _updateSourceTrigger = value; }
+        }
 
         internal Binding Clone()
         {
-            Binding b = new Binding();
-            this.CopyTo(b);
-            return b;
-        }
-
-        private void CopyTo(Binding target)
-        {
-            target.Path = new PropertyPath(this.Path == null ? string.Empty : this.Path.Path);
-            target.Converter = this.Converter;
-#if MIGRATION
-            target.ConverterCulture = this.ConverterCulture;
-#else
-            target.ConverterLanguage = this.ConverterLanguage;
-#endif
-            target.ConverterParameter = this.ConverterParameter;
-            target.ElementName = this.ElementName; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
-            target._mode = this._mode;
-            target._wasModeSetByUserRatherThanDefaultValue = this._wasModeSetByUserRatherThanDefaultValue;
-            target.RelativeSource = this.RelativeSource; //I don't think people should use this when trying to make a Binding that will be used in different places but we never know.
-            target.Source = this.Source;
-            target.UpdateSourceTrigger = this.UpdateSourceTrigger;
-            target.StringFormat = this.StringFormat;
-            target._isInStyle = this._isInStyle;
+            return new Binding(this);
         }
 
         /// <summary>
@@ -245,17 +301,21 @@ namespace Windows.UI.Xaml.Data
         /// Gets or sets a value that indicates whether the binding engine will report
         /// exception validation errors.
         /// </summary>
-        public bool ValidatesOnExceptions { get; set; }
+        public bool ValidatesOnExceptions
+        {
+            get { return _validatesOnExceptions; }
+            set { CheckSealed(); _validatesOnExceptions = value; }
+        }
 
-        // Exceptions:
-        //   System.InvalidOperationException:
-        //     The System.Windows.Data.Binding has already been attached to a target element,
-        //     and cannot be modified.
         /// <summary>
         /// Gets or sets a value that indicates whether the System.Windows.FrameworkElement.BindingValidationError
         /// event is raised on validation errors.
         /// </summary>
-        public bool NotifyOnValidationError { get; set; }
+        public bool NotifyOnValidationError
+        {
+            get { return _notifyOnValidationError; }
+            set { CheckSealed(); _notifyOnValidationError = value; }
+        }
 
         /// <summary>
         /// True to force the property to go through the Validation process when the Binding is set or when the Target is added in the Visual tree.
@@ -265,6 +325,52 @@ namespace Windows.UI.Xaml.Data
         /// </summary>
         public bool ValidatesOnLoad { get; set; }
 
-#endregion
+        /// <summary>
+        /// Gets or sets a value that indicates whether the binding ignores any <see cref="ICollectionView"/>
+        /// settings on the data source.
+        /// </summary>
+        /// <returns>
+        /// true if the binding binds directly to the data source; otherwise, false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool BindsDirectlyToSource
+        {
+            get { return _bindsDirectlyToSource; }
+            set { CheckSealed(); _bindsDirectlyToSource = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the binding engine will report validation
+        /// errors from an System.ComponentModel.INotifyDataErrorInfo implementation on the
+        /// bound data entity.
+        /// </summary>
+        /// <returns>
+        /// true if the binding engine will report System.ComponentModel.INotifyDataErrorInfo
+        /// validation errors; otherwise, false. The default is true.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool ValidatesOnNotifyDataErrors
+        {
+            get { return _validatesOnNotifyDataErrors; }
+            set { CheckSealed(); _validatesOnNotifyDataErrors = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the binding engine will report validation
+        /// errors from an System.ComponentModel.IDataErrorInfo implementation on the bound
+        /// data entity.
+        /// </summary>
+        /// <returns>
+        /// true if the binding engine will report System.ComponentModel.IDataErrorInfo validation
+        /// errors; otherwise, false. The default is false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool ValidatesOnDataErrors
+        {
+            get { return _validatesOnDataErrors; }
+            set { CheckSealed(); _validatesOnDataErrors = value; }
+        }
+
+        #endregion
     }
 }

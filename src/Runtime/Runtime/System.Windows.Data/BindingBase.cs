@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 
 #if MIGRATION 
@@ -29,12 +23,17 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Provides an abstract base class for the Binding class.
     /// </summary>
-    public partial class BindingBase : MarkupExtension
+    public abstract class BindingBase : MarkupExtension
     {
+        private bool _isSealed;
+        private object _fallbackValue;
+        private object _targetNullValue;
+        protected string _stringFormat;
+
         /// <summary>
         /// Initializes a new instance of the BindingBase class.
         /// </summary>
-        public BindingBase() { }
+        protected BindingBase() { }
 
         /// <exclude/>
         ///
@@ -48,17 +47,15 @@ namespace Windows.UI.Xaml.Data
             return this;
         }
 
-        object _fallbackValue;
         /// <summary>
         /// Gets or sets the value to use when the binding is unable to return a value.
         /// </summary>
         public object FallbackValue
         {
             get { return _fallbackValue; }
-            set { _fallbackValue = value; }
+            set { CheckSealed(); _fallbackValue = value; }
         }
 
-        object _targetNullValue;
         /// <summary>
         /// Gets or sets the value that is used in the target when the value of the source
         /// is null.
@@ -66,10 +63,9 @@ namespace Windows.UI.Xaml.Data
         public object TargetNullValue
         {
             get { return _targetNullValue; }
-            set { _targetNullValue = value; }
+            set { CheckSealed(); _targetNullValue = value; }
         }
 
-        protected string _stringFormat;
         /// <summary>
         /// Gets or sets a string that specifies how to format the binding if it displays 
         /// the bound value as a string.
@@ -77,8 +73,20 @@ namespace Windows.UI.Xaml.Data
         public string StringFormat
         {
             get { return _stringFormat; }
-            set { _stringFormat = value; }
+            set { CheckSealed(); _stringFormat = value; }
         }
 
+        protected internal void CheckSealed()
+        {
+            if (_isSealed)
+            {
+                throw new InvalidOperationException("Binding cannot be changed after it has been used.");
+            }
+        }
+
+        internal void Seal()
+        {
+            _isSealed = true;
+        }
     }
 }

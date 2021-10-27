@@ -212,6 +212,8 @@ namespace Windows.UI.Xaml.Data
             if (IsAttached)
                 return;
 
+            ParentBinding.Seal();
+
             _isAttaching = IsAttached = true;
 
             Target = d;
