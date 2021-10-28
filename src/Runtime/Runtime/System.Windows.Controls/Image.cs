@@ -94,6 +94,14 @@ namespace Windows.UI.Xaml.Controls
         public static DependencyProperty PlayToSourceProperty { get; }
          * */
 
+        internal override bool EnablePointerEventsCore
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the source for the image.
         /// 

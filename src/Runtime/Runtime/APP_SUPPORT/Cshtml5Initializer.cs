@@ -24,7 +24,7 @@ namespace DotNetForHtml5
         public static void Initialize(IJavaScriptExecutionHandler executionHandler)
         {
             DotNetForHtml5.Core.INTERNAL_Simulator.JavaScriptExecutionHandler = executionHandler;
-#if MIGRATION            
+#if MIGRATION
             EmulatorWithoutJavascript.StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(typeof(System.Windows.Controls.Button).Assembly);
 #else
             EmulatorWithoutJavascript.StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(typeof(Windows.UI.Xaml.Controls.Button).Assembly);
