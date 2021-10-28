@@ -185,6 +185,11 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing);
         }
 
+        public string GetAssemblyQualifiedNameOfXamlType(string namespaceName, string localTypeName, string assemblyName)
+        {
+            return _marshalledObject.GetAssemblyQualifiedNameOfXamlType(namespaceName, localTypeName, assemblyName);
+        }
+
         public MemberTypes GetMemberType(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny = null)
         {
             return _marshalledObject.GetMemberType(memberName, namespaceName, localTypeName, assemblyNameIfAny);
@@ -986,6 +991,23 @@ namespace DotNetForHtml5.Compiler
                         return $"global::{type}";
                     }
                 }
+            }
+
+            public string GetAssemblyQualifiedNameOfXamlType(
+                string namespaceName,
+                string localTypeName,
+                string assemblyNameIfAny)
+            {
+                Type type = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+
+                if (type != null)
+                {
+                    // Note: we do not use 'AssemblyQualifiedName' because we do not want
+                    // to include the version of the assembly
+                    return type.FullName + ", " + type.Assembly.GetName().Name;
+                }
+
+                return null;
             }
 
             public Type GetCSharpEquivalentOfXamlType(string namespaceName, string localTypeName, string assemblyIfAny = null, bool ifTypeNotFoundTryGuessing = false)

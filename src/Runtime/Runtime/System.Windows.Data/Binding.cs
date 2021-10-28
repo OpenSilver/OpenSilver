@@ -86,6 +86,7 @@ namespace Windows.UI.Xaml.Data
         private object _converterParameter;
         private string _elementName;
         private BindingMode _mode = BindingMode.OneWay;
+        private string _xamlPath;
         private PropertyPath _path;
         private RelativeSource _relativeSource;
         private object _source;
@@ -149,6 +150,7 @@ namespace Windows.UI.Xaml.Data
                 _converterParameter = original._converterParameter;
                 _elementName = original._elementName;
                 _mode = original._mode;
+                _xamlPath = original._xamlPath;
                 _path = original._path;
                 _relativeSource = original._relativeSource;
                 _source = original._source;
@@ -252,7 +254,21 @@ namespace Windows.UI.Xaml.Data
         public PropertyPath Path
         {
             get { return _path; }
-            set { CheckSealed(); _path = value; }
+            set 
+            { 
+                CheckSealed(); 
+                _path = value ?? throw new ArgumentNullException(nameof(value)); 
+            }
+        }
+
+        /// <summary>
+        /// Do not use this property.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string XamlPath
+        {
+            get { return _xamlPath; }
+            set { CheckSealed(); _xamlPath = value; }
         }
 
         /// <summary>

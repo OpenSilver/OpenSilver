@@ -43,6 +43,8 @@ namespace DotNetForHtml5.Compiler.Common
 
         string GetCSharpEquivalentOfXamlTypeAsString(string namespaceName, string localTypeName, string assemblyNameIfAny = null, bool ifTypeNotFoundTryGuessing = false);
 
+        string GetAssemblyQualifiedNameOfXamlType(string namespaceName, string localTypeName, string assemblyName);
+
         Type GetCSharpEquivalentOfXamlType(string namespaceName, string localTypeName, string assemblyIfAny = null, bool ifTypeNotFoundTryGuessing = false);
 
         string GetKeyNameOfProperty(string namespaceName, string localTypeName, string assemblyNameIfAny, string propertyName);

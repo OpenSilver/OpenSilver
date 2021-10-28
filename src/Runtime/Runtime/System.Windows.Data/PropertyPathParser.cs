@@ -43,7 +43,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
             this.Path = path;
         }
 
-        internal PropertyNodeType Step(out string typeName, out string propertyName, out string index) //Note: index can be considered a string or an int, or even a list of "parameters" (for example [20,30] can be two int)
+        internal PropertyNodeType Step(out string typeName, out string propertyName, out string index)
         {
             var type = PropertyNodeType.None;
             var path = this.Path;
@@ -61,47 +61,25 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
                 type = PropertyNodeType.AttachedProperty;
                 end = path.IndexOf(')');
                 if (end == -1)
-                    throw new ArgumentException("Invalid property path. Attached property is missing the closing bracket");
-
-                var tickOpen = path.IndexOf('\''); //I don't see where it is in the link above this class' declaration but I let it for the time being
-                var tickClose = 0;
-                int typeOpen;
-                int typeClose;
-                int propOpen;
-                int propClose;
-
-                typeOpen = path.IndexOf('\'');
-                if (typeOpen > 0)
                 {
-                    typeOpen++;
-
-                    typeClose = path.IndexOf('\'', typeOpen + 1);
-                    if (typeClose < 0)
-                        throw new Exception("Invalid property path, Unclosed type name '" + path + "'.");
-
-                    propOpen = path.IndexOf('.', typeClose);
-                    if (propOpen < 0)
-                        throw new Exception("Invalid properth path, No property indexer found '" + path + "'.");
-
-                    propOpen++;
-                }
-                else
-                {
-                    typeOpen = 1;
-                    typeClose = path.IndexOf('.', typeOpen);
-                    if (typeClose < 0)
-                        throw new Exception("Invalid property path, No property indexer found on '" + path + "'.");
-                    propOpen = typeClose + 1;
+                    throw new Exception($"Invalid property path : '{path}'.");
                 }
 
-                propClose = end;
+                int typeEnd = path.LastIndexOf('.', end);
+                if (typeEnd == -1)
+                {
+                    throw new Exception($"Invalid property path : '{path}'.");
+                }
 
-                typeName = path.Substring(typeOpen, typeClose - typeOpen);
-                propertyName = path.Substring(propOpen, propClose - propOpen);
-
+                typeName = path.Substring(1, typeEnd - 1);
+                propertyName = path.Substring(typeEnd + 1, end - typeEnd - 1);
                 index = null;
+
                 if (path.Length > (end + 1) && path[end + 1] == '.')
+                {
                     end++;
+                }
+
                 path = path.Substring(end + 1);
             }
             else if (path[0] == '[')

@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Data
 {
     internal class StandardPropertyPathNode : PropertyPathNode
     {
+        private readonly Type _resolvedType;
         private readonly string _propertyName;
         private readonly bool _bindsDirectlyToSource;
 
@@ -36,6 +37,7 @@ namespace Windows.UI.Xaml.Data
 
         internal StandardPropertyPathNode(string typeName, string propertyName)
         {
+            _resolvedType = typeName != null ? Type.GetType(typeName) : null;
             _propertyName = propertyName;
         }
 
@@ -175,7 +177,8 @@ namespace Windows.UI.Xaml.Data
 
             if (newValue is DependencyObject sourceDO)
             {
-                Type type = Source.GetType();
+                Type type = _resolvedType ?? Source.GetType();
+
                 DependencyProperty dependencyProperty = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(type, _propertyName);
 
                 if (dependencyProperty != null)
@@ -185,8 +188,7 @@ namespace Windows.UI.Xaml.Data
                 }
             }
 
-            //todo: support attached DependencyProperties
-            if (_dp == null)// || !this.DependencyProperty.IsAttached)
+            if (_dp == null)
             {
                 Type sourceType = Source.GetType();
                 for (Type t = sourceType; t != null; t = t.BaseType)

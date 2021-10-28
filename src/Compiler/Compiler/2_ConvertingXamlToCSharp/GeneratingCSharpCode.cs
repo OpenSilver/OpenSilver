@@ -1035,6 +1035,34 @@ else
                                                         }
                                                         codeForInstantiatingTheAttributeValue = null; // null means that we skip this attribute here.
                                                     }
+                                                    else if (elementTypeInCSharp == namespaceSystemWindowsData + ".Binding"
+                                                        && memberName == "Path")
+                                                    {
+                                                        if (TryResolvePathForBinding(attributeValue, element, reflectionOnSeparateAppDomain, out string resolvedPath))
+                                                        {
+                                                            stringBuilder.AppendLine(
+                                                                string.Format("{0}.XamlPath = {1};",
+                                                                    elementUniqueNameOrThisKeyword,
+                                                                    SystemTypesHelper.ConvertFromInvariantString(resolvedPath, "System.String")
+                                                                )
+                                                            );
+                                                        }
+
+                                                        XName typeName = element.Name;
+                                                        string propertyName = attribute.Name.LocalName;
+
+                                                        codeForInstantiatingTheAttributeValue =
+                                                            GenerateCodeForInstantiatingAttributeValue(
+                                                                typeName,
+                                                                propertyName,
+                                                                isAttachedProperty,
+                                                                attributeValue,
+                                                                element,
+                                                                fileNameWithPathRelativeToProjectRoot,
+                                                                assemblyNameWithoutExtension,
+                                                                reflectionOnSeparateAppDomain
+                                                            );
+                                                    }
                                                     else
                                                     {
                                                         //------------
@@ -2498,6 +2526,124 @@ public static void Main()
             else
             {
                 return false;
+            }
+        }
+
+        private static bool TryResolvePathForBinding(string path, XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain, out string resolvedPath)
+        {
+            if (path == "" || path == ".")
+            {
+                resolvedPath = path;
+                return true;
+            }
+
+            resolvedPath = null;
+            StringBuilder sb = new StringBuilder();
+
+            int pos = 0;
+            char c;
+
+            while (true)
+            {
+                while (pos < path.Length)
+                {
+                    c = path[pos];
+
+                    if (c == '(')
+                    {
+                        break;
+                    }
+
+                    sb.Append(c);
+                    pos++;
+                }
+
+                if (pos == path.Length)
+                {
+                    resolvedPath = sb.ToString();
+                    return true;
+                }
+
+                pos++;
+                if (pos == path.Length)
+                {
+                    return false;
+                }
+
+                while (pos < path.Length)
+                {
+                    c = path[pos];
+                    if (!char.IsWhiteSpace(c))
+                    {
+                        break;
+                    }
+
+                    pos++;
+                }
+
+                if (pos == path.Length)
+                {
+                    return false;
+                }
+
+                int start = pos;
+                string xmlPrefix = null;
+                string typeName = null;
+                string propertyName = null;
+                while (pos < path.Length)
+                {
+                    c = path[pos];
+                    if (c == ':')
+                    {
+                        xmlPrefix = path.Substring(start, pos - start);
+                        start = pos + 1;
+                    }
+                    else if (c == '.')
+                    {
+                        typeName = path.Substring(start, pos - start);
+                        start = pos + 1;
+                    }
+                    else if (c == ')')
+                    {
+                        propertyName = path.Substring(start, pos - start);
+                        break;
+                    }
+
+                    pos++;
+                }
+
+                if (pos == path.Length)
+                {
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(typeName) || string.IsNullOrWhiteSpace(propertyName))
+                {
+                    return false;
+                }
+
+                XNamespace xmlNamespace = xmlPrefix == null ? element.GetDefaultNamespace() : element.GetNamespaceOfPrefix(xmlPrefix);
+                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    XName.Get(typeName, xmlNamespace.NamespaceName),
+                    out string namespaceName, out string localTypeName, out string assemblyName
+                );
+
+                string assemblyQualifiedName = reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(
+                    namespaceName, localTypeName, assemblyName
+                );
+
+                if (assemblyQualifiedName == null)
+                {
+                    return false;
+                }
+
+                sb.Append('(')
+                  .Append(assemblyQualifiedName)
+                  .Append('.')
+                  .Append(propertyName)
+                  .Append(')');
+
+                pos++;
             }
         }
 

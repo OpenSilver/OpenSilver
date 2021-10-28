@@ -67,7 +67,7 @@ namespace Windows.UI.Xaml.Data
             TargetProperty = property;
 
             bool isDataContextBound = binding.ElementName == null && binding.Source == null && binding.RelativeSource == null;
-            string path = ParentBinding.Path?.Path ?? string.Empty;
+            string path = ParentBinding.XamlPath ?? ParentBinding.Path.Path ?? string.Empty;
 
             var walker = _propertyPathWalker = new PropertyPathWalker(path, isDataContextBound);
             if (binding.Mode != BindingMode.OneTime)
