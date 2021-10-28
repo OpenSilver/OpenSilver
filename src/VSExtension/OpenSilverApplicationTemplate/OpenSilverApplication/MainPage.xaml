@@ -1,7 +1,8 @@
-﻿<Page
+﻿<sdk:Page
     x:Class="$ext_safeprojectname$.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
     xmlns:local="clr-namespace:$ext_safeprojectname$"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -10,4 +11,4 @@
         <TextBlock Text="Hello World!" x:Name="TextBlock1" Canvas.Left="20" Canvas.Top="30"/>
     </Canvas>
     
-</Page>
+</sdk:Page>
