@@ -20,7 +20,7 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 #endif
 
-namespace CSHTML5.Internal
+namespace OpenSilver.Internal
 {
     internal interface IResizeObserverAdapter
     {
