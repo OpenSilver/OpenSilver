@@ -27,7 +27,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         private readonly bool _hookupEvents;
         private Content _content;
         private Settings _settings;
-        private string _navigationState = string.Empty;
+        private string _navigationState;
 
         public Host() : this(false) { }
 
@@ -36,6 +36,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             _hookupEvents = hookupEvents;
             _content = new Content(_hookupEvents);
 
+            _navigationState = GetBrowserNavigationState();
             OpenSilver.Interop.ExecuteJavaScript("window.addEventListener('hashchange', $0, false)", (Action)OnNavigationChanged);
         }
 
@@ -112,17 +113,24 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 
         private void OnNavigationChanged()
         {
-            string state = HttpUtility.UrlDecode(Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("location.hash"))) ?? string.Empty;
-
-            if (state.Length > 0 && state[0] == '#')
-            {
-                state = state.Substring(1);                
-            }
+            string state = GetBrowserNavigationState();
 
             string previousNavigationState = _navigationState;
             _navigationState = state;
 
             NavigationStateChanged?.Invoke(this, new NavigationStateChangedEventArgs(previousNavigationState, state));
+        }
+
+        private string GetBrowserNavigationState()
+        {
+            string state = HttpUtility.UrlDecode(Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("location.hash"))) ?? string.Empty;
+
+            if (state.Length > 0 && state[0] == '#')
+            {
+                state = state.Substring(1);
+            }
+
+            return state;
         }
 
         /// <summary>
