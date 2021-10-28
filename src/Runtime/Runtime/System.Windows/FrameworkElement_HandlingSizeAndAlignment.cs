@@ -1668,7 +1668,7 @@ namespace Windows.UI.Xaml
                 {
                     if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                     {
-                        _resizeObserver.Observe(this.INTERNAL_OuterDomElement, this.HandleSizeChanged);
+                        _resizeObserver.Observe(this.INTERNAL_OuterDomElement, (Action<Size>)this.HandleSizeChanged);
                     }
                 }
             }
@@ -1694,7 +1694,7 @@ namespace Windows.UI.Xaml
                         if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
                         {
                             _valueOfLastSizeChanged = new Size(0d, 0d);
-                            _resizeObserver.Observe(this.INTERNAL_OuterDomElement, this.HandleSizeChanged);
+                            _resizeObserver.Observe(this.INTERNAL_OuterDomElement, (Action<Size>)this.HandleSizeChanged);
                         } 
                         else
                         {

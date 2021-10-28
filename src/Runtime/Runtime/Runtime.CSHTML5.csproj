@@ -69,6 +69,7 @@
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="Core\Other\ResizeObserver.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
     <Compile Include="OpenSilver\Internal\ApplicationLifetimeObjectsCollection.cs" />
     <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
@@ -246,7 +247,6 @@
     <Compile Include="System.Windows.Data\IndexedEnumerable.cs" />
     <Compile Include="System.Windows.Data\INTERNAL_PagedCollectionView.cs" />
     <Compile Include="System.Windows.Data\ListCollectionView.cs" />
-    <Compile Include="System.Windows.Data\WORKINPROGRESS\Binding.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\Block.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\BlockCollection.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
