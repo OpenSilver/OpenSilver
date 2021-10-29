@@ -32,6 +32,14 @@ namespace Windows.UI.Xaml.Documents
     /// </summary>
     public abstract partial class Inline : TextElement
     {
+        internal override bool EnablePointerEventsCore
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         // Defining an implicit conversion from string to Inline allows to
         // support the following usage: TextBlock1.Inlines.Add("test");
         public static implicit operator Inline(string s)
