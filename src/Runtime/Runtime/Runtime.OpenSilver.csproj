@@ -17,11 +17,11 @@
 		<Optimize>true</Optimize>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
-		<OpenSilverVersion>1.0.0-alpha-019</OpenSilverVersion>
+		<OpenSilverVersion>1.0.0</OpenSilverVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;WORKINPROGRESS</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
