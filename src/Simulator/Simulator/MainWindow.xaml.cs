@@ -99,7 +99,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
-            
+
             InitializeComponent();
 
 #if OPENSILVER
@@ -127,7 +127,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             LoggerProvider.Instance.ChromiumLogFile = @"C:\temp\chromium.log";
             BrowserPreferences.SetChromiumSwitches("--v=1");
 #endif
-            
+
 #if OPENSILVER
             _applicationType = userApplicationType ?? throw new ArgumentNullException(nameof(userApplicationType));
             ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out _coreAssembly);
@@ -315,6 +315,7 @@ ends with "".Browser"" in your solution.";
             {
                 //case Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR:
                 case Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR:
+                case "OpenSilver.Controls.Data":
                 case "OpenSilver.Controls.Data.Input":
                 case "OpenSilver.Controls.Data.DataForm.Toolkit":
                 case "OpenSilver.Controls.Navigation":
@@ -511,7 +512,7 @@ ends with "".Browser"" in your solution.";
 
         private void OnConsoleMessageEvent(object sender, ConsoleEventArgs args)
         {
-            switch(args.Level)
+            switch (args.Level)
             {
 #if DEBUG
                 case ConsoleEventArgs.MessageLevel.DEBUG:
@@ -658,7 +659,7 @@ ends with "".Browser"" in your solution.";
                     {
                         xamlRoot = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Debug.WriteLine($"Initialization: can not get the root. {ex.Message}");
                     }
@@ -962,7 +963,7 @@ Click OK to continue.";
                 }
             }
         }
-        
+
 #if OPENSILVER
         bool InitializeApplication()
         {
@@ -985,7 +986,7 @@ Click OK to continue.";
                 InteropHelpers.InjectWebClientFactory(_coreAssembly);
                 InteropHelpers.InjectClipboardHandler(_coreAssembly);
                 InteropHelpers.InjectSimulatorProxy(new SimulatorProxy(MainWebBrowser, Console), _coreAssembly);
-                
+
                 // In the OpenSilver Version, we use this work-around to know if we're in the simulator
                 InteropHelpers.InjectIsRunningInTheSimulator_WorkAround(_coreAssembly);
 
@@ -1082,7 +1083,7 @@ Click OK to continue.";
         }
 #endif
 
-        
+
 
         void ReloadAppAfterRedirect(string urlFragment)
         {
@@ -2057,7 +2058,7 @@ Click OK to continue.";
             }
         }
 
-#region Element Picker for XAML Inspection
+        #region Element Picker for XAML Inspection
 
         void StartElementPickerForInspection()
         {
@@ -2125,7 +2126,7 @@ Click OK to continue.";
                 StopElementPickerForInspection();
         }
 
-#endregion
+        #endregion
 
 
         private bool IsNetworkAvailable()
@@ -2133,14 +2134,14 @@ Click OK to continue.";
             return NetworkInterface.GetIsNetworkAvailable();
         }
 
-#region profil popup
+        #region profil popup
 
         private void ButtonLogout_Click(object sender, RoutedEventArgs e)
         {
             LicenseChecker.LogOut();
         }
 
-#endregion
+        #endregion
 
         private void LaunchOptimizerButton_Click(object sender, RoutedEventArgs e)
         {
