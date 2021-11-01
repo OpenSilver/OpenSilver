@@ -483,8 +483,6 @@ namespace Windows.UI.Xaml.Shapes
                     // instead of "Dispatcher.BeginInvoke" because it has better performance than calling Dispatcher.BeginInvoke directly.
                     INTERNAL_DispatcherHelpers.QueueAction(() =>
                     {
-                        _redrawPending = false;
-
                         // We check whether the Shape is visible in the HTML DOM tree, because if the HTML canvas is hidden 
                         // (due to a "Dispay:none" on one of the ancestors), we cannot draw on it 
                         // (this can be seen by hiding a canvas, drawing, and then showing it: it will appear empty):
@@ -496,6 +494,7 @@ namespace Windows.UI.Xaml.Shapes
                         {
                             _redrawWhenBecomeVisible = true;
                         }
+                        _redrawPending = false;
                     });
                 }
             }
@@ -538,6 +537,12 @@ namespace Windows.UI.Xaml.Shapes
             // Because of that, we Schedule a redraw whenever Width or Height are set.
             base.OnAfterApplyVerticalAlignmentAndWidth();
             ScheduleRedraw();
+        }
+
+        protected virtual bool IsStillInDOM()
+        {
+            // Check if the canvas element is still present
+            return _canvasDomElement !=  null && Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.getContext !== undefined", _canvasDomElement));
         }
 
         #endregion
@@ -626,6 +631,12 @@ namespace Windows.UI.Xaml.Shapes
                                                double yOffsetToApplyBeforeMultiplication, 
                                                Size shapeActualSize)
         {
+            // Element has been removed prevent redraw
+			if (! shape.IsStillInDOM())
+			{
+				return;
+			}
+
             // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
             // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
             object context = CSHTML5.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");

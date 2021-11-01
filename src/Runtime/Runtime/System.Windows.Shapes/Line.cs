@@ -215,6 +215,12 @@ namespace Windows.UI.Xaml.Shapes
                     ApplyMarginToFixNegativeCoordinates(_marginOffsets);
                 }
 
+                // Element has been removed prevent redraw
+                if (! IsStillInDOM())
+                {
+                    return;
+                }
+
                 object context = CSHTML5.Interop.ExecuteJavaScriptAsync($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext('2d')"); //Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
                 string sContext = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(context);
                 //we remove the previous drawing:
