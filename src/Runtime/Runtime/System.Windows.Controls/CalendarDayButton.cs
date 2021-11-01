@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     [TemplateVisualState(Name = CalendarDayButton.StateBlackoutDay, GroupName = CalendarDayButton.GroupBlackout)]
     public sealed class CalendarDayButton : Button
     {
-#region Visual States
+        #region Visual States
         /// <summary>
         /// Identifies the Today state.
         /// </summary>
@@ -70,7 +70,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Name of the BlackoutDay state group.
         /// </summary>
         internal const string GroupBlackout = "BlackoutDayStates";
-#endregion Visual States
+        #endregion Visual States
 
         /// <summary>
         /// Default content for the CalendarDayButton.
@@ -94,7 +94,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         // REMOVE_RTM: This field should be removed after Jolt Bug#20180 is fixed.
         private bool _ignoringMouseOverState;
 
-#region internal bool IsBlackout
+        #region internal bool IsBlackout
         /// <summary>
         /// A value indicating whether this is a blackout date.
         /// </summary>
@@ -112,9 +112,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsBlackout
+        #endregion internal bool IsBlackout
 
-#region internal bool IsToday
+        #region internal bool IsToday
         /// <summary>
         /// A value indicating whether this button represents today.
         /// </summary>
@@ -133,9 +133,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsToday
+        #endregion internal bool IsToday
 
-#region internal bool IsCurrent
+        #region internal bool IsCurrent
         /// <summary>
         /// A value indicating whether the button is the focused element on the
         /// Calendar control.
@@ -155,9 +155,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsCurrent
+        #endregion internal bool IsCurrent
 
-#region internal bool IsInactive
+        #region internal bool IsInactive
         /// <summary>
         /// A value indicating whether the button is inactive.
         /// </summary>
@@ -175,9 +175,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsInactive
+        #endregion internal bool IsInactive
 
-#region internal bool IsSelected
+        #region internal bool IsSelected
         /// <summary>
         /// A value indicating whether the button is selected.
         /// </summary>
@@ -195,7 +195,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 ChangeVisualState(true);
             }
         }
-#endregion internal bool IsSelected
+        #endregion internal bool IsSelected
 
         /// <summary>
         /// Occurs when the left mouse button is pressed (or when the tip of the
