@@ -27,7 +27,11 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
+#if OPENSILVER
+namespace OpenSilver.IO.IsolatedStorage
+#else
 namespace System.IO.IsolatedStorage
+#endif
 {
     internal partial class IsolatedStorageSettingsForCSharp : IDictionary<string, Object>
     {

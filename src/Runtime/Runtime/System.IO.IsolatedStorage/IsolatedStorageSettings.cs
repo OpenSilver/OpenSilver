@@ -36,7 +36,11 @@ using System.Windows;
 using Windows.UI.Xaml;
 #endif
 
+#if OPENSILVER
+namespace OpenSilver.IO.IsolatedStorage
+#else
 namespace System.IO.IsolatedStorage
+#endif
 {
     //Note: we remove the interfaces because they are useless for now.
     //

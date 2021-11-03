@@ -85,6 +85,12 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\CompositionHost.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
+		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorage.cs" />
+		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageException.cs" />
+		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageFile.cs" />
+		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageFileStream.cs" />
+		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageScope.cs" />
+		<Compile Include="System.IO.IsolatedStorage\WORKINPROGRESS\IsolatedStorageSecurityOptions.cs" />
 		<Compile Include="System.Windows.Automation.Peers\CalendarDayButtonAutomationPeer.cs" />
 		<Compile Include="System.Windows.Browser\EventSubscriber.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
