@@ -12,7 +12,7 @@ namespace System
 		[OpenSilver.NotImplemented]
         public static AssemblyBuilder DefineDynamicAssembly(this AppDomain appDomain, AssemblyName name, AssemblyBuilderAccess access)
         {
-            return null;
+            return new AssemblyBuilder();
         }
     }
 }

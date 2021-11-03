@@ -10,7 +10,7 @@ namespace System.Reflection.Emit
 		[OpenSilver.NotImplemented]
         public TypeBuilder DefineType(string name, TypeAttributes attr, Type parent)
         {
-            return null;
+            return new TypeBuilder();
         }
     }
 }

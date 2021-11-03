@@ -200,38 +200,38 @@ namespace System.Reflection.Emit
 		[OpenSilver.NotImplemented]
         public Type CreateType()
         {
-            return null;
+            return new MethodBuilder().GetType();
         }
 
 		[OpenSilver.NotImplemented]
         public FieldBuilder DefineField(string fieldName, Type type, FieldAttributes attributes)
         {
-            return null;
+            return new FieldBuilder();
         }
 
 		[OpenSilver.NotImplemented]
         public PropertyBuilder DefineProperty(string name, PropertyAttributes attributes, Type returnType, Type[] parameterTypes)
         {
-            return null;
+            return new PropertyBuilder();
         }
 
 		[OpenSilver.NotImplemented]
         public MethodBuilder DefineMethod(string name, MethodAttributes attributes, Type returnType, Type[] parameterTypes)
         {
-            return null;
+            return new MethodBuilder();
         }
 
   
 		[OpenSilver.NotImplemented]
         public MethodBuilder DefineMethod(string name, MethodAttributes attributes, CallingConventions callingConvention, Type returnType, Type[] parameterTypes)
         {
-            return null;
+            return new MethodBuilder();
         }
 
 		[OpenSilver.NotImplemented]
         public ConstructorBuilder DefineDefaultConstructor(MethodAttributes attributes)
         {
-            return null;
+            return new ConstructorBuilder();
         }
 
     }

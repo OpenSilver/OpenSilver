@@ -198,7 +198,7 @@ namespace System.Reflection.Emit
 		[OpenSilver.NotImplemented]
         public virtual LocalBuilder DeclareLocal(Type localType)
         {
-            return null;
+            return new LocalBuilder();
         }
 
         /// <summary>

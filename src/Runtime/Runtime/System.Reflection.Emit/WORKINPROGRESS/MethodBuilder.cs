@@ -71,7 +71,7 @@ namespace System.Reflection.Emit
 		[OpenSilver.NotImplemented]
         public ILGenerator GetILGenerator()
         {
-            return null;
+            return new ILGenerator();
         }
     }
 }
