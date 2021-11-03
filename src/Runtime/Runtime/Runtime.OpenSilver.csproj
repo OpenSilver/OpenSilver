@@ -82,6 +82,9 @@
 		<Compile Include="System.Windows.Automation.Peers\CalendarDayButtonAutomationPeer.cs" />
 		<Compile Include="System.Windows.Browser\EventSubscriber.cs" />
 		<Compile Include="System.Windows.Controls\CalendarDayButton.cs" />
+		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\GenerationState.cs" />
+		<Compile Include="System.Windows.Controls\RangeCollection.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
@@ -161,6 +164,7 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ReceiverNameScope.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\TreeViewAutomationPeer.cs" />

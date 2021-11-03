@@ -56,6 +56,11 @@ namespace Windows.UI.Xaml.Controls
 
         private ItemCollection _items;
 
+        internal Panel Panel
+        {
+            get { return _itemsPresenter == null ? null : _itemsPresenter.ItemsHost; }
+        }
+
         #endregion Data
 
         #region Contructor
@@ -110,7 +115,7 @@ namespace Windows.UI.Xaml.Controls
             // the generator must attach its collection change handler before
             // the control itself, so that the generator is up-to-date by the
             // time the control tries to use it
-            this._itemContainerGenerator = new ItemContainerGenerator();
+            this._itemContainerGenerator = new ItemContainerGenerator(this);
 
             this._items.CollectionChanged += this.OnItemCollectionChanged;
         }
@@ -145,10 +150,16 @@ namespace Windows.UI.Xaml.Controls
             {
                 _methodToInstantiateFrameworkTemplate = (FrameworkElement templateOwner) =>
                 {
+                    FrameworkElement content;
+                    if (templateOwner.IsUnderCustomLayout)
+                        content = new VirtualizingStackPanel();
+                    else
+                        content = new StackPanel();
+
                     return new TemplateInstance()
                     {
                         TemplateOwner = templateOwner,
-                        TemplateContent = new StackPanel()
+                        TemplateContent = content
                     };
                 }
             };
@@ -312,6 +323,11 @@ namespace Windows.UI.Xaml.Controls
             ClearContainerForItemOverride(container, item);
         }
 
+        internal void ClearContainerForItem(DependencyObject container, object item)
+        {
+            (this as IGeneratorHost).ClearContainerForItem(container, item);
+        }
+
         DependencyObject IGeneratorHost.GetContainerForItem(object item, DependencyObject recycledContainer)
         {
             DependencyObject container;
@@ -337,6 +353,13 @@ namespace Windows.UI.Xaml.Controls
 
             return container;
         }
+
+
+        internal DependencyObject GetContainerForItem(object item, DependencyObject recycledContainer)
+        {
+            return (this as IGeneratorHost).GetContainerForItem(item, recycledContainer);
+        }
+
 
         bool IGeneratorHost.IsHostForItemContainer(DependencyObject container)
         {
@@ -638,6 +661,12 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
+            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+            {
+                ItemContainerGenerator.OnOwnerItemsItemsChanged(this, e);
+                return;
+            }
+
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 this.Refresh(false);
@@ -659,6 +688,11 @@ namespace Windows.UI.Xaml.Controls
             {
                 throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
             }
+        }
+
+        internal void PrepareContainerForItem(DependencyObject element, object item)
+        {
+            PrepareContainerForItemOverride(element, item);
         }
 
         private void OnItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -690,6 +724,11 @@ namespace Windows.UI.Xaml.Controls
             //{
             //    cp.ClearContentPresenter(item);
             //}
+        }
+
+        internal DependencyObject GetContainerForItem()
+        {
+            return GetContainerForItemOverride();
         }
 
         /// <summary>

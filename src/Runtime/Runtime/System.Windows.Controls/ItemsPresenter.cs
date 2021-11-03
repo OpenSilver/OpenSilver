@@ -197,7 +197,8 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Attach children to panel
-            this.Owner.Refresh(false);
+            // if CustomLayout is enabled, reuse containers
+            this.Owner.Refresh(this.IsUnderCustomLayout);
         }
 
         protected override Size MeasureOverride(Size availableSize)

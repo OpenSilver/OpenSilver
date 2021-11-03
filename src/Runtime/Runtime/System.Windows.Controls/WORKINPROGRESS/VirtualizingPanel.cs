@@ -1,5 +1,6 @@
 using System.Windows;
 using System;
+using System.Collections.Specialized;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -13,53 +14,70 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    [OpenSilver.NotImplemented]
 	public abstract partial class VirtualizingPanel : Panel
 	{
-		private IItemContainerGenerator _itemContainerGenerator;
-        [OpenSilver.NotImplemented]
+		private ItemContainerGenerator generator;
+
 		public IItemContainerGenerator ItemContainerGenerator
 		{
 			get
 			{
-				return _itemContainerGenerator;
+				if (generator == null)
+				{
+					ItemsControl owner = ItemsControl.GetItemsOwner(this);
+					if (owner == null)
+						throw new InvalidOperationException("VirtualizingPanels must be in the Template of an ItemsControl in order to generate items");
+					generator = owner.ItemContainerGenerator;
+					generator.ItemsChanged += OnItemsChangedInternal;
+				}
+				return generator;
 			}
 		}
 
-        [OpenSilver.NotImplemented]
+		protected VirtualizingPanel()
+		{
+			this.ClipToBounds = true;
+		}
+
+		void OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
+		{
+			InvalidateMeasure();
+			if (args.Action == NotifyCollectionChangedAction.Reset)
+			{
+				Children.Clear();
+				ItemContainerGenerator.RemoveAll();
+				OnClearChildren();
+			}
+
+			OnItemsChanged(sender, args);
+		}
+
 		protected void AddInternalChild(UIElement @child)
 		{
+			Children.Add(child);
 		}
 
-        [OpenSilver.NotImplemented]
 		protected void InsertInternalChild(int @index, UIElement @child)
 		{
+			Children.Insert(index, child);
 		}
 
-        [OpenSilver.NotImplemented]
 		protected void RemoveInternalChildRange(int @index, int @range)
 		{
+			for (int i = 0; i < range; i++)
+				Children.RemoveAt(index);
 		}
 
-        [OpenSilver.NotImplemented]
 		protected virtual void OnItemsChanged(object @sender, ItemsChangedEventArgs @args)
 		{
 		}
 
-        [OpenSilver.NotImplemented]
 		protected virtual void OnClearChildren()
 		{
 		}
 
-        [OpenSilver.NotImplemented]
 		protected virtual void BringIndexIntoView(int @index)
 		{
-		}
-
-        [OpenSilver.NotImplemented]
-		protected VirtualizingPanel()
-		{
-			_itemContainerGenerator = null;
 		}
 	}
 }

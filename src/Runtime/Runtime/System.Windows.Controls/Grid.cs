@@ -632,22 +632,7 @@ namespace Windows.UI.Xaml.Controls
         internal void LocallyManageChildrenChanged()
         {
             if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
-            {
-                if (Grid_InternalHelpers.isCSSGridSupported())
-                {
-                    foreach (UIElement uiElement in Children)
-                    {
-                        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                        {
-                            var style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(uiElement);
-                            style.zIndex = Canvas.GetZIndex(uiElement).ToString(); // we need this because for some reason, shapes overlap everything in their cell unless everyone has their zIndex set, in which case it depends of the order of the grid's children (which i the normal behaviour).
-                            style.pointerEvents = "none";
-                        }
-                    }
-                }
                 return;
-            }
-
 
 #if PERFSTAT
             var t0 = Performance.now();
