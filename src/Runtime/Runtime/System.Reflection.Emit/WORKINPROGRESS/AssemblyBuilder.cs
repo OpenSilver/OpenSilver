@@ -11,13 +11,13 @@ namespace System.Reflection.Emit
 		[OpenSilver.NotImplemented]
         public ModuleBuilder DefineDynamicModule(string name)
         {
-            return null;
+            return new ModuleBuilder();
         }
 
 		[OpenSilver.NotImplemented]
         public ModuleBuilder DefineDynamicModule(string name, bool emitSymbolInfo)
         {
-            return null;
+            return new ModuleBuilder();
         }
 
     }
