@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml
             this.INTERNAL_RootDomElement = rootDomElement;
 
             // Reset the content of the root DIV:
-            string sRootElement = INTERNAL_InteropImplementation.GetVariableStringForJS(rootDomElement);
+            string sRootElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(rootDomElement);
             CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.innerHTML = ''");
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
@@ -189,7 +189,7 @@ namespace Windows.UI.Xaml
         {
             double width;
             double height;
-            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement);
+            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement);
 #if OPENSILVER
             if (true)
 #elif BRIDGE
