@@ -56,11 +56,6 @@ namespace Windows.UI.Xaml.Controls
 
         private ItemCollection _items;
 
-        internal Panel Panel
-        {
-            get { return _itemsPresenter == null ? null : _itemsPresenter.ItemsHost; }
-        }
-
         #endregion Data
 
         #region Contructor
@@ -323,11 +318,6 @@ namespace Windows.UI.Xaml.Controls
             ClearContainerForItemOverride(container, item);
         }
 
-        internal void ClearContainerForItem(DependencyObject container, object item)
-        {
-            (this as IGeneratorHost).ClearContainerForItem(container, item);
-        }
-
         DependencyObject IGeneratorHost.GetContainerForItem(object item, DependencyObject recycledContainer)
         {
             DependencyObject container;
@@ -353,13 +343,6 @@ namespace Windows.UI.Xaml.Controls
 
             return container;
         }
-
-
-        internal DependencyObject GetContainerForItem(object item, DependencyObject recycledContainer)
-        {
-            return (this as IGeneratorHost).GetContainerForItem(item, recycledContainer);
-        }
-
 
         bool IGeneratorHost.IsHostForItemContainer(DependencyObject container)
         {
@@ -690,11 +673,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal void PrepareContainerForItem(DependencyObject element, object item)
-        {
-            PrepareContainerForItemOverride(element, item);
-        }
-
         private void OnItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.ManageCollectionChanged(e);
@@ -724,11 +702,6 @@ namespace Windows.UI.Xaml.Controls
             //{
             //    cp.ClearContentPresenter(item);
             //}
-        }
-
-        internal DependencyObject GetContainerForItem()
-        {
-            return GetContainerForItemOverride();
         }
 
         /// <summary>

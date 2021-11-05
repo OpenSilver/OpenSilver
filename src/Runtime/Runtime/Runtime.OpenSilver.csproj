@@ -435,9 +435,9 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\OpenFileDialog.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBox.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SaveFileDialog.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollContentPresenter.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\VirtualizingPanel.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\VirtualizingStackPanel.cs" />
+		<Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
+		<Compile Include="System.Windows.Controls\VirtualizingPanel.cs" />
+		<Compile Include="System.Windows.Controls\VirtualizingStackPanel.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IScrollInfo.cs" />

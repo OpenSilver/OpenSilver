@@ -26,7 +26,9 @@ namespace Windows.UI.Xaml.Controls
 				{
 					ItemsControl owner = ItemsControl.GetItemsOwner(this);
 					if (owner == null)
-						throw new InvalidOperationException("VirtualizingPanels must be in the Template of an ItemsControl in order to generate items");
+                    {
+						throw new InvalidOperationException("A VirtualizingPanel is not nested in an ItemsControl. VirtualizingPanel must be nested in ItemsControl to get and show items.");
+					}
 					generator = owner.ItemContainerGenerator;
 					generator.ItemsChanged += OnItemsChangedInternal;
 				}

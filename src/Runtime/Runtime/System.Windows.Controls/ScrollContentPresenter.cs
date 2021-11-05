@@ -16,7 +16,7 @@ namespace Windows.UI.Xaml.Controls
 {
 	public sealed partial class ScrollContentPresenter : ContentPresenter, IScrollInfo
 	{
-        static readonly double LineDelta = 16.0;
+        private const double LineDelta = 16.0;
 
         bool canHorizontallyScroll;
         bool canVerticallyScroll;
@@ -132,12 +132,13 @@ namespace Windows.UI.Xaml.Controls
             ScrollViewer sv = null;
             for (DependencyObject parent = VisualTreeHelper.GetParent(this); parent != null; parent = VisualTreeHelper.GetParent(parent))
             {
-                if (parent as ScrollViewer != null)
+                sv = parent as ScrollViewer;
+                if (sv != null)
                 {
-                    sv = parent as ScrollViewer;
                     break;
                 }
             }
+
             if (sv == null)
                 return;
 

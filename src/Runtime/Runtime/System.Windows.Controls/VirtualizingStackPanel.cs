@@ -15,14 +15,14 @@ namespace Windows.UI.Xaml.Controls
 {
 	public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
 	{
-		static readonly double LineDelta = 14.7;
-		static readonly double Wheelitude = 3;
+		private const double LineDelta = 14.7;
+		private const double Wheelitude = 3;
 
 		public static readonly DependencyProperty VirtualizationModeProperty = 
-			DependencyProperty.Register("VirtualizationMode", typeof(VirtualizationMode), typeof(VirtualizingStackPanel), new PropertyMetadata(VirtualizationMode.Recycling));
+			DependencyProperty.RegisterAttached("VirtualizationMode", typeof(VirtualizationMode), typeof(VirtualizingStackPanel), new PropertyMetadata(VirtualizationMode.Recycling));
         
 		public static readonly DependencyProperty IsVirtualizingProperty = 
-			DependencyProperty.Register("IsVirtualizing", typeof(bool), typeof(VirtualizingStackPanel), new PropertyMetadata(false));
+			DependencyProperty.RegisterAttached("IsVirtualizing", typeof(bool), typeof(VirtualizingStackPanel), new PropertyMetadata(false));
         
 		public static readonly DependencyProperty OrientationProperty = 
 			DependencyProperty.Register(nameof(Orientation), typeof(Orientation), typeof(VirtualizingStackPanel), new PropertyMetadata(Orientation.Vertical, VirtualizingStackPanel.OrientationChanged));

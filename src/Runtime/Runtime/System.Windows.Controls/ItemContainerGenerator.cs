@@ -14,6 +14,7 @@
 
 
 using CSHTML5.Internal;
+using CSHTML5.Internals.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -55,17 +56,12 @@ namespace Windows.UI.Xaml.Controls
             get; set;
         }
 
-        ItemsControl Owner
+        IGeneratorHost Owner
         {
             get; set;
         }
 
-        Panel Panel
-        {
-            get { return Owner.Panel; }
-        }
-
-        internal ItemContainerGenerator(ItemsControl owner)
+        internal ItemContainerGenerator(IGeneratorHost owner)
         {
             Cache = new Queue<DependencyObject>();
             _containers = new Dictionary<int, object>();
@@ -120,7 +116,7 @@ namespace Windows.UI.Xaml.Controls
                 return null;
         }
 
-        public int IndexFromContainer(object container)
+        public int IndexFromContainer(DependencyObject container)
         {
             foreach (var pair in _containers)
             {
@@ -138,7 +134,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>True if found and removed, false otherwise.</returns>
         public bool INTERNAL_TryUnregisterContainer(object container, object correspondingItem)
         {
-            int indexOfContainerInContainerList = IndexFromContainer(container);
+            int indexOfContainerInContainerList = IndexFromContainer(container as DependencyObject);
             if (indexOfContainerInContainerList != -1)
             {
                 _containers.Remove(indexOfContainerInContainerList);
@@ -281,7 +277,7 @@ namespace Windows.UI.Xaml.Controls
             return DependencyProperty.UnsetValue;
         }
 
-        public void RemoveAll()
+        private void RemoveAll()
 		{
             foreach (var pair in _containerToItem)
                 Owner.ClearContainerForItem(pair.Key as DependencyObject, pair.Value);
@@ -324,7 +320,7 @@ namespace Windows.UI.Xaml.Controls
             RealizedElements = newRanges;
         }
 
-        public void Remove(GeneratorPosition position, int count)
+        private void Remove(GeneratorPosition position, int count)
         {
             CheckOffsetAndRealized(position, count);
 
@@ -352,7 +348,7 @@ namespace Windows.UI.Xaml.Controls
                 throw new InvalidOperationException("Only items which have been Realized can be removed");
         }
 
-        public IDisposable StartAt(GeneratorPosition position,
+        private IDisposable StartAt(GeneratorPosition position,
                                  GeneratorDirection direction,
                                  bool allowStartAtRealizedItem)
         {
@@ -369,7 +365,7 @@ namespace Windows.UI.Xaml.Controls
             return GenerationState;
         }
 
-        public DependencyObject GenerateNext(out bool isNewlyRealized)
+        private DependencyObject GenerateNext(out bool isNewlyRealized)
         {
             if (GenerationState == null)
                 throw new InvalidOperationException("Cannot call GenerateNext before calling StartAt");
@@ -380,7 +376,7 @@ namespace Windows.UI.Xaml.Controls
             if (startAt == -1)
             {
                 if (GenerationState.Position.Offset < 0)
-                    index = Owner.Items.Count + GenerationState.Position.Offset;
+                    index = Owner.View.Count + GenerationState.Position.Offset;
                 else if (GenerationState.Position.Offset == 0)
                     index = 0;
                 else
@@ -403,7 +399,7 @@ namespace Windows.UI.Xaml.Controls
                 alreadyRealized = RealizedElements.Contains(index);
             }
 
-            if (index < 0 || index >= Owner.Items.Count)
+            if (index < 0 || index >= Owner.View.Count)
             {
                 isNewlyRealized = false;
                 return null;
@@ -418,7 +414,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             DependencyObject container;
-            var item = Owner.Items[index];
+            var item = Owner.View[index];
             if (Owner.IsItemItsOwnContainer(item))
             {
                 container = (DependencyObject)item;
@@ -428,7 +424,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (Cache.Count == 0)
                 {
-                    container = Owner.GetContainerForItem();
+                    container = null;
                     isNewlyRealized = true;
                 }
                 else
@@ -436,6 +432,7 @@ namespace Windows.UI.Xaml.Controls
                     container = Cache.Dequeue();
                     isNewlyRealized = false;
                 }
+                container = Owner.GetContainerForItem(item, container);
             }
 
             FrameworkElement f = container as FrameworkElement;
@@ -450,12 +447,12 @@ namespace Windows.UI.Xaml.Controls
             return container;
         }
 
-        public void PrepareItemContainer(DependencyObject container)
+        private void PrepareItemContainer(DependencyObject container)
         {
             var index = IndexFromContainer(container);
-            var item = Owner.Items[index];
+            var item = Owner.View[index];
 
-            Owner.PrepareContainerForItem(container, item);
+            Owner.PrepareItemContainer(container, item);
         }
 
         internal void OnOwnerItemsItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -468,7 +465,7 @@ namespace Windows.UI.Xaml.Controls
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if ((e.NewStartingIndex + 1) != Owner.Items.Count)
+                    if ((e.NewStartingIndex + 1) != Owner.View.Count)
                         MoveExistingItems(e.NewStartingIndex, 1);
                     itemCount = 1;
                     itemUICount = 0;
@@ -540,7 +537,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 return new GeneratorPosition(RealizedElements.IndexOf(itemIndex), 0);
             }
-            else if (itemIndex > Owner.Items.Count)
+            else if (itemIndex > Owner.View.Count)
             {
                 return new GeneratorPosition(-1, 0);
             }
@@ -581,7 +578,7 @@ namespace Windows.UI.Xaml.Controls
             if (position.Index == -1)
             {
                 if (position.Offset < 0)
-                    return Owner.Items.Count + position.Offset;
+                    return Owner.View.Count + position.Offset;
                 //else if (position.Offset == 0)
                 //	return 0;
                 else
@@ -589,18 +586,12 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                if (position.Index > Owner.Items.Count)
+                if (position.Index > Owner.View.Count)
                     return -1;
                 if (position.Index >= 0 && position.Index < RealizedElements.Count)
                     return RealizedElements[position.Index] + position.Offset;
                 return position.Index + position.Offset;
             }
-        }
-
-        public ItemContainerGenerator GetItemContainerGeneratorForPanel(Panel panel)
-        {
-            // FIXME: Double check this, but i think it's right
-            return panel == Panel ? this : null;
         }
 
         DependencyObject IItemContainerGenerator.GenerateNext(out bool isNewlyRealized)
@@ -610,7 +601,20 @@ namespace Windows.UI.Xaml.Controls
 
         ItemContainerGenerator IItemContainerGenerator.GetItemContainerGeneratorForPanel(Panel panel)
         {
-            return GetItemContainerGeneratorForPanel(panel);
+            if (!panel.IsItemsHost)
+                throw new ArgumentException("Panel must have IsItemsHost set to true.", "panel");
+
+            // if panel came from an ItemsPresenter, use its generator
+            ItemsPresenter ip = ItemsPresenter.FromPanel(panel);
+            if (ip != null)
+                return ip.Owner?.ItemContainerGenerator;
+
+            //// if panel came from a style, use the main generator
+            //if (panel.TemplatedParent != null)
+            //return this;
+
+            // otherwise the panel doesn't have a generator
+            return null;
         }
 
         void IItemContainerGenerator.PrepareItemContainer(DependencyObject container)

@@ -36,55 +36,48 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public sealed partial class ScrollViewer : ContentControl
     {
+        private const string ElementScrollContentPresenterName = "ScrollContentPresenter";
+        private const string ElementHorizontalScrollBarName = "HorizontalScrollBar";
+        private const string ElementVerticalScrollBarName = "VerticalScrollBar";
+
         double _verticalOffset = 0;
         double _horizontalOffset = 0;
-
-        // Set true to reset ScrollViwer template if CustomLayout is enabled.
-        private bool _requireTemplate = false;
 
         /// <summary>
         /// Initializes a new instance of the ScrollViewer class.
         /// </summary>
-        public ScrollViewer() : base() { }
+        public ScrollViewer()
+        {
+            DefaultStyleKey = typeof(ScrollViewer);
+        }
 
         internal override FrameworkTemplate TemplateCache
         {
-            get {
-                if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+            get 
+            {
+                if (IsCustomLayoutRoot || IsUnderCustomLayout)
+                {
                     return base.TemplateCache;
+                }
+
                 return null;
             }
-            set {
-                // At initialization, it cannot know the TemplateOwner and cannot know whether Customlayout is enabled.
-                // Once attached to the visualTree, recheck CustomLayout
-                if (_requireTemplate)
-                    base.TemplateCache = value;
-            }
-        }
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            if ((this.IsCustomLayoutRoot || this.IsUnderCustomLayout) && 
-                _requireTemplate == false)
+            set 
             {
-                // Reset TemplateChild
-                _requireTemplate = true;
-                DefaultStyleKey = typeof(ScrollViewer);
-
-                var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
-                style.overflow = "";
-
-                return;
+                base.TemplateCache = value;
             }
-            base.INTERNAL_OnAttachedToVisualTree();
         }
 
         internal override FrameworkTemplate TemplateInternal
         {
-            get {
-                if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+            get
+            {
+                if (IsCustomLayoutRoot || IsUnderCustomLayout)
+                {
                     return base.TemplateInternal;
-                return null; 
+                }
+
+                return null;
             }
         }
 
@@ -101,59 +94,34 @@ namespace Windows.UI.Xaml.Controls
         /// <summary> 
         /// Reference to the ScrollContentPresenter child.
         /// </summary>
-        internal ScrollContentPresenter ElementScrollContentPresenter { get; set; }
-        private const string ElementScrollContentPresenterName = "ScrollContentPresenter";
+        internal ScrollContentPresenter ElementScrollContentPresenter { get; private set; }
 
         /// <summary> 
         /// Reference to the horizontal ScrollBar child. 
         /// </summary>
-        internal ScrollBar ElementHorizontalScrollBar
-        {
-            get { return elementHorizontalScrollBar; }
-            private set
-            {
-                if (elementHorizontalScrollBar != value)
-                {
-                    ScrollBar oldValue = elementHorizontalScrollBar;
-                    elementHorizontalScrollBar = value;
-                }
-            }
-        }
-        private ScrollBar elementHorizontalScrollBar;
-        private const string ElementHorizontalScrollBarName = "HorizontalScrollBar";
+        internal ScrollBar ElementHorizontalScrollBar { get; private set; }
 
         /// <summary> 
         /// Reference to the vertical ScrollBar child.
         /// </summary>
-        internal ScrollBar ElementVerticalScrollBar
-        {
-            get { return elementVerticalScrollBar; }
-            private set
-            {
-                if (elementVerticalScrollBar != value)
-                {
-                    ScrollBar oldValue = elementVerticalScrollBar;
-                    elementVerticalScrollBar = value;
-                }
-            }
-        }
-        private ScrollBar elementVerticalScrollBar;
-        private const string ElementVerticalScrollBarName = "VerticalScrollBar";
+        internal ScrollBar ElementVerticalScrollBar { get; private set; }
 
         internal IScrollInfo ScrollInfo
         {
             get; set;
         }
-                
 
         /// <summary>
         /// Gets the value of the horizontal offset of the content. 
         /// </summary> 
         public double HorizontalOffset
         {
-            get { 
+            get 
+            { 
                 if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                {
                     return (double)GetValue(HorizontalOffsetProperty);
+                }
 
                 // Note: we did not create a DependencyProperty because we do not want to slow down the scroll by calling SetValue during the scroll.
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
@@ -477,7 +445,10 @@ namespace Windows.UI.Xaml.Controls
             get
             {
                 if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                {
                     return (double)GetValue(VerticalOffsetProperty);
+                }
+
                 // Note: we did not create a DependencyProperty because we do not want to slow down the scroll by calling SetValue during the scroll.
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
@@ -576,8 +547,13 @@ namespace Windows.UI.Xaml.Controls
             var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
             outerDivStyle.height = "100%";
             outerDivStyle.width = "100%";
-            outerDivStyle.overflowX = "scroll";
-            outerDivStyle.overflowY = "scroll";
+
+            if (!IsCustomLayoutRoot && !IsUnderCustomLayout)
+            {
+                outerDivStyle.overflowX = "scroll";
+                outerDivStyle.overflowY = "scroll";
+            }
+
             //Update the scrollviewer position when we insert again the scrollviewer in the visual tree
             if (_verticalOffset != 0)
             {
@@ -1254,11 +1230,11 @@ namespace Windows.UI.Xaml.Controls
 
             if (null != ElementHorizontalScrollBar)
             {
-                ElementHorizontalScrollBar.Scroll += delegate (Object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) { HandleScroll(Orientation.Horizontal, e); };
+                ElementHorizontalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Horizontal, e); };
             }
             if (null != ElementVerticalScrollBar)
             {
-                ElementVerticalScrollBar.Scroll += delegate (Object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) { HandleScroll(Orientation.Vertical, e); };
+                ElementVerticalScrollBar.Scroll += delegate (object sender, ScrollEventArgs e) { HandleScroll(Orientation.Vertical, e); };
             }
             UpdateScrollbarVisibility();
         }

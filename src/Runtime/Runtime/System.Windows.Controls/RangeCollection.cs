@@ -25,9 +25,9 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public class RangeCollection : ICollection<int>
+    internal class RangeCollection : ICollection<int>
     {
-        public struct Range
+        internal struct Range
         {
             private int start;
             private int end;
