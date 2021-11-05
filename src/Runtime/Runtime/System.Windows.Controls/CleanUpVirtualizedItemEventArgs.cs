@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -29,6 +30,6 @@ namespace Windows.UI.Xaml.Controls
 
 		public bool Cancel { get; set; }
 		public UIElement UIElement { get; private set; }
-		public Object Value { get; private set; }
+		public object Value { get; private set; }
 	}
 }

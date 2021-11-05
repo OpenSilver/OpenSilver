@@ -17,12 +17,12 @@ using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Automation.Peers;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 
-#if !MIGRATION
-using Windows.Foundation;
+#if MIGRATION
+using System.Windows.Controls.Primitives;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+
 #endif
 
 #if MIGRATION
@@ -1217,7 +1217,11 @@ namespace Windows.UI.Xaml.Controls
 
         */
 
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 

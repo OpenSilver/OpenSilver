@@ -14,6 +14,7 @@
 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -422,7 +423,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        Collections.IEnumerator Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }

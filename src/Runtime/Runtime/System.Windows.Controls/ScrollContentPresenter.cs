@@ -4,8 +4,9 @@ using System;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 #else
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.Foundation;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -125,7 +126,11 @@ namespace Windows.UI.Xaml.Controls
             return changed;
         }
 
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 
