@@ -6,10 +6,17 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Globalization = System.Globalization;
+
+#if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using Globalization = System.Globalization;
+#else
+using Windows.UI.Xaml.Automation.Provider;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+#endif
 
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.Column", Justification = "WPF Compatibility")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.IGridItemProvider.ColumnSpan", Justification = "WPF Compatibility")]
@@ -25,7 +32,11 @@ using Globalization = System.Globalization;
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ITableItemProvider.GetColumnHeaderItems()", Justification = "WPF Compatibility")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "System.Windows.Automation.Peers.CalendarDayButtonAutomationPeer.#System.Windows.Automation.Provider.ITableItemProvider.GetRowHeaderItems()", Justification = "WPF Compatibility")]
 
+#if MIGRATION
 namespace System.Windows.Automation.Peers
+#else
+namespace Windows.UI.Xaml.Automation.Peers
+#endif
 {
     /// <summary>
     /// Exposes
