@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal override FrameworkTemplate TemplateCache
         {
-            get 
+            get
             {
                 if (IsCustomLayoutRoot || IsUnderCustomLayout)
                 {
@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
 
                 return null;
             }
-            set 
+            set
             {
                 base.TemplateCache = value;
             }
@@ -116,8 +116,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary> 
         public double HorizontalOffset
         {
-            get 
-            { 
+            get
+            {
                 if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
                 {
                     return (double)GetValue(HorizontalOffsetProperty);
@@ -164,7 +164,7 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
             DependencyProperty.Register("HorizontalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer),
                 new FrameworkPropertyMetadata(ScrollBarVisibility.Disabled, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalScrollBarVisibility_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
         static void HorizontalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is ScrollViewer)
@@ -194,7 +194,7 @@ namespace Windows.UI.Xaml.Controls
 
         private static void OnScrollInfoDependencyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            
+
         }
 
 
@@ -464,7 +464,7 @@ namespace Windows.UI.Xaml.Controls
             }
             private set { SetValue(VerticalOffsetProperty, value); }
         }
-        
+
         /// <summary>
         /// Identifies the VerticalOffset dependency property. 
         /// </summary> 
@@ -487,8 +487,8 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
             DependencyProperty.Register("VerticalScrollBarVisibility", typeof(ScrollBarVisibility), typeof(ScrollViewer),
                 new FrameworkPropertyMetadata(ScrollBarVisibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure, VerticalScrollBarVisibility_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        
+                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+
         static void VerticalScrollBarVisibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is ScrollViewer)
@@ -1227,7 +1227,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (!this.IsCustomLayoutRoot && !this.IsUnderCustomLayout)
                 return;
-            
+
             ElementScrollContentPresenter = GetTemplateChild(ElementScrollContentPresenterName) as ScrollContentPresenter;
             ElementHorizontalScrollBar = GetTemplateChild(ElementHorizontalScrollBarName) as ScrollBar;
             ElementVerticalScrollBar = GetTemplateChild(ElementVerticalScrollBarName) as ScrollBar;
@@ -1312,7 +1312,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-        
+
         public static readonly DependencyProperty ScrollableHeightProperty = DependencyProperty.Register("ScrollableHeight", typeof(double), typeof(ScrollViewer), null);
 
         public double ScrollableHeight
@@ -1473,13 +1473,14 @@ namespace Windows.UI.Xaml.Controls
             }
             finally
             {
-                
+
             }
         }
 
         private double ScrollBarWidth
         {
-            get { 
+            get
+            {
                 return 20;  // Default scrollbar width
             }
         }

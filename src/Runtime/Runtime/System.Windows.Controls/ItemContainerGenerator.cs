@@ -156,7 +156,7 @@ namespace Windows.UI.Xaml.Controls
 
                         if (containersAssociatedToTheItem.Count == 0)
                             _itemsToContainers.Remove(correspondingItem);
-                        
+
                         _containerToItem.Remove(container);
 
                         return true;
@@ -278,7 +278,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         private void RemoveAll()
-		{
+        {
             foreach (var pair in _containerToItem)
                 Owner.ClearContainerForItem(pair.Key as DependencyObject, pair.Value);
 

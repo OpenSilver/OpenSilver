@@ -29,39 +29,39 @@ namespace Windows.UI.Xaml.Controls
 {
     internal class GenerationState : IDisposable
     {
-		public bool AllowStartAtRealizedItem
-		{
-			get; set;
-		}
+        public bool AllowStartAtRealizedItem
+        {
+            get; set;
+        }
 
-		public GeneratorDirection Direction
-		{
-			get; set;
-		}
+        public GeneratorDirection Direction
+        {
+            get; set;
+        }
 
-		public GeneratorPosition Position
-		{
-			get; set;
-		}
+        public GeneratorPosition Position
+        {
+            get; set;
+        }
 
-		public int Step
-		{
-			get { return Direction == GeneratorDirection.Forward ? 1 : -1; }
-		}
+        public int Step
+        {
+            get { return Direction == GeneratorDirection.Forward ? 1 : -1; }
+        }
 
-		public ItemContainerGenerator Generator
-		{
-			get; set;
-		}
+        public ItemContainerGenerator Generator
+        {
+            get; set;
+        }
 
-		public GenerationState()
-		{
+        public GenerationState()
+        {
 
-		}
+        }
 
-		public void Dispose()
-		{
-			Generator.GenerationState = null;
-		}
-	}
+        public void Dispose()
+        {
+            Generator.GenerationState = null;
+        }
+    }
 }

@@ -20,9 +20,10 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents the method that will handle the Window.SizeChanged event.
+    /// Represents the method that handles the <see cref="VirtualizingStackPanel.CleanUpVirtualizedItemEvent"/>
+    /// attached events.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
     public delegate void CleanUpVirtualizedItemEventHandler(object sender, CleanUpVirtualizedItemEventArgs e);
 }
