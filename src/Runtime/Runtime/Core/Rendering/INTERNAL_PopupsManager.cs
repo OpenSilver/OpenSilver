@@ -281,6 +281,14 @@ $1.removeChild(popupRoot);
                         popupPosition = popup.TransformToVisual(Application.Current.RootVisual).Transform(popupPosition);
                     }
 
+                    // Determine the height of the target element. 
+                    double targetElementHeight = 0;
+                    var target = popup.PlacementTarget as FrameworkElement;
+                    if (target != null)
+                    {
+                        targetElementHeight = target.ActualHeight;
+                    }
+
                     // Determine the size of the window:
                     Rect windowBounds = Window.Current.Bounds;
                     double popupX = popup.HorizontalOffset + popupPosition.X;
@@ -290,8 +298,8 @@ $1.removeChild(popupRoot);
                     // Note: when adding widthOfLeftOverflow and heightOfTopOverflow, I guessed the X and Y of windowBounds were 0 because of the way widthOfRightOverflow and heightOfBottomOverflow was calculated.
                     double widthOfRightOverflow = (popupX + popupActualWidth) - windowBounds.Width;
                     double widthOfLeftOverflow = -popupX; // Note: this would be -(popupX - windowBounds.X)
-                    double heightOfBottomOverflow = (popupY + popupActualHeight) - windowBounds.Height;
-                    double heightOfTopOverflow = -popupY; // Note: this would be -(popupY - windowBounds.Y)
+                    double heightOfBottomOverflow = (popupY + popupActualHeight + targetElementHeight) - windowBounds.Height;
+                    double heightOfTopOverflow = -popupY - targetElementHeight; // Note: this would be -(popupY - windowBounds.Y)
                     double totalWidthOverflow = widthOfRightOverflow + widthOfLeftOverflow;
                     double totalHeightOverflow = heightOfBottomOverflow + heightOfTopOverflow;
 
