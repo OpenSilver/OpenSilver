@@ -131,7 +131,6 @@ namespace Windows.UI.Xaml.Controls
 
                     var style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(uiElement);
 
-                    style.zIndex = Canvas.GetZIndex(uiElement).ToString(); // we need this because for some reason, shapes overlap everything in their cell unless everyone has their zIndex set, in which case it depends of the order of the grid's children (which i the normal behaviour).
                     style.position = "relative";
 
                     bool isMsGrid = Grid_InternalHelpers.isMSGrid();

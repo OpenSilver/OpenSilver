@@ -1033,7 +1033,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
             get
             {
-                return this._templateCache != null;
+                return this.TemplateCache != null;
             }
         }
 

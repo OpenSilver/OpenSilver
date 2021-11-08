@@ -110,7 +110,7 @@ namespace Windows.UI.Xaml.Controls
             // the generator must attach its collection change handler before
             // the control itself, so that the generator is up-to-date by the
             // time the control tries to use it
-            this._itemContainerGenerator = new ItemContainerGenerator();
+            this._itemContainerGenerator = new ItemContainerGenerator(this);
 
             this._items.CollectionChanged += this.OnItemCollectionChanged;
         }
@@ -145,10 +145,16 @@ namespace Windows.UI.Xaml.Controls
             {
                 _methodToInstantiateFrameworkTemplate = (FrameworkElement templateOwner) =>
                 {
+                    FrameworkElement content;
+                    if (templateOwner.IsUnderCustomLayout)
+                        content = new VirtualizingStackPanel();
+                    else
+                        content = new StackPanel();
+
                     return new TemplateInstance()
                     {
                         TemplateOwner = templateOwner,
-                        TemplateContent = new StackPanel()
+                        TemplateContent = content
                     };
                 }
             };
@@ -635,6 +641,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this.ItemsHost == null)
             {
+                return;
+            }
+
+            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+            {
+                ItemContainerGenerator.OnOwnerItemsItemsChanged(this, e);
                 return;
             }
 

@@ -121,8 +121,6 @@ namespace Windows.UI.Xaml
         private Size layoutLastSize;
         private bool layoutProcessing;
 
-        private int disableMeasureInvalidationRequests;
-        private IDisposable disableMeasureInvalidationToken;
         private int visualLevel;
 
         internal int VisualLevel
@@ -195,8 +193,6 @@ namespace Windows.UI.Xaml
             IsRendered = false;
             isFirstRendering = false;
             visualLevel = -1;
-
-            disableMeasureInvalidationToken = new Disposable(() => disableMeasureInvalidationRequests--);
         }
         internal virtual object GetDomElementToSetContentString()
         {
@@ -1338,12 +1334,6 @@ document.ondblclick = null;
             }
         }
 
-        private IDisposable DisableMeasureInvalidation()
-        {
-            disableMeasureInvalidationRequests++;
-            return disableMeasureInvalidationToken;
-        }
-
         internal void RaiseLayoutUpdated()
         {
             OnLayoutUpdated();
@@ -1458,30 +1448,27 @@ document.ondblclick = null;
             using (Windows.UI.Core.CoreDispatcher.INTERNAL_GetCurrentDispatcher().DisableProcessing())
 #endif
             {
-                using (DisableMeasureInvalidation())
+                bool previousMeasureValid = IsMeasureValid;
+                Size savedPreviousAvailableSize = PreviousAvailableSize;
+                PreviousAvailableSize = availableSize;
+                IsMeasureValid = true;
+
+                LayoutManager.Current.RemoveMeasure(this);
+
+                if (Visibility == Visibility.Collapsed)
                 {
-                    bool previousMeasureValid = IsMeasureValid;
-                    Size savedPreviousAvailableSize = PreviousAvailableSize;
+                    DesiredSize = new Size();
+                }
+                else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
+                {
+                    DesiredSize = previousDesiredSize;
+                }
+                else
+                {
+                    DesiredSize = MeasureCore(availableSize);
+
                     PreviousAvailableSize = availableSize;
-                    IsMeasureValid = true;
-
-                    LayoutManager.Current.RemoveMeasure(this);
-
-                    if (Visibility == Visibility.Collapsed)
-                    {
-                        DesiredSize = new Size();
-                    }
-                    else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
-                    {
-                        DesiredSize = previousDesiredSize;
-                    }
-                    else
-                    {
-                        DesiredSize = MeasureCore(availableSize);
-
-                        PreviousAvailableSize = availableSize;
-                        previousDesiredSize = DesiredSize;
-                    }
+                    previousDesiredSize = DesiredSize;
                 }
             }
         }
@@ -1510,7 +1497,7 @@ document.ondblclick = null;
         
         public void InvalidateMeasure()
         {
-            if (disableMeasureInvalidationRequests > 0 || !IsMeasureValid)
+            if (!IsMeasureValid)
             {
                 return;
             }
