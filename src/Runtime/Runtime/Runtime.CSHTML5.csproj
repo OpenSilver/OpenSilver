@@ -130,6 +130,7 @@
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
     <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
+    <Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
     <Compile Include="System.Windows.Controls\TextBoxView.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />

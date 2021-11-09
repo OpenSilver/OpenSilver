@@ -14,7 +14,7 @@
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
 		<DebugType>full</DebugType>
-		<Optimize>true</Optimize>
+		<!--<Optimize>true</Optimize>-->
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
 		<OpenSilverVersion>1.0.0</OpenSilverVersion>
@@ -84,6 +84,7 @@
 		<Compile Include="System.Windows.Controls\CalendarDayButton.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\GenerationState.cs" />
+		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RangeCollection.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
@@ -181,7 +182,6 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridComboBoxColumn.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridHyperlinkColumn.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridTemplateColumn.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\PasswordBox.cs" />
 		<Compile Include="System.Windows.Controls\TreeView.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewItem.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
