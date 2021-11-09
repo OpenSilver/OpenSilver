@@ -232,9 +232,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnItemTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
-            if (itemsControl.ItemsHost != null)
+            if (itemsControl._itemContainerGenerator != null)
             {
-                itemsControl.Refresh(true);
+                itemsControl._itemContainerGenerator.Refresh();
             }
         }
 
@@ -261,9 +261,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnDisplayMemberPathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
-            if (itemsControl.ItemsHost != null)
+            if (itemsControl._itemContainerGenerator != null)
             {
-                itemsControl.Refresh(true);
+                itemsControl._itemContainerGenerator.Refresh();
             }
         }
 
@@ -289,9 +289,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnItemContainerStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ItemsControl itemsControl = (ItemsControl)d;
-            if (itemsControl.ItemsHost != null)
+            if (itemsControl._itemContainerGenerator != null)
             {
-                itemsControl.Refresh(true);
+                itemsControl._itemContainerGenerator.Refresh();
             }
         }
 
@@ -395,15 +395,11 @@ namespace Windows.UI.Xaml.Controls
 
         protected virtual void ManageCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            this.HandleItemsChanged(e);
         }
 
         protected virtual void UpdateItemsPanel(ItemsPanelTemplate newTemplate)
         {
-            if (this.ItemsPresenter != null)
-            {
-                this.ItemsPresenter.Template = newTemplate;
-            }
+            this.ItemContainerGenerator.OnPanelChanged();
         }
 
         protected virtual void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
@@ -479,18 +475,6 @@ namespace Windows.UI.Xaml.Controls
             set { this._itemsPresenter = value; }
         }
 
-        internal Panel ItemsHost
-        {
-            get
-            {
-                if (this.ItemsPresenter != null)
-                {
-                    return this.ItemsPresenter.ItemsHost;
-                }
-                return null;
-            }
-        }
-
         internal bool HasItems
         {
             get { return this._items != null && this._items.CountInternal > 0; }
@@ -554,117 +538,6 @@ namespace Windows.UI.Xaml.Controls
         internal bool IsItemItsOwnContainer(object item)
         {
             return IsItemItsOwnContainerOverride(item);
-        }
-
-        private void OnItemAdded(object item, int position)
-        {
-            IGeneratorHost host = this;
-            DependencyObject container = host.GetContainerForItem(item, null);
-
-            this.ItemContainerGenerator.INTERNAL_RegisterContainer(container, item);
-            if (container != item)
-            {
-                container.SetValue(DataContextProperty, item);
-            }
-
-            this.ItemsHost.Children.Insert(position, (UIElement)container);
-
-            host.PrepareItemContainer(container, item);
-        }
-
-        private void OnItemRemoved(object item, int position)
-        {
-            IGeneratorHost host = this;
-            DependencyObject container = this.ItemsHost.Children[position];
-
-            this.ItemContainerGenerator.INTERNAL_TryUnregisterContainer(container, item);
-            this.ItemsHost.Children.RemoveAt(position);
-
-            host.ClearContainerForItem(container, item);
-        }
-
-        internal void Refresh(bool reuseContainers)
-        {
-            IGeneratorHost host = this;
-            DependencyObject[] oldContainers = new DependencyObject[Math.Max(this.ItemsHost.Children.Count, this.Items.CountInternal)];
-
-            // First we need to get the containers and their associated item,
-            // or they will be lost before being able to clear them.
-            int containersCount = this.ItemsHost.Children.Count;
-            object[] oldItems = new object[containersCount];
-            for (int i = 0; i < containersCount; ++i)
-            {
-                DependencyObject container = this.ItemsHost.InternalChildren[i];
-                oldContainers[i] = container;
-                oldItems[i] = this.ItemContainerGenerator.ItemFromContainer(container);
-            }
-
-            if (!reuseContainers)
-            {
-                this.ItemsHost.InternalChildren.Clear();
-                this.ItemContainerGenerator.INTERNAL_Clear();
-
-                for (int i = 0; i < containersCount; ++i)
-                {
-                    host.ClearContainerForItem(oldContainers[i], oldItems[i]);
-                }
-            }
-
-            int count = this.Items.CountInternal;
-            for (int i = 0; i < count; ++i)
-            {
-                object item = this.Items[i];
-                DependencyObject recycledContainer = reuseContainers ? oldContainers[i] : null;
-                DependencyObject container = host.GetContainerForItem(item, recycledContainer);
-
-                if (!reuseContainers)
-                {
-                    this.ItemContainerGenerator.INTERNAL_RegisterContainer(container, item);
-                    if (container != item)
-                    {
-                        container.SetValue(FrameworkElement.DataContextProperty, item);
-                    }
-                    this.ItemsHost.Children.Add((UIElement)container);
-                }
-
-                host.PrepareItemContainer(container, item);
-            }
-        }
-
-        internal void HandleItemsChanged(NotifyCollectionChangedEventArgs e)
-        {
-            if (this.ItemsHost == null)
-            {
-                return;
-            }
-
-            if (this.ItemsHost != null && VirtualizingStackPanel.GetIsVirtualizing(this.ItemsHost))
-            {
-                ItemContainerGenerator.OnOwnerItemsItemsChanged(this, e);
-                return;
-            }
-
-            if (e.Action == NotifyCollectionChangedAction.Reset)
-            {
-                this.Refresh(false);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                this.OnItemAdded(e.NewItems[0], e.NewStartingIndex);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                this.OnItemRemoved(e.OldItems[0], e.OldStartingIndex);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Replace)
-            {
-                this.OnItemAdded(e.NewItems[0], e.NewStartingIndex);
-                this.OnItemRemoved(e.OldItems[0], e.OldStartingIndex + 1);
-            }
-            else
-            {
-                throw new NotSupportedException(string.Format("Unexpected collection change action '{0}'.", e.Action));
-            }
         }
 
         private void OnItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

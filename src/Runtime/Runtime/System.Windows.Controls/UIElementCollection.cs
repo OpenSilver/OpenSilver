@@ -25,9 +25,6 @@ namespace Windows.UI.Xaml.Controls
     /// <exclude/>
     public class UIElementCollection : PresentationFrameworkCollection<UIElement>
     {
-        private readonly UIElement _visualParent;
-        private readonly FrameworkElement _logicalParent;
-
         internal UIElementCollection(UIElement visualParent, FrameworkElement logicalParent) : base(true)
         {
             if (visualParent == null)
@@ -35,9 +32,13 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentNullException(string.Format("'{0}' must be provided when instantiating '{1}'", "visualParent", this.GetType()));
             }
 
-            this._visualParent = visualParent;
-            this._logicalParent = logicalParent;
+            this.VisualParent = visualParent;
+            this.LogicalParent = logicalParent;
         }
+
+        internal UIElement VisualParent { get; }
+
+        internal FrameworkElement LogicalParent { get; }
 
         internal override void AddOverride(UIElement value)
         {
@@ -184,17 +185,17 @@ namespace Windows.UI.Xaml.Controls
 
         private void SetLogicalParent(UIElement child)
         {
-            if (this._logicalParent != null)
+            if (this.LogicalParent != null)
             {
-                this._logicalParent.AddLogicalChild(child);
+                this.LogicalParent.AddLogicalChild(child);
             }
         }
 
         private void ClearLogicalParent(UIElement child)
         {
-            if (this._logicalParent != null)
+            if (this.LogicalParent != null)
             {
-                this._logicalParent.RemoveLogicalChild(child);
+                this.LogicalParent.RemoveLogicalChild(child);
             }
         }
     }

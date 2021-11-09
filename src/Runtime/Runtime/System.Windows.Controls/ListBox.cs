@@ -435,9 +435,18 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void UnselectAllItems()
         {
-            foreach (SelectorItem selectorItem in ItemContainerGenerator.INTERNAL_AllContainers)
+            if (!this.HasItems)
             {
-                selectorItem.IsSelected = false;
+                return;
+            }
+
+            for (int i = 0; i < this.Items.Count; i++)
+            {
+                SelectorItem container = this.ItemContainerGenerator.ContainerFromIndex(i) as SelectorItem;
+                if (container != null)
+                {
+                    container.IsSelected = false;
+                }
             }
         }
 
@@ -480,9 +489,18 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                foreach (SelectorItem selectorItem in ItemContainerGenerator.INTERNAL_AllContainers)
+                if (!this.HasItems)
                 {
-                    selectorItem.IsSelected = true;
+                    return;
+                }
+
+                for (int i = 0; i < this.Items.Count; i++)
+                {
+                    SelectorItem container = this.ItemContainerGenerator.ContainerFromIndex(i) as SelectorItem;
+                    if (container != null)
+                    {
+                        container.IsSelected = true;
+                    }
                 }
             }
         }

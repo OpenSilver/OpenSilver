@@ -247,11 +247,11 @@ namespace Windows.UI.Xaml.Controls
                 var presenter = Content as ItemsPresenter;
                 if (presenter != null)
                 {
-                    if (presenter.ItemsHost == null)
+                    presenter.ApplyTemplate();
+                    if (presenter.TemplateChild != null)
                     {
-                        presenter.ApplyTemplate();
+                        info = presenter.TemplateChild as IScrollInfo;
                     }
-                    info = presenter.ItemsHost as IScrollInfo;
                 }
             }
             info = info ?? this;

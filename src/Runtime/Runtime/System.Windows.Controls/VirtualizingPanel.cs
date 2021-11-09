@@ -157,5 +157,14 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void BringIndexIntoView(int @index)
         {
         }
+
+        internal override void GenerateChildren()
+        {
+            if (!IsCustomLayoutRoot && !IsUnderCustomLayout)
+            {
+                base.GenerateChildren();
+            }
+            // Do nothing. Subclasses will use the exposed generator to generate children.
+        }
     }
 }

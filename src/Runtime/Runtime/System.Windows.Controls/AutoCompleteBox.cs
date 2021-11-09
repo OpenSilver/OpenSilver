@@ -97,18 +97,24 @@ namespace Windows.UI.Xaml.Controls
             // Opening DropDown will instantiate and assign ItemsHost
             this.IsDropDownOpen = true;
 
-            if (this.ItemsHost != null)
+            if (this.HasItems)
             {
-                for (int i = 0; i < this.ItemsHost.Children.Count; ++i)
+                for (int i = 0; i < this.Items.Count; i++)
                 {
-                    ComboBoxItem child = this.ItemsHost.Children[i] as ComboBoxItem;
-                    if (this._filter(this._textBox.Text, child.Content))
+                    ComboBoxItem container = this.ItemContainerGenerator.ContainerFromIndex(i) as ComboBoxItem;
+                    
+                    if (container == null)
                     {
-                        child.Visibility = Visibility.Visible;
+                        continue;
+                    }
+
+                    if (this._filter(this._textBox.Text, container.Content))
+                    {
+                        container.Visibility = Visibility.Visible;
                     }
                     else
                     {
-                        child.Visibility = Visibility.Collapsed;
+                        container.Visibility = Visibility.Collapsed;
                         if (this.SelectedIndex == i)
                         {
                             this.SetCurrentValue(SelectedIndexProperty, -1);
@@ -743,7 +749,7 @@ namespace Windows.UI.Xaml.Controls
         {
             base.ApplySelectedIndex(index);
 
-            if (this.ItemsHost == null)
+            if (!this.HasItems)
             {
                 return;
             }
@@ -756,9 +762,9 @@ namespace Windows.UI.Xaml.Controls
                 // not en exception but we don't want to treat it as there is no item
                 newSelectedContent = null;
             }
-            else if (index < this.ItemsHost.Children.Count)
+            else if (index < this.Items.Count)
             {
-                ComboBoxItem container = this.ItemsHost.Children[index] as ComboBoxItem;
+                ComboBoxItem container = this.ItemContainerGenerator.ContainerFromIndex(index) as ComboBoxItem;
                 newSelectedContent = container;
             }
             else

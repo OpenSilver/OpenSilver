@@ -1,7 +1,17 @@
-using System.Windows.Controls;
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System;
-using System.Windows;
-using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
@@ -9,16 +19,109 @@ namespace System.Windows.Controls.Primitives
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
-	public partial interface IItemContainerGenerator
+    /// <summary>
+    /// An interface that is implemented by classes which are responsible for generating
+    /// UI content on behalf of a host.
+    /// </summary>
+    public interface IItemContainerGenerator
     {
-		ItemContainerGenerator GetItemContainerGeneratorForPanel(Panel panel);
-		IDisposable StartAt(GeneratorPosition position, GeneratorDirection direction, bool allowStartAtRealizedItem);
-		DependencyObject GenerateNext(out bool isNewlyRealized);
-		void PrepareItemContainer(DependencyObject container);
+        /// <summary>
+        /// Returns the <see cref="ItemContainerGenerator"/> appropriate for use
+        /// by the specified panel.
+        /// </summary>
+        /// <param name="panel">
+        /// The panel for which to return an appropriate <see cref="ItemContainerGenerator"/>.
+        /// </param>
+        /// <returns>
+        /// An <see cref="ItemContainerGenerator"/> appropriate for use by the
+        /// specified panel.
+        /// </returns>
+        ItemContainerGenerator GetItemContainerGeneratorForPanel(Panel panel);
+
+        /// <summary>
+        /// Prepares the generator to generate items, starting at the specified <see cref="GeneratorPosition"/>,
+        /// and in the specified <see cref="GeneratorDirection"/>, and
+        /// controlling whether or not to start at a generated (realized) item.
+        /// </summary>
+        /// <param name="position">
+        /// A <see cref="GeneratorPosition"/>, that specifies the position
+        /// of the item to start generating items at.
+        /// </param>
+        /// <param name="direction">
+        /// Specifies the position of the item to start generating items at.
+        /// </param>
+        /// <param name="allowStartAtRealizedItem">
+        /// A <see cref="bool"/> that specifies whether to start at a generated (realized) item.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IDisposable"/> object that tracks the lifetime of the generation process.
+        /// </returns>
+        IDisposable StartAt(GeneratorPosition position, GeneratorDirection direction, bool allowStartAtRealizedItem);
+
+        /// <summary>
+        /// Returns the container element used to display the next item, and whether the
+        /// container element has been newly generated (realized).
+        /// </summary>
+        /// <param name="isNewlyRealized">
+        /// Is true if the returned <see cref="DependencyObject"/> is newly generated (realized);
+        /// otherwise, false.
+        /// </param>
+        /// <returns>
+        /// A <see cref="DependencyObject"/> that is the container element which is used
+        /// to display the next item.
+        /// </returns>
+        DependencyObject GenerateNext(out bool isNewlyRealized);
+
+        /// <summary>
+        /// Prepares the specified element as the container for the corresponding item.
+        /// </summary>
+        /// <param name="container">
+        /// The container to prepare. Normally, container is the result of the previous call
+        /// to <see cref="GenerateNext(out bool)"/>.
+        /// </param>
+        void PrepareItemContainer(DependencyObject container);
+
+        /// <summary>
+        /// Removes all generated (realized) items.
+        /// </summary>
 		void RemoveAll();
-		void Remove(GeneratorPosition position, int count);
-		GeneratorPosition GeneratorPositionFromIndex(int itemIndex);
-		int IndexFromGeneratorPosition(GeneratorPosition position);
+
+        /// <summary>
+        /// Removes one or more generated (realized) items.
+        /// </summary>
+        /// <param name="position">
+        /// The <see cref="int"/> index of the element to remove. position must refer to a previously
+        /// generated (realized) item, which means its offset must be zero.
+        /// </param>
+        /// <param name="count">
+        /// The <see cref="int"/> number of elements to remove, starting at position.
+        /// </param>
+        void Remove(GeneratorPosition position, int count);
+
+        /// <summary>
+        /// Returns the <see cref="GeneratorPosition"/> object that
+        /// maps to the item at the specified index.
+        /// </summary>
+        /// <param name="itemIndex">
+        /// The index of desired item.
+        /// </param>
+        /// <returns>
+        /// An <see cref="GeneratorPosition"/> object that maps to the
+        /// item at the specified index.
+        /// </returns>
+        GeneratorPosition GeneratorPositionFromIndex(int itemIndex);
+
+        /// <summary>
+        /// Returns the index that maps to the specified <see cref="GeneratorPosition"/>.
+        /// </summary>
+        /// <param name="position">
+        /// The index of desired item. The <see cref="GeneratorPosition"/>
+        /// for the desired index.
+        /// </param>
+        /// <returns>
+        /// An <see cref="int"/> that is the index which maps to the specified <see cref="GeneratorPosition"/>.
+        /// </returns>
+        int IndexFromGeneratorPosition(GeneratorPosition position);
 	}
 
     /// <summary>

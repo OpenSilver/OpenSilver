@@ -23,8 +23,10 @@ using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -41,14 +43,18 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Children")]
     public abstract partial class Panel : FrameworkElement
     {
+        private UIElementCollection _uiElementCollection;
+        private ItemContainerGenerator _itemContainerGenerator;
+
         /// <summary> 
         /// Returns enumerator to logical children.
         /// </summary>
-        /*protected*/ internal override IEnumerator LogicalChildren
+        /*protected*/
+        internal override IEnumerator LogicalChildren
         {
             get
             {
-                if (this._children == null || this._children.Count == 0 || this.IsItemsHost)
+                if (this._uiElementCollection == null || this._uiElementCollection.Count == 0 || this.IsItemsHost)
                 {
                     // empty panel or a panel being used as the items
                     // host has *no* logical children; give empty enumerator
@@ -60,12 +66,23 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        /// <summary>
+        /// The generator associated with this panel.
+        /// </summary>
+        internal IItemContainerGenerator Generator
+        {
+            get
+            {
+                return _itemContainerGenerator;
+            }
+        }
+
         internal bool HasChildren
         {
             get
             {
-                return this._children != null &&
-                       this._children.Count > 0;
+                return this._uiElementCollection != null &&
+                       this._uiElementCollection.Count > 0;
             }
         }
 
@@ -86,8 +103,6 @@ namespace Windows.UI.Xaml.Controls
                 return this.Background != null;
             }
         }
-
-        private UIElementCollection _children;
 
         private bool _enableProgressiveRendering;
         public bool EnableProgressiveRendering
@@ -215,23 +230,269 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (_children == null)
+                if (IsItemsHost)
                 {
-                    _children = CreateUIElementCollection(IsItemsHost ? null : this);
-
-                    if (this._isLoaded)
-                        _children.CollectionChanged += OnChildrenCollectionChanged;
+                    EnsureGenerator();
+                }
+                else
+                {
+                    if (_uiElementCollection == null)
+                    {
+                        // First access on a regular panel
+                        EnsureEmptyChildren(/* logicalParent = */ this);
+                    }
                 }
 
-                return _children;
+                return _uiElementCollection;
             }
+        }
+
+        private void ConnectToGenerator()
+        {
+            Debug.Assert(_itemContainerGenerator == null, "Attempted to connect to a generator when Panel._itemContainerGenerator is non-null.");
+
+            ItemsControl itemsOwner = ItemsControl.GetItemsOwner(this);
+            if (itemsOwner == null)
+            {
+                // This can happen if IsItemsHost=true, but the panel is not nested in an ItemsControl
+                throw new InvalidOperationException("A panel with IsItemsHost=\"true\" is not nested in an ItemsControl. Panel must be nested in ItemsControl to get and show items.");
+            }
+
+            IItemContainerGenerator itemsOwnerGenerator = itemsOwner.ItemContainerGenerator;
+            if (itemsOwnerGenerator != null)
+            {
+                _itemContainerGenerator = itemsOwnerGenerator.GetItemContainerGeneratorForPanel(this);
+                if (_itemContainerGenerator != null)
+                {
+                    _itemContainerGenerator.ItemsChanged += new ItemsChangedEventHandler(OnItemsChanged);
+                    ((IItemContainerGenerator)_itemContainerGenerator).RemoveAll();
+                }
+            }
+        }
+
+        private void EnsureEmptyChildren(FrameworkElement logicalParent)
+        {
+            if ((_uiElementCollection == null) || (_uiElementCollection.LogicalParent != logicalParent))
+            {
+                if (_uiElementCollection != null)
+                {
+                    _uiElementCollection.CollectionChanged -= new NotifyCollectionChangedEventHandler(OnChildrenCollectionChanged);
+                }
+
+                _uiElementCollection = CreateUIElementCollection(logicalParent);
+                
+                if (_uiElementCollection != null && IsLoaded)
+                {
+                    _uiElementCollection.CollectionChanged += new NotifyCollectionChangedEventHandler(OnChildrenCollectionChanged);
+                }
+            }
+            else
+            {
+                ClearChildren();
+            }
+        }
+
+        internal void EnsureGenerator()
+        {
+            Debug.Assert(IsItemsHost, "Should be invoked only on an ItemsHost panel");
+
+            if (_itemContainerGenerator == null)
+            {
+                // First access on an items presenter panel
+                ConnectToGenerator();
+
+                // Children of this panel should not have their logical parent reset
+                EnsureEmptyChildren(/* logicalParent = */ null);
+
+                GenerateChildren();
+            }
+        }
+
+        private void ClearChildren()
+        {
+            if (_itemContainerGenerator != null)
+            {
+                ((IItemContainerGenerator)_itemContainerGenerator).RemoveAll();
+            }
+
+            if ((_uiElementCollection != null) && (_uiElementCollection.Count > 0))
+            {
+                _uiElementCollection.Clear();
+                OnClearChildrenInternal();
+            }
+        }
+
+        internal virtual void OnClearChildrenInternal()
+        {
+        }
+
+        internal virtual void GenerateChildren()
+        {
+            // This method is typically called during layout, which suspends the dispatcher.
+            // Firing an assert causes an exception "Dispatcher processing has been suspended, but messages are still being processed."
+            // Besides, the asserted condition can actually arise in practice, and the
+            // code responds harmlessly.
+            //Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while being asked to generate children.");
+
+            IItemContainerGenerator generator = (IItemContainerGenerator)_itemContainerGenerator;
+            if (generator != null)
+            {
+                using (generator.StartAt(new GeneratorPosition(-1, 0), GeneratorDirection.Forward, true))
+                {
+                    UIElement child;
+                    bool isNewlyRealized;
+                    while ((child = generator.GenerateNext(out isNewlyRealized) as UIElement) != null)
+                    {
+                        _uiElementCollection.Add(child);
+                        generator.PrepareItemContainer(child);
+                    }
+                }
+            }
+        }
+
+        private void OnItemsChanged(object sender, ItemsChangedEventArgs args)
+        {
+            //if (VerifyBoundState())
+            //{
+            Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while receiving an ItemsChanged from a generator.");
+
+            bool affectsLayout = OnItemsChangedInternal(sender, args);
+
+            if (affectsLayout)
+            {
+                // todo
+                InvalidateMeasure();
+            }
+            //}
+        }
+
+        // This method returns a bool to indicate if or not the panel layout is affected by this collection change
+        internal virtual bool OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    AddChildren(args.Position, args.ItemCount);
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    RemoveChildren(args.Position, args.ItemUICount);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    ReplaceChildren(args.Position, args.ItemCount, args.ItemUICount);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    MoveChildren(args.OldPosition, args.Position, args.ItemUICount);
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    ResetChildren();
+                    break;
+            }
+
+            return true;
+        }
+
+        private void AddChildren(GeneratorPosition pos, int itemCount)
+        {
+            Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while receiving an Add action from a generator.");
+
+            IItemContainerGenerator generator = (IItemContainerGenerator)_itemContainerGenerator;
+            using (generator.StartAt(pos, GeneratorDirection.Forward, true))
+            {
+                for (int i = 0; i < itemCount; i++)
+                {
+                    bool isNewlyRealized;
+                    UIElement e = generator.GenerateNext(out isNewlyRealized) as UIElement;
+                    if (e != null)
+                    {
+                        _uiElementCollection.Insert(pos.Index + 1 + i, e);
+                        generator.PrepareItemContainer(e);
+                    }
+                    // check this
+                    //else
+                    //{
+                    //    _itemContainerGenerator.Verify();
+                    //}
+                }
+            }
+        }
+
+        private void RemoveChildren(GeneratorPosition pos, int containerCount)
+        {
+            // If anything is wrong, I think these collections should do parameter checking
+            for (int i = pos.Index; i < pos.Index + containerCount; i++)
+            {
+                _uiElementCollection.RemoveAt(i);
+            }
+        }
+
+        private void ReplaceChildren(GeneratorPosition pos, int itemCount, int containerCount)
+        {
+            Debug.Assert(itemCount == containerCount, "Panel expects Replace to affect only realized containers");
+            Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while receiving an Replace action from a generator.");
+
+            IItemContainerGenerator generator = (IItemContainerGenerator)_itemContainerGenerator;
+            using (generator.StartAt(pos, GeneratorDirection.Forward, true))
+            {
+                for (int i = 0; i < itemCount; i++)
+                {
+                    bool isNewlyRealized;
+                    UIElement e = generator.GenerateNext(out isNewlyRealized) as UIElement;
+
+                    Debug.Assert(e != null && !isNewlyRealized, "Panel expects Replace to affect only realized containers");
+                    if (e != null && !isNewlyRealized)
+                    {
+                        _uiElementCollection[pos.Index + i] = e;
+                        generator.PrepareItemContainer(e);
+                    }
+                    // check this
+                    //else
+                    //{
+                    //    _itemContainerGenerator.Verify();
+                    //}
+                }
+            }
+        }
+
+        private void MoveChildren(GeneratorPosition fromPos, GeneratorPosition toPos, int containerCount)
+        {
+            if (fromPos == toPos)
+                return;
+
+            Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while receiving an Move action from a generator.");
+
+            IItemContainerGenerator generator = (IItemContainerGenerator)_itemContainerGenerator;
+            int toIndex = generator.IndexFromGeneratorPosition(toPos);
+
+            UIElement[] elements = new UIElement[containerCount];
+
+            for (int i = 0; i < containerCount; i++)
+            {
+                elements[i] = _uiElementCollection[fromPos.Index + i];
+            }
+
+            for (int i = 0; i < containerCount; i++)
+            {
+                _uiElementCollection.RemoveAt(fromPos.Index + i);
+            }
+
+            for (int i = 0; i < containerCount; i++)
+            {
+                _uiElementCollection.Insert(toIndex + i, elements[i]);
+            }
+        }
+
+        private void ResetChildren()
+        {
+            EnsureEmptyChildren(null);
+            GenerateChildren();
         }
 
         internal UIElementCollection InternalChildren
         {
             get
             {
-                return _children;
+                return _uiElementCollection;
             }
         }
 
@@ -240,21 +501,13 @@ namespace Windows.UI.Xaml.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            if (_children != null)
+            if (this._uiElementCollection != null)
             {
-                _children.CollectionChanged -= OnChildrenCollectionChanged;
-                _children.CollectionChanged += OnChildrenCollectionChanged;
+                this._uiElementCollection.CollectionChanged -= new NotifyCollectionChangedEventHandler(OnChildrenCollectionChanged);
+                this._uiElementCollection.CollectionChanged += new NotifyCollectionChangedEventHandler(OnChildrenCollectionChanged);
             }
 
             this.OnChildrenReset();
-        }
-
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            base.INTERNAL_OnDetachedFromVisualTree();
-
-            if (_children != null)
-                _children.CollectionChanged -= OnChildrenCollectionChanged;
         }
 
         private async void ProgressivelyAttachChildren(IList<UIElement> newChildren)

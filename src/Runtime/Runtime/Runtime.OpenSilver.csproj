@@ -83,9 +83,7 @@
 		<Compile Include="System.Windows.Browser\EventSubscriber.cs" />
 		<Compile Include="System.Windows.Controls\CalendarDayButton.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\GenerationState.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
-		<Compile Include="System.Windows.Controls\RangeCollection.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />

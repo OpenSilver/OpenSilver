@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 
 #if MIGRATION
@@ -38,24 +35,23 @@ namespace Windows.UI.Xaml.Controls
     {
         private ItemsPanelTemplate _templateCache;
         private ItemsControl _owner; // templated parent.
-        private Panel _itemsHost; // template child
+        private ItemContainerGenerator _generator;
 
         internal sealed override FrameworkElement TemplateChild
         {
             get { return base.TemplateChild; }
             set
             {
-                Panel panel = null;
                 if (value != null)
                 {
-                    panel = value as Panel;
+                    Panel panel = value as Panel;
                     if (panel == null)
                     {
                         throw new InvalidOperationException(string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", value.GetType()));
                     }
                     panel.IsItemsHost = true;
                 }
-                this._itemsHost = panel;
+
                 base.TemplateChild = value;
             }
         }
@@ -65,9 +61,9 @@ namespace Windows.UI.Xaml.Controls
             get { return _owner; }
         }
 
-        internal Panel ItemsHost
+        internal ItemContainerGenerator Generator
         {
-            get { return _itemsHost; }
+            get { return _generator; }
         }
 
         // Internal Helper so the FrameworkElement could see this property
@@ -116,7 +112,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void ClearPanel()
         {
-            Panel oldPanel = this.ItemsHost;
+            Panel oldPanel = this.TemplateChild as Panel;
             if (oldPanel != null)
             {
                 oldPanel.IsItemsHost = false;
@@ -128,6 +124,7 @@ namespace Windows.UI.Xaml.Controls
             // Find the templated parent
             // todo: change this once FrameworkElement.TemplatedParent is implemented.
             ItemsControl owner = this._owner;
+            ItemContainerGenerator generator = null;
             DependencyObject elt = this;
             while (owner == null)
             {
@@ -150,18 +147,45 @@ namespace Windows.UI.Xaml.Controls
                 elt = parent;
             }
 
+            if (owner != null)
+            {
+                // top-level presenter - get information from ItemsControl
+                generator = owner.ItemContainerGenerator;
+            }
+
             this._owner = owner;
+            this.UseGenerator(generator);
 
             ItemsPanelTemplate template = null;
             if (this._owner != null)
             {
-                this._owner.ItemsPresenter = this;
-
                 // create the panel, based on ItemsControl.ItemsPanel
                 template = this._owner.ItemsPanel;
             }
 
             this.Template = template;
+        }
+
+        private void UseGenerator(ItemContainerGenerator generator)
+        {
+            if (generator == this._generator)
+                return;
+
+            if (this._generator != null)
+                this._generator.PanelChanged -= new EventHandler(this.OnPanelChanged);
+
+            this._generator = generator;
+
+            if (this._generator != null)
+                this._generator.PanelChanged += new EventHandler(this.OnPanelChanged);
+        }
+
+        private void OnPanelChanged(object sender, EventArgs e)
+        {
+            // something has changed that affects the ItemsPresenter.
+            // Re-measure.  This will recalculate everything from scratch.
+            this.InvalidateMeasureInternal();
+            _ = (this.TemplateChild as Panel)?.Children;
         }
 
         internal static ItemsPresenter FromPanel(Panel panel)
@@ -187,35 +211,28 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnApplyTemplate()
 #endif
         {
-            base.OnApplyTemplate();
-
             // verify that the template produced a panel with no children
-            Panel panel = this.ItemsHost;
+            Panel panel = this.TemplateChild as Panel;
             if (panel == null || panel.HasChildren)
             {
                 throw new InvalidOperationException("Content of ItemsPanelTemplate must be a single Panel (with no children).");
             }
 
-            // Attach children to panel
-            if (this.ItemsHost as VirtualizingPanel != null && this.ItemsHost.IsUnderCustomLayout)
-            {
-                VirtualizingStackPanel.SetIsVirtualizing(this.ItemsHost, true);
-            }
-            else
-            {
-                this.Owner.Refresh(false);
-            }
+            this.OnPanelChanged(this, EventArgs.Empty);
+
+            base.OnApplyTemplate();
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (ItemsHost == null)
+            FrameworkElement child = this.TemplateChild;
+            if (child == null)
             {
                 return new Size();
             }
 
-            ItemsHost.Measure(availableSize);
-            return ItemsHost.DesiredSize;
+            child.Measure(availableSize);
+            return child.DesiredSize;
         }
     }
 }
