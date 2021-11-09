@@ -14,6 +14,7 @@
 using System;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -26,7 +27,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class TextBoxView : FrameworkElement
+    internal class TextBoxView : FrameworkElement, ITextBoxView
     {
         private object _contentEditableDiv;
         private bool _isUpdatingDOM;

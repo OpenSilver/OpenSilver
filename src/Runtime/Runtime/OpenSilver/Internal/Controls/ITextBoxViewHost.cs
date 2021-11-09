@@ -12,7 +12,9 @@
 \*====================================================================================*/
 
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Windows.Markup;
 
 #if MIGRATION
 using System.Windows;
@@ -24,154 +26,156 @@ using Windows.UI.Xaml.Controls;
 
 namespace OpenSilver.Internal.Controls
 {
-    internal interface ITextBoxViewHost
-    {
-        TextBoxView View { get; }
+    internal interface ITextBoxView { }
 
-        void AttachView(TextBoxView view);
+    internal interface ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    {
+        T View { get; }
+
+        void AttachView(T view);
 
         void DetachView();
     }
 
-    internal class TextBoxViewHost_ContentControl : ITextBoxViewHost
+    internal class TextBoxViewHost_ContentControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly ContentControl _host;
-        private TextBoxView _view;
+        private T _view;
 
         internal TextBoxViewHost_ContentControl(ContentControl host)
         {
             _host = host;
         }
 
-        TextBoxView ITextBoxViewHost.View => _view;
+        T ITextBoxViewHost<T>.View => _view;
 
-        void ITextBoxViewHost.AttachView(TextBoxView view)
+        void ITextBoxViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Content = view;
         }
 
-        void ITextBoxViewHost.DetachView()
+        void ITextBoxViewHost<T>.DetachView()
         {
             _view = null;
             _host.Content = null;
         }
     }
 
-    internal class TextBoxViewHost_Border : ITextBoxViewHost
+    internal class TextBoxViewHost_Border<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly Border _host;
-        private TextBoxView _view;
+        private T _view;
 
         internal TextBoxViewHost_Border(Border host)
         {
             _host = host;
         }
 
-        TextBoxView ITextBoxViewHost.View => _view;
+        T ITextBoxViewHost<T>.View => _view;
 
-        void ITextBoxViewHost.AttachView(TextBoxView view)
+        void ITextBoxViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Child = view;
         }
 
-        void ITextBoxViewHost.DetachView()
+        void ITextBoxViewHost<T>.DetachView()
         {
             _view = null;
             _host.Child = null;
         }
     }
 
-    internal class TextBoxViewHost_ContentPresenter : ITextBoxViewHost
+    internal class TextBoxViewHost_ContentPresenter<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly ContentPresenter _host;
-        private TextBoxView _view;
+        private T _view;
 
         internal TextBoxViewHost_ContentPresenter(ContentPresenter host)
         {
             _host = host;
         }
 
-        TextBoxView ITextBoxViewHost.View => _view;
+        T ITextBoxViewHost<T>.View => _view;
 
-        void ITextBoxViewHost.AttachView(TextBoxView view)
+        void ITextBoxViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Content = view;
         }
 
-        void ITextBoxViewHost.DetachView()
+        void ITextBoxViewHost<T>.DetachView()
         {
             _view = null;
             _host.Content = null;
         }
     }
 
-    internal class TextBoxViewHost_UserControl : ITextBoxViewHost
+    internal class TextBoxViewHost_UserControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly UserControl _host;
-        private TextBoxView _view;
+        private T _view;
 
         internal TextBoxViewHost_UserControl(UserControl host)
         {
             _host = host;
         }
 
-        TextBoxView ITextBoxViewHost.View => _view;
+        T ITextBoxViewHost<T>.View => _view;
 
-        void ITextBoxViewHost.AttachView(TextBoxView view)
+        void ITextBoxViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Content = view;
         }
 
-        void ITextBoxViewHost.DetachView()
+        void ITextBoxViewHost<T>.DetachView()
         {
             _view = null;
             _host.Content = null;
         }
     }
 
-    internal class TextBoxViewHost_Panel : ITextBoxViewHost
+    internal class TextBoxViewHost_Panel<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly Panel _host;
-        private TextBoxView _view;
+        private T _view;
 
         internal TextBoxViewHost_Panel(Panel host)
         {
             _host = host;
         }
 
-        TextBoxView ITextBoxViewHost.View => _view;
+        T ITextBoxViewHost<T>.View => _view;
 
-        void ITextBoxViewHost.AttachView(TextBoxView view)
+        void ITextBoxViewHost<T>.AttachView(T view)
         {
             _view = view;
             _host.Children.Add(view);
         }
 
-        void ITextBoxViewHost.DetachView()
+        void ITextBoxViewHost<T>.DetachView()
         {
-            TextBoxView view = _view;
+            T view = _view;
             _view = null;
             _host.Children.Remove(view);
         }
     }
 
-    internal class TextBoxViewHost_ItemsControl : ITextBoxViewHost
+    internal class TextBoxViewHost_ItemsControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly ItemsControl _host;
-        private TextBoxView _view;
+        private T _view;
 
         internal TextBoxViewHost_ItemsControl(ItemsControl host)
         {
             _host = host;
         }
 
-        TextBoxView ITextBoxViewHost.View => _view;
+        T ITextBoxViewHost<T>.View => _view;
 
-        void ITextBoxViewHost.AttachView(TextBoxView view)
+        void ITextBoxViewHost<T>.AttachView(T view)
         {
             if (_host.HasItems)
             {
@@ -182,19 +186,19 @@ namespace OpenSilver.Internal.Controls
             _host.Items.Add(view);
         }
 
-        void ITextBoxViewHost.DetachView()
+        void ITextBoxViewHost<T>.DetachView()
         {
-            TextBoxView view = _view;
+            T view = _view;
             _view = null;
             _host.Items.Remove(view);
         }
     }
 
-    internal class TextBoxViewHost_ContentProperty : ITextBoxViewHost
+    internal class TextBoxViewHost_ContentProperty<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly FrameworkElement _host;
         private readonly string _contentPropertyName;
-        private TextBoxView _view;
+        private T _view;
         private bool _isInitialized;
         private MethodInfo _setMethod;
 
@@ -204,9 +208,9 @@ namespace OpenSilver.Internal.Controls
             _contentPropertyName = contentPropertyName;
         }
 
-        TextBoxView ITextBoxViewHost.View => _view;
+        T ITextBoxViewHost<T>.View => _view;
 
-        void ITextBoxViewHost.AttachView(TextBoxView view)
+        void ITextBoxViewHost<T>.AttachView(T view)
         {
             EnsureInitialized();
 
@@ -217,7 +221,7 @@ namespace OpenSilver.Internal.Controls
             }
         }
 
-        void ITextBoxViewHost.DetachView()
+        void ITextBoxViewHost<T>.DetachView()
         {
             EnsureInitialized();
 

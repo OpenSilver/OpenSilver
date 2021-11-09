@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml.Controls
     public partial class TextBox : Control
     {
         private FrameworkElement _contentElement;
-        private ITextBoxViewHost _textViewHost;
+        private ITextBoxViewHost<TextBoxView> _textViewHost;
 
         /// <summary>
         /// The name of the ExpanderButton template part.
@@ -597,7 +597,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void InitializeContentElement()
         {
-            _textViewHost = GetContentHost(_contentElement);
+            _textViewHost = GetContentHost<TextBoxView>(_contentElement);
 
             if (_textViewHost != null)
             {
@@ -615,35 +615,35 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private static ITextBoxViewHost GetContentHost(FrameworkElement contentElement)
+        internal static ITextBoxViewHost<T> GetContentHost<T>(FrameworkElement contentElement) where T : FrameworkElement, ITextBoxView
         {
             if (contentElement is ContentControl cc)
             {
-                return new TextBoxViewHost_ContentControl(cc);
+                return new TextBoxViewHost_ContentControl<T>(cc);
             }
             else if (contentElement is ContentPresenter cp)
             {
-                return new TextBoxViewHost_ContentPresenter(cp);
+                return new TextBoxViewHost_ContentPresenter<T>(cp);
             }
             else if (contentElement is Border border)
             {
-                return new TextBoxViewHost_Border(border);
+                return new TextBoxViewHost_Border<T>(border);
             }
             else if (contentElement is UserControl uc)
             {
-                return new TextBoxViewHost_UserControl(uc);
+                return new TextBoxViewHost_UserControl<T>(uc);
             }
             else if (contentElement is Panel panel)
             {
-                return new TextBoxViewHost_Panel(panel);
+                return new TextBoxViewHost_Panel<T>(panel);
             }
             else if (contentElement is ItemsControl ic)
             {
-                return new TextBoxViewHost_ItemsControl(ic);
+                return new TextBoxViewHost_ItemsControl<T>(ic);
             }
             else if (IsContentPropertyHost(contentElement, out string contentPropertyName))
             {
-                return new TextBoxViewHost_ContentProperty(contentElement, contentPropertyName);
+                return new TextBoxViewHost_ContentProperty<T>(contentElement, contentPropertyName);
             }
 
             return null;
