@@ -117,44 +117,6 @@ namespace Windows.UI.Xaml.Controls
 
             domElementWhereToPlaceChildren = passwordField; // Note: this value is used by the Padding_Changed method to set the padding of the PasswordBox.
 
-            //if the child of this.INTERNAL_AdditionalOutsideDivForMargins has the tagname "INPUT", replace it with a div:
-            var additionalDivForMargins = this.INTERNAL_AdditionalOutsideDivForMargins;
-
-            var newOuterDomElement = OpenSilver.Interop.ExecuteJavaScript(@"(function() {
-    var formerInputElement = $0.firstChild;
-    var outerDomElement = formerInputElement;
-    if(formerInputElement.tagName == 'INPUT') {
-        var replacement = document.createElement('div');
-        outerDomElement = replacement;
-        // copy the attributes:
-        for(var i=0; i<formerInputElement.attributes.length; ++i) {
-            var at = formerInputElement.attributes[i];
-            if(at.name != 'type' && at.name != 'tabIndex') //removing the type (which is now irrelevant) and the tabIndex (which would add the div to the tabbing sequence)
-            {
-                replacement.setAttribute(at.name, at.value);
-            }
-        }
-        // move the potential children to the replacement node:
-        while(formerInputElement.firstChild)
-        {
-            replacement.appendChild(formerInputElement.firstChild);
-        }
-        // replace the element:
-        formerInputElement.replaceWith(replacement);
-    }
-    return outerDomElement;
-})()", additionalDivForMargins);
-
-#if BRIDGE
-            if(!OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                //Note: we replaced the former <input> with a <div> in the DOM tree because it was created before knowing that there was a Template.
-                //      In the Simulator, there is no need to do anything because INTERNAL_OuterDomElement is only linked to the DOM element through its id (which was copied in the replacement <div>).
-                //      In the browser, INTERNAL_OuterDomElement is the Dom element itself so we need to replace it, so we do it here.
-                INTERNAL_OuterDomElement = newOuterDomElement;
-            }
-#endif
-
             passwordFieldStyle.border = "transparent"; // This removes the border. We do not need it since we are templated
             passwordFieldStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             passwordFieldStyle.backgroundColor = "transparent";
@@ -164,8 +126,6 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.height = "100%";
 
             INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password", forceSimulatorExecuteImmediately: true);
-
-            //passwordField.type = "password";
 
             //-----------------------
             // Prepare to raise the "TextChanged" event and to update the value of the "Text" property when the DOM text changes:
