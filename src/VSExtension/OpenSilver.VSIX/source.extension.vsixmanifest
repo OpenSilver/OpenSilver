@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="OpenSilver.64201874-6ead-4828-b5af-31a76285b73d" Version="1.0.23" Language="en-US" Publisher="Userware" />
+        <Identity Id="OpenSilver.64201874-6ead-4828-b5af-31a76285b73d" Version="1.0.24" Language="en-US" Publisher="Userware" />
         <DisplayName>OpenSilver</DisplayName>
         <Description xml:space="preserve">Project templates for creating OpenSilver applications. OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</Description>
         <Icon>Logo_32x32.png</Icon>
