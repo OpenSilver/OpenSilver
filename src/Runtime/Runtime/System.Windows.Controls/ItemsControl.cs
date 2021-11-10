@@ -145,16 +145,10 @@ namespace Windows.UI.Xaml.Controls
             {
                 _methodToInstantiateFrameworkTemplate = (FrameworkElement templateOwner) =>
                 {
-                    FrameworkElement content;
-                    if (templateOwner.IsUnderCustomLayout)
-                        content = new VirtualizingStackPanel();
-                    else
-                        content = new StackPanel();
-
                     return new TemplateInstance()
                     {
                         TemplateOwner = templateOwner,
-                        TemplateContent = content
+                        TemplateContent = new StackPanel()
                     };
                 }
             };
@@ -644,7 +638,7 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+            if (this.ItemsHost != null && VirtualizingStackPanel.GetIsVirtualizing(this.ItemsHost))
             {
                 ItemContainerGenerator.OnOwnerItemsItemsChanged(this, e);
                 return;

@@ -916,7 +916,8 @@
     <Style TargetType="ScrollViewer">
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
-        <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="Padding" Value="4"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="BorderBrush">

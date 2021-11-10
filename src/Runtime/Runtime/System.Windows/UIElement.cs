@@ -140,17 +140,17 @@ namespace Windows.UI.Xaml
         {
             get
             {
-                FrameworkElement child = this as FrameworkElement;
+                FrameworkElement parent = this as FrameworkElement;
 
-                if (child.CustomLayout == false)
+                if (parent.CustomLayout == false)
                     return false;
 
                 FrameworkElement layoutRoot = null;
-                while (child != null)
+                while (parent != null)
                 {
-                    if (child.CustomLayout)
-                        layoutRoot = child;
-                    child = child.INTERNAL_VisualParent as FrameworkElement;
+                    if (parent.CustomLayout)
+                        layoutRoot = parent;
+                    parent = VisualTreeHelper.GetParent(parent) as FrameworkElement;
                 }
 
                 if (layoutRoot == null)
@@ -164,15 +164,13 @@ namespace Windows.UI.Xaml
         {
             get
             {
-                FrameworkElement child = this as FrameworkElement;
-                if (child.CustomLayout)
-                    return false;
-
-                while (child != null)
+                FrameworkElement parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
+                
+                while (parent != null)
                 {
-                    if (child.CustomLayout)
+                    if (parent.CustomLayout)
                         return true;
-                    child = child.INTERNAL_VisualParent as FrameworkElement;
+                    parent = VisualTreeHelper.GetParent(parent) as FrameworkElement;
                 }
 
                 return false;
