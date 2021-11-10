@@ -154,8 +154,7 @@ namespace CSHTML5.Internal
 
                     INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
 
-                    child.InvalidateMeasure();
-                    child.InvalidateArrange();
+                    parent.InvalidateMeasure();
                     parent.InvalidateArrange();
                 }
                 else
