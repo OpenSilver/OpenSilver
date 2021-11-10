@@ -12,5 +12,5 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
   </ItemGroup>
-  
+
 </Project>
