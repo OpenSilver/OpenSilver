@@ -681,8 +681,10 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
         }}
         if(text.length + correctionDueToNewLines >= maxLength)
         {{
-            e.preventDefault();
-            return false;
+            if (!window.getSelection().toString()) {{
+                e.preventDefault();
+                return false;
+            }}
         }}
     }}
 
