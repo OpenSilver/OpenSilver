@@ -197,8 +197,14 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Attach children to panel
-            // if CustomLayout is enabled, reuse containers
-            this.Owner.Refresh(this.IsUnderCustomLayout);
+            if (this.ItemsHost as VirtualizingStackPanel != null && this.ItemsHost.IsUnderCustomLayout)
+            {
+                VirtualizingStackPanel.SetIsVirtualizing(this.ItemsHost, true);
+            }
+            else
+            {
+                this.Owner.Refresh(false);
+            }
         }
 
         protected override Size MeasureOverride(Size availableSize)

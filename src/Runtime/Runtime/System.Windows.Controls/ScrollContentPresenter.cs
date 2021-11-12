@@ -192,6 +192,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ScrollContentPresenter()
         {
+            this.ClipToBounds = true;
         }
 
         bool ClampOffsets()
