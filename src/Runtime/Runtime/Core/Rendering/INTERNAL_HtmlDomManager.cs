@@ -1214,6 +1214,11 @@ parentElement.appendChild(child);";
             while (!IsNullOrUndefined(domElementRef))
             {
                 // Walk up the DOM tree until we find a DOM element that has a corresponding CSharp object:
+
+                // Check if element exists in the DOM Tree; strangely, sometimes it doesn't
+                if (bool.Parse(Interop.ExecuteJavaScript("$0 == null", domElementRef).ToString()))
+                    break;
+
 #if OPENSILVER
                 if (true)
 #elif BRIDGE
