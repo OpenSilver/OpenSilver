@@ -87,8 +87,10 @@ window.onCallBack = (function() {
 					callbackArgs = args;
 					for (let i = 0; i < args.length; i++) {
 						let itemType = typeof args[i];
-						// do not accept nested arrays for now
-						if (!(args[i] === null || itemType === 'number' || itemType === 'string' || itemType === 'boolean')) {
+						if (!(args[i] === null || itemType === 'number' || itemType === 'string' || itemType === 'boolean' ||
+							// Check for TypedArray. This is used for reading binary data for FileReader for example
+							(ArrayBuffer.isView(args[i]) && !(args[i] instanceof DataView))
+						)) {
 							callbackArgs = [];
 							break;
 						}

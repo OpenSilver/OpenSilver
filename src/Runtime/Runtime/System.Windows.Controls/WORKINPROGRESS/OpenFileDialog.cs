@@ -18,52 +18,5 @@ namespace Windows.UI.Xaml.Controls
 			get;
 			set;
 		}
-
-		[OpenSilver.NotImplemented]
-		public bool Multiselect
-		{
-			get;
-			set;
-		}
-
-        [OpenSilver.NotImplemented]
-		public string Filter
-		{
-			get;
-			set;
-		}
-
-        [OpenSilver.NotImplemented]
-		public int FilterIndex
-		{
-			get;
-			set;
-		}
-
-        [OpenSilver.NotImplemented]
-		public FileInfo File
-		{
-			get;
-			private set;
-		}
-
-        [OpenSilver.NotImplemented]
-		public IEnumerable<FileInfo> Files
-		{
-			get;
-			private set;
-		}
-
-        [OpenSilver.NotImplemented]
-		public bool? ShowDialog()
-		{
-			return null;
-		}
-
-        [OpenSilver.NotImplemented]
-		public bool? ShowDialog(Window owner)
-		{
-			return null;
-		}
 	}
 }
