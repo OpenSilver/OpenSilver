@@ -37,7 +37,6 @@ namespace Windows.UI.Xaml.Controls
 
     public partial class ItemContainerGenerator : IRecyclingItemContainerGenerator
     {
-        Dictionary<object, List<object>> _itemsToContainers; // Note: this maps each item (for example a string or a business object) to the corresponding element that is added to the visual tree (such a datatemplate) or to the native DOM element in case of native combo box for example. The reason why each single element can be associated to multiple objects is because of Strings and other value types: for example, if two identical strings are added to the ItemsControl, they will be the same key of the dictionary.
         private Dictionary<object, object> _containerToItem = new Dictionary<object, object>(); // This is the reverse of the line above. Used to resolve items from their containers.
         Dictionary<int, object> _containers; //this list is kept to get the index from the container (with minimum work to keep it updated, it might not be the most efficient method perf-wise).
 
@@ -65,7 +64,6 @@ namespace Windows.UI.Xaml.Controls
         {
             Cache = new Queue<DependencyObject>();
             _containers = new Dictionary<int, object>();
-            _itemsToContainers = new Dictionary<object, List<object>>();
             Owner = owner;
             RealizedElements = new RangeCollection();
         }
@@ -82,23 +80,13 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public DependencyObject ContainerFromItem(object item) //This signature is here to fit the original (Microsoft's) signature for this method.
         {
-            return (DependencyObject)INTERNAL_ContainerFromItem(item);
-        }
-
-        public object INTERNAL_ContainerFromItem(object item) //Note: this signature is needed (at least) for the native ComboBox. The only difference is that we [do not need to]/[we cannot] cast the result into a DependencyObject
-        {
-            if (item != null && _itemsToContainers.ContainsKey(item))
+            foreach(var containerToItem in _containerToItem)
             {
-                List<object> containersAssociatedToTheItem = _itemsToContainers[item];
-                if (containersAssociatedToTheItem != null && containersAssociatedToTheItem.Count > 0)
-                {
-                    return containersAssociatedToTheItem[0];
-                }
-                else
-                    return null;
+                if (containerToItem.Value == item)
+                    return containerToItem.Key as DependencyObject;
             }
-            else
-                return null;
+            
+            return null;
         }
 
         /// <summary>
@@ -145,60 +133,20 @@ namespace Windows.UI.Xaml.Controls
                     _containers.Remove(i);
                     _containers.Add(i - 1, ct);
                 }
-            }
-            if (_itemsToContainers.ContainsKey(correspondingItem))
-            {
-                List<object> containersAssociatedToTheItem = _itemsToContainers[correspondingItem];
-                if (containersAssociatedToTheItem != null)
-                {
-                    if (containersAssociatedToTheItem.Remove(container))
-                    {
 
-                        if (containersAssociatedToTheItem.Count == 0)
-                            _itemsToContainers.Remove(correspondingItem);
+                _containerToItem.Remove(container);
 
-                        _containerToItem.Remove(container);
-
-                        return true;
-                    }
-                }
+                return true;
             }
 
             return false;
         }
-
-        ///// <summary>
-        ///// Removes the container at the given position. IMPORTANT NOTE: Contrary to expectations, this method is not as efficient as INTERNAL_TryUnregisterContainer so if given the choice, use that one instead.
-        ///// </summary>
-        ///// <param name="index">The index of the Container to remove.</param>
-        ///// <returns>True if found and removed, false otherwise</returns>
-        //public bool INTERNAL_TryUnregisterContainerAt(int index)
-        //{
-        //    //Note: this method has not been tested yet.
-        //    var container = ContainerFromIndex(index);
-        //    foreach(object item in _itemsToContainers.Keys)
-        //    {
-        //        List<object> containersAssociatedToTheItem = _itemsToContainers[item];
-        //        if (containersAssociatedToTheItem.Remove(container))
-        //        {
-
-        //            if (containersAssociatedToTheItem.Count == 0)
-        //                _itemsToContainers.Remove(item);
-
-        //            _containers.Remove(container);
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
-
 
         /// <summary>
         /// Resets the ItemContainerGenerator.
         /// </summary>
         public void INTERNAL_Clear()
         {
-            _itemsToContainers.Clear();
             _containerToItem.Clear();
             _containers.Clear();
             RealizedElements.Clear();
@@ -212,17 +160,6 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="correspondingItem">The item that corresponds to the container to add.</param>
         public void INTERNAL_RegisterContainer(object container, object correspondingItem)
         {
-            List<object> containersAssociatedToTheItem;
-            if (_itemsToContainers.ContainsKey(correspondingItem))
-            {
-                containersAssociatedToTheItem = _itemsToContainers[correspondingItem];
-            }
-            else
-            {
-                containersAssociatedToTheItem = new List<object>();
-                _itemsToContainers.Add(correspondingItem, containersAssociatedToTheItem);
-            }
-            containersAssociatedToTheItem.Add(container);
             _containerToItem.Add(container, correspondingItem);
             _containers.Add(_containers.Count, container);
         }
@@ -234,20 +171,15 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                foreach (List<object> containers in
+                foreach (object container in
 #if BRIDGE
-                    INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_itemsToContainers)
+                    INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(_containers)
 #else
-                    _itemsToContainers.Values
+                    _containers.Values
 #endif
 
                     )
-                {
-                    foreach (object container in containers)
-                    {
                         yield return container;
-                    }
-                }
             }
         }
 
@@ -282,7 +214,6 @@ namespace Windows.UI.Xaml.Controls
             foreach (var pair in _containerToItem)
                 Owner.ClearContainerForItem(pair.Key as DependencyObject, pair.Value);
 
-            _itemsToContainers.Clear();
             _containerToItem.Clear();
             _containers.Clear();
             RealizedElements.Clear();
