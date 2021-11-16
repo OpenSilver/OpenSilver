@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -26,41 +20,67 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    //[MarshalingBehavior(MarshalingType.Agile)]
-    //[Threading(ThreadingModel.Both)]
-    //[Version(100794368)]
-    //[WebHostHidden]
     /// <summary>
-    /// Provides data for the SelectionChanged event.
+    /// Provides data for the <see cref="Primitives.Selector.SelectionChanged"/>
+    /// event.
     /// </summary>
-    public partial class SelectionChangedEventArgs : RoutedEventArgs
+    public class SelectionChangedEventArgs : RoutedEventArgs
     {
+        private readonly object[] _addedItems;
+        private readonly object[] _removedItems;
+
         /// <summary>
-        /// Initializes a new instance of the SelectionChangedEventArgs class with the specified removed and added items.
+        /// Initializes a new instance of the <see cref="SelectionChangedEventArgs"/>
+        /// class.
         /// </summary>
-        /// <param name="removedItems">A list of the elements that have been removed from the list.</param>
-        /// <param name="addedItems">A list of the elements that have been added to the list.</param>
+        /// <param name="removedItems">
+        /// The items that were unselected.
+        /// </param>
+        /// <param name="addedItems">
+        /// The items that were selected.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// removedItems or addedItems is null.
+        /// </exception>
         public SelectionChangedEventArgs(IList removedItems, IList addedItems)
         {
-            _addedItems = addedItems;
-            _removedItems = removedItems;
+            if (removedItems == null)
+            {
+                throw new ArgumentNullException(nameof(removedItems));
+            }
+
+            if (addedItems == null)
+            {
+                throw new ArgumentNullException(nameof(addedItems));
+            }
+
+            _removedItems = new object[removedItems.Count];
+            removedItems.CopyTo(_removedItems, 0);
+
+            _addedItems = new object[addedItems.Count];
+            addedItems.CopyTo(_addedItems, 0);
         }
 
-        IList _addedItems;
-        IList _removedItems;
-
-        // Returns:
-        //     The loosely typed collection of items that were selected in this event.
         /// <summary>
         /// Gets a list that contains the items that were selected.
         /// </summary>
-        public IList AddedItems { get { return _addedItems; } }
+        /// <returns>
+        /// The items that were selected in this event.
+        /// </returns>
+        public IList RemovedItems
+        {
+            get { return _removedItems; }
+        }
 
-        // Returns:
-        //     The loosely typed list of items that were unselected in this event.
         /// <summary>
         /// Gets a list that contains the items that were unselected.
         /// </summary>
-        public IList RemovedItems { get { return _removedItems; } }
+        /// <returns>
+        /// The items that were unselected in this event.
+        /// </returns>
+        public IList AddedItems
+        {
+            get { return _addedItems; }
+        }
     }
 }
