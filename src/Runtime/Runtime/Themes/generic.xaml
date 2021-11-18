@@ -7,8 +7,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultChildWindowStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultComboBoxStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDataGridStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDataPagerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDatePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultExpanderStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultGridSplitterStyle.xaml" />

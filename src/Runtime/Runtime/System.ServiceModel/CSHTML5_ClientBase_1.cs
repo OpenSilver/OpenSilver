@@ -1145,7 +1145,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                 string requestFormat = null;
 
                 string interfaceTypeName = interfaceType.Name; // default value
-                string interfaceTypeNamespace = "http://tempuri.org/"; // default value
+                string interfaceTypeNamespace = string.Empty; // default value
                 string soapAction = string.Empty;
 
 
