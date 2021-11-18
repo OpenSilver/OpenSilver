@@ -121,7 +121,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.OnItemsSourceChanged_BeforeVisualUpdate(oldValue, newValue);
             if (SelectedItems != null && SelectedItems.Count != 0)
             {
-                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                SelectedItems.Clear();
             }
         }
 

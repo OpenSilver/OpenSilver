@@ -211,7 +211,7 @@ namespace Windows.UI.Xaml.Controls
                         selectedItemsHashSet = CopyToHashSet(SelectedItems);
                         hasSelectionChanged = true;
                     }
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                    SelectedItems.Clear();
                 }
                 if (isNewValueSet)
                 {
@@ -225,7 +225,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 selectedItemsHashSet = CopyToHashSet(SelectedItems);
                             }
-                            INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                            SelectedItems.Clear();
                         }
                         SelectedItems.Add(item);
                         if (!skipSelectionEventHere)
@@ -285,7 +285,7 @@ namespace Windows.UI.Xaml.Controls
                 if (SelectedItem != selectorItem.INTERNAL_CorrespondingItem) //todo: SelectedItems contains more than one element (I'm pretty sure we ignore is as long as the clicked element is the SelectedItem).
                 {
                     HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                    SelectedItems.Clear();
                     SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                     addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                     if (selectedItemsHashSet.Contains(selectorItem.INTERNAL_CorrespondingItem))
@@ -305,9 +305,9 @@ namespace Windows.UI.Xaml.Controls
             else if (SelectionMode == SelectionMode.Multiple)
             {
                 //If click on an already selected element
-                if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
+                if (SelectedItems.Contains(selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
                 {
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Remove(SelectedItems, selectorItem.INTERNAL_CorrespondingItem);
+                    SelectedItems.Remove(selectorItem.INTERNAL_CorrespondingItem);
                     removedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                 }
                 //else  click on a new element
@@ -344,12 +344,12 @@ namespace Windows.UI.Xaml.Controls
                     //copy the SelectedItems in a hashset so we can easily know which items have been removed:
                     HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
                     //clear before adding
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                    SelectedItems.Clear();
                     foreach (object item in Items)
                     {
                         if (indexStart <= index && index <= indexEnd)
                         {
-                            if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, item)) //todo-perfs: use a dictionary
+                            if (!SelectedItems.Contains(item)) //todo-perfs: use a dictionary
                             {
                                 SelectedItems.Add(item);
                                 addedItems.Add(item);
@@ -372,9 +372,9 @@ namespace Windows.UI.Xaml.Controls
                 else if (isControl)
                 {
                     //If click on an already selected element
-                    if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
+                    if (SelectedItems.Contains(selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
                     {
-                        INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Remove(SelectedItems, selectorItem.INTERNAL_CorrespondingItem);
+                        SelectedItems.Remove(selectorItem.INTERNAL_CorrespondingItem);
                         removedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
 
                     }
@@ -392,7 +392,7 @@ namespace Windows.UI.Xaml.Controls
                     if (SelectedItem != selectorItem.INTERNAL_CorrespondingItem)
                     {
                         HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
-                        INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                        SelectedItems.Clear();
                         SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                         addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
                         if (selectedItemsHashSet.Contains(selectorItem.INTERNAL_CorrespondingItem))

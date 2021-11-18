@@ -646,16 +646,16 @@ namespace Windows.UI.Xaml.Controls
             base.ManageSelectedIndex_Changed(e);
             if ((e.OldValue != null && (int)e.OldValue >= 0) && SelectionMode == DataGridSelectionMode.Single)
             {
-                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                SelectedItems.Clear();
             }
             if (e.NewValue != null && ((int)e.NewValue >= 0))
             {
                 if (SelectionMode == DataGridSelectionMode.Single)
                 {
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems);
+                    SelectedItems.Clear();
                     SelectedItems.Add(Items[(int)e.NewValue]);
                 }
-                else if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, e.NewValue)) //todo: remove the cast once the bug with the IList elements undefined in javascript is fixed.
+                else if (SelectedItems.Contains(e.NewValue))
                 {
                     SelectedItems.Add(Items[(int)e.NewValue]);
                 }
@@ -966,7 +966,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, item)) //todo: remove the cast once the bug with the IList elements undefined in javascript is fixed.
+                if (!SelectedItems.Contains(item))
                 {
                     SelectedItems.Add(item);//this will cause the method VisuallySelectItem to be called by MultiSelector.SelectedItems_CollectionChanged through RefreshSelectedItems
                 }
@@ -978,13 +978,13 @@ namespace Windows.UI.Xaml.Controls
             //todo: manage the event of selectionChanged ?
             if (SelectionMode == DataGridSelectionMode.Single)
             {
-                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Clear(SelectedItems); //todo: remove the cast once the bug with the IList elements undefined in javascript is fixed.
+                SelectedItems.Clear();
             }
             else
             {
-                if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(SelectedItems, item)) //todo: remove the cast once the bug with the IList elements undefined in javascript is fixed.
+                if (SelectedItems.Contains(item))
                 {
-                    INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Remove(SelectedItems, item); //todo: remove the cast once the bug with the IList elements undefined in javascript is fixed.
+                    SelectedItems.Remove(item);
                 }
             }
         }

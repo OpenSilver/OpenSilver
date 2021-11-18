@@ -318,7 +318,6 @@
     <Compile Include="Core\Other\INTERNAL_ShapesDrawHelpers.cs" />
     <Compile Include="Core\Other\INTERNAL_SizeComparisonHelpers.cs" />
     <Compile Include="Core\Other\INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.cs" />
-    <Compile Include="Core\Other\INTERNAL_WorkaroundObservableCollectionBugWithJSIL.cs" />
     <Compile Include="Core\Other\INTERNAL_XamlResourcesHandler.cs" />
     <Compile Include="Core\Other\ISet2_1.cs" />
     <Compile Include="Core\Other\Performance.cs" />

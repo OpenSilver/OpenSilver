@@ -60,16 +60,16 @@ namespace Windows.UI.Xaml.Controls
                         var parent = (MultiSelector)INTERNAL_ParentSelectorControl;
                         if (newValue)
                         {
-                            if (!INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(parent.SelectedItems, this.INTERNAL_CorrespondingItem))
+                            if (!parent.SelectedItems.Contains(this.INTERNAL_CorrespondingItem))
                             {
-                                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Add(parent.SelectedItems, this.INTERNAL_CorrespondingItem);
+                                parent.SelectedItems.Add(this.INTERNAL_CorrespondingItem);
                             }
                         }
                         else
                         {
-                            if (INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Contains(parent.SelectedItems, this.INTERNAL_CorrespondingItem))
+                            if (parent.SelectedItems.Contains(this.INTERNAL_CorrespondingItem))
                             {
-                                INTERNAL_WorkaroundObservableCollectionBugWithJSIL.Remove(parent.SelectedItems, this.INTERNAL_CorrespondingItem);
+                                parent.SelectedItems.Remove(this.INTERNAL_CorrespondingItem);
                             }
                         }
 
