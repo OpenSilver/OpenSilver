@@ -678,9 +678,11 @@ namespace Windows.UI.Xaml.Controls
             ComboBoxItem container = element as ComboBoxItem;
             if (container != null)
             {
-                container.INTERNAL_CorrespondingItem = item;
-                container.INTERNAL_ParentSelectorControl = this;
-                container.Click += ComboBoxItem_Click;
+#if MIGRATION
+                container.AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(ComboBoxItem_Click), true);
+#else
+                container.AddHandler(PointerPressedEvent, new PointerEventHandler(ComboBoxItem_Click), true);
+#endif
             }
         }
 
@@ -691,9 +693,11 @@ namespace Windows.UI.Xaml.Controls
             ComboBoxItem container = element as ComboBoxItem;
             if (container != null)
             {
-                container.INTERNAL_CorrespondingItem = null;
-                container.INTERNAL_ParentSelectorControl = null;
-                container.Click -= ComboBoxItem_Click;
+#if MIGRATION
+                container.RemoveHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(ComboBoxItem_Click));
+#else
+                container.RemoveHandler(PointerPressedEvent, new PointerEventHandler(ComboBoxItem_Click));
+#endif
             }
         }
 
@@ -707,20 +711,18 @@ namespace Windows.UI.Xaml.Controls
             return (item is ComboBoxItem);
         }
 
+        [Obsolete]
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return (SelectorItem)this.GetContainerFromItem(item);
         }
 
+        [Obsolete]
         protected override DependencyObject GetContainerFromItem(object item)
         {
             ComboBoxItem comboBoxItem = item as ComboBoxItem ?? new ComboBoxItem();
-            comboBoxItem.INTERNAL_CorrespondingItem = item;
-            comboBoxItem.INTERNAL_ParentSelectorControl = this;
-            comboBoxItem.Click += ComboBoxItem_Click;
             return comboBoxItem;
         }
-
 
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {
@@ -738,41 +740,12 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Select the item:
-            this.SelectedItem = selectedContainer.INTERNAL_CorrespondingItem;
+            this.SelectedItem = ItemContainerGenerator.ItemFromContainer(selectedContainer);
 
             // Close the popup:
             if (_dropDownToggle != null)
                 _dropDownToggle.IsChecked = false; // Note: this has other effects as well: see the "IsDropDownOpen_Changed" method.
         }
-
-        protected override void ApplySelectedIndex(int index)
-        {
-            base.ApplySelectedIndex(index);
-
-            if (!this.HasItems)
-            {
-                return;
-            }
-
-            UIElement newSelectedContent;
-
-            if (index == -1)
-            {
-                // index is sometimes at -1, for exemple when the app is starting
-                // not en exception but we don't want to treat it as there is no item
-                newSelectedContent = null;
-            }
-            else if (index < this.Items.Count)
-            {
-                ComboBoxItem container = this.ItemContainerGenerator.ContainerFromIndex(index) as ComboBoxItem;
-                newSelectedContent = container;
-            }
-            else
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-
 
 #if MIGRATION
         void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -847,7 +820,7 @@ namespace Windows.UI.Xaml.Controls
                                         typeof(AutoCompleteBox), 
                                         new PropertyMetadata(200d));
 
-        #region event
+#region event
 
         /// <summary>
         /// Occurs when the text in the text box portion of the AutoCompleteBox changes.
@@ -871,7 +844,7 @@ namespace Windows.UI.Xaml.Controls
 #else
         public event RoutedEventHandler DropDownOpened;
 #endif
-        #endregion
+#endregion
     }
 
     /// <summary>

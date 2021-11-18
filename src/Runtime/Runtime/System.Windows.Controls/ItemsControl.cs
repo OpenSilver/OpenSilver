@@ -16,6 +16,7 @@ using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Markup;
 using System.Diagnostics;
@@ -422,6 +423,13 @@ namespace Windows.UI.Xaml.Controls
         {
         }
 
+        /// <summary>
+        /// Adjust ItemInfos when the Items property changes.
+        /// </summary>
+        internal virtual void AdjustItemInfoOverride(NotifyCollectionChangedEventArgs e)
+        {
+        }
+
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             // We update the ItemsPanel only if there is no ControlTemplate.
@@ -484,6 +492,198 @@ namespace Windows.UI.Xaml.Controls
 
         #region Internal Methods
 
+        // adjust ItemInfos after a generator status change
+        internal void AdjustItemInfoAfterGeneratorChange(ItemInfo info)
+        {
+            if (info != null)
+            {
+                ItemInfo[] a = new ItemInfo[] { info };
+                AdjustItemInfosAfterGeneratorChange(a, claimUniqueContainer: false);
+            }
+        }
+
+        // adjust ItemInfos after a generator status change
+        internal void AdjustItemInfosAfterGeneratorChange(IEnumerable<ItemInfo> list, bool claimUniqueContainer)
+        {
+            // detect discarded containers and mark the ItemInfo accordingly
+            // (also see if there are infos awaiting containers)
+            bool resolvePendingContainers = false;
+            foreach (ItemInfo info in list)
+            {
+                DependencyObject container = info.Container;
+                if (container == null)
+                {
+                    resolvePendingContainers = true;
+                }
+                else if (info.IsRemoved || !ItemsControl.EqualsEx(info.Item,
+                            container.ReadLocalValue(ItemContainerGenerator.ItemForItemContainerProperty)))
+                {
+                    info.Container = null;
+                    resolvePendingContainers = true;
+                }
+            }
+
+            // if any of the ItemInfos correspond to containers
+            // that are now realized, record the container in the ItemInfo
+            if (resolvePendingContainers)
+            {
+                // first find containers that are already claimed by the list
+                List<DependencyObject> claimedContainers = new List<DependencyObject>();
+                if (claimUniqueContainer)
+                {
+                    foreach (ItemInfo info in list)
+                    {
+                        DependencyObject container = info.Container;
+                        if (container != null)
+                        {
+                            claimedContainers.Add(container);
+                        }
+                    }
+                }
+
+                // now try to match the pending items with an unclaimed container
+                foreach (ItemInfo info in list)
+                {
+                    DependencyObject container = info.Container;
+                    if (container == null)
+                    {
+                        int index = info.Index;
+                        if (index >= 0)
+                        {
+                            // if we know the index, see if the container exists
+                            container = ItemContainerGenerator.ContainerFromIndex(index);
+                        }
+                        else
+                        {
+                            // otherwise see if an unclaimed container matches the item
+                            object item = info.Item;
+                            ItemContainerGenerator.FindItem(
+                                delegate (object o, DependencyObject d)
+                                {
+                                    return ItemsControl.EqualsEx(o, item) &&
+                                      !claimedContainers.Contains(d);
+                                },
+                                out container, out index);
+                        }
+
+                        if (container != null)
+                        {
+                            // update ItemInfo and claim the container
+                            info.Container = container;
+                            info.Index = index;
+                            if (claimUniqueContainer)
+                            {
+                                claimedContainers.Add(container);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // correct the indices in the given ItemInfo, in response to a collection change event
+        internal void AdjustItemInfo(NotifyCollectionChangedEventArgs e, ItemInfo info)
+        {
+            if (info != null)
+            {
+                ItemInfo[] a = new ItemInfo[] { info };
+                AdjustItemInfos(e, a);
+            }
+        }
+
+        // correct the indices in the given ItemInfos, in response to a collection change event
+        internal void AdjustItemInfos(NotifyCollectionChangedEventArgs e, IEnumerable<ItemInfo> list)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    // items at NewStartingIndex and above have moved up 1
+                    foreach (ItemInfo info in list)
+                    {
+                        int index = info.Index;
+                        if (index >= e.NewStartingIndex)
+                        {
+                            info.Index = index + 1;
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    // items at OldStartingIndex and above have moved down 1
+                    foreach (ItemInfo info in list)
+                    {
+                        int index = info.Index;
+                        if (index > e.OldStartingIndex)
+                        {
+                            info.Index = index - 1;
+                        }
+                        else if (index == e.OldStartingIndex)
+                        {
+                            info.Index = -1;
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    // items between New and Old have moved.  The direction and
+                    // exact endpoints depends on whether New comes before Old.
+                    int left, right, delta;
+                    if (e.OldStartingIndex < e.NewStartingIndex)
+                    {
+                        left = e.OldStartingIndex + 1;
+                        right = e.NewStartingIndex;
+                        delta = -1;
+                    }
+                    else
+                    {
+                        left = e.NewStartingIndex;
+                        right = e.OldStartingIndex - 1;
+                        delta = 1;
+                    }
+
+                    foreach (ItemInfo info in list)
+                    {
+                        int index = info.Index;
+                        if (index == e.OldStartingIndex)
+                        {
+                            info.Index = e.NewStartingIndex;
+                        }
+                        else if (left <= index && index <= right)
+                        {
+                            info.Index = index + delta;
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    // nothing to do
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    // the indices and containers are no longer valid
+                    foreach (ItemInfo info in list)
+                    {
+                        info.Index = -1;
+                        info.Container = null;
+                    }
+                    break;
+            }
+        }
+
+        internal object GetItemOrContainerFromContainer(DependencyObject container)
+        {
+            object item = ItemContainerGenerator.ItemFromContainer(container);
+
+            if (item == DependencyProperty.UnsetValue
+                && ItemsControlFromItemContainer(container) == this
+                && ((IGeneratorHost)this).IsItemItsOwnContainer(container))
+            {
+                item = container;
+            }
+
+            return item;
+        }
+
         // A version of Object.Equals with paranoia for mismatched types, to avoid problems
         // with classes that implement Object.Equals poorly, as in Dev11 439664, 746174, DDVSO 602650
         internal static bool EqualsEx(object o1, object o2)
@@ -543,6 +743,8 @@ namespace Windows.UI.Xaml.Controls
         private void OnItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.ManageCollectionChanged(e);
+
+            this.AdjustItemInfoOverride(e);
 
             this.OnItemsChanged(e);
         }

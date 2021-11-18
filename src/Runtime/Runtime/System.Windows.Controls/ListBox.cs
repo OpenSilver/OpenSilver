@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,24 +11,20 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using ModifierKeys = System.Windows.Input.ModifierKeys;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using Windows.System;
+using ModifierKeys = Windows.System.VirtualKeyModifiers;
 #endif
 
 
@@ -42,470 +37,90 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Contains a list of selectable items.
     /// </summary>
-    /// <example>
-    /// <code lang="XAML" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    /// <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-    ///     <ListBox x:Name="ListBox1" DisplayMemberPath="Name" SelectedValuePath="ImagePath" VerticalAlignment="Top" SelectionMode="Single" BorderThickness="1" BorderBrush="LightGray"/>
-    ///     <Image Source="{Binding ElementName=ListBox1, Path=SelectedValue}" Width="60" Height="60" Margin="20,0,0,0" VerticalAlignment="Top"/>
-    /// </StackPanel>
-    /// </code>
-    /// <code lang="C#">
-    /// ListBox1.ItemsSource = Planet.GetListOfPlanets();
-    /// public partial class Planet
-    /// {
-    ///    public string Name { get; set; }
-    ///    public string ImagePath { get; set; }
-    ///
-    ///
-    ///    public static ObservableCollection&lt;Planet&gt; GetListOfPlanets()
-    ///    {
-    ///        return new ObservableCollection&lt;Planet&gt;()
-    ///        {
-    ///            new Planet() { Name = "Mercury", ImagePath = "ms-appx:/Planets/Mercury.png" },
-    ///            new Planet() { Name = "Venus", ImagePath = "ms-appx:/Planets/Venus.png" },
-    ///            new Planet() { Name = "Earth", ImagePath = "ms-appx:/Planets/Earth.png" },
-    ///            new Planet() { Name = "Mars", ImagePath = "ms-appx:/Planets/Mars.png" },
-    ///            new Planet() { Name = "Jupiter", ImagePath = "ms-appx:/Planets/Jupiter.png" },
-    ///            new Planet() { Name = "Saturn", ImagePath = "ms-appx:/Planets/Saturn.png" },
-    ///            new Planet() { Name = "Uranus", ImagePath = "ms-appx:/Planets/Uranus.png" },
-    ///            new Planet() { Name = "Neptune", ImagePath = "ms-appx:/Planets/Neptune.png" }
-    ///            new Planet() { Name = "Pluto", ImagePath = "ms-appx:/Planets/Pluto.png" }
-    ///        };
-    ///    }
-    ///} 
-    /// </code>
-    /// </example>
-    public partial class ListBox : MultiSelector //normally it should be Selector but since MultiSelector already adds SelectedItems, we inherit from MultiSelector.
+    [TemplatePart(Name = "ScrollViewer", Type = typeof(ScrollViewer))]
+    [TemplateVisualState(Name = "InvalidFocused", GroupName = "ValidationStates")]
+    [TemplateVisualState(Name = "InvalidUnfocused", GroupName = "ValidationStates")]
+    [TemplateVisualState(Name = "Valid", GroupName = "ValidationStates")]
+    public partial class ListBox : Selector
     {
-        //local variable used in SelectionMode.Extended 
-        int _indexOfLastClickedItemWithoutShiftKey = 0;
+        private ItemInfo _anchorItem;
+
         /// <summary>
-        /// Initializes a new instance of the ListBox class.
+        /// Initializes a new instance of the <see cref="ListBox"/> class.
         /// </summary>
         public ListBox()
         {
-            this.DefaultStyleKey = typeof(ListBox);
+            DefaultStyleKey = typeof(ListBox);
         }
-
-        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
-        {
-            base.PrepareContainerForItemOverride(element, item);
-
-            ListBoxItem container = element as ListBoxItem;
-            if (container != null)
-            {
-                container.INTERNAL_CorrespondingItem = item;
-                container.INTERNAL_ParentSelectorControl = this;
-                if (SelectedItems.Contains(item))
-                {
-                    // todo if possible: reuse the former items if they were already 
-                    // created rather than recreating them. It would actually be 
-                    // necessary to avoir errors like item is a string and there are 
-                    // two items with the same string, but only one of them is 
-                    // selected. Both will be considered (un)selected.
-
-                    // this can be needed when the SelectedItems collection was 
-                    // modified before the ListBox.Loaded event happened (which 
-                    // leads to an ItemsControl.UpdateItemsPanel, which then leads 
-                    // here).
-                    container.IsSelected = true;
-                }
-                container.Click += listBoxItem_Click;
-            }
-        }
-
-        protected override void ClearContainerForItemOverride(DependencyObject element, object item)
-        {
-            base.ClearContainerForItemOverride(element, item);
-
-            ListBoxItem container = element as ListBoxItem;
-            if (container != null)
-            {
-                container.INTERNAL_CorrespondingItem = null;
-                container.INTERNAL_ParentSelectorControl = null;
-                container.Click -= listBoxItem_Click;
-            }
-        }
-
-        protected override DependencyObject GetContainerForItemOverride()
-        {
-            return new ListBoxItem();
-        }
-
-        protected override bool IsItemItsOwnContainerOverride(object item)
-        {
-            return (item is ListBoxItem);
-        }
-
-        protected override SelectorItem INTERNAL_GenerateContainer(object item)
-        {
-            return (SelectorItem)this.GetContainerFromItem(item);
-        }
-
-        protected override DependencyObject GetContainerFromItem(object item)
-        {
-            ListBoxItem listBoxItem = item as ListBoxItem ?? new ListBoxItem();
-            listBoxItem.INTERNAL_CorrespondingItem = item;
-            listBoxItem.INTERNAL_ParentSelectorControl = this;
-            if (SelectedItems.Contains(item))
-            {
-                // todo if possible: reuse the former items if they were already 
-                // created rather than recreating them. It would actually be 
-                // necessary to avoir errors like item is a string and there are 
-                // two items with the same string, but only one of them is 
-                // selected. Both will be considered (un)selected.
-
-                // this can be needed when the SelectedItems collection was 
-                // modified before the ListBox.Loaded event happened (which 
-                // leads to an ItemsControl.UpdateItemsPanel, which then leads 
-                // here).
-                listBoxItem.IsSelected = true;
-            }
-            listBoxItem.Click += listBoxItem_Click;
-            return listBoxItem;
-        }
-
-
-        #region selection related elements
 
         /// <summary>
-        /// Gets or sets the selection behavior for the ListBox control.
+        /// Gets the list of currently selected items for the <see cref="ListBox"/>
+        /// control.
         /// </summary>
+        /// <returns>
+        /// The list of currently selected items for the <see cref="ListBox"/>.
+        /// </returns>
+        public IList SelectedItems
+        {
+            get { return SelectedItemsImpl; }
+        }
+
+        /// <summary>
+        /// Gets or sets the selection behavior for the <see cref="ListBox"/> control.
+        /// </summary>
+        /// <returns>
+        /// One of the <see cref="SelectionMode"/> values.
+        /// </returns>
         public SelectionMode SelectionMode
         {
             get { return (SelectionMode)GetValue(SelectionModeProperty); }
             set { SetValue(SelectionModeProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the SelectionMode dependency property.
+        /// Identifies the <see cref="SelectionMode"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty SelectionModeProperty =
-            DependencyProperty.Register("SelectionMode", typeof(SelectionMode), typeof(ListBox), new PropertyMetadata(SelectionMode.Single));
-        //we didn't implement a SelectionMode_Changed method since I don't think it would be of any use.
+            DependencyProperty.Register(
+                nameof(SelectionMode), 
+                typeof(SelectionMode), 
+                typeof(ListBox), 
+                new PropertyMetadata(SelectionMode.Single, OnSelectionModeChanged));
 
-
-        protected override void ManageSelectedIndex_Changed(DependencyPropertyChangedEventArgs e)
+        private static void OnSelectionModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!_skipSelectionChangedEvent) //this test because if it is true (meaning the SelectionChanged event is dealt with somewhere else), it means that SelectedItems has already been updated.
-            {
-                bool skipSelectionEventHere = _skipSelectionChangedEvent;
-                _skipSelectionChangedEvent = true; // Note: we keep this to true for the whole method since this method will handle the SelectionChanged event itself.
-
-                base.ManageSelectedIndex_Changed(e);
-
-                bool hasSelectionChanged = false;
-
-                List<object> addedItems = new List<object>();
-                List<object> removedItems = new List<object>();
-                HashSet<object> selectedItemsHashSet = null;
-
-                // Note: in this method, we use "Convert.ToInt32()" intead of casting to "(int)" because otherwise the JS code is not compatible with IE 9 (or Windows Phone 8.0).
-                bool isNewValueSet = e.NewValue != null && e.NewValue is int && Convert.ToInt32(e.NewValue) >= 0;
-                bool isOldValueSet = e.OldValue != null && e.OldValue is int && Convert.ToInt32(e.OldValue) >= 0;
-                bool isNewValueDifferentFromOldValue = e.NewValue != e.OldValue;
-                if (isOldValueSet && isNewValueDifferentFromOldValue)
-                {
-                    //We clear the selection and remember the old items if needed for the SelectionChanged event:
-                    if (!skipSelectionEventHere)
-                    {
-                        selectedItemsHashSet = CopyToHashSet(SelectedItems);
-                        hasSelectionChanged = true;
-                    }
-                    SelectedItems.Clear();
-                }
-                if (isNewValueSet)
-                {
-                    int newValue = Convert.ToInt32(e.NewValue);
-                    object item = Items[newValue];
-                    if (SelectedItems.Count == 0 || SelectedItems[0] != item) //If SelectedItem stays the same (the first item in SelectedItems), we do nothing
-                    {
-                        if (SelectedItems.Count != 0) //this test is to avoid calling clear (and entering MultiSelector.RefreshSelectedItems) for no reason.
-                        {
-                            if (!skipSelectionEventHere)
-                            {
-                                selectedItemsHashSet = CopyToHashSet(SelectedItems);
-                            }
-                            SelectedItems.Clear();
-                        }
-                        SelectedItems.Add(item);
-                        if (!skipSelectionEventHere)
-                        {
-                            if (selectedItemsHashSet != null && selectedItemsHashSet.Contains(item))
-                            {
-                                selectedItemsHashSet.Remove(item);
-                            }
-                            addedItems.Add(item);
-                            hasSelectionChanged = true;
-                        }
-                    }
-                }
-                if (hasSelectionChanged && !skipSelectionEventHere)
-                {
-                    if (selectedItemsHashSet != null)
-                    {
-                        foreach (object item in selectedItemsHashSet)
-                        {
-                            removedItems.Add(item);
-                        }
-                    }
-                    OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
-                }
-                _skipSelectionChangedEvent = skipSelectionEventHere;
-            }
+            ListBox listBox = (ListBox)d;
+            listBox.ValidateSelectionMode(listBox.SelectionMode);
         }
 
-        void listBoxItem_Click(object sender, RoutedEventArgs e)
+        private void ValidateSelectionMode(SelectionMode mode)
         {
-            _skipSelectionChangedEvent = true; // Note: we keep this to true for the whole method since this method will handle the SelectionChanged event itself (this way we don't risk having multiple calls to SelectionChanged when adding multiple elements for example).
-
-            //object[] oldItems = null;
-            bool hasSelectionChanged = false;
-
-            List<object> addedItems = new List<object>();
-            List<object> removedItems = new List<object>();
-
-#if MIGRATION
-            ModifierKeys modifiersKey = new ModifierKeys();
-            modifiersKey = Keyboard.Modifiers;
-            bool isControl = modifiersKey.HasFlag(ModifierKeys.Control);
-            bool isShift = modifiersKey.HasFlag(ModifierKeys.Shift);
-#else
-            VirtualKeyModifiers modifiersKey = new VirtualKeyModifiers();
-            modifiersKey = Keyboard.Modifiers;
-            bool isControl = modifiersKey.HasFlag(VirtualKeyModifiers.Control);
-            bool isShift = modifiersKey.HasFlag(VirtualKeyModifiers.Shift);
-
-#endif
-            SelectorItem selectorItem = (SelectorItem)sender;
-            //---------------------------------------------------
-            //Single
-            //---------------------------------------------------
-            if (SelectionMode == SelectionMode.Single)
-            {
-                if (SelectedItem != selectorItem.INTERNAL_CorrespondingItem) //todo: SelectedItems contains more than one element (I'm pretty sure we ignore is as long as the clicked element is the SelectedItem).
-                {
-                    HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
-                    SelectedItems.Clear();
-                    SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                    addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                    if (selectedItemsHashSet.Contains(selectorItem.INTERNAL_CorrespondingItem))
-                    {
-                        selectedItemsHashSet.Remove(selectorItem.INTERNAL_CorrespondingItem);
-                    }
-                    foreach (object item in selectedItemsHashSet)
-                    {
-                        removedItems.Add(item);
-                    }
-                    hasSelectionChanged = true;
-                }
-            }
-            //---------------------------------------------------
-            //Multiple
-            //---------------------------------------------------
-            else if (SelectionMode == SelectionMode.Multiple)
-            {
-                //If click on an already selected element
-                if (SelectedItems.Contains(selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
-                {
-                    SelectedItems.Remove(selectorItem.INTERNAL_CorrespondingItem);
-                    removedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                }
-                //else  click on a new element
-                else
-                {
-                    SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                    addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                }
-                hasSelectionChanged = true;
-            }
-            //---------------------------------------------------
-            //Extended
-            //---------------------------------------------------
-            else if (SelectionMode == SelectionMode.Extended)
-            {
-
-                int indexOfClickedItem = INTERNAL_ListsHelper.ConvertToListOfObjectsOrNull(Items).IndexOf(selectorItem.INTERNAL_CorrespondingItem); //todo-perfs: this is O(N).
-
-                //if Shift is pressed
-                if (isShift)
-                {
-
-
-                    int indexStart = _indexOfLastClickedItemWithoutShiftKey;
-                    int indexEnd = indexOfClickedItem;
-                    int change;
-                    if (indexStart > indexEnd)
-                    {
-                        change = indexEnd;
-                        indexEnd = indexStart;
-                        indexStart = change;
-                    }
-                    int index = 0;
-                    //copy the SelectedItems in a hashset so we can easily know which items have been removed:
-                    HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
-                    //clear before adding
-                    SelectedItems.Clear();
-                    foreach (object item in Items)
-                    {
-                        if (indexStart <= index && index <= indexEnd)
-                        {
-                            if (!SelectedItems.Contains(item)) //todo-perfs: use a dictionary
-                            {
-                                SelectedItems.Add(item);
-                                addedItems.Add(item);
-                                if (selectedItemsHashSet.Contains(item))
-                                {
-                                    selectedItemsHashSet.Remove(item);
-                                }
-                            }
-                        }
-                        index++;
-                    }
-                    foreach (object item in selectedItemsHashSet)
-                    {
-                        removedItems.Add(item);
-                    }
-
-                    hasSelectionChanged = removedItems.Count > 0 || addedItems.Count > 0;
-                }
-                //if Control is pressed
-                else if (isControl)
-                {
-                    //If click on an already selected element
-                    if (SelectedItems.Contains(selectorItem.INTERNAL_CorrespondingItem))//if we are in a multiple mode and the currently selected element is the one we clicked, we want to unselect it.
-                    {
-                        SelectedItems.Remove(selectorItem.INTERNAL_CorrespondingItem);
-                        removedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-
-                    }
-                    //else click on a new element
-                    else
-                    {
-                        SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                        addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                    }
-                    hasSelectionChanged = true;
-                }
-                //Nothing is pressed
-                else
-                {
-                    if (SelectedItem != selectorItem.INTERNAL_CorrespondingItem)
-                    {
-                        HashSet<object> selectedItemsHashSet = CopyToHashSet(SelectedItems);
-                        SelectedItems.Clear();
-                        SelectedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                        addedItems.Add(selectorItem.INTERNAL_CorrespondingItem);
-                        if (selectedItemsHashSet.Contains(selectorItem.INTERNAL_CorrespondingItem))
-                        {
-                            selectedItemsHashSet.Remove(selectorItem.INTERNAL_CorrespondingItem);
-                        }
-                        foreach (object item in selectedItemsHashSet)
-                        {
-                            removedItems.Add(item);
-                        }
-                        hasSelectionChanged = true;
-                    }
-                }
-
-                if (!isShift)
-                    _indexOfLastClickedItemWithoutShiftKey = indexOfClickedItem;
-            }
-            else
-            {
-                throw new NotSupportedException("SelectionMode is not Single, Multiple or Extended.");
-            }
-
-            OnSelectionChanged(new SelectionChangedEventArgs(removedItems, addedItems));
-            _skipSelectionChangedEvent = false;
+            CanSelectMultiple = (mode != SelectionMode.Single);
         }
 
-        HashSet<object> CopyToHashSet(IList iListToCopy)
+        /// <summary>
+        /// Gets or sets the style that is used when rendering the item containers.
+        /// </summary>
+        /// <returns>
+        /// The style applied to the item containers. The default is null.
+        /// </returns>
+        public new Style ItemContainerStyle
         {
-            HashSet<object> hashSet = new HashSet<object>();
-            if (iListToCopy != null)
-            {
-                foreach (object item in iListToCopy)
-                {
-                    hashSet.Add(item);
-                }
-            }
-            return hashSet;
+            get { return base.ItemContainerStyle; }
+            set { base.ItemContainerStyle = value; }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="ItemContainerStyle"/> dependency
+        /// property.
+        /// </summary>
+        public static readonly new DependencyProperty ItemContainerStyleProperty =
+            ItemsControl.ItemContainerStyleProperty;
 
-        protected override void UnselectAllItems()
-        {
-            if (!this.HasItems)
-            {
-                return;
-            }
-
-            for (int i = 0; i < this.Items.Count; i++)
-            {
-                SelectorItem container = this.ItemContainerGenerator.ContainerFromIndex(i) as SelectorItem;
-                if (container != null)
-                {
-                    container.IsSelected = false;
-                }
-            }
-        }
-
-
-
-        protected override void SetItemVisualSelectionState(object item, bool newState)
-        {
-            ListBoxItem listBoxItem = (ListBoxItem)ItemContainerGenerator.ContainerFromItem(item);
-            if (listBoxItem != null)
-            {
-                listBoxItem.IsSelected = newState;
-                //if (newState)
-                //{
-                //    SelectedItem = item;
-                //}
-                //else
-                //{
-                //    //trigger the OnSelectionChanged event:
-                //    List<object> oldItems = new List<object>();
-                //    oldItems.Add(item);
-                //    List<object> newItems = new List<object>();
-                //    //newItems.Add(null);
-                //    OnSelectionChanged(new SelectionChangedEventArgs(oldItems, newItems));
-                //}
-                ////else
-                ////{
-                ////    SelectedItem = null;
-                ////}
-            }
-        }
-
-        ////
-        //// Summary:
-        ////     Selects all the items in the ListBox class.
-        public void SelectAll()
-        {
-            if (this.SelectionMode == SelectionMode.Single)
-            {
-                throw new NotSupportedException();
-            }
-            else
-            {
-                if (!this.HasItems)
-                {
-                    return;
-                }
-
-                for (int i = 0; i < this.Items.Count; i++)
-                {
-                    SelectorItem container = this.ItemContainerGenerator.ContainerFromIndex(i) as SelectorItem;
-                    if (container != null)
-                    {
-                        container.IsSelected = true;
-                    }
-                }
-            }
-        }
-        #endregion
-
+        /// <summary>
+        /// Builds the visual tree for the <see cref="ListBox"/> control when a
+        /// new template is applied.
+        /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -513,24 +128,261 @@ namespace Windows.UI.Xaml.Controls
 #endif
         {
             base.OnApplyTemplate();
-            List<object> l = new List<object>();
-            foreach (object item in SelectedItems)
+        }
+
+        /// <summary>
+        /// Causes the object to scroll into view.
+        /// </summary>
+        /// <param name="item">
+        /// The object to scroll.
+        /// </param>
+        public void ScrollIntoView(object item)
+        {
+            if (!(ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem container) 
+                || container.INTERNAL_OuterDomElement == null)
             {
-                l.Add(item);
+                return;
             }
-            foreach (object item in l)
+
+            OpenSilver.Interop.ExecuteJavaScript("$0.scrollIntoView({ block: 'nearest'})", container.INTERNAL_OuterDomElement);
+        }
+
+        /// <summary>
+        /// Selects all the items in the <see cref="ListBox"/>.
+        /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// <see cref="SelectionMode"/> is set to <see cref="SelectionMode.Single"/>
+        /// </exception>
+        public void SelectAll()
+        {
+            if (CanSelectMultiple)
             {
-                SetItemVisualSelectionState(item, true);
+                SelectAllImpl();
+            }
+            else
+            {
+                throw new NotSupportedException("Can only call SelectAll when SelectionMode is Multiple or Extended.");
             }
         }
 
-        //// Summary:
-        ////     Causes the object to scroll into view.
-        ////
-        //// Parameters:
-        ////   item:
-        ////     The object to scroll to.
-        //public void ScrollIntoView(object item);
+        /// <summary>
+        /// Creates or identifies the element used to display a specified item.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ListBoxItem"/> corresponding to a specified item.
+        /// </returns>
+        protected override DependencyObject GetContainerForItemOverride()
+        {
+            return new ListBoxItem();
+        }
+
+        /// <summary>
+        /// Determines if the specified item is (or is eligible to be) its own item container.
+        /// </summary>
+        /// <param name="item">
+        /// The specified item.
+        /// </param>
+        /// <returns>
+        /// true if the item is its own item container; otherwise, false.
+        /// </returns>
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return item is ListBoxItem;
+        }
+
+        /// <summary>
+        /// Adjust ItemInfos when the Items property changes.
+        /// </summary>
+        internal override void AdjustItemInfoOverride(NotifyCollectionChangedEventArgs e)
+        {
+            AdjustItemInfo(e, _anchorItem);
+
+            // If the anchor item is removed, drop our reference to it.
+            if (_anchorItem != null && _anchorItem.Index < 0)
+            {
+                _anchorItem = null;
+            }
+
+            base.AdjustItemInfoOverride(e);
+        }
+
+        /// <summary>
+        /// Adjust ItemInfos when the generator finishes.
+        /// </summary>
+        internal override void AdjustItemInfosAfterGeneratorChangeOverride()
+        {
+            AdjustItemInfoAfterGeneratorChange(_anchorItem);
+            base.AdjustItemInfosAfterGeneratorChangeOverride();
+        }
+
+        internal ItemInfo AnchorItemInternal
+        {
+            get { return _anchorItem; }
+            set { _anchorItem = value?.Clone(); } // clone, so that adjustments to selection and anchor don't double-adjust
+        }
+
+        internal void NotifyListItemClicked(ListBoxItem item)
+        {
+            switch (SelectionMode)
+            {
+                case SelectionMode.Single:
+                    
+                    if (!item.IsSelected)
+                    {
+                        item.SetCurrentValue(ListBoxItem.IsSelectedProperty, true);
+                    }
+                    else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                    {
+                        item.SetCurrentValue(ListBoxItem.IsSelectedProperty, false);
+                    }
+
+                    UpdateAnchorItem(ItemInfoFromContainer(item));
+                    break;
+
+                case SelectionMode.Multiple:
+                    MakeToggleSelection(item);
+                    break;
+
+                case SelectionMode.Extended:
+                    ModifierKeys kbModifiers = Keyboard.Modifiers;
+                    if (kbModifiers.HasFlag(ModifierKeys.Control | ModifierKeys.Shift))
+                    {
+                        MakeAnchorSelection(item, false);
+                    }
+                    else if (kbModifiers.HasFlag(ModifierKeys.Control))
+                    {
+                        MakeToggleSelection(item);
+                    }
+                    else if (kbModifiers.HasFlag(ModifierKeys.Shift))
+                    {
+                        MakeAnchorSelection(item, true);
+                    }
+                    else
+                    {
+                        MakeSingleSelection(item);
+                    }
+                    break;
+            }
+        }
+
+        private void UpdateAnchorItem(ItemInfo info)
+        {
+            object item = info.Item;
+
+            if (item == DependencyProperty.UnsetValue)
+            {
+                AnchorItemInternal = null;
+            }
+            else
+            {
+                AnchorItemInternal = info;
+            }
+        }
+
+        private void MakeSingleSelection(ListBoxItem listItem)
+        {
+            if (ItemsControlFromItemContainer(listItem) == this)
+            {
+                ItemInfo info = ItemInfoFromContainer(listItem);
+
+                SelectionChange.SelectJustThisItem(info, true /* assumeInItemsCollection */);
+
+                listItem.Focus();
+
+                UpdateAnchorItem(info);
+            }
+        }
+
+        private void MakeToggleSelection(ListBoxItem item)
+        {
+            item.SetCurrentValue(SelectorItem.IsSelectedProperty, !item.IsSelected);
+
+            UpdateAnchorItem(ItemInfoFromContainer(item));
+        }
+
+        private void MakeAnchorSelection(ListBoxItem actionItem, bool clearCurrent)
+        {
+            ItemInfo anchorInfo = AnchorItemInternal;
+
+            if (anchorInfo == null)
+            {
+                if (SelectedItemsInternal.Count > 0)
+                {
+                    // If we haven't set the anchor, then just use the last selected item
+                    AnchorItemInternal = SelectedItemsInternal[SelectedItemsInternal.Count - 1];
+                }
+                else
+                {
+                    // There was nothing selected, so take the first child element
+                    AnchorItemInternal = NewItemInfo(Items[0], null, 0);
+                }
+            }
+
+            // Find the indexes of the elements
+            int start, end;
+
+            start = ItemContainerGenerator.IndexFromContainer(actionItem);
+            end = AnchorItemInternal.Index;
+
+            // Ensure start is before end
+            if (start > end)
+            {
+                int index = start;
+
+                start = end;
+                end = index;
+            }
+
+            bool beganSelectionChange = false;
+            if (!SelectionChange.IsActive)
+            {
+                beganSelectionChange = true;
+                SelectionChange.Begin();
+            }
+            try
+            {
+                if (clearCurrent)
+                {
+                    // Unselect items not within the selection range
+                    for (int index = 0; index < SelectedItemsInternal.Count; index++)
+                    {
+                        ItemInfo info = SelectedItemsInternal[index];
+                        int itemIndex = info.Index;
+
+                        if ((itemIndex < start) || (end < itemIndex))
+                        {
+                            SelectionChange.Unselect(info);
+                        }
+                    }
+                }
+
+                // Select the children in the selection range
+                IEnumerator enumerator = ((IEnumerable)Items).GetEnumerator();
+                for (int index = 0; index <= end; index++)
+                {
+                    enumerator.MoveNext();
+                    if (index >= start)
+                    {
+                        SelectionChange.Select(NewItemInfo(enumerator.Current, null, index), true /* assumeInItemsCollection */);
+                    }
+                }
+
+                IDisposable d = enumerator as IDisposable;
+                if (d != null)
+                {
+                    d.Dispose();
+                }
+            }
+            finally
+            {
+                if (beganSelectionChange)
+                {
+                    SelectionChange.End();
+                }
+            }
+        }
+
+        #region Obsoletes
 
         [Obsolete("Use SelectedItemBackground instead.")]
         public Brush SelectedItemBackgroundBrush
@@ -560,10 +412,6 @@ namespace Windows.UI.Xaml.Controls
             set { UnselectedItemForeground = value; }
         }
 
-        public void ScrollIntoView(object item)
-        {
-            var container = (ListBoxItem)ItemContainerGenerator.ContainerFromItem(item);
-            CSHTML5.Interop.ExecuteJavaScript("$0.scrollIntoView({ block: 'nearest'})", container.INTERNAL_OuterDomElement);
-        }
+        #endregion Obsoletes
     }
 }

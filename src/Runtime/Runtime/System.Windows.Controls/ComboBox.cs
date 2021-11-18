@@ -30,45 +30,28 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a selection control that combines a non-editable text box and
-    /// a drop-down list box that allows users to select an item from a list.
+    /// Represents a selection control that combines a non-editable text box and a drop-down
+    /// containing a list box that allows users to select an item from a list.
     /// </summary>
-    /// <example>
-    /// <code lang="XAML" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    /// <ComboBox x:Name="ComboBox1" DisplayMemberPath="Name" SelectedValuePath="ImagePath" VerticalAlignment="Top"/>
-    /// </code>
-    /// <code lang="C#">
-    /// ComboBox1.ItemsSource = Planet.GetListOfPlanets();
-    /// public partial class Planet
-    ///{
-    ///    public string Name { get; set; }
-    ///    public string ImagePath { get; set; }
-    ///
-    ///
-    ///    public static ObservableCollection&lt;Planet&gt; GetListOfPlanets()
-    ///    {
-    ///        return new ObservableCollection&lt;Planet&gt;()
-    ///        {
-    ///            new Planet() { Name = "Mercury", ImagePath = "ms-appx:/Planets/Mercury.png" },
-    ///            new Planet() { Name = "Venus", ImagePath = "ms-appx:/Planets/Venus.png" },
-    ///            new Planet() { Name = "Earth", ImagePath = "ms-appx:/Planets/Earth.png" },
-    ///            new Planet() { Name = "Mars", ImagePath = "ms-appx:/Planets/Mars.png" },
-    ///            new Planet() { Name = "Jupiter", ImagePath = "ms-appx:/Planets/Jupiter.png" },
-    ///            new Planet() { Name = "Saturn", ImagePath = "ms-appx:/Planets/Saturn.png" },
-    ///            new Planet() { Name = "Uranus", ImagePath = "ms-appx:/Planets/Uranus.png" },
-    ///            new Planet() { Name = "Neptune", ImagePath = "ms-appx:/Planets/Neptune.png" },
-    ///            new Planet() { Name = "Pluto", ImagePath = "ms-appx:/Planets/Pluto.png" }
-    ///        };
-    ///    }
-    ///}
-    /// </code>
-    /// </example>
-    public partial class ComboBox : Selector
+    [TemplatePart(Name = "ContentPresenter", Type = typeof(ContentPresenter))]
+    [TemplatePart(Name = "Popup", Type = typeof(Popup))]
+    [TemplatePart(Name = "ContentPresenterBorder", Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = "DropDownToggle", Type = typeof(ToggleButton))]
+    [TemplatePart(Name = "ScrollViewer", Type = typeof(ScrollViewer))]
+    [TemplateVisualState(Name = "InvalidUnfocused", GroupName = "ValidationStates")]
+    [TemplateVisualState(Name = "InvalidFocused", GroupName = "ValidationStates")]
+    [TemplateVisualState(Name = "Normal", GroupName = "CommonStates")]
+    [TemplateVisualState(Name = "MouseOver", GroupName = "CommonStates")]
+    [TemplateVisualState(Name = "Disabled", GroupName = "CommonStates")]
+    [TemplateVisualState(Name = "Unfocused", GroupName = "FocusStates")]
+    [TemplateVisualState(Name = "Focused", GroupName = "FocusStates")]
+    [TemplateVisualState(Name = "FocusedDropDown", GroupName = "FocusStates")]
+    [TemplateVisualState(Name = "Valid", GroupName = "ValidationStates")]
+    public class ComboBox : Selector
     {
         Popup _popup;
         ToggleButton _dropDownToggle;
         ContentPresenter _contentPresenter;
-        SelectorItem _selectedItemContainer;
 
         [Obsolete("ComboBox does not support Native ComboBox. Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
@@ -85,44 +68,6 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(ComboBox);
         }
 
-        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
-        {
-            base.PrepareContainerForItemOverride(element, item);
-            ComboBoxItem container = element as ComboBoxItem;
-            if (container != null)
-            {
-                container.INTERNAL_CorrespondingItem = item;
-                container.INTERNAL_ParentSelectorControl = this;
-                container.Click += ComboBoxItem_Click;
-            }
-
-            int index = base.ItemContainerGenerator.IndexFromContainer(element);
-            if(index != -1)
-            {
-                if(this.SelectedItem == item)
-                {
-                    container.IsSelected = true;
-                }
-                else
-                {
-                    container.IsSelected = false;
-                }
-            }
-        }
-
-        protected override void ClearContainerForItemOverride(DependencyObject element, object item)
-        {
-            base.ClearContainerForItemOverride(element, item);
-
-            ComboBoxItem container = element as ComboBoxItem;
-            if (container != null)
-            {
-                container.INTERNAL_ParentSelectorControl = null;
-                container.INTERNAL_CorrespondingItem = null;
-                container.Click -= ComboBoxItem_Click;
-            }
-        }
-
         protected override DependencyObject GetContainerForItemOverride()
         {
             return new ComboBoxItem();
@@ -133,50 +78,17 @@ namespace Windows.UI.Xaml.Controls
             return (item is ComboBoxItem);
         }
 
+        [Obsolete]
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return (SelectorItem)this.GetContainerFromItem(item);
         }
 
+        [Obsolete]
         protected override DependencyObject GetContainerFromItem(object item)
         {
             ComboBoxItem comboBoxItem = item as ComboBoxItem ?? new ComboBoxItem();
-            comboBoxItem.INTERNAL_CorrespondingItem = item;
-            comboBoxItem.INTERNAL_ParentSelectorControl = this;
-            comboBoxItem.Click += ComboBoxItem_Click;
             return comboBoxItem;
-        }
-
-        void ComboBoxItem_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedContainer = (SelectorItem)sender;
-
-            if (selectedContainer != _selectedItemContainer)
-            {
-                if (_selectedItemContainer != null)
-                    _selectedItemContainer.IsSelected = false;
-
-                selectedContainer.IsSelected = true;
-                _selectedItemContainer = selectedContainer;
-            }
-
-            // Select the item:
-            this.SelectedItem = selectedContainer.INTERNAL_CorrespondingItem;
-
-            // Close the popup (note: this has other effects as well: see the "IsDropDownOpen_Changed" method):
-            if (_dropDownToggle != null)
-                _dropDownToggle.IsChecked = false;
-        }
-
-        protected override void ApplySelectedIndex(int index)
-        {
-            base.ApplySelectedIndex(index);
-
-            // Put the selected item into the ContentPresenter if the popup is closed
-            if (!this.IsDropDownOpen)
-            {
-                this.UpdateContentPresenter();
-            }
         }
 
         private void UpdateContentPresenter()
@@ -225,19 +137,6 @@ namespace Windows.UI.Xaml.Controls
             this.SelectionBoxItemTemplate = template;
         }
 
-        protected override void OnSelectedItemChanged(object selectedItem)
-        {
-            var container = base.ItemContainerGenerator.ContainerFromItem(selectedItem) as ComboBoxItem;
-            if (container != null && container != this._selectedItemContainer)
-            {
-                if (this._selectedItemContainer != null)
-                    this._selectedItemContainer.IsSelected = false;
-
-                container.IsSelected = true;
-                this._selectedItemContainer = container;
-            }
-        }
-
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -268,7 +167,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 _popup.StayOpen = false;
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
-                _popup.Opened += OnPopupOpened;
             }
 
             if (!IsDropDownOpen)
@@ -277,16 +175,28 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private void OnPopupOpened(object sender, EventArgs e)
+        /// <inheritdoc />
+        protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
-            if(SelectedItem != null && _selectedItemContainer == null)
+            base.OnSelectionChanged(e);
+
+            if (!IsDropDownOpen)
             {
-                _selectedItemContainer = base.ItemContainerGenerator.ContainerFromItem(SelectedItem) as SelectorItem;
-                if(_selectedItemContainer != null)
-                {
-                    _selectedItemContainer.IsSelected = true;
-                    _selectedItemContainer.UpdateVisualStates();
-                }
+                UpdateContentPresenter();
+            }
+        }
+
+        internal void NotifyComboBoxItemMouseUp(ComboBoxItem comboBoxItem)
+        {
+            object item = ItemContainerGenerator.ItemFromContainer(comboBoxItem);
+            if (item != null && item != DependencyProperty.UnsetValue)
+            {
+                SelectionChange.SelectJustThisItem(NewItemInfo(item, comboBoxItem), true /* assumeInItemsCollection */);
+            }
+
+            if (IsDropDownOpen)
+            {
+                IsDropDownOpen = false;
             }
         }
 

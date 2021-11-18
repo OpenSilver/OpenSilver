@@ -48,6 +48,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         protected MultiSelector() //todo: see if it should be internal
         {
+            // Note: we don't use SelectedItemsImpl because the DataGrid does not behave
+            // as an ItemsControl is expected to.
             SelectedItems = new ObservableCollection<object>();
             ((ObservableCollection<object>)SelectedItems).CollectionChanged += SelectedItems_CollectionChanged;
         }
