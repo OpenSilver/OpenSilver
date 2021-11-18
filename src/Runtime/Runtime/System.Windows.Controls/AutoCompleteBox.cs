@@ -386,13 +386,16 @@ namespace Windows.UI.Xaml.Controls
         {
             AutoCompleteBox autoCompleteBox = (AutoCompleteBox)d;
 
-            autoCompleteBox.OnTextChanged(new RoutedEventArgs());            
+            autoCompleteBox.OnTextChanged(new RoutedEventArgs());
         }
 
         protected virtual void OnTextChanged(RoutedEventArgs e)
         {
-            if (TextChanged != null)
-                TextChanged(this, e);
+            if (!_updatingTextOnSelection)
+            {
+                if (TextChanged != null)
+                    TextChanged(this, e);
+            }
         }
 
         /// <summary>
@@ -716,6 +719,17 @@ namespace Windows.UI.Xaml.Controls
         void ComboBoxItem_Click(object sender, RoutedEventArgs e)
         {
             var selectedContainer = (SelectorItem)sender;
+
+            // Updates the text but without triggering the text change event
+            _updatingTextOnSelection = true;
+            try
+            {
+                this.Text = selectedContainer.ToString();
+            }
+            finally
+            {
+                _updatingTextOnSelection = false;
+            }
 
             // Select the item:
             this.SelectedItem = selectedContainer.INTERNAL_CorrespondingItem;
