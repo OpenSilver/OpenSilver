@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media.Imaging
             {
                 if (!_isStreamAsBase64StringValid)
                 {
-                    byte[] bytes = new byte[INTERNAL_StreamSource.Length + 10];//note: if s.Length is longer than int.MaxValue, that's a problem... But that means they have a stream of more than 2 Go...
+                    byte[] bytes = new byte[INTERNAL_StreamSource.Length];//note: if s.Length is longer than int.MaxValue, that's a problem... But that means they have a stream of more than 2 Go...
                     if (INTERNAL_StreamSource.Length > int.MaxValue)
                     {
                         throw new InvalidOperationException("The Stream set as the BitmapSource's Source is too big (more than int.MaxValue (2,147,483,647) bytes).");
@@ -86,7 +86,13 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// <param name="streamSource">The stream source that sets the image source value.</param>
         public void SetSource(Stream streamSource) //note: this is supposed to be a IRandomAccessStream
         {
-            INTERNAL_StreamSource = streamSource;
+            // Copying the original stream because it could be disposed by the user before it is consumed
+            // by the target image
+            MemoryStream streamCopy = new MemoryStream();
+            streamSource.CopyTo(streamCopy);
+            streamCopy.Seek(0, SeekOrigin.Begin);
+
+            INTERNAL_StreamSource = streamCopy;
             _isStreamAsBase64StringValid = false; //in case we set the source after having already set it and used it.
         }
 
