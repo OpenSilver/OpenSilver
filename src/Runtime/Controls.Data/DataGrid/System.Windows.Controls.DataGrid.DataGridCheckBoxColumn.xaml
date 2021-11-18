@@ -1,0 +1,183 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<Style xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+       TargetType="CheckBox">
+    <!-- Cannot currently parse bool? type in XAML so it's being set in code -->
+    <!-- <Setter Property="IsEnabled" Value="false" /> -->
+    <Setter Property="IsEnabled" Value="true" />
+    <Setter Property="IsTabStop" Value="false" />
+    <Setter Property="Background" Value="#FF003255" />
+    <Setter Property="Foreground" Value="#FF313131" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Arrow" />
+    <!-- Cannot currently parse FontFamily type in XAML so it's being set in code -->
+    <!-- <Setter Property="FontFamily" Value="Trebuchet MS" /> -->
+    <Setter Property="FontSize" Value="11" />
+    <!-- Cannot currently parse FontWeight type in XAML so it's being set in code -->
+    <!-- <Setter Property="FontWeight" Value="Bold" /> -->
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="CheckBox">
+                <Grid Cursor="Arrow">
+                    <Grid.Resources>
+                        <!-- Visual constants used by the template -->
+                        <SolidColorBrush x:Key="Background" Color="#FF003255" />
+                        <SolidColorBrush x:Key="DisabledBrush" Color="#A5FFFFFF" />
+                        <LinearGradientBrush x:Key="BoxStrokeBrush" StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="#FF000000" Offset="0" />
+                            <GradientStop Color="#FF000000" Offset="1" />
+                            <GradientStop Color="#FF000000" Offset="0.325" />
+                            <GradientStop Color="#FF000000" Offset="0.325" />
+                        </LinearGradientBrush>
+                        <LinearGradientBrush x:Key="FocusedStrokeBrush" StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="#B2FFFFFF" Offset="0" />
+                            <GradientStop Color="#51FFFFFF" Offset="1" />
+                            <GradientStop Color="#66FFFFFF" Offset="0.325" />
+                            <GradientStop Color="#1EFFFFFF" Offset="0.325" />
+                        </LinearGradientBrush>
+                        <Color x:Key="BorderColor">#FF000000</Color>
+                        <Color x:Key="IconColor">#FF313131</Color>
+                        <Color x:Key="PressedIconColor">#FF000000</Color>
+                        <Color x:Key="MiddleBoxStrokeBrush">#FFADADAD</Color>
+                        <Color x:Key="MiddleBoxStrokeBrushOver">#FF656565</Color>
+                        <Color x:Key="LinearBevelLightStartColor">#FFFFFFFF</Color>
+                        <Color x:Key="LinearBevelLightEndColor">#FFFFFFFF</Color>
+                        <Color x:Key="LinearBevelDarkStartColor">#FFFFFFFF</Color>
+                        <Color x:Key="LinearBevelDarkEndColor">#FFFFFFFF</Color>
+                        <Color x:Key="LinearBevelLightStartColor2">#FCFFFFFF</Color>
+                        <Color x:Key="LinearBevelLightEndColor2">#F4FFFFFF</Color>
+                        <Color x:Key="LinearBevelDarkStartColor2">#E0FFFFFF</Color>
+                        <Color x:Key="LinearBevelDarkEndColor2">#19FFFFFF</Color>
+                        <Color x:Key="LinearBevelLightEndColor3">#FCFFFFFF</Color>
+                        <Color x:Key="LinearBevelDarkStartColor3">#FCFFFFFF</Color>
+                        <Color x:Key="LinearBevelDarkEndColor3">#FCFFFFFF</Color>
+                        <Color x:Key="LinearBevelIndeterminateStartColor2">#BFFFFFFF</Color>
+                        <Color x:Key="LinearBevelIndeterminateEndColor2">#E0FFFFFF</Color>
+                        <Color x:Key="FocusColor">#FF333333</Color>
+                    </Grid.Resources>
+                    <vsm:VisualStateManager.VisualStateGroups>
+                        <vsm:VisualStateGroup x:Name="CommonStates">
+                            <vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualTransition GeneratedDuration="0" />
+                                <vsm:VisualTransition To="MouseOver" GeneratedDuration="0:0:0.1" />
+                                <vsm:VisualTransition To="Pressed" GeneratedDuration="0:0:0.1" />
+                            </vsm:VisualStateGroup.Transitions>
+                            <vsm:VisualState x:Name="Normal" />
+                            <vsm:VisualState x:Name="MouseOver">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="Box" Storyboard.TargetProperty="Opacity" To=".65" Duration="0" />
+                                    <ColorAnimation Storyboard.TargetName="BoxMiddleStroke" Storyboard.TargetProperty="Color" To="{StaticResource MiddleBoxStrokeBrushOver}" Duration="0" />
+                                </Storyboard>
+                            </vsm:VisualState>
+                            <vsm:VisualState x:Name="Pressed">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="Box" Storyboard.TargetProperty="Opacity" To=".35" Duration="0" />
+                                    <ColorAnimation Storyboard.TargetName="BoxMiddleStroke" Storyboard.TargetProperty="Color" To="{StaticResource MiddleBoxStrokeBrushOver}" Duration="0" />
+                                </Storyboard>
+                            </vsm:VisualState>
+                            <vsm:VisualState x:Name="Disabled">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="DisabledBox" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                </Storyboard>
+                            </vsm:VisualState>
+                        </vsm:VisualStateGroup>
+                        <vsm:VisualStateGroup x:Name="CheckStates">
+                            <vsm:VisualStateGroup.Transitions>
+                                <vsm:VisualTransition GeneratedDuration="0" />
+                                <vsm:VisualTransition To="Indeterminate" GeneratedDuration="0:0:0.1" />
+                            </vsm:VisualStateGroup.Transitions>
+                            <vsm:VisualState x:Name="Checked">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="CheckIcon" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                </Storyboard>
+                            </vsm:VisualState>
+                            <vsm:VisualState x:Name="Unchecked" />
+                            <vsm:VisualState x:Name="Indeterminate">
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="BoxMiddleBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                    <ColorAnimation Storyboard.TargetName="LinearBevelLightStart2" Storyboard.TargetProperty="Color" To="{StaticResource LinearBevelIndeterminateStartColor2}" Duration="0" />
+                                    <ColorAnimation Storyboard.TargetName="LinearBevelLightEnd2" Storyboard.TargetProperty="Color" To="{StaticResource LinearBevelIndeterminateEndColor2}" Duration="0" />
+                                </Storyboard>
+                            </vsm:VisualState>
+                        </vsm:VisualStateGroup>
+                    </vsm:VisualStateManager.VisualStateGroups>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- CheckBox visual -->
+                    <Rectangle x:Name="BoxBackground" Width="13" Height="13" RadiusX="1" RadiusY="1" StrokeThickness="1" Stroke="{StaticResource BoxStrokeBrush}" Fill="{TemplateBinding Background}" VerticalAlignment="Center" />
+                    <Rectangle x:Name="Box" Width="12" Height="12" RadiusX="1" RadiusY="1" StrokeThickness="0" VerticalAlignment="Center" Opacity="1">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0.7,0" EndPoint="0.7,1">
+                                <GradientStop x:Name="LinearBevelLightStart" Color="{StaticResource LinearBevelLightStartColor}" Offset="0" />
+                                <GradientStop x:Name="LinearBevelLightEnd" Color="{StaticResource LinearBevelLightEndColor}" Offset="0.35" />
+                                <GradientStop x:Name="LinearBevelDarkStart" Color="{StaticResource LinearBevelDarkStartColor}" Offset="0.35" />
+                                <GradientStop x:Name="LinearBevelDarkEnd" Color="{StaticResource LinearBevelDarkEndColor}" Offset="1" />
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <Rectangle x:Name="BoxMiddleBackground" Width="9" Height="9" RadiusX="1" RadiusY="1" StrokeThickness=".5" Fill="{TemplateBinding Background}" VerticalAlignment="Center" Opacity=".20" />
+                    <Rectangle x:Name="BoxMiddle" Width="9" Height="9" RadiusX=".75" RadiusY=".75" StrokeThickness=".5" VerticalAlignment="Center">
+                        <Rectangle.Stroke>
+                            <SolidColorBrush x:Name="BoxMiddleStroke"  Color="{StaticResource MiddleBoxStrokeBrush}" />
+                        </Rectangle.Stroke>
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0.7,0" EndPoint="0.7,1">
+                                <GradientStop x:Name="LinearBevelLightStart2" Color="{StaticResource LinearBevelLightStartColor2}" Offset="0" />
+                                <GradientStop x:Name="LinearBevelLightEnd2" Color="{StaticResource LinearBevelLightEndColor2}" Offset="0.35" />
+                                <GradientStop x:Name="LinearBevelDarkStart2" Color="{StaticResource LinearBevelDarkStartColor2}" Offset="0.35" />
+                                <GradientStop x:Name="LinearBevelDarkEnd2" Color="{StaticResource LinearBevelDarkEndColor2}" Offset="1" />
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <!-- Check visual -->
+                    <Path x:Name="CheckIcon" Width="10" Height="10.25" StrokeThickness="0" Margin="1,0,0,1" Stretch="Fill" Opacity="0" Data="M102.25328,600.04001 L104.24903,598.36361 106.83701,601.34354 C106.83701,601.34354 107.69255,599.2869 108.115,597.98927 109.23287,594.55556 109.34883,594.62845 110.1473,593.3508 111.28679,591.5275 114.50233,591.36146 114.50233,591.36146 114.50233,591.36146 112.68588,593.07898 112.02753,594.15635 111.14921,595.59371 109.68054,598.69111 109.39256,599.26693 108.99332,600.06522 107.15683,604.13837 107.15683,604.13837 Z">
+                        <Path.Fill>
+                            <SolidColorBrush x:Name="IconColor" Color="{StaticResource IconColor}" />
+                        </Path.Fill>
+                    </Path>
+                    <!-- Focus indicator -->
+                    <Rectangle Grid.Column="1" x:Name="ContentFocusVisual" StrokeDashCap="Round" Margin="2" StrokeDashArray=".2 2" Visibility="Collapsed" IsHitTestVisible="false">
+                        <Rectangle.Stroke>
+                            <SolidColorBrush Color="{StaticResource FocusColor}" />
+                        </Rectangle.Stroke>
+                    </Rectangle>
+                    <!-- CheckBox content -->
+                    <ContentPresenter
+                          x:Name="Content"
+                          Grid.Column="1"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Margin="6,5.5,4,4"
+                          IsHitTestVisible="true" />
+                  <!--Properties to implement later-->
+                    <!--<ContentPresenter
+                          x:Name="Content"
+                          Grid.Column="1"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Background="Transparent"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          Padding="{TemplateBinding Padding}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                          Margin="6,5.5,4,4"
+                          IsHitTestVisible="true" />-->
+                    <!-- Disabled -->
+                    <Rectangle x:Name="DisabledBox" Width="13" Height="13" RadiusX="1" RadiusY="1" StrokeThickness=".75" Stroke="{StaticResource DisabledBrush}" Fill="{StaticResource DisabledBrush}" VerticalAlignment="Center" Opacity="0" />
+                </Grid>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>

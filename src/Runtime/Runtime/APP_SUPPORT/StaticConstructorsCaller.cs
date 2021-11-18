@@ -48,7 +48,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "ImageSource", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml.Media", "System.Windows.Media", "Matrix", coreAssembly);
             LoadTypeConstructor("Windows.UI.Xaml", "System.Windows", "PropertyPath", coreAssembly);
+#if CSHTML5
             LoadTypeConstructor("Windows.UI.Xaml.Controls", "System.Windows.Controls", "DataGridLength", coreAssembly);
+#endif
             LoadTypeConstructor("System.Windows.Input", null, "Cursor", coreAssembly);
         }
 

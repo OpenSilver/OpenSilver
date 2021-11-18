@@ -3,7 +3,6 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -19,15 +18,15 @@ namespace Windows.UI.Xaml.Controls
     /// <QualityBand>Mature</QualityBand>
     public class DataGridLengthConverter : TypeConverter
     {
-#region Data
+        #region Data
 
         private static string _starSuffix = "*";
-        private static string[] _valueInvariantUnitStrings = { "auto", /*"sizetocells", "sizetoheader"*/ };
-        private static DataGridLength[] _valueInvariantDataGridLengths = { DataGridLength.Auto, /*DataGridLength.SizeToCells, DataGridLength.SizeToHeader*/ };
+        private static string[] _valueInvariantUnitStrings = { "auto", "sizetocells", "sizetoheader" };
+        private static DataGridLength[] _valueInvariantDataGridLengths = { DataGridLength.Auto, DataGridLength.SizeToCells, DataGridLength.SizeToHeader };
+        
+        #endregion Data
 
-#endregion Data
-
-#region Methods
+        #region Methods
 
         /// <summary>
         /// Checks whether or not this class can convert from a given type.
@@ -99,7 +98,7 @@ namespace Windows.UI.Xaml.Controls
             // GridLengthConverter in WPF throws a NotSupportedException on a null value as well.
             if (value == null)
             {
-                throw new NotSupportedException(string.Format("DataGridLengthConverter cannot convert from {0}.", nameof(value)));
+                throw DataGridError.DataGridLengthConverter.CannotConvertFrom("(null)");
             }
 
             string stringValue = value as string;
@@ -179,12 +178,12 @@ namespace Windows.UI.Xaml.Controls
             }
             if (destinationType != typeof(string))
             {
-                throw new NotSupportedException(string.Format("Cannot convert from DataGridLength to {0}.", destinationType.ToString()));
+                throw DataGridError.DataGridLengthConverter.CannotConvertTo(destinationType.ToString());
             }
             DataGridLength? dataGridLength = value as DataGridLength?;
             if (!dataGridLength.HasValue)
             {
-                throw new NotSupportedException("Invalid DataGridLength.");
+                throw DataGridError.DataGridLengthConverter.InvalidDataGridLength("value");
             }
             else
             {
@@ -195,17 +194,17 @@ namespace Windows.UI.Xaml.Controls
                     case DataGridLengthUnitType.Auto:
                         return "Auto";
 
-                    //case DataGridLengthUnitType.SizeToHeader:
-                    //    return "SizeToHeader";
+                    case DataGridLengthUnitType.SizeToHeader:
+                        return "SizeToHeader";
 
-                    //case DataGridLengthUnitType.SizeToCells:
-                    //    return "SizeToCells";
+                    case DataGridLengthUnitType.SizeToCells:
+                        return "SizeToCells";
 
                     //  Star has one special case when value is "1.0".
                     //  in this case drop value part and print only "Star"
                     case DataGridLengthUnitType.Star:
                         return (
-                            AreClose(1.0, dataGridLength.Value.Value)
+                            DoubleUtil.AreClose(1.0, dataGridLength.Value.Value)
                             ? DataGridLengthConverter._starSuffix
                             : Convert.ToString(dataGridLength.Value.Value, culture ?? CultureInfo.CurrentCulture) + DataGridLengthConverter._starSuffix);
 
@@ -216,34 +215,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        /// <summary>
-        /// AreClose - Returns whether or not two doubles are "close".  That is, whether or 
-        /// not they are within epsilon of each other.  Note that this epsilon is proportional
-        /// to the numbers themselves to that AreClose survives scalar multiplication.
-        /// There are plenty of ways for this to return false even for numbers which
-        /// are theoretically identical, so no code calling this should fail to work if this 
-        /// returns false.  This is important enough to repeat:
-        /// NB: NO CODE CALLING THIS FUNCTION SHOULD DEPEND ON ACCURATE RESULTS - this should be
-        /// used for optimizations *only*.
-        /// </summary>
-        /// <returns>
-        /// bool - the result of the AreClose comparison.
-        /// </returns>
-        /// <param name="value1"> The first double to compare. </param>
-        /// <param name="value2"> The second double to compare. </param>
-        private static bool AreClose(double value1, double value2)
-        {
-            const double DBL_EPSILON = 1e-6;
-
-            //in case they are Infinities (then epsilon check does not work)
-            if (value1 == value2)
-                return true;
-            // This computes (|value1-value2| / (|value1| + |value2| + 10.0)) < DBL_EPSILON
-            double eps = (Math.Abs(value1) + Math.Abs(value2) + 10.0) * DBL_EPSILON;
-            double delta = value1 - value2;
-            return (-eps < delta) && (eps > delta);
-        }
-
-#endregion Methods
+        #endregion Methods
     }
 }

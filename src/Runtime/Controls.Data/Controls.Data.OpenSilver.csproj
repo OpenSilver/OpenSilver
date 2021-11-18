@@ -1,0 +1,152 @@
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>OpenSilver.Controls.Data</AssemblyName>
+    <RootNamespace>System.Windows.Controls</RootNamespace>
+    <Configurations>SL;UWP</Configurations>
+    <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
+    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+    <OpenSilverVersion>1.0.0</OpenSilverVersion>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION;WORKINPROGRESS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION;WORKINPROGRESS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="DataGrid\Automation\DataGridAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridCellAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridColumnHeaderAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridColumnHeadersPresenterAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridDetailsPresenterAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridGroupItemAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridItemAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridRowAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridRowGroupHeaderAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridRowHeaderAutomationPeer.cs" />
+    <Compile Include="DataGrid\Automation\DataGridRowsPresenterAutomationPeer.cs" />
+    <Compile Include="DataGrid\DataGrid.xaml.cs" />
+    <Compile Include="DataGrid\DataGridAutoGeneratingColumnEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridBeginningEditEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridBoundColumn.cs" />
+    <Compile Include="DataGrid\DataGridCell.cs" />
+    <Compile Include="DataGrid\DataGridCellCollection.cs" />
+    <Compile Include="DataGrid\DataGridCellCoordinates.cs" />
+    <Compile Include="DataGrid\DataGridCellEditEndedEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridCellEditEndingEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridCellEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridCellsPresenter.cs" />
+    <Compile Include="DataGrid\DataGridCheckBoxColumn.cs" />
+    <Compile Include="DataGrid\DataGridClipboardCellContent.cs" />
+    <Compile Include="DataGrid\DataGridColumn.cs" />
+    <Compile Include="DataGrid\DataGridColumnCollection.cs" />
+    <Compile Include="DataGrid\DataGridColumnEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridColumnHeader.xaml.cs" />
+    <Compile Include="DataGrid\DataGridColumnHeadersPresenter.cs" />
+    <Compile Include="DataGrid\DataGridColumnReorderingEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridColumns.cs" />
+    <Compile Include="DataGrid\DataGridDataConnection.cs" />
+    <Compile Include="DataGrid\DataGridDetailsPresenter.cs" />
+    <Compile Include="DataGrid\DataGridDisplayData.cs" />
+    <Compile Include="DataGrid\DataGridEnumerations.cs" />
+    <Compile Include="DataGrid\DataGridError.cs" />
+    <Compile Include="DataGrid\DataGridFillerColumn.cs" />
+    <Compile Include="DataGrid\DataGridFrozenGrid.cs" />
+    <Compile Include="DataGrid\DataGridLength.cs" />
+    <Compile Include="DataGrid\DataGridLengthConverter.cs" />
+    <Compile Include="DataGrid\DataGridPreparingCellForEditEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridRow.xaml.cs" />
+    <Compile Include="DataGrid\DataGridRowClipboardEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridRowDetailsEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridRowEditEndedEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridRowEditEndingEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridRowEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridRowGroupHeader.cs" />
+    <Compile Include="DataGrid\DataGridRowGroupHeaderEventArgs.cs" />
+    <Compile Include="DataGrid\DataGridRowGroupInfo.cs" />
+    <Compile Include="DataGrid\DataGridRowHeader.xaml.cs" />
+    <Compile Include="DataGrid\DataGridRows.cs" />
+    <Compile Include="DataGrid\DataGridRowsPresenter.cs" />
+    <Compile Include="DataGrid\DataGridSelectedItemsCollection.cs" />
+    <Compile Include="DataGrid\DataGridTemplateColumn.cs" />
+    <Compile Include="DataGrid\DataGridTextColumn.cs" />
+    <Compile Include="DataGrid\DataGridValueConverter.cs" />
+    <Compile Include="DataGrid\IndexToValueTable.cs" />
+    <Compile Include="DataGrid\KeyboardHelper.cs" />
+    <Compile Include="DataGrid\Range.cs" />
+    <Compile Include="DataGrid\ResourceHelper.cs" />
+    <Compile Include="DataGrid\TestHooks\DataGridCellInternalTestHook.cs" />
+    <Compile Include="DataGrid\TestHooks\DataGridColumnHeaderInternalTestHook.cs" />
+    <Compile Include="DataGrid\TestHooks\DataGridInternalTestHook.cs" />
+    <Compile Include="DataGrid\TestHooks\DataGridRowInternalTestHook.cs" />
+    <Compile Include="DataGrid\TypeHelper.cs" />
+    <Compile Include="DataPager\DataPager.cs" />
+    <Compile Include="DataPager\DataPagerAutomationPeer.cs" />
+    <Compile Include="DataPager\PagerDisplayMode.cs" />
+    <Compile Include="DataPager\PagerResources.Designer.cs" />
+    <Compile Include="DoubleUtil.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="InvalidEnumArgumentException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource.Designer.cs" />
+    <Compile Include="ValidationUtil.cs" />
+    <Compile Include="VisualStates.cs" />
+    <Compile Include="WeakEventListener.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="CustomDictionary.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DataPager\PagerResources.resx" />
+    <EmbeddedResource Include="Resource.resx" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Include="themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="DataGrid\System.Windows.Controls.DataGrid.DataGridCheckBoxColumn.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+        <Content Include="DataGrid\System.Windows.Controls.DataGrid.DataGridColumnDropLocationIndicator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+  
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
+  <Import Project="..\..\packages\OpenSilver.WorkInProgress.$(OpenSilverVersion)\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
+  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
+
+  
+</Project>
