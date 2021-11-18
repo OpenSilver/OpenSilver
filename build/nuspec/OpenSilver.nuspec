@@ -35,7 +35,9 @@
     <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" />
     <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.dll" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.dll" />
     <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.pdb" />
-
+    <file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.dll" />
+	<file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.pdb" />
+    
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" />
     <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
