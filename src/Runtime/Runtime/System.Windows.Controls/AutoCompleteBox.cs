@@ -94,6 +94,9 @@ namespace Windows.UI.Xaml.Controls
 
         private void UpdateItemsVisibilityOnTextChanged()
         {
+            // Opening DropDown will instantiate and assign ItemsHost
+            this.IsDropDownOpen = true;
+
             if (this.ItemsHost != null)
             {
                 for (int i = 0; i < this.ItemsHost.Children.Count; ++i)
@@ -112,8 +115,6 @@ namespace Windows.UI.Xaml.Controls
                         }
                     }
                 }
-
-                this.IsDropDownOpen = true;
             }
         }
 
