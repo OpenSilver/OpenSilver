@@ -21,7 +21,8 @@
             <Folder Name="Pages" TargetFolderName="Pages">
                 <ProjectItem ReplaceParameters="true" TargetFileName="Index.cs">Index.cs</ProjectItem>
             </Folder>
-            <ProjectItem ReplaceParameters="true" TargetFileName="App.cs">App.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="App.razor">App.razor</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="App.razor.cs">App.razor.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
         </Project>
     </TemplateContent>
