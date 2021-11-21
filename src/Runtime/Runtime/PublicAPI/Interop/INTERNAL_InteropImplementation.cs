@@ -87,6 +87,9 @@ namespace CSHTML5
             }
 
             string unmodifiedJavascript = javascript;
+            // Replace '{' and '}' characters for String.Format.
+            javascript = javascript.Replace("{", "{{").Replace("}", "}}");
+            object[] args = new object[variables.Length];
 
             // If the javascript code has references to previously obtained JavaScript objects,
             // we replace those references with calls to the "document.jsObjRef"
@@ -98,6 +101,7 @@ namespace CSHTML5
             for (int i = variables.Length - 1; i >= 0; i--)  
             {
                 var variable = variables[i];
+                javascript = javascript.Replace("$" + i.ToString(), "{" + i + "}");
                 if (variable is INTERNAL_JSObjectReference)
                 {
                     //----------------------
@@ -116,7 +120,7 @@ namespace CSHTML5
                         jsCodeForAccessingTheObject = $@"document.jsObjRef[""{jsObjectReference.ReferenceId}""]";
                     }
 
-                    javascript = javascript.Replace("$" + i.ToString(), jsCodeForAccessingTheObject);
+                    args[i] = jsCodeForAccessingTheObject;
                 }
                 else if (variable is INTERNAL_HtmlDomElementReference)
                 {
@@ -125,7 +129,7 @@ namespace CSHTML5
                     //------------------------
 
                     string id = ((INTERNAL_HtmlDomElementReference)variable).UniqueIdentifier;
-                    javascript = javascript.Replace("$" + i.ToString(), $@"document.getElementByIdSafe(""{id}"")");
+                    args[i] = $@"document.getElementByIdSafe(""{id}"")";
                 }
                 else if (variable is INTERNAL_SimulatorJSExpression)
                 {
@@ -134,7 +138,7 @@ namespace CSHTML5
                     //------------------------
 
                     string expression = ((INTERNAL_SimulatorJSExpression)variable).Expression;
-                    javascript = javascript.Replace("$" + i.ToString(), expression);
+                    args[i] = expression;
                 }
                 else if (variable is Delegate)
                 {
@@ -151,7 +155,7 @@ namespace CSHTML5
                     var isVoid = callback.Method.ReturnType == typeof(void);
 
                     // Change the JS code to point to that callback:
-                    javascript = javascript.Replace("$" + i.ToString(), string.Format(
+                    args[i] = string.Format(
                                        @"(function() {{ return document.eventCallback({0}, {1}, {2});}})", callbackId,
 #if OPENSILVER
                                        Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)",
@@ -159,7 +163,7 @@ namespace CSHTML5
                                        "Array.prototype.slice.call(arguments)",
 #endif
                                        (!isVoid).ToString().ToLower()
-                                       ));
+                                       );
 
                     // Note: generating the random number in JS rather than C# is important in order
                     // to be able to put this code inside a JavaScript "for" statement (cf.
@@ -179,7 +183,7 @@ namespace CSHTML5
                     // Null
                     //--------------------
 
-                    javascript = javascript.Replace("$" + i.ToString(), "null");
+                    args[i] = "null";
                 }
                 else
                 {
@@ -190,9 +194,11 @@ namespace CSHTML5
                     // as the class "Uri")
                     //--------------------
 
-                    javascript = javascript.Replace("$" + i.ToString(), INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(variable));
+                    args[i] = INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(variable);
                 }
             }
+
+            javascript = String.Format(javascript, args);
 
             UnmodifiedJavascriptCalls.Add(unmodifiedJavascript);
 
