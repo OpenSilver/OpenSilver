@@ -568,6 +568,7 @@ namespace Windows.UI.Xaml
             d.SetValue(IsVisibleProperty, newValue != Visibility.Collapsed);
 
             uiElement.InvalidateParentMeasure();
+            uiElement.InvalidateParentArrange();
         }
 
         internal static void INTERNAL_ApplyVisibility(UIElement uiElement, Visibility newValue)
@@ -1347,7 +1348,7 @@ document.ondblclick = null;
             if (this.INTERNAL_OuterDomElement == null)
             {
                 LayoutManager.Current.RemoveArrange(this);
-                PreviousFinalRect = finalRect;
+                PreviousFinalRect = Rect.Empty;
                 IsArrangeValid = true;
                 return;
             }
@@ -1365,8 +1366,12 @@ document.ondblclick = null;
 
                 LayoutManager.Current.RemoveArrange(this);
 
-                if (Visibility != Visibility.Visible ||
-                    (previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size)))
+                if (Visibility != Visibility.Visible) {
+                    PreviousFinalRect = Rect.Empty;
+                    return;
+                }
+
+                if (previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size))
                     return;
 
                 if (!IsMeasureValid)
@@ -1456,6 +1461,7 @@ document.ondblclick = null;
                 if (Visibility == Visibility.Collapsed)
                 {
                     DesiredSize = new Size();
+                    previousDesiredSize = Size.Empty;
                 }
                 else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
                 {

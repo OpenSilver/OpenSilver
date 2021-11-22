@@ -197,7 +197,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Attach children to panel
-            if (this.ItemsHost as VirtualizingStackPanel != null && this.ItemsHost.IsUnderCustomLayout)
+            if (this.ItemsHost as VirtualizingPanel != null && this.ItemsHost.IsUnderCustomLayout)
             {
                 VirtualizingStackPanel.SetIsVirtualizing(this.ItemsHost, true);
             }
