@@ -117,7 +117,7 @@ namespace Windows.UI.Xaml
         {
             this.CheckReentrancy();
             this._collection.Add(item);
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, this.Count));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, this.Count - 1));
         }
 
         /// <summary>
