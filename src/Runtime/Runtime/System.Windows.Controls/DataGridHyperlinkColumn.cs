@@ -71,7 +71,7 @@ namespace Windows.UI.Xaml.Controls
             //we should probably simply make a TextBox
             TextBox textBox = new TextBox();
             textBox.DataContext = childData;
-            Binding b = Binding as Binding;
+            Binding b = GetBinding();
             if (b != null)
             {
                 if (b.Mode == BindingMode.OneWay)
@@ -97,7 +97,7 @@ namespace Windows.UI.Xaml.Controls
             HyperlinkButton hyperlink = new HyperlinkButton();
             hyperlink.DataContext = childData;
             Binding contentBinding = ContentBinding as Binding;
-            Binding b = Binding as Binding;
+            Binding b = GetBinding();
             if (b != null)
             {
                 if (b.Mode == BindingMode.OneWay)

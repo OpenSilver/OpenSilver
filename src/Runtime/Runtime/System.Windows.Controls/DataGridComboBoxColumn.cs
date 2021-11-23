@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Controls
     {
         internal override FrameworkElement GenerateEditingElement(object childData)
         {
-            Binding b = Binding as Binding;
+            Binding b = GetBinding();
             if (b.Mode == BindingMode.OneWay)
             {
                 if (!b.INTERNAL_WasModeSetByUserRatherThanDefaultValue())
@@ -89,7 +89,7 @@ namespace Windows.UI.Xaml.Controls
         {
             TextBlock textBlock = new TextBlock();
             //textBlock.DataContext = childData;
-            Binding b = Binding as Binding;
+            Binding b = GetBinding();
             if (b != null)
             {
                 if (b.Mode == BindingMode.OneWay)

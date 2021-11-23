@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml.Controls
         {
             TextBox textBox = new TextBox();
             textBox.DataContext = childData;
-            Binding b = Binding as Binding;
+            Binding b = GetBinding();
             if (b != null)
             {
                 if (b.Mode == BindingMode.OneWay)
@@ -82,7 +82,7 @@ namespace Windows.UI.Xaml.Controls
             TextBlock textBlock = new TextBlock();
             //textBlock.DataContext = childData;
             textBlock.VerticalAlignment = VerticalAlignment.Center;
-            Binding b = Binding as Binding;
+            Binding b = GetBinding();
             if (b != null)
                 textBlock.SetBinding(TextBlock.TextProperty, b);
             else if (childData is string)

@@ -53,5 +53,18 @@ namespace Windows.UI.Xaml.Controls
         {
             //todo: tell the DataGrid that the Binding has changed so it has to refresh the elements (only i it is already in the visual tree).
         }
+
+        internal Binding GetBinding()
+        {
+            Binding b = _binding as Binding;
+            if (b != null)
+            {
+                // Return a copy so that the binding is not sealed and
+                // we are able to edit the Mode
+                return new Binding(b);
+            }
+
+            return null;
+        }
     }
 }
