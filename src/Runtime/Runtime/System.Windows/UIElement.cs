@@ -1348,8 +1348,9 @@ document.ondblclick = null;
             if (this.INTERNAL_OuterDomElement == null)
             {
                 LayoutManager.Current.RemoveArrange(this);
-                PreviousFinalRect = Rect.Empty;
+                PreviousFinalRect = finalRect;
                 IsArrangeValid = true;
+                IsRendered = false;
                 return;
             }
 
@@ -1367,11 +1368,11 @@ document.ondblclick = null;
                 LayoutManager.Current.RemoveArrange(this);
 
                 if (Visibility != Visibility.Visible) {
-                    PreviousFinalRect = Rect.Empty;
+                    IsRendered = false;
                     return;
                 }
 
-                if (previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size))
+                if (IsRendered && previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size))
                     return;
 
                 if (!IsMeasureValid)

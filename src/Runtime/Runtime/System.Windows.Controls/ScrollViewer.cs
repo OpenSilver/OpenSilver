@@ -750,6 +750,8 @@ namespace Windows.UI.Xaml.Controls
             _horizontalOffset = offset;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 INTERNAL_HtmlDomManager.SetDomElementProperty(this.INTERNAL_OuterDomElement, "scrollLeft", offset);
+
+            SetScrollOffset(Orientation.Horizontal, offset);
         }
 
         /// <summary>
@@ -762,6 +764,8 @@ namespace Windows.UI.Xaml.Controls
             _verticalOffset = offset;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 INTERNAL_HtmlDomManager.SetDomElementProperty(this.INTERNAL_OuterDomElement, "scrollTop", offset);
+
+            SetScrollOffset(Orientation.Vertical, offset);
         }
 
         // Summary:
