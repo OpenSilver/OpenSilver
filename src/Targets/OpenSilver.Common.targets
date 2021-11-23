@@ -437,7 +437,7 @@
     <XamlPreprocessor
     Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).g.cs"
+    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     CoreAssemblyFiles="$(CoreAssemblyFiles)"
@@ -460,7 +460,7 @@
     <XamlPreprocessor
     Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).g.cs"
+    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     CoreAssemblyFiles="$(CoreAssemblyFiles)"
@@ -487,11 +487,11 @@
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined in the project.
       ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
+      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
       ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
+      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
       <!--============================================================
       Remove the XAML files from the solution and include the generated CS files.
       ============================================================-->
@@ -705,7 +705,7 @@
     <XamlPreprocessor
     Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).g.cs"
+    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     CoreAssemblyFiles="$(CoreAssemblyFiles)"
@@ -728,7 +728,7 @@
     <XamlPreprocessor
     Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
     SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).g.cs"
+    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.cs"
     FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
     AssemblyNameWithoutExtension="$(AssemblyName)"
     CoreAssemblyFiles="$(CoreAssemblyFiles)"
@@ -756,11 +756,11 @@
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined in the project.
       ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
+      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
       <!--============================================================
       Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
       ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
+      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
 
       <!--============================================================
       Remove the XAML files from the solution and include the generated CS files.
