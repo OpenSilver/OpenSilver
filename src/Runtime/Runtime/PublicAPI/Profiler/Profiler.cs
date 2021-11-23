@@ -13,6 +13,8 @@
 \*====================================================================================*/
 
 
+using System;
+
 #if !BRIDGE
 using JSIL.Meta;
 #else
@@ -44,7 +46,7 @@ namespace CSHTML5
 #endif
         public static double StartMeasuringTime()
         {
-            return 0;
+            return Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("performance.now()"));
         }
 
         /// <summary>
