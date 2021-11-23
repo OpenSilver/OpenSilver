@@ -1060,11 +1060,11 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
 #if MIGRATION
         /// <summary>Called before the <see cref="E:System.Windows.UIElement.MouseWheel" /> event occurs to provide handling for the event in a derived class without attaching a delegate. </summary>
         /// <param name="e">A <see cref="T:System.Windows.Input.MouseWheelEventArgs" /> that contains the event data.</param>
-        [OpenSilver.NotImplemented]
+        /*[OpenSilver.NotImplemented]
         protected virtual void OnMouseWheel(MouseWheelEventArgs e)
         {
 
-        }
+        }*/
 #endif
 
         [OpenSilver.NotImplemented]
