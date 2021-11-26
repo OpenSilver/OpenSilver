@@ -447,7 +447,8 @@ namespace Windows.UI.Xaml
                                             //          <TextBlock Text="Center"/>
                                             //      </Border>
                                             //  </Border>
-                                            if (styleOfChildOfOuterDomElement.display != "table") //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
+                                            if (styleOfChildOfOuterDomElement.display != "table" && //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
+                                                styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
                                                 CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
@@ -472,7 +473,8 @@ namespace Windows.UI.Xaml
                                         if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
                                         {
                                             //Example of the note below: cf at the same place in case HorizontalAlignment.Left of the switch statement
-                                            if (styleOfChildOfOuterDomElement.display != "table") //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
+                                            if (styleOfChildOfOuterDomElement.display != "table" && //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
+                                                styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
                                                 CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
@@ -497,7 +499,8 @@ namespace Windows.UI.Xaml
                                         if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
                                         {
                                             //Example of the note below: cf at the same place in case HorizontalAlignment.Left of the switch statement
-                                            if (styleOfChildOfOuterDomElement.display != "table") //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
+                                            if (styleOfChildOfOuterDomElement.display != "table" && //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
+                                                styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
                                                 CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
