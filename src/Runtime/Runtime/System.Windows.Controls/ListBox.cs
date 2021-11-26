@@ -118,19 +118,6 @@ namespace Windows.UI.Xaml.Controls
             ItemsControl.ItemContainerStyleProperty;
 
         /// <summary>
-        /// Builds the visual tree for the <see cref="ListBox"/> control when a
-        /// new template is applied.
-        /// </summary>
-#if MIGRATION
-        public override void OnApplyTemplate()
-#else
-        protected override void OnApplyTemplate()
-#endif
-        {
-            base.OnApplyTemplate();
-        }
-
-        /// <summary>
         /// Causes the object to scroll into view.
         /// </summary>
         /// <param name="item">
@@ -138,13 +125,11 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         public void ScrollIntoView(object item)
         {
-            if (!(ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem container) 
-                || container.INTERNAL_OuterDomElement == null)
+            ListBoxItem container = ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
+            if (container != null && container.INTERNAL_OuterDomElement != null)
             {
-                return;
+                OpenSilver.Interop.ExecuteJavaScript("$0.scrollIntoView({ block: 'nearest'})", container.INTERNAL_OuterDomElement);
             }
-
-            OpenSilver.Interop.ExecuteJavaScript("$0.scrollIntoView({ block: 'nearest'})", container.INTERNAL_OuterDomElement);
         }
 
         /// <summary>
