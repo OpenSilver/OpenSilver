@@ -43,7 +43,6 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public PolyLineSegment()
         {
-
         }
 
         #endregion
@@ -56,7 +55,19 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public PointCollection Points
         {
-            get { return (PointCollection)GetValue(PointsProperty); }
+            get 
+            {
+                PointCollection points = (PointCollection)GetValue(PointsProperty);
+
+                if (points == null)
+                {
+                    points = new PointCollection();
+                    SetValue(PointsProperty, points);
+                }
+
+                return points;
+            }
+
             set { SetValue(PointsProperty, value); }
         }
 
