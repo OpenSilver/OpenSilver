@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public PolyLineSegment()
         {
-
+            Points = new PointCollection();
         }
 
         #endregion

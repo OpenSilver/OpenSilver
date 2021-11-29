@@ -48,6 +48,7 @@ namespace Windows.UI.Xaml.Shapes
 		[OpenSilver.NotImplemented]
 		public Polyline()
 		{
+			Points = new PointCollection();
 		}
 
 		//
