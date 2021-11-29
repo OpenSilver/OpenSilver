@@ -65,10 +65,33 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Child")]
     public partial class Border : FrameworkElement
     {
+        /// <summary>
+        /// Returns the Visual children count.
+        /// </summary>
+        internal override int VisualChildrenCount
+        {
+            get { return (_child == null) ? 0 : 1; }
+        }
+
+        /// <summary>
+        /// Returns the child at the specified index.
+        /// </summary>
+        internal override UIElement GetVisualChild(int index)
+        {
+            if ((_child == null)
+                || (index != 0))
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return _child;
+        }
+
         /// <summary> 
         /// Returns enumerator to logical children.
         /// </summary>
-        /*protected*/ internal override IEnumerator LogicalChildren
+        /*protected*/
+        internal override IEnumerator LogicalChildren
         {
             get
             {
@@ -108,14 +131,16 @@ namespace Windows.UI.Xaml.Controls
             }
             set
             {
-                if (object.ReferenceEquals(_child, value))
+                if (ReferenceEquals(_child, value))
                     return;
 
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
 
-                this.RemoveLogicalChild(_child);
+                RemoveVisualChild(_child);
+                RemoveLogicalChild(_child);
                 _child = value;
-                this.AddLogicalChild(value);
+                AddLogicalChild(value);
+                AddVisualChild(value);
 
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
             }

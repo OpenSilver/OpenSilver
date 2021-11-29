@@ -127,7 +127,7 @@ namespace Windows.UI.Xaml.Controls
                 ctrl.DataContext = e.NewValue;
             }
 
-            if (VisualTreeHelper.GetParent(ctrl) != null)
+            if (ctrl.IsConnectedToLiveTree)
             {
                 ctrl.InvalidateMeasureInternal();
             }
@@ -165,7 +165,7 @@ namespace Windows.UI.Xaml.Controls
             // if ContentTemplate is really changing, remove the old template
             ctrl.Template = null;
 
-            if (VisualTreeHelper.GetParent(ctrl) != null)
+            if (ctrl.IsConnectedToLiveTree)
             {
                 ctrl.InvalidateMeasureInternal();
             }
@@ -196,7 +196,7 @@ namespace Windows.UI.Xaml.Controls
             ContentPresenter cp = (ContentPresenter)d;
             UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (VisualTreeHelper.GetParent(cp) != null)
+            if (cp.IsConnectedToLiveTree)
             {
                 cp.InvalidateMeasureInternal();
             }

@@ -27,10 +27,13 @@ namespace Windows.UI.Xaml.Controls
     {
         internal UIElementCollection(UIElement visualParent, FrameworkElement logicalParent) : base(true)
         {
-            if (visualParent == null)
-            {
-                throw new ArgumentNullException(string.Format("'{0}' must be provided when instantiating '{1}'", "visualParent", this.GetType()));
-            }
+            // Note: visualParent should never be null. However because we have Panels which rely on other Panels
+            // for their rendering (DockPanel and TileViewPanel use a Grid) we have to make an exception for these
+            // Panels.
+            //if (visualParent == null)
+            //{
+            //    throw new ArgumentNullException(string.Format("'{0}' must be provided when instantiating '{1}'", "visualParent", this.GetType()));
+            //}
 
             this.VisualParent = visualParent;
             this.LogicalParent = logicalParent;
@@ -48,6 +51,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             this.SetLogicalParent(value);
+            this.SetVisualParent(value);
             this.AddInternal(value);
         }
 
@@ -62,6 +66,7 @@ namespace Windows.UI.Xaml.Controls
 
             for (int i = 0; i < count; ++i)
             {
+                this.ClearVisualParent(uies[i]);
                 this.ClearLogicalParent(uies[i]);
             }
 
@@ -91,6 +96,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             this.SetLogicalParent(value);
+            this.SetVisualParent(value);
             this.InsertInternal(index, value);
         }
 
@@ -102,6 +108,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             UIElement oldChild = this.GetItemInternal(index);
+            this.ClearVisualParent(oldChild);
             this.ClearLogicalParent(oldChild);
             this.RemoveAtInternal(index);
         }
@@ -121,11 +128,13 @@ namespace Windows.UI.Xaml.Controls
             UIElement oldChild = this.GetItemInternal(index);
             if (oldChild != value)
             {
+                this.ClearVisualParent(oldChild);
                 this.ClearLogicalParent(oldChild);
 
                 this.SetItemInternal(index, value);
 
                 this.SetLogicalParent(value);
+                this.SetVisualParent(value);
             }
         }
 
@@ -175,6 +184,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (child != null)
                 {
+                    this.ClearVisualParent(child);
                     this.ClearLogicalParent(child);
                     this.RemoveInternal(child);
                 }
@@ -196,6 +206,22 @@ namespace Windows.UI.Xaml.Controls
             if (this.LogicalParent != null)
             {
                 this.LogicalParent.RemoveLogicalChild(child);
+            }
+        }
+
+        private void SetVisualParent(UIElement child)
+        {
+            if (this.VisualParent != null)
+            {
+                this.VisualParent.AddVisualChild(child);
+            }
+        }
+
+        private void ClearVisualParent(UIElement child)
+        {
+            if (this.VisualParent != null)
+            {
+                this.VisualParent.RemoveVisualChild(child);
             }
         }
     }

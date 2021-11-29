@@ -46,6 +46,21 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Inlines")]
     public partial class TextBlock : Control //todo: this is supposed to inherit from FrameworkElement but Control has the implementations of FontSize, FontWeight, Foreground, etc. Maybe use an intermediate class between FrameworkElement and Control or add the implementation here too.
     {
+        internal override int VisualChildrenCount
+        {
+            get { return this.Inlines.Count; }
+        }
+
+        internal override UIElement GetVisualChild(int index)
+        {
+            if (index >= VisualChildrenCount)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return (Inline)this.Inlines[index];
+        }
+
         private bool _isTextChanging;
 
         public TextBlock()

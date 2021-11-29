@@ -47,12 +47,150 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class UIElement : DependencyObject
     {
+        internal bool IsConnectedToLiveTree { get; set; }
+
+        #region Visual Parent
+
+        private DependencyObject _parent;
+
+        /// <summary>
+        /// Returns the parent of this UIElement.
+        /// </summary>
+        internal DependencyObject INTERNAL_VisualParent
+        {
+            get
+            {
+                return _parent;
+            }
+        }
+
+        #endregion Visual Parent
+
+        #region Visual Children
+
+        /// <summary>
+        /// Derived class must implement to support UIElement children. The method must return
+        /// the child at the specified index. Index must be between 0 and GetVisualChildrenCount-1.
+        ///
+        /// By default a UIElement does not have any children.
+        ///
+        /// Remark:
+        ///       Need to lock down Visual tree during the callbacks.
+        ///       During this virtual call it is not valid to modify the Visual tree.
+        /// </summary>
+        internal virtual UIElement GetVisualChild(int index)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        /// <summary>
+        /// Derived classes override this property to enable the UIElement code to enumerate
+        /// the UIElement children. Derived classes need to return the number of children
+        /// from this method.
+        ///
+        /// By default a UIElement does not have any children.
+        ///
+        /// Remark: During this virtual method the Visual tree must not be modified.
+        /// </summary>
+        internal virtual int VisualChildrenCount
+        {
+            get { return 0; }
+        }
+
+        /// <Summary>
+        /// Flag to check if this visual has any children
+        /// </Summary>
+        internal bool HasVisualChildren { get; private set; }
+
+        // Are we in the process of iterating the visual children.
+        // This flag is set during a descendents walk, for property invalidation.
+        internal bool IsVisualChildrenIterationInProgress { get; set; }
+
+        /// <summary>
+        /// AttachChild
+        ///
+        /// Derived classes must call this method to notify the UIElement layer that a new
+        /// child appeard in the children collection. The UIElement layer will then call the GetVisualChild
+        /// method to find out where the child was added.
+        /// </summary>
+        internal void AddVisualChild(UIElement child)
+        {
+            if (child == null)
+            {
+                return;
+            }
+
+            if (child._parent != null)
+            {
+                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+            }
+
+            HasVisualChildren = true;
+
+            // Set the parent pointer.
+
+            child._parent = this;
+
+            child.OnVisualParentChanged(null);
+        }
+
+        /// <summary>
+        /// DisconnectChild
+        ///
+        /// Derived classes must call this method to notify the UIElement layer that a
+        /// child was removed from the children collection. The UIElement layer will then call
+        /// GetChildren to find out which child has been removed.
+        /// </summary>
+        internal void RemoveVisualChild(UIElement child)
+        {
+            if (child == null || child._parent == null)
+            {
+                return;
+            }
+
+            if (child._parent != this)
+            {
+                throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
+            }
+
+            if (VisualChildrenCount == 0)
+            {
+                HasVisualChildren = false;
+            }
+
+            // Set the parent pointer to null.
+
+            child._parent = null;
+
+            child.OnVisualParentChanged(this);
+        }
+
+        /// <summary>
+        /// OnVisualParentChanged is called when the parent of the UIElement is changed.
+        /// </summary>
+        /// <param name="oldParent">Old parent or null if the UIElement did not have a parent before.</param>
+        internal virtual void OnVisualParentChanged(DependencyObject oldParent)
+        {
+            // Synchronize ForceInherit properties
+            if (_parent != null)
+            {
+                SynchronizeForceInheritProperties(this, _parent);
+            }
+            else
+            {
+                if (oldParent != null)
+                {
+                    SynchronizeForceInheritProperties(this, oldParent);
+                }
+            }
+        }
+
+        #endregion Visual Children
+
         internal virtual Size MeasureCore()
         {
             return new Size(0, 0);
         }
-
-        internal DependencyObject INTERNAL_VisualParent { get; set; } // This is used to determine if the item is in the Visual Tree: null means that the item is not in the visual tree, not null otherwise.
 
         internal Window INTERNAL_ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
 
@@ -1279,14 +1417,14 @@ document.ondblclick = null;
 
         internal virtual void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
         {
-            if (this.INTERNAL_VisualChildrenInformation == null)
+            int cChildren = this.VisualChildrenCount;
+            for (int i = 0; i < cChildren; i++)
             {
-                return;
-            }
-
-            foreach (UIElement child in this.INTERNAL_VisualChildrenInformation.Select(kp => kp.Key))
-            {
-                child.CoerceValue(property);
+                DependencyObject child = this.GetVisualChild(i);
+                if (child != null)
+                {
+                    child.CoerceValue(property);
+                }
             }
         }
 

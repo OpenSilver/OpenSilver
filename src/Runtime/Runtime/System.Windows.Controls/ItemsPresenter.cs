@@ -104,7 +104,7 @@ namespace Windows.UI.Xaml.Controls
             ip.ClearPanel();
             FrameworkElement.UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (VisualTreeHelper.GetParent(ip) != null)
+            if (ip.IsConnectedToLiveTree)
             {
                 ip.InvalidateMeasureInternal();
             }

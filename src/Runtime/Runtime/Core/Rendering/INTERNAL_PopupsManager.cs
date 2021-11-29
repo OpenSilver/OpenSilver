@@ -276,7 +276,7 @@ $1.removeChild(popupRoot);
                     && popupActualHeight > 0)
                 {
                     Point popupPosition = new Point(0, 0);
-                    if (popup.INTERNAL_VisualParent != null)
+                    if (popup.IsConnectedToLiveTree)
                     {
                         popupPosition = popup.TransformToVisual(Application.Current.RootVisual).Transform(popupPosition);
                     }

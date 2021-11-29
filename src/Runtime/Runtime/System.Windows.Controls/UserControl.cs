@@ -108,7 +108,7 @@ namespace Windows.UI.Xaml.Controls
             uc.RemoveLogicalChild(e.OldValue);
             uc.AddLogicalChild(e.NewValue);
 
-            if (VisualTreeHelper.GetParent(uc) != null)
+            if (uc.IsConnectedToLiveTree)
             {
                 uc.InvalidateMeasureInternal();
             }

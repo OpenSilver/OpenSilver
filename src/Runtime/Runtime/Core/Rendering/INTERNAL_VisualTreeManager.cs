@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -218,28 +219,14 @@ namespace CSHTML5.Internal
                 }
             }
 
-            DependencyObject oldParent = element.INTERNAL_VisualParent;
-
             // Reset all visual-tree related information:
+            element.IsConnectedToLiveTree = false;
             element.INTERNAL_OuterDomElement = null;
             element.INTERNAL_InnerDomElement = null;
-            element.INTERNAL_VisualParent = null;
             element.INTERNAL_VisualChildrenInformation = null;
             element.INTERNAL_AdditionalOutsideDivForMargins = null;
             element.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
-
-            // We reset the inherited properties since the element is no longer attached to its parent
-
-            if (element is FrameworkElement fe && fe.Parent == null)
-            {
-                FrameworkElement.InvalidateInheritedProperties(element, null);
-            }
-
-            if (oldParent != null)
-            {
-                UIElement.SynchronizeForceInheritProperties(element, oldParent);
-            }
         }
 
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
@@ -344,7 +331,7 @@ if(nextSibling != undefined) {
             if (child != null && IsElementInVisualTree(parent))
             {
                 // Ensure that the child is not already attached:
-                if (child.INTERNAL_VisualParent == null)
+                if (!child.IsConnectedToLiveTree)
                 {
                     string label = "";
                     if (EnablePerformanceLogging)
@@ -360,7 +347,7 @@ if(nextSibling != undefined) {
                         Profiler.ConsoleTimeEnd(label);
                     }
                 }
-                else if (!object.ReferenceEquals(child.INTERNAL_VisualParent, parent))
+                else if (!ReferenceEquals(child.INTERNAL_VisualParent, parent))
                 {
                     throw new InvalidOperationException("The element already has a parent. An element cannot appear in multiple locations in the Visual Tree. Remove the element from the Visual Tree before adding it elsewhere.");
                 }
@@ -573,9 +560,7 @@ if(nextSibling != undefined) {
                     ? innerDivOfWrapperForChild
                     : domElementWhereToPlaceChildStuff));
 
-            // Set the "Parent" property of the Child (IMPORTANT: we need to do that before child.CreateDomElement 
-            // because the type of the parent is used to display the child correctly):
-            child.INTERNAL_VisualParent = parent;
+            child.IsConnectedToLiveTree = true;
 
             // Set the "ParentWindow" property so that the element knows where to display popups:
             child.INTERNAL_ParentWindow = parent.INTERNAL_ParentWindow;
@@ -665,8 +650,6 @@ if(nextSibling != undefined) {
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = "absolute"; //todo: test if this works properly
             }
 
-            UIElement.SynchronizeForceInheritProperties(child, parent);
-
             UIElement.SetPointerEvents(child);
 
             // Reset the flag that tells if we have already applied the RenderTransformOrigin (this is useful to ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS):
@@ -689,25 +672,6 @@ if(nextSibling != undefined) {
 
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Handle events", t5);
-#endif
-            //--------------------------------------------------------
-            // HANDLE INHERITED PROPERTIES:
-            //--------------------------------------------------------
-
-#if PERFSTAT
-            var t6 = Performance.now();
-#endif
-
-            if (child is FrameworkElement fe)
-            {
-                if (fe.Parent == null)
-                {
-                    FrameworkElement.InvalidateInheritedProperties(fe, parent);
-                }
-            }
-
-#if PERFSTAT
-            Performance.Counter("Handle inherited properties", t6);
 #endif
 
             //--------------------------------------------------------
@@ -769,7 +733,7 @@ if(nextSibling != undefined) {
             // IMPORTANT: This needs to be done AFTER the "OnApplyTemplate" (for example, the TextBox sets the "INTERNAL_OptionalSpecifyDomElementConcernedByFocus" in the "OnApplyTemplate").
             if (isChildAControl)
             {
-                if (!(child is TextBlock)) //ContentPresenter should not count in tabbing, as well as TextBlock (especially since TextBlock is not supposed to be a Control).
+                if (!(child is TextBlock)) // TextBlock should not count in tabbing (TextBlock is not supposed to be a Control).
                 {
                     Control.TabIndexProperty_MethodToUpdateDom(child, ((Control)child).TabIndex);
                 }
@@ -823,7 +787,7 @@ if(nextSibling != undefined) {
 
         public static bool IsElementInVisualTree(UIElement child)
         {
-            return (child.INTERNAL_VisualParent != null || child is Window || child is PopupRoot); //todo: replace "INTERNAL_VisualParent" with a check of the "_isLoaded" property? (it may work better with bindings, see for example the issue on March 22, where a "Binding" on ListBox.ItemsSource caused the selection to not work properly: it was fixed with a workaround to avoid possible regressions)
+            return (child.IsConnectedToLiveTree || child is Window || child is PopupRoot); //todo: replace "INTERNAL_VisualParent" with a check of the "_isLoaded" property? (it may work better with bindings, see for example the issue on March 22, where a "Binding" on ListBox.ItemsSource caused the selection to not work properly: it was fixed with a workaround to avoid possible regressions)
         }
 
         static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(DependencyObject dependencyObject)

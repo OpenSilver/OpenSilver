@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 using CSHTML5.Internal;
 
 #if !MIGRATION
@@ -26,6 +27,35 @@ namespace Windows.UI.Xaml.Controls.Primitives
 {
     internal partial class PopupRoot : FrameworkElement
     {
+        /// <summary>
+        /// Returns the Visual children count.
+        /// </summary>
+        internal override int VisualChildrenCount
+        {
+            get
+            {
+                if (Content == null)
+                {
+                    return 0;
+                }
+
+                return 1;
+            }
+        }
+
+        /// <summary>
+        /// Returns the child at the specified index.
+        /// </summary>
+        internal override UIElement GetVisualChild(int index)
+        {
+            if (Content == null || index != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return Content;
+        }
+
         internal string INTERNAL_UniqueIndentifier { get; set; }
 
         internal Popup INTERNAL_LinkedPopup { get; set; }
@@ -43,7 +73,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             // Make sure that the Loaded event of the Popup is raised (this is useful if the <Popup> control is never added to the visual tree, such as for tooltips).
             if (this.INTERNAL_LinkedPopup != null
-                && this.INTERNAL_LinkedPopup.INTERNAL_VisualParent == null) // We check that the <Popup> has no visual parent. In fact, if it had a visual parent, it means that it is in the visual tree (for example if the <Popup> was declared in XAML), and therefore the Loaded event has already been called once.
+                && !this.INTERNAL_LinkedPopup.IsConnectedToLiveTree) // We check that the <Popup> has no visual parent. In fact, if it had a visual parent, it means that it is in the visual tree (for example if the <Popup> was declared in XAML), and therefore the Loaded event has already been called once.
                 this.INTERNAL_LinkedPopup.INTERNAL_RaiseLoadedEvent();
             if (INTERNAL_ParentWindow != null && this.IsCustomLayoutRoot)
             {
@@ -76,6 +106,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             UIElement newChild = (UIElement)e.NewValue;
 
             INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, parent);
+            parent.RemoveVisualChild(oldChild);
+            parent.AddVisualChild(newChild);
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
         }
 

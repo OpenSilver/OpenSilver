@@ -750,7 +750,7 @@ namespace Windows.UI.Xaml.Controls
             Control control = (Control)d;
             FrameworkElement.UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (VisualTreeHelper.GetParent(control) != null)
+            if (control.IsConnectedToLiveTree)
             {
                 control.InvalidateMeasureInternal();
             }

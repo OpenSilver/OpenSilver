@@ -113,20 +113,19 @@ namespace OpenSilver.Internal
         }
 
         /// <summary>
-        ///     Given a object of type Visual, call VisitNode on each of its
+        /// Given a object of type Visual, call VisitNode on each of its
         /// Visual children.
         /// </summary>
         private void WalkVisualChildren(UIElement v)
         {
-#if WPF
             v.IsVisualChildrenIterationInProgress = true;
 
             try
             {
-                int count = v.InternalVisual2DOr3DChildrenCount;
+                int count = v.VisualChildrenCount;
                 for (int i = 0; i < count; i++)
                 {
-                    DependencyObject childVisual = v.InternalGet2DOr3DVisualChild(i);
+                    DependencyObject childVisual = v.GetVisualChild(i);
                     if (childVisual != null)
                     {
                         bool visitedViaVisualTree = true;
@@ -138,19 +137,6 @@ namespace OpenSilver.Internal
             {
                 v.IsVisualChildrenIterationInProgress = false;
             }
-#else
-            if (v.INTERNAL_VisualChildrenInformation != null)
-            {
-                foreach (DependencyObject childVisual in v.INTERNAL_VisualChildrenInformation.Select(kp => kp.Key))
-                {
-                    if (childVisual != null)
-                    {
-                        bool visitedViaVisualTree = true;
-                        VisitNode(childVisual, visitedViaVisualTree);
-                    }
-                }
-            }
-#endif // WPF
         }
 
         /// <summary>
@@ -266,18 +252,17 @@ namespace OpenSilver.Internal
                 WalkLogicalChildren(feParent, feParent.LogicalChildren);
             }
 
-#if WPF
             feParent.IsVisualChildrenIterationInProgress = true;
 
             try
             {
                 // Optimized variant of WalkVisualChildren
-                int count = feParent.InternalVisualChildrenCount;
+                int count = feParent.VisualChildrenCount;
 
                 for (int i = 0; i < count; i++)
                 {
-                    Visual child = feParent.InternalGetVisualChild(i);
-                    if (child != null && FrameworkElement.DType.IsInstanceOfType(child))
+                    UIElement child = feParent.GetVisualChild(i);
+                    if (child != null && typeof(FrameworkElement).IsInstanceOfType(child))
                     {
                         // For the case that both parents are identical, this node should
                         // have already been visited when walking through logical
@@ -294,26 +279,6 @@ namespace OpenSilver.Internal
             {
                 feParent.IsVisualChildrenIterationInProgress = false;
             }
-#else
-            // Optimized variant of WalkVisualChildren
-            if (feParent.INTERNAL_VisualChildrenInformation != null)
-            {
-                foreach (UIElement child in feParent.INTERNAL_VisualChildrenInformation.Select(kp => kp.Key))
-                {
-                    if (child != null && typeof(FrameworkElement).IsInstanceOfType(child))
-                    {
-                        // For the case that both parents are identical, this node should
-                        // have already been visited when walking through logical
-                        // children, hence we short-circuit here
-                        if (VisualTreeHelper.GetParent(child) != ((FrameworkElement)child).Parent)
-                        {
-                            bool visitedViaVisualTree = true;
-                            VisitNode(child, visitedViaVisualTree);
-                        }
-                    }
-                }
-            }
-#endif // WPF
 
 #if WPF
             //

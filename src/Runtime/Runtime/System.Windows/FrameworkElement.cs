@@ -48,6 +48,56 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class FrameworkElement : UIElement
     {
+        #region Visual Children
+
+        internal override void OnVisualParentChanged(DependencyObject oldParent)
+        {
+            DependencyObject newParent = VisualTreeHelper.GetParent(this);
+
+            // Do it only if you do not have a logical parent
+            if (this.Parent == null)
+            {
+                // Invalidate relevant properties for this subtree
+                this.OnParentChangedInternal(newParent ?? oldParent);
+            }
+
+            base.OnVisualParentChanged(oldParent);
+        }
+
+        /// <summary>
+        /// Gets the number of Visual children of this FrameworkElement.
+        /// </summary>
+        /// <remarks>
+        /// Derived classes override this property getter to provide the children count
+        /// of their custom children collection.
+        /// </remarks>
+        internal override int VisualChildrenCount
+        {
+            get
+            {
+                return (_templateChild == null) ? 0 : 1;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Visual child at the specified index.
+        /// </summary>
+        /// <remarks>
+        /// Derived classes that provide a custom children collection must override this method
+        /// and return the child at the specified index.
+        /// </remarks>
+        internal override UIElement GetVisualChild(int index)
+        {
+            if (_templateChild == null || index != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return _templateChild;
+        }
+
+        #endregion Visual Children
+
         #region Logical Parent
 
         /// <summary>
@@ -192,7 +242,9 @@ namespace Windows.UI.Xaml
                 if (this._templateChild != value)
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(this._templateChild, this);
+                    this.RemoveVisualChild(this._templateChild);
                     this._templateChild = value;
+                    this.AddVisualChild(this._templateChild);
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this._templateChild, this, 0);
                 }
             }
@@ -414,11 +466,6 @@ namespace Windows.UI.Xaml
 
         internal bool ApplyTemplate()
         {
-            if (VisualTreeHelper.GetParent(this) == null)
-            {
-                return false;
-            }
-
             // Notify the ContentPresenter/ItemsPresenter that we are about to generate the
             // template tree and allow them to choose the right template to be applied.
             this.OnPreApplyTemplate();

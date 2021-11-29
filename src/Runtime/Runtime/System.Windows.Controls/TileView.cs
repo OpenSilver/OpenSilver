@@ -18,10 +18,12 @@ using System.Diagnostics;
 #if MIGRATION
 using System.Windows.Data;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -143,6 +145,7 @@ namespace Windows.UI.Xaml.Controls
                 grid.ColumnDefinitions.Add(column1);
                 grid.ColumnDefinitions.Add(column2);
                 this._contentGrid = grid;
+                this.AddVisualChild(this._contentGrid);
             }
 
             BindingOperations.SetBinding(
@@ -160,7 +163,31 @@ namespace Windows.UI.Xaml.Controls
             base.INTERNAL_OnDetachedFromVisualTree();
 
             this._owner = null;
+            this.RemoveVisualChild(this._contentGrid);
             this._contentGrid = null;
+        }
+
+        protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
+        {
+            return new UIElementCollection(null, logicalParent);
+        }
+
+        internal override int VisualChildrenCount
+        {
+            get
+            {
+                return this._contentGrid == null ? 0 : 1;
+            }
+        }
+
+        internal override UIElement GetVisualChild(int index)
+        {
+            if (this._contentGrid == null || index != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return this._contentGrid;
         }
 
         internal override void OnChildrenAdded(UIElement newChild, int index)

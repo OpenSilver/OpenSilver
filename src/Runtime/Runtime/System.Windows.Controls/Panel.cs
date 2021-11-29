@@ -67,6 +67,37 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Gets the Visual children count.
+        /// </summary>
+        internal override int VisualChildrenCount
+        {
+            get
+            {
+                if (_uiElementCollection == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return _uiElementCollection.Count;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the Visual child at the specified index.
+        /// </summary>
+        internal override UIElement GetVisualChild(int index)
+        {
+            if (_uiElementCollection == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return _uiElementCollection[index];
+        }
+
+        /// <summary>
         /// The generator associated with this panel.
         /// </summary>
         internal IItemContainerGenerator Generator

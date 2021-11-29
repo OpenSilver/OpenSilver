@@ -71,10 +71,12 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The parent object of the reference object in the visual tree.</returns>
         public static DependencyObject GetParent(DependencyObject reference) //todo: the original signature takes a "DependencyObject"
         {
-            if (reference is UIElement)
-                return ((UIElement)reference).INTERNAL_VisualParent;
-            else
-                return null;
+            if (reference is UIElement uie)
+            {
+                return uie.INTERNAL_VisualParent;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -84,43 +86,12 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The number of visual children for the provided source visual.</returns>
         public static int GetChildrenCount(DependencyObject reference)
         {
-            List<DependencyObject> children;
-
-            if (reference is UIElement)
+            if (reference is UIElement uie)
             {
-                //-------------------------------------------------------------
-                // If the reference object is currently loaded into the 
-                // visual tree, we look at the "INTERNAL_VisualChildrenInformation"
-                // property. Alternatively, we attempt to find the [ContentProperty]
-                // attribute, which usually contains the name of the dependency
-                // property that contains the children of the object.
-                //-------------------------------------------------------------
+                return uie.VisualChildrenCount;
+            }
 
-                if (((UIElement)reference)._isLoaded)
-                {
-                    var visualChildrenInformation = ((UIElement)reference).INTERNAL_VisualChildrenInformation;
-                    if (visualChildrenInformation != null)
-                    {
-                        return visualChildrenInformation.Count;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
-                }
-                else if (TryGetChildrenUsingContentProperty(reference, out children)) //todo-perfs: the current implementation is O(N), so it may lead to O(N^2) algorithms.
-                {
-                    return children.Count;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("The argument is null, or is not a valid UIElement.");
-            }
+            throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
         }
 
         /// <summary>
@@ -131,57 +102,12 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The child object as referenced by childIndex.</returns>
         public static DependencyObject GetChild(DependencyObject reference, int childIndex)
         {
-            //todo: the current implementation does not guarantee that the index corresponds to the visual order of the controls.
-
-            //todo-perfs: the current implementation is O(N), so it may lead to O(N^2) algorithms.
-
-            List<DependencyObject> children;
-
-            if (reference is UIElement)
+            if (reference is UIElement uie)
             {
-                //-------------------------------------------------------------
-                // If the reference object is currently loaded into the 
-                // visual tree, we look at the "INTERNAL_VisualChildrenInformation"
-                // property. Alternatively, we attempt to find the [ContentProperty]
-                // attribute, which usually contains the name of the dependency
-                // property that contains the children of the object.
-                //-------------------------------------------------------------
-
-                if (((UIElement)reference)._isLoaded)
-                {
-                    var visualChildrenInformation = ((UIElement)reference).INTERNAL_VisualChildrenInformation;
-                    if (visualChildrenInformation != null)
-                    {
-                        var keys = visualChildrenInformation.Keys.ToArray();
-
-                        //todo: the current implementation does not guarantee that the index corresponds to the visual order of the controls.
-
-                        if (childIndex >= keys.Length)
-                            throw new Exception(string.Format("The index '{0}' is out of bounds.", childIndex.ToString()));
-
-                        return visualChildrenInformation[keys[childIndex]].INTERNAL_UIElement;
-                    }
-                    else
-                    {
-                        throw new Exception(string.Format("The index '{0}' is out of bounds.", childIndex.ToString()));
-                    }
-                }
-                else if (TryGetChildrenUsingContentProperty(reference, out children))
-                {
-                    if (childIndex >= children.Count)
-                        throw new Exception(string.Format("The index '{0}' is out of bounds.", childIndex.ToString()));
-
-                    return children[childIndex];
-                }
-                else
-                {
-                    throw new Exception(string.Format("The index '{0}' is out of bounds.", childIndex.ToString()));
-                }
+                return uie.GetVisualChild(childIndex);
             }
-            else
-            {
-                throw new InvalidOperationException("The argument is null, or is not a valid UIElement.");
-            }
+            
+            throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
         }
 
         /// <summary>
@@ -250,94 +176,6 @@ namespace Windows.UI.Xaml.Media
             {
                 return new List<UIElement>();
             }
-        }
-
-        private static bool TryGetChildrenUsingContentProperty(DependencyObject depObj, out List<DependencyObject> children)
-        {
-            Type depObjType = depObj.GetType();
-
-            // Attempt to find the attribute [ContentProperty("Children")] on the object:
-#if !BRIDGE
-            ContentPropertyAttribute contentPropertyAttribute
-                = (ContentPropertyAttribute)Attribute.GetCustomAttribute(depObjType, typeof(ContentPropertyAttribute));
-#else
-            
-            ContentPropertyAttribute contentPropertyAttribute
-                = (ContentPropertyAttribute)GetCustomAttribute(depObjType.GetCustomAttributes(true), typeof(ContentPropertyAttribute));
-#endif
-            
-            if (contentPropertyAttribute != null)
-            {
-                // Get the name of the dependency property that contains the children:
-                string contentPropertyName = contentPropertyAttribute.Name;
-
-                // Attempt to find the property using Reflection:
-                PropertyInfo propertyInfo = depObjType.GetProperty(contentPropertyName);
-
-                //BRIDGETODO 
-                //Verify that GetGetMethod() == GetMethod
-#if !BRIDGE
-                if (propertyInfo != null && propertyInfo.CanRead && propertyInfo.GetGetMethod() != null)
-#else
-                if (propertyInfo != null && propertyInfo.CanRead && propertyInfo.GetMethod != null)
-#endif
-                {
-                    // Attempt to read the value of the content property:
-                    object value = propertyInfo.GetValue(depObj);
-
-                    children = new List<DependencyObject>();
-
-                    // If the content of the content property is a single item, we return it. Otherwise we return the whole collection:
-                    if (value is UIElement)
-                    {
-                        children.Add((DependencyObject)value);
-                    }
-                    else if (value is IEnumerable && (!(value is string)))
-                    {
-                        foreach (var item in (IEnumerable)value)
-                        {
-                            if (!(item is UIElement))
-                            {
-                                children = null;
-
-                                //--------
-                                // ERROR: enumerable does not contain dependency objects
-                                //--------
-                                return false;
-                            }
-                            else
-                            {
-                                children.Add((DependencyObject)item);
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    children = null;
-                    return false;
-                }
-            }
-            else
-            {
-                children = null;
-                return false;
-            }
-        }
-    
-        private static Attribute GetCustomAttribute(object[] arrayOfAttribute, Type typeWanted)
-        {
-            int k = 0;
-            
-            while (k < arrayOfAttribute.Length)
-            {
-                if (arrayOfAttribute[k].GetType() == typeWanted)
-                    return (Attribute)arrayOfAttribute[k];
-                ++k;
-            }
-            return null; // no attribute found
         }
 
         /// <summary>

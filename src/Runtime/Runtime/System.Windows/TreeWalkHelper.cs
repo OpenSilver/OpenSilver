@@ -26,54 +26,13 @@ namespace Windows.UI.Xaml
 
         internal static void InvalidateOnInheritablePropertyChange(FrameworkElement fe, InheritablePropertyChangeInfo info)
         {
-            if (fe.HasLogicalChildren || (fe.INTERNAL_VisualChildrenInformation != null &&
-                                          fe.INTERNAL_VisualChildrenInformation.Count > 0))
+            if (HasChildren(fe))
             {
                 DescendentsWalker<InheritablePropertyChangeInfo> walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
                     TreeWalkPriority.LogicalTree, InheritablePropertyChangeDelegate, info);
 
                 walker.StartWalk(fe, true);
             }
-
-#if false
-            if (rootFE != null)
-            {
-                if (rootFE.HasLogicalChildren)
-                {
-                    rootFE.IsLogicalChildrenIterationInProgress = true;
-                    try
-                    {
-                        IEnumerator logicalChildren = rootFE.LogicalChildren;
-                        if (logicalChildren != null)
-                        {
-                            while (logicalChildren.MoveNext())
-                            {
-                                DependencyObject child = logicalChildren.Current as DependencyObject;
-                                if (child != null)
-                                {
-                                    child.SetInheritedValue(info.Property, info.NewValue, true);
-                                }
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        rootFE.IsLogicalChildrenIterationInProgress = false;
-                    }
-                }
-            }
-
-            if (rootUIE != null)
-            {
-                if (rootUIE.INTERNAL_VisualChildrenInformation != null)
-                {
-                    foreach (UIElement child in rootUIE.INTERNAL_VisualChildrenInformation.Keys)
-                    {
-                        child.SetInheritedValue(info.Property, info.NewValue, true);
-                    }
-                }
-            }
-#endif // false
         }
 
         /// <summary>
@@ -158,6 +117,19 @@ namespace Windows.UI.Xaml
         }
 
         #endregion InheritablePropertyChange
+
+        #region PrivateMethods
+
+        /// <summary>
+        ///     Says if the current FE has visual or logical children
+        /// </summary>
+        internal static bool HasChildren(FrameworkElement fe)
+        {
+            // See if we have logical or visual children, in which case this is a real tree invalidation.
+            return fe != null && (fe.HasLogicalChildren || fe.HasVisualChildren);
+        }
+
+        #endregion PrivateMethods
 
         #region StaticData
 

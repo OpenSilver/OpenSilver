@@ -210,7 +210,7 @@ namespace Windows.UI.Xaml.Controls
             if (element.IsUnderCustomLayout)
                 return;
             int maxRow = 0;
-            if (element.INTERNAL_VisualParent != null && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
+            if (element.IsConnectedToLiveTree && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
             {
                 Grid parent = (Grid)element.INTERNAL_VisualParent;
                 if (parent._rowDefinitionsOrNull != null && parent._rowDefinitionsOrNull.Count > 0)
@@ -249,7 +249,7 @@ namespace Windows.UI.Xaml.Controls
             if (element.IsUnderCustomLayout)
                 return;
             int maxColumn = 0;
-            if (element.INTERNAL_VisualParent != null && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
+            if (element.IsConnectedToLiveTree && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
             {
                 Grid parent = (Grid)element.INTERNAL_VisualParent;
                 if (parent._columnDefinitionsOrNull != null && parent._columnDefinitionsOrNull.Count > 0)

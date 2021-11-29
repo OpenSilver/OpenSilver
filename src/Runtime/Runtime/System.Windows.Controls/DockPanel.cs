@@ -20,7 +20,10 @@ using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
 using Windows.Foundation;
 #endif
 
@@ -37,6 +40,29 @@ namespace Windows.UI.Xaml.Controls
     public partial class DockPanel : Panel
     {
         GridNotLogical _grid;
+
+        internal override int VisualChildrenCount
+        {
+            get
+            {
+                return _grid == null ? 0 : 1;
+            }
+        }
+
+        internal override UIElement GetVisualChild(int index)
+        {
+            if (_grid == null || index != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return _grid;
+        }
+
+        protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
+        {
+            return new UIElementCollection(null, logicalParent);
+        }
 
         ///// <summary>
         ///// Initializes a new instance of the DockPanel class.
@@ -94,10 +120,21 @@ namespace Windows.UI.Xaml.Controls
             if (_grid == null)
             {
                 _grid = new GridNotLogical();
-                MakeUIStructure();
             }
 
+            AddVisualChild(_grid);
+
             base.INTERNAL_OnAttachedToVisualTree();
+        }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            if (_grid != null)
+            {
+                RemoveVisualChild(_grid);
+            }
+
+            base.INTERNAL_OnDetachedFromVisualTree();
         }
 
         private void MakeUIStructure()

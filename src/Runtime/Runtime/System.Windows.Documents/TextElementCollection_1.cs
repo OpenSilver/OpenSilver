@@ -236,6 +236,7 @@ namespace Windows.UI.Xaml.Documents
                 throw new ArgumentNullException("item");
             }
             this._collection.Insert(index, item);
+            this.SetVisualParent(item);
             this.OnAdd(item);
         }
 
@@ -244,10 +245,28 @@ namespace Windows.UI.Xaml.Documents
             bool success;
             if (success = this._collection.Remove(item))
             {
+                this.ClearVisualParent(item);
                 this.OnRemove(item);
             }
             return success;
         }
+
+        private void SetVisualParent(T item)
+        {
+            if (this._owner is UIElement parent)
+            {
+                parent.AddVisualChild(item);
+            }
+        }
+
+        private void ClearVisualParent(T item)
+        {
+            if (this._owner is UIElement parent)
+            {
+                parent.RemoveVisualChild(item);
+            }
+        }
+
         #endregion
     }
 }
