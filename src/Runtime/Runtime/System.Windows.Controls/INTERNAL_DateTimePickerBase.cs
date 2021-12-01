@@ -184,7 +184,7 @@ namespace Windows.UI.Xaml.Controls
         {
             // we don't set INTERNAL_SelectedDate because it is already linked to the flatpickr
 
-            OnSelectionChanged((DateTime?)e.AddedItems[0]); // overridden by date picker and time picker for specific behavior
+            OnSelectionChanged((DateTime?)OpenSilver.Interop.Unbox(e.AddedItems[0])); // overridden by date picker and time picker for specific behavior
 
             RefreshTextBox();
 
