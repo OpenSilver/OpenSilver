@@ -19,10 +19,12 @@ using System;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
 #endif
 
 namespace CSHTML5.Internal
@@ -52,7 +54,7 @@ namespace CSHTML5.Internal
         /// <summary>
         /// Prepares the Shape so that its canvas has the size it should have, depending on its container, content and Stretch mode.
         /// </summary>
-        /// <param name="frameworkElement">The Shape containing the canvas.</param>
+        /// <param name="shape">The Shape containing the canvas.</param>
         /// <param name="canvasDomElement">The canvas in the Shape.</param>
         /// <param name="minX">The minimum X-coordinate of the points in the Shape.</param>
         /// <param name="maxX">The maximum X-coordinate of the points in the Shape.</param>
@@ -60,7 +62,7 @@ namespace CSHTML5.Internal
         /// <param name="maxY">The maximum Y-coordinate of the points in the Shape.</param>
         /// <param name="stretch">The Stretch mode to apply on the Shape</param>
         /// <param name="shapeActualSize"></param>
-        internal static void PrepareStretch(FrameworkElement frameworkElement, object canvasDomElement, double minX, double maxX, double minY, double maxY, Stretch stretch, out Size shapeActualSize)
+        internal static void PrepareStretch(Shape shape, object canvasDomElement, double minX, double maxX, double minY, double maxY, Stretch stretch, out Size shapeActualSize)
         {
             var canvasStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);
 
@@ -91,25 +93,26 @@ namespace CSHTML5.Internal
                 }
             }
 
+            double offset = shape.StrokeThickness > 0 ? shape.StrokeThickness : 1;
             //todo: (?) for the line below, replace the "+ 1" with the StrokeThickness/LineWidth
-            Size sizeToApply = new Size(Math.Max(sizeX + 1, 0), Math.Max(sizeY + 1, 0)); //example: a vertical line still needs 1 pixel width
+            Size sizeToApply = new Size(Math.Max(sizeX + offset, 0), Math.Max(sizeY + offset, 0)); //example: a vertical line still needs 1 pixel width
 
             //we apply the possible defined size of the outerDomElement of the shape:
-            var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
+            var style = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(shape);
             bool frameworkElementWidthWasSpecified = false;
-            double frameworkElementWidth = frameworkElement.Width;
-            double frameworkElementHeight = frameworkElement.Height;
+            double frameworkElementWidth = shape.Width;
+            double frameworkElementHeight = shape.Height;
             if (!double.IsNaN(frameworkElementWidth))
             {
                 frameworkElementWidthWasSpecified = true;
-                sizeToApply.Width = frameworkElementWidth + 1;
+                sizeToApply.Width = frameworkElementWidth + offset;
                 style.width = sizeToApply.Width.ToInvariantString() + "px";
             }
             bool frameworkElementHeightWasSpecified = false;
             if (!double.IsNaN(frameworkElementHeight))
             {
                 frameworkElementHeightWasSpecified = true;
-                sizeToApply.Height = frameworkElementHeight + 1;
+                sizeToApply.Height = frameworkElementHeight + offset;
                 style.height = sizeToApply.Height.ToInvariantString() + "px";
             }
 
@@ -126,7 +129,7 @@ namespace CSHTML5.Internal
             }
             else
             {
-                if (frameworkElement.IsUnderCustomLayout == false)
+                if (shape.IsUnderCustomLayout == false)
                 {
                     //We apply the size defined earlier (size either by the Width and/or Height of the Shape (when they are set) or by the width and/or height of its content):
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
@@ -135,27 +138,27 @@ namespace CSHTML5.Internal
                     canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px"; // The "sizeToApply" is the size that the shape would take if it was not constrained by the parent framework element.
                     canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
 
-                    shapeActualSize = frameworkElement.INTERNAL_GetActualWidthAndHeight(); //Note: in case that the framework element is constrained, it won't take the size of its canvas2d content, so we then resize the canvas2d content so that the shape stretches.
+                    shapeActualSize = shape.INTERNAL_GetActualWidthAndHeight(); //Note: in case that the framework element is constrained, it won't take the size of its canvas2d content, so we then resize the canvas2d content so that the shape stretches.
 
                     if (!frameworkElementWidthWasSpecified)
                     {
                         canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + 1); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset); //todo: add StrokeThickness instead of +1?
                     }
                     if (!frameworkElementHeightWasSpecified)
                     {
                         canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + 1); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset); //todo: add StrokeThickness instead of +1?
                     }
                 }
                 else
                 {
-                    shapeActualSize = frameworkElement.VisualBounds.Size;
+                    shapeActualSize = shape.VisualBounds.Size;
 
                     if (!frameworkElementWidthWasSpecified)
                     {
                         canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + 1); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset); //todo: add StrokeThickness instead of +1?
                     }
                     else
                     {
@@ -167,7 +170,7 @@ namespace CSHTML5.Internal
                     if (!frameworkElementHeightWasSpecified)
                     {
                         canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + 1); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset); //todo: add StrokeThickness instead of +1?
                     }
                     else
                     {
