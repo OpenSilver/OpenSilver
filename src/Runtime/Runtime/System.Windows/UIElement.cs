@@ -566,9 +566,6 @@ namespace Windows.UI.Xaml
 
             // Update the "IsVisible" property (which is inherited using the "coerce" method):
             d.SetValue(IsVisibleProperty, newValue != Visibility.Collapsed);
-
-            uiElement.InvalidateParentMeasure();
-            uiElement.InvalidateParentArrange();
         }
 
         internal static void INTERNAL_ApplyVisibility(UIElement uiElement, Visibility newValue)
@@ -655,6 +652,9 @@ namespace Windows.UI.Xaml
             {    
                 uiElement.IsVisibleChanged(d, e);
             }
+
+            uiElement.InvalidateParentMeasure();
+            uiElement.InvalidateParentArrange();
         }
 
         private static object CoerceIsVisibleProperty(DependencyObject d, object baseValue)
@@ -1459,7 +1459,7 @@ document.ondblclick = null;
 
                 LayoutManager.Current.RemoveMeasure(this);
 
-                if (Visibility == Visibility.Collapsed)
+                if (this.IsVisible == false)
                 {
                     DesiredSize = new Size();
                     previousDesiredSize = Size.Empty;

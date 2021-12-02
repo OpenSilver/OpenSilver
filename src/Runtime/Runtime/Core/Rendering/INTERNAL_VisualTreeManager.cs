@@ -735,6 +735,7 @@ if(nextSibling != undefined) {
                 child.INTERNAL_DeferredRenderingWhenControlBecomesVisible = () =>
                 {
                     RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
+                    child.ClearMeasureAndArrangeValidation();
                 };
             }
             else
