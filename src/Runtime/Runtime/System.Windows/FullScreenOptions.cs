@@ -1,13 +1,9 @@
 ﻿using System;
 
 #if MIGRATION
-#if WORKINPROGRESS
 namespace System.Windows.Interop
 #else
-namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
-#endif
-#else
-namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
+namespace Windows.UI.Xaml.Interop
 #endif
 {
 	/// <summary>
@@ -23,6 +19,6 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 		/// <summary>
 		/// The application does not exit full-screen mode when other applications gain focus. 
 		/// </summary>
-		StaysFullScreenWhenUnfocused = 1 << 0
+		StaysFullScreenWhenUnfocused = 1
 	}
 }

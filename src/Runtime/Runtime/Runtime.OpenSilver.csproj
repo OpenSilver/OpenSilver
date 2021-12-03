@@ -151,7 +151,6 @@
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
-		<Compile Include="Windows.UI.Xaml\FullScreenOptions.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\LocalMessageReceiver.cs" />
@@ -159,8 +158,9 @@
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\MessageReceivedEventArgs.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ReceiverNameScope.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\SendCompletedEventArgs.cs" />
+    <Compile Include="System.Windows\FullScreenOptions.cs" />
 		<Compile Include="System.Windows\InstallState.cs" />
-		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
+    <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
@@ -787,8 +787,8 @@
 		<Compile Include="System.Windows.Controls\Orientation.cs" />
 		<Compile Include="System.Windows.Controls\Panel.cs" />
 		<Compile Include="System.Windows.Controls\PanelDragDropTarget.cs" />
-		<Compile Include="System.Windows.Controls\PasswordBox.cs" />
-		<Compile Include="System.Windows.Controls\ProgressBar.cs" />
+    <Compile Include="System.Windows.Controls\PasswordBox.cs" />
+    <Compile Include="System.Windows.Controls\ProgressBar.cs" />
 		<Compile Include="System.Windows.Controls\RadioButton.OpenSilver.cs" />
 		<Compile Include="System.Windows.Controls\RowDefinition.cs" />
 		<Compile Include="System.Windows.Controls\RowDefinitionCollection.cs" />

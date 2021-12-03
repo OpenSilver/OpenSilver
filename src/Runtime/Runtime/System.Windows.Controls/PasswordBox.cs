@@ -50,10 +50,14 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>
         /// The DependencyID for the PasswordChar property.
-        /// Default Value:     '*'
+        /// Default Value: '●'
         /// </summary>
         public static readonly DependencyProperty PasswordCharProperty =
-                DependencyProperty.Register("PasswordChar", typeof(char), typeof(PasswordBox), new FrameworkPropertyMetadata('*'));
+            DependencyProperty.Register(
+                nameof(PasswordChar), 
+                typeof(char), 
+                typeof(PasswordBox), 
+                new PropertyMetadata('●'));
 
         /// <summary>
         /// Character to display instead of the actual password.

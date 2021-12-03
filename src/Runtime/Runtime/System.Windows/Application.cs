@@ -478,6 +478,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <param name="component">Root Element</param>
         /// <param name="resourceLocator">Resource Locator</param>
+        [OpenSilver.NotImplemented]
         public static void LoadComponent(object component, Uri resourceLocator)
         {
             if (component is null)
