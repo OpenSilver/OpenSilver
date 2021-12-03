@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if MIGRATION
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -257,3 +259,5 @@ namespace Microsoft.Expression.Interactivity.Core
         }
     }
 }
+
+#endif // MIGRATION
