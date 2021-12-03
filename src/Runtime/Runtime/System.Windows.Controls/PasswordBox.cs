@@ -49,6 +49,26 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// The DependencyID for the PasswordChar property.
+        /// Default Value: '●'
+        /// </summary>
+        public static readonly DependencyProperty PasswordCharProperty =
+            DependencyProperty.Register(
+                nameof(PasswordChar), 
+                typeof(char), 
+                typeof(PasswordBox), 
+                new PropertyMetadata('●'));
+
+        /// <summary>
+        /// Character to display instead of the actual password.
+        /// </summary>
+        public char PasswordChar
+        {
+            get => (char)GetValue(PasswordCharProperty);
+            set => SetValue(PasswordCharProperty, value);
+        }
+
+        /// <summary>
         /// Gets or sets the maximum length for passwords to be handled by this PasswordBox.
         /// </summary>
         /// <returns>

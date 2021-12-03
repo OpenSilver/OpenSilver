@@ -47,6 +47,10 @@ namespace Windows.UI.Xaml
         /// </summary>
         public event EventHandler<ApplicationUnhandledExceptionEventArgs> UnhandledException;
 
+        /// <summary>Occurs when the <see cref="P:System.Windows.Application.InstallState" /> property value changes. </summary>
+        [OpenSilver.NotImplemented]
+        public event EventHandler InstallStateChanged;
+
         internal void OnUnhandledException(Exception exception, bool handled)
         {
             if (UnhandledException != null)
@@ -70,6 +74,11 @@ namespace Windows.UI.Xaml
             get { return false; }
         }
 
+        /// <summary>Gets the current out-of-browser installation state of the application.</summary>
+        /// <returns>The out-of-browser installation state of the application.</returns>
+        [OpenSilver.NotImplemented]
+        public InstallState InstallState { get; }
+
         [OpenSilver.NotImplemented]
         public bool HasElevatedPermissions { get; set; }
 
@@ -77,6 +86,25 @@ namespace Windows.UI.Xaml
         public static StreamResourceInfo GetResourceStream(StreamResourceInfo zipPackageStreamResourceInfo, Uri uriResource)
         {
             return null;
+        }
+
+        /// <summary>Attempts to install the application so that it can run outside the browser. </summary>
+        /// <returns>true if the user gave consent to install the application or the application requires elevated trust; otherwise, false. See Remarks for more information. </returns>
+        /// <exception cref="T:System.InvalidOperationException">The application is already installed.-or-The application is hosted at a URI with a scheme other than http, https, or file.</exception>
+        [OpenSilver.NotImplemented]
+        public bool Install()
+        {
+            if (Current.Host.Source.Scheme.Equals("http", StringComparison.OrdinalIgnoreCase) || Current.Host.Source.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase) || Current.Host.Source.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
+            {
+                if (InstallState.Installed == InstallState)
+                {
+                    throw new InvalidOperationException("Application is already installed.");
+                }
+
+                throw new NotImplementedException($"Installing application is not implemented yet.");
+            }
+
+            throw new InvalidOperationException("Application cannot be installed.");
         }
     }
 }
