@@ -11,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-
+using System;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -31,10 +31,10 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public static readonly DependencyProperty PowerProperty =
             DependencyProperty.Register(
-                    "Power",
-                    typeof(double),
-                    typeof(PowerEase),
-                    new PropertyMetadata(2.0));
+                nameof(Power),
+                typeof(double),
+                typeof(PowerEase),
+                new PropertyMetadata(2.0));
 
         /// <summary>
         /// Specifies the power for the polynomial equation.
