@@ -15,6 +15,12 @@
 using System;
 
 #if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
@@ -88,5 +94,107 @@ namespace Windows.UI.Xaml.Controls
 
         [OpenSilver.NotImplemented]
         public Style CalendarDayButtonStyle { get; set; }
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.Control.IsTabStop dependency property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.Control.IsTabStop dependency property.
+        public static readonly DependencyProperty IsTabStopProperty;
+
+        //
+        // Summary:
+        //     Gets or sets a value that indicates whether a control is included in tab navigation.
+        //
+        // Returns:
+        //     true if the control is included in tab navigation; otherwise, false. The default
+        //     is true.
+        public bool IsTabStop { get; set; }
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.Control.Background dependency property
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.Control.Background dependency
+        //     property.
+        public static readonly DependencyProperty BackgroundProperty;
+
+        //
+        // Summary:
+        //     Gets or sets a brush that provides the background of the control.
+        //
+        // Returns:
+        //     The brush that provides the background of the control. The default is null.
+        public Brush Background { get; set; }
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.Control.Padding dependency property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.Control.Padding dependency property.
+        public static readonly DependencyProperty PaddingProperty;
+
+        //
+        // Summary:
+        //     Gets or sets the padding inside a control.
+        //
+        // Returns:
+        //     The amount of space between the content of a System.Windows.Controls.Control
+        //     and its System.Windows.FrameworkElement.Margin or System.Windows.Controls.Border.
+        //     The default is a thickness of 0 on all four sides.
+        public Thickness Padding { get; set; }
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.Control.BorderThickness dependency property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.Control.BorderThickness dependency
+        //     property.
+        public static readonly DependencyProperty BorderThicknessProperty;
+
+        //
+        // Summary:
+        //     Gets or sets the border thickness of a control.
+        //
+        // Returns:
+        //     A thickness value; the default is a thickness of 0 on all four sides.
+        public Thickness BorderThickness { get; set; }
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.Control.BorderBrush dependency property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.Control.BorderBrush dependency
+        //     property.
+        public static readonly DependencyProperty BorderBrushProperty;
+
+        //
+        // Summary:
+        //     Gets or sets a brush that describes the border background of a control.
+        //
+        // Returns:
+        //     The brush that is used to fill the control's border; the default is null.
+        public Brush BorderBrush { get; set; }
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.Control.Template dependency property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.Control.Template dependency property.
+        public static readonly DependencyProperty TemplateProperty;
+
+        //
+        // Summary:
+        //     Gets or sets a control template.
+        //
+        // Returns:
+        //     The template that defines the appearance of the System.Windows.Controls.Control.
+        public ControlTemplate Template { get; set; }
     }
 }

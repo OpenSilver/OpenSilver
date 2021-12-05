@@ -221,6 +221,17 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        //
+        // Summary:
+        //     Gets or sets the distance between characters of text in the control measured
+        //     in 1000ths of the font size.
+        //
+        // Returns:
+        //     The distance between characters of text in the control measured in 1000ths of
+        //     the font size. The default is 0.
+        [OpenSilver.NotImplemented]
+        public int CharacterSpacing { get; set; }
+
         //-----------------------
         // FONTWEIGHT
         //-----------------------

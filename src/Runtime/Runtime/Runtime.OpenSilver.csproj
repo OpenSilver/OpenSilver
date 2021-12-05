@@ -85,9 +85,13 @@
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
 		<Compile Include="System.Windows.Controls\CalendarDayButton.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\ISelectionAdapter.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
+		<Compile Include="System.Windows.Controls\PopulatedEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
+		<Compile Include="System.Windows.Controls\SelectorSelectionAdapter.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
@@ -95,7 +99,10 @@
 		<Compile Include="System.ComponentModel\ReflectedPropertyCollection.cs" />
 		<Compile Include="System.ComponentModel\ReflectedPropertyData.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
+		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTrigger.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />

@@ -210,5 +210,25 @@ namespace Windows.UI.Xaml.Controls
             typeof(bool),
             typeof(DatePicker),
             null);
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.DatePicker.CalendarStyle dependency property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.DatePicker.CalendarStyle dependency
+        //     property.
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty CalendarStyleProperty =
+            DependencyProperty.Register("CalendarStyle", typeof(Style), typeof(DatePicker), null);
+
+        //
+        // Summary:
+        //     Gets or sets the style that is used when rendering the calendar.
+        //
+        // Returns:
+        //     The style that is used when rendering the calendar.
+        [OpenSilver.NotImplemented]
+        public Style CalendarStyle { get; set; }
     }
 }

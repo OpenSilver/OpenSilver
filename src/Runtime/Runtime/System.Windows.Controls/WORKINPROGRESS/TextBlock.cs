@@ -1,6 +1,12 @@
 using System.Windows;
 
 #if MIGRATION
+using System.Windows.Documents;
+#else
+using Windows.UI.Xaml.Documents;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls
 #else
 namespace Windows.UI.Xaml.Controls
@@ -36,5 +42,8 @@ namespace Windows.UI.Xaml.Controls
 			get { return (int)this.GetValue(CharacterSpacingProperty); }
 			set { this.SetValue(CharacterSpacingProperty, value); }
 		}
+
+		[OpenSilver.NotImplemented]
+		public FontSource FontSource { get; set; }
 	}
 }

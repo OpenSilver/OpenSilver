@@ -137,5 +137,27 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnDropDownOpening(RoutedPropertyChangingEventArgs<bool> e)
         {
         }
+
+        //
+        // Summary:
+        //     Identifies the System.Windows.Controls.AutoCompleteBox.ItemFilter dependency
+        //     property.
+        //
+        // Returns:
+        //     The identifier for the System.Windows.Controls.AutoCompleteBox.ItemFilter dependency
+        //     property.
+        public static readonly DependencyProperty ItemFilterProperty = DependencyProperty.Register("ItemFilter", typeof(AutoCompleteFilterPredicate<object>), typeof(AutoCompleteBox), null);
+
+        //
+        // Summary:
+        //     Raises the System.Windows.Controls.AutoCompleteBox.Populated event
+        //
+        // Parameters:
+        //   e:
+        //     A System.Windows.Controls.PopulatedEventArgs that contains the event data.
+        [OpenSilver.NotImplemented]
+        protected virtual void OnPopulated(PopulatedEventArgs e)
+        {
+        }
     }
 }

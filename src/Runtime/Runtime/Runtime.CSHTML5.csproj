@@ -137,6 +137,7 @@
     <Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
     <Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
     <Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
+    <Compile Include="System.Windows.Controls\PopulatedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
     <Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
     <Compile Include="System.Windows.Controls\TextBoxView.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
     <Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
+    <Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
@@ -170,6 +172,7 @@
     <Compile Include="System.Windows\FontStretchConverter.cs" />
     <Compile Include="System.Windows\FontStyleConverter.cs" />
     <Compile Include="System.Windows\IApplicationService.cs" />
+    <Compile Include="System.Windows\InstallState.cs" />
     <Compile Include="System.Windows\NullableBoolConverter.cs" />
     <Compile Include="System.Windows\RectConverter.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
