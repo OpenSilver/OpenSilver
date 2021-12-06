@@ -67,5 +67,18 @@ namespace Windows.UI.Xaml.Printing
 		public void Print(string documentName, PrinterFallbackSettings printerFallbackSettings, bool useDefaultPrinter = false)
 		{
 		}
+
+		//
+		// Summary:
+		//     Starts the bitmap printing process for the specified document by opening the
+		//     print dialog box.
+		//
+		// Parameters:
+		//   documentName:
+		//     The name of the document to print.
+		[OpenSilver.NotImplemented]
+		public void PrintBitmap(string documentName)
+        {
+        }
 	}
 }

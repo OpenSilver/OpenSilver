@@ -1043,6 +1043,29 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty CharacterSpacingProperty =
+            DependencyProperty.Register(
+                nameof(CharacterSpacing),
+                typeof(int),
+                typeof(Control),
+                new PropertyMetadata(0));
+
+        //
+        // Summary:
+        //     Gets or sets the distance between characters of text in the control measured
+        //     in 1000ths of the font size.
+        //
+        // Returns:
+        //     The distance between characters of text in the control measured in 1000ths of
+        //     the font size. The default is 0.
+        [OpenSilver.NotImplemented]
+        public int CharacterSpacing
+        {
+            get { return (int)GetValue(CharacterSpacingProperty); }
+            set { SetValue(CharacterSpacingProperty, value); }
+        }
+
+        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TabNavigationProperty = 
             DependencyProperty.Register(
                 nameof(TabNavigation), 

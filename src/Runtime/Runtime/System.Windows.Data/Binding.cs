@@ -341,6 +341,12 @@ namespace Windows.UI.Xaml.Data
         /// </summary>
         public bool ValidatesOnLoad { get; set; }
 
+        //
+        // Summary:
+        //     Indicates whether data binding debugging is enabled.
+        [OpenSilver.NotImplemented]
+        public static bool IsDebuggingEnabled;
+
         /// <summary>
         /// Gets or sets a value that indicates whether the binding ignores any <see cref="ICollectionView"/>
         /// settings on the data source.
