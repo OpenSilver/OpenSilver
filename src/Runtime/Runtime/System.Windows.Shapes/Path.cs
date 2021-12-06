@@ -89,14 +89,18 @@ namespace Windows.UI.Xaml.Shapes
         private static void Data_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Path path = (Path)d;
+
             if (null != e.OldValue)
             {
                 ((Geometry)e.OldValue).SetParentPath(null);
             }
+
             if (null != e.NewValue)
             {
                 ((Geometry)e.NewValue).SetParentPath(path);
             }
+
+            path.InvalidateMeasure();
             path.ScheduleRedraw();
         }
 
@@ -124,6 +128,7 @@ namespace Windows.UI.Xaml.Shapes
                     Transform originalTransform = Data.Transform;
                     Transform actualTransform = originalTransform;
                     double int32FactorX = 1d;
+
                     double int32FactorY = 1d;
                     INTERNAL_ShapesDrawHelpers.FixCoordinatesGreaterThanInt32MaxValue(minX,
                                                                                       minY,
@@ -227,6 +232,29 @@ namespace Windows.UI.Xaml.Shapes
                 this.Data.SetParentPath(this);
             }
             base.RefreshOverride();
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (Data == null)
+            {
+                return base.MeasureOverride(availableSize);
+            }
+
+            if (Data is PathGeometry pathGeometry)
+            {
+                if (pathGeometry.Figures == null || pathGeometry.Figures.Count == 0)
+                {
+                    return base.MeasureOverride(availableSize);
+                }
+            }
+
+            double minX = double.MaxValue;
+            double minY = double.MaxValue;
+            double maxX = double.MinValue;
+            double maxY = double.MinValue;
+            Data.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY);
+            return new Size(availableSize.Width.Min(maxX + StrokeThickness), availableSize.Height.Min(maxY + StrokeThickness));
         }
     }
 }
