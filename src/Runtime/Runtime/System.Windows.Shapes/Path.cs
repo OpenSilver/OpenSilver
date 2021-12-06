@@ -254,7 +254,7 @@ namespace Windows.UI.Xaml.Shapes
             double maxX = double.MinValue;
             double maxY = double.MinValue;
             Data.GetMinMaxXY(ref minX, ref maxX, ref minY, ref maxY);
-            return new Size(maxX + StrokeThickness, maxY + StrokeThickness);
+            return new Size(availableSize.Width.Min(maxX + StrokeThickness), availableSize.Height.Min(maxY + StrokeThickness));
         }
     }
 }
