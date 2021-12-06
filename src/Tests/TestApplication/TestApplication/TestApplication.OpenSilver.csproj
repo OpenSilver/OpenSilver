@@ -198,6 +198,7 @@
     <Compile Include="Tests\Paths\PathTest.xaml.cs">
       <DependentUpon>PathTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\PopupZIndexTest.xaml.cs" />
     <Compile Include="Tests\PrintingTest.xaml.cs">
       <DependentUpon>PrintingTest.xaml</DependentUpon>
     </Compile>
@@ -592,6 +593,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Tests\PopupZIndexTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
 </Project>
