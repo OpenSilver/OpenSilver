@@ -47,7 +47,6 @@ namespace Windows.UI.Xaml.Controls
 
         private AutoCompleteFilterMode _filterMode; // filter mode
         private AutoCompleteFilterPredicate<object> _filter; // currently selected filter
-        private AutoCompleteFilterPredicate<object> _itemFilter; // filter used when mode is set to Custom.
 
         private bool _updatingTextOnSelection;
 
@@ -419,25 +418,36 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Identifies the <see cref="ItemFilter"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ItemFilterProperty = 
+            DependencyProperty.Register(
+                nameof(ItemFilter), 
+                typeof(AutoCompleteFilterPredicate<object>), 
+                typeof(AutoCompleteBox),
+                new PropertyMetadata(OnItemFilterPropertyChanged));
+
+        /// <summary>
         /// The custom method that uses the user-entered text to filter the items specified by the ItemsSource property.
         /// </summary>
         public AutoCompleteFilterPredicate<object> ItemFilter
         {
-            get { return _itemFilter; }
-            set
+            get { return (AutoCompleteFilterPredicate<object>)GetValue(ItemFilterProperty); }
+            set { SetValue(ItemFilterProperty, value); }
+        }
+
+        private static void OnItemFilterPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            AutoCompleteBox source = (AutoCompleteBox)d;
+            AutoCompleteFilterPredicate<object> value = (AutoCompleteFilterPredicate<object>)e.NewValue;
+
+            if (value == null)
             {
-                if (_itemFilter != value)
-                {
-                    _itemFilter = value;
-                    if (value != null)
-                    {
-                        FilterMode = AutoCompleteFilterMode.Custom;
-                    }
-                    else
-                    {
-                        FilterMode = AutoCompleteFilterMode.None;
-                    }
-                }
+                source.FilterMode = AutoCompleteFilterMode.None;
+            }
+            else
+            {
+                source.FilterMode = AutoCompleteFilterMode.Custom;
             }
         }
 
@@ -661,7 +671,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (item != null && search != null)
             {
-                return this._itemFilter(search, item);
+                return this.ItemFilter(search, item);
             }
             else
             {

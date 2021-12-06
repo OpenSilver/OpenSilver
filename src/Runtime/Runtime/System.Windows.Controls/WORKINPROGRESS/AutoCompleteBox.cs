@@ -140,16 +140,6 @@ namespace Windows.UI.Xaml.Controls
 
         //
         // Summary:
-        //     Identifies the System.Windows.Controls.AutoCompleteBox.ItemFilter dependency
-        //     property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Controls.AutoCompleteBox.ItemFilter dependency
-        //     property.
-        public static readonly DependencyProperty ItemFilterProperty = DependencyProperty.Register("ItemFilter", typeof(AutoCompleteFilterPredicate<object>), typeof(AutoCompleteBox), null);
-
-        //
-        // Summary:
         //     Raises the System.Windows.Controls.AutoCompleteBox.Populated event
         //
         // Parameters:
