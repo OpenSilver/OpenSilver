@@ -23,6 +23,7 @@ namespace TestApplication
             Tests.Add(new Test("Opacity", "IsHitTestVisible Opacity"));
             Tests.Add(new Test("IsHitTestVisible", "IsHitTestVisible Opacity"));
             Tests.Add(new Test("ChildWindow", "ChildWindow"));
+            Tests.Add(new Test("PopupZIndex", "PopupZIndex"));
             Tests.Add(new Test("Viewbox", "Viewbox"));
             Tests.Add(new Test("Frame", "Frame")); //TODO: fix it
 

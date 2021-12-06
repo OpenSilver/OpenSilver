@@ -115,7 +115,7 @@ namespace Windows.UI.Xaml.Controls
                 "ZIndex", 
                 typeof(int), 
                 typeof(UIElement), 
-                new PropertyMetadata(0)
+                new PropertyMetadata(0, ZIndex_Changed)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -125,6 +125,14 @@ namespace Windows.UI.Xaml.Controls
                         ApplyAlsoWhenThereIsAControlTemplate = true
                     }
                 });
+
+        internal static int MaxZIndex = 0;
+        private static void ZIndex_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            int zindex = (int)e.NewValue;
+            if (zindex > MaxZIndex)
+                MaxZIndex = zindex;
+        }
 
         /// <summary>
         /// Sets the value of the Canvas.Left XAML attached property for a target element.
