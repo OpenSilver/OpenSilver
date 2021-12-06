@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -36,7 +37,11 @@ namespace Windows.UI.Xaml.Controls
         //     The URI source of the HTML content to display in the System.Windows.Controls.WebBrowser
         //     control.
         [OpenSilver.NotImplemented]
-        public Uri Source { get; set; }
+        public Uri Source
+        {
+            get => (Uri)GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
+        }
 
         //
         // Summary:

@@ -12,6 +12,12 @@
 *  
 \*====================================================================================*/
 
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
+
 namespace System.Windows.Interactivity
 {
     /// <summary>
@@ -30,8 +36,17 @@ namespace System.Windows.Interactivity
             DependencyProperty.Register("SourceObject", typeof(string), typeof(EventTrigger), null);
 
         [OpenSilver.NotImplemented]
-        public string SourceName { get; set; }
+        public string SourceName
+        {
+            get => (string)GetValue(SourceNameProperty);
+            set => SetValue(SourceNameProperty, value);
+        }
+
         [OpenSilver.NotImplemented]
-        public object SourceObject { get; set; }
+        public object SourceObject
+        {
+            get => GetValue(SourceObjectProperty);
+            set => SetValue(SourceObjectProperty, value);
+        }
     }
 }

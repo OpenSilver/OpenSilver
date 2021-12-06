@@ -229,6 +229,10 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     The style that is used when rendering the calendar.
         [OpenSilver.NotImplemented]
-        public Style CalendarStyle { get; set; }
+        public Style CalendarStyle
+        {
+            get => (Style)GetValue(CalendarStyleProperty);
+            set => SetValue(CalendarStyleProperty, value);
+        }
     }
 }
