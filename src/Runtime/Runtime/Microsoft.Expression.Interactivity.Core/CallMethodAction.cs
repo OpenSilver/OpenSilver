@@ -1,8 +1,11 @@
 ﻿#if MIGRATION
 
+// Copyright (c) Microsoft. All rights reserved. 
+// Licensed under the MIT license. See LICENSE file in the project root for full license information. 
+
+
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -10,6 +13,9 @@ using System.Windows.Interactivity;
 
 namespace Microsoft.Expression.Interactivity.Core
 {
+    /// <summary>
+    /// Calls a method on a specified object when invoked.
+    /// </summary>
     public class CallMethodAction : TriggerAction<DependencyObject>
     {
         private List<MethodDescriptor> methodDescriptors;
@@ -62,7 +68,6 @@ namespace Microsoft.Expression.Interactivity.Core
                 {
                     ParameterInfo[] parameters = methodDescriptor.Parameters;
 
-                    // todo jekelly: reconcile these restrictions with spec questions (see below)
                     if (parameters.Length == 0)
                     {
                         methodDescriptor.MethodInfo.Invoke(this.Target, null);
@@ -79,10 +84,7 @@ namespace Microsoft.Expression.Interactivity.Core
                 }
                 else if (this.TargetObject != null)
                 {
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
-                        "Method not found",
-                        this.MethodName,
-                        this.TargetObject.GetType().Name));
+                    throw new ArgumentException($"Could not find method named '{MethodName}' on object of type '{TargetObject.GetType().Name}' that matches the expected signature.");
                 }
             }
         }
@@ -113,7 +115,6 @@ namespace Microsoft.Expression.Interactivity.Core
 
             return this.methodDescriptors.FirstOrDefault((methodDescriptor) =>
             {
-                // todo jekelly: Need spec clarification on if we want to call an (object, EventArgs) overload if there is no parameter or void() sig. Currently, no. (see above)
                 return !methodDescriptor.HasParameters ||
                     (parameter != null &&
                     methodDescriptor.SecondParameterType.IsAssignableFrom(parameter.GetType()));
