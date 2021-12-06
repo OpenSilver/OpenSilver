@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using System.Text;
 
 #if OPENSILVER
 using System.Text.Json;
@@ -31,6 +32,57 @@ using Windows.UI.Xaml;
 
 namespace CSHTML5
 {
+    public static class InteropHelper
+    {
+        static int FindArg(string str, int args_count)
+        {
+            int res = -1;
+            StringBuilder sb = new StringBuilder();
+            foreach (char s in str)
+            {
+                sb.Append(s);
+                if (int.TryParse(sb.ToString(), out int s_int) && s_int < args_count)
+                    res = s_int;
+                else
+                    break;
+            }
+            return res;
+        }
+
+        public static string ReplaceArgs(string str, string[] args)
+        {
+            int char_count = Math.Abs(args.Length - 1).ToString().Length;
+            StringBuilder sb = new StringBuilder();
+
+            int index = str.IndexOf('$');
+            while (index != -1)
+            {
+                sb.Append(str.Substring(0, index));
+                str = str.Substring(index);
+
+                string arg_candidate = str.Substring(1, str.Length > char_count ? char_count : str.Length - 1);
+                int arg = FindArg(arg_candidate, args.Length);
+
+                if (arg != -1)
+                {
+                    str = str.Substring(arg.ToString().Length + 1);
+                    sb.Append(args[arg]);
+                }
+                else
+                {
+                    index = str.IndexOf('$', 1);
+                    continue;
+                }
+
+                index = str.IndexOf('$');
+            }
+            // Append remaining part
+            sb.Append(str);
+
+            return sb.ToString();
+        }
+    }
+
     internal static class INTERNAL_InteropImplementation
     {
         private static bool IsJavaScriptCSharpInteropSetUp;
@@ -87,21 +139,14 @@ namespace CSHTML5
             }
 
             string unmodifiedJavascript = javascript;
-            // Replace '{' and '}' characters for String.Format.
-            javascript = javascript.Replace("{", "{{").Replace("}", "}}");
-            object[] args = new object[variables.Length];
+            string[] args = new string[variables.Length];
 
             // If the javascript code has references to previously obtained JavaScript objects,
             // we replace those references with calls to the "document.jsObjRef"
             // dictionary.
-            // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we
-            // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
-            // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
-            // 10 arguments and using "$10".
-            for (int i = variables.Length - 1; i >= 0; i--)  
+            for (int i = 0; i < variables.Length; i++)
             {
                 var variable = variables[i];
-                javascript = javascript.Replace("$" + i.ToString(), "{" + i + "}");
                 if (variable is INTERNAL_JSObjectReference)
                 {
                     //----------------------
@@ -155,15 +200,13 @@ namespace CSHTML5
                     var isVoid = callback.Method.ReturnType == typeof(void);
 
                     // Change the JS code to point to that callback:
-                    args[i] = string.Format(
-                                       @"(function() {{ return document.eventCallback({0}, {1}, {2});}})", callbackId,
+                    string arg =
 #if OPENSILVER
-                                       Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)",
+                    Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)";
 #elif BRIDGE
-                                       "Array.prototype.slice.call(arguments)",
+                    "Array.prototype.slice.call(arguments)";
 #endif
-                                       (!isVoid).ToString().ToLower()
-                                       );
+                    args[i] = "(function() { return document.eventCallback(" + callbackId + ", " + arg + ", " + (!isVoid).ToString().ToLower() + ");})";
 
                     // Note: generating the random number in JS rather than C# is important in order
                     // to be able to put this code inside a JavaScript "for" statement (cf.
@@ -198,7 +241,7 @@ namespace CSHTML5
                 }
             }
 
-            javascript = String.Format(javascript, args);
+            javascript = InteropHelper.ReplaceArgs(javascript, args);
 
             UnmodifiedJavascriptCalls.Add(unmodifiedJavascript);
 
