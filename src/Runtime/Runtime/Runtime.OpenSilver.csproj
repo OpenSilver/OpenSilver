@@ -156,7 +156,7 @@
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
 		<Compile Include="System.Windows.Interactivity\CustomPropertyValueEditor.cs" />
 		<Compile Include="System.Windows.Interactivity\CustomPropertyValueEditorAttribute.cs" />
-		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\CallMethodAction.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity.Core\CallMethodAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
