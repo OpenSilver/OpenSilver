@@ -1,7 +1,7 @@
 ﻿#if MIGRATION
 
 // Copyright (c) Microsoft. All rights reserved. 
-// Licensed under the MIT license. See LICENSE file in the project root for full license information. 
+// Licensed under the MIT license. See https://github.com/microsoft/XamlBehaviorsWpf/blob/master/src/Microsoft.Xaml.Behaviors/Core/CallMethodAction.cs
 
 
 using System;
