@@ -51,6 +51,7 @@ Note: these libraries get bundled into your application (in whole or in part).
 - ResizeSensor.js (MIT License) (https://github.com/marcj/css-element-queries)
 - flatpickr.js (MIT License) (https://github.com/flatpickr/flatpickr)
 - Silverlight Toolkit (MS-PL License) (https://github.com/microsoftarchive/SilverlightToolkit)
+- XamlBehaviorsWpf (MIT License) (subset) (https://github.com/microsoft/XamlBehaviorsWpf)
 
 Big kudos to the Bridge.NET team who has developed one of best pieces of technology out there. More information can be found at: https://bridge.net
 
