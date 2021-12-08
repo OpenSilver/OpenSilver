@@ -187,7 +187,11 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
             UpdateTextAlignment(INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this), alignment);
         }
 
-        private void UpdateTextAlignment(INTERNAL_HtmlDomStyleReference style, TextAlignment alignment)
+#if OPENSILVER
+        private static void UpdateTextAlignment(INTERNAL_HtmlDomStyleReference style, TextAlignment alignment)
+#elif BRIDGE
+        private static void UpdateTextAlignment(dynamic style, TextAlignment alignment)
+#endif
         {
             switch (alignment)
             {
