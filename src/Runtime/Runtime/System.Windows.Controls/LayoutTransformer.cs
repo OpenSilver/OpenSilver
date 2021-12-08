@@ -7,10 +7,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 #if MIGRATION
 using System.Windows.Media;
 #else
-using System;
 using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 #endif
@@ -22,8 +23,11 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    [TemplatePart(Name = "Presenter", Type = typeof(ContentPresenter))]
-    [TemplatePart(Name = "TransformRoot", Type = typeof(Grid))]
+    /// <summary>
+    /// Represents a control that applies a layout transformation to its Content.
+    /// </summary>
+    [TemplatePart(Name = TransformRootName, Type = typeof(ContentPresenter))]
+    [TemplatePart(Name = PresenterName, Type = typeof(Grid))]
     public class LayoutTransformer : ContentControl
     {
         /// <summary>
@@ -128,11 +132,10 @@ namespace Windows.UI.Xaml.Controls
         /// template is applied.
         /// </summary>
 #if MIGRATION
-        public
+        public override void OnApplyTemplate()
 #else
-        protected
+        protected override void OnApplyTemplate()
 #endif
-         override void OnApplyTemplate()
         {
             // Apply new template
             base.OnApplyTemplate();
