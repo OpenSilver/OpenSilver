@@ -603,29 +603,13 @@ namespace Windows.UI.Xaml.Controls
             {
                 TextBoxView view = CreateView();
                 _textViewHost.AttachView(view);
-                view.Loaded += OnTexBoxtViewLoaded;
             }
-        }
-
-        private void OnTexBoxtViewLoaded(object sender, RoutedEventArgs e)
-        {
-            _textViewHost.View.OnAcceptsReturnChanged(AcceptsReturn);
-            _textViewHost.View.OnTextChanged(Text);
-            _textViewHost.View.OnTextAlignmentChanged(TextAlignment);
-            _textViewHost.View.OnTextWrappingChanged(TextWrapping);
-            _textViewHost.View.OnHorizontalScrollBarVisibilityChanged(HorizontalScrollBarVisibility);
-            _textViewHost.View.OnVerticalScrollBarVisibilityChanged(VerticalScrollBarVisibility);
-            _textViewHost.View.OnMaxLengthChanged(MaxLength);
-            _textViewHost.View.OnTextDecorationsChanged(TextDecorations);
-            _textViewHost.View.OnIsReadOnlyChanged(IsReadOnly);
-            UpdateVisualStates();
         }
 
         private void ClearContentElement()
         {
             if (_textViewHost != null)
             {
-                _textViewHost.View.Loaded += OnTexBoxtViewLoaded;
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
