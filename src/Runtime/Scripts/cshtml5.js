@@ -295,9 +295,14 @@ document.addEventListenerSafe = function (element, method, func) {
     if (typeof element == 'string') {
         element = document.getElementById(element);
     }
-	if (element){
-		element.addEventListener(method, func);
-	}
+    if (element) {
+        if (method == "touchstart" || method == "wheel" || method == "touchmove") {
+            element.addEventListener(method, func, { passive: true });
+        }
+        else {
+            element.addEventListener(method, func);
+        }
+    }
 }
 
 document.eventCallback = function (callbackId, arguments, sync) {
