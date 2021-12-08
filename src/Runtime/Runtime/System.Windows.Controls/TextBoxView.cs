@@ -184,19 +184,28 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
 
         internal void OnTextAlignmentChanged(TextAlignment alignment)
         {
+            UpdateTextAlignment(INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this), alignment);
+        }
+
+#if OPENSILVER
+        private static void UpdateTextAlignment(INTERNAL_HtmlDomStyleReference style, TextAlignment alignment)
+#elif BRIDGE
+        private static void UpdateTextAlignment(dynamic style, TextAlignment alignment)
+#endif
+        {
             switch (alignment)
             {
                 case TextAlignment.Center:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).textAlign = "center";
+                    style.textAlign = "center";
                     break;
                 case TextAlignment.Left:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).textAlign = "left";
+                    style.textAlign = "left";
                     break;
                 case TextAlignment.Right:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).textAlign = "right";
+                    style.textAlign = "right";
                     break;
                 case TextAlignment.Justify:
-                    INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this).textAlign = "justify";
+                    style.textAlign = "justify";
                     break;
                 default:
                     break;
@@ -418,6 +427,9 @@ sel.addRange(range);
             contentEditableDivStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             contentEditableDivStyle.background = "solid transparent";
             contentEditableDivStyle.cursor = "text";
+
+            // Apply TextAlignment
+            UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);
 
             string isContentEditable = (!isReadOnly).ToString().ToLower();
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "contentEditable", isContentEditable);
