@@ -87,6 +87,7 @@
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\ISelectionAdapter.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
+		<Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\PopulatedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
@@ -790,7 +791,6 @@
 		<Compile Include="System.Windows.Controls\Viewbox.cs" />
 		<Compile Include="System.Windows.Controls\VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\WebView.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\LayoutTransformer.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\VirtualizationMode.cs" />
 		<Compile Include="System.Windows.Controls\WrapPanel.cs" />
 		<Compile Include="System.Windows.Data\Binding.cs" />
