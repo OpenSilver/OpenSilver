@@ -655,6 +655,7 @@ namespace Windows.UI.Xaml.Controls
                     // First displayed row is partially scrolled of. Let's scroll it so that this.NegVerticalOffset becomes 0.
                     this.DisplayData.PendingVerticalScrollHeight = -this.NegVerticalOffset;
                     InvalidateRowsMeasure(false /*invalidateIndividualRows*/);
+                    InvalidateRowsArrange(); // force
                 }
                 return true;
             }
@@ -743,6 +744,7 @@ namespace Windows.UI.Xaml.Controls
 
             InvalidateMeasure();
             InvalidateRowsMeasure(false /*invalidateIndividualRows*/);
+            InvalidateRowsArrange(); // force
 
             return true;
         }
