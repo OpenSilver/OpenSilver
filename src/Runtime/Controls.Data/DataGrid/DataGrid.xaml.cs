@@ -3151,6 +3151,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     this.DisplayData.PendingVerticalScrollHeight = scrollHeight;
                     InvalidateRowsMeasure(false /*invalidateIndividualRows*/);
+                    InvalidateRowsArrange(); // force invalidate
                     e.Handled = true;
                 }
             }
@@ -3707,6 +3708,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     // Invalidate so the scroll happens on idle
                     InvalidateRowsMeasure(false /*invalidateIndividualElements*/);
+                    InvalidateRowsArrange(); // force invalidate
                 }
                 // 
             }
@@ -3827,7 +3829,10 @@ namespace Windows.UI.Xaml.Controls
                 this.HorizontalOffset = newValue;
 
                 InvalidateColumnHeadersMeasure();
+                InvalidateColumnHeadersArrange();    // force invalidate
+
                 InvalidateRowsMeasure(true);
+                InvalidateRowsArrange();    // force invalidate
             }
         }
 
@@ -4465,8 +4470,16 @@ namespace Windows.UI.Xaml.Controls
         {
             this.ColumnsInternal.EnsureVisibleEdgedColumnsWidth();
             InvalidateColumnHeadersMeasure();
+
+            // Invalidate Column Header when edit text or resize column width
+            InvalidateColumnHeadersArrange(); // force invalidate
+
             InvalidateRowsMeasure(true);
+            InvalidateRowsArrange();    // force invalidate
+
             InvalidateMeasure();
+
+            InvalidateCellsArrange();    // force invalidate
         }
 
         private void EnsureRowHeaderWidth()
@@ -6789,6 +6802,8 @@ namespace Windows.UI.Xaml.Controls
                 {
                     UpdateDisplayedRows(this.DisplayData.FirstScrollingSlot, this.CellsHeight);
                     InvalidateRowsMeasure(false /*invalidateIndividualElements*/);
+
+                    InvalidateRowsArrange(); // force invalidate
                 }
             }
         }
