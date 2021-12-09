@@ -405,6 +405,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return new Size(this.OwningGrid.ColumnsInternal.VisibleEdgedColumnsWidth, height);
         }
 
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            object outerDiv = base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
+
+            var style = CSHTML5.Internal.INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDiv);
+
+            // Set overflow for scrolling
+            style.overflow = "hidden";
+            return outerDiv;
+        }
+
         /// <summary>
         /// Creates AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
         /// </summary>
