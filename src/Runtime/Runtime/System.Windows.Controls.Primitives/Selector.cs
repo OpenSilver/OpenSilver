@@ -38,6 +38,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// </summary>
     public partial class Selector : ItemsControl
     {
+        private bool SelectedValueWaitsForItems;
         private bool SelectedValueDrivesSelection;
         private bool SkipCoerceSelectedItemCheck;
         private bool SyncingSelectionAndCurrency;
@@ -453,6 +454,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
             CoerceValue(SelectedIndexProperty);
             CoerceValue(SelectedItemProperty);
 
+            if (SelectedValueWaitsForItems &&
+                !Object.Equals(SelectedValue, InternalSelectedValue))
+            {
+                // This sets the selection from SelectedValue when SelectedValue
+                // was set prior to the arrival of any items to select, provided
+                // that SelectedIndex or SelectedItem didn't already do it.
+                SelectItemWithValue(SelectedValue, selectNow: true);
+            }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -769,7 +779,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 }
             }
 
-            if (!SelectedValueDrivesSelection)
+            if (_selectedItems.Count > 0)
+            {
+                // an item has been selected, so turn off the delayed
+                // selection by SelectedValue (bug 452619)
+                SelectedValueWaitsForItems = false;
+            }
+
+            if (!SelectedValueDrivesSelection && !SelectedValueWaitsForItems)
             {
                 object desiredSelectedValue = InternalSelectedValue;
                 if (desiredSelectedValue == DependencyProperty.UnsetValue)
@@ -1047,32 +1064,44 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         private object SelectItemWithValue(object value, bool selectNow)
         {
-            int index;
-            object item = FindItemWithValue(value, out index);
-
-            ItemInfo info = NewItemInfo(item, null, index);
-
-            if (selectNow)
+            object item;
+            if (base.HasItems)
             {
-                try
+                int index;
+                item = FindItemWithValue(value, out index);
+
+                ItemInfo info = NewItemInfo(item, null, index);
+
+                if (selectNow)
                 {
-                    SelectedValueDrivesSelection = true;
-                    // We can assume it's in the collection because we just searched
-                    // through the collection to find it.
-                    SelectionChange.SelectJustThisItem(info, assumeInItemsCollection: true);
+                    try
+                    {
+                        SelectedValueDrivesSelection = true;
+                        // We can assume it's in the collection because we just searched
+                        // through the collection to find it.
+                        SelectionChange.SelectJustThisItem(info, assumeInItemsCollection: true);
+                    }
+                    finally
+                    {
+                        SelectedValueDrivesSelection = false;
+                    }
                 }
-                finally
+                else
                 {
-                    SelectedValueDrivesSelection = false;
+                    // when called during coercion, don't actually select until
+                    // OnSelectedValueChanged, so that the new SelectedValue is
+                    // fully set before raising the SelectedChanged event
+                    //PendingSelectionByValueField.SetValue(this, info);
+                    PendingSelectionByValue = info;
                 }
             }
             else
             {
-                // when called during coercion, don't actually select until
-                // OnSelectedValueChanged, so that the new SelectedValue is
-                // fully set before raising the SelectedChanged event
-                //PendingSelectionByValueField.SetValue(this, info);
-                PendingSelectionByValue = info;
+                // if there are no items, protect SelectedValue from being overwritten
+                // until items show up.  This enables a SelectedValue set from markup
+                // to set the initial selection when the items eventually appear.
+                item = DependencyProperty.UnsetValue;
+                SelectedValueWaitsForItems = true;
             }
 
             return item;
