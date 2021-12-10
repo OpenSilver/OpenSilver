@@ -146,7 +146,18 @@ namespace Windows.UI.Xaml
                 {
                     UIElement element = GetTopElement(arrangeQueue);
                     //Console.WriteLine($"LayoutManager UpdateLayout / Arrange {element}");
-                    element.Arrange(element.PreviousFinalRect);
+
+                    Rect previousRect = element.PreviousFinalRect;
+                    FrameworkElement fe = element as FrameworkElement;
+                    if (fe.IsCustomLayoutRoot)
+                    {
+                        if (fe.IsAutoWidthOnCustomLayout)
+                            previousRect.Width = fe.DesiredSize.Width;
+
+                        if (fe.IsAutoHeightOnCustomLayout)
+                            previousRect.Height = fe.DesiredSize.Height;
+                    }
+                    element.Arrange(previousRect);
                 }
 
                 while (updatedElements.Count > 0 && measureQueue.Count == 0 && arrangeQueue.Count == 0) // LayoutUpdated can invalidate other elements
