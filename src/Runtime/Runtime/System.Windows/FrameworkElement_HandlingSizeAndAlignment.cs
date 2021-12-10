@@ -88,6 +88,16 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
+        /// Gets or sets the Auto Width to the root of CustomLayout
+        /// </summary>
+        public bool IsAutoWidthOnCustomLayout { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Auto Height to the root of CustomLayout
+        /// </summary>
+        public bool IsAutoHeightOnCustomLayout { get; set; }
+
+        /// <summary>
         /// Enable or disable measure/arrange layout system in a sub part
         /// </summary>
         public bool CustomLayout
@@ -1520,6 +1530,14 @@ namespace Windows.UI.Xaml
                 else
                     return 0d;
             }
+        }
+
+        /// <summary>
+        /// Gets the rendered size of a FrameworkElement.
+        /// </summary>
+        public Size ActualSize
+        {
+            get { return this.INTERNAL_GetActualWidthAndHeight(); }
         }
 
         /// <summary>
