@@ -45,6 +45,7 @@ namespace CSHTML5.Internal
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);
             style.width = "0px";
             style.height = "0px";
+            style.position = "absolute";
             return div;
         }
 
