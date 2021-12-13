@@ -264,17 +264,7 @@ namespace OpenSilver
         /// <returns></returns>
         public static object GetDiv(FrameworkElement frameworkElement)
         {
-            if (frameworkElement.INTERNAL_OuterDomElement == null)
-                throw new InvalidOperationException("Cannot get the Div because the control is not in the visual tree. Consider waiting until the 'FrameworkElement.Loaded' event is fired before calling this piece of code.");
-
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (IsRunningInTheSimulator)
-#endif
-                return (INTERNAL_HtmlDomElementReference)frameworkElement.INTERNAL_OuterDomElement;
-            else
-                return frameworkElement.INTERNAL_OuterDomElement;
+            return frameworkElement.INTERNAL_OuterDomElement;
         }
 
 #if CSHTML5BLAZOR
