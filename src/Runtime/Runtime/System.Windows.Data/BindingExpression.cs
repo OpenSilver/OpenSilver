@@ -137,7 +137,7 @@ namespace Windows.UI.Xaml.Data
                 // BROKEN PATH
                 //------------------------
 
-                if (_propertyPathWalker.IsDataContextBound)
+                if (_propertyPathWalker.IsDataContextBound && _propertyPathWalker.FinalNode is DependencyPropertyNode)
                 {
                     value = UseTargetNullValue();
                 }

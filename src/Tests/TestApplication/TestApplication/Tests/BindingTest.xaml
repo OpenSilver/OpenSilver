@@ -4,7 +4,12 @@
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+           xmlns:converters="clr-namespace:TestApplication.OpenSilver.Converters">
+    <sdk:Page.Resources>
+         <converters:BooleanVisibilityConverter x:Key="booleanVisibilityConverter" />
+    </sdk:Page.Resources>
+
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
             <TextBox x:Name="TextboxForBinding1" Width="100" Height="30"/>
@@ -22,5 +27,16 @@
             <Button x:Name="Button2" Content="Remove and add TextBlock" Click="ButtonTestBinding_Click"/>
             <Button x:Name="Button3" Content="ChangeDataContext" Click="ButtonTestBinding2_Click"/>
         </StackPanel>
+        <StackPanel x:Name="StackPanelTargetNullValue">
+            <TextBlock x:Name="visibleLabel" Text="Should be Visible"
+                Visibility="{Binding Path=WrongPath, Converter={StaticResource booleanVisibilityConverter}, TargetNullValue=Visible }"
+                           />
+            <TextBlock x:Name="visibleTooLabel" Text="Should be Visible Too"
+                Visibility="{Binding Path=WrongPath, Converter={StaticResource booleanVisibilityConverter}, TargetNullValue=Collapsed }"
+                           />
+            <TextBlock x:Name="hiddenLabel" Text="Should not be Visible"
+                Visibility="{Binding Path=WrongPath, Converter={StaticResource booleanVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Visible }"
+                           />
+         </StackPanel>
     </StackPanel>
 </sdk:Page>
