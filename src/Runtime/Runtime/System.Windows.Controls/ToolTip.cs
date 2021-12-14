@@ -330,15 +330,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        //private static void OnInitialDelayPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    ToolTip toolTip = (ToolTip)d;
-        //    if (toolTip != null && toolTip.InitialDelay.HasTimeSpan)
-        //    {
-        //        toolTip._timerInitialDelay.Interval = toolTip.InitialDelay.TimeSpan;
-        //    }
-        //}
-
         public static readonly DependencyProperty DisplayTimeProperty =
             DependencyProperty.RegisterAttached(nameof(DisplayTime), typeof(Duration), typeof(ToolTip), new PropertyMetadata(new Duration(TimeSpan.FromSeconds(5.0))));
         public Duration DisplayTime
@@ -352,14 +343,5 @@ namespace Windows.UI.Xaml.Controls
                 SetValue(DisplayTimeProperty, value);
             }
         }
-
-        //private static void OnDisplayTimePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    ToolTip toolTip = (ToolTip)d;
-        //    if (toolTip != null && toolTip.DisplayTime.HasTimeSpan)
-        //    {
-        //        toolTip._timerDisplayTime.Interval = toolTip.DisplayTime.TimeSpan;
-        //    }
-        //}
     }
 }
