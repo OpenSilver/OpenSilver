@@ -53,15 +53,13 @@ namespace Windows.UI.Xaml.Controls.Tests
 
             TestSetup.SleepWhile(() => !autoCompleteBox.IsDropDownOpen,
                 "DropDown is not open after text change");
-            autoCompleteBox.ItemsHost.Children
-                .Cast<SelectorItem>()
-                .First(c => c.Content.ToString() == "AnItem")
+            autoCompleteBox.ItemContainerGenerator.ContainerFromItem("AnItem")
+                .As<SelectorItem>()
                 .Visibility
                 .Should()
                 .Be(Visibility.Visible);
-            autoCompleteBox.ItemsHost.Children
-                .Cast<SelectorItem>()
-                .First(c => c.Content.ToString() == "OtherItem")
+            autoCompleteBox.ItemContainerGenerator.ContainerFromItem("OtherItem")
+                .As<SelectorItem>()
                 .Visibility
                 .Should()
                 .Be(Visibility.Collapsed);
