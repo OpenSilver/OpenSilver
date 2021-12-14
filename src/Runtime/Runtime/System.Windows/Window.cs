@@ -43,6 +43,25 @@ namespace Windows.UI.Xaml
     public partial class Window : FrameworkElement
 #endif
     {
+        internal override int VisualChildrenCount
+        {
+            get
+            {
+                return Content == null ? 0 : 1;
+            }
+        }
+
+        internal override UIElement GetVisualChild(int index)
+        {
+            UIElement content = Content;
+            if (content == null || index != 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return content;
+        }
+
         /// <summary>
         /// Gets the currently activated window for an application.
         /// </summary>
@@ -210,8 +229,13 @@ namespace Windows.UI.Xaml
 #if RECURSIVE_CONSTRUCTION_FIXED
                 base.OnContentChanged(oldContent, newContent);
 #else
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldContent as UIElement, this);
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newContent as UIElement, this);
+                UIElement newChild = newContent as UIElement;
+                UIElement oldChild = oldContent as UIElement;
+
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
+                RemoveVisualChild(oldChild);
+                AddVisualChild(newChild);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this);
 #endif
                 // We can now revert the "ParentWindow" to null (cf. comment above):
                 this.INTERNAL_ParentWindow = null;
