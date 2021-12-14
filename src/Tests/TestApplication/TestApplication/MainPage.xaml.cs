@@ -49,7 +49,7 @@ namespace TestApplication
         private void NavigateToPage(string pageName)
         {
             // Navigate to the target page:
-            Uri uri = new Uri($"/{pageName}Test", UriKind.Relative);
+            Uri uri = new Uri(string.Format("/{0}Test", pageName), UriKind.Relative);
             ContentContainer.Source = uri;
 
             // Scroll to top:

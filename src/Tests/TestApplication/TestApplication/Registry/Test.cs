@@ -2,8 +2,8 @@
 {
     public class Test : ITreeItem
     {
-        public string Name { get; }
-        public string FileName { get; }
+        public string Name { get; private set; }
+        public string FileName { get; private set; }
 
         public Test(string name, string fileName)
         {

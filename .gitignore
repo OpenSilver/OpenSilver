@@ -335,7 +335,7 @@ ASALocalRun/
 build/output
 build/temp
 
-# Ignore wwwroot of test application, except index.html
-src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/*
-!src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/index.html
+# Ignore libs and resources in the wwwroot of test application
+src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/libs/
+src/Tests/TestApplication/TestApplication.OpenSilver.Browser/wwwroot/resources/
 
