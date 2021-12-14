@@ -45,7 +45,8 @@ namespace Windows.UI.Xaml.Controls
         internal UIElement INTERNAL_ElementToWhichThisToolTipIsAssigned;
         internal HtmlCanvasElement INTERNAL_HtmlCanvasElementToWhichThisToolTipIsAssigned;
 
-        DispatcherTimer _timerForClosingTooltipAfter5Seconds = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 5) };
+        // time for controlling InitialDelay to display and for the DisplayTime to show for
+        DispatcherTimer _timerDisplayControl = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0) };
 
         /// <summary>
         /// Initializes a new instance of the ToolTip class.
@@ -133,22 +134,23 @@ namespace Windows.UI.Xaml.Controls
                         toolTip._parentPopup.Loaded -= toolTip._parentPopup_Loaded; // We unregister the event to ensure that it is not registered twice.
                         toolTip._parentPopup.Loaded += toolTip._parentPopup_Loaded;
 
-                        // Open the popup:
-                        toolTip._parentPopup.IsOpen = true;
+                        toolTip._timerDisplayControl.Tick -= toolTip.OnTimerDisplayControlElapsed;
+                        toolTip._timerDisplayControl.Tick += toolTip.OnTimerDisplayControlElapsed;
 
-                        //Start the timer to close the popup after 5 seconds:
-                        toolTip._timerForClosingTooltipAfter5Seconds.Tick -= toolTip._timerForClosingTooltipAfter5Seconds_Tick;
-                        toolTip._timerForClosingTooltipAfter5Seconds.Tick += toolTip._timerForClosingTooltipAfter5Seconds_Tick;
-                        toolTip._timerForClosingTooltipAfter5Seconds.Start();
-
-                        // Raise the "Opened" event:
-                        if (toolTip.Opened != null)
-                            toolTip.Opened(toolTip, new RoutedEventArgs());
+                        if (toolTip.InitialDelay.HasTimeSpan && toolTip.InitialDelay.TimeSpan.TotalMilliseconds > 0)
+                        {
+                            toolTip._timerDisplayControl.Interval = toolTip.InitialDelay.TimeSpan;
+                            toolTip._timerDisplayControl.Start();
+                        }                       
+                        else
+                        {
+                            toolTip.ShowPopup();
+                        }
                     }
                 }
                 else
                 {
-                    toolTip._timerForClosingTooltipAfter5Seconds.Stop();
+                    toolTip._timerDisplayControl.Stop();
 
                     if (toolTip._parentPopup != null
                         && toolTip._parentPopup.IsOpen == true)
@@ -168,12 +170,34 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_parentPopup);
         }
 
-        void _timerForClosingTooltipAfter5Seconds_Tick(object sender, object e)
+        private void OnTimerDisplayControlElapsed(object sender, object e)
         {
-            _timerForClosingTooltipAfter5Seconds.Stop();
-            if (this.IsOpen)
+            _timerDisplayControl.Stop();
+
+            // If popup is opened, meaning its time to hide it as it is shown for DisplayTime
+            // Otherwise we are here after the initial delay time is over, so show it.
+            if (_parentPopup.IsOpen)
             {
                 this.IsOpen = false;
+            }
+            else
+            {
+                ShowPopup();
+            }
+        }
+
+        private void ShowPopup()
+        {
+            _parentPopup.IsOpen = true;
+            if (Opened != null)
+            {
+                Opened(this, new RoutedEventArgs());
+            }
+
+            if (DisplayTime.HasTimeSpan)
+            {
+                _timerDisplayControl.Interval = DisplayTime.TimeSpan;
+                _timerDisplayControl.Start();
             }
         }
 
@@ -291,5 +315,51 @@ namespace Windows.UI.Xaml.Controls
         public static readonly DependencyProperty VerticalOffsetProperty =
             DependencyProperty.Register("VerticalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
 
+
+        public static readonly DependencyProperty InitialDelayProperty =
+            DependencyProperty.RegisterAttached(nameof(InitialDelay), typeof(Duration), typeof(ToolTip), new PropertyMetadata(new Duration(TimeSpan.FromSeconds(0.0))));
+        public Duration InitialDelay
+        {
+            get
+            {
+                return (Duration)GetValue(InitialDelayProperty);
+            }
+            set
+            {
+                SetValue(InitialDelayProperty, value);
+            }
+        }
+
+        //private static void OnInitialDelayPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    ToolTip toolTip = (ToolTip)d;
+        //    if (toolTip != null && toolTip.InitialDelay.HasTimeSpan)
+        //    {
+        //        toolTip._timerInitialDelay.Interval = toolTip.InitialDelay.TimeSpan;
+        //    }
+        //}
+
+        public static readonly DependencyProperty DisplayTimeProperty =
+            DependencyProperty.RegisterAttached(nameof(DisplayTime), typeof(Duration), typeof(ToolTip), new PropertyMetadata(new Duration(TimeSpan.FromSeconds(5.0))));
+        public Duration DisplayTime
+        {
+            get
+            {
+                return (Duration)GetValue(DisplayTimeProperty);
+            }
+            set
+            {
+                SetValue(DisplayTimeProperty, value);
+            }
+        }
+
+        //private static void OnDisplayTimePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    ToolTip toolTip = (ToolTip)d;
+        //    if (toolTip != null && toolTip.DisplayTime.HasTimeSpan)
+        //    {
+        //        toolTip._timerDisplayTime.Interval = toolTip.DisplayTime.TimeSpan;
+        //    }
+        //}
     }
 }
