@@ -75,6 +75,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanVisibilityConverter.cs" />
     <Compile Include="HintBehavior.cs" />
     <Compile Include="LinqSamples.cs" />
     <Compile Include="Registry\ITreeItem.cs" />
