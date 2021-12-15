@@ -1255,7 +1255,8 @@ namespace Windows.UI.Xaml
         /// </summary>
         void ProcessOnKeyDown(object jsEventArg)
         {
-            int keyCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg));
+            if (!int.TryParse(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
+                return;
 
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
@@ -1370,7 +1371,8 @@ namespace Windows.UI.Xaml
         /// </summary>
         void ProcessOnKeyUp(object jsEventArg)
         {
-            int keyCode = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg));
+            if (!int.TryParse(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
+                return;
 
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
