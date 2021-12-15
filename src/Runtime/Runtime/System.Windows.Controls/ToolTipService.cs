@@ -68,6 +68,38 @@ namespace Windows.UI.Xaml.Controls
                 CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
             });
 
+        /// <summary>
+        /// Gets the value of the ToolTipService.ToolTip XAML attached property for an object.
+        /// </summary>
+        /// <param name="element">The object from which the property value is read.</param>
+        /// <returns>The object's tooltip content.</returns>
+        public static ToolTip GetToolTip(DependencyObject element)
+        {
+            if (element == null)
+                throw new ArgumentNullException("element");
+
+            return (object)element.GetValue(ToolTipProperty) as ToolTip;
+        }
+
+        /// <summary>
+        /// Sets the value of the ToolTipService.ToolTip XAML attached property.
+        /// </summary>
+        /// <param name="element">The object to set tooltip content on.</param>
+        /// <param name="value">The value to set for tooltip content.</param>
+        public static void SetToolTip(DependencyObject element, object value)
+        {
+            if (element == null)
+                throw new ArgumentNullException("element");
+
+            if (value != null)
+            {
+                element.SetValue(ToolTipProperty, value);
+            }
+            else
+            {
+                element.ClearValue(ToolTipProperty);
+            }
+        }
         private static void ToolTip_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DependencyObject element = (DependencyObject)d;
@@ -78,7 +110,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     bool openNewTooltip = false;
                     Point? position = null;
-                    ToolTip oldTooltip = uiElement.INTERNAL_AssignedToolTip;
+                    ToolTip oldTooltip = GetToolTip(uiElement);
                     if (oldTooltip != null)
                     {
                         openNewTooltip = oldTooltip.IsOpen;
@@ -109,7 +141,7 @@ namespace Windows.UI.Xaml.Controls
         {
             // Assign the tooltip:
             var toolTip = ConvertToToolTip(newTooltip);
-            uiElement.INTERNAL_AssignedToolTip = toolTip;
+            SetToolTip(uiElement, toolTip);
             toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned = uiElement;
         }
 
@@ -133,8 +165,12 @@ namespace Windows.UI.Xaml.Controls
         public static void UnregisterToolTip(UIElement uiElement)
         {
             // Unassign tooltip:
-            uiElement.INTERNAL_AssignedToolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned = null;
-            uiElement.INTERNAL_AssignedToolTip = null;
+            var toolTip = GetToolTip(uiElement);
+            if (toolTip != null)
+            {
+                toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned = null;
+            }
+            SetToolTip(uiElement, null);
         }
 
         private static void UnregisterToolTipInternal(UIElement uiElement)
@@ -168,8 +204,8 @@ namespace Windows.UI.Xaml.Controls
 #endif
         {
             UIElement uiElement = (UIElement)sender;
-            if (uiElement.INTERNAL_AssignedToolTip != null
-                && uiElement.INTERNAL_AssignedToolTip.IsOpen == true)
+            var toolTip = GetToolTip(uiElement);
+            if (toolTip != null && toolTip.IsOpen == true)
             {
                 CloseToolTip(uiElement);
             }
@@ -181,10 +217,9 @@ namespace Windows.UI.Xaml.Controls
         static void UIElement_PointerEntered(object sender, PointerRoutedEventArgs e)
 #endif
         {
-            UIElement uielement = (UIElement)sender;
-
-            if (uielement.INTERNAL_AssignedToolTip != null
-                && uielement.INTERNAL_AssignedToolTip.IsOpen == false)
+            UIElement uiElement = (UIElement)sender;
+            var toolTip = GetToolTip(uiElement);
+            if (toolTip != null && toolTip.IsOpen == false)
             {
 #if MIGRATION
                 Point absoluteCoordinates = e.GetPosition(null);
@@ -192,17 +227,21 @@ namespace Windows.UI.Xaml.Controls
                 Point absoluteCoordinates = e.GetCurrentPoint(null).Position;
 #endif
                 Point absoluteCoordinatesShiftedToBeBelowThePointer = new Point(absoluteCoordinates.X, absoluteCoordinates.Y + 20);
-                OpenToolTipAt(uielement, absoluteCoordinatesShiftedToBeBelowThePointer);
+                OpenToolTipAt(uiElement, absoluteCoordinatesShiftedToBeBelowThePointer);
             }
         }
 
         internal static void OpenToolTipAt(UIElement uiElement, Point? point)
         {
-            uiElement.INTERNAL_AssignedToolTip.INTERNAL_OpenAtCoordinates(point);
-            _currentTooltip = uiElement.INTERNAL_AssignedToolTip;
-            _timerClose.Tick -= OnTimerCloseElapsed;
-            _timerClose.Tick += OnTimerCloseElapsed;            
-            _timerClose.Start();
+            var toolTip = GetToolTip(uiElement);
+            if (toolTip != null)
+            {
+                toolTip.INTERNAL_OpenAtCoordinates(point);
+                _currentTooltip = toolTip;
+                _timerClose.Tick -= OnTimerCloseElapsed;
+                _timerClose.Tick += OnTimerCloseElapsed;
+                _timerClose.Start();
+            }
         }
 
         internal static void OpenToolTipAt(ToolTip toolTip, Point? point)
@@ -217,7 +256,7 @@ namespace Windows.UI.Xaml.Controls
         internal static void CloseToolTip(UIElement uiElement)
         {
             _timerClose.Stop();
-            uiElement?.INTERNAL_AssignedToolTip?.INTERNAL_Close();
+            GetToolTip(uiElement)?.INTERNAL_Close();
         }
 
         internal static void CloseToolTip(ToolTip toolTip)
@@ -258,20 +297,6 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Gets the value of the ToolTipService.ToolTip XAML attached property for an object.
-        /// </summary>
-        /// <param name="element">The object from which the property value is read.</param>
-        /// <returns>The object's tooltip content.</returns>
-        public static object GetToolTip(DependencyObject element)
-        {
-            if (element == null)
-                throw new ArgumentNullException("element");
-
-            return (object)element.GetValue(ToolTipProperty);
-        }
-
-
-        /// <summary>
         /// Sets the ToolTipService.Placement XAML attached property value for the specified target element.
         /// </summary>
         /// <param name="element">The target element for the attached property value.</param>
@@ -299,18 +324,5 @@ namespace Windows.UI.Xaml.Controls
             element.SetValue(PlacementTargetProperty, value);
         }
          */
-
-        /// <summary>
-        /// Sets the value of the ToolTipService.ToolTip XAML attached property.
-        /// </summary>
-        /// <param name="element">The object to set tooltip content on.</param>
-        /// <param name="value">The value to set for tooltip content.</param>
-        public static void SetToolTip(DependencyObject element, object value)
-        {
-            if (element == null)
-                throw new ArgumentNullException("element");
-
-            element.SetValue(ToolTipProperty, value);
-        }
     }
 }
