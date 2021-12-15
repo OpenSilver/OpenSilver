@@ -1532,6 +1532,22 @@ namespace Windows.UI.Xaml
             }
         }
 
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty ActualWidthProperty =
+            DependencyProperty.Register(
+                nameof(ActualWidth),
+                typeof(double),
+                typeof(FrameworkElement),
+                null);
+
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty ActualHeightProperty =
+            DependencyProperty.Register(
+                nameof(ActualHeight),
+                typeof(double),
+                typeof(FrameworkElement),
+                null);
+
         /// <summary>
         /// Gets the rendered size of a FrameworkElement.
         /// </summary>
