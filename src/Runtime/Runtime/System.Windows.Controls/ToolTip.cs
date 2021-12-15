@@ -19,10 +19,7 @@ using CSHTML5.Native.Html.Controls;
 using DotNetForHtml5.Core;
 
 #if MIGRATION
-using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
-using System.Windows.Threading;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -44,9 +41,6 @@ namespace Windows.UI.Xaml.Controls
         internal Point? _forceSpecifyAbsoluteCoordinates;
         internal UIElement INTERNAL_ElementToWhichThisToolTipIsAssigned;
         internal HtmlCanvasElement INTERNAL_HtmlCanvasElementToWhichThisToolTipIsAssigned;
-
-        // time for controlling InitialDelay to display and for the DisplayTime to show for
-        DispatcherTimer _timerDisplayControl = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0) };
 
         /// <summary>
         /// Initializes a new instance of the ToolTip class.
@@ -134,26 +128,16 @@ namespace Windows.UI.Xaml.Controls
                         toolTip._parentPopup.Loaded -= toolTip._parentPopup_Loaded; // We unregister the event to ensure that it is not registered twice.
                         toolTip._parentPopup.Loaded += toolTip._parentPopup_Loaded;
 
-                        toolTip._timerDisplayControl.Tick -= toolTip.OnTimerDisplayControlElapsed;
-                        toolTip._timerDisplayControl.Tick += toolTip.OnTimerDisplayControlElapsed;
-
-                        if (toolTip.InitialDelay.HasTimeSpan && toolTip.InitialDelay.TimeSpan.TotalMilliseconds > 0)
+                        toolTip._parentPopup.IsOpen = true;
+                        if (toolTip.Opened != null)
                         {
-                            toolTip._timerDisplayControl.Interval = toolTip.InitialDelay.TimeSpan;
-                            toolTip._timerDisplayControl.Start();
-                        }                       
-                        else
-                        {
-                            toolTip.ShowPopup();
+                            toolTip.Opened(toolTip, new RoutedEventArgs());
                         }
                     }
                 }
                 else
                 {
-                    toolTip._timerDisplayControl.Stop();
-
-                    if (toolTip._parentPopup != null
-                        && toolTip._parentPopup.IsOpen == true)
+                    if (toolTip._parentPopup != null && toolTip._parentPopup.IsOpen == true)
                     {
                         toolTip._parentPopup.IsOpen = false;
 
@@ -170,42 +154,16 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_parentPopup);
         }
 
-        private void OnTimerDisplayControlElapsed(object sender, object e)
-        {
-            _timerDisplayControl.Stop();
-
-            // If popup is opened, meaning its time to hide it as it is shown for DisplayTime
-            // Otherwise we are here after the initial delay time is over, so show it.
-            if (_parentPopup.IsOpen)
-            {
-                this.IsOpen = false;
-            }
-            else
-            {
-                ShowPopup();
-            }
-        }
-
-        private void ShowPopup()
-        {
-            _parentPopup.IsOpen = true;
-            if (Opened != null)
-            {
-                Opened(this, new RoutedEventArgs());
-            }
-
-            if (DisplayTime.HasTimeSpan)
-            {
-                _timerDisplayControl.Interval = DisplayTime.TimeSpan;
-                _timerDisplayControl.Start();
-            }
-        }
-
-        public void INTERNAL_OpenAtCoordinates(Point absoluteCoordinates)
+ 
+        public void INTERNAL_OpenAtCoordinates(Point? absoluteCoordinates)
         {
             _forceSpecifyAbsoluteCoordinates = absoluteCoordinates;
-
             this.IsOpen = true;
+        }
+
+        public void INTERNAL_Close()
+        {
+            this.IsOpen = false;
         }
 
         /*
@@ -314,34 +272,5 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty VerticalOffsetProperty =
             DependencyProperty.Register("VerticalOffset", typeof(double), typeof(ToolTip), new PropertyMetadata(0d));
-
-
-        public static readonly DependencyProperty InitialDelayProperty =
-            DependencyProperty.RegisterAttached(nameof(InitialDelay), typeof(Duration), typeof(ToolTip), new PropertyMetadata(new Duration(TimeSpan.FromSeconds(0.0))));
-        public Duration InitialDelay
-        {
-            get
-            {
-                return (Duration)GetValue(InitialDelayProperty);
-            }
-            set
-            {
-                SetValue(InitialDelayProperty, value);
-            }
-        }
-
-        public static readonly DependencyProperty DisplayTimeProperty =
-            DependencyProperty.RegisterAttached(nameof(DisplayTime), typeof(Duration), typeof(ToolTip), new PropertyMetadata(new Duration(TimeSpan.FromSeconds(5.0))));
-        public Duration DisplayTime
-        {
-            get
-            {
-                return (Duration)GetValue(DisplayTimeProperty);
-            }
-            set
-            {
-                SetValue(DisplayTimeProperty, value);
-            }
-        }
     }
 }

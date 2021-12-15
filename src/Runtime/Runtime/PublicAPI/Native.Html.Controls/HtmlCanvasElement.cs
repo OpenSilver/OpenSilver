@@ -375,7 +375,7 @@ namespace CSHTML5.Native.Html.Controls
                 Point absoluteCoordinates = e.GetCurrentPoint(null).Position;
 #endif
                 Point absoluteCoordinatesShiftedToBeBelowThePointer = new Point(absoluteCoordinates.X, absoluteCoordinates.Y + 20);
-                _toolTipContainer.INTERNAL_OpenAtCoordinates(absoluteCoordinatesShiftedToBeBelowThePointer);
+                ToolTipService.OpenToolTipAt(_toolTipContainer, absoluteCoordinatesShiftedToBeBelowThePointer);
             }
         }
 
@@ -383,7 +383,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (_toolTipContainer != null
                 && _toolTipContainer.IsOpen == true)
-                _toolTipContainer.IsOpen = false;
+                ToolTipService.CloseToolTip(_toolTipContainer);
         }
 
         /// <summary>
