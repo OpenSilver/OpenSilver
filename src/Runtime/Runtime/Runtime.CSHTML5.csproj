@@ -178,6 +178,7 @@
     <Compile Include="System.Windows\RectConverter.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
+    <Compile Include="System.Windows\WORKINPROGRESS\CheckAndDownloadUpdateCompletedEventArgs.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
     <Compile Include="System.Windows\Disposable.cs" />

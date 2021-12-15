@@ -12,9 +12,14 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 using System;
 using System.Collections;
 using System.Windows.Resources;
+
+#if !MIGRATION
+using System.Windows;
+#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -22,6 +27,9 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+    public delegate void CheckAndDownloadUpdateCompletedEventHandler(object sender,
+        CheckAndDownloadUpdateCompletedEventArgs e);
+
     /// <summary>
     /// Encapsulates the app and its available services.
     /// </summary>
@@ -105,6 +113,14 @@ namespace Windows.UI.Xaml
             }
 
             throw new InvalidOperationException("Application cannot be installed.");
+        }
+
+        [OpenSilver.NotImplemented]
+        public event CheckAndDownloadUpdateCompletedEventHandler CheckAndDownloadUpdateCompleted;
+
+        [OpenSilver.NotImplemented]
+        public void CheckAndDownloadUpdateAsync()
+        {
         }
     }
 }
