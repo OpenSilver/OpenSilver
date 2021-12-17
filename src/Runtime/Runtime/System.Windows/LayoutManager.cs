@@ -136,7 +136,6 @@ namespace Windows.UI.Xaml
 
                     if (previousDesiredSize != element.DesiredSize)
                     {
-                        element.InvalidateArrange();
                         element.InvalidateParentMeasure();
                         element.InvalidateParentArrange();
                     }
