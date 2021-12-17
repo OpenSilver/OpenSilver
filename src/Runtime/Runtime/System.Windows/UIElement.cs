@@ -1519,7 +1519,6 @@ document.ondblclick = null;
                     Measure(this.PreviousAvailableSize);
                     if (previousDesiredSizeInArrange != this.DesiredSize)
                     {
-                        this.InvalidateArrange();
                         this.InvalidateParentMeasure();
                         this.InvalidateParentArrange();
                     }
@@ -1622,7 +1621,12 @@ document.ondblclick = null;
                 }
                 else
                 {
+                    Size previousDesiredSizeInMeasure = this.DesiredSize;
                     DesiredSize = MeasureCore(availableSize);
+                    if (previousDesiredSizeInMeasure != DesiredSize)
+                    {
+                        this.InvalidateArrange();
+                    }
 
                     PreviousAvailableSize = availableSize;
                     previousDesiredSize = DesiredSize;
