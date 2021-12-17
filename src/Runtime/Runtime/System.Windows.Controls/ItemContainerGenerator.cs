@@ -1551,6 +1551,9 @@ namespace Windows.UI.Xaml.Controls
             // discarded.   (See Dev10 628778)
             host.ClearContainerForItem(container, item);
 
+            // Silverlight does not clear the datacontext of the containers when they are
+            // removed.
+#if WPF 
             if (container != item)
             {
                 DependencyProperty dp = FrameworkElement.DataContextProperty;
@@ -1564,6 +1567,7 @@ namespace Windows.UI.Xaml.Controls
 
                 container.ClearValue(dp);
             }
+#endif // WPF
         }
 
         void ValidateAndCorrectIndex(object item, ref int index)
