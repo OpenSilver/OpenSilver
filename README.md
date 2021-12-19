@@ -29,6 +29,9 @@ After creating the project, you may then want to update the NuGet package to ref
 
 3. **Run the restoration .BAT:** Execute the .BAT file "**restore-packages-opensilver.bat**" *(or "restore-packages-cshtml5.bat" depending on whether you are using OpenSilver or CSHTML5)*
 
+	3.1 **OpenSiler new builds has a dependency on an older version of OpenSilver, which is retrieved by the restore batch file.
+		Due to continous updates, this restored version can sometimes have outdated OpenSilver compiler assemblies which might cause uexpected runtime errors.
+
 4. **Delete bin/obj:** Make sure to remove the "bin" and "obj" folders, if any. They can cause issues when building using the ".bat" files.
 
 5. **Launch Developer Command Prompt:** Open the "Developer Command Prompt for VS 2019" (or newer) from your Start Menu
