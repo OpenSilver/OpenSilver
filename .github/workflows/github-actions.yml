@@ -1,5 +1,8 @@
 name: OpenSilver Build
-on: [push]
+on:
+  push:
+    branches:
+      - develop
 env:
   SHA8: "$(echo ${{ github.sha }} | cut -c1-8)"
 jobs:
