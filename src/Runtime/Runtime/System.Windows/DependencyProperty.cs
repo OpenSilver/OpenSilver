@@ -181,6 +181,16 @@ namespace Windows.UI.Xaml
                     if (!type.IsInstanceOfType(value))
 #endif
                     {
+                        if (type.IsEnum)
+                        {
+                            string[] names = type.GetEnumNames();
+                            foreach (var name in names)
+                            {
+                                if (name == value.ToString())
+                                    return true;
+                            }
+                        }
+
                         return false;
                     }
                 }
