@@ -37,10 +37,7 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public partial class ToolTip : ContentControl
     {
-        Popup _parentPopup;
-        internal Point? _forceSpecifyAbsoluteCoordinates;
-        internal UIElement INTERNAL_ElementToWhichThisToolTipIsAssigned;
-        internal HtmlCanvasElement INTERNAL_HtmlCanvasElementToWhichThisToolTipIsAssigned;
+        private Popup _parentPopup;
 
         /// <summary>
         /// Initializes a new instance of the ToolTip class.
@@ -76,63 +73,41 @@ namespace Windows.UI.Xaml.Controls
                 if (isOpen)
                 {
                     bool wasPopupAlreadyOpen = (toolTip._parentPopup != null && toolTip._parentPopup.IsOpen == true);
-                    if (!wasPopupAlreadyOpen) // Note: this prevents loops due to the fact that when the popup opens, the "ToolTip.IsOpen_Changed" method is called because the tooltip is the child of the Popup so its properties are called when it is loaded into the Visual Tree.
+                    // Note: this prevents loops due to the fact that when the popup opens, the "ToolTip.IsOpen_Changed" method is called
+                    // because the tooltip is the child of the Popup so its properties are called when it is loaded into the Visual Tree.
+                    if (wasPopupAlreadyOpen) 
                     {
-                        // Propagate the DataContext:
-                        if (toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned is FrameworkElement)
-                            toolTip.DataContext = ((FrameworkElement)toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned).DataContext;
+                        return;
+                    }
 
-                        // Make sure the tooltip is transparent to clicks:
-                        toolTip.IsHitTestVisible = false;
+                    // Make sure the tooltip is transparent to clicks:
+                    toolTip.IsHitTestVisible = false;
 
-                        // Make sure the tooltip is Top/Left-aligned:
-                        toolTip.HorizontalAlignment = HorizontalAlignment.Left;
-                        toolTip.VerticalAlignment = VerticalAlignment.Top;
+                    // Make sure the tooltip is Top/Left-aligned:
+                    toolTip.HorizontalAlignment = HorizontalAlignment.Left;
+                    toolTip.VerticalAlignment = VerticalAlignment.Top;
 
-                        // Create the popup if not already created:
-                        if (toolTip._parentPopup == null)
+                    // Create the popup if not already created:
+                    if (toolTip._parentPopup == null)
+                    {
+                        toolTip._parentPopup = new Popup()
                         {
-                            toolTip._parentPopup = new Popup()
-                            {
-                                Child = toolTip,
-                                HorizontalAlignment = HorizontalAlignment.Left,
-                                VerticalAlignment = VerticalAlignment.Top,
-                                HorizontalContentAlignment = HorizontalAlignment.Left,
-                                VerticalContentAlignment = VerticalAlignment.Top,
-                            };
+                            Child = toolTip,
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                            HorizontalContentAlignment = HorizontalAlignment.Left,
+                            VerticalContentAlignment = VerticalAlignment.Top,
+                        };
+                    }
 
-                            // Make sure that the popup is displayed in the same Window as the element to which the ToolTip is assigned. This is useful when there are multiple Windows:
-                            if (toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned != null)
-                                toolTip._parentPopup.INTERNAL_ParentWindow = toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned.INTERNAL_ParentWindow;
-                        }
+                    // Ensure that the popup stays within the screen bounds if its content is big:
+                    toolTip._parentPopup.Loaded -= toolTip._parentPopup_Loaded; // We unregister the event to ensure that it is not registered twice.
+                    toolTip._parentPopup.Loaded += toolTip._parentPopup_Loaded;
 
-                        // Calculate the popup position:
-                        Point popupAbsolutePosition;
-                        if (toolTip._forceSpecifyAbsoluteCoordinates.HasValue)
-                        {
-                            popupAbsolutePosition = toolTip._forceSpecifyAbsoluteCoordinates.Value;
-                        }
-                        else
-                        {
-                            popupAbsolutePosition = INTERNAL_PopupsManager.CalculatePopupAbsolutePositionBasedOnElementPosition(
-                                    toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned,
-                                    toolTip.HorizontalOffset,
-                                    toolTip.VerticalOffset);
-                        }
-
-                        // Set the popup position:
-                        toolTip._parentPopup.HorizontalOffset = popupAbsolutePosition.X;
-                        toolTip._parentPopup.VerticalOffset = popupAbsolutePosition.Y;
-
-                        // Ensure that the popup stays within the screen bounds if its content is big:
-                        toolTip._parentPopup.Loaded -= toolTip._parentPopup_Loaded; // We unregister the event to ensure that it is not registered twice.
-                        toolTip._parentPopup.Loaded += toolTip._parentPopup_Loaded;
-
-                        toolTip._parentPopup.IsOpen = true;
-                        if (toolTip.Opened != null)
-                        {
-                            toolTip.Opened(toolTip, new RoutedEventArgs());
-                        }
+                    toolTip._parentPopup.IsOpen = true;
+                    if (toolTip.Opened != null)
+                    {
+                        toolTip.Opened(toolTip, new RoutedEventArgs());
                     }
                 }
                 else
@@ -153,35 +128,6 @@ namespace Windows.UI.Xaml.Controls
         {
             INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_parentPopup);
         }
-
- 
-        public void INTERNAL_OpenAtCoordinates(Point? absoluteCoordinates)
-        {
-            _forceSpecifyAbsoluteCoordinates = absoluteCoordinates;
-            this.IsOpen = true;
-        }
-
-        public void INTERNAL_Close()
-        {
-            this.IsOpen = false;
-        }
-
-        /*
-        /// <summary>
-        /// Gets or sets how a ToolTip should be positioned in relation to the placement target element.
-        /// </summary>
-        public PlacementMode Placement
-        {
-            get { return (PlacementMode)GetValue(PlacementProperty); }
-            set { SetValue(PlacementProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the Placement dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PlacementProperty =
-            DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), new PropertyMetadata(PlacementMode.Bottom));
-        */
 
         /// <summary>
         /// Occurs when a ToolTip is closed and is no longer visible.
@@ -233,7 +179,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>Identifies the <see cref="P:System.Windows.Controls.ToolTip.Placement" /> dependency property.</summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Controls.ToolTip.Placement" />dependency property.</returns>
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), null);
+        public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), new PropertyMetadata(PlacementMode.Mouse));
 #endregion
 
         //-----------------------

@@ -16,6 +16,7 @@
 using System;
 using CSHTML5.Internal;
 using System.Windows.Threading;
+using DotNetForHtml5.Core;
 
 #if MIGRATION
 using System.Windows;
@@ -41,6 +42,7 @@ namespace Windows.UI.Xaml.Controls
         // time to hide tooltip after 5 seconds
         private static DispatcherTimer _timerClose = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 5) };
         private static ToolTip _currentTooltip;
+        private static Point? _oldAbsPoistion;
         private static void OnTimerCloseElapsed(object sender, object e)
         {
             CloseToolTip(_currentTooltip);
@@ -114,7 +116,7 @@ namespace Windows.UI.Xaml.Controls
                     if (oldTooltip != null)
                     {
                         openNewTooltip = oldTooltip.IsOpen;
-                        position = oldTooltip._forceSpecifyAbsoluteCoordinates;
+                        position = _oldAbsPoistion;
                         CloseToolTip(uiElement);
                     }
 
@@ -137,17 +139,10 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        public static void RegisterToolTip(UIElement uiElement, object newTooltip)
-        {
-            // Assign the tooltip:
-            var toolTip = ConvertToToolTip(newTooltip);
-            SetToolTip(uiElement, toolTip);
-            toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned = uiElement;
-        }
-
         private static void RegisterToolTipInternal(UIElement uiElement, object newTooltip)
         {
-            RegisterToolTip(uiElement, newTooltip);
+            var toolTip = ConvertToToolTip(newTooltip);
+            SetToolTip(uiElement, toolTip);
             // Register pointer events: // Note: we unregister before registering in order to ensure that it is only registered once.
 #if MIGRATION
             uiElement.MouseEnter -= UIElement_MouseEnter;
@@ -162,17 +157,6 @@ namespace Windows.UI.Xaml.Controls
 #endif
         }
 
-        public static void UnregisterToolTip(UIElement uiElement)
-        {
-            // Unassign tooltip:
-            var toolTip = GetToolTip(uiElement);
-            if (toolTip != null)
-            {
-                toolTip.INTERNAL_ElementToWhichThisToolTipIsAssigned = null;
-            }
-            SetToolTip(uiElement, null);
-        }
-
         private static void UnregisterToolTipInternal(UIElement uiElement)
         {
             // Unregister pointer events:
@@ -183,7 +167,8 @@ namespace Windows.UI.Xaml.Controls
             uiElement.PointerEntered -= UIElement_PointerEntered;
             uiElement.PointerExited -= UIElement_PointerExited;
 #endif
-            UnregisterToolTip(uiElement);
+            var toolTip = GetToolTip(uiElement);
+            SetToolTip(uiElement, null);
         }
 
         internal static ToolTip ConvertToToolTip(object obj)
@@ -230,39 +215,87 @@ namespace Windows.UI.Xaml.Controls
                 OpenToolTipAt(uiElement, absoluteCoordinatesShiftedToBeBelowThePointer);
             }
         }
+        
+        private static void ShowTooltip(Point? point, UIElement uiElement = null)
+        {
+            // Propagate the DataContext:
+            _oldAbsPoistion = point;
+            if (uiElement != null && uiElement is FrameworkElement)
+            {
+                _currentTooltip.DataContext = ((FrameworkElement)uiElement).DataContext;
+            }
+
+            _currentTooltip.IsOpen = true;
+
+            // Calculate the popup position:
+            Popup parentPopup = (Popup)_currentTooltip.Parent;
+            if (parentPopup != null)
+            {
+                // Make sure that the popup is displayed in the same Window as the element to which the ToolTip is assigned. This is useful when there are multiple Windows:
+                if (uiElement != null)
+                {
+                    parentPopup.INTERNAL_ParentWindow = uiElement.INTERNAL_ParentWindow;
+                }
+
+                Point? popupAbsolutePosition = null;
+                if (point.HasValue)
+                {
+                    popupAbsolutePosition = point;
+                }
+                else 
+                {
+                    if (uiElement != null)
+                    {
+                        popupAbsolutePosition = INTERNAL_PopupsManager.CalculatePopupAbsolutePositionBasedOnElementPosition(
+                                uiElement, _currentTooltip.HorizontalOffset, _currentTooltip.VerticalOffset);
+                    }
+                }
+
+                // Set the popup position:
+                if (popupAbsolutePosition != null)
+                {
+                    parentPopup.HorizontalOffset = popupAbsolutePosition.Value.X;
+                    parentPopup.VerticalOffset = popupAbsolutePosition.Value.Y;
+                }
+            }
+
+            _timerClose.Tick -= OnTimerCloseElapsed;
+            _timerClose.Tick += OnTimerCloseElapsed;
+            _timerClose.Start();
+        }
 
         internal static void OpenToolTipAt(UIElement uiElement, Point? point)
         {
             var toolTip = GetToolTip(uiElement);
             if (toolTip != null)
             {
-                toolTip.INTERNAL_OpenAtCoordinates(point);
                 _currentTooltip = toolTip;
-                _timerClose.Tick -= OnTimerCloseElapsed;
-                _timerClose.Tick += OnTimerCloseElapsed;
-                _timerClose.Start();
+                ShowTooltip(point, uiElement);                
             }
         }
 
+
+        // This is only used by HtmlCanvasElement
+        // TODO: We should handle it better
         internal static void OpenToolTipAt(ToolTip toolTip, Point? point)
         {
-            toolTip?.INTERNAL_OpenAtCoordinates(point);
             _currentTooltip = toolTip;
-            _timerClose.Tick -= OnTimerCloseElapsed;
-            _timerClose.Tick += OnTimerCloseElapsed;
-            _timerClose.Start();
+            ShowTooltip(point);            
         }
 
         internal static void CloseToolTip(UIElement uiElement)
         {
             _timerClose.Stop();
-            GetToolTip(uiElement)?.INTERNAL_Close();
+            var toolTip = GetToolTip(uiElement);
+            if (toolTip != null) toolTip.IsOpen = false;
         }
 
+        // This is only used by HtmlCanvasElement
+        // TODO: We should handle it better
         internal static void CloseToolTip(ToolTip toolTip)
         {
             _timerClose.Stop();
-            toolTip?.INTERNAL_Close();
+            if (toolTip != null) toolTip.IsOpen = false;
         }
 
   
@@ -277,6 +310,19 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentNullException("element");
 
             return (PlacementMode)element.GetValue(PlacementProperty);
+        }
+
+        /// <summary>
+        /// Sets the ToolTipService.Placement XAML attached property value for the specified target element.
+        /// </summary>
+        /// <param name="element">The target element for the attached property value.</param>
+        /// <param name="value">One of the PlacementMode values, which specifies where the tooltip should appear relative to the control that is the placement target.</param>
+        public static void SetPlacement(DependencyObject element, PlacementMode value)
+        {
+            if (element == null)
+                throw new ArgumentNullException("element");
+
+            element.SetValue(PlacementProperty, value);
         }
 
 
@@ -294,35 +340,6 @@ namespace Windows.UI.Xaml.Controls
         public static void SetPlacementTarget(DependencyObject element, UIElement value)
         {
             element.SetValue(ToolTipService.PlacementTargetProperty, (DependencyObject)value);
-        }
-
-        /// <summary>
-        /// Sets the ToolTipService.Placement XAML attached property value for the specified target element.
-        /// </summary>
-        /// <param name="element">The target element for the attached property value.</param>
-        /// <param name="value">One of the PlacementMode values, which specifies where the tooltip should appear relative to the control that is the placement target.</param>
-        public static void SetPlacement(DependencyObject element, PlacementMode value)
-        {
-            if (element == null)
-                throw new ArgumentNullException("element");
-
-            element.SetValue(PlacementProperty, value);
-        }
-
-
-        /*
-        /// <summary>
-        /// Sets the ToolTipService.PlacementTarget XAML attached property value for the specified target element.
-        /// </summary>
-        /// <param name="element">The target element for the attached property value.</param>
-        /// <param name="value">The visual element that should be the placement target for the tooltip.</param>
-        public static void SetPlacementTarget(DependencyObject element, UIElement value)
-        {
-            if (element == null)
-                throw new ArgumentNullException("element");
-
-            element.SetValue(PlacementTargetProperty, value);
-        }
-         */
+        }        
     }
 }
