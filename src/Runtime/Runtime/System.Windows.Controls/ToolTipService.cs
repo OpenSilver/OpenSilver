@@ -39,10 +39,20 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public static class ToolTipService
     {
-        // time to hide tooltip after 5 seconds
-        private static DispatcherTimer _timerClose = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 5) };
+        private static readonly DispatcherTimer _timerClose;
         private static ToolTip _currentTooltip;
-        private static Point? _oldAbsPoistion;
+
+        static ToolTipService()
+        {
+            _timerClose = new DispatcherTimer
+            {
+                // time to hide tooltip after 5 seconds
+                Interval = new TimeSpan(0, 0, 5)
+            };
+
+            _timerClose.Tick += OnTimerCloseElapsed;
+        }
+
         private static void OnTimerCloseElapsed(object sender, object e)
         {
             CloseToolTip(_currentTooltip);
@@ -65,22 +75,36 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty ToolTipProperty =
             DependencyProperty.RegisterAttached("ToolTip", typeof(object), typeof(ToolTipService),
-            new PropertyMetadata(null, ToolTip_Changed)
-            {
-                CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-            });
+            new PropertyMetadata(null, ToolTip_Changed));
+
+        private static readonly DependencyProperty ToolTipInternalProperty =
+            DependencyProperty.Register(
+                "ToolTipInternal",
+                typeof(ToolTip),
+                typeof(ToolTipService),
+                null);
+
+        private static ToolTip GetToolTipInternal(DependencyObject element)
+        {
+            return (ToolTip)element.GetValue(ToolTipInternalProperty);
+        }
+
+        private static void SetToolTipInternal(DependencyObject element, ToolTip tooltip)
+        {
+            element.SetValue(ToolTipInternalProperty, tooltip);
+        }
 
         /// <summary>
         /// Gets the value of the ToolTipService.ToolTip XAML attached property for an object.
         /// </summary>
         /// <param name="element">The object from which the property value is read.</param>
         /// <returns>The object's tooltip content.</returns>
-        public static ToolTip GetToolTip(DependencyObject element)
+        public static object GetToolTip(DependencyObject element)
         {
             if (element == null)
                 throw new ArgumentNullException("element");
 
-            return (object)element.GetValue(ToolTipProperty) as ToolTip;
+            return element.GetValue(ToolTipProperty);
         }
 
         /// <summary>
@@ -93,66 +117,33 @@ namespace Windows.UI.Xaml.Controls
             if (element == null)
                 throw new ArgumentNullException("element");
 
-            if (value != null)
-            {
-                element.SetValue(ToolTipProperty, value);
-            }
-            else
-            {
-                element.ClearValue(ToolTipProperty);
-            }
+            element.SetValue(ToolTipProperty, value);
         }
+
         private static void ToolTip_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DependencyObject element = (DependencyObject)d;
-            if (element is UIElement)
+            UIElement uie = (UIElement)d;
+            if (e.OldValue != null)
             {
-                var uiElement = (UIElement)element;
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                {
-                    bool openNewTooltip = false;
-                    Point? position = null;
-                    ToolTip oldTooltip = GetToolTip(uiElement);
-                    if (oldTooltip != null)
-                    {
-                        openNewTooltip = oldTooltip.IsOpen;
-                        position = _oldAbsPoistion;
-                        CloseToolTip(uiElement);
-                    }
-
-                    object newTooltip = (object)e.NewValue;
-
-                    if (newTooltip != null)
-                    {
-                        RegisterToolTipInternal(uiElement, newTooltip);
- 
-                        if (openNewTooltip)
-                        {
-                            OpenToolTipAt(uiElement, position);
-                        }
-                    }
-                    else
-                    {
-                        UnregisterToolTipInternal(uiElement);
-                    }
-                }
+                UnregisterToolTipInternal(uie);
+            }
+            if (e.NewValue != null)
+            {
+                RegisterToolTipInternal(uie, e.NewValue);
             }
         }
 
         private static void RegisterToolTipInternal(UIElement uiElement, object newTooltip)
         {
-            var toolTip = ConvertToToolTip(newTooltip);
-            SetToolTip(uiElement, toolTip);
-            // Register pointer events: // Note: we unregister before registering in order to ensure that it is only registered once.
+            ToolTip tooltip = ConvertToToolTip(newTooltip);
+            SetToolTipInternal(uiElement, tooltip);
+            tooltip.SetOwner(uiElement);
+            
 #if MIGRATION
-            uiElement.MouseEnter -= UIElement_MouseEnter;
             uiElement.MouseEnter += UIElement_MouseEnter;
-            uiElement.MouseLeave -= UIElement_MouseLeave;
             uiElement.MouseLeave += UIElement_MouseLeave;
 #else
-            uiElement.PointerEntered -= UIElement_PointerEntered;
             uiElement.PointerEntered += UIElement_PointerEntered;
-            uiElement.PointerExited -= UIElement_PointerExited;
             uiElement.PointerExited += UIElement_PointerExited;
 #endif
         }
@@ -167,138 +158,81 @@ namespace Windows.UI.Xaml.Controls
             uiElement.PointerEntered -= UIElement_PointerEntered;
             uiElement.PointerExited -= UIElement_PointerExited;
 #endif
-            var toolTip = GetToolTip(uiElement);
-            SetToolTip(uiElement, null);
+            ToolTip oldToolTip = GetToolTipInternal(uiElement);
+            if (oldToolTip != null && oldToolTip.IsOpen)
+            {
+                CloseToolTip(oldToolTip);
+            }
+
+            SetToolTipInternal(uiElement, null);
         }
 
         internal static ToolTip ConvertToToolTip(object obj)
         {
-            if (obj is ToolTip)
-                return (ToolTip)obj;
-            else if (obj is UIElement
-                && ((UIElement)obj).INTERNAL_VisualParent is ToolTip)
-                return (ToolTip)((UIElement)obj).INTERNAL_VisualParent;
-            else
-                return new ToolTip() { Content = obj };
+            if (obj is ToolTip tooltip)
+            {
+                return tooltip;
+            }
+
+            if (obj is FrameworkElement fe)
+            {
+                tooltip = fe.Parent as ToolTip;
+                if (tooltip != null)
+                {
+                    return tooltip;
+                }
+            }
+
+            return new ToolTip { Content = obj };
         }
 
 #if MIGRATION
-        static void UIElement_MouseLeave(object sender, MouseEventArgs e)
+        private static void UIElement_MouseLeave(object sender, MouseEventArgs e)
 #else
-        static void UIElement_PointerExited(object sender, PointerRoutedEventArgs e)
+        private static void UIElement_PointerExited(object sender, PointerRoutedEventArgs e)
 #endif
         {
             UIElement uiElement = (UIElement)sender;
-            var toolTip = GetToolTip(uiElement);
+            ToolTip toolTip = GetToolTipInternal(uiElement);
             if (toolTip != null && toolTip.IsOpen == true)
             {
-                CloseToolTip(uiElement);
+                CloseToolTip(toolTip);
             }
         }
 
 #if MIGRATION
-        static void UIElement_MouseEnter(object sender, MouseEventArgs e)
+        private static void UIElement_MouseEnter(object sender, MouseEventArgs e)
 #else
-        static void UIElement_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private static void UIElement_PointerEntered(object sender, PointerRoutedEventArgs e)
 #endif
         {
             UIElement uiElement = (UIElement)sender;
-            var toolTip = GetToolTip(uiElement);
+            ToolTip toolTip = GetToolTipInternal(uiElement);
             if (toolTip != null && toolTip.IsOpen == false)
             {
-#if MIGRATION
-                Point absoluteCoordinates = e.GetPosition(null);
-#else
-                Point absoluteCoordinates = e.GetCurrentPoint(null).Position;
-#endif
-                Point absoluteCoordinatesShiftedToBeBelowThePointer = new Point(absoluteCoordinates.X, absoluteCoordinates.Y + 20);
-                OpenToolTipAt(uiElement, absoluteCoordinatesShiftedToBeBelowThePointer);
+                OpenToolTip(toolTip);
             }
         }
-        
-        private static void ShowTooltip(Point? point, UIElement uiElement = null)
+
+        internal static void OpenToolTip(ToolTip tooltip)
         {
-            // Propagate the DataContext:
-            _oldAbsPoistion = point;
-            if (uiElement != null && uiElement is FrameworkElement)
-            {
-                _currentTooltip.DataContext = ((FrameworkElement)uiElement).DataContext;
-            }
-
-            _currentTooltip.IsOpen = true;
-
-            // Calculate the popup position:
-            Popup parentPopup = (Popup)_currentTooltip.Parent;
-            if (parentPopup != null)
-            {
-                // Make sure that the popup is displayed in the same Window as the element to which the ToolTip is assigned. This is useful when there are multiple Windows:
-                if (uiElement != null)
-                {
-                    parentPopup.INTERNAL_ParentWindow = uiElement.INTERNAL_ParentWindow;
-                }
-
-                Point? popupAbsolutePosition = null;
-                if (point.HasValue)
-                {
-                    popupAbsolutePosition = point;
-                }
-                else 
-                {
-                    if (uiElement != null)
-                    {
-                        popupAbsolutePosition = INTERNAL_PopupsManager.CalculatePopupAbsolutePositionBasedOnElementPosition(
-                                uiElement, _currentTooltip.HorizontalOffset, _currentTooltip.VerticalOffset);
-                    }
-                }
-
-                // Set the popup position:
-                if (popupAbsolutePosition != null)
-                {
-                    parentPopup.HorizontalOffset = popupAbsolutePosition.Value.X;
-                    parentPopup.VerticalOffset = popupAbsolutePosition.Value.Y;
-                }
-            }
-
-            _timerClose.Tick -= OnTimerCloseElapsed;
-            _timerClose.Tick += OnTimerCloseElapsed;
-            _timerClose.Start();
+            _currentTooltip = tooltip;
+            tooltip.IsOpen = true;
         }
 
-        internal static void OpenToolTipAt(UIElement uiElement, Point? point)
-        {
-            var toolTip = GetToolTip(uiElement);
-            if (toolTip != null)
-            {
-                _currentTooltip = toolTip;
-                ShowTooltip(point, uiElement);                
-            }
-        }
-
-
-        // This is only used by HtmlCanvasElement
-        // TODO: We should handle it better
         internal static void OpenToolTipAt(ToolTip toolTip, Point? point)
         {
-            _currentTooltip = toolTip;
-            ShowTooltip(point);            
+            OpenToolTip(toolTip);
         }
 
-        internal static void CloseToolTip(UIElement uiElement)
-        {
-            _timerClose.Stop();
-            var toolTip = GetToolTip(uiElement);
-            if (toolTip != null) toolTip.IsOpen = false;
-        }
-
-        // This is only used by HtmlCanvasElement
-        // TODO: We should handle it better
         internal static void CloseToolTip(ToolTip toolTip)
         {
             _timerClose.Stop();
-            if (toolTip != null) toolTip.IsOpen = false;
+            if (toolTip != null)
+                toolTip.IsOpen = false;
         }
 
-  
+
         /// <summary>
         /// Gets the ToolTipService.Placement XAML attached property value for the specified target element.
         /// </summary>
@@ -340,6 +274,6 @@ namespace Windows.UI.Xaml.Controls
         public static void SetPlacementTarget(DependencyObject element, UIElement value)
         {
             element.SetValue(ToolTipService.PlacementTargetProperty, (DependencyObject)value);
-        }        
+        }
     }
 }
