@@ -139,6 +139,7 @@
     <Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
     <Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
     <Compile Include="System.Windows.Controls\PopulatedEventArgs.cs" />
+    <Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
     <Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
     <Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
     <Compile Include="System.Windows.Controls\TextBoxView.cs" />
