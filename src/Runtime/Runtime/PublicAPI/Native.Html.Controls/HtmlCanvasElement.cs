@@ -340,9 +340,6 @@ namespace CSHTML5.Native.Html.Controls
                         // Unregister pointer events:
                         this.PointerEntered -= ToolTipOwner_PointerEntered;
                         this.PointerExited -= ToolTipOwner_PointerExited;
-
-                        if (_toolTipContainer != null)
-                            _toolTipContainer.INTERNAL_HtmlCanvasElementToWhichThisToolTipIsAssigned = null;
                     }
 
                     // Remember the new tooltip:
@@ -352,7 +349,6 @@ namespace CSHTML5.Native.Html.Controls
                     if (value != null)
                     {
                         _toolTipContainer = ToolTipService.ConvertToToolTip(value);
-                        _toolTipContainer.INTERNAL_HtmlCanvasElementToWhichThisToolTipIsAssigned = this;
 
                         // Register pointer events:
                         this.PointerEntered -= ToolTipOwner_PointerEntered; // Note: we unregister before registering in order to ensure that it is only registered once.
@@ -375,7 +371,7 @@ namespace CSHTML5.Native.Html.Controls
                 Point absoluteCoordinates = e.GetCurrentPoint(null).Position;
 #endif
                 Point absoluteCoordinatesShiftedToBeBelowThePointer = new Point(absoluteCoordinates.X, absoluteCoordinates.Y + 20);
-                _toolTipContainer.INTERNAL_OpenAtCoordinates(absoluteCoordinatesShiftedToBeBelowThePointer);
+                ToolTipService.OpenToolTipAt(_toolTipContainer, absoluteCoordinatesShiftedToBeBelowThePointer);
             }
         }
 
@@ -383,7 +379,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (_toolTipContainer != null
                 && _toolTipContainer.IsOpen == true)
-                _toolTipContainer.IsOpen = false;
+                ToolTipService.CloseToolTip(_toolTipContainer);
         }
 
         /// <summary>
