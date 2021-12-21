@@ -84,23 +84,6 @@ namespace Windows.UI.Xaml.Controls
                 typeof(ToolTipService),
                 null);
 
-        /// <summary>
-        /// Allows to propagate data context changes in owner to tooltip
-        /// </summary>
-        private static readonly DependencyProperty DataContextProperty =
-            DependencyProperty.RegisterAttached("DataContext", typeof(object), typeof(ToolTipService), new PropertyMetadata(new PropertyChangedCallback(OnDataContextChanged)));
-
-        public static void OnDataContextChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
-        {
-            var owner = sender as FrameworkElement;
-            var toolTip = GetToolTip(owner);
-
-            if (toolTip is FrameworkElement)
-            {
-                ((FrameworkElement)toolTip).DataContext = owner.DataContext;
-            }
-        }
-
         private static ToolTip GetToolTipInternal(DependencyObject element)
         {
             return (ToolTip)element.GetValue(ToolTipInternalProperty);
@@ -153,15 +136,8 @@ namespace Windows.UI.Xaml.Controls
         private static void RegisterToolTipInternal(UIElement uiElement, object newTooltip)
         {
             ToolTip tooltip = ConvertToToolTip(newTooltip);
-
-            var ownerFramework = uiElement as FrameworkElement;
-            if (ownerFramework != null)
-            {
-                tooltip.DataContext = ownerFramework.DataContext;
-                ownerFramework.SetBinding(DataContextProperty, new Data.Binding());
-            }
-            
             SetToolTipInternal(uiElement, tooltip);
+            tooltip.SetOwner(uiElement);
             
 #if MIGRATION
             uiElement.MouseEnter += UIElement_MouseEnter;
@@ -188,7 +164,6 @@ namespace Windows.UI.Xaml.Controls
                 CloseToolTip(oldToolTip);
             }
 
-            uiElement.ClearValue(DataContextProperty);
             SetToolTipInternal(uiElement, null);
         }
 
@@ -239,7 +214,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-   
         internal static void OpenToolTip(ToolTip tooltip)
         {
             _currentTooltip = tooltip;
