@@ -29,11 +29,14 @@ After creating the project, you may then want to update the NuGet package to ref
 
 3. **Run the restoration .BAT:** Execute the .BAT file "**restore-packages-opensilver.bat**" *(or "restore-packages-cshtml5.bat" depending on whether you are using OpenSilver or CSHTML5)*
 
-4. **Delete bin/obj:** Make sure to remove the "bin" and "obj" folders, if any. They can cause issues when building using the ".bat" files.
+4. (Optional) **Update OpenSilver compiler assemblies:** OpenSiler has a dependency on an older version of OpenSilver to convert xaml files to C#, which is retrieved by the restore batch file (from **3.**). 
+Due to continous updates, this restored version can sometimes have outdated OpenSilver compiler assemblies which might cause unexpected compilation or runtime errors. To fix this, you should rebuild the **Compiler.OpenSilver** project and replace the assemblies **"OpenSilver.Compiler.dll"**, **"OpenSilver.Compiler.Common.dll"** in the **"src/packages/OpenSilver.<version>/tools/"** (or **"src/packages/OpenSilver.UWPCompatible.<version>/tools/"** if you are working with the **UWP** configuration) folder.
 
-5. **Launch Developer Command Prompt:** Open the "Developer Command Prompt for VS 2019" (or newer) from your Start Menu
+5. **Delete bin/obj:** Make sure to remove the "bin" and "obj" folders, if any. They can cause issues when building using the ".bat" files.
 
-6. **Run the compilation .BAT:** Launch the file "**build-nuget-package-OpenSilver-private.bat**" *(or "build-nuget-package-CSHTML5-private.bat" depending on whether you are using OpenSilver or CSHTML5)* and **enter today's date** or any other unique identifier to use for the version number (eg. 2021-10-12)
+6. **Launch Developer Command Prompt:** Open the "Developer Command Prompt for VS 2019" (or newer) from your Start Menu
+
+7. **Run the compilation .BAT:** Launch the file "**build-nuget-package-OpenSilver-private.bat**" *(or "build-nuget-package-CSHTML5-private.bat" depending on whether you are using OpenSilver or CSHTML5)* and **enter today's date** or any other unique identifier to use for the version number (eg. 2021-10-12)
 
 For convenience, instead of building the whole packages as instructed above, you can alternatively build only the Runtime DLL, To do so, open the solution file "OpenSilver.sln" or "CSHTML5.sln" (depending on whether you are using OpenSilver or CSHTML5), choose the appropriate "Solution Configuration" (see below) 
 
