@@ -598,7 +598,11 @@ namespace Windows.UI.Xaml.Data
                     // special cases:
                     // 1. if target property is DataContext, use the target's parent.
                     //      This enables <X DataContext="{Binding...}"/>
-                    if (TargetProperty == FrameworkElement.DataContextProperty || TargetProperty == ContentPresenter.ContentProperty)
+                    // 2. if the target is ContentPresenter and the target property
+                    //      is Content, use the parent.  This enables
+                    //          <ContentPresenter Content="{Binding...}"/>
+                    if (TargetProperty == FrameworkElement.DataContextProperty || 
+                        TargetProperty == ContentPresenter.ContentProperty)
                     {
                         contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
                     }
