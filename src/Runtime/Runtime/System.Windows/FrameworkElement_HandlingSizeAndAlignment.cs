@@ -77,7 +77,7 @@ namespace Windows.UI.Xaml
                 // Width:
                 if (!double.IsNaN(element.Width))
                     style.width = element.Width.ToInvariantString() + "px";
-                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element is CheckBox))
                     style.width = "100%";
                 else
                     style.width = "auto";
@@ -375,8 +375,8 @@ namespace Windows.UI.Xaml
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
                 if (fe.INTERNAL_VisualParent is Canvas || isParentAViewBox) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
                 {
-                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? 
-                        fe.Width.ToInvariantString() + "px" : 
+                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ?
+                        fe.Width.ToInvariantString() + "px" :
                         "auto";
                 }
                 else // Otherwise we handle both alignment and Width/Height:
@@ -874,7 +874,7 @@ namespace Windows.UI.Xaml
                             break;
                         case VerticalAlignment.Bottom:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
-                            { 
+                            {
                                 if (isCSSGrid && (VisualTreeHelper.GetParent(fe) is Grid))
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
@@ -1186,7 +1186,7 @@ namespace Windows.UI.Xaml
                 // Note: this is used to avoid overwriting the value set for the vertical
                 // alignment when in a css Grid, but the msGrid uses another way to set it
                 // so we do not need to change what happens here in this case.
-                bool isInsideACSSBasedGrid = isCSSGrid && !isMsGrid && frameworkElement.INTERNAL_VisualParent is Grid; 
+                bool isInsideACSSBasedGrid = isCSSGrid && !isMsGrid && frameworkElement.INTERNAL_VisualParent is Grid;
 
                 var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
                 var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);
@@ -1205,13 +1205,13 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingLeft = newMargin.Left.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfBoxSizingElement.marginLeft = ""; 
+                    styleOfBoxSizingElement.marginLeft = "";
                 }
                 else
                 {
                     // This is to "undo" the value that was previously set in case we are
                     // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingLeft = ""; 
+                    styleOfBoxSizingElement.paddingLeft = "";
                     styleOfBoxSizingElement.marginLeft = newMargin.Left.ToInvariantString() + "px";
                 }
 
@@ -1221,7 +1221,7 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingTop = newMargin.Top.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfOuterDomElement.marginTop = ""; 
+                    styleOfOuterDomElement.marginTop = "";
                 }
                 else
                 {
@@ -1230,15 +1230,15 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingTop = "";
                     // In case of CSS-based Grid, we cannot mess with the margin proprty
                     // because it is used for vertical alignment (margin "auto").
-                    if (!isInsideACSSBasedGrid || 
-                        frameworkElement.VerticalAlignment == VerticalAlignment.Top || 
-                        frameworkElement.VerticalAlignment == VerticalAlignment.Stretch) 
+                    if (!isInsideACSSBasedGrid ||
+                        frameworkElement.VerticalAlignment == VerticalAlignment.Top ||
+                        frameworkElement.VerticalAlignment == VerticalAlignment.Stretch)
                     {
                         // Note: vertically we apply negative margins to the "outer dom element"
                         // instead of the "box sizing" element in order to not mess with the CSS
                         // Grid Layout vertical alignment, which uses the margins of the "box sizing"
                         // to apply vertical alignment.
-                        styleOfOuterDomElement.marginTop = newMargin.Top.ToInvariantString() + "px"; 
+                        styleOfOuterDomElement.marginTop = newMargin.Top.ToInvariantString() + "px";
                     }
                 }
 
@@ -1248,13 +1248,13 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingRight = newMargin.Right.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfBoxSizingElement.marginRight = ""; 
+                    styleOfBoxSizingElement.marginRight = "";
                 }
                 else
                 {
                     // This is to "undo" the value that was previously set in case we are
                     // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingRight = ""; 
+                    styleOfBoxSizingElement.paddingRight = "";
                     styleOfBoxSizingElement.marginRight = newMargin.Right.ToInvariantString() + "px";
                 }
 
@@ -1264,7 +1264,7 @@ namespace Windows.UI.Xaml
                     styleOfBoxSizingElement.paddingBottom = newMargin.Bottom.ToInvariantString() + "px";
                     // This is to "undo" the value that was previously set in case we are
                     // moving from negative margin to positive margin.
-                    styleOfOuterDomElement.marginBottom = ""; 
+                    styleOfOuterDomElement.marginBottom = "";
                 }
                 else
                 {
@@ -1275,7 +1275,7 @@ namespace Windows.UI.Xaml
                     // instead of the "box sizing" element in order to not mess with the CSS
                     // Grid Layout vertical alignment, which uses the margins of the "box sizing"
                     // to apply vertical alignment.
-                    styleOfOuterDomElement.marginBottom = newMargin.Bottom.ToInvariantString() + "px"; 
+                    styleOfOuterDomElement.marginBottom = newMargin.Bottom.ToInvariantString() + "px";
                 }
             }
 
@@ -1732,7 +1732,7 @@ namespace Windows.UI.Xaml
                         {
                             _valueOfLastSizeChanged = new Size(0d, 0d);
                             _resizeObserver.Observe(this.INTERNAL_OuterDomElement, (Action<Size>)this.HandleSizeChanged);
-                        } 
+                        }
                         else
                         {
                             HandleSizeChanged(Size.Empty);
