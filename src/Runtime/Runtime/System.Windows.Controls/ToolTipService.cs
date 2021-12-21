@@ -158,7 +158,7 @@ namespace Windows.UI.Xaml.Controls
             if (ownerFramework != null)
             {
                 tooltip.DataContext = ownerFramework.DataContext;
-                ownerFramework.SetBinding(DataContextProperty, new System.Windows.Data.Binding());
+                ownerFramework.SetBinding(DataContextProperty, new Data.Binding());
             }
             
             SetToolTipInternal(uiElement, tooltip);
