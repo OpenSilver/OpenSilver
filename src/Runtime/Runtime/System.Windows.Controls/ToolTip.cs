@@ -38,7 +38,6 @@ namespace Windows.UI.Xaml.Controls
     public partial class ToolTip : ContentControl
     {
         private Popup _parentPopup;
-        private FrameworkElement _owner;
 
         /// <summary>
         /// Initializes a new instance of the ToolTip class.
@@ -97,8 +96,6 @@ namespace Windows.UI.Xaml.Controls
                         VerticalContentAlignment = VerticalAlignment.Top,
                     };
 
-                    toolTip.DataContext = toolTip._owner?.DataContext;
-
                     toolTip._parentPopup.Loaded += new RoutedEventHandler(ParentPopupLoaded);
                 }
 
@@ -126,16 +123,6 @@ namespace Windows.UI.Xaml.Controls
                     if (toolTip.Closed != null)
                         toolTip.Closed(toolTip, new RoutedEventArgs());
                 }
-            }
-        }
-
-        internal void SetOwner(UIElement owner)
-        {
-            _owner = owner as FrameworkElement;
-
-            if (_parentPopup != null)
-            {
-                _parentPopup.DataContext = _owner?.DataContext;
             }
         }
 
