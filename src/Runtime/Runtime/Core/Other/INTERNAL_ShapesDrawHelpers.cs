@@ -311,8 +311,10 @@ namespace CSHTML5.Internal
             //context.lineWidth = path.StrokeThickness;
         }
 
-        internal static void PreparePolygon(object canvasDomElement, PointCollection points)
+        internal static void PrepareLines(object canvasDomElement, PointCollection points, bool isClosed)
         {
+            if (points?.Count < 2) return;
+
             var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             context.beginPath();
@@ -323,8 +325,11 @@ namespace CSHTML5.Internal
                 context.lineTo(points[i].X, points[i].Y);
             }
 
-            context.closePath();
-            context.fill();
+            if (isClosed)
+            {
+                context.closePath();
+                context.fill();
+            }
         }
 
         internal static void PrepareEllipse(object canvasDomElement, double ellipseWidth, double ellipseHeight, double centerX, double centerY)

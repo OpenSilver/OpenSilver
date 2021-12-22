@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Media
 {
     public sealed partial class PointCollection : PresentationFrameworkCollection<Point>
     {
-        private Path _parentPath;
+        private Shape _parentShape;
 
         /// <summary>
         /// Initializes a new instance that is empty.
@@ -120,16 +120,16 @@ namespace Windows.UI.Xaml.Media
             this.NotifyParent();
         }
 
-        internal void SetParentPath(Path path)
+        internal void SetParentShape(Shape shape)
         {
-            this._parentPath = path;
+            this._parentShape = shape;
         }
 
         private void NotifyParent()
         {
-            if (this._parentPath != null)
+            if (this._parentShape != null)
             {
-                this._parentPath.ScheduleRedraw();
+                this._parentShape.ScheduleRedraw();
             }
         }
     }
