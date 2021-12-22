@@ -143,12 +143,12 @@ namespace CSHTML5.Internal
                     if (!frameworkElementWidthWasSpecified)
                     {
                         canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset);
                     }
                     if (!frameworkElementHeightWasSpecified)
                     {
                         canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset);
                     }
                 }
                 else
@@ -158,7 +158,7 @@ namespace CSHTML5.Internal
                     if (!frameworkElementWidthWasSpecified)
                     {
                         canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset);
                     }
                     else
                     {
@@ -170,7 +170,7 @@ namespace CSHTML5.Internal
                     if (!frameworkElementHeightWasSpecified)
                     {
                         canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset); //todo: add StrokeThickness instead of +1?
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset);
                     }
                     else
                     {
@@ -311,18 +311,18 @@ namespace CSHTML5.Internal
             //context.lineWidth = path.StrokeThickness;
         }
 
-        internal static void PrepareLines(object canvasDomElement, PointCollection points, bool isClosed)
+        internal static void PrepareLines(object canvasDomElement, PointCollection points, double strokeThikness, bool isClosed)
         {
             if (points?.Count < 2) return;
 
             var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             context.beginPath();
-            context.moveTo(points[0].X, points[0].Y);
+            context.moveTo(points[0].X + strokeThikness / 2, points[0].Y + strokeThikness / 2);
 
             for (int i = 1; i < points.Count; i++)
             {
-                context.lineTo(points[i].X, points[i].Y);
+                context.lineTo(points[i].X + strokeThikness/2, points[i].Y + strokeThikness/2);
             }
 
             if (isClosed)

@@ -171,7 +171,9 @@ namespace Windows.UI.Xaml.Shapes
 			double yOffsetToApplyBeforeMultiplication;
 			double xOffsetToApplyAfterMultiplication;
 			double yOffsetToApplyAfterMultiplication;
-			INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(this, StrokeThickness, 0, maxX, 0, maxY, Stretch, shapeActualSize, out horizontalMultiplicator, out verticalMultiplicator, out xOffsetToApplyBeforeMultiplication, out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out _marginOffsets);
+			INTERNAL_ShapesDrawHelpers.GetMultiplicatorsAndOffsetForStretch(this, StrokeThickness, 0, maxX, 0, maxY, 
+				Stretch, shapeActualSize, out horizontalMultiplicator, out verticalMultiplicator, out xOffsetToApplyBeforeMultiplication, 
+				out yOffsetToApplyBeforeMultiplication, out xOffsetToApplyAfterMultiplication, out yOffsetToApplyAfterMultiplication, out _marginOffsets);
 
 			ApplyMarginToFixNegativeCoordinates(new Point());
 
@@ -180,11 +182,11 @@ namespace Windows.UI.Xaml.Shapes
 				ApplyMarginToFixNegativeCoordinates(_marginOffsets);
 			}
 
-			INTERNAL_ShapesDrawHelpers.PrepareLines(_canvasDomElement, Points, false);
+			INTERNAL_ShapesDrawHelpers.PrepareLines(_canvasDomElement, Points, StrokeThickness, false);
 			//todo: make sure the parameters below are correct.
-			Shape.DrawFillAndStroke(this, "evenodd", xOffsetToApplyAfterMultiplication, yOffsetToApplyAfterMultiplication, xOffsetToApplyAfterMultiplication + maxX, 
-				yOffsetToApplyAfterMultiplication + maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, 
-				yOffsetToApplyBeforeMultiplication, shapeActualSize);
+			Shape.DrawFillAndStroke(this, FillRule == FillRule.Nonzero ? "nonzero" : "evenodd", xOffsetToApplyAfterMultiplication, 
+				yOffsetToApplyAfterMultiplication,  xOffsetToApplyAfterMultiplication + maxX, yOffsetToApplyAfterMultiplication + maxY, 
+				horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication,  yOffsetToApplyBeforeMultiplication, shapeActualSize);
 		}
 
 		protected override Size MeasureOverride(Size availableSize)
