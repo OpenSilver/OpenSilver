@@ -60,6 +60,7 @@
     <Reference Include="System.Net" />
     <Reference Include="System.Windows.Controls, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Controls.Data, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Data.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.Windows.Controls.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Controls.Input.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Controls.Navigation, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -307,6 +308,9 @@
     </Compile>
     <Compile Include="Tests\TwoTextBoxesHorizontallyTest.xaml.cs">
       <DependentUpon>TwoTextBoxesHorizontallyTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tests\ValidationSummaryTest.xaml.cs">
+      <DependentUpon>ValidationSummaryTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\ValidationTest.xaml.cs">
       <DependentUpon>ValidationTest.xaml</DependentUpon>
@@ -626,6 +630,10 @@
     <Page Include="Tests\TwoTextBoxesHorizontallyTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\ValidationSummaryTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tests\ValidationTest.xaml">
       <SubType>Designer</SubType>
