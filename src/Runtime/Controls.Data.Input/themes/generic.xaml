@@ -166,24 +166,25 @@
                                 </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="ValidationStates">
-                                <VisualState x:Name="Empty">
+                                <VisualState x:Name="HasErrors">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content"
                                                                        Storyboard.TargetProperty="Visibility"
                                                                        Duration="0">
                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="Collapsed" />
+                                                                    Value="Visible" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="HasErrors" />
+                                <VisualState x:Name="Empty" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="Content"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="0,0,2,2">
+                                CornerRadius="0,0,2,2"
+                                Visibility="Collapsed">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
