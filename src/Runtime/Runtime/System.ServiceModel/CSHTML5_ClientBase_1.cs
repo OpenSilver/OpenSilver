@@ -417,15 +417,11 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         /// Initializes a new instance of the System.ServiceModel.ClientBase`1
         /// class using the specified binding and target address.
         /// </summary>
-        /// <param name="binding">The binding with which to make calls to the service.</param>
         /// <param name="remoteAddress">The address of the service endpoint.</param>
-        /// <exception cref="ArgumentNullException">
-        /// The binding is null.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
         /// The remote address is null.
         /// </exception>
-        protected CSHTML5_ClientBase(Binding binding, EndpointAddress remoteAddress)
+        protected CSHTML5_ClientBase(EndpointAddress remoteAddress)
         {
             if (remoteAddress == null)
             {

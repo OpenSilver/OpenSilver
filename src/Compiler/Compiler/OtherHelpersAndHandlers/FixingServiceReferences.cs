@@ -302,8 +302,12 @@ namespace DotNetForHtml5.Compiler
 
             finalText = FixBasicHttpBinding(finalText);
 
-            return finalText;
+            // Remove the Binding parameter from the service constructor because it is not being used
+            // and only System.ServiceModel.Channels.CustomBinding is supported. All other binding types throw an exception in client side Blazor:
+            // "System.PlatformNotSupportedException: System.Net.Security is not supported on this platform."
+            finalText = finalText.Replace("(System.ServiceModel.Channels.Binding binding, ", "(").Replace("base(binding, ", "base(");
 
+            return finalText;
         }
 
         private static string FixBasicHttpBinding(string text)
