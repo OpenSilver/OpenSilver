@@ -77,7 +77,7 @@ namespace Windows.UI.Xaml
                 // Width:
                 if (!double.IsNaN(element.Width))
                     style.width = element.Width.ToInvariantString() + "px";
-                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element is CheckBox))
                     style.width = "100%";
                 else
                     style.width = "auto";
@@ -375,8 +375,8 @@ namespace Windows.UI.Xaml
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
                 if (fe.INTERNAL_VisualParent is Canvas || isParentAViewBox) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
                 {
-                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? 
-                        fe.Width.ToInvariantString() + "px" : 
+                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ?
+                        fe.Width.ToInvariantString() + "px" :
                         "auto";
                 }
                 else // Otherwise we handle both alignment and Width/Height:
