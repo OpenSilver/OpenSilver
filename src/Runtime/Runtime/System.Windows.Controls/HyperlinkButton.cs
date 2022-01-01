@@ -29,8 +29,10 @@ using System.Windows.Browser;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -73,6 +75,13 @@ namespace Windows.UI.Xaml.Controls
                 string targetName = this.TargetName;
                 object targetElement = null;
 
+                if (!IsExternalTarget())
+                {
+                    if (TryInternalNavigate())
+                    {
+                        return;
+                    }
+                }
                 // Look for an element within the application (in the Visual Tree) that has the specified TargetName and implements INavigate:
                 if (!string.IsNullOrEmpty(targetName)
                     && (targetElement = this.FindName(targetName)) is INavigate) //todo: verify that "FindName" is enough to find the element (it walks up the visual tree and looks in the elements that implement INameScope) or if we should manually traverse all the nodes of the Visual Tree.
@@ -102,6 +111,69 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private bool IsExternalTarget()
+        {
+            if (!string.Equals(TargetName, "_blank") && !string.Equals(TargetName, "_media") && !string.Equals(TargetName, "_search") && !string.Equals(TargetName, "_parent") && !string.Equals(TargetName, "_self"))
+            {
+                return string.Equals(TargetName, "_top");
+            }
+            return true;
+        }
+
+        private bool TryInternalNavigate()
+        {
+            INavigate navigate = null;
+            DependencyObject dependencyObject = this;
+            DependencyObject dependencyObject2 = null;
+            DependencyObject lastSearchedSubtree = this;
+            do
+            {
+                dependencyObject2 = VisualTreeHelper.GetParent(dependencyObject);
+                if (dependencyObject2 == null && dependencyObject is FrameworkElement)
+                {
+                    dependencyObject2 = ((FrameworkElement)dependencyObject).Parent;
+                }
+                if (dependencyObject2 != null && (dependencyObject2 is INavigate || VisualTreeHelper.GetParent(dependencyObject2) == null))
+                {
+                    navigate = FindNavigator(dependencyObject2 as FrameworkElement, lastSearchedSubtree);
+                    if (navigate != null)
+                    {
+                        return navigate.Navigate(NavigateUri);
+                    }
+                    lastSearchedSubtree = dependencyObject2;
+                }
+                dependencyObject = dependencyObject2;
+            }
+            while (dependencyObject != null);
+            return false;
+        }
+
+        private INavigate FindNavigator(FrameworkElement baseFE, DependencyObject lastSearchedSubtree)
+        {
+            if (baseFE == null)
+            {
+                return null;
+            }
+            if (baseFE is INavigate && (string.Equals(baseFE.Name, TargetName) || string.IsNullOrEmpty(TargetName)))
+            {
+                return baseFE as INavigate;
+            }
+            bool flag = baseFE is Popup;
+            int num = (flag ? 1 : VisualTreeHelper.GetChildrenCount(baseFE));
+            for (int i = 0; i < num; i++)
+            {
+                DependencyObject dependencyObject = (flag ? ((Popup)baseFE).Child : VisualTreeHelper.GetChild(baseFE, i));
+                if (!object.ReferenceEquals(dependencyObject, lastSearchedSubtree))
+                {
+                    INavigate navigate = FindNavigator(dependencyObject as FrameworkElement, lastSearchedSubtree);
+                    if (navigate != null)
+                    {
+                        return navigate;
+                    }
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// Gets or sets the Uniform Resource Identifier (URI) to navigate to when the
