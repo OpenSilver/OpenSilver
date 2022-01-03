@@ -101,7 +101,7 @@ namespace Windows.UI.Xaml.Controls
                 for (int i = 0; i < this.Items.Count; i++)
                 {
                     ComboBoxItem container = this.ItemContainerGenerator.ContainerFromIndex(i) as ComboBoxItem;
-                    
+
                     if (container == null)
                     {
                         continue;
@@ -188,9 +188,9 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the IsDropDownOpen dependency property.
         /// </summary>
         public static readonly DependencyProperty IsDropDownOpenProperty =
-            DependencyProperty.Register("IsDropDownOpen", 
-                                        typeof(bool), 
-                                        typeof(AutoCompleteBox), 
+            DependencyProperty.Register("IsDropDownOpen",
+                                        typeof(bool),
+                                        typeof(AutoCompleteBox),
                                         new PropertyMetadata(false, OnIsDropDownOpenChanged));
 
         private static void OnIsDropDownOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -265,7 +265,7 @@ namespace Windows.UI.Xaml.Controls
 
                         try
                         {
-                            autoCompleteBox._textBox.Text = (autoCompleteBox.SelectedItem ?? string.Empty).ToString();
+                            autoCompleteBox._textBox.Text = autoCompleteBox.SelectedItem != null ? autoCompleteBox.GetItemValue(autoCompleteBox.SelectedItem) : string.Empty;
                         }
                         finally
                         {
@@ -293,9 +293,9 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty IsArrowVisibleProperty =
-            DependencyProperty.Register("IsArrowVisible", 
-                                        typeof(bool), 
-                                        typeof(AutoCompleteBox), 
+            DependencyProperty.Register("IsArrowVisible",
+                                        typeof(bool),
+                                        typeof(AutoCompleteBox),
                                         new PropertyMetadata(false, OnIsArrowVisibleChanged));
 
         private static void OnIsArrowVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -336,9 +336,9 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty MinimumPopulateDelayProperty =
-            DependencyProperty.Register("MinimumPopulateDelay", 
-                                        typeof(int), 
-                                        typeof(AutoCompleteBox), 
+            DependencyProperty.Register("MinimumPopulateDelay",
+                                        typeof(int),
+                                        typeof(AutoCompleteBox),
                                         new PropertyMetadata(0, OnMinimumPopulateDelayChanged));
 
         private static void OnMinimumPopulateDelayChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -357,9 +357,9 @@ namespace Windows.UI.Xaml.Controls
         }
 
         public static readonly DependencyProperty MinimumPrefixLengthProperty =
-            DependencyProperty.Register("MinimumPrefixLength", 
-                                        typeof(int), 
-                                        typeof(AutoCompleteBox), 
+            DependencyProperty.Register("MinimumPrefixLength",
+                                        typeof(int),
+                                        typeof(AutoCompleteBox),
                                         new PropertyMetadata(1));
 
         /// <summary>
@@ -382,8 +382,8 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(TextProperty, value); }
         }
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", 
-                                        typeof(string), 
+            DependencyProperty.Register("Text",
+                                        typeof(string),
                                         typeof(AutoCompleteBox),
                                         new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextChanged));
 
@@ -420,10 +420,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="ItemFilter"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ItemFilterProperty = 
+        public static readonly DependencyProperty ItemFilterProperty =
             DependencyProperty.Register(
-                nameof(ItemFilter), 
-                typeof(AutoCompleteFilterPredicate<object>), 
+                nameof(ItemFilter),
+                typeof(AutoCompleteFilterPredicate<object>),
                 typeof(AutoCompleteBox),
                 new PropertyMetadata(OnItemFilterPropertyChanged));
 
@@ -738,11 +738,12 @@ namespace Windows.UI.Xaml.Controls
         {
             var selectedContainer = (SelectorItem)sender;
 
+            var selectedItem = ItemContainerGenerator.ItemFromContainer(selectedContainer);
             // Updates the text but without triggering the text change event
             _updatingTextOnSelection = true;
             try
             {
-                this.Text = selectedContainer.ToString();
+                this.Text = selectedItem != null ? GetItemValue(selectedItem) : String.Empty;
             }
             finally
             {
@@ -750,13 +751,24 @@ namespace Windows.UI.Xaml.Controls
             }
 
             // Select the item:
-            this.SelectedItem = ItemContainerGenerator.ItemFromContainer(selectedContainer);
+            this.SelectedItem = selectedItem;
 
             // Close the popup:
             if (_dropDownToggle != null)
                 _dropDownToggle.IsChecked = false; // Note: this has other effects as well: see the "IsDropDownOpen_Changed" method.
         }
 
+
+        protected virtual string GetItemValue(object value)
+        {
+            if (ValueMemberPath != null)
+            {
+                var readValue = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(value, ValueMemberPath) as String;
+                return readValue != null ? readValue : string.Empty;
+            }
+
+            return value == null ? string.Empty : value.ToString();
+        }
 #if MIGRATION
         void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 #else
@@ -825,12 +837,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxDropDownHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxDropDownHeightProperty =
-            DependencyProperty.Register("MaxDropDownHeight", 
-                                        typeof(double), 
-                                        typeof(AutoCompleteBox), 
+            DependencyProperty.Register("MaxDropDownHeight",
+                                        typeof(double),
+                                        typeof(AutoCompleteBox),
                                         new PropertyMetadata(200d));
 
-#region event
+        #region event
 
         /// <summary>
         /// Occurs when the text in the text box portion of the AutoCompleteBox changes.
@@ -865,7 +877,7 @@ namespace Windows.UI.Xaml.Controls
         public event RoutedEventHandler DropDownClosing;
 #endif
 
-#endregion
+        #endregion
     }
 
     /// <summary>
