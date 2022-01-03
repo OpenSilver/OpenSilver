@@ -107,7 +107,7 @@ namespace Windows.UI.Xaml.Controls
                         continue;
                     }
 
-                    if (this._filter(this._textBox.Text, container.Content))
+                    if (this._filter(this._textBox.Text, GetItemValue(container.Content)))
                     {
                         container.Visibility = Visibility.Visible;
                     }
