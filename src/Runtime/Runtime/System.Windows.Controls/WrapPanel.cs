@@ -158,6 +158,8 @@ namespace Windows.UI.Xaml.Controls
                 var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
                 divStyle.display = "inline-block";
                 divStyle.lineHeight = "initial";
+                divStyle.verticalAlign = "middle";
+
                 domElementWhereToPlaceChild = div;
                 return div;
             }

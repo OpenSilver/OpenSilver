@@ -52,12 +52,14 @@
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ControlStoryboardAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ControlStoryboardOption.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\DataTrigger.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity.Core\ExtendedVisualStateManager.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\PropertyChangedTrigger.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\StoryboardAction.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
 		<Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
 		<Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
 		<Compile Include="OpenSilver\Internal\NameScope.cs" />
+		<Compile Include="Microsoft.Expression.Media.Effects\TransitionEffect.cs" />
 		<Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
 		<Compile Include="OpenSilver\Internal\Parsers.cs" />
 		<Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
