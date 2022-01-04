@@ -13,6 +13,8 @@
 
 using System;
 using System.Collections.Specialized;
+using CSHTML5.Internals.Controls;
+
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 #else
@@ -173,7 +175,6 @@ namespace Windows.UI.Xaml.Controls
             IRecyclingItemContainerGenerator generator = ItemContainerGenerator as IRecyclingItemContainerGenerator;
             ItemsControl owner = ItemsControl.GetItemsOwner(this);
             VirtualizationMode mode = GetVirtualizationMode(this);
-            CleanUpVirtualizedItemEventArgs args;
             int last = first + count - 1;
             GeneratorPosition pos;
             int item;
@@ -184,25 +185,29 @@ namespace Windows.UI.Xaml.Controls
             {
                 item = generator.IndexFromGeneratorPosition(pos);
 
-                if (item < first || item > last)
+                if (item < first || item > last &&
+                    !((IGeneratorHost)owner).IsItemItsOwnContainer(owner.Items[item]) && 
+                    NotifyCleanupItem(Children[pos.Index], owner))
                 {
-                    //Console.WriteLine ("\tRemoving item[{0}] (child #{1})", item, pos.Index);
-                    args = new CleanUpVirtualizedItemEventArgs(Children[pos.Index], owner.Items[item]);
-                    OnCleanUpVirtualizedItem(args);
+                    RemoveInternalChildRange(pos.Index, 1);
 
-                    if (!args.Cancel)
-                    {
-                        RemoveInternalChildRange(pos.Index, 1);
-
-                        if (mode == VirtualizationMode.Recycling)
-                            generator.Recycle(pos, 1);
-                        else
-                            generator.Remove(pos, 1);
-                    }
+                    if (mode == VirtualizationMode.Recycling)
+                        generator.Recycle(pos, 1);
+                    else
+                        generator.Remove(pos, 1);
                 }
 
                 pos.Index--;
             }
+        }
+
+        private bool NotifyCleanupItem(UIElement child, ItemsControl itemsControl)
+        {
+            CleanUpVirtualizedItemEventArgs e = new CleanUpVirtualizedItemEventArgs(child, itemsControl.ItemContainerGenerator.ItemFromContainer(child));
+            e.OriginalSource = this;
+            OnCleanUpVirtualizedItem(e);
+
+            return !e.Cancel;
         }
 
         /// <summary>
