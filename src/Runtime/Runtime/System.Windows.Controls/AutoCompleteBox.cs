@@ -761,7 +761,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected virtual string GetItemValue(object value)
         {
-            if (ValueMemberPath != null)
+            if (ValueMemberPath != null && value != null)
             {
                 var readValue = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(value, ValueMemberPath) as String;
                 return readValue != null ? readValue : string.Empty;
