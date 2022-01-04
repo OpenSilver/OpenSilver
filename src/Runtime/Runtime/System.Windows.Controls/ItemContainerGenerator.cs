@@ -233,10 +233,11 @@ namespace Windows.UI.Xaml.Controls
             while (rblock != blockR || offset <= offsetR)
             {
                 DependencyObject container = rblock.ContainerAt(offset);
+                object item = rblock.ItemAt(offset);
 
                 UnlinkContainerFromItem(container, rblock.ItemAt(offset));
 
-                if (isRecycling)
+                if (isRecycling && !this.Host.IsItemItsOwnContainer(item))
                 {
                     Debug.Assert(!_recyclableContainers.Contains(container), "trying to add a container to the collection twice");
 
