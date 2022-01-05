@@ -547,6 +547,9 @@ namespace Windows.UI.Xaml.Controls
             var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
             outerDivStyle.height = "100%";
             outerDivStyle.width = "100%";
+            // Setting display to grid for child height to fill entire ScrollViewer height if child does not set height explicitly (e.g. 100%)
+            // Without this, child ends up having height auto and only fills its content height, and not 100% or ScrollViewer's MinHeight
+            outerDivStyle.display = "grid";
 
             if (!IsCustomLayoutRoot && !IsUnderCustomLayout)
             {
