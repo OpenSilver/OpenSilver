@@ -795,6 +795,9 @@ namespace Windows.UI.Xaml.Controls
             if (IsTabStop)
             {
                 INTERNAL_HtmlDomManager.SetFocus(this);
+                
+                FocusManager.SetFocusedElement(this.INTERNAL_ParentWindow, this);
+
                 return true; //todo: see if there is a way for this to fail, in which case we want to return false.
             }
             return false;

@@ -84,5 +84,43 @@ namespace Windows.UI.Xaml.Input.Tests
             var focusedElement = FocusManager.GetFocusedElement();
             focusedElement.Should().BeNull();
         }
+
+        [TestMethod]
+        public void GetFocusedElement_ControlFocus()
+        {
+            var window = new Window();
+            Window.Current = window;
+
+            var element = new Control();
+            element.INTERNAL_ParentWindow = window;
+
+            element.Focus();
+
+            var focusedElement = FocusManager.GetFocusedElement();
+            focusedElement.Should().Be(element);
+        }
+
+        [TestMethod]
+        public void GetFocusedElement_TwoControls_ControlFocus()
+        {
+            var window = new Window();
+            Window.Current = window;
+
+            var firstElement = new Control();
+            firstElement.INTERNAL_ParentWindow = window;
+
+            var secondElement = new Control();
+            secondElement.INTERNAL_ParentWindow = window;
+
+            firstElement.Focus();
+
+            var focusedElement = FocusManager.GetFocusedElement();
+            focusedElement.Should().Be(firstElement);
+
+            secondElement.Focus();
+            focusedElement = FocusManager.GetFocusedElement();
+            focusedElement.Should().NotBe(firstElement);
+            focusedElement.Should().Be(secondElement);
+        }
     }
 }
