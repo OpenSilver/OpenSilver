@@ -1548,8 +1548,6 @@ namespace Windows.UI.Xaml
                 INTERNAL_OriginalJSEventArg = jsEventArg
             };
 
-            FocusManager.SetFocusedElement(this.INTERNAL_ParentWindow, null);
-
             OnLostFocus(eventArgs); //todo: should we skip this method if "handled" is true? (test by overriding "OnLostFocus" method below and see how it works in this case in WPF)
         }
 
