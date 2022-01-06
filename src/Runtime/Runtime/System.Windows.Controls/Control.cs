@@ -792,7 +792,10 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool Focus()
         {
-            if (IsTabStop)
+            if (Visibility == Visibility.Visible &&
+                IsTabStop &&
+                IsEnabled &&
+                IsConnectedToLiveTree)
             {
                 INTERNAL_HtmlDomManager.SetFocus(this);
                 
