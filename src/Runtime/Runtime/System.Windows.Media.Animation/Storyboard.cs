@@ -228,10 +228,9 @@ namespace Windows.UI.Xaml.Media.Animation
         object thisLock = new object();
         internal void NotifyStoryboardOfTimelineEnd(Timeline timeline)
         {
-            HashSet2<Guid> completedguids = timeline.CompletedGuids;
-            List<Guid> guidsDealtWith = new List<Guid>();
-            foreach (Guid guid in completedguids)
+            if (timeline != null && timeline._parameters != null)
             {
+                Guid guid = timeline._parameters.Guid;
                 bool raiseEvent = false;
                 lock (thisLock)
                 {
@@ -241,7 +240,6 @@ namespace Windows.UI.Xaml.Media.Animation
                         --_expectedAmountOfTimelineEnds;
                         --expectedAmount;
                         _expectedAmountOfTimelineEndsDict[guid] = expectedAmount;
-                        guidsDealtWith.Add(guid);
                         if (expectedAmount <= 0)
                         {
                             raiseEvent = true;
@@ -250,13 +248,16 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
                 if (raiseEvent)
                 {
-                    OnIterationCompleted(_guidToIterationParametersDict[guid]);
-                    _guidToIterationParametersDict.Remove(guid);
+                    if (_guidToIterationParametersDict.ContainsKey(guid))
+                    {
+                        _guidToIterationParametersDict.Remove(guid);
+
+                        if (_guidToIterationParametersDict.Count == 0)
+                        {
+                             OnIterationCompleted(this._parameters);
+                        }
+                    }
                 }
-            }
-            foreach (Guid guid in guidsDealtWith)
-            {
-                timeline.CompletedGuids.Remove(guid);
             }
         }
 
