@@ -102,7 +102,12 @@ namespace TestApplication
             Tests.Add(datagrids);
 
             Tests.Add(new Test("ICommand", "ICommand"));
-            Tests.Add(new Test("Validation", "Validation"));
+
+            TestCategory validation = new TestCategory("Validation");
+            validation.Add(new Test("Validation", "Validation"));
+            validation.Add(new Test("ValidationSummary", "ValidationSummary"));
+            Tests.Add(validation);
+
             Tests.Add(new Test("MediaElement", "MediaElement"));
             Tests.Add(new Test("Video Player", "VideoPlayer"));
             Tests.Add(new Test("Composite Controls", "CompositeControls"));
