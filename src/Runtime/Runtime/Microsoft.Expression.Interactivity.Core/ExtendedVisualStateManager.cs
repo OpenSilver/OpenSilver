@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Windows.Media.Effects;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Collections;
 
 #if MIGRATION
 using System.Windows;
@@ -87,6 +88,24 @@ namespace Microsoft.Expression.Interactivity.Core
         }
 
         public static bool IsRunningFluidLayoutTransition { get { return LayoutTransitionStoryboard != null; } }
+
+        public static bool GoToElementState(FrameworkElement root, string stateName, bool useTransitions)
+        {
+            if (VisualStateManager.GetCustomVisualStateManager(root) is ExtendedVisualStateManager extendedVisualStateManager)
+            {
+                return extendedVisualStateManager.GoToStateInternal(root, stateName, useTransitions);
+            }
+            return false;
+        }
+
+        private bool GoToStateInternal(FrameworkElement stateGroupsRoot, string stateName, bool useTransitions)
+        {
+            if (TryGetState(stateGroupsRoot, stateName, out var group, out var state))
+            {
+                return GoToStateCore(null, stateGroupsRoot, stateName, group, state, useTransitions);
+            }
+            return false;
+        }
 
         #region Data attached to VSM
         /// <summary>
@@ -1580,6 +1599,29 @@ namespace Microsoft.Expression.Interactivity.Core
         private static bool IsClose(double a, double b)
         {
             return (Math.Abs((double)(a - b)) < 1E-07);
+        }
+
+        private static bool TryGetState(FrameworkElement element, string stateName, out VisualStateGroup group, out VisualState state)
+        {
+            group = null;
+            state = null;
+
+            IList visualStateGroups = VisualStateManager.GetVisualStateGroups(element);
+            
+            foreach (VisualStateGroup visualStateGroup in visualStateGroups)
+            {
+                foreach (VisualState visualState in visualStateGroup.States)
+                {
+                    if (visualState.Name == stateName)
+                    {
+                        group = visualStateGroup;
+                        state = visualState;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
         #endregion
     }
