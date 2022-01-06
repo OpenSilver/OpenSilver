@@ -120,7 +120,7 @@ namespace Windows.UI.Xaml
                 return;
             }
 
-            if (child._parent != null)
+            if (child._parent != null && child._parent != this)
             {
                 throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
             }
