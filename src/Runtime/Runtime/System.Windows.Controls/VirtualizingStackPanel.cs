@@ -185,13 +185,17 @@ namespace Windows.UI.Xaml.Controls
             {
                 item = generator.IndexFromGeneratorPosition(pos);
 
-                if (item < first || item > last &&
-                    !((IGeneratorHost)owner).IsItemItsOwnContainer(owner.Items[item]) && 
+                // Note: we should not remove the child if it is an item of its owner ItemsControl be
+                // we remove it anyway because ScrollContentPresenter does not properly work with an
+                // external IScrollInfo which leads to layout issues
+                if ((item < first || item > last) &&
+                    /*!((IGeneratorHost)owner).IsItemItsOwnContainer(owner.Items[item]) &&*/ 
                     NotifyCleanupItem(Children[pos.Index], owner))
                 {
                     RemoveInternalChildRange(pos.Index, 1);
 
-                    if (mode == VirtualizationMode.Recycling)
+                    if (mode == VirtualizationMode.Recycling &&
+                        !((IGeneratorHost)owner).IsItemItsOwnContainer(owner.Items[item]))
                         generator.Recycle(pos, 1);
                     else
                         generator.Remove(pos, 1);
