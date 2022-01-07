@@ -176,13 +176,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderBrush), 
                 typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata((object)null)
-                {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Name = new List<string> { "borderColor" },
-                    }
-                });
+                new PropertyMetadata((object)null));
 
         //-----------------------
         // BORDERTHICKNESS
