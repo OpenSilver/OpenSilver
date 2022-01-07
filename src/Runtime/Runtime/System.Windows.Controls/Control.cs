@@ -176,13 +176,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderBrush), 
                 typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata((object)null)
-                {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Name = new List<string> { "borderColor" },
-                    }
-                });
+                new PropertyMetadata((object)null));
 
         //-----------------------
         // BORDERTHICKNESS
@@ -204,22 +198,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderThickness), 
                 typeof(Thickness), 
                 typeof(Control), 
-                new PropertyMetadata(new Thickness())
-                {
-                    MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
-                });
-
-        private static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var control = (Control)d;
-            if (!control.HasTemplate)
-            {
-                var newThickness = (Thickness)newValue;
-                var domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
-                domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-                domElement.borderWidth = $"{newThickness.Top.ToString(CultureInfo.InvariantCulture)}px {newThickness.Right.ToString(CultureInfo.InvariantCulture)}px {newThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px {newThickness.Left.ToString(CultureInfo.InvariantCulture)}px";
-            }
-        }
+                new PropertyMetadata(new Thickness()));
 
         //-----------------------
         // FONTWEIGHT
