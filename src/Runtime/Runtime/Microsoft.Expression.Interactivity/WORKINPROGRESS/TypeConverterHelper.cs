@@ -1,11 +1,29 @@
-﻿#if MIGRATION
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See THIRD-PARTY-NOTICES file in the project root for full license information.
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
 using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text;
-using System.Windows.Controls;
 using System.Windows.Markup;
+
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 namespace Microsoft.Expression.Interactivity
 {
@@ -198,5 +216,3 @@ namespace Microsoft.Expression.Interactivity
 		}
 	}
 }
-
-#endif
