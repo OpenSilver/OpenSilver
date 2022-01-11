@@ -61,7 +61,7 @@ namespace Windows.UI.Xaml.Controls
             internal set { _error = value; }
         }
 
-        public new bool Handled
+        public bool Handled
         {
             get { return m_handled; }
             set { m_handled = value; }

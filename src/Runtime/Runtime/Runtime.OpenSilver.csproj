@@ -363,7 +363,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\FontVariants.cs" />
 		<Compile Include="System.Windows\TextMeasurementService.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="System.Windows\FrameworkPropertyMetadata.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
