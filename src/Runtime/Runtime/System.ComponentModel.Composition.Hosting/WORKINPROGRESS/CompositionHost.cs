@@ -15,7 +15,6 @@
 // UGiacobbi2000104 First implementation
 
 using System.ComponentModel.Composition.Primitives;
-using System.Globalization;
 using System.Threading;
 
 namespace System.ComponentModel.Composition.Hosting
@@ -23,10 +22,10 @@ namespace System.ComponentModel.Composition.Hosting
     /// <summary>Provides static methods to control the container used by <see cref="T:System.ComponentModel.Composition.CompositionInitializer" />.</summary>
     public static class CompositionHost
     {
-        internal static CompositionContainer _container = (CompositionContainer)null;
+        internal static CompositionContainer _container;
         
         // Better to add some thread safety here
-        private static object _lockObject = new object();
+        private static readonly object _lockObject = new object();
 
         /// <summary>Sets <see cref="T:System.ComponentModel.Composition.CompositionInitializer" /> to use the specified container.</summary>
         /// <param name="container">The container to use.</param>
@@ -38,10 +37,9 @@ namespace System.ComponentModel.Composition.Hosting
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
 
-            CompositionContainer globalContainer = (CompositionContainer)null;
+            CompositionContainer globalContainer;
             
-            if (CompositionHost.TryGetOrCreateContainer((Func<CompositionContainer>)(() => container), out globalContainer))
-                //TODO: Localize this string
+            if (TryGetOrCreateContainer(() => container, out globalContainer))
                 throw new InvalidOperationException("Global container already initialized.");
         }
 
@@ -51,13 +49,11 @@ namespace System.ComponentModel.Composition.Hosting
         public static CompositionContainer Initialize(params ComposablePartCatalog[] catalogs)
         {
             AggregateCatalog catalog = new AggregateCatalog(catalogs);
-            // ExportProvider exportProvider = new ExportProvider();
-            var container = new CompositionContainer(catalog, null /*exportProvider*/);
-
-            //CompositionContainer container = new CompositionContainer((ComposablePartCatalog)catalog, new ExportProvider[0]);
+            var container = new CompositionContainer(catalog);
+            
             try
             {
-                CompositionHost.Initialize(container);
+                Initialize(container);
             }
             catch
             {
@@ -75,21 +71,21 @@ namespace System.ComponentModel.Composition.Hosting
         {
             bool container = true;
 
-            if (CompositionHost._container == null)
+            if (_container == null)
             {
                 CompositionContainer compositionContainer = createContainer();
-                lock (CompositionHost._lockObject)
+                lock (_lockObject)
                 {
-                    if (CompositionHost._container == null)
+                    if (_container == null)
                     {
                         Thread.MemoryBarrier();
-                        CompositionHost._container = compositionContainer;
+                        _container = compositionContainer;
                         container = false;
                     }
                 }
             }
 
-            globalContainer = CompositionHost._container;
+            globalContainer = _container;
 
             return container;
         }

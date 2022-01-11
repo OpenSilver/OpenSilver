@@ -16,13 +16,9 @@
 // UGiacobbi2000104 First implementation - SITA
 
 using System.ComponentModel.Composition.Primitives;
-using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Resources;
 
 namespace System.ComponentModel.Composition
 {
@@ -43,7 +39,7 @@ namespace System.ComponentModel.Composition
             if (attributedPart == null)
                 throw new ArgumentNullException(nameof(attributedPart));
 
-            CompositionInitializer.SatisfyImports(AttributedModelServices.CreatePart(attributedPart));
+            SatisfyImports(AttributedModelServices.CreatePart(attributedPart));
         }
 
         /// <summary>Fills the imports of the specified part.</summary>
@@ -63,18 +59,19 @@ namespace System.ComponentModel.Composition
 
             batch.AddPart(part);
 
-            if (part.ExportDefinitions.Any<ExportDefinition>())
-                throw new ArgumentException(string.Format((IFormatProvider)CultureInfo.CurrentCulture, "Error type has export {0}", part.ToString()), nameof(part));
+            if (part.ExportDefinitions.Any())
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Error type has export {0}", part.ToString()), nameof(part));
 
-            CompositionContainer globalContainer = (CompositionContainer)null;
+            CompositionContainer globalContainer;
 
             // UGiacobbi 2000105 The original SL implementation allows us to pass a delegate and create a container, for now this is not support so me need a non-null container.
 
-            // For now null the delegate that should build the catalog...
-            CompositionHost.TryGetOrCreateContainer(null, out globalContainer);
+            // we need a non null container to prevent NullReferenceExceptions
+            CompositionHost.TryGetOrCreateContainer(() => _container, out globalContainer);
 
             globalContainer.Compose(batch);
-
         }
+
+        private static readonly CompositionContainer _container = new CompositionContainer();
     }
 }
