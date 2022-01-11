@@ -15,13 +15,13 @@
 
 using System;
 using CSHTML5.Internal;
-using System.Windows.Threading;
 using DotNetForHtml5.Core;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Threading;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls.Primitives;
