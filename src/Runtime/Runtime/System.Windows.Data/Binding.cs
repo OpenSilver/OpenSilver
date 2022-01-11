@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml.Data
 #if MIGRATION
         private CultureInfo _culture;
 #else
-        private string _culture;
+        private string _culture = ""; //todo: avoiding null value because it causes exceptions, we probably want to revert that and have the correct value set depending on what we are dealing with ?
 #endif
         private object _converterParameter;
         private string _elementName;
