@@ -109,7 +109,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(CommandParameter),
                 typeof(object),
                 typeof(ButtonBase),
-                new PropertyMetadata(null));
+                new PropertyMetadata(null, OnCommandParameterChanged));
+
+        private static void OnCommandParameterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ButtonBase)d).UpdateCanExecute();
+        }
 
         /// <summary>
         /// Gets or sets the command to invoke when this button is pressed. 
