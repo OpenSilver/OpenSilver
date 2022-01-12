@@ -148,7 +148,20 @@ namespace CSHTML5
                     int callbackId = ReferenceIDGenerator.GenerateId();
                     CallbacksDictionary.Add(callbackId, callback);
 
+                    string eventName = i > 0 ? variables[i - 1] as string : "";
                     var isVoid = callback.Method.ReturnType == typeof(void);
+#if OPENSILVER
+                    if (!IsRunningInTheSimulator_WorkAround())
+#else
+                    if (!IsRunningInTheSimulator())
+#endif
+                    {
+                        if (eventName == "mouseup")
+                        {
+                            // To prevent MouseButtonUp event bubble up to the parent, eventCallback should work in synchronously.
+                            isVoid = false;
+                        }
+                    }
 
                     // Change the JS code to point to that callback:
                     javascript = javascript.Replace("$" + i.ToString(), string.Format(
