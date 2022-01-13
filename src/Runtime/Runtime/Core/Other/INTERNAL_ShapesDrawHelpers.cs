@@ -318,11 +318,11 @@ namespace CSHTML5.Internal
             var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
 
             context.beginPath();
-            context.moveTo(points[0].X + strokeThikness / 2, points[0].Y + strokeThikness / 2);
+            context.moveTo(points[0].X, points[0].Y);
 
             for (int i = 1; i < points.Count; i++)
             {
-                context.lineTo(points[i].X + strokeThikness/2, points[i].Y + strokeThikness/2);
+                context.lineTo(points[i].X, points[i].Y);
             }
 
             if (isClosed)
