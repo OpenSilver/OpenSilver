@@ -14,74 +14,67 @@ namespace System.Windows.Shapes
 namespace Windows.UI.Xaml.Shapes
 #endif
 {
-    //
-    // Summary:
-    //     Draws a series of connected straight lines.
+    /// <summary>
+    /// Draws a series of connected straight lines.
+    /// </summary>
     public sealed partial class Polyline : Shape
     {
         static Polyline()
         {
-            Shape.StretchProperty.OverrideMetadata(typeof(Polyline), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            StretchProperty.OverrideMetadata(typeof(Polyline), new PropertyMetadata(Stretch.Fill, Stretch_Changed));
         }
 
-        //
-        // Summary:
-        //     Identifies the System.Windows.Shapes.Polyline.FillRule dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Shapes.Polyline.FillRule dependency property.
+        /// <summary>
+        /// Identifies the <see cref="FillRule"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty FillRuleProperty =
             DependencyProperty.Register(
-                "FillRule",
+                nameof(FillRule),
                 typeof(FillRule),
                 typeof(Polyline),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
-        //
-        // Summary:
-        //     Identifies the System.Windows.Shapes.Polyline.Points dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Shapes.Polyline.Points dependency property.
+        /// <summary>
+        /// Identifies the <see cref="Points"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register(
-                "Points",
+                nameof(Points),
                 typeof(PointCollection),
                 typeof(Polyline),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnPointsChanged));
-        //
-        // Summary:
-        //     Initializes a new instance of the System.Windows.Shapes.Polyline class.
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Polyline"/> class.
+        /// </summary>
         public Polyline()
         {
         }
 
-        //
-        // Summary:
-        //     Gets or sets a value that specifies how the interior fill of the shape is determined.
-        //
-        // Returns:
-        //     A value of the enumeration that specifies the fill behavior. The default is System.Windows.Media.FillRule.EvenOdd.
+        /// <summary>
+        /// Gets or sets a value that specifies how the interior fill of the shape is determined.
+        /// </summary>
+        /// <returns>
+        /// A value of the enumeration that specifies the fill behavior. The default is <see cref="FillRule.EvenOdd"/>.
+        /// </returns>
         public FillRule FillRule
         {
             get
             {
                 return (FillRule)this.GetValue(FillRuleProperty);
             }
-
             set
             {
                 this.SetValue(FillRuleProperty, value);
             }
         }
 
-        //
-        // Summary:
-        //     Gets or sets a collection that contains the vertex points of the System.Windows.Shapes.Polyline.
-        //
-        // Returns:
-        //     A collection of System.Windows.Point structures that describe the vertex points
-        //     of the System.Windows.Shapes.Polyline. The default is null.
+        /// <summary>
+        /// Gets or sets a collection that contains the vertex points of the <see cref="Polyline"/>.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="Point"/> structures that describe the vertex points
+        /// of the <see cref="Polyline"/>. The default is null.
+        /// </returns>
         public PointCollection Points
         {
             get
@@ -91,12 +84,13 @@ namespace Windows.UI.Xaml.Shapes
                 if (points == null)
                 {
                     points = new PointCollection();
+                    _suspendRendering = true;
                     this.SetValue(PointsProperty, points);
+                    _suspendRendering = false;
                 }
 
                 return points;
             }
-
             set
             {
                 this.SetValue(PointsProperty, value);
@@ -131,7 +125,6 @@ namespace Windows.UI.Xaml.Shapes
 
 
         private void GetMinMaxXY(out double minX, out double maxX, out double minY, out double maxY)
-
         {
             minX = double.MaxValue;
             minY = double.MaxValue;
