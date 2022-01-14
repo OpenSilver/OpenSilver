@@ -95,7 +95,7 @@ namespace Windows.UI.Xaml.Media
         internal override void SetParentPath(Path path)
         {
             base.SetParentPath(path);
-            Points.SetParentPath(path);
+            Points.SetParentShape(path);
         }
 
         internal override Point DefineInCanvas(double xOffsetToApplyBeforeMultiplication,

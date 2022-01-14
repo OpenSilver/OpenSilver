@@ -484,7 +484,7 @@
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintDocument.cs" />
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrinterFallbackSettings.cs" />
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintPageEventArgs.cs" />
-		<Compile Include="System.Windows.Shapes\WORKINPROGRESS\Polyline.cs" />
+		<Compile Include="System.Windows.Shapes\Polyline.cs" />
 		<Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherSynchronizationContext.cs" />
 		<Compile Include="APP_SUPPORT\ClientSideResourceManager.cs" />
 		<Compile Include="APP_SUPPORT\Cshtml5Initializer.cs" />

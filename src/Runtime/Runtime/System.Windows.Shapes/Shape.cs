@@ -326,7 +326,7 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeMiterLimit), 
                 typeof(double), 
                 typeof(Shape), 
-                new PropertyMetadata(0d));
+                new PropertyMetadata(10d));
 
         /// <summary>
         /// Gets or sets a collection of Double values that indicates the pattern of
@@ -657,6 +657,12 @@ namespace Windows.UI.Xaml.Shapes
             else
             {
                 CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = ''", context);
+            }
+
+            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.lineJoin = $1;", context, shape.StrokeLineJoin.ToString().ToLower());
+            if (shape.StrokeLineJoin == PenLineJoin.Miter)
+            {
+                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.miterLimit = $1", context, shape.StrokeMiterLimit);
             }
 
             if (shape.Fill != null)
