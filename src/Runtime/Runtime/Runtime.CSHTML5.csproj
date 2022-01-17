@@ -1007,7 +1007,6 @@
     <Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\OutOfBrowserSettings.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TabletDeviceType.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\TriggerActionCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\TriggerBase.cs" />

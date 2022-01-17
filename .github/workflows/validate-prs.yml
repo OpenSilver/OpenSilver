@@ -1,0 +1,61 @@
+name: OpenSilver Validate PRs
+env:
+  actual-version: '1.0.0'
+on:
+  # Any pull request to develop
+  pull_request:
+    branches:
+      - develop
+jobs:
+  OpenSilver-Build:
+    runs-on: windows-latest
+    steps:
+      - uses: microsoft/setup-msbuild@v1.0.3
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - name: Clone OpenSilver repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Restore teamdev.licenses
+        run: 'echo "FAKE TEAMDEV LICENSE TO PREVENT BUILDING ERROR. WE DO NOT USE REAL FOR PULL REQUESTS" > ./src/Simulator/Simulator/teamdev.licenses'
+        shell: bash
+      - name: Restore Packages
+        run: |
+          ./restore-packages-opensilver.bat
+          nuget restore src/OpenSilver.sln -v quiet
+      - name: Build Compiler SL Configuration
+        run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=SL -clp:ErrorsOnly -restore
+      - name: Build Compiler UWP Configuration
+        run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=UWP -clp:ErrorsOnly -restore
+      - name: Copy Compiler SL Assemblies
+        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/OpenSilver.Compiler*dll src/packages/OpenSilver.1.0.0/tools/;
+      - name: Copy Compiler UWP Assemblies
+        run: cp src/Compiler/Compiler/bin/OpenSilver/UWP/OpenSilver.Compiler*dll src/packages/OpenSilver.UWPCompatible.1.0.0/tools/;
+      # There is the TestApplication for SL version in the Solution, so we need to build the latest SL package
+      - name: Build OpenSilver
+        working-directory: build
+        run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+      - name: Pack OpenSilver
+        working-directory: build
+        run: |
+          mkdir temp; echo "OpenSilver ${{ env.actual-version }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
+          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=${{ env.actual-version }};Configuration=SL;Target=OpenSilver"
+      - name: Replace existing package with actual one
+        run: |
+          Remove-Item -Path "$($env:USERPROFILE)\.nuget\packages\OpenSilver\${{ env.actual-version }}" -Force -Recurse
+          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj package OpenSilver -v ${{ env.actual-version }} -s "$(Get-Location)\build\output\OpenSilver"
+      - name: Drop all bin and obj folders
+        run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
+        shell: bash
+      - name: Verify OpenSilver Solution SL Configuration
+        run: msbuild src/OpenSilver.sln -p:Configuration=SL -clp:ErrorsOnly -restore
+      - name: Drop all bin and obj folders
+        run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
+        shell: bash
+      - name: Verify OpenSilver Solution UWP Configuration
+        run: msbuild src/OpenSilver.sln -p:Configuration=UWP -clp:ErrorsOnly -restore
+      - name: Drop all bin and obj folders
+        run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
+        shell: bash

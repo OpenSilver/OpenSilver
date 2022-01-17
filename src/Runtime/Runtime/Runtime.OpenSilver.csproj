@@ -46,6 +46,10 @@
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\DataStateBehavior.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\ComparisonLogic.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\TypeConverterHelper.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\VisualStateUtilities.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
@@ -359,7 +363,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\FontVariants.cs" />
 		<Compile Include="System.Windows\TextMeasurementService.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="System.Windows\FrameworkPropertyMetadata.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
@@ -481,7 +484,7 @@
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintDocument.cs" />
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrinterFallbackSettings.cs" />
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintPageEventArgs.cs" />
-		<Compile Include="System.Windows.Shapes\WORKINPROGRESS\Polyline.cs" />
+		<Compile Include="System.Windows.Shapes\Polyline.cs" />
 		<Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherSynchronizationContext.cs" />
 		<Compile Include="APP_SUPPORT\ClientSideResourceManager.cs" />
 		<Compile Include="APP_SUPPORT\Cshtml5Initializer.cs" />
