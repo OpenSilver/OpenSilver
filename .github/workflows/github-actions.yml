@@ -33,22 +33,22 @@ jobs:
       - name: Build OpenSilver
         working-directory: build
         run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+      - name: Format Package Version
+        id: version
+        run: echo "::set-output name=suffix::$(date +'%Y-%m-%d-%H%M%S')-${{ env.SHA8 }}"
       - name: Build Simulator
         working-directory: build
-        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="output/OpenSilver" -p:NuspecFile="nuspec/OpenSilver.Simulator.nuspec" -p:NuspecProperties=PackageVersion=1.0.0-private-${{ steps.date.outputs.date }}-${{ env.SHA8 }}
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%d-%m-%Y')"; echo "::set-output name=datetime::$(date +'%d/%m/%Y %H:%M:%S')"
+        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="output/OpenSilver" -p:NuspecFile="nuspec/OpenSilver.Simulator.nuspec" -p:NuspecProperties=PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }}
       - name: Pack OpenSilver
         working-directory: build
         run: |
-          mkdir temp; echo "OpenSilver 1.0.0-private-${{ steps.date.outputs.date }}-${{ env.SHA8 }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=1.0.0-private-${{ steps.date.outputs.date }}-${{ env.SHA8 }};Configuration=SL;Target=OpenSilver"
+          mkdir temp; echo "OpenSilver 1.0.0-private-${{ steps.version.outputs.suffix }}" > temp/Version.txt
+          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }};Configuration=SL;Target=OpenSilver"
       - name: Pack Simulator
         working-directory: build
         run: |
-          echo "OpenSilver.Simulator 1.0.0-private-${{ steps.date.outputs.date }}-${{ env.SHA8 }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
-          msbuild -t:pack slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="D:\a\OpenSilver\OpenSilver\build\output\OpenSilver" -p:NuspecFile="D:\a\OpenSilver\OpenSilver\build\nuspec\OpenSilver.Simulator.nuspec" -p:NuspecBasePath="D:\a\OpenSilver\OpenSilver\build" -p:NuspecProperties=PackageVersion=1.0.0-private-${{ steps.date.outputs.date }}-${{ env.SHA8 }}
+          echo "OpenSilver.Simulator 1.0.0-private-${{ steps.version.outputs.suffix }}" > temp/Version.txt
+          msbuild -t:pack slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="D:\a\OpenSilver\OpenSilver\build\output\OpenSilver" -p:NuspecFile="D:\a\OpenSilver\OpenSilver\build\nuspec\OpenSilver.Simulator.nuspec" -p:NuspecBasePath="D:\a\OpenSilver\OpenSilver\build" -p:NuspecProperties=PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }}
       - uses: actions/upload-artifact@v2
         with:
           name: OpenSilver
