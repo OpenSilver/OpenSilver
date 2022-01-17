@@ -14,9 +14,13 @@
 
 #if MIGRATION
 using System.Windows.Media;
-namespace System.Windows.Controls.Primitives
 #else
 using Windows.UI.Xaml.Media;
+#endif
+
+#if MIGRATION
+namespace System.Windows.Controls.Primitives
+#else
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
