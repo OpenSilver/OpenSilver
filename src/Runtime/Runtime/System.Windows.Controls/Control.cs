@@ -122,8 +122,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
             DependencyProperty.Register(
-                nameof(Background), typeof(Brush), 
-                typeof(Control), 
+                nameof(Background), typeof(Brush),
+                typeof(Control),
                 new PropertyMetadata((object)null)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
@@ -173,9 +173,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty BorderBrushProperty =
             DependencyProperty.Register(
-                nameof(BorderBrush), 
-                typeof(Brush), 
-                typeof(Control), 
+                nameof(BorderBrush),
+                typeof(Brush),
+                typeof(Control),
                 new PropertyMetadata((object)null)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
@@ -201,9 +201,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
             DependencyProperty.Register(
-                nameof(BorderThickness), 
-                typeof(Thickness), 
-                typeof(Control), 
+                nameof(BorderThickness),
+                typeof(Thickness),
+                typeof(Control),
                 new PropertyMetadata(new Thickness())
                 {
                     MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
@@ -239,8 +239,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty FontWeightProperty =
             DependencyProperty.Register(
-                nameof(FontWeight), 
-                typeof(FontWeight), 
+                nameof(FontWeight),
+                typeof(FontWeight),
                 typeof(Control),
                 new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
@@ -305,9 +305,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty ForegroundProperty =
             DependencyProperty.Register(
-                nameof(Foreground), 
-                typeof(Brush), 
-                typeof(Control), 
+                nameof(Foreground),
+                typeof(Brush),
+                typeof(Control),
                 new PropertyMetadata(new SolidColorBrush(Colors.Black))
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
@@ -335,8 +335,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(
-                nameof(FontFamily), 
-                typeof(FontFamily), 
+                nameof(FontFamily),
+                typeof(FontFamily),
                 typeof(Control),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
@@ -368,11 +368,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty FontSizeProperty =
             DependencyProperty.Register(
-                nameof(FontSize), 
-                typeof(double), 
+                nameof(FontSize),
+                typeof(double),
                 typeof(Control),
                 new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure)
-                { 
+                {
                     Inherits = true,
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
@@ -390,7 +390,7 @@ namespace Windows.UI.Xaml.Controls
 
 #endif                      // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 
                             // decimals at the most.
-                            return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString() + "px"; 
+                            return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString() + "px";
                         },
                         Name = new List<string> { "fontSize" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
@@ -414,7 +414,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="Control.TextDecorations"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty TextDecorationsProperty = 
+        public static readonly DependencyProperty TextDecorationsProperty =
             DependencyProperty.Register(
                 nameof(TextDecorations),
                 typeof(TextDecorationCollection),
@@ -516,11 +516,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
             DependencyProperty.Register(
-                nameof(Padding), 
-                typeof(Thickness), 
+                nameof(Padding),
+                typeof(Thickness),
                 typeof(Control),
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-                { 
+                {
                     MethodToUpdateDom = Padding_MethodToUpdateDom,
                 });
 
@@ -529,14 +529,14 @@ namespace Windows.UI.Xaml.Controls
             var control = (Control)d;
             // if the parent is a canvas, we ignore this property and we want to ignore this
             // property if there is a ControlTemplate on this control.
-            if (!(control.INTERNAL_VisualParent is Canvas) && !control.HasTemplate && !control.IsUnderCustomLayout) 
+            if (!(control.INTERNAL_VisualParent is Canvas) && !control.HasTemplate && !control.IsUnderCustomLayout)
             {
                 var innerDomElement = control.INTERNAL_InnerDomElement;
                 if (innerDomElement != null)
                 {
                     var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
                     Thickness newPadding = (Thickness)newValue;
-                    
+
                     // todo: if the container has a padding, add it to the margin
                     styleOfInnerDomElement.boxSizing = "border-box";
                     styleOfInnerDomElement.padding = $"{newPadding.Top.ToString(CultureInfo.InvariantCulture)}px {newPadding.Right.ToString(CultureInfo.InvariantCulture)}px {newPadding.Bottom.ToString(CultureInfo.InvariantCulture)}px {newPadding.Left.ToString(CultureInfo.InvariantCulture)}px";
@@ -562,8 +562,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty HorizontalContentAlignmentProperty =
             DependencyProperty.Register(
-                nameof(HorizontalContentAlignment), 
-                typeof(HorizontalAlignment), 
+                nameof(HorizontalContentAlignment),
+                typeof(HorizontalAlignment),
                 typeof(Control),
                 new FrameworkPropertyMetadata(HorizontalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
@@ -585,8 +585,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
             DependencyProperty.Register(
-                nameof(VerticalContentAlignment), 
-                typeof(VerticalAlignment), 
+                nameof(VerticalContentAlignment),
+                typeof(VerticalAlignment),
                 typeof(Control),
                 new FrameworkPropertyMetadata(VerticalAlignment.Center, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
@@ -610,9 +610,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty TabIndexProperty =
             DependencyProperty.Register(
-                nameof(TabIndex), 
-                typeof(int), 
-                typeof(Control), 
+                nameof(TabIndex),
+                typeof(int),
+                typeof(Control),
                 new PropertyMetadata(int.MaxValue)
                 {
                     MethodToUpdateDom = TabIndexProperty_MethodToUpdateDom,
@@ -699,9 +699,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty IsTabStopProperty =
             DependencyProperty.Register(
-                nameof(IsTabStop),    
-                typeof(bool), 
-                typeof(Control), 
+                nameof(IsTabStop),
+                typeof(bool),
+                typeof(Control),
                 new PropertyMetadata(true)
                 {
                     MethodToUpdateDom = TabStopProperty_MethodToUpdateDom,
@@ -740,9 +740,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty TemplateProperty =
             DependencyProperty.Register(
-                nameof(Template), 
-                typeof(ControlTemplate), 
-                typeof(Control), 
+                nameof(Template),
+                typeof(ControlTemplate),
+                typeof(Control),
                 new PropertyMetadata(null, OnTemplateChanged));
 
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -1066,11 +1066,11 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty TabNavigationProperty = 
+        public static readonly DependencyProperty TabNavigationProperty =
             DependencyProperty.Register(
-                nameof(TabNavigation), 
-                typeof(KeyboardNavigationMode), 
-                typeof(Control), 
+                nameof(TabNavigation),
+                typeof(KeyboardNavigationMode),
+                typeof(Control),
                 new PropertyMetadata(KeyboardNavigationMode.Local));
 
         [OpenSilver.NotImplemented]
@@ -1081,10 +1081,10 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
 
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty FontStretchProperty = 
+        public static readonly DependencyProperty FontStretchProperty =
             DependencyProperty.Register(
-                nameof(FontStretch), 
-                typeof(FontStretch), 
+                nameof(FontStretch),
+                typeof(FontStretch),
                 typeof(Control),
                 new FrameworkPropertyMetadata(new FontStretch(), FrameworkPropertyMetadataOptions.AffectsMeasure));
 
@@ -1098,19 +1098,6 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
             get { return (FontStretch)GetValue(FontStretchProperty); }
             set { SetValue(FontStretchProperty, value); }
-        }
-
-        //
-        // Summary:
-        //     Called before the System.Windows.UIElement.TextInput event occurs.
-        //
-        // Parameters:
-        //   e:
-        //     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
-        [OpenSilver.NotImplemented]
-        protected virtual void OnTextInput(TextCompositionEventArgs e)
-        {
-
         }
 
         [OpenSilver.NotImplemented]
@@ -1157,7 +1144,7 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
                 if (child as FrameworkElement == null)
                     continue;
 
-                FrameworkElement childElement = child as FrameworkElement; 
+                FrameworkElement childElement = child as FrameworkElement;
                 childElement.Measure(availableSize);
                 extent.Width += childElement.DesiredSize.Width;
                 extent.Height += childElement.DesiredSize.Height;
