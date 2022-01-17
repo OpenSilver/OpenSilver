@@ -70,7 +70,7 @@ namespace CSHTML5.Native.JavaScript.WebSockets
             string data = string.Empty;
 
             if (!Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined')", e)))
-                data = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.data", e));
+                data = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.handled", e));
 
             if (this.OnMessage != null)
                 OnMessage(this, new OnMessageEventArgs(data));
@@ -81,7 +81,7 @@ namespace CSHTML5.Native.JavaScript.WebSockets
             string data = string.Empty;
 
             if (!Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("(typeof $0 === 'undefined')", e)))
-                data = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.data", e));
+                data = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.handled", e));
 
             if (this.OnError != null)
                 OnError(this, new OnErrorEventArgs(data));
