@@ -1399,7 +1399,7 @@ namespace Windows.UI.Xaml
             }
             CSHTML5.Interop.ExecuteJavaScriptAsync("$0.IsProcessingOSKeyDown = false;", jsEventArg);
         }
-
+        static int counter = 0;
         /// <summary>
         /// Raises the KeyDown event
         /// </summary>
