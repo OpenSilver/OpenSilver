@@ -217,8 +217,8 @@ namespace Windows.UI.Xaml.Controls
                 int sepIndex = concatenated.IndexOf('|');
                 string imgWidthAsString = concatenated.Substring(0, sepIndex);
                 string imgHeightAsString = concatenated.Substring(sepIndex + 1);
-                imgWidth = double.Parse(imgWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                imgHeight = double.Parse(imgHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+                double.TryParse(imgWidthAsString, Globalization.NumberStyles.Any, global::System.Globalization.CultureInfo.InvariantCulture, out imgWidth); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                double.TryParse(imgHeightAsString, Globalization.NumberStyles.Any, global::System.Globalization.CultureInfo.InvariantCulture, out imgHeight); //todo: read note above
             }
             else
             {
