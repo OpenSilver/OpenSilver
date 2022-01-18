@@ -941,7 +941,7 @@ namespace Windows.UI.Xaml
         INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> _textInputEventManager;
         INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> TextInputEventManager
 #else
-        INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> _TextInputEventManager;
+        INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> _textInputEventManager;
         INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> TextInputEventManager
 #endif
         {
@@ -971,7 +971,7 @@ namespace Windows.UI.Xaml
 #if MIGRATION
             var eventArgs = new TextCompositionEventArgs()
 #else
-            var eventArgs = new KeyRoutedEventArgs()
+            var eventArgs = new TextCompositionEventArgs()
 #endif
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
@@ -1388,7 +1388,7 @@ namespace Windows.UI.Xaml
             {
                 CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
                 CSHTML5.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
-                Diagnostics.Debug.WriteLine($"InteropInterop {counter++}");
+                //Diagnostics.Debug.WriteLine($"InteropInterop {counter++}");
             }
         }
         static int counter = 0;
