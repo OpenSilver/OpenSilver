@@ -73,7 +73,8 @@
     <Compile Include="OpenSilver\Internal\ApplicationLifetimeObjectsCollection.cs" />
     <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
-    <Compile Include="OpenSilver\Internal\NameScope.cs" />
+    <Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
+	<Compile Include="OpenSilver\Internal\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
