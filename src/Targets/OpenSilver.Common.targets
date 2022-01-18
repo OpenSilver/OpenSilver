@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!--
+	<!--
   /*===================================================================================
   *
   *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -17,276 +17,276 @@
 -->
 
 
-  <!--============================================================
+	<!--============================================================
   Import the "Microsoft.CSharp.targets" target if not already present in the CSPROJ:
   ============================================================-->
-  <!--<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(CoreCompileDependsOn)' == '' " />-->
-  <!-- Note: The condition on the "CoreCompileDependsOn" property defined in "Microsoft.CSharp.targets" is here to avoid a warning if the target was already imported. We could have used any other property defined in "Microsoft.CSharp.targets". -->
+	<!--<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition=" '$(CoreCompileDependsOn)' == '' " />-->
+	<!-- Note: The condition on the "CoreCompileDependsOn" property defined in "Microsoft.CSharp.targets" is here to avoid a warning if the target was already imported. We could have used any other property defined in "Microsoft.CSharp.targets". -->
 
-  <!--============================================================
+	<!--============================================================
   LOCATION OF COMPILER TASKS
   ============================================================-->
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyReferenceValidator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.EntryPointGenerator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyAttributesGenerator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ServiceReferenceFixer" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResXProcessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.BeforeXamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.XamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AfterXamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.OutputPathsEraser" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesExtractorAndCopier" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.Wrapper_BridgeVersion" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.TypeScriptDefToCSharp" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyReferenceValidator" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.EntryPointGenerator" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyAttributesGenerator" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ServiceReferenceFixer" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResXProcessor" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.BeforeXamlPreprocessor" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.XamlPreprocessor" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AfterXamlPreprocessor" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.OutputPathsEraser" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesExtractorAndCopier" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.Wrapper_BridgeVersion" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.TypeScriptDefToCSharp" />
 
-  <ItemGroup>
-    <AvailableItemName Include="ApplicationDefinition" />
-    <AvailableItemName Include="Page" />
-    <AvailableItemName Include="Resource" />
-  </ItemGroup>
+	<ItemGroup>
+		<AvailableItemName Include="ApplicationDefinition" />
+		<AvailableItemName Include="Page" />
+		<AvailableItemName Include="Resource" />
+	</ItemGroup>
 
-  <!--============================================================
+	<!--============================================================
   PROPERTIES
   ============================================================-->
-  <PropertyGroup Condition="'$(CoreAssemblyFiles)'==''">
-    <CoreAssemblyFiles>$(MSBuildThisFileDirectory)..\lib\netstandard2.0\OpenSilver.dll</CoreAssemblyFiles>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(CoreAssemblyFiles)'==''">
+		<CoreAssemblyFiles>$(MSBuildThisFileDirectory)..\lib\netstandard2.0\OpenSilver.dll</CoreAssemblyFiles>
+	</PropertyGroup>
 
-  <!--============================================================
+	<!--============================================================
   Add the tasks "CSharpXamlForHtml5BeforeCompile" and "CSharpXamlForHtml5BeforeBuild" to the build process:
   ============================================================-->
-  <PropertyGroup>
-    <CompileDependsOn>
-      CSharpXamlForHtml5BeforeCompile;
-      $(CompileDependsOn);
-    </CompileDependsOn>
-  </PropertyGroup>
+	<PropertyGroup>
+		<CompileDependsOn>
+			CSharpXamlForHtml5BeforeCompile;
+			$(CompileDependsOn);
+		</CompileDependsOn>
+	</PropertyGroup>
 
-  <Target Name="CSharpXamlForHtml5BeforeCompile">
-    <CallTarget Condition="'$(IsNotDesignTimeCompilation)' == 'true'"
-      Targets="CSharpXamlForHtml5BeforeCompile_NotDesignTime" />
-  </Target>
+	<Target Name="CSharpXamlForHtml5BeforeCompile">
+		<CallTarget Condition="'$(IsNotDesignTimeCompilation)' == 'true'"
+		  Targets="CSharpXamlForHtml5BeforeCompile_NotDesignTime" />
+	</Target>
 
-  <PropertyGroup>
-    <BuildDependsOn>
-      CSharpXamlForHtml5BeforeBuild;
-      $(BuildDependsOn);
-    </BuildDependsOn>
-  </PropertyGroup>
+	<PropertyGroup>
+		<BuildDependsOn>
+			CSharpXamlForHtml5BeforeBuild;
+			$(BuildDependsOn);
+		</BuildDependsOn>
+	</PropertyGroup>
 
-  <!--============================================================
+	<!--============================================================
   Add the Compilation directive "OPENSILVER":
   ============================================================-->
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
-  </PropertyGroup>
-  
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);OPENSILVER</DefineConstants>
+	</PropertyGroup>
 
-  <!--============================================================
+
+	<!--============================================================
   Workaround an issue with the IL linker related to the fact that we reference "DotNetBrowser.Chromium.dll" (this workaround dates back to January 3, 2020)
   More information on this issue can be found at: https://stackoverflow.com/questions/56345320/build-fail-for-asp-net-core-3-blazor-client-side
   The error that appeared without this workaround was:
   "Unhandled Exception: Mono.Linker.LoadException: Error while processing references of 'EmptyOpenSilverApp.Browser, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' - Mono.Linker.LoadException: Error while processing references of 'EmptyOpenSilverApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' - Mono.Linker.LoadException: Error while processing references of 'OpenSilver, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' - Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e' - Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'DotNetBrowser.Chromium, Version=1.14.0.0, Culture=neutral, PublicKeyToken=b0b5aaca9c95c84e'"
   ============================================================-->
-  <PropertyGroup>
-    <BlazorWebAssemblyEnableLinking>false</BlazorWebAssemblyEnableLinking>
-  </PropertyGroup>
+	<PropertyGroup>
+		<BlazorWebAssemblyEnableLinking>false</BlazorWebAssemblyEnableLinking>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
+	<PropertyGroup>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
 
-  <!--============================================================
+	<!--============================================================
   Tell the SplittedXamlEditor to use our xaml designer
   (see file EditorFactory.cs in DotNetForHtml5.VisualStudioExtension.Editor.SplittedXamlEditor) 
   ============================================================-->
-  <PropertyGroup>
-    <IsOpenSilver>true</IsOpenSilver>
-  </PropertyGroup>
-  
-  <!--============================================================
+	<PropertyGroup>
+		<IsOpenSilver>true</IsOpenSilver>
+	</PropertyGroup>
+
+	<!--============================================================
   Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
   ============================================================-->
-  <PropertyGroup Condition="'$(IsSecondPass)'==''">
-    <IsSecondPass>False</IsSecondPass>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Flags)'==''">
-    <Flags>noflags</Flags>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputRootPath)'==''">
-    <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
-    <Cshtml5OutputRootPath>wwwroot\</Cshtml5OutputRootPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputAppFilesPath)'==''">
-    <!-- Default sub-path for output application files. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputAppFilesPath>app\</Cshtml5OutputAppFilesPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputLibrariesPath)'==''">
-    <!-- Default sub-path for output libraries. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputLibrariesPath>libs\</Cshtml5OutputLibrariesPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Cshtml5OutputResourcesPath)'==''">
-    <!-- Default sub-path for output resources. This path needs to be relative to the output root path. -->
-    <Cshtml5OutputResourcesPath>resources\</Cshtml5OutputResourcesPath>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(IsSecondPass)'==''">
+		<IsSecondPass>False</IsSecondPass>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Flags)'==''">
+		<Flags>noflags</Flags>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Cshtml5OutputRootPath)'==''">
+		<!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
+		<Cshtml5OutputRootPath>wwwroot\</Cshtml5OutputRootPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Cshtml5OutputAppFilesPath)'==''">
+		<!-- Default sub-path for output application files. This path needs to be relative to the output root path. -->
+		<Cshtml5OutputAppFilesPath>app\</Cshtml5OutputAppFilesPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Cshtml5OutputLibrariesPath)'==''">
+		<!-- Default sub-path for output libraries. This path needs to be relative to the output root path. -->
+		<Cshtml5OutputLibrariesPath>libs\</Cshtml5OutputLibrariesPath>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Cshtml5OutputResourcesPath)'==''">
+		<!-- Default sub-path for output resources. This path needs to be relative to the output root path. -->
+		<Cshtml5OutputResourcesPath>resources\</Cshtml5OutputResourcesPath>
+	</PropertyGroup>
 
-  <!--============================================================
+	<!--============================================================
   Declare some local properties to make this file more concise:
   ============================================================-->
-  <PropertyGroup>
-    <IsProcessingCSHTML5Itself Condition="'$(NoCSHTML5Reference)'=='true'">True</IsProcessingCSHTML5Itself>
-    <IsFirstPassAndProcessingCSHTML5Itself Condition="'$(IsSecondPass)'!='True' And '$(IsProcessingCSHTML5Itself)'=='True'">True</IsFirstPassAndProcessingCSHTML5Itself>
-  </PropertyGroup>
+	<PropertyGroup>
+		<IsProcessingCSHTML5Itself Condition="'$(NoCSHTML5Reference)'=='true'">True</IsProcessingCSHTML5Itself>
+		<IsFirstPassAndProcessingCSHTML5Itself Condition="'$(IsSecondPass)'!='True' And '$(IsProcessingCSHTML5Itself)'=='True'">True</IsFirstPassAndProcessingCSHTML5Itself>
+	</PropertyGroup>
 
-  <!--============================================================
+	<!--============================================================
   Get a consistent way to access the output directory, independent on whether OutputPath is Relative or Absolute:
   ============================================================-->
-  <PropertyGroup>
-    <OutputAssemblyDirectory Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.[^:].*'))"
+	<PropertyGroup>
+		<OutputAssemblyDirectory Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.[^:].*'))"
         >$(MSBuildProjectDirectory)\$(OutputPath)</OutputAssemblyDirectory>
-    <OutputAssemblyDirectory Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.:.*'))"
+		<OutputAssemblyDirectory Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('$(OutputPath)', '^.:.*'))"
         >$(OutputPath)</OutputAssemblyDirectory>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <!--============================================================
+	<!--============================================================
       Change the names of the EmbeddedResources so they keep their original names.
    ============================================================-->
-  <Target Name="ModifyEmbeddedResourceNames" BeforeTargets="CreateManifestResourceNames">
-    <ItemGroup>
-      <EmbeddedResource>
-        <LogicalName Condition="'%(EmbeddedResource.Extension)' != '.resx'">%(EmbeddedResource.Identity)</LogicalName>
-      </EmbeddedResource>
-    </ItemGroup>
-  </Target>
+	<Target Name="ModifyEmbeddedResourceNames" BeforeTargets="CreateManifestResourceNames">
+		<ItemGroup>
+			<EmbeddedResource>
+				<LogicalName Condition="'%(EmbeddedResource.Extension)' != '.resx'">%(EmbeddedResource.Identity)</LogicalName>
+			</EmbeddedResource>
+		</ItemGroup>
+	</Target>
 
-  <!--============================================================
+	<!--============================================================
   BEFORE BUILD
   ============================================================-->
-  <Target Name="CSharpXamlForHtml5BeforeBuild">
-    <PropertyGroup>
-      <IsNotDesignTimeCompilation>true</IsNotDesignTimeCompilation>
-    </PropertyGroup>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="OpenSilver Compiler"
-      Importance="high"/>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="     To enable detailed logging, set the 'MSBuild project build output verbosity' to 'Normal' or higher. The option is located in the Visual Studio IDE under Tools -> Options -> Projects and solutions -> Build and Run."
-      Importance="high"/>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="Visual Studio version: $(VisualStudioVersion)"
-      Importance="normal"/>
-    <Message
-      Condition="'$(IsSecondPass)'!='True'"
-      Text="OpenSilver Pass 1. Assembly name - $(AssemblyName)"
-      Importance="normal"/>
-    <Message
-      Condition="'$(IsSecondPass)'=='True'"
-      Text="OpenSilver Pass 2. Assembly name - $(AssemblyName)"
-      Importance="normal"/>
+	<Target Name="CSharpXamlForHtml5BeforeBuild">
+		<PropertyGroup>
+			<IsNotDesignTimeCompilation>true</IsNotDesignTimeCompilation>
+		</PropertyGroup>
+		<Message
+		  Condition="'$(IsSecondPass)'!='True'"
+		  Text="OpenSilver Compiler"
+		  Importance="high"/>
+		<Message
+		  Condition="'$(IsSecondPass)'!='True'"
+		  Text="     To enable detailed logging, set the 'MSBuild project build output verbosity' to 'Normal' or higher. The option is located in the Visual Studio IDE under Tools -> Options -> Projects and solutions -> Build and Run."
+		  Importance="high"/>
+		<Message
+		  Condition="'$(IsSecondPass)'!='True'"
+		  Text="Visual Studio version: $(VisualStudioVersion)"
+		  Importance="normal"/>
+		<Message
+		  Condition="'$(IsSecondPass)'!='True'"
+		  Text="OpenSilver Pass 1. Assembly name - $(AssemblyName)"
+		  Importance="normal"/>
+		<Message
+		  Condition="'$(IsSecondPass)'=='True'"
+		  Text="OpenSilver Pass 2. Assembly name - $(AssemblyName)"
+		  Importance="normal"/>
 
-    <!--============================================================
+		<!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
-    <PropertyGroup>
-      <IsCompilingTheBrowserProject Condition="'$(RazorCompileOnPublish)'!=''">True</IsCompilingTheBrowserProject>
-    </PropertyGroup>
-    <Exec
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
-      Command="explorer.exe https://opensilver.net/permalinks/update/alpha7.aspx" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
-      Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha7.aspx"/>
-    <Exec
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
-      Command="explorer.exe https://opensilver.net/permalinks/update/alpha19.aspx" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
-      Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha19.aspx"/>
-    <Exec
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
-      Command="explorer.exe https://opensilver.net/permalinks/update/alpha20.aspx" Timeout="2000" ContinueOnError="True"></Exec>
-    <Error
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
-      Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx"/>
+		<PropertyGroup>
+			<IsCompilingTheBrowserProject Condition="'$(RazorCompileOnPublish)'!=''">True</IsCompilingTheBrowserProject>
+		</PropertyGroup>
+		<Exec
+		  Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+		  Command="explorer.exe https://opensilver.net/permalinks/update/alpha7.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+		<Error
+		  Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+		  Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha7.aspx"/>
+		<Exec
+		  Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+		  Command="explorer.exe https://opensilver.net/permalinks/update/alpha19.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+		<Error
+		  Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+		  Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha19.aspx"/>
+		<Exec
+		  Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
+		  Command="explorer.exe https://opensilver.net/permalinks/update/alpha20.aspx" Timeout="2000" ContinueOnError="True"></Exec>
+		<Error
+		  Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
+		  Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx"/>
 
-    <!--============================================================
+		<!--============================================================
       If compiling CSHTML5 itself, remove some references:
       ============================================================-->
-    <!-- If compiling CSHTML5 itself, we remove the reference to CSHTML5.dll -->
-    <ItemGroup Condition="'$(NoCSHTML5Reference)'=='true'">
-      <Reference Remove="CSHTML5.Blazor"/>
-      <Reference Remove="CSHTML5.Blazor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"/>
-      <Reference Remove="CSHTML5.Migration.Blazor"/>
-      <Reference Remove="CSHTML5.Migration.Blazor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"/>
-    </ItemGroup>
-    <!-- If compiling CSHTML5.Stubs itself, we remove the reference to CSHTML5.Stubs.dll too -->
-    <!--<ItemGroup Condition="'$(NoCSHTML5StubsReference)'=='true'">
+		<!-- If compiling CSHTML5 itself, we remove the reference to CSHTML5.dll -->
+		<ItemGroup Condition="'$(NoCSHTML5Reference)'=='true'">
+			<Reference Remove="CSHTML5.Blazor"/>
+			<Reference Remove="CSHTML5.Blazor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"/>
+			<Reference Remove="CSHTML5.Migration.Blazor"/>
+			<Reference Remove="CSHTML5.Migration.Blazor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"/>
+		</ItemGroup>
+		<!-- If compiling CSHTML5.Stubs itself, we remove the reference to CSHTML5.Stubs.dll too -->
+		<!--<ItemGroup Condition="'$(NoCSHTML5StubsReference)'=='true'">
       <Reference Remove="CSHTML5.Stubs"/>
       <Reference Remove="CSHTML5.Stubs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"/>
     </ItemGroup>-->
 
-    <!--============================================================
+		<!--============================================================
       Change the Build Action of XAML and TypeScript files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition", "TypeScriptCompile"] to "Content" in case the developer has not already done so.
       ============================================================-->
-    <ItemGroup>
-      <Content Include="@(Page)"/>
-      <Page Remove="@(Page)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(CodeAnalysisDictionary)"/>
-      <CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(ApplicationDefinition)"/>
-      <ApplicationDefinition Remove="@(ApplicationDefinition)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(TypeScriptCompile)"/>
-      <TypeScriptCompile Remove="@(TypeScriptCompile)"/>
-    </ItemGroup>
+		<ItemGroup>
+			<Content Include="@(Page)"/>
+			<Page Remove="@(Page)"/>
+		</ItemGroup>
+		<ItemGroup>
+			<Content Include="@(CodeAnalysisDictionary)"/>
+			<CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
+		</ItemGroup>
+		<ItemGroup>
+			<Content Include="@(ApplicationDefinition)"/>
+			<ApplicationDefinition Remove="@(ApplicationDefinition)"/>
+		</ItemGroup>
+		<ItemGroup>
+			<Content Include="@(TypeScriptCompile)"/>
+			<TypeScriptCompile Remove="@(TypeScriptCompile)"/>
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       Change the Build Action of JS/CSS/Image/Video/Audio/Text/Xml/Font files from ["Content", "Resource"] to "EmbeddedResource" in case the developer has not already done so.
       ============================================================-->
 
-    <PropertyGroup>
-      <IsBrowserProject Condition="'$(UseRazorBuildServer)' == 'true'">true</IsBrowserProject>
-      <IsBrowserProject Condition="'$(UseRazorBuildServer)' == ''">false</IsBrowserProject>
-    </PropertyGroup>
+		<PropertyGroup>
+			<IsBrowserProject Condition="'$(UseRazorBuildServer)' == 'true'">true</IsBrowserProject>
+			<IsBrowserProject Condition="'$(UseRazorBuildServer)' == ''">false</IsBrowserProject>
+		</PropertyGroup>
 
-    <ItemGroup Condition="'$(IsBrowserProject)' == 'false'">
-      <EmbeddedResource Include="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
-      <EmbeddedResource Include="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
-      <None Remove="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
-      <EmbeddedResource Include="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx' "/>
-      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx'"/>
-    </ItemGroup>
+		<ItemGroup Condition="'$(IsBrowserProject)' == 'false'">
+			<EmbeddedResource Include="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
+			<Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
+			<EmbeddedResource Include="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
+			<None Remove="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
+			<EmbeddedResource Include="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.woff2' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx' "/>
+			<Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.woff2' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx'"/>
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       Validate that XAML files have "MSBuild:Compile" set for their "Custom Tool" property (useful for always-up-to-date Intellisense) (only during Pass 1):
       ============================================================-->
-    <Error
-      Condition="'%(Content.Extension)'=='.xaml' And '%(Content.Generator)'=='' And '$(IsSecondPass)'!='True' And '$(IgnoreMissingCustomTool)'!='True'"
-      Text="Before you can build the project, please go to Solution Explorer, select the file '%(Content.FileName).xaml', hit F4, and enter 'MSBuild:Compile' (without the quotes) in the 'Custom Tool' property. You will need to do the same for all XAML files in the project."/>
+		<Error
+		  Condition="'%(Content.Extension)'=='.xaml' And '%(Content.Generator)'=='' And '$(IsSecondPass)'!='True' And '$(IgnoreMissingCustomTool)'!='True'"
+		  Text="Before you can build the project, please go to Solution Explorer, select the file '%(Content.FileName).xaml', hit F4, and enter 'MSBuild:Compile' (without the quotes) in the 'Custom Tool' property. You will need to do the same for all XAML files in the project."/>
 
-    <!--============================================================
+		<!--============================================================
       EntryPointGenerator (only during Pass 2)
       ============================================================-->
-    <!--<EntryPointGenerator
+		<!--<EntryPointGenerator
       Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True'"
       OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSHTML5_Entry_Point.cs"
       />-->
 
-    <!--The AssemblyAttributeGenerator is disabled as it is not working with the open silver version-->
-    <!--============================================================
+		<!--The AssemblyAttributeGenerator is disabled as it is not working with the open silver version-->
+		<!--============================================================
       AssemblyAttributesGenerator
       ============================================================-->
-    <!--
+		<!--
     <Message
       Text="Starting AssemblyAttributesGenerator"
       Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
@@ -303,104 +303,104 @@
         Include="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSharpXamlForHtml5_AssemblyAttributes.cs" />
     </ItemGroup>-->
 
-    <!--============================================================
+		<!--============================================================
       ServiceReferenceFixer (case insensitive) (only during Pass 2)
       ============================================================-->
-	  <ItemGroup>
-		  <ServiceReferenceFile Include="%(Compile.RelativeDir)%(Compile.Filename).cs" Condition="'%(Compile.Filename)%(Compile.Extension)'=='reference.cs'" />
-		  <!-- Note: users can specify additional files by adding ServiceReferenceFile tags to the .CSPROJ
+		<ItemGroup>
+			<ServiceReferenceFile Include="%(Compile.RelativeDir)%(Compile.Filename).cs" Condition="'%(Compile.Filename)%(Compile.Extension)'=='reference.cs'" />
+			<!-- Note: users can specify additional files by adding ServiceReferenceFile tags to the .CSPROJ
 		  Possible optional attributes are:
 		  - ClientBaseToken to enforce a specific token representing the ClientBase object, if different from "base.Channel"
 		  - ClientBaseInterfaceName to enforce a specific interface for the Service Contract
 		  - EndpointCode to enforce a specific token to retrieve the endpoint address, if diffferent from "this.INTERNAL_RemoteAddressAsString"
 		  - SoapVersion to set the SOAP version (default: 1.1) -->
-	  </ItemGroup>
-	  <ServiceReferenceFixer
-		Condition="'$(CSharpXamlForHtml5_SkipServiceReferenceFixer)'!='True'"
-		SourceFile="@(ServiceReferenceFile)"
-		OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(ServiceReferenceFile.RelativeDir)%(ServiceReferenceFile.Filename).g.cs"
+		</ItemGroup>
+		<ServiceReferenceFixer
+		  Condition="'$(CSharpXamlForHtml5_SkipServiceReferenceFixer)'!='True'"
+		  SourceFile="@(ServiceReferenceFile)"
+		  OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(ServiceReferenceFile.RelativeDir)%(ServiceReferenceFile.Filename).g.cs"
       />
-	  <ItemGroup Condition="'$(CSharpXamlForHtml5_SkipServiceReferenceFixer)'!='True'">
-		  <ServiceReferenceFixerProcessedFiles Include="@(ServiceReferenceFile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename).g.cs')" />
-		  <Compile Remove="@(ServiceReferenceFile)" />
-		  <Compile Include="@(ServiceReferenceFixerProcessedFiles)" />
-		  <FileWrites Include="@(ServiceReferenceFixerProcessedFiles)" />
-	  </ItemGroup>
+		<ItemGroup Condition="'$(CSharpXamlForHtml5_SkipServiceReferenceFixer)'!='True'">
+			<ServiceReferenceFixerProcessedFiles Include="@(ServiceReferenceFile->'$(IntermediateOutputPath)%(RelativeDir)%(Filename).g.cs')" />
+			<Compile Remove="@(ServiceReferenceFile)" />
+			<Compile Include="@(ServiceReferenceFixerProcessedFiles)" />
+			<FileWrites Include="@(ServiceReferenceFixerProcessedFiles)" />
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       ResourcesProcessor (only during Pass 2)
       ============================================================-->
-    <ResourcesProcessor
-      Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'"
-      SourceFile="%(Resource.FullPath)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).g.js"
+		<ResourcesProcessor
+		  Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'"
+		  SourceFile="%(Resource.FullPath)"
+		  OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).g.js"
       />
-    <ItemGroup>
-      <ResourcesProcessorProcessedFiles Include="@(Resource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.js')" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
-      <Resource Remove="@(Resource)" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
-      <Resource Include="@(ResourcesProcessorProcessedFiles)" />
-      <FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
-    </ItemGroup>
+		<ItemGroup>
+			<ResourcesProcessorProcessedFiles Include="@(Resource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.js')" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
+			<Resource Remove="@(Resource)" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
+			<Resource Include="@(ResourcesProcessorProcessedFiles)" />
+			<FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       ResXProcessor (only during Pass 2)
       ============================================================-->
-    <Message
-      Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
-      Text="Starting processing .resx files"
-      Importance="normal"/>
-    <ResXProcessor
-      Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
-      SourceFile="%(Resource.FullPath)"
-      RootNamespace="$(RootNamespace)"
-      SourceFileRelativePath="%(Resource.RelativeDir)%(Resource.Filename)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).js"
+		<Message
+		  Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
+		  Text="Starting processing .resx files"
+		  Importance="normal"/>
+		<ResXProcessor
+		  Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'"
+		  SourceFile="%(Resource.FullPath)"
+		  RootNamespace="$(RootNamespace)"
+		  SourceFileRelativePath="%(Resource.RelativeDir)%(Resource.Filename)"
+		  OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).js"
       />
-    <ItemGroup>
-      <ResXProcessorProcessedFiles Include="@(Resource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).js')" Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'" />
-      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'" />
-      <Resource Include="@(ResXProcessorProcessedFiles)" />
-      <FileWrites Include="@(ResXProcessorProcessedFiles)"/>
-    </ItemGroup>
+		<ItemGroup>
+			<ResXProcessorProcessedFiles Include="@(Resource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).js')" Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'" />
+			<Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.resx' And '$(IsSecondPass)'=='True'" />
+			<Resource Include="@(ResXProcessorProcessedFiles)" />
+			<FileWrites Include="@(ResXProcessorProcessedFiles)"/>
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       TypeScriptDefToCSharp
       ============================================================-->
-    <ItemGroup>
-      <TypeScriptDefFiles Include="@(Content)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.+\.d\.ts'))"/>
-    </ItemGroup>
-    <Message
-      Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
-      Importance="normal"/>
-    <TypeScriptDefToCSharp
-      InputFiles="@(TypeScriptDefFiles)"
-      OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)">
-      <Output TaskParameter="GeneratedFiles" PropertyName="GeneratedFiles"/>
-    </TypeScriptDefToCSharp>
-    <Message
-      Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
-      Importance="normal"/>
-    <ItemGroup>
-      <Compile
-        Include="$(GeneratedFiles)"/>
-    </ItemGroup>
+		<ItemGroup>
+			<TypeScriptDefFiles Include="@(Content)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.+\.d\.ts'))"/>
+		</ItemGroup>
+		<Message
+		  Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
+		  Importance="normal"/>
+		<TypeScriptDefToCSharp
+		  InputFiles="@(TypeScriptDefFiles)"
+		  OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)">
+			<Output TaskParameter="GeneratedFiles" PropertyName="GeneratedFiles"/>
+		</TypeScriptDefToCSharp>
+		<Message
+		  Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
+		  Importance="normal"/>
+		<ItemGroup>
+			<Compile
+			  Include="$(GeneratedFiles)"/>
+		</ItemGroup>
 
-  </Target>
+	</Target>
 
 
-  <!--============================================================
+	<!--============================================================
   BEFORE COMPILE
   ============================================================-->
-  <Target Name="CSharpXamlForHtml5BeforeCompile_NotDesignTime">
-    <Message
-          Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
-          Importance="normal"/>
+	<Target Name="CSharpXamlForHtml5BeforeCompile_NotDesignTime">
+		<Message
+			  Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
+			  Importance="normal"/>
 
-    <!--============================================================
+		<!--============================================================
       AssemblyReferenceValidator (only during Pass 1)
       ============================================================-->
-    <!--Disabled for now as we use reference without any metadata from package reference-->
-    <!--<AssemblyReferenceValidator
+		<!--Disabled for now as we use reference without any metadata from package reference-->
+		<!--<AssemblyReferenceValidator
       Condition="'$(IsSecondPass)'!='True' And '$(AllowAnyReferences)'!='True'"
       References="@(Reference)"
       AllowedAssemblies="mscorlib|System.Core|Microsoft.CSharp|CSHTML5.Blazor|CSHTML5.Migration.Blazor|CSHTML5.Stubs|Bridge"
@@ -413,110 +413,110 @@
       ContinueOnError="ErrorAndStop"
       />-->
 
-    <!--============================================================
+		<!--============================================================
       XamlPreprocessor (during Pass 1 and Pass 2)
       ============================================================-->
 
-    <!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved references/projectReferences -->
-    <!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
-    <BeforeXamlPreprocessor
-      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-      IsSecondPass="$(IsSecondPass)"
-      Flags="$(Flags)"
-      TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
-      ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
-      SourceAssemblyForPass2="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
-      IsBridgeBasedVersion="true"
-      IsProcessingCSHTML5Itself="$(NoCSHTML5Reference)"
-      NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
+		<!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved references/projectReferences -->
+		<!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
+		<BeforeXamlPreprocessor
+		  Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		  IsSecondPass="$(IsSecondPass)"
+		  Flags="$(Flags)"
+		  TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
+		  ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
+		  SourceAssemblyForPass2="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
+		  IsBridgeBasedVersion="true"
+		  IsProcessingCSHTML5Itself="$(NoCSHTML5Reference)"
+		  NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
       />
 
-    <!--============================================================
+		<!--============================================================
       Process files which have been added as link to project.
       ============================================================-->
-    <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.cs"
-    FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    CoreAssemblyFiles="$(CoreAssemblyFiles)"
-    IsSecondPass="$(IsSecondPass)"
-    IsSLMigration="$(IsSLMigration)"
-    ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
-    CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    IsBridgeBasedVersion="true"
-    NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
+		<XamlPreprocessor
+		Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		SourceFile="%(Content.FullPath)"
+		OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.cs"
+		FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
+		AssemblyNameWithoutExtension="$(AssemblyName)"
+		CoreAssemblyFiles="$(CoreAssemblyFiles)"
+		IsSecondPass="$(IsSecondPass)"
+		IsSLMigration="$(IsSLMigration)"
+		ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
+		CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
+		OverrideOutputOnlyIfSourceHasChanged="false"
+		OutputRootPath="$(Cshtml5OutputRootPath)"
+		OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
+		OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
+		OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+		Flags="$(Flags)"
+		IsBridgeBasedVersion="true"
+		NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
     />
-    <!--============================================================
+		<!--============================================================
       Process files which have been added directly to the project.
       ============================================================-->
-    <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.cs"
-    FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    CoreAssemblyFiles="$(CoreAssemblyFiles)"
-    IsSecondPass="$(IsSecondPass)"
-    IsSLMigration="$(IsSLMigration)"
-    ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
-    CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    IsBridgeBasedVersion="true"
-    NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
+		<XamlPreprocessor
+		Condition="'$(SkipXamlPreprocessor)'!='true' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		SourceFile="%(Content.FullPath)"
+		OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.cs"
+		FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
+		AssemblyNameWithoutExtension="$(AssemblyName)"
+		CoreAssemblyFiles="$(CoreAssemblyFiles)"
+		IsSecondPass="$(IsSecondPass)"
+		IsSLMigration="$(IsSLMigration)"
+		ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
+		CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
+		OverrideOutputOnlyIfSourceHasChanged="false"
+		OutputRootPath="$(Cshtml5OutputRootPath)"
+		OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
+		OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
+		OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+		Flags="$(Flags)"
+		IsBridgeBasedVersion="true"
+		NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
     />
-    <AfterXamlPreprocessor
-      Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-      IsSecondPass="$(IsSecondPass)"
-      Flags="$(Flags)"
+		<AfterXamlPreprocessor
+		  Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		  IsSecondPass="$(IsSecondPass)"
+		  Flags="$(Flags)"
       />
 
-    <ItemGroup>
-      <!--============================================================
+		<ItemGroup>
+			<!--============================================================
       Make the list of XAML files to convert to CS that are defined in the project.
       ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
-      <!--============================================================
+			<ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
+			<!--============================================================
       Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
       ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
-      <!--============================================================
+			<ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And ('$(NoCSHTML5Reference)'!='true' Or '$(IsSecondPass)'=='True')"/>
+			<!--============================================================
       Remove the XAML files from the solution and include the generated CS files.
       ============================================================-->
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
-      <Compile Include="@(ProcessedFiles)" />
-      <Compile Include="@(ProcessedFiles2)" />
-    </ItemGroup> 
-    
-  </Target>
+			<Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
+			<Compile Include="@(ProcessedFiles)" />
+			<Compile Include="@(ProcessedFiles2)" />
+		</ItemGroup>
 
-  <!--============================================================
+	</Target>
+
+	<!--============================================================
   BEFORE POST BUILD
   ============================================================-->
-  <Target Name="CSharpXamlForHtml5BeforePostBuild" BeforeTargets="PostBuildEvent">
-    <Message
-          Text="OpenSilver Before post build. IsSecondPass=$(IsSecondPass)"
-          Importance="normal"/>
-    <ItemGroup>
-      <OutputAssembly Include="$(OutputAssemblyDirectory)\$(AssemblyName).dll" />
-    </ItemGroup>
+	<Target Name="CSharpXamlForHtml5BeforePostBuild" BeforeTargets="PostBuildEvent">
+		<Message
+			  Text="OpenSilver Before post build. IsSecondPass=$(IsSecondPass)"
+			  Importance="normal"/>
+		<ItemGroup>
+			<OutputAssembly Include="$(OutputAssemblyDirectory)\$(AssemblyName).dll" />
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       OutputPathsEraser (only during Pass 2)
       ============================================================-->
-    <!--<OutputPathsEraser
+		<!--<OutputPathsEraser
       Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True'"
       SourceAssembly="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
       OutputRootPath="$(Cshtml5OutputRootPath)"
@@ -525,153 +525,156 @@
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       />-->
 
-    <!--============================================================
+		<!--============================================================
       Setting the proper path for copying the resources:
       ============================================================-->
-    <PropertyGroup Condition="'$(IsBrowserProject)' == 'false'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
-      <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
-      <Cshtml5OutputRootPath>wwwroot\</Cshtml5OutputRootPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(IsBrowserProject)' == 'true'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
-      <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
-      <Cshtml5OutputRootPath>..\..\..\wwwroot\</Cshtml5OutputRootPath>
-    </PropertyGroup>
+		<PropertyGroup Condition="'$(IsBrowserProject)' == 'false'">
+			<!--'$(Cshtml5OutputRootPath)'=='' And-->
+			<!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
+			<Cshtml5OutputRootPath>wwwroot\</Cshtml5OutputRootPath>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(IsBrowserProject)' == 'true'">
+			<!--'$(Cshtml5OutputRootPath)'=='' And-->
+			<!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
+			<Cshtml5OutputRootPath>..\..\..\wwwroot\</Cshtml5OutputRootPath>
+		</PropertyGroup>
 
-    <!--============================================================
+		<!--============================================================
       Copying the js/css libraries that come with OpenSilver:
       ============================================================-->
-    <ItemGroup Condition="'$(IsBrowserProject)' == 'true'">
-      <MySourceFiles Include="$(MSBuildThisFileDirectory)..\js_css\*"/>
-    </ItemGroup>
-    
-    <!--<Message  Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
+		<ItemGroup Condition="'$(IsBrowserProject)' == 'true'">
+			<MySourceFiles Include="$(MSBuildThisFileDirectory)..\js_css\*"/>
+		</ItemGroup>
+
+		<!--<Message  Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
                 Text="Copying resources from &quot;$(MSBuildThisFileDirectory)&quot; to &quot;$(BaseIntermediateOutputPath)..\wwwroot\libs\&quot;"
                 Importance="normal"/>-->
-    
-    <Message  Condition="'$(IsBrowserProject)' == 'true'"
-                Text="Copying OpenSilver's required js/css libraries."
-                Importance="normal"/>
 
-    <Copy Condition="'$(IsBrowserProject)' == 'true'"
-        SourceFiles="@(MySourceFiles)"
-        SkipUnchangedFiles="true"
-        DestinationFolder="$(BaseIntermediateOutputPath)..\wwwroot\libs\"
-        /><!-- Note: BaseIntermediateOutputPath is an absolute path to the project's obj folder.-->
+		<Message  Condition="'$(IsBrowserProject)' == 'true'"
+					Text="Copying OpenSilver's required js/css libraries."
+					Importance="normal"/>
 
-    <PropertyGroup>
-      <ResourcesSourceLocation>$(OutputAssemblyDirectory)</ResourcesSourceLocation>
-      <ResourcesSourceLocation Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\wwwroot\_framework</ResourcesSourceLocation>
-      <ResourcesRootOutput>$(Cshtml5OutputRootPath)</ResourcesRootOutput>
-      <ResourcesRootOutput Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\..\..\..\wwwroot\</ResourcesRootOutput>
-    </PropertyGroup>
+		<Copy Condition="'$(IsBrowserProject)' == 'true'"
+			SourceFiles="@(MySourceFiles)"
+			SkipUnchangedFiles="true"
+			DestinationFolder="$(BaseIntermediateOutputPath)..\wwwroot\libs\"
+        />
+		<!-- Note: BaseIntermediateOutputPath is an absolute path to the project's obj folder.-->
 
-    <!--============================================================
+		<PropertyGroup>
+			<ResourcesSourceLocation>$(OutputAssemblyDirectory)</ResourcesSourceLocation>
+			<ResourcesSourceLocation Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\wwwroot\_framework</ResourcesSourceLocation>
+			<ResourcesRootOutput>$(Cshtml5OutputRootPath)</ResourcesRootOutput>
+			<ResourcesRootOutput Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\..\..\..\wwwroot\</ResourcesRootOutput>
+		</PropertyGroup>
+
+		<!--============================================================
       ResourceExtractorAndCopier (only during Pass 1)
       ============================================================-->
-    <ResourcesExtractorAndCopier
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
-      SourceAssembly="$(ResourcesSourceLocation)\$(AssemblyName).dll"
-      OutputRootPath="$(ResourcesRootOutput)"
-      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-      AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp|JSIL.Meta|Bridge"
-      SupportedExtensions=".js|.css|.png|.jpg|.gif|.ico|.mp4|.ogv|.webm|.3gp|.mp3|.ogg|.txt|.xml|.ttf|.woff|.cur|.config|.ClientConfig|.htm|.html|.svg"
-      IsBridgeBasedVersion="true"
-      TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
-      NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
-      CoreAssemblyFiles="$(CoreAssemblyFiles)"
+		<ResourcesExtractorAndCopier
+		  Condition="'$(IsSecondPass)'!='True' And '$(SkipResourcesExtractorAndCopier)'!='true'"
+		  SourceAssembly="$(ResourcesSourceLocation)\$(AssemblyName).dll"
+		  OutputRootPath="$(ResourcesRootOutput)"
+		  OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+		  AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp|JSIL.Meta|Bridge"
+		  SupportedExtensions=".js|.css|.png|.jpg|.gif|.ico|.mp4|.ogv|.webm|.3gp|.mp3|.ogg|.txt|.xml|.ttf|.woff|.woff2|.cur|.config|.ClientConfig|.htm|.html|.svg"
+		  IsBridgeBasedVersion="true"
+		  TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
+		  NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
+		  CoreAssemblyFiles="$(CoreAssemblyFiles)"
       >
-      <Output TaskParameter="CopiedResXFiles" PropertyName="CopiedResXFiles"/>
-      <Output TaskParameter="IsSuccess" PropertyName="ResourceExtractorAndCopierIsSuccess"/>
-    </ResourcesExtractorAndCopier>
+			<Output TaskParameter="CopiedResXFiles" PropertyName="CopiedResXFiles"/>
+			<Output TaskParameter="IsSuccess" PropertyName="ResourceExtractorAndCopierIsSuccess"/>
+		</ResourcesExtractorAndCopier>
 
-    <!--============================================================
+		<!--============================================================
       Launch the second pass (only during Pass 1)
       ============================================================-->
-    <MSBuild
-      Condition="'$(IsSecondPass)'!='True' And '$(IsBrowserProject)'!='true'"
-      Projects="$(MSBuildProjectFile)"
-      Properties="IsSecondPass=True;EnableBridgeCompilation=True"
+		<MSBuild
+		  Condition="'$(IsSecondPass)'!='True' And '$(IsBrowserProject)'!='true'"
+		  Projects="$(MSBuildProjectFile)"
+		  Properties="IsSecondPass=True;EnableBridgeCompilation=True"
       />
 
-    <!--============================================================
+		<!--============================================================
       Enable the Post Build event only during Pass 2 (to avoid calling the Post Build event twice)
       ============================================================-->
-    <PropertyGroup Condition="'$(IsSecondPass)'!='True'">
-      <!-- This will override the the PostBuild event during Pass 1 with a useless command ("echo") -->
-      <PostBuildEvent>echo </PostBuildEvent>
-    </PropertyGroup>
+		<PropertyGroup Condition="'$(IsSecondPass)'!='True'">
+			<!-- This will override the the PostBuild event during Pass 1 with a useless command ("echo") -->
+			<PostBuildEvent>echo </PostBuildEvent>
+		</PropertyGroup>
 
-  </Target>
-  
-  <!--============================================================
+	</Target>
+
+	<!--============================================================
   DESIGN-TIME COMPILATION
   ============================================================-->
 
-  <PropertyGroup>
-    <CoreCompileDependsOn>
-      BeforeCoreCompile;
-      $(CoreCompileDependsOn);
-    </CoreCompileDependsOn>
-  </PropertyGroup>
+	<PropertyGroup>
+		<CoreCompileDependsOn>
+			BeforeCoreCompile;
+			$(CoreCompileDependsOn);
+		</CoreCompileDependsOn>
+	</PropertyGroup>
 
-  <Target Name="BeforeCoreCompile">
-    <CallTarget Condition="'$(IsNotDesignTimeCompilation)' != 'true'"
-      Targets="DesignTimeCompilation" />
-  </Target>
+	<Target Name="BeforeCoreCompile">
+		<CallTarget Condition="'$(IsNotDesignTimeCompilation)' != 'true'"
+		  Targets="DesignTimeCompilation" />
+	</Target>
 
-  <Target Name="DesignTimeCompilation">
-    <Message
-      Text="OpenSilver Design-Time Compilation started"
-      Importance="normal"/>
+	<Target Name="DesignTimeCompilation">
+		<Message
+		  Text="OpenSilver Design-Time Compilation started"
+		  Importance="normal"/>
 
-    <!--============================================================
+		<!--============================================================
       Change the Build Action of XAML and TypeScript files from ["Page", "CodeAnalysisDictionary", "ApplicationDefinition"] to "Content" in case the developer has not already done so.
       ============================================================-->
-    <ItemGroup>
-      <Content Include="@(Page)"/>
-      <Page Remove="@(Page)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(CodeAnalysisDictionary)"/>
-      <CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(ApplicationDefinition)"/>
-      <ApplicationDefinition Remove="@(ApplicationDefinition)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="@(TypeScriptCompile)"/>
-      <TypeScriptCompile Remove="@(TypeScriptCompile)"/>
-    </ItemGroup>
+		<ItemGroup>
+			<Content Include="@(Page)"/>
+			<Page Remove="@(Page)"/>
+		</ItemGroup>
+		<ItemGroup>
+			<Content Include="@(CodeAnalysisDictionary)"/>
+			<CodeAnalysisDictionary Remove="@(CodeAnalysisDictionary)"/>
+		</ItemGroup>
+		<ItemGroup>
+			<Content Include="@(ApplicationDefinition)"/>
+			<ApplicationDefinition Remove="@(ApplicationDefinition)"/>
+		</ItemGroup>
+		<ItemGroup>
+			<Content Include="@(TypeScriptCompile)"/>
+			<TypeScriptCompile Remove="@(TypeScriptCompile)"/>
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       TypeScriptDefToCSharp
       ============================================================-->
-    <ItemGroup>
-      <TypeScriptDefFiles Include="@(Content)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.+\.d\.ts'))"/>
-    </ItemGroup>
-    <Message
-      Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
-      Importance="normal"/>
-    <TypeScriptDefToCSharp
-      InputFiles="@(TypeScriptDefFiles)"
-      OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
-      NoRecompile="true">
-      <Output TaskParameter="GeneratedFiles" PropertyName="GeneratedFiles"/>
-    </TypeScriptDefToCSharp>
-    <Message
-      Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
-      Importance="normal"/>
-    <ItemGroup>
-      <Compile
-        Include="$(GeneratedFiles)"/>
-    </ItemGroup>
+		<ItemGroup>
+			<TypeScriptDefFiles Include="@(Content)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', '.+\.d\.ts'))"/>
+		</ItemGroup>
+		<Message
+		  Text="Starting processing TypeScript Definition files: @(TypeScriptDefFiles)"
+		  Importance="normal"/>
+		<TypeScriptDefToCSharp
+		  InputFiles="@(TypeScriptDefFiles)"
+		  OutputDirectory="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
+		  NoRecompile="true">
+			<Output TaskParameter="GeneratedFiles" PropertyName="GeneratedFiles"/>
+		</TypeScriptDefToCSharp>
+		<Message
+		  Text="TypeScriptDefToCSharp output: $(ListOfGeneratedFiles)"
+		  Importance="normal"/>
+		<ItemGroup>
+			<Compile
+			  Include="$(GeneratedFiles)"/>
+		</ItemGroup>
 
-    <!--============================================================
+		<!--============================================================
       AssemblyReferenceValidator
       ============================================================-->
-    <!--Disabled for now as we use reference without any metadata from package reference-->
-    <!--<AssemblyReferenceValidator
+		<!--Disabled for now as we use reference without any metadata from package reference-->
+		<!--<AssemblyReferenceValidator
       Condition="'$(IsSecondPass)'!='True' And '$(AllowAnyReferences)'!='True'"
       References="@(Reference)"
       AllowedAssemblies="mscorlib|System.Core|Microsoft.CSharp|CSHTML5.Blazor|CSHTML5.Migration.Blazor|CSHTML5.Stubs|Bridge"
@@ -684,94 +687,94 @@
       ContinueOnError="ErrorAndStop"
       />-->
 
-    <!--============================================================
+		<!--============================================================
       XamlPreprocessor
       ============================================================-->
-    <!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved assemblies references/project references -->
-    <!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
-    <BeforeXamlPreprocessor
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-      IsSecondPass="false"
-      Flags="$(Flags)"
-      TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
-      ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
-      IsBridgeBasedVersion="true"
-      NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
+		<!-- _ResolveAssemblyReferenceResolvedFiles is the MSBuild variable containing the collection of all resolved assemblies references/project references -->
+		<!-- if we can't use this variable anymore we need to use the "@(Reference)" (assembly references) and "@(ProjectReference)" (project references) variables and manually resolve the references -->
+		<BeforeXamlPreprocessor
+		  Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		  IsSecondPass="false"
+		  Flags="$(Flags)"
+		  TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
+		  ResolvedReferences="@(_ResolveAssemblyReferenceResolvedFiles)"
+		  IsBridgeBasedVersion="true"
+		  NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
       />
 
-    <!--============================================================
+		<!--============================================================
       Process files which have been added as link to project.
       ============================================================-->
-    <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.cs"
-    FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    CoreAssemblyFiles="$(CoreAssemblyFiles)"
-    IsSecondPass="false"
-    IsSLMigration="$(IsSLMigration)"
-    ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
-    CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    IsBridgeBasedVersion="true"
-    NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
+		<XamlPreprocessor
+		Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		SourceFile="%(Content.FullPath)"
+		OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.Link).$(IsSecondPass).g.cs"
+		FileNameWithPathRelativeToProjectRoot="%(Content.Link)"
+		AssemblyNameWithoutExtension="$(AssemblyName)"
+		CoreAssemblyFiles="$(CoreAssemblyFiles)"
+		IsSecondPass="false"
+		IsSLMigration="$(IsSLMigration)"
+		ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
+		CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
+		OverrideOutputOnlyIfSourceHasChanged="false"
+		OutputRootPath="$(Cshtml5OutputRootPath)"
+		OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
+		OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
+		OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+		Flags="$(Flags)"
+		IsBridgeBasedVersion="true"
+		NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
     />
-    <!--============================================================
+		<!--============================================================
       Process files which have been added directly to the project.
       ============================================================-->
-    <XamlPreprocessor
-    Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-    SourceFile="%(Content.FullPath)"
-    OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.cs"
-    FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
-    AssemblyNameWithoutExtension="$(AssemblyName)"
-    CoreAssemblyFiles="$(CoreAssemblyFiles)"
-    IsSecondPass="false"
-    IsSLMigration="$(IsSLMigration)"
-    ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
-    CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
-    OverrideOutputOnlyIfSourceHasChanged="false"
-    OutputRootPath="$(Cshtml5OutputRootPath)"
-    OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-    OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-    OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-    Flags="$(Flags)"
-    IsBridgeBasedVersion="true"
-    NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
+		<XamlPreprocessor
+		Condition="'$(SkipXamlPreprocessor)'!='true' And '$(IsSecondPass)'!='True' And '%(Content.Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		SourceFile="%(Content.FullPath)"
+		OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Content.RelativeDir)%(Content.Filename)%(Content.Extension).$(IsSecondPass).g.cs"
+		FileNameWithPathRelativeToProjectRoot="%(Content.RelativeDir)%(Content.Filename)%(Content.Extension)"
+		AssemblyNameWithoutExtension="$(AssemblyName)"
+		CoreAssemblyFiles="$(CoreAssemblyFiles)"
+		IsSecondPass="false"
+		IsSLMigration="$(IsSLMigration)"
+		ActivationAppPath="$(MSBuildThisFileDirectory)..\Activation\CSharpXamlForHtml5.Activation.exe"
+		CSharpXamlForHtml5OutputType="$(CSharpXamlForHtml5OutputType)"
+		OverrideOutputOnlyIfSourceHasChanged="false"
+		OutputRootPath="$(Cshtml5OutputRootPath)"
+		OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
+		OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
+		OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
+		Flags="$(Flags)"
+		IsBridgeBasedVersion="true"
+		NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
     />
 
-    <AfterXamlPreprocessor
-      Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
-      IsSecondPass="false"
-      Flags="$(Flags)"
+		<AfterXamlPreprocessor
+		  Condition="'$(IsSecondPass)'!='True' And '$(SkipXamlPreprocessor)'!='true' And '$(IsFirstPassAndProcessingCSHTML5Itself)'!='True' And '$(NoXamlPreprocessor)'!='True'"
+		  IsSecondPass="false"
+		  Flags="$(Flags)"
       />
 
-    <ItemGroup>
-      <!--============================================================
+		<ItemGroup>
+			<!--============================================================
       Make the list of XAML files to convert to CS that are defined in the project.
       ============================================================-->
-      <ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
-      <!--============================================================
+			<ProcessedFiles Include="@(Content->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'=='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
+			<!--============================================================
       Make the list of XAML files to convert to CS that are defined outside the project (i.e added as link).
       ============================================================-->
-      <ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
+			<ProcessedFiles2 Include="@(Content->'$(IntermediateOutputPath)%(Link).$(IsSecondPass).g.cs')" Condition="'%(Extension)'=='.xaml' And '%(Content.Link)'!='' And '$(SkipXamlPreprocessor)'!='true' And '$(NoCSHTML5Reference)'!='true'"/>
 
-      <!--============================================================
+			<!--============================================================
       Remove the XAML files from the solution and include the generated CS files.
       ============================================================-->
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
-      <Compile Include="@(ProcessedFiles)" />
-      <Compile Include="@(ProcessedFiles2)" />
-    </ItemGroup>
-    <Message
-      Text="OpenSilver Design-Time Compilation ended"
-      Importance="normal"/>
-  </Target>
+			<Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.xaml'" />
+			<Compile Include="@(ProcessedFiles)" />
+			<Compile Include="@(ProcessedFiles2)" />
+		</ItemGroup>
+		<Message
+		  Text="OpenSilver Design-Time Compilation ended"
+		  Importance="normal"/>
+	</Target>
 
 </Project>
