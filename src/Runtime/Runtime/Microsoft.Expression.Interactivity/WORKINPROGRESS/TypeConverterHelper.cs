@@ -105,6 +105,10 @@ namespace Microsoft.Expression.Interactivity
                     {
 						convertedObj = int.Parse(text);
                     }
+					else if (type == typeof(string))
+					{
+						convertedObj = text;
+					}
 					else
 					{
 						var stringBuilder = new StringBuilder();
