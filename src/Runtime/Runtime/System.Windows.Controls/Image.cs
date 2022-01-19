@@ -217,8 +217,13 @@ namespace Windows.UI.Xaml.Controls
                 int sepIndex = concatenated.IndexOf('|');
                 string imgWidthAsString = concatenated.Substring(0, sepIndex);
                 string imgHeightAsString = concatenated.Substring(sepIndex + 1);
-                imgWidth = double.Parse(imgWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                imgHeight = double.Parse(imgHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture); //todo: read note above
+#if NETSTANDARD
+                double.TryParse(imgWidthAsString, global::System.Globalization.NumberStyles.Any, global::System.Globalization.CultureInfo.InvariantCulture, out imgWidth); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                double.TryParse(imgHeightAsString, global::System.Globalization.NumberStyles.Any, global::System.Globalization.CultureInfo.InvariantCulture, out imgHeight); //todo: read note above
+#elif BRIDGE
+                double.TryParse(imgWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture, out imgWidth); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                double.TryParse(imgHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture, out imgHeight); //todo: read note above
+#endif
             }
             else
             {
@@ -339,7 +344,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             }
         }
 
-        #region Image failed event
+#region Image failed event
 
         INTERNAL_EventManager<EventHandler<ExceptionRoutedEventArgs>, ExceptionRoutedEventArgs> _imageFailedEventManager = null;
 
@@ -393,10 +398,10 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             }
         }
 
-        #endregion
+#endregion
 
 
-        #region Image opened event
+#region Image opened event
 
         INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs> _imageOpenedEventManager = null;
         INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs> ImageOpenedEventManager
@@ -460,7 +465,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             }
         }
 
-        #endregion
+#endregion
 
         //todo: create a test case for those events.
         public override void INTERNAL_AttachToDomEvents()
