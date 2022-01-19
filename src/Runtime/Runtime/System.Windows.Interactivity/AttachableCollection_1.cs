@@ -12,18 +12,18 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
-namespace System.Windows.Interactivity
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
     /// <summary>
     /// Represents a collection of IAttachedObject with a shared AssociatedObject

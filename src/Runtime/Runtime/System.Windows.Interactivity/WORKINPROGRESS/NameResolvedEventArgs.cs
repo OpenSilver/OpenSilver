@@ -12,23 +12,33 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Interactivity
-{
-    public abstract partial class TriggerAction
-    {
-		[OpenSilver.NotImplemented]
-        protected virtual Type AssociatedObjectTypeConstraint { get; }
-        
-		[OpenSilver.NotImplemented]
-        protected virtual void OnAttached()
-        {
+using System;
 
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
+{
+    internal class NameResolvedEventArgs : EventArgs
+    {
+        private object oldObject;
+        private object newObject;
+
+        public object OldObject
+        {
+            get { return oldObject; }
         }
 
-		[OpenSilver.NotImplemented]
-        protected virtual void OnDetaching()
+        public object NewObject
         {
-            
+            get { return newObject; }
+        }
+
+        public NameResolvedEventArgs(object oldObject, object newObject)
+        {
+            this.oldObject = oldObject;
+            this.newObject = newObject;
         }
     }
 }

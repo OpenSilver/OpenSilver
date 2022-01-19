@@ -12,16 +12,14 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Interactivity;
 
-namespace System.Windows.Interactivity
-{
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
+{ 
     /// <summary>
     /// Represents a collection of triggers with a shared AssociatedObject and provides change notifications to its contents when that AssociatedObject changes.
     /// </summary>

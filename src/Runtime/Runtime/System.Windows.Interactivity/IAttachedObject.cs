@@ -12,17 +12,11 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
 #endif
-
-namespace System.Windows.Interactivity
 {
     /// <summary>
     /// An interface for an object that can be attached to another object.

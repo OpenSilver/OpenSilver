@@ -19,7 +19,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Windows.Interactivity
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
     /// <summary>
     /// Represents a collection of behaviors with a shared AssociatedObject and provides

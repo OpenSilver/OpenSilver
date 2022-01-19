@@ -20,7 +20,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Interactivity;
 using System.Windows.Markup;
-#if !MIGRATION
+
+#if MIGRATION
+using System.Windows;
+#else
 using Windows.UI.Xaml;
 #endif
 
@@ -70,7 +73,14 @@ namespace System.Windows.Interactivity
             this.Actions.Attach(_associatedObject);
 
         }
-#endregion
+        #endregion
+
+        internal TriggerBase(Type associatedObjectTypeConstraint)
+        {
+            this.associatedObjectTypeConstraint = associatedObjectTypeConstraint;
+            TriggerActionCollection newCollection = new TriggerActionCollection();
+            this.SetValue(ActionsProperty, newCollection);
+        }
 
         public static readonly DependencyProperty ActionsProperty = DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(TriggerBase), null);
 
@@ -92,6 +102,20 @@ namespace System.Windows.Interactivity
                     this.SetValue(TriggerBase.ActionsProperty, actions);
                 }
                 return actions;
+            }
+        }
+
+        private Type associatedObjectTypeConstraint;
+
+        /// <summary>
+		/// Gets the type constraint of the associated object.
+		/// </summary>
+		/// <value>The associated object type constraint.</value>
+		protected virtual Type AssociatedObjectTypeConstraint
+        {
+            get
+            {
+                return this.associatedObjectTypeConstraint;
             }
         }
 
@@ -140,6 +164,13 @@ namespace System.Windows.Interactivity
         {
             this._associatedObject = null;
             this.Actions.Detach();
+        }
+
+        /// <summary>
+        /// Called when the trigger is being detached from its AssociatedObject, but before it has actually occurred.
+        /// </summary>
+        protected virtual void OnDetaching()
+        {
         }
     }
 }

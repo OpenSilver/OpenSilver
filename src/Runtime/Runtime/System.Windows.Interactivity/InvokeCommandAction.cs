@@ -20,7 +20,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-#if !MIGRATION
+
+#if MIGRATION
+using System.Windows;
+#else
 using Windows.UI.Xaml;
 #endif
 
@@ -30,7 +33,7 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
     /// Executes a specified ICommand when invoked.
     /// 
     /// </summary>
-    public sealed partial class InvokeCommandAction : TriggerAction //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
+    public sealed partial class InvokeCommandAction : TriggerAction<FrameworkElement> //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
     {
         //Example of a currently working code:
         //<Button x:Name="TestButton" Content="a" Width="100" Height="30">

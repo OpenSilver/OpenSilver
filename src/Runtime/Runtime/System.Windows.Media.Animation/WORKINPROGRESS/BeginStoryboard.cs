@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Media.Animation
 		//     Initializes a new instance of the System.Windows.Media.Animation.BeginStoryboard
 		//     class.
         [OpenSilver.NotImplemented]
-		public BeginStoryboard()
+		public BeginStoryboard() : base(typeof(Storyboard))
 		{
 			
 		}
@@ -53,5 +53,10 @@ namespace Windows.UI.Xaml.Media.Animation
 			get { return (Storyboard)GetValue(StoryboardProperty); }
 			set { SetValue(StoryboardProperty, value); }
 		}
-	}
+
+		[OpenSilver.NotImplemented]
+        protected override void Invoke(object parameter)
+        {
+        }
+    }
 }

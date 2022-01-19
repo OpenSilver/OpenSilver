@@ -12,17 +12,13 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if !MIGRATION
-using Windows.UI.Xaml;
-#endif
 
-namespace System.Windows.Interactivity
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
     /// <summary>
     /// Represents an attachable object that encapsulates a unit of functionality.
@@ -36,6 +32,8 @@ namespace System.Windows.Interactivity
     {
         //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
         //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
+
+        private Type associatedObjectTypeConstraint;
 
         #region added because we changed heritage
         internal DependencyObject _associatedObject = null;
@@ -100,10 +98,14 @@ namespace System.Windows.Interactivity
             }
         }
 
-        internal TriggerAction()//Type associatedObjectTypeConstraint)
+        internal TriggerAction(Type associatedObjectTypeConstraint)
         {
-            //todo: should probably handle that property
-            //this.AssociatedObjectTypeConstraint = associatedObjectTypeConstraint;
+            this.associatedObjectTypeConstraint = associatedObjectTypeConstraint;
+        }
+
+        protected virtual Type AssociatedObjectTypeConstraint 
+        {
+            get { return this.associatedObjectTypeConstraint; }
         }
 
         /// <summary>
@@ -126,6 +128,20 @@ namespace System.Windows.Interactivity
         /// </summary>
         /// <param name="parameter">The parameter to the action. If the action does not require a parameter, the parameter may be set to a null reference.</param>
         protected abstract void Invoke(object parameter);
+
+        /// <summary>
+		/// Called after the action is attached to an AssociatedObject.
+		/// </summary>
+		protected virtual void OnAttached()
+        {
+        }
+
+        /// <summary>
+        /// Called when the action is being detached from its AssociatedObject, but before it has actually occurred.
+        /// </summary>
+        protected virtual void OnDetaching()
+        {
+        }
 
         /// <summary>
         /// Attaches to the specified object.
