@@ -94,7 +94,10 @@
                                 VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                 RenderTransformOrigin="0.5,0.5"
                                 Height="{TemplateBinding Height}"
-                                Width="{TemplateBinding Width}">
+                                Width="{TemplateBinding Width}"
+                                MaxWidth="{TemplateBinding MaxWidth}"
+                                MaxHeight="{TemplateBinding MaxHeight}"
+                                MinWidth="{TemplateBinding MinWidth}">
                             <!--<Grid.RenderTransform>
                                     <TransformGroup>
                                         <ScaleTransform />
