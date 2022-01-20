@@ -50,6 +50,7 @@
 		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\ComparisonLogic.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\TypeConverterHelper.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\VisualStateUtilities.cs" />
+		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />

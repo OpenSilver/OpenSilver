@@ -410,6 +410,8 @@ namespace Windows.UI.Xaml
                         styleOfOuterDomElement.marginRight = "0px"; // Default value
                         styleOfOuterDomElement.display = "block"; // Default value
                         styleOfOuterDomElement.width = "100%";
+                        styleOfOuterDomElement.maxWidth = "none";
+                        styleOfOuterDomElement.maxHeight = "none";
                         return;
                     }
 
