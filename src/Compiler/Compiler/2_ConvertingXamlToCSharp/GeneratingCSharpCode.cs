@@ -295,12 +295,10 @@ namespace DotNetForHtml5.Compiler
                                 //we replace the Placeholder that was put for the template name:
                                 codeToInstantiateTheDataTemplate = codeToInstantiateTheDataTemplate.Replace(GeneratingCSharpCode.TemplateOwnerValuePlaceHolder, templateInstanceUniqueName);
 
-                                XElement frameworkTemplateRoot = element.Parent;
-                                string frameworkTemplateUniqueName = GetUniqueName(frameworkTemplateRoot);
+                                XElement frameworkTemplateRoot = element.Elements().First();
+                                string frameworkTemplateUniqueName = GetUniqueName(element.Parent);
                                 string childUniqueName = GetUniqueName(element.Elements().First());
-                                string objectsToInstantiateAtTheBeginningOfTheDataTemplate = string.Join("\r\n",
-                                   GetNameToUniqueNameDictionary(frameworkTemplateRoot,
-                                       namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
+                                string objectsToInstantiateAtTheBeginningOfTheDataTemplate = string.Empty;
                                 string markupExtensionsAdditionalCode = string.Join("\r\n",
                                     GetListThatContainsAdditionalCodeFromDictionary(frameworkTemplateRoot,
                                         namescopeRootToMarkupExtensionsAdditionalCode));
@@ -323,7 +321,7 @@ namespace DotNetForHtml5.Compiler
                                     templateNameScope,
                                     namespaceSystemWindows);
                                 // Create the code that sets the "MethodToInstantiateDataTemplate":
-                                string codeToSetTheMethod = string.Format("{0}.SetMethodToInstantiateFrameworkTemplate({1});", frameworkTemplateUniqueName, dataTemplateMethod);
+                                string codeToSetTheMethod = $"{frameworkTemplateUniqueName}.SetMethodToInstantiateFrameworkTemplate({dataTemplateMethod});";
 
                                 stringBuilder.AppendLine(codeToSetTheMethod);
                             }
@@ -437,22 +435,20 @@ namespace DotNetForHtml5.Compiler
                                                 string nameForParentsCollection = GeneratingUniqueNames.GenerateUniqueNameFromString("parents"); // Example: parents_4541C363579C48A981219C392BF8ACD5
                                                 stringBuilder.AppendLine(string.Format("var {0} = new global::System.Collections.Generic.List<global::System.Object>();",
                                                     nameForParentsCollection));
-                                                while (elementForSearch != null && elementForSearch.Parent != null) //we check for the parent because the last parent will be the container(for example a Page) and the generated code doesn't create an instance for itself.
+
+                                                while (elementForSearch != null)
                                                 {
-                                                    if (elementForSearch != elementThatIsRootOfTheCurrentNamescope)
+                                                    if (!elementForSearch.Name.LocalName.Contains('.'))
                                                     {
-                                                        if (!elementForSearch.Name.LocalName.Contains('.'))
+                                                        if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(elementForSearch, reflectionOnSeparateAppDomain)) //we don't want to add the MarkupExtensions in the list of the parents (A MarkupExtension is not a DependencyObject)
                                                         {
-                                                            if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(elementForSearch, reflectionOnSeparateAppDomain)) //we don't want to add the MarkupExtensions in the list of the parents (A MarkupExtension is not a DependencyObject)
-                                                            {
-                                                                stringBuilder.AppendLine(string.Format("{0}.Add({1});",
-                                                                    nameForParentsCollection, GetUniqueName(elementForSearch)));
-                                                            }
+                                                            stringBuilder.AppendLine(string.Format("{0}.Add({1});",
+                                                                nameForParentsCollection, GetUniqueName(elementForSearch)));
                                                         }
                                                     }
+
                                                     elementForSearch = elementForSearch.Parent;
                                                 }
-                                                stringBuilder.AppendLine($"{nameForParentsCollection}.Add({GetUniqueName(doc.Root)});");
 
                                                 string[] splittedLocalName = element.Name.LocalName.Split('.');
                                                 string propertyKey = GettingInformationAboutXamlTypes.GetKeyNameOfProperty(
@@ -812,6 +808,21 @@ else
                         // (unless this is the root element)
                         string elementUniqueNameOrThisKeyword = GetUniqueName(element);
                         stringBuilder.Clear();
+
+                        if (element == elementThatIsRootOfTheCurrentNamescope)
+                        {
+                            stringBuilder.AppendLine(
+                                string.Join(
+                                    Environment.NewLine,
+                                    GetNameToUniqueNameDictionary(
+                                        elementThatIsRootOfTheCurrentNamescope,
+                                        namescopeRootToElementsUniqueNameToInstantiatedObjects
+                                    )
+                                    .Select(x => x.Value)
+                                )
+                            );
+                        }
+
                         if (!isRootElement)
                         {
                             // Instantiate the object if it has not been done yet in the 'PopulateDictionaryThatAssociatesNamesToUniqueNames()' method.
@@ -1323,12 +1334,30 @@ dependencyPropertyPath);
                 out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
 
             // Create the "IntializeComponent()" method:
-            string objectsToInstantiateEarly = string.Join("\r\n", GetNameToUniqueNameDictionary(doc.Root, namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
-            string markupExtensionsAdditionalCodeForElementsInRootNamescope = string.Join("\r\n", GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToMarkupExtensionsAdditionalCode));
-            string storyboardsAdditionalCodeForElementsInRootNamescope = string.Join("\r\n", GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToStoryboardsAdditionalCode));
+            string markupExtensionsAdditionalCodeForElementsInRootNamescope = 
+                string.Join(
+                    Environment.NewLine, 
+                    GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToMarkupExtensionsAdditionalCode)
+                );
+            
+            string storyboardsAdditionalCodeForElementsInRootNamescope = 
+                string.Join(
+                    Environment.NewLine, 
+                    GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToStoryboardsAdditionalCode)
+                );
+            
             bool isClassTheApplicationClass = IsClassTheApplicationClass(baseType);
-            string additionalCodeToPlaceAtTheBeginningOfInitializeComponent = (isClassTheApplicationClass ? codeToPutInTheInitializeComponentOfTheApplicationClass : "") + objectsToInstantiateEarly;
-            string additionalCodeToPlaceAtTheEndOfInitializeComponent = markupExtensionsAdditionalCodeForElementsInRootNamescope + Environment.NewLine + storyboardsAdditionalCodeForElementsInRootNamescope;
+
+            string additionalCodeToPlaceAtTheBeginningOfInitializeComponent =
+                isClassTheApplicationClass ?
+                codeToPutInTheInitializeComponentOfTheApplicationClass :
+                string.Empty;
+            
+            string additionalCodeToPlaceAtTheEndOfInitializeComponent = 
+                markupExtensionsAdditionalCodeForElementsInRootNamescope + 
+                Environment.NewLine + 
+                storyboardsAdditionalCodeForElementsInRootNamescope;
+            
             string nameScope = null;
 
             if (hasCodeBehind)
@@ -1680,24 +1709,26 @@ var {4} = {2}.GetValue({1});
         private static XElement GetRootOfCurrentNamescopeForRuntime(XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
             XElement currentElement = element;
-            bool skipTemplateNode = true;
             while (currentElement.Parent != null)
             {
-                if (!currentElement.Name.LocalName.Contains("."))
+                int index = currentElement.Parent.Name.LocalName.IndexOf(".");
+                if (index > - 1)
                 {
-                    if (reflectionOnSeparateAppDomain.IsAssignableFrom(DefaultXamlNamespace.NamespaceName, "FrameworkTemplate",
-                        currentElement.Name.NamespaceName, currentElement.Name.LocalName))
+                    string namespaceName = currentElement.Parent.Name.NamespaceName;
+                    string typeName = currentElement.Parent.Name.LocalName.Substring(0, index);
+                    string propertyName = currentElement.Parent.Name.LocalName.Substring(index + 1);                    
+
+                    if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
+                        reflectionOnSeparateAppDomain.IsAssignableFrom(DefaultXamlNamespace.NamespaceName, "FrameworkTemplate",
+                        namespaceName, typeName))
                     {
-                        if (!skipTemplateNode)
-                        {
-                            return currentElement;
-                        }
+                        return currentElement;
                     }
-                    skipTemplateNode = false;
                 }
 
                 currentElement = currentElement.Parent;
             }
+
             return currentElement;
         }
 
