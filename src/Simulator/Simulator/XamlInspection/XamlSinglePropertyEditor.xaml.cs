@@ -93,7 +93,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                     ButtonOK.Visibility = Visibility.Collapsed;
 
                     // Read property name:
-                    this.PropertyNameTextBlock.Text = _propertyInfo.Name + ":";
 
                     // Set "AcceptsReturn" only if it is a string:
                     bool isString = (propertyType == typeof(string));
