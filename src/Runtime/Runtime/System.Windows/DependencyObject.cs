@@ -42,26 +42,17 @@ namespace Windows.UI.Xaml
     {
         #region Inheritance Context
 
-        private DependencyObject _inheritanceContext;
-        private FrameworkElement _inheritedParent;
-        private readonly HashSet<DependencyObject> _contextListeners = new HashSet<DependencyObject>();
+        private HashSet<DependencyObject> _contextListeners;
+
         internal event EventHandler InheritedContextChanged;
 
-        internal FrameworkElement InheritedParent
-        {
-            get { return this._inheritedParent; }
-        }
-
-        internal DependencyObject InheritanceContext
-        {
-            get { return this._inheritanceContext; }
-        }
+        internal DependencyObject InheritanceContext { get; private set; }
 
         internal bool CanBeInheritanceContext { get; set; }
 
         internal bool IsInheritanceContextSealed { get; set; }
 
-        internal bool ShouldProvideInheritanceContext(DependencyObject target, DependencyProperty property)
+        internal virtual bool ShouldProvideInheritanceContext(DependencyObject target, DependencyProperty property)
         {
             // We never provide an inherited context for a FrameworkElement because the DataContext takes
             // priority over inherited context.
@@ -119,13 +110,10 @@ namespace Windows.UI.Xaml
             context.StopListeningToInheritanceContextChanges(this);
 
             // Reset inheritance context
-            this._inheritanceContext = null;
-
-            // Reset inherited parent
-            this._inheritedParent = null;
+            this.InheritanceContext = null;
 
             // Notify listeners that inheritance context changed
-            this.OnInheritedContextChanged(null);
+            this.OnInheritedContextChanged(EventArgs.Empty);
         }
 
         // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
@@ -182,48 +170,57 @@ namespace Windows.UI.Xaml
             context.ListenToInheritanceContextChanges(this);
 
             // Set the new context
-            this._inheritanceContext = context;
-
-            // Find the new inherited parent
-            this._inheritedParent = this.ComputeInheritedParent();
+            this.InheritanceContext = context;
 
             // Notify listeners that inheritance context changed
-            this.OnInheritedContextChanged(this._inheritedParent);
+            this.OnInheritedContextChanged(EventArgs.Empty);
         }
 
-        private void OnInheritedContextChanged(FrameworkElement newParent)
+        private void OnInheritedContextChanged(EventArgs args)
         {
             if (this.InheritedContextChanged != null)
             {
-                this.InheritedContextChanged(this, EventArgs.Empty);
+                this.InheritedContextChanged(this, args);
             }
-            foreach (DependencyObject listener in this._contextListeners)
-            {
-                listener._inheritedParent = newParent;
-                listener.OnInheritedContextChanged(newParent);
-            }
-        }
 
-        private FrameworkElement ComputeInheritedParent()
-        {
-            FrameworkElement inheritedParent;
-            for (DependencyObject contextDO = this._inheritanceContext; contextDO != null; contextDO = contextDO._inheritanceContext)
+            if (this._contextListeners != null)
             {
-                if ((inheritedParent = contextDO as FrameworkElement) != null)
+                foreach (DependencyObject listener in this._contextListeners)
                 {
-                    return inheritedParent;
+                    listener.OnInheritedContextChanged(args);
                 }
             }
-            return null;
+
+            // Let sub-classes do their own thing
+            this.OnInheritanceContextChangedCore(args);
+        }
+
+        /// <summary>
+        ///     This is a means for subclasses to get notification
+        ///     of InheritanceContext changes and then they can do
+        ///     their own thing.
+        /// </summary>
+        internal virtual void OnInheritanceContextChangedCore(EventArgs args)
+        {
         }
 
         private void ListenToInheritanceContextChanges(DependencyObject listener)
         {
+            if (this._contextListeners == null)
+            {
+                this._contextListeners = new HashSet<DependencyObject>();
+            }
+
             this._contextListeners.Add(listener);
         }
 
         private void StopListeningToInheritanceContextChanges(DependencyObject listener)
         {
+            if (this._contextListeners == null)
+            {
+                return;
+            }
+
             bool isListening = this._contextListeners.Contains(listener);
             if (isListening)
             {

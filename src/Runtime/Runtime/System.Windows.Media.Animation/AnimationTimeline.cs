@@ -33,7 +33,6 @@ namespace Windows.UI.Xaml.Media.Animation
         internal PropertyPath _targetProperty;
         internal DependencyObject _propertyContainer;
         internal DependencyObject _target;
-        internal IterationParameters _parameters;
         internal DependencyProperty _propDp;
         internal bool _isInitialized = false;
         internal bool _cancelledAnimation = false;

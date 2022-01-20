@@ -543,6 +543,13 @@ namespace Windows.UI.Xaml
 
         #region Internal API
 
+        internal static readonly DependencyProperty ResourceKeyProperty =
+            DependencyProperty.Register(
+                "ResourceKeyProperty",
+                typeof(object),
+                typeof(ResourceDictionary),
+                null);
+
         #region Helper Methods
 
         // Add an owner for this dictionary
@@ -1036,7 +1043,7 @@ namespace Windows.UI.Xaml
         // add inheritance context to a value
         private void AddInheritanceContext(DependencyObject inheritanceContext, object value)
         {
-            if (inheritanceContext.ProvideSelfAsInheritanceContext(value, null))
+            if (inheritanceContext.ProvideSelfAsInheritanceContext(value, ResourceKeyProperty))
             {
                 // if the assignment was successful, seal the value's InheritanceContext.
                 // This makes sure the resource always gets inheritance-related information
@@ -1081,7 +1088,7 @@ namespace Windows.UI.Xaml
                 doValue.InheritanceContext == inheritanceContext)
             {
                 doValue.IsInheritanceContextSealed = false;
-                inheritanceContext.RemoveSelfAsInheritanceContext(doValue, null);
+                inheritanceContext.RemoveSelfAsInheritanceContext(doValue, ResourceKeyProperty);
             }
         }
 

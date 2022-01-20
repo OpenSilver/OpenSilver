@@ -73,7 +73,8 @@
     <Compile Include="OpenSilver\Internal\ApplicationLifetimeObjectsCollection.cs" />
     <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
-    <Compile Include="OpenSilver\Internal\NameScope.cs" />
+    <Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
+	<Compile Include="OpenSilver\Internal\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
@@ -1007,7 +1008,6 @@
     <Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\OutOfBrowserSettings.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TabletDeviceType.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\TriggerAction.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\TriggerActionCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\TriggerBase.cs" />

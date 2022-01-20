@@ -69,7 +69,7 @@ namespace Windows.UI.Xaml
                 // Height:
                 if (!double.IsNaN(element.Height))
                     style.height = element.Height.ToInvariantString() + "px";
-                else if (element.VerticalAlignment == VerticalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                else if (element.VerticalAlignment == VerticalAlignment.Stretch && !(element is CheckBox) && (!(element.INTERNAL_VisualParent is Canvas) || element is Canvas))
                     style.height = "100%";
                 else
                     style.height = "auto";
@@ -77,7 +77,7 @@ namespace Windows.UI.Xaml
                 // Width:
                 if (!double.IsNaN(element.Width))
                     style.width = element.Width.ToInvariantString() + "px";
-                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element is CheckBox) && (!(element.INTERNAL_VisualParent is Canvas) || element is Canvas))
                     style.width = "100%";
                 else
                     style.width = "auto";
@@ -375,8 +375,8 @@ namespace Windows.UI.Xaml
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
                 if (fe.INTERNAL_VisualParent is Canvas || isParentAViewBox) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
                 {
-                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? 
-                        fe.Width.ToInvariantString() + "px" : 
+                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ?
+                        fe.Width.ToInvariantString() + "px" :
                         "auto";
                 }
                 else // Otherwise we handle both alignment and Width/Height:
@@ -410,6 +410,8 @@ namespace Windows.UI.Xaml
                         styleOfOuterDomElement.marginRight = "0px"; // Default value
                         styleOfOuterDomElement.display = "block"; // Default value
                         styleOfOuterDomElement.width = "100%";
+                        styleOfOuterDomElement.maxWidth = "none";
+                        styleOfOuterDomElement.maxHeight = "none";
                         return;
                     }
 
@@ -747,6 +749,17 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
+            if (fe.IsUnderCustomLayout)
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
+                    && fe.Visibility != Visibility.Collapsed
+                    && !double.IsNaN(fe.Height))
+                {
+                    var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(fe);
+                    styleOfOuterDomElement.height = fe.Height.ToInvariantString() + "px";
+                }
+                return;
+            }
 
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
                 && fe.Visibility != Visibility.Collapsed)

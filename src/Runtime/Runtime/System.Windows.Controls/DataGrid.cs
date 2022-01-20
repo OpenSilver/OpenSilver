@@ -782,6 +782,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
+            this.SelectedItems.Clear();
             if (newValue == null)
             {
                 //--------------

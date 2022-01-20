@@ -32,8 +32,6 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public abstract partial class VirtualizingPanel : Panel
     {
-        private ItemContainerGenerator generator;
-
         /// <summary>
         /// Gets a value that identifies the <see cref="ItemContainerGenerator"/>
         /// for this <see cref="VirtualizingPanel"/>.
@@ -45,17 +43,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (generator == null)
-                {
-                    ItemsControl owner = ItemsControl.GetItemsOwner(this);
-                    if (owner == null)
-                    {
-                        throw new InvalidOperationException("A VirtualizingPanel is not nested in an ItemsControl. VirtualizingPanel must be nested in ItemsControl to get and show items.");
-                    }
-                    generator = owner.ItemContainerGenerator;
-                    generator.ItemsChanged += OnItemsChangedInternal;
-                }
-                return generator;
+                return Generator;
             }
         }
 
@@ -65,19 +53,6 @@ namespace Windows.UI.Xaml.Controls
         protected VirtualizingPanel()
         {
             this.ClipToBounds = true;
-        }
-
-        void OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
-        {
-            InvalidateMeasure();
-            if (args.Action == NotifyCollectionChangedAction.Reset)
-            {
-                Children.Clear();
-                ItemContainerGenerator.RemoveAll();
-                OnClearChildren();
-            }
-
-            OnItemsChanged(sender, args);
         }
 
         /// <summary>
@@ -165,6 +140,38 @@ namespace Windows.UI.Xaml.Controls
                 base.GenerateChildren();
             }
             // Do nothing. Subclasses will use the exposed generator to generate children.
+        }
+
+        // This method returns a bool to indicate if or not the panel layout is affected by this collection change
+        internal override bool OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
+        {
+            if (!IsCustomLayoutRoot && !IsUnderCustomLayout)
+            {
+                return base.OnItemsChangedInternal(sender, args);
+            }
+
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
+                    // Don't allow Panel's code to run for add/remove/replace/move
+                    break;
+
+                default:
+                    base.OnItemsChangedInternal(sender, args);
+                    break;
+            }
+
+            OnItemsChanged(sender, args);
+
+            return true;
+        }
+
+        internal override void OnClearChildrenInternal()
+        {
+            OnClearChildren();
         }
     }
 }
