@@ -125,48 +125,69 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            // Create the "IntializeComponent()" method:
-            string initializeComponentMethod = CreateInitializeComponentMethod(null, new List<string>(0), null, null, null,
-                isSLMigration, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot);
-
-            resultingMethods.Add(initializeComponentMethod);
-
-            // Add a contructor if there is no code behind:
-            if (!hasCodeBehind)
+            if (hasCodeBehind)
             {
-                string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-                resultingMethods.Add(string.Format(@"
-        public {0}()
-        {{
-            this.InitializeComponent();
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-            if (this is {1})
-            {{
-                (({1})(object)this).XamlSourcePath = @""{2}\{3}"";
-            }}
-#pragma warning restore 0184
-        }}
-", className, uiElementFullyQualifiedTypeName, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot));
-            }
+                // Create the "IntializeComponent()" method:
+                string initializeComponentMethod = CreateInitializeComponentMethod(GetUniqueName(doc.Root), null, new List<string>(0), null, null, null,
+                    isSLMigration, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot);
 
-            // Wrap everything into a partial class:
-            string finalCode = GeneratePartialClass(resultingMethods,
-                                                    resultingFieldsForNamedElements,
-                                                    className,
-                                                    namespaceStringIfAny,
-                                                    baseType,
-                                                    fileNameWithPathRelativeToProjectRoot,
-                                                    assemblyNameWithoutExtension,
-                                                    listOfAllTheTypesUsedInThisXamlFile,
-                                                    hasCodeBehind,
-#if BRIDGE
-                                                    addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
-#else
-                                                    addApplicationEntryPoint: false
+                resultingMethods.Add(initializeComponentMethod);
+
+                // Wrap everything into a partial class:
+                string partialClass = GeneratePartialClass(resultingMethods,
+                                                           resultingFieldsForNamedElements,
+                                                           className,
+                                                           namespaceStringIfAny,
+                                                           baseType,
+                                                           fileNameWithPathRelativeToProjectRoot,
+                                                           assemblyNameWithoutExtension,
+                                                           listOfAllTheTypesUsedInThisXamlFile,
+                                                           hasCodeBehind,
+#if BRIDGE                                                 
+                                                           addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
+#else                                                      
+                                                           addApplicationEntryPoint: false
 #endif
 );
 
-            return finalCode;
+                string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
+
+                string factoryClass = GenerateFactoryClass(
+                    componentTypeFullName,
+                    CreateFactoryMethod(componentTypeFullName),
+                    Enumerable.Empty<string>(),
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = $@"
+{factoryClass}
+{partialClass}";
+
+                return finalCode;
+            }
+            else
+            {
+                string factoryImpl = CreateFactoryMethod(
+                    GetUniqueName(doc.Root),
+                    baseType,
+                    null, 
+                    new List<string>(0), 
+                    null, 
+                    null, 
+                    null,
+                    isSLMigration, 
+                    assemblyNameWithoutExtension, 
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = GenerateFactoryClass(
+                    baseType,
+                    factoryImpl,
+                    Enumerable.Empty<string>(),
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                return finalCode;
+            }
         }
 
         public static string GenerateCSharpCodeForPass2(XDocument doc,
@@ -431,7 +452,7 @@ namespace DotNetForHtml5.Compiler
                                                     }
                                                     elementForSearch = elementForSearch.Parent;
                                                 }
-                                                stringBuilder.AppendLine(string.Format("{0}.Add(this);", nameForParentsCollection));
+                                                stringBuilder.AppendLine($"{nameForParentsCollection}.Add({GetUniqueName(doc.Root)});");
 
                                                 string[] splittedLocalName = element.Name.LocalName.Split('.');
                                                 string propertyKey = GettingInformationAboutXamlTypes.GetKeyNameOfProperty(
@@ -853,9 +874,19 @@ else
                                     // Add the type initialization from "Source" URI:
                                     //------------------------------------------------
                                     string sourceUri = element.Attribute("Source").Value; // Note: this attribute exists because we have checked earlier.
-                                    string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(sourceUri, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension);
+                                    string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(
+                                        sourceUri,
+                                        fileNameWithPathRelativeToProjectRoot,
+                                        assemblyNameWithoutExtension);
 
-                                    stringBuilder.AppendLine(string.Format("var {0} = new global::{1}();", elementUniqueNameOrThisKeyword, XamlFilesWithoutCodeBehindHelper.GenerateClassNameFromAbsoluteUri(absoluteSourceUri)));
+                                    stringBuilder.AppendLine(
+                                        string.Format(
+                                            "var {0} = (({1})new {2}()).CreateComponent();",
+                                            elementUniqueNameOrThisKeyword,
+                                            $"{IXamlComponentFactoryClass}<{namespaceSystemWindows}.ResourceDictionary>",
+                                            XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri)
+                                        )
+                                    );
                                 }
                                 else
                                 {
@@ -1288,7 +1319,8 @@ dependencyPropertyPath);
             // Get general information about the class:
             string className, namespaceStringIfAny, baseType;
             bool hasCodeBehind;
-            GetClassInformationFromXaml(doc, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
+            GetClassInformationFromXaml(doc, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain,
+                out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
 
             // Create the "IntializeComponent()" method:
             string objectsToInstantiateEarly = string.Join("\r\n", GetNameToUniqueNameDictionary(doc.Root, namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
@@ -1298,65 +1330,89 @@ dependencyPropertyPath);
             string additionalCodeToPlaceAtTheBeginningOfInitializeComponent = (isClassTheApplicationClass ? codeToPutInTheInitializeComponentOfTheApplicationClass : "") + objectsToInstantiateEarly;
             string additionalCodeToPlaceAtTheEndOfInitializeComponent = markupExtensionsAdditionalCodeForElementsInRootNamescope + Environment.NewLine + storyboardsAdditionalCodeForElementsInRootNamescope;
             string nameScope = null;
-            if (hasCodeBehind &&
-                reflectionOnSeparateAppDomain.IsAssignableFrom(namespaceSystemWindows, "DependencyObject",
-                    doc.Root.Name.NamespaceName, doc.Root.Name.LocalName))
+
+            if (hasCodeBehind)
             {
-                nameScope = CreateNameScope(
-                    "this",
-                    GetNameToUniqueNameDictionary(doc.Root, namescopeRootToNameToUniqueNameDictionary)
+                if (reflectionOnSeparateAppDomain.IsAssignableFrom(namespaceSystemWindows, "DependencyObject",
+                        doc.Root.Name.NamespaceName, doc.Root.Name.LocalName))
+                {
+                    nameScope = CreateNameScope(
+                        GetUniqueName(doc.Root),
+                        GetNameToUniqueNameDictionary(doc.Root, namescopeRootToNameToUniqueNameDictionary)
+                    );
+                }
+
+                // Create the "IntializeComponent()" method:
+                string initializeComponentMethod = CreateInitializeComponentMethod(
+                    GetUniqueName(doc.Root),
+                    codeToWorkWithTheRootElement,
+                    resultingFindNameCalls,
+                    additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
+                    additionalCodeToPlaceAtTheEndOfInitializeComponent,
+                    nameScope,
+                    isSLMigration,
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot
                 );
-            }
 
-            string initializeComponentMethod = CreateInitializeComponentMethod(
-                codeToWorkWithTheRootElement, 
-                resultingFindNameCalls, 
-                additionalCodeToPlaceAtTheBeginningOfInitializeComponent, 
-                additionalCodeToPlaceAtTheEndOfInitializeComponent,
-                nameScope,
-                isSLMigration, 
-                assemblyNameWithoutExtension, 
-                fileNameWithPathRelativeToProjectRoot
-            );
-            
-            resultingMethods.Insert(0, initializeComponentMethod);
+                resultingMethods.Insert(0, initializeComponentMethod);
 
-            // Add a contructor if there is no code behind:
-            if (!hasCodeBehind)
-            {
-                string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-                resultingMethods.Add(string.Format(@"
-        public {0}()
-        {{
-            this.InitializeComponent();
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-            if (this is {1})
-            {{
-                (({1})(object)this).XamlSourcePath = @""{2}\{3}"";
-            }}
-#pragma warning restore 0184
-        }}
-", className, uiElementFullyQualifiedTypeName, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot));
-            }
-
-            // Wrap everything into a partial class:
-            string finalCode = GeneratePartialClass(resultingMethods,
-                                                    resultingFieldsForNamedElements,
-                                                    className,
-                                                    namespaceStringIfAny,
-                                                    baseType,
-                                                    fileNameWithPathRelativeToProjectRoot,
-                                                    assemblyNameWithoutExtension,
-                                                    listOfAllTheTypesUsedInThisXamlFile,
-                                                    hasCodeBehind,
-#if BRIDGE
-                                                    addApplicationEntryPoint: isClassTheApplicationClass
-#else
- addApplicationEntryPoint: false
+                // Wrap everything into a partial class:
+                string partialClass = GeneratePartialClass(resultingMethods,
+                                                           resultingFieldsForNamedElements,
+                                                           className,
+                                                           namespaceStringIfAny,
+                                                           baseType,
+                                                           fileNameWithPathRelativeToProjectRoot,
+                                                           assemblyNameWithoutExtension,
+                                                           listOfAllTheTypesUsedInThisXamlFile,
+                                                           hasCodeBehind,
+#if BRIDGE                                                 
+                                                           addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
+#else                                                      
+                                                           addApplicationEntryPoint: false
 #endif
 );
 
-            return finalCode;
+                string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
+
+                string factoryClass = GenerateFactoryClass(
+                    componentTypeFullName,
+                    CreateFactoryMethod(componentTypeFullName),
+                    Enumerable.Empty<string>(),
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = $@"
+{factoryClass}
+{partialClass}";
+
+                return finalCode;
+            }
+            else
+            {
+                string factoryImpl = CreateFactoryMethod(
+                    GetUniqueName(doc.Root),
+                    baseType,
+                    codeToWorkWithTheRootElement,
+                    resultingFindNameCalls,
+                    additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
+                    additionalCodeToPlaceAtTheEndOfInitializeComponent,
+                    nameScope,
+                    isSLMigration,
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = GenerateFactoryClass(
+                    baseType,
+                    factoryImpl,
+                    resultingMethods,
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                return finalCode;
+            }
+
         }
 
         /// <summary>
@@ -2062,6 +2118,7 @@ var {4} = {2}.GetValue({1});
         }
 
         private static string CreateInitializeComponentMethod(
+            string rootElementName,
             string codeToWorkWithTheRootElement, 
             List<string> findNameCalls, 
             string codeToPlaceAtTheBeginningOfInitializeComponent, 
@@ -2072,7 +2129,13 @@ var {4} = {2}.GetValue({1});
             string fileNameWithPathRelativeToProjectRoot)
         {
             string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-            string findNameCallsMerged = string.Join("\r\n", findNameCalls);
+
+            string body = CreateMethodBody(
+                codeToWorkWithTheRootElement,
+                findNameCalls,
+                codeToPlaceAtTheBeginningOfInitializeComponent,
+                codeToPlaceAtTheEndOfInitializeComponent,
+                nameScope);
 
             return $@"
         private bool _contentLoaded;
@@ -2089,15 +2152,8 @@ var {4} = {2}.GetValue({1});
             }}
 #pragma warning restore 0184
 
-{codeToPlaceAtTheBeginningOfInitializeComponent}
-
-{codeToWorkWithTheRootElement}
-
-{findNameCallsMerged}
-
-{nameScope}
-
-{codeToPlaceAtTheEndOfInitializeComponent}    
+            var {rootElementName} = this;
+            {body}
         }}
 ";
         }
@@ -2127,14 +2183,7 @@ return {templateInstanceUniqueName};
 
         static string GetUniqueName(XElement element)
         {
-            if (element == element.Document.Root)
-            {
-                return "this";
-            }
-            else
-            {
-                return element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value; // Note: this is supposed to exist because we have added it in a prior code.
-            }
+            return element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
         }
 
         static string GetElementXKey(XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain, out bool isImplicitStyle, out bool isImplicitDataTemplate)
@@ -2173,78 +2222,74 @@ return {templateInstanceUniqueName};
             bool hasCodeBehind,
             bool addApplicationEntryPoint)
         {
-            string classFactoryCode = @"
-public static class {1}
+            string applicationEntryPointIfAny = string.Empty;
+            if (addApplicationEntryPoint)
+            {
+                applicationEntryPointIfAny = $@"
+public static void Main()
 {{
-    public static object Instantiate()
-    {{
-        global::System.Type type = typeof({0});
-        return global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(type);
-    }}
-}}
-";
+    new {className}();
+}}";
+            }
 
-            string classCode = @"
-//------------------------------------------------------------------------------
-// <auto-generated>
-//     This code was auto-generated by ""C#/XAML for HTML5""
-//
-//     Changes to this file may cause incorrect behavior and will be lost if
-//     the code is regenerated.
-// </auto-generated>
-//------------------------------------------------------------------------------
+            string absoluteSourceUri = 
+                fileNameWithPathRelativeToProjectRoot.Contains(';') ? 
+                fileNameWithPathRelativeToProjectRoot : 
+                "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot;
+            
+            string classToInstantiateName = 
+                XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
 
+            string methodsMergedCode = string.Join(Environment.NewLine + Environment.NewLine, methods);
+            
+            string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
+            // Note: This is useful because we need to generate some c# code for every type used in the XAML
+            // file because otherwise the types risk not being found at "Pass2" of the compilation. In fact,
+            // Visual Studio automatically removes project references that are not referenced from C#, so if
+            // a type is present only in XAML and not in C#, its DLL risks not being referenced.
+            string fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced = 
+                string.Join(
+                    Environment.NewLine, 
+                    listOfAllTheTypesUsedInThisXamlFile.Select(
+                        x => $"private {x} {GeneratingUniqueNames.GenerateUniqueNameFromString("Unused")};"
+                    )
+                );
 
-{5}partial class {0} : {1}
+            string classAccessModifier = hasCodeBehind ? "" : "public ";
+
+            string classCodeFilled = $@"
+public partial class {className} : {baseType}
 {{
 
 #pragma warning disable 169, 649, 0628 // Prevents warning CS0169 ('field ... is never used'), CS0649 ('field ... is never assigned to, and will always have its default value null'), and CS0628 ('member : new protected member declared in sealed class')
-{3}
+{fieldsForNamedElementsMergedCode}
 
-{4}
+{fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced}
 #pragma warning restore 169, 649, 0628
 
-{2}
+{methodsMergedCode}
 
-{6}
-
-}}
-";
-            string namespaceWrapperIfNecessary = @"
-{2}
-namespace {0}
-{{
-
-{1}
+{applicationEntryPointIfAny}
 
 }}
 ";
-            string applicationEntryPointIfAny =
-                (addApplicationEntryPoint ?
-                string.Format(@"
-public static void Main()
-{{
-    new {0}();
-}}", className) : "");
-            string absoluteSourceUri = (fileNameWithPathRelativeToProjectRoot.Contains(';') ? fileNameWithPathRelativeToProjectRoot : "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot); // This line ensures that the Uri is in the absolute form: "/assemblyName;component/RelativePath/FileName.xaml"
-            string classToInstantiateName = XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
-            string methodsMergedCode = string.Join("\r\n\r\n", methods);
-            string fieldsForNamedElementsMergedCode = string.Join("\r\n", fieldsForNamedElements);
-            string fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced = string.Join("\r\n", listOfAllTheTypesUsedInThisXamlFile.Select<string, string>(x => string.Format("private {0} Unused_{1};", x, Guid.NewGuid().ToString("N")))); // Note: This is useful because we need to generate some c# code for every type used in the XAML file because otherwise the types risk not being found at "Pass2" of the compilation. In fact, Visual Studio automatically removes project references that are not referenced from C#, so if a type is present only in XAML and not in C#, its DLL risks not being referenced.
-            string classAccessModifier = (hasCodeBehind ? "" : "public "); // Note: if the class has code-behind, we do not specify an access modifier so that the user can specify it by setting an access modifier in the partial class of the code-behind. If there is no code-behind (such as for resource dictionaries), we set it to "public".
-            string classCodeFilled = string.Format(classCode, className, baseType, methodsMergedCode, fieldsForNamedElementsMergedCode, fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced, classAccessModifier, applicationEntryPointIfAny);
+            
             string finalCode;
             if (!string.IsNullOrEmpty(namespaceStringIfAny))
             {
-                classFactoryCode = string.Format(classFactoryCode, namespaceStringIfAny + "." + className, classToInstantiateName);
-                finalCode = string.Format(namespaceWrapperIfNecessary, namespaceStringIfAny, classCodeFilled, classFactoryCode);
+                finalCode = $@"
+namespace {namespaceStringIfAny}
+{{
+{classCodeFilled}
+}}
+";
             }
             else
             {
-                classFactoryCode = string.Format(classFactoryCode, className, classToInstantiateName);
-                finalCode = classFactoryCode + classCodeFilled;
+                finalCode = classCodeFilled;
             }
+
             return finalCode;
         }
 
@@ -2278,7 +2323,7 @@ public static void Main()
                 // XAML files without code-behind (such as ResourceDictionaries)
                 //-----------------
 
-                className = XamlFilesWithoutCodeBehindHelper.GenerateClassNameFromAssemblyAndPath(fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension);
+                className = null;
                 namespaceStringIfAny = null;
                 hasCodeBehind = false;
                 //todo: handle the case where there is a code-behing but the user has simply forgotten the "x:Class" attribute, in which case the user will currently get strange error messages.
@@ -2723,6 +2768,132 @@ public static void Main()
             return string.Concat("@\"", stringValue.Replace("\"", "\"\""), "\"");
         }
 
+        private static string GetFullTypeName(string namespaceName, string typeName)
+        {
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                return $"global::{typeName}";
+            }
+
+            return $"global::{namespaceName}.{typeName}";
+        }
+
+        private static string GenerateFactoryClass(
+            string componentTypeFullName,
+            string factoryImpl,
+            IEnumerable<string> additionalMethods,
+            string assemblyName,
+            string fileNameWithPathRelativeToProjectRoot)
+        {
+            string absoluteSourceUri =
+                    fileNameWithPathRelativeToProjectRoot.Contains(';') ?
+                    fileNameWithPathRelativeToProjectRoot :
+                    "/" + assemblyName + ";component/" + fileNameWithPathRelativeToProjectRoot;
+
+            string factoryName =
+                XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
+
+            string finalCode = $@"
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was auto-generated by ""C#/XAML for HTML5""
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>
+{{
+    public static object Instantiate()
+    {{
+        return new {factoryName}().CreateComponentImpl();
+    }}
+
+    {componentTypeFullName} {IXamlComponentFactoryClass}<{componentTypeFullName}>.CreateComponent()
+    {{
+        return CreateComponentImpl();
+    }}
+
+    object {IXamlComponentFactoryClass}.CreateComponent()
+    {{
+        return CreateComponentImpl();
+    }}
+    {factoryImpl}
+
+    {string.Join(Environment.NewLine + Environment.NewLine, additionalMethods)}
+}}
+";
+
+            return finalCode;
+        }
+
+        private static string CreateFactoryMethod(
+            string rootElementName,
+            string typeFullName,
+            string codeToWorkWithTheRootElement,
+            List<string> findNameCalls,
+            string codeToPlaceAtTheBeginningOfInitializeComponent,
+            string codeToPlaceAtTheEndOfInitializeComponent,
+            string nameScope,
+            bool isSLMigration,
+            string assemblyNameWithoutExtension,
+            string fileNameWithPathRelativeToProjectRoot)
+        {
+            string body = CreateMethodBody(
+                codeToWorkWithTheRootElement,
+                findNameCalls,
+                codeToPlaceAtTheBeginningOfInitializeComponent,
+                codeToPlaceAtTheEndOfInitializeComponent,
+                nameScope);
+            string uiElementFullName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
+
+            return $@"
+    private {typeFullName} CreateComponentImpl()
+    {{
+        var {rootElementName} = new {typeFullName}();
+    
+    #pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
+        if ({rootElementName} is {uiElementFullName})
+        {{
+            (({uiElementFullName})(object){rootElementName}).XamlSourcePath = @""{assemblyNameWithoutExtension}\{fileNameWithPathRelativeToProjectRoot}"";
+        }}
+    #pragma warning restore 0184
+    
+        {body}
+    
+        return {rootElementName};
+    }}";
+        }
+
+        private static string CreateFactoryMethod(string componentType)
+        {
+            return $@"
+    private {componentType} CreateComponentImpl()
+    {{
+        return ({componentType})global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof({componentType}));
+    }}
+";
+        }
+
+        private static string CreateMethodBody(
+            string codeToWorkWithTheRootElement,
+            List<string> findNameCalls,
+            string codeToPlaceAtTheBeginningOfInitializeComponent,
+            string codeToPlaceAtTheEndOfInitializeComponent,
+            string nameScope)
+        {
+            return $@"
+{codeToPlaceAtTheBeginningOfInitializeComponent}
+{codeToWorkWithTheRootElement}
+{string.Join("\r\n", findNameCalls)}
+{nameScope}
+{codeToPlaceAtTheEndOfInitializeComponent}    
+";
+        }
+
         private const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
+        private const string IXamlComponentFactoryClass = "global::OpenSilver.Internal.Xaml.IXamlComponentFactory";
     }
 }
