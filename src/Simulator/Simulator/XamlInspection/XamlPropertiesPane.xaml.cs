@@ -46,8 +46,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
         public void Refresh(object targetElement)
         {
             // Clear the display:
-            WritablesPanel.Children.Clear();
-            ReadOnlyPanel.Children.Clear();
+            MainContainer.Children.Clear();
 
             if (targetElement != null)
             {
@@ -59,26 +58,20 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 var properties =
                     from property
                     in targetElementType.GetProperties(flags)
+                    where property.CanWrite
                     orderby property.Name
                     select property;
 
-                // Display the writable properties and their values:
-                foreach (PropertyInfo propertyInfo in properties.Where(p => p.CanWrite))
+                // Display the properties and their values:
+                foreach (PropertyInfo propertyInfo in properties)
                 {
-                    var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement) { IsReadOnly = false };
-                    WritablesPanel.Children.Add(editor);
-                }
-
-                // Display the read only properties and their values:
-                foreach (PropertyInfo propertyInfo in properties.Where(p => !p.CanWrite))
-                {
-                    var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement) { IsReadOnly = true };
-                    ReadOnlyPanel.Children.Add(editor);
+                    var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement);
+                    MainContainer.Children.Add(editor);
                 }
             }
 
             // Set the appropriate size:
-            if (WritablesPanel.Children.Count > 0)
+            if (MainContainer.Children.Count > 0)
                 this.Width = 250;
             else
                 this.Width = 0;
