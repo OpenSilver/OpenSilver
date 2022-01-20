@@ -66,13 +66,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 _isReadOnly = value;
             }
         }
-        public XamlSinglePropertyEditor(PropertyInfo propertyInfo, object targetElement)
+        public XamlSinglePropertyEditor(PropertyInfo propertyInfo, object targetElement, bool isReadOnly)
         {
             _isInitializing = true;
 
             InitializeComponent();
 
             _isInitializing = false;
+            IsReadOnly = isReadOnly;
 
             _propertyInfo = propertyInfo;
             _targetElement = targetElement;
@@ -128,7 +129,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
 
         void SetPropertyValueStyle(bool isConvertibleFromString)
         {
-            this.PropertyValueTextBox.IsReadOnly = IsReadOnly || isConvertibleFromString;
+            this.PropertyValueTextBox.IsReadOnly = IsReadOnly || !isConvertibleFromString;
 
             if (isConvertibleFromString)
             {

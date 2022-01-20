@@ -65,14 +65,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 // Display the writable properties and their values:
                 foreach (PropertyInfo propertyInfo in properties.Where(p => p.CanWrite))
                 {
-                    var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement) { IsReadOnly = false };
+                    var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement, false);
                     WritablesPanel.Children.Add(editor);
                 }
 
                 // Display the read only properties and their values:
                 foreach (PropertyInfo propertyInfo in properties.Where(p => !p.CanWrite))
                 {
-                    var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement) { IsReadOnly = true };
+                    var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement, true);
                     ReadOnlyPanel.Children.Add(editor);
                 }
             }
