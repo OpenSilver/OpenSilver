@@ -87,6 +87,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             try
             {
                 Type propertyType = _propertyInfo.PropertyType;
+                this.PropertyNameTextBlock.Text = _propertyInfo.Name + ":";
                 if (!IsReadOnly)
                 {
                     ButtonOK.Visibility = Visibility.Collapsed;
