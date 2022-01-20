@@ -1388,10 +1388,9 @@ namespace Windows.UI.Xaml
             {
                 CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
                 CSHTML5.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
-                //Diagnostics.Debug.WriteLine($"InteropInterop {counter++}");
             }
         }
-        static int counter = 0;
+
         /// <summary>
         /// Raises the KeyDown event
         /// </summary>
