@@ -95,16 +95,43 @@ namespace System.Windows.Browser
             return default(T);
         }
 
-        [OpenSilver.NotImplemented]
-        public virtual object GetProperty(int index)
+        /// <summary>
+        /// Gets the value of a property that is identified by ordinal number on the current
+        /// scriptable object.
+        /// </summary>
+        /// <param name="index">
+        /// The ordinal number of the property.
+        /// </param>
+        /// <returns>
+        /// A null reference if the property does not exist or
+        /// if the underlying <see cref="ScriptObject"/> is a managed type.
+        /// </returns>
+        public object GetProperty(int index)
         {
-            throw new NotImplementedException();
+            return GetProperty(index.ToString());
         }
 
+        /// <summary>
+        /// Gets the value of a property that is identified by name on the current scriptable
+        /// object.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the property.
+        /// </param>
+        /// <returns>
+        /// A null reference if the property does not exist or
+        /// if the underlying <see cref="ScriptObject"/> is a managed type.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// name is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// name is an empty string.-or-name contains an embedded null character (\0).
+        /// </exception>
         [OpenSilver.NotImplemented]
         public virtual object GetProperty(string name)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         /// <summary>

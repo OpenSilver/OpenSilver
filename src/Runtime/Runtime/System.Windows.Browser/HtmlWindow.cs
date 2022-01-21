@@ -122,20 +122,6 @@ namespace System.Windows.Browser
         }
 
         /// <summary>
-        /// Gets the value of a property that is identified by ordinal number on the current <see cref="HtmlWindow" />.
-        /// </summary>
-        /// <param name="index">
-        /// The ordinal number of the property.
-        /// </param>
-        /// <returns>
-        /// <see langword="null" /> if the property does not exist.
-        /// </returns>
-        public override object GetProperty(int index)
-        {
-            return GetProperty(index.ToString());
-        }
-
-        /// <summary>
         /// Gets the value of a property that is identified by name on the current <see cref="HtmlWindow" />
         /// </summary>
         /// <param name="name">
