@@ -13,24 +13,20 @@
 \*====================================================================================*/
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+
 #if !MIGRATION
 using Windows.UI.Xaml;
 #endif
 
-namespace System.Windows.Interactivity //Windows.UI.Interactivity
+namespace System.Windows.Interactivity
 {
     /// <summary>
     /// Executes a specified ICommand when invoked.
     /// 
     /// </summary>
-    public sealed partial class InvokeCommandAction : TriggerAction<DependencyObject> //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
+    public sealed partial class InvokeCommandAction : TriggerAction<DependencyObject>
     {
         //Example of a currently working code:
         //<Button x:Name="TestButton" Content="a" Width="100" Height="30">
