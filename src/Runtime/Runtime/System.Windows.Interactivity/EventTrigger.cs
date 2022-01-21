@@ -35,7 +35,7 @@ namespace System.Windows.Interactivity
     /// A trigger that listens for a specified event on its source and fires when that event is fired.
     /// 
     /// </summary>
-    public partial class EventTrigger : TriggerBase //EventTriggerBase<object> For simplicity's sake, we inherited directly from TriggerBase and will currently only support the properties EventName and Actions directly here.
+    public partial class EventTrigger : EventTriggerBase<object> //EventTriggerBase<object> For simplicity's sake, we inherited directly from TriggerBase and will currently only support the properties EventName and Actions directly here.
     {
         //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
 
@@ -83,10 +83,10 @@ namespace System.Windows.Interactivity
             this.EventName = eventName;
         }
 
-        protected string GetEventName() //should be an override but we changed the heritage
-        {
-            return this.EventName;
-        }
+        //protected string GetEventName() //should be an override but we changed the heritage
+        //{
+        //    return this.EventName;
+        //}
 
         private static void OnEventNameChanged(object sender, DependencyPropertyChangedEventArgs args)
         {
@@ -106,8 +106,12 @@ namespace System.Windows.Interactivity
             }
         }
 
+        protected override string GetEventName()
+        {
+            return this.EventName;
+        }
 
-#region added because we changed heritage
+        #region added because we changed heritage
 
         private void UnregisterEvent(DependencyObject associatedObject, string eventName)
         {

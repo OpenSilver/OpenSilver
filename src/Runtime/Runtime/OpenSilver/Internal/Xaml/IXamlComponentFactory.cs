@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,19 @@
 *  
 \*====================================================================================*/
 
-namespace System.Windows.Interactivity
+using System.ComponentModel;
+
+namespace OpenSilver.Internal.Xaml
 {
-    public abstract partial class TriggerAction
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface IXamlComponentFactory
     {
-		[OpenSilver.NotImplemented]
-        protected virtual Type AssociatedObjectTypeConstraint { get; }
-        
-		[OpenSilver.NotImplemented]
-        protected virtual void OnAttached()
-        {
+        object CreateComponent();
+    }
 
-        }
-
-		[OpenSilver.NotImplemented]
-        protected virtual void OnDetaching()
-        {
-            
-        }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public interface IXamlComponentFactory<T> : IXamlComponentFactory
+    {
+        new T CreateComponent();
     }
 }
