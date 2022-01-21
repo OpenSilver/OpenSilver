@@ -17,8 +17,6 @@
 using Windows.UI.Xaml;
 #endif
 
-#if MIGRATION
-
 using System.ComponentModel;
 using System.Globalization;
 
@@ -255,5 +253,3 @@ namespace System.Windows.Interactivity
 		}
 	}
 }
-
-#endif

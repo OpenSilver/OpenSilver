@@ -24,15 +24,13 @@ using System.Windows.Input;
 using Windows.UI.Xaml;
 #endif
 
-#if MIGRATION
-
 namespace System.Windows.Interactivity //Windows.UI.Interactivity
 {
     /// <summary>
     /// Executes a specified ICommand when invoked.
     /// 
     /// </summary>
-    public sealed partial class InvokeCommandAction : TriggerAction<FrameworkElement> //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
+    public sealed partial class InvokeCommandAction : TriggerAction<DependencyObject> //DependencyObject, IAttachedObject //TriggerAction<FrameworkElement>
     {
         //Example of a currently working code:
         //<Button x:Name="TestButton" Content="a" Width="100" Height="30">
@@ -168,5 +166,3 @@ namespace System.Windows.Interactivity //Windows.UI.Interactivity
         }
     }
 }
-
-#endif

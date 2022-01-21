@@ -13,17 +13,23 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Interactivity;
+
+#if MIGRATION
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media.Animation;
+using Windows.UI;
+#endif
 
 namespace Microsoft.Expression.Interactivity.Core
 {
@@ -226,18 +232,10 @@ namespace Microsoft.Expression.Interactivity.Core
 			{
 				propertyInfo.SetValue(this.Target, newValue, new object[0]);
 			};
+
 			sb.FillBehavior = FillBehavior.Stop;
 
-			// Give the storyboard the neccesary context to resolve target names
-			FrameworkElement containingObject = this.AssociatedObject as FrameworkElement;
-			if (containingObject != null)
-			{
-				sb.Begin(containingObject);
-			}
-			else
-			{
-				sb.Begin();
-			}
+			sb.Begin();
 		}
 
 		private static object GetCurrentPropertyValue(object target, PropertyInfo propertyInfo)
@@ -455,5 +453,3 @@ namespace Microsoft.Expression.Interactivity.Core
 		}
 	}	
 }
-
-#endif

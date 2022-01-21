@@ -17,8 +17,6 @@
 using Windows.UI.Xaml;
 #endif
 
-#if MIGRATION
-
 namespace System.Windows.Interactivity
 {
     /// <summary>
@@ -67,5 +65,3 @@ namespace System.Windows.Interactivity
         }
     }
 }
-
-#endif

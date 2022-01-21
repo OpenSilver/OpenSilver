@@ -13,17 +13,20 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+
 #if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Interactivity
 {
-    using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Reflection;
-    using System.Windows;
-
     /// <summary>
     /// Represents a trigger that can listen to an element other than its AssociatedObject.
     /// </summary>
@@ -230,7 +233,7 @@ namespace System.Windows.Interactivity
         /// </summary>
         /// <param name="eventArgs">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         /// <remarks>Override this to provide more granular control over when actions associated with this trigger will be invoked.</remarks>
-        protected virtual void OnEvent(EventArgs eventArgs)
+        protected virtual void OnEvent(RoutedEventArgs eventArgs)
         {
             this.InvokeActions(eventArgs);
         }
@@ -514,7 +517,7 @@ namespace System.Windows.Interactivity
             this.eventHandlerMethodInfo = null;
         }
 
-        private void OnEventImpl(object sender, EventArgs eventArgs)
+        private void OnEventImpl(object sender, RoutedEventArgs eventArgs)
         {
             this.OnEvent(eventArgs);
         }
@@ -545,5 +548,3 @@ namespace System.Windows.Interactivity
         }
     }
 }
-
-#endif

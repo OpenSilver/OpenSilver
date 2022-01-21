@@ -29,8 +29,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
 #endif
 
-#if MIGRATION
-
 namespace System.Windows.Interactivity
 {
     /// <summary>
@@ -222,5 +220,3 @@ namespace System.Windows.Interactivity
 #endregion
     }
 }
-
-#endif

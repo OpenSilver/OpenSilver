@@ -177,21 +177,6 @@ namespace Windows.UI.Xaml.Media.Animation
             Begin(target, true, "DirectlyStoryboard", isVisualStateChange: false);
         }
 
-        //
-        // Summary:
-        //     Applies the animations associated with this System.Windows.Media.Animation.Storyboard
-        //     to their targets and initiates them.
-        //
-        // Parameters:
-        //   containingObject:
-        //     An object contained within the same name scope as the targets of this storyboard's
-        //     animations. Animations without a System.Windows.Media.Animation.Storyboard.TargetName
-        //     are applied to containingObject.
-        [OpenSilver.NotImplemented]
-        public void Begin(FrameworkElement containingObject)
-        {
-        }
-
         internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
         {
             this.IsUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user synchronously Starts then Stops then Starts an animation, we want it to be in the started state.

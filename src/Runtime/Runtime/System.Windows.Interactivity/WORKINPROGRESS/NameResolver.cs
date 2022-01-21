@@ -13,10 +13,14 @@
 \*====================================================================================*/
 
 
-#if MIGRATION
-
 using System.Diagnostics;
 using System.Globalization;
+
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Interactivity
 {
@@ -231,5 +235,3 @@ namespace System.Windows.Interactivity
         }
     }
 }
-
-#endif

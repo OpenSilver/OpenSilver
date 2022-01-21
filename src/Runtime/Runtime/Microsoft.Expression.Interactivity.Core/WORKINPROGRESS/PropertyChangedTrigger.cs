@@ -13,10 +13,14 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-
 using System.Windows.Interactivity;
 using System.Windows;
+
+#if MIGRATION
+using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
 
 namespace Microsoft.Expression.Interactivity.Core
 {
@@ -68,5 +72,3 @@ namespace Microsoft.Expression.Interactivity.Core
         }
     }
 }
-
-#endif
