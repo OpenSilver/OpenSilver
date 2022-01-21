@@ -95,62 +95,16 @@ namespace System.Windows.Browser
             return default(T);
         }
 
-        /// <summary>
-        /// Gets the value of a property that is identified by ordinal number on the current
-        /// scriptable object.
-        /// </summary>
-        /// <param name="index">
-        /// The ordinal number of the property.
-        /// </param>
-        /// <returns>
-        /// A null reference if the property does not exist or
-        /// if the underlying <see cref="ScriptObject"/> is a managed type.
-        /// </returns>
-        public object GetProperty(int index)
+        [OpenSilver.NotImplemented]
+        public virtual object GetProperty(int index)
         {
-            return GetProperty(index.ToString());
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Gets the value of a property that is identified by name on the current scriptable
-        /// object.
-        /// </summary>
-        /// <param name="name">
-        /// The name of the property.
-        /// </param>
-        /// <returns>
-        /// A null reference if the property does not exist or
-        /// if the underlying <see cref="ScriptObject"/> is a managed type.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// name is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// name is an empty string.-or-name contains an embedded null character (\0).
-        /// </exception>
+        [OpenSilver.NotImplemented]
         public virtual object GetProperty(string name)
         {
-            var result = default(object);
-
-            if (name is null)
-            {
-                throw new ArgumentNullException(name);
-            }
-            else if (string.IsNullOrEmpty(name) || name.Contains("\\0"))
-            {
-                throw new ArgumentException($"{nameof(name)} is an empty string or contains an embedded null character (\0)");
-            }
-
-            var jsObject = CSHTML5.Interop.ExecuteJavaScript(name);
-
-            if (!jsObject.ToString().Equals("undefined"))
-            {
-                result = jsObject;
-            }
-
-            // TODO: Check if the underlying ScriptObject is a managed type
-
-            return result;
+            throw new NotImplementedException();
         }
 
         /// <summary>
