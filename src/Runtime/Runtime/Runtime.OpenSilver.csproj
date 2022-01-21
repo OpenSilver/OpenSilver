@@ -111,7 +111,11 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTrigger.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTriggerBase.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolvedEventArgs.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolver.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TypeConstraintAttribute.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ListBoxDragDropTarget.cs" />
@@ -172,8 +176,6 @@
 		<Compile Include="Microsoft.Expression.Interactivity.Core\CallMethodAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
 		<Compile Include="System.Windows.Media.Animation\PowerEase.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
@@ -632,7 +634,6 @@
 		<Compile Include="System.Windows.input\Cursors.cs" />
 		<Compile Include="System.Windows.input\Keyboard.cs" />
 		<Compile Include="System.Windows.input\MouseButtonEventArgs.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\AttachableCollection_1.cs" />
 		<Compile Include="System.Windows.Interactivity\Behavior.cs" />

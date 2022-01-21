@@ -10,24 +10,48 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Interactivity
 {
-	[OpenSilver.NotImplemented]
-    public abstract partial class TriggerAction<T> : TriggerAction where T : DependencyObject
+    /// <summary>
+    /// Represents an attachable object that encapsulates a unit of functionality.
+    /// </summary>
+    /// <typeparam name="T">The type to which this action can be attached.</typeparam>
+    public abstract class TriggerAction<T> : TriggerAction where T : DependencyObject
     {
-		[OpenSilver.NotImplemented]
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TriggerAction&lt;T&gt;"/> class.
+        /// </summary>
         protected TriggerAction()
+            : base(typeof(T))
         {
-
         }
 
-		[OpenSilver.NotImplemented]
-        protected new T AssociatedObject { get; private set; }
+        /// <summary>
+        /// Gets the object to which this <see cref="TriggerAction&lt;T&gt;"/> is attached.
+        /// </summary>
+        /// <value>The associated object.</value>
+        protected new T AssociatedObject
+        {
+            get
+            {
+                return (T)base.AssociatedObject;
+            }
+        }
 
-        //protected sealed override Type AssociatedObjectTypeConstraint { get; }
+        /// <summary>
+        /// Gets the associated object type constraint.
+        /// </summary>
+        /// <value>The associated object type constraint.</value>
+        protected sealed override Type AssociatedObjectTypeConstraint
+        {
+            get
+            {
+                return base.AssociatedObjectTypeConstraint;
+            }
+        }
     }
 }
-
-#endif
