@@ -138,6 +138,7 @@
     <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\WrapperHelpers.cs" />
     <Compile Include="OtherHelpersAndHandlers\XamlFilesWithoutCodeBehindHelper.cs" />
+    <Compile Include="OtherHelpersAndHandlers\XamlParseException.cs" />
     <Compile Include="Tests\Program.cs" />
     <Compile Include="Tests\StandaloneCompilerTest.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.cs" />

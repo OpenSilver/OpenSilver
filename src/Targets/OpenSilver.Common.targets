@@ -26,18 +26,13 @@
   <!--============================================================
   LOCATION OF COMPILER TASKS
   ============================================================-->
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyReferenceValidator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.EntryPointGenerator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyAttributesGenerator" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ServiceReferenceFixer" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResXProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.BeforeXamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.XamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AfterXamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.OutputPathsEraser" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesExtractorAndCopier" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.Wrapper_BridgeVersion" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.TypeScriptDefToCSharp" />
 
   <ItemGroup>
@@ -275,35 +270,6 @@
       Text="Before you can build the project, please go to Solution Explorer, select the file '%(Content.FileName).xaml', hit F4, and enter 'MSBuild:Compile' (without the quotes) in the 'Custom Tool' property. You will need to do the same for all XAML files in the project."/>
 
     <!--============================================================
-      EntryPointGenerator (only during Pass 2)
-      ============================================================-->
-    <!--<EntryPointGenerator
-      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True'"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSHTML5_Entry_Point.cs"
-      />-->
-
-    <!--The AssemblyAttributeGenerator is disabled as it is not working with the open silver version-->
-    <!--============================================================
-      AssemblyAttributesGenerator
-      ============================================================-->
-    <!--
-    <Message
-      Text="Starting AssemblyAttributesGenerator"
-      Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
-      Importance="normal"/>
-    <AssemblyAttributesGenerator
-      Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
-      IsSLMigration="$(IsSLMigration)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSharpXamlForHtml5_AssemblyAttributes.cs"
-      IntermediateOutputAbsolutePath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
-      />
-    <ItemGroup>
-      <Compile
-        Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
-        Include="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSharpXamlForHtml5_AssemblyAttributes.cs" />
-    </ItemGroup>-->
-
-    <!--============================================================
       ServiceReferenceFixer (case insensitive) (only during Pass 2)
       ============================================================-->
 	  <ItemGroup>
@@ -395,23 +361,6 @@
     <Message
           Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
           Importance="normal"/>
-
-    <!--============================================================
-      AssemblyReferenceValidator (only during Pass 1)
-      ============================================================-->
-    <!--Disabled for now as we use reference without any metadata from package reference-->
-    <!--<AssemblyReferenceValidator
-      Condition="'$(IsSecondPass)'!='True' And '$(AllowAnyReferences)'!='True'"
-      References="@(Reference)"
-      AllowedAssemblies="mscorlib|System.Core|Microsoft.CSharp|CSHTML5.Blazor|CSHTML5.Migration.Blazor|CSHTML5.Stubs|Bridge"
-      Flags="$(Flags)"
-      IsBridgeBasedVersion="true"
-      TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
-      NameOfAssembliesThatDoNotContainUserCode="Bridge"
-      ProjectDir="$(MSBuildProjectDirectory)"
-      ReferencesPaths="@(ReferenceCopyLocalPaths)"
-      ContinueOnError="ErrorAndStop"
-      />-->
 
     <!--============================================================
       XamlPreprocessor (during Pass 1 and Pass 2)
@@ -512,18 +461,6 @@
     <ItemGroup>
       <OutputAssembly Include="$(OutputAssemblyDirectory)\$(AssemblyName).dll" />
     </ItemGroup>
-
-    <!--============================================================
-      OutputPathsEraser (only during Pass 2)
-      ============================================================-->
-    <!--<OutputPathsEraser
-      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True'"
-      SourceAssembly="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
-      OutputRootPath="$(Cshtml5OutputRootPath)"
-      OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-      OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-      />-->
 
     <!--============================================================
       Setting the proper path for copying the resources:
@@ -666,23 +603,6 @@
       <Compile
         Include="$(GeneratedFiles)"/>
     </ItemGroup>
-
-    <!--============================================================
-      AssemblyReferenceValidator
-      ============================================================-->
-    <!--Disabled for now as we use reference without any metadata from package reference-->
-    <!--<AssemblyReferenceValidator
-      Condition="'$(IsSecondPass)'!='True' And '$(AllowAnyReferences)'!='True'"
-      References="@(Reference)"
-      AllowedAssemblies="mscorlib|System.Core|Microsoft.CSharp|CSHTML5.Blazor|CSHTML5.Migration.Blazor|CSHTML5.Stubs|Bridge"
-      Flags="$(Flags)"
-      IsBridgeBasedVersion="true"
-      TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
-      NameOfAssembliesThatDoNotContainUserCode="Bridge"
-      ProjectDir="$(MSBuildProjectDirectory)"
-      ReferencesPaths="@(ReferenceCopyLocalPaths)"
-      ContinueOnError="ErrorAndStop"
-      />-->
 
     <!--============================================================
       XamlPreprocessor

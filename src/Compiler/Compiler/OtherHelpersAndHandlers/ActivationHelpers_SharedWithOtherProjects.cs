@@ -29,6 +29,19 @@ namespace DotNetForHtml5
     {
         internal static bool IsFeatureEnabled(string featureId)
         {
+            return IsFeatureEnabled(featureId, null);
+        }
+
+        internal static bool IsFeatureEnabled(string featureId, HashSet<string> flags)
+        {
+#if SPECIAL_LICENSE_FOR_APL_USERS
+            // If the "apl" flag is specified, we consider that the Pro Edition features are allowed. This was made for the APL community. See the ZenDesk ticket 807 and related.
+            if (flags != null && flags.Contains("apl") && featureId == Constants.PROFESSIONAL_EDITION_FEATURE_ID)
+            {
+                return true;
+            }
+#endif
+
             object value = RegistryHelpers.GetSetting("Feature_" + featureId, null);
             if (value != null)
                 return true; //todo: to prevent registry tampering, we should retrieve the activation key and check with the server that it is ok.

@@ -13,10 +13,6 @@
 *  
 \*====================================================================================*/
 
-
-
-extern alias wpf;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -139,7 +135,7 @@ namespace DotNetForHtml5.Compiler
                     int indexOfClosingBracket = value.IndexOf('}');
                     if (indexOfClosingBracket < 0)
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Invalid value for attribute {0}. Use \"{{}}\" to escape '{{'.", attribute.Name), GeneratingCSharpCode.GetLineNumber(attribute.Parent), -1);
+                        throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use \"{{}}\" to escape '{{'.", attribute.Name), GeneratingCSharpCode.GetLineNumber(attribute.Parent), -1);
                     }
                     string contentBetweenBrackets = value.Substring(1, indexOfClosingBracket - 1);
                     if (string.IsNullOrEmpty(contentBetweenBrackets)) //handle special case where '{' is escaped with "{}"
@@ -156,7 +152,7 @@ namespace DotNetForHtml5.Compiler
                         }
                         else
                         {
-                            throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Invalid value for attribute {0}. Use {} to escape '{'.", attribute.Name), GeneratingCSharpCode.GetLineNumber(attribute.Parent), -1);
+                            throw new XamlParseException(string.Format("Invalid value for attribute {0}. Use {} to escape '{'.", attribute.Name), GeneratingCSharpCode.GetLineNumber(attribute.Parent), -1);
                         }
                     }
                 }
@@ -255,7 +251,7 @@ namespace DotNetForHtml5.Compiler
                     }
                     catch (Exception ex)
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException("Error in the following markup extension: \"" + currentAttribute + "\". " + ex.Message);
+                        throw new XamlParseException("Error in the following markup extension: \"" + currentAttribute + "\". " + ex.Message);
                     }
                 }
                 else //it can be directly set as an attribute because it is not a markupExtension:
@@ -326,13 +322,13 @@ namespace DotNetForHtml5.Compiler
                     else
                     {
                         // Unknown prefix.
-                        throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Unknown prefix '{0}' in '{1}'", prefix, nameThatMayHaveAPrefix));
+                        throw new XamlParseException(string.Format("Unknown prefix '{0}' in '{1}'", prefix, nameThatMayHaveAPrefix));
                     }
                 }
                 else
                 {
                     // Empty prefix.
-                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Empty prefix in '{1}'", prefix, nameThatMayHaveAPrefix));
+                    throw new XamlParseException(string.Format("Empty prefix in '{1}'", prefix, nameThatMayHaveAPrefix));
                 }
             }
             else

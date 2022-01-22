@@ -13,10 +13,6 @@
 *  
 \*====================================================================================*/
 
-
-
-extern alias wpf;
-
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
@@ -209,9 +205,9 @@ namespace DotNetForHtml5.Compiler
                 //-----------------------------------------------------
                 string message = $"{operationName} failed: {ex.Message}\nNote: the XAML editor sometimes raises errors that are misleading. To see only real non-misleading errors, make sure to close all the XAML editor windows/tabs before compiling.";
 
-                if (ex is wpf::System.Windows.Markup.XamlParseException)
+                if (ex is XamlParseException)
                 {
-                    int lineNumber = ((wpf::System.Windows.Markup.XamlParseException)ex).LineNumber;
+                    int lineNumber = ((XamlParseException)ex).LineNumber;
                     logger.WriteError(message, file: sourceFile, lineNumber: lineNumber);
                 }
                 else

@@ -42,10 +42,10 @@
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
 
     <!-- OpenSilver compiler -->
-    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
-    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
-    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
-    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/$Configuration$/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
+    <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
+    <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/Release/net461/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
+    <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/Release/net461/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
 
 	<!-- OpenSilver analyzers -->
 	<file src="../../src/Analyzers/NotImplemented/bin/Release/netstandard2.0/OpenSilver.Analyzers.dll" target="analyzers/dotnet/cs/OpenSilver.Analyzers.dll" />

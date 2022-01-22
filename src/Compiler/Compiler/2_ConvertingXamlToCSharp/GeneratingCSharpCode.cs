@@ -13,13 +13,6 @@
 *  
 \*====================================================================================*/
 
-
-
-#if !BRIDGE && !CSHTML5BLAZOR
-extern alias custom;
-#endif
-extern alias wpf;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,9 +21,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
-#if !BRIDGE && !CSHTML5BLAZOR
-using custom::System.Windows.Markup;
-#endif
 using System.IO;
 
 namespace DotNetForHtml5.Compiler
@@ -282,9 +272,9 @@ namespace DotNetForHtml5.Compiler
                                 //------------------------------
 
                                 if (codeStack.Count == 0 || element.Elements().FirstOrDefault() == null)
-                                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot be empty.", typeName));
+                                    throw new XamlParseException(string.Format("A {0} cannot be empty.", typeName));
                                 else if (element.Elements().Count() > 1)
-                                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot contain more than one child element.", typeName));
+                                    throw new XamlParseException(string.Format("A {0} cannot contain more than one child element.", typeName));
 
                                 // Create the method to instantiate the DataTemplate:
                                 //we create a frameworkTemplate element to allow Binding with RelativeSource = TemplatedParent:
@@ -398,7 +388,6 @@ namespace DotNetForHtml5.Compiler
                                         if (!first)
                                         {
                                             //TODO: check wether WPF & UWP also allow that silently
-                                            //throw new wpf::System.Windows.Markup.XamlParseException(string.Format("The property '{0}' is set more than once.", propertyName));
                                             logger.WriteWarning($"The property \"{propertyName}\" is set more than once.", sourceFile, GetLineNumber(element));
                                         }
 
@@ -1046,13 +1035,13 @@ else
                                                                     codeForInstantiatingTheAttributeValue = GenerateCodeForInstantiatingAttributeValue(name, propertyName, isSetterForAttachedProperty, attributeValue, element, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain);
                                                                 }
                                                                 else
-                                                                    throw new wpf::System.Windows.Markup.XamlParseException(@"The <Setter> element must declare a ""Property"" attribute.");
+                                                                    throw new XamlParseException(@"The <Setter> element must declare a ""Property"" attribute.");
                                                             }
                                                             else
-                                                                throw new wpf::System.Windows.Markup.XamlParseException(@"The <Setter> element cannot have attributes other than ""Property"" and ""Value"".");
+                                                                throw new XamlParseException(@"The <Setter> element cannot have attributes other than ""Property"" and ""Value"".");
                                                         }
                                                         else
-                                                            throw new wpf::System.Windows.Markup.XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
+                                                            throw new XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
                                                     }
                                                     else if (elementTypeInCSharp == namespaceSystemWindowsData + ".Binding"
                                                         && memberName == "ElementName")
@@ -1071,7 +1060,6 @@ else
                                                             else
                                                             {
                                                                 //TODO: check wether WPF & UWP also allow that silently
-                                                                // throw new wpf::System.Windows.Markup.XamlParseException("The \"ElementName\" specified in the Binding was not found: " + attributeValue);
                                                                 logger.WriteWarning($"The \"ElementName\" specified in the Binding was not found: {attributeValue}", sourceFile, GetLineNumber(element));
                                                             }
                                                         }
@@ -1262,11 +1250,6 @@ dependencyPropertyPath);
                                             List<string> storyboardsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToStoryboardsAdditionalCode);
                                             //storyboardsAdditionalCode.Add(codeForStoryboardAccessToProperty);
                                             storyboardsAdditionalCode.Add(findAName);
-                                            //}
-                                            //else
-                                            //{
-                                            //    throw new wpf::System.Windows.Markup.XamlParseException(@"An element with a ""Storyboard.TargetProperty"" attribute must declare a ""Storyboard.TargetName"" attribute.");
-                                            //}
                                         }
                                     }
                                 }
@@ -1308,12 +1291,12 @@ dependencyPropertyPath);
                     }
                     #endregion
                 }
-                catch (wpf::System.Windows.Markup.XamlParseException xamlParseException)
+                catch (XamlParseException xamlParseException)
                 {
                     // We create and throw a copy of the "XamlParseException" in order to add the line number information:
                     int lineNumber = GetLineNumber(element);
                     var newXamlParseException =
-                        new wpf::System.Windows.Markup.XamlParseException(
+                        new XamlParseException(
                             xamlParseException.Message,
                             lineNumber,
                             -1,
@@ -1324,7 +1307,7 @@ dependencyPropertyPath);
 
             // Process the code that remains in the stack:
             if (codeStack.Count != 1)
-                throw new wpf::System.Windows.Markup.XamlParseException("At the end of the parsing, the code stack should contain exactly one item.");
+                throw new XamlParseException("At the end of the parsing, the code stack should contain exactly one item.");
             string codeToWorkWithTheRootElement = codeStack.Pop();
 
             // Get general information about the class:
@@ -1855,7 +1838,7 @@ var {4} = {2}.GetValue({1});
                         // Remember the "Name to UniqueName" association:
                         Dictionary<string, string> nameToUniqueNameDictionary = GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToNameToUniqueNameDictionary);
                         if (nameToUniqueNameDictionary.ContainsKey(name))
-                            throw new wpf::System.Windows.Markup.XamlParseException("The name already exists in the tree: " + name);
+                            throw new XamlParseException("The name already exists in the tree: " + name);
                         nameToUniqueNameDictionary.Add(name, elementUniqueNameOrThisKeyword);
                         if (element != elementThatIsRootOfTheCurrentNamescope)
                         {
@@ -2083,14 +2066,14 @@ var {4} = {2}.GetValue({1});
                 currentXElement = setterElement;
                 attributeToLookAt = currentXElement.Attribute("Property");
                 if (attributeToLookAt == null)
-                    throw new wpf::System.Windows.Markup.XamlParseException("Setter must declare a Property.");
+                    throw new XamlParseException("Setter must declare a Property.");
             }
             else
             {
                 currentXElement = setterElement.Parent.Parent;
                 attributeToLookAt = currentXElement.Attribute("TargetType");
                 if (attributeToLookAt == null)
-                    throw new wpf::System.Windows.Markup.XamlParseException("Style must declare a TargetType.");
+                    throw new XamlParseException("Style must declare a TargetType.");
             }
 
             string attributeTypeString;
@@ -2107,7 +2090,7 @@ var {4} = {2}.GetValue({1});
                     }
                     else
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException(@"Namespaces or prefixes must be followed by a type.");
+                        throw new XamlParseException(@"Namespaces or prefixes must be followed by a type.");
                     }
                 }
                 else
@@ -2131,7 +2114,7 @@ var {4} = {2}.GetValue({1});
             string assemblyNameIfAny;
             var targetTypeAttribute = styleElement.Attribute(isDataType ? "DataType" : "TargetType");
             if (targetTypeAttribute == null)
-                throw new wpf::System.Windows.Markup.XamlParseException(isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.");
+                throw new XamlParseException(isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.");
             string targetTypeString = targetTypeAttribute.Value;
             GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(targetTypeString, styleElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
             string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: false);
@@ -2238,7 +2221,7 @@ return {templateInstanceUniqueName};
                 return GetCSharpFullTypeNameFromTargetTypeString(element, reflectionOnSeparateAppDomain, isDataType: true);
             }
             else
-                throw new wpf::System.Windows.Markup.XamlParseException("Each dictionary entry must have an associated key. The element named '" + element.Name.LocalName + "' does not have a key.");
+                throw new XamlParseException("Each dictionary entry must have an associated key. The element named '" + element.Name.LocalName + "' does not have a key.");
         }
 
         static string GeneratePartialClass(
