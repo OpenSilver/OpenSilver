@@ -13,13 +13,6 @@
 *  
 \*====================================================================================*/
 
-
-
-#if !BRIDGE && !CSHTML5BLAZOR
-extern alias custom;
-#endif
-extern alias wpf;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,9 +22,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xml.Linq;
-#if !BRIDGE && !CSHTML5BLAZOR
-using custom::System.Windows.Markup;
-#endif
 
 namespace DotNetForHtml5.Compiler
 {

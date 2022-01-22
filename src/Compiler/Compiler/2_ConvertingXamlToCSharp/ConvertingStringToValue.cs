@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-extern alias wpf;
-
 using System;
 
 namespace DotNetForHtml5.Compiler
