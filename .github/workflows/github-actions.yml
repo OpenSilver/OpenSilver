@@ -29,7 +29,7 @@ jobs:
       - name: Build Compiler
         run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=SL -clp:ErrorsOnly -restore
       - name: Copy Compiler Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/OpenSilver.Compiler*dll src/packages/OpenSilver.1.0.0/tools/;
+        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.1.0.0/tools/;
       - name: Build OpenSilver
         working-directory: build
         run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
