@@ -57,6 +57,16 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class HyperlinkButton : ButtonBase
     {
+        private static readonly HashSet<string> ExternalTargets = new HashSet<string>
+        {
+            "_blank",
+            "_media",
+            "_parent",
+            "_search",
+            "_self",
+            "_top"
+        };
+
         /// <summary>
         /// Initializes a new instance of the HyperlinkButton class.
         /// </summary>
@@ -64,114 +74,98 @@ namespace Windows.UI.Xaml.Controls
         {
             // Set default style:
             this.DefaultStyleKey = typeof(HyperlinkButton);
-
-            Click += HyperlinkButton_Click;
         }
 
-        void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        protected override void OnClick()
         {
+            base.OnClick();
+
             if (NavigateUri != null)
             {
-                string targetName = this.TargetName;
-                object targetElement = null;
-
-                if (!IsExternalTarget())
-                {
-                    if (TryInternalNavigate())
-                    {
-                        return;
-                    }
-                }
-                // Look for an element within the application (in the Visual Tree) that has the specified TargetName and implements INavigate:
-                if (!string.IsNullOrEmpty(targetName)
-                    && (targetElement = this.FindName(targetName)) is INavigate) //todo: verify that "FindName" is enough to find the element (it walks up the visual tree and looks in the elements that implement INameScope) or if we should manually traverse all the nodes of the Visual Tree.
-                {
-                    //-----------------
-                    // Navigation within the application
-                    //-----------------
-
-                    ((INavigate)targetElement).Navigate(NavigateUri);
-                }
-                else
-                {
-                    //-----------------
-                    // External navigation (browser navigation)
-                    //-----------------
-
-                    if (string.IsNullOrEmpty(targetName))
-                    {
-#if MIGRATION
-                        targetName = "_self";
-#else
-                        targetName = "_blank";
-#endif
-                    }
-                    HtmlPage.Window.Navigate(NavigateUri, targetName);
-                }
+                Navigate();
             }
         }
 
-        private bool IsExternalTarget()
+        /// <summary>
+        /// Navigate to the Uri. 
+        /// </summary>
+        private void Navigate()
         {
-            if (!string.Equals(TargetName, "_blank") && !string.Equals(TargetName, "_media") && !string.Equals(TargetName, "_search") && !string.Equals(TargetName, "_parent") && !string.Equals(TargetName, "_self"))
+            string target = TargetName;
+            Uri navigateUri = NavigateUri;
+
+            if (!ExternalTargets.Contains(target))
             {
-                return string.Equals(TargetName, "_top");
+                if (TryInternalNavigate())
+                {
+                    return;
+                }
             }
-            return true;
+
+            if (string.IsNullOrEmpty(target))
+            {
+#if MIGRATION
+                target = "_self";
+#else
+                target = "_blank";
+#endif
+            }
+
+            HtmlPage.Window.Navigate(navigateUri, target);
         }
 
         private bool TryInternalNavigate()
         {
-            INavigate navigate = null;
-            DependencyObject dependencyObject = this;
-            DependencyObject dependencyObject2 = null;
-            DependencyObject lastSearchedSubtree = this;
+            DependencyObject d = this;
+            DependencyObject subtree = this;
             do
             {
-                dependencyObject2 = VisualTreeHelper.GetParent(dependencyObject);
-                if (dependencyObject2 == null && dependencyObject is FrameworkElement)
+                d = VisualTreeHelper.GetParent(d) ?? (d as FrameworkElement)?.Parent;
+
+                if (d != null && (d is INavigate || VisualTreeHelper.GetParent(d) == null))
                 {
-                    dependencyObject2 = ((FrameworkElement)dependencyObject).Parent;
-                }
-                if (dependencyObject2 != null && (dependencyObject2 is INavigate || VisualTreeHelper.GetParent(dependencyObject2) == null))
-                {
-                    navigate = FindNavigator(dependencyObject2 as FrameworkElement, lastSearchedSubtree);
-                    if (navigate != null)
+                    INavigate navigator = FindNavigator(d as FrameworkElement, subtree);
+                    if (navigator != null)
                     {
-                        return navigate.Navigate(NavigateUri);
+                        return navigator.Navigate(NavigateUri);
                     }
-                    lastSearchedSubtree = dependencyObject2;
+                    subtree = d;
                 }
-                dependencyObject = dependencyObject2;
             }
-            while (dependencyObject != null);
+            while (d != null);
+
             return false;
         }
 
-        private INavigate FindNavigator(FrameworkElement baseFE, DependencyObject lastSearchedSubtree)
+        private INavigate FindNavigator(FrameworkElement fe, DependencyObject subtree)
         {
-            if (baseFE == null)
+            if (fe == null)
             {
                 return null;
             }
-            if (baseFE is INavigate && (string.Equals(baseFE.Name, TargetName) || string.IsNullOrEmpty(TargetName)))
+            
+            if (fe is INavigate && (fe.Name == TargetName || string.IsNullOrEmpty(TargetName)))
             {
-                return baseFE as INavigate;
+                return (INavigate)fe;
             }
-            bool flag = baseFE is Popup;
-            int num = (flag ? 1 : VisualTreeHelper.GetChildrenCount(baseFE));
-            for (int i = 0; i < num; i++)
+
+            bool isPopup = fe is Popup;
+            int count = (isPopup ? 1 : VisualTreeHelper.GetChildrenCount(fe));
+            for (int i = 0; i < count; i++)
             {
-                DependencyObject dependencyObject = (flag ? ((Popup)baseFE).Child : VisualTreeHelper.GetChild(baseFE, i));
-                if (!object.ReferenceEquals(dependencyObject, lastSearchedSubtree))
+                DependencyObject child = (isPopup ? ((Popup)fe).Child : VisualTreeHelper.GetChild(fe, i));
+                if (child == subtree)
                 {
-                    INavigate navigate = FindNavigator(dependencyObject as FrameworkElement, lastSearchedSubtree);
-                    if (navigate != null)
-                    {
-                        return navigate;
-                    }
+                    continue;
+                }
+
+                INavigate navigate = FindNavigator(child as FrameworkElement, subtree);
+                if (navigate != null)
+                {
+                    return navigate;
                 }
             }
+
             return null;
         }
 
