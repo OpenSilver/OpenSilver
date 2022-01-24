@@ -3,13 +3,15 @@ on:
   push:
     branches:
       - develop
-env:
-  SHA8: "$(echo ${{ github.sha }} | cut -c1-8)"
 jobs:
   OpenSilver-Build:
+    #We should not run these steps on the forks by default.
+    if: github.repository_owner == 'OpenSilver'
     runs-on: windows-latest
     steps:
       - uses: microsoft/setup-msbuild@v1.0.3
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
@@ -35,21 +37,24 @@ jobs:
         run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
       - name: Format Package Version
         id: version
-        run: echo "::set-output name=suffix::$(date +'%Y-%m-%d-%H%M%S')-${{ env.SHA8 }}"
+        run: echo "::set-output name=suffix::$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}"
       - name: Build Simulator
         working-directory: build
-        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="output/OpenSilver" -p:NuspecFile="nuspec/OpenSilver.Simulator.nuspec" -p:NuspecProperties=PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }}
+        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly
       - name: Pack OpenSilver
         working-directory: build
         run: |
           mkdir temp; echo "OpenSilver 1.0.0-private-${{ steps.version.outputs.suffix }}" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }};Configuration=SL;Target=OpenSilver"
+          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }};Configuration=SL;Target=OpenSilver;RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
       - name: Pack Simulator
         working-directory: build
         run: |
           echo "OpenSilver.Simulator 1.0.0-private-${{ steps.version.outputs.suffix }}" > temp/Version.txt
-          msbuild -t:pack slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="D:\a\OpenSilver\OpenSilver\build\output\OpenSilver" -p:NuspecFile="D:\a\OpenSilver\OpenSilver\build\nuspec\OpenSilver.Simulator.nuspec" -p:NuspecBasePath="D:\a\OpenSilver\OpenSilver\build" -p:NuspecProperties=PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }}
+          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver"  -BasePath ".\" -Properties "PackageVersion=1.0.0-private-${{ steps.version.outputs.suffix }};RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
       - uses: actions/upload-artifact@v2
         with:
           name: OpenSilver
           path: "build/output/OpenSilver"
+      - name: Upload packages
+        run: |
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/index.json
