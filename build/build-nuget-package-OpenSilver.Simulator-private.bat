@@ -34,8 +34,8 @@ nuget restore ../src/OpenSilver.sln -v quiet
 echo. 
 echo %ESC%[95mBuilding and packaging %ESC%[0mOpenSilver.Simulator %ESC%[0m
 echo. 
-msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="%batDirectory%/output/OpenSilver" -p:NuspecFile="%batDirectory%/nuspec/OpenSilver.Simulator.nuspec" -p:NuspecBasePath="%batDirectory%" -p:NuspecProperties=PackageVersion=1.0.0-private-%PackageVersion%
-msbuild -t:pack slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -p:PackageOutputPath="%batDirectory%/output/OpenSilver" -p:NuspecFile="%batDirectory%/nuspec/OpenSilver.Simulator.nuspec" -p:NuspecBasePath="%batDirectory%" -p:NuspecProperties=PackageVersion=1.0.0-private-%PackageVersion%
+msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly
+nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver" -BasePath "%batDirectory%" -Properties "PackageVersion=1.0.0-private-%PackageVersion%;RepositoryUrl=https://github.com/OpenSilver/OpenSilver"
 
 explorer "output\OpenSilver"
 
