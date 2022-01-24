@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Runtime.Serialization;
+using System.Security;
+using System.Security.Permissions;
 
 namespace DotNetForHtml5.Compiler
 {
+    [Serializable]
     public class XamlParseException : SystemException
     {
         ///<summary>
@@ -119,5 +123,48 @@ namespace DotNetForHtml5.Compiler
         /// The BaseUri in effect at the point of the exception.
         ///</summary>
         public Uri BaseUri { get; }
+
+        /// <summary>
+        /// Internal constructor used for serialization when marshalling an
+        /// exception of this type across and AppDomain or machine boundary.
+        /// </summary>
+        /// <param name="info">
+        /// Contains all the information needed to serialize or deserialize
+        /// the object.
+        /// </param>
+        /// <param name="context">
+        /// Describes the source and destination of a given serialized stream,
+        /// as well as a means for serialization to retain that context and an
+        /// additional caller-defined context.
+        /// </param>
+        protected XamlParseException(
+            SerializationInfo info,
+            StreamingContext context
+            )
+            : base(info, context)
+        {
+            LineNumber = info.GetInt32("Line");
+            LinePosition = info.GetInt32("Position");
+        }
+
+        /// <summary>
+        /// Populates a SerializationInfo with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">
+        /// The SerializationInfo to populate with data.
+        /// </param>
+        /// <param name="context">
+        /// The destination for this serialization.
+        /// </param>
+        ///
+        /// <SecurityNote>
+        ///     Critical: calls Exception.GetObjectData which LinkDemands
+        /// </SecurityNote>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Line", LineNumber);
+            info.AddValue("Position", LinePosition);
+        }
     }
 }
