@@ -647,7 +647,7 @@ if(nextSibling != undefined) {
             // If we are inside a canvas, we set the position to "absolute":
             if (parent is Canvas)
             {
-                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = "absolute"; //todo: test if this works properly
+                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = child is StackPanel ? "relative" : "absolute"; //todo: test if this works properly
             }
 
             UIElement.SetPointerEvents(child);
