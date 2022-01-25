@@ -143,7 +143,7 @@ if (requestMethod) {
         /// </summary>
         private void FullScreenChangedCallback()
         {
-            this.FullScreenChanged?.Invoke(this, EventArgs.Empty);
+            FullScreenChanged?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -152,15 +152,13 @@ if (requestMethod) {
         /// </summary>
         private void WindowResizeCallback()
         {
-            this.Resized?.Invoke(this, EventArgs.Empty);
+            Resized?.Invoke(this, EventArgs.Empty);
         }
 
-        // Summary:
-        //     Gets or sets a value that indicates the behavior of full-screen mode.
-        //
-        // Returns:
-        //     A value that indicates the behavior of full-screen mode.
-        //public FullScreenOptions FullScreenOptions { get; set; }
+        /// <summary>
+        /// Gets or sets a value that indicates the behavior of full-screen mode.
+        /// </summary>
+        public FullScreenOptions FullScreenOptions { get; set; }
 
         /// <summary>
         /// Occurs when the zoom setting in the host browser window changes or is initialized.
