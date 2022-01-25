@@ -268,6 +268,15 @@ namespace DotNetForHtml5.Compiler
                     case "System.Windows.Controls.Navigation":
                         assemblyName = "OpenSilver.Controls.Navigation";
                         return;
+                    case "System.Windows.Interactivity":
+                        assemblyName = "OpenSilver.Interactivity";
+                        return;
+                    case "Microsoft.Expression.Interactions":
+                        assemblyName = "OpenSilver.Expression.Interactions";
+                        return;
+                    case "Microsoft.Expression.Effects":
+                        assemblyName = "OpenSilver.Expression.Effects";
+                        return;
                     default:
                         if (assemblyName == "System" || assemblyName.StartsWith("System."))
                         {
