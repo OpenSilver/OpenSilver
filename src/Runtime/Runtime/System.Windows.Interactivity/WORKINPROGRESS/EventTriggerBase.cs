@@ -13,14 +13,12 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 
 #if MIGRATION
-using System.Windows;
 #else
 using Windows.UI.Xaml;
 #endif
@@ -85,9 +83,7 @@ namespace System.Windows.Interactivity
     /// <remarks>This is an infrastructure class. Trigger authors should derive from EventTriggerBase&lt;T&gt; instead of this class.</remarks>
     public abstract class EventTriggerBase : TriggerBase
     {
-        private Type sourceTypeConstraint;
         private bool isSourceChangedRegistered;
-        private NameResolver sourceNameResolver;
         private MethodInfo HandlerMethod;
 
         public static readonly DependencyProperty SourceObjectProperty = DependencyProperty.Register("SourceObject",
@@ -112,13 +108,13 @@ namespace System.Windows.Interactivity
         {
             get
             {
-                AttributeCollection attributes = TypeDescriptor.GetAttributes(this.GetType());
-                TypeConstraintAttribute typeConstraintAttribute = attributes[typeof(TypeConstraintAttribute)] as TypeConstraintAttribute;
+                var attributes = TypeDescriptor.GetAttributes(GetType());
 
-                if (typeConstraintAttribute != null)
+                if (attributes[typeof(TypeConstraintAttribute)] is TypeConstraintAttribute typeConstraintAttribute)
                 {
                     return typeConstraintAttribute.Constraint;
                 }
+
                 return typeof(DependencyObject);
             }
         }
@@ -127,13 +123,7 @@ namespace System.Windows.Interactivity
         /// Gets the source type constraint.
         /// </summary>
         /// <value>The source type constraint.</value>
-        protected Type SourceTypeConstraint
-        {
-            get
-            {
-                return this.sourceTypeConstraint;
-            }
-        }
+        protected Type SourceTypeConstraint { get; }
 
         /// <summary>
         /// Gets or sets the target object. If TargetObject is not set, the target will look for the object specified by TargetName. If an element referred to by TargetName cannot be found, the target will default to the AssociatedObject. This is a dependency property.
@@ -189,10 +179,7 @@ namespace System.Windows.Interactivity
             }
         }
 
-        private NameResolver SourceNameResolver
-        {
-            get { return this.sourceNameResolver; }
-        }
+        private NameResolver SourceNameResolver { get; }
 
         private bool IsSourceChangedRegistered
         {
@@ -204,22 +191,17 @@ namespace System.Windows.Interactivity
         {
             get
             {
-                return !string.IsNullOrEmpty(this.SourceName) || this.ReadLocalValue(SourceNameProperty) != DependencyProperty.UnsetValue;
+                return !string.IsNullOrEmpty(SourceName) || ReadLocalValue(SourceNameProperty) != DependencyProperty.UnsetValue;
             }
         }
 
-        private bool IsLoadedRegistered
-        {
-            get;
-            set;
-        }
+        private bool IsLoadedRegistered { get; set; }
 
-        internal EventTriggerBase(Type sourceTypeConstraint)
-            : base(typeof(DependencyObject))
+        internal EventTriggerBase(Type sourceTypeConstraint) : base(typeof(DependencyObject))
         {
-            this.sourceTypeConstraint = sourceTypeConstraint;
-            this.sourceNameResolver = new NameResolver();
-            this.RegisterSourceChanged();
+            this.SourceTypeConstraint = sourceTypeConstraint;
+            SourceNameResolver = new NameResolver();
+            RegisterSourceChanged();
         }
 
         /// <summary>
@@ -235,14 +217,14 @@ namespace System.Windows.Interactivity
         /// <remarks>Override this to provide more granular control over when actions associated with this trigger will be invoked.</remarks>
         protected virtual void OnEvent(EventArgs eventArgs)
         {
-            this.InvokeActions(eventArgs);
+            InvokeActions(eventArgs);
         }
 
         private void OnSourceChanged(object oldSource, object newSource)
         {
-            if (this.AssociatedObject != null)
+            if (AssociatedObject != null)
             {
-                this.OnSourceChangedImpl(oldSource, newSource);
+                OnSourceChangedImpl(oldSource, newSource);
             }
         }
 
@@ -437,7 +419,9 @@ namespace System.Windows.Interactivity
         /// <exception cref="ArgumentException">Could not find eventName on the Target.</exception>
         private void RegisterEvent(object obj, string eventName)
         {
-            Debug.Assert(this.HandlerMethod == null && string.Compare(eventName, "Loaded", StringComparison.Ordinal) != 0);
+#if DEBUG
+            Debug.Assert(HandlerMethod == null && string.Compare(eventName, "Loaded", StringComparison.Ordinal) != 0);
+#endif
             
             var targetType = obj.GetType();
             var eventInfo = targetType.GetEvent(eventName);
