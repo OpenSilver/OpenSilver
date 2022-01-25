@@ -15,6 +15,10 @@
 using CSHTML5;
 using System;
 
+#if !MIGRATION
+using Windows.UI.Xaml.Interop;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Interop
 #else
@@ -158,6 +162,7 @@ if (requestMethod) {
         /// <summary>
         /// Gets or sets a value that indicates the behavior of full-screen mode.
         /// </summary>
+        [OpenSilver.NotImplemented]
         public FullScreenOptions FullScreenOptions { get; set; }
 
         /// <summary>
