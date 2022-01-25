@@ -3,7 +3,7 @@
 #if MIGRATION
 namespace System.Windows.Interop
 #else
-namespace Windows.UI.Xaml.Interop
+namespace Windows.UI.Xaml
 #endif
 {
 	/// <summary>
