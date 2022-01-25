@@ -88,7 +88,7 @@ namespace System.Windows.Interactivity
         private Type sourceTypeConstraint;
         private bool isSourceChangedRegistered;
         private NameResolver sourceNameResolver;
-        private MethodInfo eventHandlerMethodInfo;
+        private MethodInfo HandlerMethod;
 
         public static readonly DependencyProperty SourceObjectProperty = DependencyProperty.Register("SourceObject",
                                                                                                     typeof(object),
@@ -233,7 +233,7 @@ namespace System.Windows.Interactivity
         /// </summary>
         /// <param name="eventArgs">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         /// <remarks>Override this to provide more granular control over when actions associated with this trigger will be invoked.</remarks>
-        protected virtual void OnEvent(RoutedEventArgs eventArgs)
+        protected virtual void OnEvent(EventArgs eventArgs)
         {
             this.InvokeActions(eventArgs);
         }
@@ -415,7 +415,7 @@ namespace System.Windows.Interactivity
 
         private void RegisterLoaded(FrameworkElement associatedElement)
         {
-            Debug.Assert(this.eventHandlerMethodInfo == null);
+            Debug.Assert(this.HandlerMethod == null);
             Debug.Assert(!this.IsLoadedRegistered, "Trying to register Loaded more than once.");
             if (!this.IsLoadedRegistered && associatedElement != null)
             {
@@ -426,7 +426,7 @@ namespace System.Windows.Interactivity
 
         private void UnregisterLoaded(FrameworkElement associatedElement)
         {
-            Debug.Assert(this.eventHandlerMethodInfo == null);
+            Debug.Assert(this.HandlerMethod == null);
             if (this.IsLoadedRegistered && associatedElement != null)
             {
                 associatedElement.Loaded -= this.OnEventImpl;
@@ -437,17 +437,16 @@ namespace System.Windows.Interactivity
         /// <exception cref="ArgumentException">Could not find eventName on the Target.</exception>
         private void RegisterEvent(object obj, string eventName)
         {
-            Debug.Assert(this.eventHandlerMethodInfo == null && string.Compare(eventName, "Loaded", StringComparison.Ordinal) != 0);
-            Type targetType = obj.GetType();
-            EventInfo eventInfo = targetType.GetEvent(eventName);
+            Debug.Assert(this.HandlerMethod == null && string.Compare(eventName, "Loaded", StringComparison.Ordinal) != 0);
+            
+            var targetType = obj.GetType();
+            var eventInfo = targetType.GetEvent(eventName);
+
             if (eventInfo == null)
             {
-                if (this.SourceObject != null)
+                if (SourceObject != null)
                 {
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
-                                                                "Cannot find an event named '{0}' on type '{1}'.",
-                                                                eventName,
-                                                                obj.GetType().Name));
+                    throw new ArgumentException($"Cannot find an event named '{eventName}' on type '{targetType.Name}'.");
                 }
                 else
                 {
@@ -455,22 +454,21 @@ namespace System.Windows.Interactivity
                 }
             }
 
-            if (!EventTriggerBase.IsValidEvent(eventInfo))
+            if (!IsValidEvent(eventInfo))
             {
-                if (this.SourceObject != null)
+                if (SourceObject != null)
                 {
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
-                                                                "The event '{0}' on type '{1}' has an incompatible signature. Make sure the event is public and satisfies the EventHandler delegate.",
-                                                                eventName,
-                                                                obj.GetType().Name));
+                    throw new ArgumentException($"The event '{eventName}' on type '{targetType.Name}' has an incompatible signature. Make sure the event is public and satisfies the EventHandler delegate.");
                 }
                 else
                 {
                     return;
                 }
             }
-            this.eventHandlerMethodInfo = typeof(EventTriggerBase).GetMethod("OnEventImpl", BindingFlags.NonPublic | BindingFlags.Instance);
-            eventInfo.AddEventHandler(obj, Delegate.CreateDelegate(eventInfo.EventHandlerType, this, this.eventHandlerMethodInfo));
+
+            HandlerMethod = typeof(EventTriggerBase).GetMethod(nameof(OnEventImpl), BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            eventInfo.AddEventHandler(obj, HandlerMethod.CreateDelegate(eventInfo.EventHandlerType, this));
         }
 
         private static bool IsValidEvent(EventInfo eventInfo)
@@ -504,22 +502,22 @@ namespace System.Windows.Interactivity
         private void UnregisterEventImpl(object obj, string eventName)
         {
             Type targetType = obj.GetType();
-            Debug.Assert(this.eventHandlerMethodInfo != null || targetType.GetEvent(eventName) == null);
+            Debug.Assert(this.HandlerMethod != null || targetType.GetEvent(eventName) == null);
 
-            if (this.eventHandlerMethodInfo == null)
+            if (this.HandlerMethod == null)
             {
                 return;
             }
 
             EventInfo eventInfo = targetType.GetEvent(eventName);
             Debug.Assert(eventInfo != null, "Should not try to unregister an event that we successfully registered");
-            eventInfo.RemoveEventHandler(obj, Delegate.CreateDelegate(eventInfo.EventHandlerType, this, this.eventHandlerMethodInfo));
-            this.eventHandlerMethodInfo = null;
+            eventInfo.RemoveEventHandler(obj, Delegate.CreateDelegate(eventInfo.EventHandlerType, this, this.HandlerMethod));
+            this.HandlerMethod = null;
         }
 
-        private void OnEventImpl(object sender, RoutedEventArgs eventArgs)
+        private void OnEventImpl(object sender, EventArgs eventArgs)
         {
-            this.OnEvent(eventArgs);
+            OnEvent(eventArgs);
         }
 
         internal void OnEventNameChanged(string oldEventName, string newEventName)
