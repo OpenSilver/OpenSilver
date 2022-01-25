@@ -1,5 +1,3 @@
-#if MIGRATION
-
 namespace Microsoft.Expression.Interactivity.Core
 {
 	public enum ControlStoryboardOption
@@ -12,5 +10,3 @@ namespace Microsoft.Expression.Interactivity.Core
 		SkipToFill = 5
 	}
 }
-
-#endif
