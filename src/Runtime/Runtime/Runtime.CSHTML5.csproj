@@ -175,6 +175,7 @@
     <Compile Include="System.Windows\DataTemplateKey.cs" />
     <Compile Include="System.Windows\FontStretchConverter.cs" />
     <Compile Include="System.Windows\FontStyleConverter.cs" />
+    <Compile Include="System.Windows\FullScreenOptions.cs" />
     <Compile Include="System.Windows\IApplicationService.cs" />
     <Compile Include="System.Windows\InstallState.cs" />
     <Compile Include="System.Windows\NullableBoolConverter.cs" />
