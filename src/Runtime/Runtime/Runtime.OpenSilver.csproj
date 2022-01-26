@@ -1264,5 +1264,8 @@
 
 	<Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
 	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="copy /y $(OutDir)\opensilver*.* C:\Users\ams\.nuget\packages\opensilver\1.0.0\lib\netstandard2.0&#xD;&#xA;copy /y $(OutDir)\opensilver*.* D:\Userware\code\TestAndDebug\Tests.TelerikForOpenSilver-Main-Repo\OS.Test.Tlrk\OS.Test.Tlrk.Simulator\bin\Debug\net472\&#xD;&#xA;copy /y $(OutDir)\opensilver*.* D:\Userware\code\TestAndDebug\Tests.TelerikForOpenSilver-Main-Repo\OS.Test.Tlrk\OS.Test.Tlrk\bin\Debug\netstandard2.0\&#xD;&#xA;copy /y $(OutDir)\opensilver*.* D:\Userware\code\TestAndDebug\Tests.TelerikForOpenSilver-Main-Repo\OS.Test.Tlrk\OS.Test.Tlrk.Browser\bin\Debug\net6.0\&#xD;&#xA;copy /y $(OutDir)\opensilver*.* D:\Userware\code\TestAndDebug\Tests.TelerikForOpenSilver-Main-Repo\OS.Test.Tlrk\OS.Test.Tlrk.Browser\bin\Debug\net6.0\wwwroot\_framework" />
+	</Target>
 
 </Project>
