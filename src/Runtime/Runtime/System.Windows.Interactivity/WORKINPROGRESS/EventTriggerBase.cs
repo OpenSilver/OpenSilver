@@ -215,7 +215,11 @@ namespace System.Windows.Interactivity
         /// </summary>
         /// <param name="eventArgs">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         /// <remarks>Override this to provide more granular control over when actions associated with this trigger will be invoked.</remarks>
+#if MIGRATION
         protected virtual void OnEvent(EventArgs eventArgs)
+#else
+        protected virtual void OnEvent(RoutedEventArgs eventArgs)
+#endif
         {
             InvokeActions(eventArgs);
         }
@@ -499,7 +503,11 @@ namespace System.Windows.Interactivity
             this.HandlerMethod = null;
         }
 
+#if MIGRATION
         private void OnEventImpl(object sender, EventArgs eventArgs)
+#else
+        private void OnEventImpl(object sender, RoutedEventArgs eventArgs)
+#endif
         {
             OnEvent(eventArgs);
         }
