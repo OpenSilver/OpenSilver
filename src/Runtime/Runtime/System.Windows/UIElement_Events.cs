@@ -34,6 +34,8 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Threading;
+using CSHTML5.Types;
+using DotNetForHtml5.Core;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -371,7 +373,6 @@ namespace Windows.UI.Xaml
                     break;
                 handler(this, eventArgs);
             }
-
             //Workaround so that the elements that capture the pointer events still get the focus:
             //Note: we put this here instead of in OnPointerPressed_ForHandledEventsToo because this takes into consideration the checkForDivsThatAbsorbEvents thing (it broke the <Button><TextBox/></Button> case for example).
             //      It might be better in certain cases to have this in the other method and especially test for those event-absorbing divs at that moment but I'm not sure.
@@ -514,10 +515,11 @@ namespace Windows.UI.Xaml
         /// </summary>
         void ProcessOnPointerWheelChangedEvent(object jsEventArg)
         {
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
             var eventArgs = new MouseWheelEventArgs()
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
+                Handled = handled.IsUndefined() ? false : (bool)handled
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -537,7 +539,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = true", jsEventArg);
                 }
             }
         }
@@ -964,6 +966,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         void ProcessOnTextInput(object jsEventArg)
         {
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
             var inputText = CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg).ToString();
             if (inputText == null)
                 return;
@@ -976,7 +979,7 @@ namespace Windows.UI.Xaml
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 Text = inputText,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled"),
+                Handled = handled.IsUndefined() ? false : (bool)handled,
                 TextComposition = new TextComposition() { CompositionText = "" }
             };
 
@@ -989,7 +992,7 @@ namespace Windows.UI.Xaml
 
             if (eventArgs.Handled)
             {
-                CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.handled = true", jsEventArg);
                 CSHTML5.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
             }
         }
@@ -1112,10 +1115,11 @@ namespace Windows.UI.Xaml
         /// </summary>
         void ProcessOnTapped(object jsEventArg)
         {
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
             var eventArgs = new TappedRoutedEventArgs()
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
+                Handled = handled.IsUndefined() ? false : (bool)handled
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -1132,7 +1136,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = true", jsEventArg);
                 }
             }
         }
@@ -1225,6 +1229,7 @@ namespace Windows.UI.Xaml
         void ProcessOnRightTapped(object jsEventArg)
 #endif
         {
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
 #if MIGRATION
             var eventArgs = new MouseButtonEventArgs()
 #else
@@ -1232,7 +1237,7 @@ namespace Windows.UI.Xaml
 #endif
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
+                Handled = handled.IsUndefined() ? false : (bool)handled
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -1262,7 +1267,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = true", jsEventArg);
                 }
             }
         }
@@ -1363,6 +1368,8 @@ namespace Windows.UI.Xaml
 
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
+
             var eventArgs = new KeyEventArgs()
 #else
             var eventArgs = new KeyRoutedEventArgs()
@@ -1371,7 +1378,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 PlatformKeyCode = keyCode,
                 Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
+                Handled = handled.IsUndefined() ? false : (bool)handled
             };
 
             // Add the key modifier to the eventArgs:
@@ -1382,13 +1389,14 @@ namespace Windows.UI.Xaml
             {
                 OnKeyDown(eventArgs);
             }
+
             OnKeyDown_ForHandledEventsToo(eventArgs);
 
             if (eventArgs.Handled)
             {
-                CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                CSHTML5.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.handled = true", jsEventArg);
             }
+            CSHTML5.Interop.ExecuteJavaScriptAsync("$0.IsProcessingOSKeyDown = false;", jsEventArg);
         }
 
         /// <summary>
@@ -1479,6 +1487,7 @@ namespace Windows.UI.Xaml
 
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
             var eventArgs = new KeyEventArgs()
 #else
             var eventArgs = new KeyRoutedEventArgs()
@@ -1487,7 +1496,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 PlatformKeyCode = keyCode,
                 Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
+                Handled = handled.IsUndefined() ? false : (bool)handled
             };
 
             // Add the key modifier to the eventArgs:
@@ -1502,7 +1511,7 @@ namespace Windows.UI.Xaml
 
             if (eventArgs.Handled)
             {
-                CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.handled = true", jsEventArg);
             }
         }
 
@@ -1934,6 +1943,7 @@ namespace Windows.UI.Xaml
             bool isMouseEvent = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.type.startsWith('mouse')", jsEventArg));
             if (!(ignoreMouseEvents && isMouseEvent)) //Ignore mousedown, mousemove and mouseup if the touch equivalents have been handled.
             {
+                var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
 #if MIGRATION
                 var eventArgs = new MouseButtonEventArgs()
 #else
@@ -1941,7 +1951,7 @@ namespace Windows.UI.Xaml
 #endif
                 {
                     INTERNAL_OriginalJSEventArg = jsEventArg,
-                    Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
+                    Handled = handled.IsUndefined() ? false : (bool)handled
                 };
                 if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
                 {
@@ -1967,7 +1977,7 @@ namespace Windows.UI.Xaml
 
                     if (eventArgs.Handled)
                     {
-                        CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
+                        CSHTML5.Interop.ExecuteJavaScript("$0.handled = true", jsEventArg);
                     }
                 }
 

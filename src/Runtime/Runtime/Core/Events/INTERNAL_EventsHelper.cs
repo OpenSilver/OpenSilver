@@ -59,7 +59,18 @@ namespace CSHTML5.Internal
                 Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier, eventName, (Action<object>)newProxy.OnEvent);
             else
                 Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, (Action<object>)newProxy.OnEvent);
-
+            //ams->
+            // incase of keydown events we register a second handler keydownFinalize that waits for OS keydown handler to finish
+            if (!OpenSilver.Interop.IsRunningInTheSimulator) // this fix currently not working in simulator and keydwon remains bugy 
+            {
+                if (eventName == "keydown")
+                {
+                    if (domElementRef is INTERNAL_HtmlDomElementReference)
+                        Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier, eventName, "function(e) { return document.keydownFinalize(e);}");
+                    else
+                        Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, "function(e) { return document.keydownFinalize(e);}");
+                }
+            }
             /*
             DOMEventType eventType;
              * 
