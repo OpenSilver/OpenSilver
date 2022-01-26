@@ -42,6 +42,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
         object _targetElement;
         bool _isInitializing;
         bool _isChangingTextProgrammatically;
+        bool _isReadOnly;
 
         public bool IsReadOnly
         {
@@ -93,17 +94,19 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
 
                     // Read property name:
 
-                // Read property name:
-                this.PropertyNameTextBlock.Text = _propertyInfo.Name + ":";
+                    // Set "AcceptsReturn" only if it is a string:
+                    bool isString = (propertyType == typeof(string));
+                    this.PropertyValueTextBox.AcceptsReturn = isString;
+                }
+                else
+                {
+                    ButtonOK.Visibility = Visibility.Visible;
+                    PropertyValueTextBox.IsReadOnly = IsReadOnly;
+                }
 
                 // Set property appearance depending on whether there exists a converter from String to the property type:
-                Type propertyType = _propertyInfo.PropertyType;
                 bool isItPossibleToConvertFromString = IsItPossibleToConvertFromString(propertyType);
-                SetIsReadOnly(!isItPossibleToConvertFromString);
-
-                // Set "AcceptsReturn" only if it is a string:
-                bool isString = (propertyType == typeof(string));
-                this.PropertyValueTextBox.AcceptsReturn = isString;
+                SetPropertyValueStyle(isItPossibleToConvertFromString);
 
                 // Attempt to read the property value:
                 _isChangingTextProgrammatically = true;
@@ -124,21 +127,22 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             }
         }
 
-        void SetIsReadOnly(bool isReadOnly)
+        void SetPropertyValueStyle(bool isConvertibleFromString)
         {
             this.PropertyValueTextBox.IsReadOnly = IsReadOnly || !isConvertibleFromString;
 
-            if (isReadOnly)
-            {
-                this.PropertyValueTextBox.Opacity = 0.7d;
-                this.PropertyValueTextBox.Foreground = new SolidColorBrush(Colors.White);
-                this.PropertyValueTextBox.Background = new SolidColorBrush(Colors.Transparent);
-            }
-            else
+            if (isConvertibleFromString)
             {
                 this.PropertyValueTextBox.Opacity = 1d;
                 this.PropertyValueTextBox.Foreground = new SolidColorBrush(Colors.LightGray);
                 this.PropertyValueTextBox.Background = new SolidColorBrush(Colors.Black);
+            }
+            else
+            {
+                this.PropertyValueTextBox.Opacity = 0.7d;
+                this.PropertyValueTextBox.Foreground = new SolidColorBrush(Colors.White);
+                this.PropertyValueTextBox.Background = new SolidColorBrush(Colors.Transparent);
+                ButtonOK.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -164,16 +168,18 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
         void ApplyChange()
         {
             // Attempt to set the property value:
-            try
+            if (!IsReadOnly)
             {
-                string valueAsString = PropertyValueTextBox.Text;
-                object convertedValue = ConvertFromString(valueAsString, _propertyInfo.PropertyType);
-                _propertyInfo.SetValue(_targetElement, convertedValue);
+                try
+                {
+                    string valueAsString = PropertyValueTextBox.Text;
+                    object convertedValue = ConvertFromString(valueAsString, _propertyInfo.PropertyType);
+                    _propertyInfo.SetValue(_targetElement, convertedValue);
+                }
+                catch
+                {
+                }
             }
-            catch
-            {
-            }
-
             Refresh();
         }
 

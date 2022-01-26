@@ -29,6 +29,7 @@ namespace Windows.UI.Xaml.Input
 	// Summary:
 	//     Represents a composition related to text input which includes the composition
 	//     text itself.
+    [OpenSilver.NotImplemented]
 	public sealed partial class TextComposition
 	{
 		//
@@ -37,6 +38,7 @@ namespace Windows.UI.Xaml.Input
 		//
 		// Returns:
 		//     The composition text for this text composition.
-		public string CompositionText { get; set; }
+        [OpenSilver.NotImplemented]
+		public string CompositionText { get; }
 	}
 }

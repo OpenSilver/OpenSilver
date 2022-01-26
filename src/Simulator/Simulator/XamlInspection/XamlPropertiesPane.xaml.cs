@@ -46,7 +46,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
         public void Refresh(object targetElement)
         {
             // Clear the display:
-            MainContainer.Children.Clear();
+            WritablesPanel.Children.Clear();
+            ReadOnlyPanel.Children.Clear();
 
             if (targetElement != null)
             {
@@ -58,12 +59,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 var properties =
                     from property
                     in targetElementType.GetProperties(flags)
-                    where property.CanWrite
                     orderby property.Name
                     select property;
 
-                // Display the properties and their values:
-                foreach (PropertyInfo propertyInfo in properties)
+                // Display the writable properties and their values:
+                foreach (PropertyInfo propertyInfo in properties.Where(p => p.CanWrite))
                 {
                     var editor = new XamlSinglePropertyEditor(propertyInfo, targetElement, false);
                     WritablesPanel.Children.Add(editor);
@@ -78,7 +78,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             }
 
             // Set the appropriate size:
-            if (MainContainer.Children.Count > 0)
+            if (WritablesPanel.Children.Count > 0)
                 this.Width = 250;
             else
                 this.Width = 0;
