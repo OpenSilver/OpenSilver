@@ -27,6 +27,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Effects;
+using CSHTML5.Types;
+
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -34,7 +36,6 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Threading;
-using CSHTML5.Types;
 using DotNetForHtml5.Core;
 #else
 using Windows.UI.Xaml.Controls;
@@ -1366,9 +1367,9 @@ namespace Windows.UI.Xaml
             if (!int.TryParse(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
                 return;
 
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
-            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
 
             var eventArgs = new KeyEventArgs()
 #else
@@ -1485,9 +1486,9 @@ namespace Windows.UI.Xaml
             if (!int.TryParse(CSHTML5.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
                 return;
 
+            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
 #if MIGRATION
             keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
-            var handled = CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) as INTERNAL_JSObjectReference;
             var eventArgs = new KeyEventArgs()
 #else
             var eventArgs = new KeyRoutedEventArgs()
