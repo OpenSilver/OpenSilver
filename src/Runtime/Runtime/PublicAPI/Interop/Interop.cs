@@ -260,11 +260,11 @@ namespace OpenSilver
         /// Note: the FrameworkElement must be in the visual tree. Consider calling this
         /// method from the 'Loaded' event to ensure that the element is in the visual tree.
         /// </summary>
-        /// <param name="frameworkElement"></param>
+        /// <param name="element"></param>
         /// <returns></returns>
-        public static object GetDiv(FrameworkElement frameworkElement)
+        public static object GetDiv(UIElement element)
         {
-            return frameworkElement.INTERNAL_OuterDomElement;
+            return element.INTERNAL_OuterDomElement;
         }
 
 #if CSHTML5BLAZOR
