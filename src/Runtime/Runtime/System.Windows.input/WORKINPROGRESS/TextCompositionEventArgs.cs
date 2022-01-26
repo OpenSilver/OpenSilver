@@ -28,7 +28,6 @@ namespace Windows.UI.Xaml.Input
 	//
 	// Summary:
 	//     Provides data for the System.Windows.UIElement.TextInput routed event.
-    [OpenSilver.NotImplemented]
 	public sealed partial class TextCompositionEventArgs : RoutedEventArgs
 	{
 		//
@@ -40,7 +39,6 @@ namespace Windows.UI.Xaml.Input
 		//     true to mark the routed event handled. false to leave the routed event unhandled,
 		//     which permits the event to potentially route further and be acted on by other
 		//     handlers. The default is false.
-        [OpenSilver.NotImplemented]
 		public bool Handled { get; set; }
 		//
 		// Summary:
@@ -48,8 +46,7 @@ namespace Windows.UI.Xaml.Input
 		//
 		// Returns:
 		//     The text string of the text composition.
-        [OpenSilver.NotImplemented]
-		public string Text { get; }
+		public string Text { get; set; }
 		//
 		// Summary:
 		//     Gets or sets the text in the composition as a System.Windows.Input.TextComposition
@@ -57,7 +54,6 @@ namespace Windows.UI.Xaml.Input
 		//
 		// Returns:
 		//     The text in the composition, as a System.Windows.Input.TextComposition object.
-        [OpenSilver.NotImplemented]
-		public TextComposition TextComposition { get; }
+		public TextComposition TextComposition { get; set; }
 	}
 }
