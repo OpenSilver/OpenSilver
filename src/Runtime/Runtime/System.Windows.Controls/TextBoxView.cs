@@ -437,6 +437,9 @@ sel.addRange(range);
             this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
 
+            this.Host.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
+            this.Host.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
+
             contentEditableDivStyle.minWidth = "14px";
             contentEditableDivStyle.minHeight = (Math.Floor(this.Host.FontSize * 1.5 * 1000) / 1000).ToInvariantString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most. //Note: setting "minHeight" is for FireFox only, because other browsers don't seem to need it. The "1.5" factor is here to ensure that the resulting Height is the same as that of the PasswordBox.
 
