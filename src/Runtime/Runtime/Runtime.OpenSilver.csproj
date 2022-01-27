@@ -1248,17 +1248,15 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultCalendarDayButtonStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
