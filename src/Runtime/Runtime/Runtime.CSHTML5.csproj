@@ -74,7 +74,7 @@
     <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
-	<Compile Include="OpenSilver\Internal\NameScope.cs" />
+    <Compile Include="OpenSilver\Internal\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
@@ -99,6 +99,7 @@
     <Compile Include="PublicAPI\Performance\Performance.cs" />
     <Compile Include="System.Collections.Generic\WORKINPROGRESS\PriorityQueue.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
+    <Compile Include="System.ComponentModel\AsyncOperation.cs" />
     <Compile Include="System.ComponentModel\CurrentChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\GroupDescription.cs" />
     <Compile Include="System.ComponentModel\ICollectionView.cs" />

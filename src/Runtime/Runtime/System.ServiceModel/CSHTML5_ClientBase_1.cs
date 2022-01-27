@@ -130,14 +130,8 @@ namespace System.ServiceModel
         protected void InvokeAsync(BeginOperationDelegate beginOperationDelegate, object[] inValues,
           EndOperationDelegate endOperationDelegate, SendOrPostCallback operationCompletedCallback, object userState)
         {
-#if USE_ASYNCOPERATION_CLASS
             AsyncOperation asyncOperation = AsyncOperationManager.CreateOperation(userState);
-#endif
-            AsyncOperationContext context = new AsyncOperationContext(
-#if USE_ASYNCOPERATION_CLASS
-                asyncOperation,
-#endif
-endOperationDelegate, operationCompletedCallback);
+            AsyncOperationContext context = new AsyncOperationContext(asyncOperation, endOperationDelegate, operationCompletedCallback);
             IAsyncResult result = beginOperationDelegate(inValues, OnAsyncCallCompleted, context);
         }
 
@@ -161,43 +155,28 @@ endOperationDelegate, operationCompletedCallback);
         {
             if (context.CompletionCallback != null)
             {
-                InvokeAsyncCompletedEventArgs e = new InvokeAsyncCompletedEventArgs(results, error, false, null/*context.AsyncOperation.UserSuppliedState*/);
-#if USE_ASYNCOPERATION_CLASS
+                InvokeAsyncCompletedEventArgs e = new InvokeAsyncCompletedEventArgs(results, error, false, context.AsyncOperation.UserSuppliedState);
                 context.AsyncOperation.PostOperationCompleted(context.CompletionCallback, e);
-#else
-                context.CompletionCallback(e);
-#endif
             }
-#if USE_ASYNCOPERATION_CLASS
             else
             {
                 context.AsyncOperation.OperationCompleted();
             }
-#endif
         }
 
         class AsyncOperationContext
         {
-#if USE_ASYNCOPERATION_CLASS
             AsyncOperation asyncOperation;
-#endif
             EndOperationDelegate endDelegate;
             SendOrPostCallback completionCallback;
 
-            internal AsyncOperationContext(
-#if USE_ASYNCOPERATION_CLASS
-                AsyncOperation asyncOperation,
-#endif
-EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
+            internal AsyncOperationContext(AsyncOperation asyncOperation, EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             {
-#if USE_ASYNCOPERATION_CLASS
                 this.asyncOperation = asyncOperation;
-#endif
                 this.endDelegate = endDelegate;
                 this.completionCallback = completionCallback;
             }
 
-#if USE_ASYNCOPERATION_CLASS
             internal AsyncOperation AsyncOperation
             {
                 get
@@ -205,7 +184,6 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
                     return this.asyncOperation;
                 }
             }
-#endif
 
             internal EndOperationDelegate EndDelegate
             {
@@ -1120,7 +1098,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             }
 #endif
 
-                private void ProcessNode(XElement node, Action<XElement> action)
+            private void ProcessNode(XElement node, Action<XElement> action)
             {
                 action(node);
                 foreach (XElement child in node.Elements())
@@ -1856,13 +1834,13 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             get { return null; }
         }
 
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public void Abort()
         {
 
         }
 
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         public CommunicationState State
         {
             get { return CommunicationState.Created; }
@@ -1873,7 +1851,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //    /// Returns a new channel to the service.
         //    /// </summary>
         //    /// <returns>A channel of the type of the service contract.</returns>
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         protected virtual TChannel CreateChannel()
         {
             return null;
@@ -1884,7 +1862,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //    /// </summary>
         //    /// <typeparam name="T">The type that is identified as reference or numeric by the keyword.</typeparam>
         //    /// <returns>Returns null if T is a reference type and zero if T is a numeric value type.</returns>
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         protected T GetDefaultValueForInitialization<T>()
         {
             return default(T);
@@ -1895,7 +1873,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         //protected class ChannelBase<T> : IOutputChannel, IRequestChannel, IClientChannel, IDisposable, IContextChannel, IChannel, ICommunicationObject, IExtensibleObject<IContextChannel> where T : class
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         protected class ChannelBase<T> where T : class
         {
             /// <summary>
@@ -1918,7 +1896,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="state">The state object.</param>
             /// <returns>The System.IAsyncResult that references the asynchronous method invoked.</returns>
             //[SecuritySafeCritical]
-		    [OpenSilver.NotImplemented]
+            [OpenSilver.NotImplemented]
             protected IAsyncResult BeginInvoke(string methodName, object[] args, AsyncCallback callback, object state)
             {
                 return null;
@@ -1932,7 +1910,7 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
             /// <param name="result">The result returned by a call.</param>
             /// <returns>The System.Object output by the method invoked.</returns>
             //[SecuritySafeCritical]
-		    [OpenSilver.NotImplemented]
+            [OpenSilver.NotImplemented]
             protected object EndInvoke(string methodName, object[] args, IAsyncResult result)
             {
                 return null;
