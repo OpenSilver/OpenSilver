@@ -105,6 +105,7 @@
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\SelectorSelectionAdapter.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarButton.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />

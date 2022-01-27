@@ -18,7 +18,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
     [OpenSilver.NotImplemented]
-    public partial class CalendarItem
+    public partial class CalendarItem : Control
     {
     }
 }

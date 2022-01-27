@@ -101,7 +101,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.IsTabStop dependency property.
-        public static readonly DependencyProperty IsTabStopProperty;
+        public static readonly DependencyProperty IsTabStopProperty = DependencyProperty.Register(nameof(IsTabStop), typeof(bool), typeof(Calendar), new PropertyMetadata());
 
         //
         // Summary:
@@ -119,7 +119,7 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.Background dependency
         //     property.
-        public static readonly DependencyProperty BackgroundProperty;
+        public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(Calendar), new PropertyMetadata());
 
         //
         // Summary:
@@ -135,7 +135,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.Padding dependency property.
-        public static readonly DependencyProperty PaddingProperty;
+        public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(Thickness), typeof(Calendar), new PropertyMetadata());
 
         //
         // Summary:
@@ -154,7 +154,7 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.BorderThickness dependency
         //     property.
-        public static readonly DependencyProperty BorderThicknessProperty;
+        public static readonly DependencyProperty BorderThicknessProperty = DependencyProperty.Register(nameof(BorderThickness), typeof(Thickness), typeof(Calendar), new PropertyMetadata());
 
         //
         // Summary:
@@ -171,7 +171,7 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.BorderBrush dependency
         //     property.
-        public static readonly DependencyProperty BorderBrushProperty;
+        public static readonly DependencyProperty BorderBrushProperty = DependencyProperty.Register(nameof(BorderBrush), typeof(Brush), typeof(Calendar), new PropertyMetadata());
 
         //
         // Summary:
@@ -187,7 +187,7 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.Template dependency property.
-        public static readonly DependencyProperty TemplateProperty;
+        public static readonly DependencyProperty TemplateProperty = DependencyProperty.Register(nameof(Template), typeof(ControlTemplate), typeof(Calendar), new PropertyMetadata());
 
         //
         // Summary:
