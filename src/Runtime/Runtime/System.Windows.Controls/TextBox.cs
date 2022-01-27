@@ -1,6 +1,6 @@
 
 /*===================================================================================
-* 
+*   //ams->
 *   Copyright (c) Userware/OpenSilver.net
 *      
 *   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
