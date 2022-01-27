@@ -17,11 +17,15 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;MIGRATION</DefineConstants>
+    <DefineConstants>TRACE;MIGRATION</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Optimize) != true">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

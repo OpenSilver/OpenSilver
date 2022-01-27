@@ -21,12 +21,16 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;GD_WIP</DefineConstants>
+		<DefineConstants>TRACE;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;GD_WIP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
+		<DefineConstants>TRACE;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 	</PropertyGroup>
+
+  <PropertyGroup Condition="$(Optimize) != true">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

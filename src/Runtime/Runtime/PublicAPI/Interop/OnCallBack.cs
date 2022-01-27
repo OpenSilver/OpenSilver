@@ -205,10 +205,11 @@ namespace CSHTML5.Internal
                         }
                         catch (Exception ex)
                         {
-#if DEBUG
                             Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-#endif
-                            throw;
+//#if DEBUG
+//                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+//#endif
+//                            throw;
                         }
                     });
             };
