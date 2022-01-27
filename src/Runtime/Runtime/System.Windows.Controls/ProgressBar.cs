@@ -15,9 +15,12 @@
 #if MIGRATION
 using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 #else
+using System;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Shapes;
+using Windows.UI.Xaml.Media;
 #endif
 
 
@@ -27,13 +30,10 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    [OpenSilver.NotImplemented]
     public partial class ProgressBar : RangeBase
     {
-        //public bool IsIndeterminateProperty;
-        Canvas _rootCanvas;
-        Rectangle _rectangleBehind;
-        Rectangle _rectangleInFront;
+        private Border _trackBorder;
+        private Rectangle _rectProgressIndicator;
 
         public bool IsIndeterminate
         {
@@ -46,24 +46,26 @@ namespace Windows.UI.Xaml.Controls
                 "IsIndeterminate", 
                 typeof(bool), 
                 typeof(ProgressBar), 
-                new PropertyMetadata(false));
+                new PropertyMetadata(false, IsIndeterminatePropertyChanged));
+
+        private static void IsIndeterminatePropertyChanged(
+            DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var target = (ProgressBar)d;
+            target.OnIsIndeterminateChanged();
+        }
 
         public ProgressBar()
         {
             this.DefaultStyleKey = typeof(ProgressBar);
-            //this.IsIndeterminate = false;
             this.SizeChanged += OnSizeChanged;
         }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_rectangleBehind != null && _rootCanvas != null && _rectangleInFront != null)
+            if (_trackBorder != null && _rectProgressIndicator != null)
             {
-                _rectangleBehind.Width = _rootCanvas.ActualWidth;
-                _rectangleBehind.Height = _rootCanvas.ActualHeight;
-                _rectangleInFront.Height = _rootCanvas.ActualHeight;
-                _rectangleBehind.ScheduleRedraw();
-                UpdateRectangleInFront();
+                UpdateProgressRectangle();
             }
         }
 
@@ -81,56 +83,90 @@ namespace Windows.UI.Xaml.Controls
             //----------------------------
             // Get a reference to the UI elements defined in the control template:
             //----------------------------
-            _rootCanvas = this.GetTemplateChild("RootCanvas") as Canvas;
-            _rectangleBehind = this.GetTemplateChild("RectangleBehind") as Rectangle;
-            _rectangleInFront = this.GetTemplateChild("RectangleInFront") as Rectangle;
 
-            if (_rectangleBehind != null && _rectangleInFront != null)
+            if (_trackBorder != null)
             {
-                _rectangleBehind.Height = _rootCanvas.ActualHeight;
-                _rectangleBehind.Width = _rootCanvas.ActualWidth;
-                _rectangleInFront.Height = _rootCanvas.ActualHeight;
-                UpdateRectangleInFront();
+                _trackBorder.SizeChanged -= new SizeChangedEventHandler(OnTrackSizeChanged);
             }
 
+            _trackBorder = GetTemplateChild("ProgressBarTrack") as Border;
 
-        }
-
-        private void UpdateRectangleInFront()
-        {
-            if (_rootCanvas != null && _rectangleInFront != null && !double.IsNaN(_rootCanvas.ActualWidth))
+            if (_trackBorder != null)
             {
-                if (this.Minimum >= this.Maximum)
+                _trackBorder.SizeChanged += new SizeChangedEventHandler(OnTrackSizeChanged);
+            }
+
+            _rectProgressIndicator = GetTemplateChild("ProgressBarIndicator") as Rectangle;
+
+            if (_trackBorder != null && _rectProgressIndicator != null)
+            {
+                if (IsIndeterminate)
                 {
-                    _rectangleInFront.Width = _rootCanvas.ActualWidth;
+                    OnIsIndeterminateChanged();
                 }
                 else
                 {
-                    _rectangleInFront.Width = (this.Value - this.Minimum) / (this.Maximum - this.Minimum) * _rootCanvas.ActualWidth;
+                    UpdateProgressRectangle();
                 }
-                _rectangleInFront.ScheduleRedraw();
             }
+        }
+
+        private void OnTrackSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateProgressRectangle();
+        }
+
+        private void UpdateProgressRectangle()
+        {
+            if (_trackBorder == null || _rectProgressIndicator == null) return;
+
+            var parent = VisualTreeHelper.GetParent(_rectProgressIndicator) as FrameworkElement;
+            if (parent == null) return;
+
+            double widthOffset = _rectProgressIndicator.Margin.Left + _rectProgressIndicator.Margin.Right;
+            double minimum = Minimum;
+            double maximum = Maximum;
+
+            switch (parent)
+            {
+                case Border border:
+                    widthOffset += border.Padding.Left + border.Padding.Right;
+                    break;
+                case Control control:
+                    widthOffset += control.Padding.Left + control.Padding.Right;
+                    break;
+            }
+
+            _rectProgressIndicator.Width = (IsIndeterminate || maximum == minimum ? 1.0 : (Value - minimum) / (maximum - minimum)) * Math.Max(0.0, parent.ActualWidth - widthOffset);
+            _rectProgressIndicator.ScheduleRedraw();
         }
 
         protected override void OnMaximumChanged(double oldMaximum, double newMaximum)
         {
             base.OnMaximumChanged(oldMaximum, newMaximum);
-            //The progress bar updates its appearance when the Maximum property changes.
-            UpdateRectangleInFront();
+            UpdateProgressRectangle();
         }
 
         protected override void OnMinimumChanged(double oldMinimum, double newMinimum)
         {
             base.OnMinimumChanged(oldMinimum, newMinimum);
-            //The progress bar updates its appearance when the Minimum property changes.
-            UpdateRectangleInFront();
+            UpdateProgressRectangle();
         }
 
         protected override void OnValueChanged(double oldValue, double newValue)
         {
             base.OnValueChanged(oldValue, newValue);
-            //The progress bar updates its appearance when the Value property changes.
-            UpdateRectangleInFront();
+            UpdateProgressRectangle();
+        }
+
+        private void OnIsIndeterminateChanged()
+        {
+            UpdateVisualState(true);
+        }
+
+        private void UpdateVisualState(bool useTransitions)
+        {
+            VisualStateManager.GoToState(this, IsIndeterminate ? "Indeterminate" : "Determinate", useTransitions);
         }
     }
 }
