@@ -31,6 +31,24 @@ namespace Windows.UI.Xaml.Controls
     [OpenSilver.NotImplemented]
     public class UpDownBase : Control
     {
+
+        #region Template Parts Name Constants
+        /// <summary>
+        /// Name constant for Text template part.
+        /// </summary>
+        internal const string ElementTextName = "Text";
+
+        /// <summary>
+        /// Name constant for Spinner template part.
+        /// </summary>
+        internal const string ElementSpinnerName = "Spinner";
+
+        /// <summary>
+        /// Name constant for SpinnerStyle property.
+        /// </summary>
+        internal const string SpinnerStyleName = "SpinnerStyle";
+        #endregion 
+
         #region public Style SpinnerStyle
         /// <summary>
         /// Gets or sets the Style that is applied to the spinner.
