@@ -16,6 +16,7 @@ using DotNetForHtml5.Core;
 using CSHTML5.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 #if BRIDGE
 using Bridge;
@@ -206,6 +207,7 @@ namespace CSHTML5.Internal
                         catch (Exception ex)
                         {
 #if DEBUG
+                            Trace.TraceError("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
                             Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
 #endif
                             throw;
@@ -258,6 +260,17 @@ namespace CSHTML5.Internal
             string idWhereCallbackArgsAreStored,
             object callbackArgsObject,
             bool returnValue)
+        {
+            return OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
+                MakeArgumentsForCallbackSimulator, true, returnValue);
+        }
+
+        //ams->
+        public static async global::System.Threading.Tasks.Task<object> OnCallbackFromJavaScript(
+            int callbackId,
+            string idWhereCallbackArgsAreStored,
+            object callbackArgsObject,
+            bool returnValue, bool runAsync)
         {
             return OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
                 MakeArgumentsForCallbackSimulator, true, returnValue);
