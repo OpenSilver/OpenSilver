@@ -1085,18 +1085,17 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             set { SetValue(FontStretchProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Called before the System.Windows.UIElement.TextInput event occurs.
-        //
-        // Parameters:
-        //   e:
-        //     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
-        [OpenSilver.NotImplemented]
-        protected virtual void OnTextInput(TextCompositionEventArgs e)
-        {
+        ////
+        //// Summary:
+        ////     Called before the System.Windows.UIElement.TextInput event occurs.
+        ////
+        //// Parameters:
+        ////   e:
+        ////     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
+        //protected virtual void OnTextInput(TextCompositionEventArgs e)
+        //{
 
-        }
+        //}
 
         [OpenSilver.NotImplemented]
         protected virtual void OnDrop(DragEventArgs e)
