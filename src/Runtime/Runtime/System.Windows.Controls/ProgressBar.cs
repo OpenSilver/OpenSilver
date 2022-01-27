@@ -100,7 +100,14 @@ namespace Windows.UI.Xaml.Controls
 
             if (_trackBorder != null && _rectProgressIndicator != null)
             {
-                UpdateProgressRectangle();
+                if (IsIndeterminate)
+                {
+                    OnIsIndeterminateChanged();
+                }
+                else
+                {
+                    UpdateProgressRectangle();
+                }
             }
         }
 
