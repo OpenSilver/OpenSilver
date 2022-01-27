@@ -161,7 +161,7 @@ endOperationDelegate, operationCompletedCallback);
         {
             if (context.CompletionCallback != null)
             {
-                InvokeAsyncCompletedEventArgs e = new InvokeAsyncCompletedEventArgs(results, error, false, null/*context.AsyncOperation.UserSuppliedState*/);
+                InvokeAsyncCompletedEventArgs e = new InvokeAsyncCompletedEventArgs(results, error, false, context.AsyncOperation.UserSuppliedState);
 #if USE_ASYNCOPERATION_CLASS
                 context.AsyncOperation.PostOperationCompleted(context.CompletionCallback, e);
 #else
