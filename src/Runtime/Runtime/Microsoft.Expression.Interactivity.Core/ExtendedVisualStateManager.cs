@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Windows.Media.Effects;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using CSHTML5.Internal;
 using System.Collections;
 
 #if MIGRATION
@@ -253,10 +254,8 @@ namespace Microsoft.Expression.Interactivity.Core
             //DependencyProperty property = path.PathParameters[0] as DependencyProperty;
             PropertyPathParser propertyPathParser = new PropertyPathParser(path.Path);
             propertyPathParser.Step(out string _, out string propertyName, out string _);
-            PropertyInfo propertyInfo = timeline.GetType().GetProperty(propertyName);
-            DependencyProperty property = (DependencyProperty)propertyInfo.DeclaringType
-                .GetField(propertyName + "Property")
-                .GetValue(null);
+            DependencyProperty property = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
+                timeline.GetType(), propertyName);
 
             if (property != null)
             {
