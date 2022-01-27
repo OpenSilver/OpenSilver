@@ -1256,6 +1256,11 @@
 		<None Include="Runtime.licenseheader" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
 		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
 	</ItemGroup>
   

@@ -16,6 +16,7 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultMenuItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultNumericUpDownStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultPasswordBoxStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultProgressBarStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultSliderStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultScrollBarStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTabControlStyle.xaml" />
