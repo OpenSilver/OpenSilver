@@ -161,7 +161,12 @@ endOperationDelegate, operationCompletedCallback);
         {
             if (context.CompletionCallback != null)
             {
+#if MIGRATION
                 InvokeAsyncCompletedEventArgs e = new InvokeAsyncCompletedEventArgs(results, error, false, context.AsyncOperation.UserSuppliedState);
+#else
+                InvokeAsyncCompletedEventArgs e = new InvokeAsyncCompletedEventArgs(results, error, false, null);
+#endif
+
 #if USE_ASYNCOPERATION_CLASS
                 context.AsyncOperation.PostOperationCompleted(context.CompletionCallback, e);
 #else
@@ -1828,9 +1833,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 #endif
 
-        #region work in progress
+#region work in progress
 
-        #region Not Supported Stuff
+#region Not Supported Stuff
 
         //    /// <summary>
         //    /// Gets the underlying System.ServiceModel.ChannelFactory<TChannel> object.
@@ -1940,10 +1945,10 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         }
 
 
-        #endregion
+#endregion
 
 #if BRIDGE
-        #region ICommunicationObject methods
+#region ICommunicationObject methods
 
 		[OpenSilver.NotImplemented]
         CommunicationState ICommunicationObject.State
@@ -2056,9 +2061,9 @@ EndOperationDelegate endDelegate, SendOrPostCallback completionCallback)
         //{
 
         //}
-        #endregion
+#endregion
 #endif
 
-        #endregion work in progress
+#endregion work in progress
     }
 }
