@@ -517,7 +517,7 @@ namespace Windows.UI.Xaml
             var eventArgs = new MouseWheelEventArgs()
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -537,7 +537,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
                 }
             }
         }
@@ -717,7 +717,7 @@ namespace Windows.UI.Xaml
         {
 
 #if MIGRATION
-                ProcessPointerEvent(jsEventArg, OnMouseEnter, OnMouseEnter_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true);
+            ProcessPointerEvent(jsEventArg, OnMouseEnter, OnMouseEnter_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true);
 #else
             ProcessPointerEvent(jsEventArg, OnPointerEntered, OnPointerEntered_ForHandledEventsToo, preventTextSelectionWhenPointerIsCaptured: true);
 #endif
@@ -935,8 +935,99 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the <see cref="TextInput"/> routed event.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent TextInputEvent = new RoutedEvent("TextInputEvent");
+
+#if MIGRATION
+        INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> _textInputEventManager;
+        INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> TextInputEventManager
+#else
+        INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> _textInputEventManager;
+        INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs> TextInputEventManager
+#endif
+        {
+            get
+            {
+                if (_textInputEventManager == null)
+                {
+#if MIGRATION
+                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "input", ProcessOnTextInput);
+#else
+                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "input", ProcessOnTextInput);
+#endif
+                }
+                return _textInputEventManager;
+            }
+        }
+
+        /// <summary>
+        /// Raises the TextInput event
+        /// </summary>
+        void ProcessOnTextInput(object jsEventArg)
+        {
+            var inputText = CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg).ToString();
+            if (inputText == null)
+                return;
+
+#if MIGRATION
+            var eventArgs = new TextCompositionEventArgs()
+#else
+            var eventArgs = new TextCompositionEventArgs()
+#endif
+            {
+                INTERNAL_OriginalJSEventArg = jsEventArg,
+                Text = inputText,
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled"),
+                TextComposition = new TextComposition("")
+            };
+
+            // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
+            if (!eventArgs.Handled)
+            {
+                OnTextInput(eventArgs);
+            }
+            OnTextInput_ForHandledEventsToo(eventArgs);
+
+            if (eventArgs.Handled)
+            {
+                CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+            }
+        }
+
+        /// <summary>
+        /// Raises the TextInput event
+        /// </summary>
+        /// <param name="eventArgs">The arguments for the event.</param>
+#if MIGRATION
+        protected virtual void OnTextInput(TextCompositionEventArgs eventArgs)
+#else
+        protected virtual void OnTextInput(TextCompositionEventArgs eventArgs)
+#endif
+        {
+            if (_textInputEventManager == null)
+                return;
+            foreach (TextCompositionEventHandler handler in _textInputEventManager.Handlers.ToList<TextCompositionEventHandler>())
+            {
+                if (eventArgs.Handled)
+                    break;
+                handler(this, eventArgs);
+            }
+        }
+
+#if MIGRATION
+        void OnTextInput_ForHandledEventsToo(TextCompositionEventArgs eventArgs)
+#else
+        void OnTextInput_ForHandledEventsToo(TextCompositionEventArgs eventArgs)
+#endif
+        {
+            if (_textInputEventManager == null)
+                return;
+            foreach (TextCompositionEventHandler handler in _textInputEventManager.HandlersForHandledEventsToo.ToList<TextCompositionEventHandler>())
+            {
+                handler(this, eventArgs);
+            }
+        }
+
 
         /// <summary>
         /// Identifies the <see cref="TextInputStart"/> routed event.
@@ -953,8 +1044,20 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Occurs when a UI element gets text in a device-independent manner.
         /// </summary>
-        [OpenSilver.NotImplemented]
-        public event TextCompositionEventHandler TextInput;
+        /// <summary>
+        /// Occurs when a keyboard key is pressed while the UIElement has focus.
+        /// </summary>
+        public event TextCompositionEventHandler TextInput
+        {
+            add
+            {
+                TextInputEventManager.Add(value);
+            }
+            remove
+            {
+                TextInputEventManager.Remove(value);
+            }
+        }
 
         /// <summary>
         /// Occurs when a UI element initially gets text in a device-independent manner.
@@ -968,7 +1071,7 @@ namespace Windows.UI.Xaml
         [OpenSilver.NotImplemented]
         public event TextCompositionEventHandler TextInputUpdate;
 
-#endregion
+        #endregion
 
 
         #region Tapped event
@@ -1012,7 +1115,7 @@ namespace Windows.UI.Xaml
             var eventArgs = new TappedRoutedEventArgs()
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -1029,7 +1132,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
                 }
             }
         }
@@ -1129,7 +1232,7 @@ namespace Windows.UI.Xaml
 #endif
             {
                 INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
             };
 
             if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
@@ -1159,7 +1262,7 @@ namespace Windows.UI.Xaml
 
                 if (eventArgs.Handled)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
                 }
             }
         }
@@ -1268,7 +1371,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 PlatformKeyCode = keyCode,
                 Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
             };
 
             // Add the key modifier to the eventArgs:
@@ -1283,7 +1386,7 @@ namespace Windows.UI.Xaml
 
             if (eventArgs.Handled)
             {
-                CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
                 CSHTML5.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
             }
         }
@@ -1384,7 +1487,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 PlatformKeyCode = keyCode,
                 Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
+                Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
             };
 
             // Add the key modifier to the eventArgs:
@@ -1399,7 +1502,7 @@ namespace Windows.UI.Xaml
 
             if (eventArgs.Handled)
             {
-                CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
             }
         }
 
@@ -1638,7 +1741,7 @@ namespace Windows.UI.Xaml
         /// pressed, while within this element.
         /// Note that ONLY sender's informations are currently filled (not pointer's)
         /// </summary>
-        private event RoutedEventHandler GotFocusForIsTabStop 
+        private event RoutedEventHandler GotFocusForIsTabStop
         {
             add
             {
@@ -1711,7 +1814,7 @@ namespace Windows.UI.Xaml
         {
             if (!INTERNAL_AreFocusEventsAllowed)
             {
-                 INTERNAL_AreFocusEventsAllowed = true;
+                INTERNAL_AreFocusEventsAllowed = true;
 
                 INTERNAL_AttachToFocusEvents();
                 GotFocusForIsTabStop -= UIElement_GotFocusForIsTabStop; //just in case.
@@ -1730,7 +1833,7 @@ namespace Windows.UI.Xaml
         private void INTERNAL_AttachToFocusEvents()
         {
             Type[] methodParameters = { typeof(RoutedEventArgs) };
-            
+
             if (_gotFocusEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnGotFocus", methodParameters))
             {
                 var v = GotFocusEventManager; //forces the creation of the event manager.
@@ -1764,53 +1867,53 @@ namespace Windows.UI.Xaml
             }
         }
 
-#region first try at this (would be better than the current one but It doesn't work for whatever reason).
+        #region first try at this (would be better than the current one but It doesn't work for whatever reason).
 
-//        private HtmlEventProxy _preventFocusProxy = null;
+        //        private HtmlEventProxy _preventFocusProxy = null;
 
-//        private static void PreventFocus(object jsEvent)
-//        {
-//            //Note: this is not ideal because TextBoxes still have a flicker of Focus in the simulator and it is possible to type something during that flicker (there is a frame where the textBox did get the focus).
-//            //          fortunately, it seems that we cannot do the same in browsers (at least chrome)
-//            //      and pressing tab afterwards brings to the element after the one that we prevented from being focused while in SL it goes back to the first of the page.
-//            //          I consider this acceptable (at least for now) because it is more like I would have expected.
-//            CSHTML5.Interop.ExecuteJavaScript(@"
-//        var v = $0.target || $0.srcElement
-//        v.blur()", jsEvent);
-//        }
+        //        private static void PreventFocus(object jsEvent)
+        //        {
+        //            //Note: this is not ideal because TextBoxes still have a flicker of Focus in the simulator and it is possible to type something during that flicker (there is a frame where the textBox did get the focus).
+        //            //          fortunately, it seems that we cannot do the same in browsers (at least chrome)
+        //            //      and pressing tab afterwards brings to the element after the one that we prevented from being focused while in SL it goes back to the first of the page.
+        //            //          I consider this acceptable (at least for now) because it is more like I would have expected.
+        //            CSHTML5.Interop.ExecuteJavaScript(@"
+        //        var v = $0.target || $0.srcElement
+        //        v.blur()", jsEvent);
+        //        }
 
-//        internal void PreventFocusEvents()
-//        {
-//            if (INTERNAL_AreFocusEventsAllowed)
-//            {
-//                INTERNAL_AreFocusEventsAllowed = false;
+        //        internal void PreventFocusEvents()
+        //        {
+        //            if (INTERNAL_AreFocusEventsAllowed)
+        //            {
+        //                INTERNAL_AreFocusEventsAllowed = false;
 
-//                INTERNAL_DetachFromFocusEvents();
+        //                INTERNAL_DetachFromFocusEvents();
 
 
-//                var domElementConcernedByFocus = INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? INTERNAL_OuterDomElement;
+        //                var domElementConcernedByFocus = INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? INTERNAL_OuterDomElement;
 
-//                _preventFocusProxy = INTERNAL_EventsHelper.AttachToDomEvents("focusin", domElementConcernedByFocus, (Action<object>)(jsEventArg =>
-//                {
-//                    PreventFocus(jsEventArg);
-//                }));
-//            }
-//        }
+        //                _preventFocusProxy = INTERNAL_EventsHelper.AttachToDomEvents("focusin", domElementConcernedByFocus, (Action<object>)(jsEventArg =>
+        //                {
+        //                    PreventFocus(jsEventArg);
+        //                }));
+        //            }
+        //        }
 
-//        internal void AllowFocusEvents()
-//        {
-//            if (!INTERNAL_AreFocusEventsAllowed)
-//            {
-//                INTERNAL_AreFocusEventsAllowed = true;
+        //        internal void AllowFocusEvents()
+        //        {
+        //            if (!INTERNAL_AreFocusEventsAllowed)
+        //            {
+        //                INTERNAL_AreFocusEventsAllowed = true;
 
-//                INTERNAL_AttachToFocusEvents();
-//                _preventFocusProxy.Dispose();
-//            }
-//        }
+        //                INTERNAL_AttachToFocusEvents();
+        //                _preventFocusProxy.Dispose();
+        //            }
+        //        }
 
-#endregion
+        #endregion
 
-#endregion
+        #endregion
 
         void ProcessPointerEvent(
             object jsEventArg,
@@ -1823,23 +1926,23 @@ namespace Windows.UI.Xaml
 #endif
  bool preventTextSelectionWhenPointerIsCaptured = false,
             bool checkForDivsThatAbsorbEvents = false,  //Note: this is currently true only for PointerPressed and PointerReleased
-            //because those are the events we previously attached ourselves to for TextBox
-            //so that it would set the event to handled to prevent the click in a TextBox (to change the text) located
-            //in a button or any other control that reacts to clicks from also triggering the click from that control
+                                                        //because those are the events we previously attached ourselves to for TextBox
+                                                        //so that it would set the event to handled to prevent the click in a TextBox (to change the text) located
+                                                        //in a button or any other control that reacts to clicks from also triggering the click from that control
             bool refreshClickCount = false)
         {
             bool isMouseEvent = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.type.startsWith('mouse')", jsEventArg));
             if (!(ignoreMouseEvents && isMouseEvent)) //Ignore mousedown, mousemove and mouseup if the touch equivalents have been handled.
             {
 #if MIGRATION
-            var eventArgs = new MouseButtonEventArgs()
+                var eventArgs = new MouseButtonEventArgs()
 #else
                 var eventArgs = new PointerRoutedEventArgs()
 #endif
                 {
                     INTERNAL_OriginalJSEventArg = jsEventArg,
-                    Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.data", jsEventArg) ?? "").ToString() == "handled")
-            };
+                    Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
+                };
                 if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
                 {
                     eventArgs.Handled = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
@@ -1864,7 +1967,7 @@ namespace Windows.UI.Xaml
 
                     if (eventArgs.Handled)
                     {
-                        CSHTML5.Interop.ExecuteJavaScript("$0.data = 'handled'", jsEventArg);
+                        CSHTML5.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
                     }
                 }
 
@@ -1874,14 +1977,14 @@ namespace Windows.UI.Xaml
                     CSHTML5.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
                 }
                 bool isTouchEndEvent = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.type == 'touchend'", jsEventArg));
-                if(isTouchEndEvent) //prepare to ignore the mouse events since they were already handled as touch events
+                if (isTouchEndEvent) //prepare to ignore the mouse events since they were already handled as touch events
                 {
                     ignoreMouseEvents = true;
-                    if(_ignoreMouseEventsTimer == null)
+                    if (_ignoreMouseEventsTimer == null)
                     {
-                        _ignoreMouseEventsTimer = new DispatcherTimer() { Interval = new TimeSpan(0,0,0,0,100) }; //I arbitrarily picked 100ms because at 30ms with throttling x6, it didn't work every time (but sometimes did so it should be alright, also, I tested with 100ms and it worked everytime)
+                        _ignoreMouseEventsTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, 100) }; //I arbitrarily picked 100ms because at 30ms with throttling x6, it didn't work every time (but sometimes did so it should be alright, also, I tested with 100ms and it worked everytime)
                         _ignoreMouseEventsTimer.Tick += _ignoreMouseEventsTimer_Tick;
-                        
+
                     }
                     _ignoreMouseEventsTimer.Stop();
                     _ignoreMouseEventsTimer.Start();
@@ -2022,6 +2125,15 @@ namespace Windows.UI.Xaml
             if (_lostFocusEventManager != null)
             {
                 _lostFocusEventManager.AttachToDomEvents(this, typeof(UIElement), "OnLostFocus", methodParameters);
+            }
+            methodParameters = new Type[] { typeof(TextCompositionEventArgs) };
+            if (_textInputEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(UIElement), "OnTextInput", methodParameters))
+            {
+                var v = TextInputEventManager; //forces the creation of the event manager.
+            }
+            if (_textInputEventManager != null)
+            {
+                _textInputEventManager.AttachToDomEvents(this, typeof(UIElement), "OnTextInput", methodParameters);
             }
 #else
             Type[] methodParameters = new Type[] { typeof(PointerRoutedEventArgs) };
@@ -2178,6 +2290,11 @@ namespace Windows.UI.Xaml
             {
                 _lostFocusEventManager.DetachFromDomEvents();
             }
+            if (_textInputEventManager != null)
+            {
+                _textInputEventManager.DetachFromDomEvents();
+            }
+
         }
 
 
@@ -2309,10 +2426,14 @@ namespace Windows.UI.Xaml
             {
                 LostFocusEventManager.Add((RoutedEventHandler)handler, handledEventsToo: handledEventsToo);
             }
+            else if (routedEvent == UIElement.TextInputEvent)
+            {
+                TextInputEventManager.Add((TextCompositionEventHandler)handler, handledEventsToo: handledEventsToo);
+            }
             else if (routedEvent == UIElement.TextInputUpdateEvent ||
-                     routedEvent == UIElement.TextInputEvent ||
                      routedEvent == UIElement.TextInputStartEvent)
             {
+
             }
             else
             {
@@ -2397,7 +2518,7 @@ namespace Windows.UI.Xaml
             else if (routedEvent == UIElement.MouseRightButtonDownEvent)
             {
                 MouseRightButtonDownEventManager.Remove((MouseButtonEventHandler)handler);
-                
+
             }
 #endif
 #if MIGRATION
@@ -2439,6 +2560,15 @@ namespace Windows.UI.Xaml
             else if (routedEvent == UIElement.LostFocusEvent)
             {
                 LostFocusEventManager.Remove((RoutedEventHandler)handler);
+            }
+            else if (routedEvent == UIElement.TextInputEvent)
+            {
+                TextInputEventManager.Remove((TextCompositionEventHandler)handler);
+            }
+            else if (routedEvent == UIElement.TextInputUpdateEvent ||
+                     routedEvent == UIElement.TextInputStartEvent)
+            {
+
             }
             else
             {
