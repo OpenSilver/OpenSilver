@@ -977,7 +977,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_OriginalJSEventArg = jsEventArg,
                 Text = inputText,
                 Handled = ((CSHTML5.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled"),
-                TextComposition = new TextComposition() { CompositionText = "" }
+                TextComposition = new TextComposition("")
             };
 
             // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
@@ -2560,6 +2560,15 @@ namespace Windows.UI.Xaml
             else if (routedEvent == UIElement.LostFocusEvent)
             {
                 LostFocusEventManager.Remove((RoutedEventHandler)handler);
+            }
+            else if (routedEvent == UIElement.TextInputEvent)
+            {
+                TextInputEventManager.Remove((TextCompositionEventHandler)handler);
+            }
+            else if (routedEvent == UIElement.TextInputUpdateEvent ||
+                     routedEvent == UIElement.TextInputStartEvent)
+            {
+
             }
             else
             {

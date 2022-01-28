@@ -25,18 +25,23 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-	//
-	// Summary:
-	//     Represents a composition related to text input which includes the composition
-	//     text itself.
+	/// <summary>
+	/// Represents a composition related to text input which includes the composition
+	/// text itself.
+	/// </summary>
 	public sealed partial class TextComposition
 	{
-		//
-		// Summary:
-		//     Gets the composition text for this text composition.
-		//
-		// Returns:
-		//     The composition text for this text composition.
-		public string CompositionText { get; set; }
+		internal TextComposition(string compositionText)
+        {
+			CompositionText = compositionText;
+		}
+
+		/// <summary>
+		/// Gets the composition text for this text composition.
+		/// </summary>
+		/// <returns>
+		/// The composition text for this text composition.
+		/// </returns>
+		public string CompositionText { get; }
 	}
 }
