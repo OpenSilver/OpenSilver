@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
         {
             this.Loaded += DatePicker_Loaded;
         }
-
+       
         private void DatePicker_Loaded(object sender, RoutedEventArgs e)
         {
             DateTime defaultDate = SelectedValue == null ? DateTime.Today : SelectedValue.Value;
