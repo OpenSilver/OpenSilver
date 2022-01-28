@@ -232,5 +232,18 @@ namespace Windows.UI.Xaml.Controls
             get { return (ControlTemplate)GetValue(TemplateProperty); }
             set { SetValue(TemplateProperty, value); }
         }
+
+        [OpenSilver.NotImplemented]
+        public double FontSize
+        {
+            get { return (double)GetValue(FontSizeProperty); }
+            set { SetValue(FontSizeProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Control.FontSize"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(Calendar), new PropertyMetadata(11d));
     }
 }
