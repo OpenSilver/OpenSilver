@@ -56,22 +56,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="Control.FontSize"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(Calendar), new PropertyMetadata());
-
-
-
-        public double FontSize
-        {
-            get { return (double)GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
-        }
-
-        [OpenSilver.NotImplemented]
-        /// <summary>
-        /// Identifies the <see cref="Control.FontSize"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(Calendar), new PropertyMetadata());
-
-
+       
         private void DatePicker_Loaded(object sender, RoutedEventArgs e)
         {
             DateTime defaultDate = SelectedValue == null ? DateTime.Today : SelectedValue.Value;
