@@ -1,4 +1,6 @@
-﻿/*===================================================================================
+﻿
+
+/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -11,6 +13,12 @@
 \*====================================================================================*/
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Interactivity;
 using System.Windows.Markup;
 #if !MIGRATION
 using Windows.UI.Xaml;
@@ -24,20 +32,20 @@ namespace System.Windows.Interactivity
     /// </summary>
     /// 
     /// <remarks>
-    /// This is an infrastructure class. Trigger authors should derive from <see cref="TriggerBase{T}" /> instead of this class.
+    /// This is an infrastructure class. Trigger authors should derive from Trigger&lt;T&gt; instead of this class.
     /// </remarks>
     [ContentProperty(Name = "Actions")]
-    public abstract partial class TriggerBase : DependencyObject, IAttachedObject
+    public abstract partial class TriggerBase : DependencyObject, IAttachedObject//InteractivityBase
     {
         //Note on this file: see commit 58c52131 of October 30th, 2019 for comments on the modifications from the original source.
         //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
 
         #region added because we changed heritage
-
+        internal DependencyObject _associatedObject = null;
         /// <summary>
         /// Gets the object to which this behavior is attached.
         /// </summary>
-        public DependencyObject AssociatedObject { get; internal set; }  //todo: was protected but it has to be public because it comes from an interface si I don't really understand.
+        public DependencyObject AssociatedObject { get { return _associatedObject; } }  //todo: was protected but it has to be public because it comes from an interface si I don't really understand.
 
         /// <summary>
         /// Attaches to the specified object.
@@ -45,30 +53,30 @@ namespace System.Windows.Interactivity
         /// <param name="dependencyObject">The object to attach to.</param>
         public void Attach(DependencyObject dependencyObject)
         {
-            if (dependencyObject == AssociatedObject)
+            if (dependencyObject == this.AssociatedObject)
             {
                 return;
             }
-            if (AssociatedObject != null)
+            if (_associatedObject != null)
             {
                 throw new InvalidOperationException("The Behavior is already hosted on a different element.");
             }
-            AssociatedObject = dependencyObject;
+            _associatedObject = dependencyObject;
             OnAttached();
         }
 
         protected virtual void OnAttached()
         {
-            Actions.Attach(AssociatedObject);
-        }
+            this.Actions.Attach(_associatedObject);
 
+        }
         #endregion
 
         internal TriggerBase(Type associatedObjectTypeConstraint)
         {
-            AssociatedObjectTypeConstraint = associatedObjectTypeConstraint;
+            this.associatedObjectTypeConstraint = associatedObjectTypeConstraint;
             TriggerActionCollection newCollection = new TriggerActionCollection();
-            SetValue(ActionsProperty, newCollection);
+            this.SetValue(ActionsProperty, newCollection);
         }
 
         public static readonly DependencyProperty ActionsProperty = DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(TriggerBase), null);
@@ -84,23 +92,29 @@ namespace System.Windows.Interactivity
         {
             get
             {
-                var actions = (TriggerActionCollection)GetValue(ActionsProperty);
-
+                TriggerActionCollection actions = (TriggerActionCollection)this.GetValue(TriggerBase.ActionsProperty);
                 if (actions == null)
                 {
                     actions = new TriggerActionCollection();
-                    this.SetValue(ActionsProperty, actions);
+                    this.SetValue(TriggerBase.ActionsProperty, actions);
                 }
-
                 return actions;
             }
         }
+
+        private Type associatedObjectTypeConstraint;
 
         /// <summary>
 		/// Gets the type constraint of the associated object.
 		/// </summary>
 		/// <value>The associated object type constraint.</value>
-		protected virtual Type AssociatedObjectTypeConstraint { get; }
+		protected virtual Type AssociatedObjectTypeConstraint
+        {
+            get
+            {
+                return this.associatedObjectTypeConstraint;
+            }
+        }
 
         /// <summary>
         /// Invoke all actions associated with this trigger.
@@ -111,7 +125,7 @@ namespace System.Windows.Interactivity
         /// </remarks>
         protected void InvokeActions(object parameter)
         {
-            foreach (TriggerAction triggerAction in Actions)
+            foreach (TriggerAction triggerAction in this.Actions)
             {
                 triggerAction.CallInvoke(parameter);
             }
@@ -125,19 +139,19 @@ namespace System.Windows.Interactivity
         {
             //Note: I don't think this method is ever called.
 
-            if (frameworkElement == AssociatedObject)
+            if (frameworkElement == this.AssociatedObject)
             {
                 return;
             }
-            if (AssociatedObject != null)
+            if (this.AssociatedObject != null)
             {
                 throw new InvalidOperationException("Cannot Host Trigger Multiple Times");
             }
            
-            AssociatedObject = frameworkElement;
+            this._associatedObject = frameworkElement;
             Attach((DependencyObject)frameworkElement);
-            Actions.Attach(frameworkElement);
-            OnAttached();
+            this.Actions.Attach(frameworkElement);
+            this.OnAttached();
         }
 
         /// <summary>
@@ -145,8 +159,8 @@ namespace System.Windows.Interactivity
         /// </summary>
         public void Detach()//should be an override but we changed the heritage
         {
-            AssociatedObject = null;
-            Actions.Detach();
+            this._associatedObject = null;
+            this.Actions.Detach();
         }
 
         /// <summary>
