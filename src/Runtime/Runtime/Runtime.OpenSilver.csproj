@@ -52,6 +52,8 @@
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\DataStateBehavior.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\GoToStateAction.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity.Media\WORKINPROGRESS\StoryboardCompletedTrigger.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity.Media\WORKINPROGRESS\StoryboardTrigger.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\ComparisonLogic.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\TypeConverterHelper.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\VisualStateUtilities.cs" />

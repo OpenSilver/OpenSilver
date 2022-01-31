@@ -58,6 +58,7 @@ using System.Runtime.InteropServices;
 
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")] // This is used for example in the {x:Static ...} markup extension.
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/expression/2010/interactions", "Microsoft.Expression.Interactivity.Core")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/expression/2010/interactions", "Microsoft.Expression.Interactivity.Media")]
 
 #if MIGRATION
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.IO.IsolatedStorage")]
