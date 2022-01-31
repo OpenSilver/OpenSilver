@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml
 
             // Raise the "Loaded" event:
             this.INTERNAL_RaiseLoadedEvent();
-
+            
             this.SizeChanged += WindowSizeChangedEventHandler;
         }
 

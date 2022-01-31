@@ -165,11 +165,11 @@ namespace Windows.UI.Xaml.Controls
                     _sourceItemsControl = (TItemsControlType)this.Content; // Note: there is no risk of InvalidCastException because the type has been tested before, and the derived class (PanelDragDropTarget) also verifies the type in the "OnContentChanged" method.
 
                     // Capture the pointer so that when dragged outside the DragDropPanel, we can still get its position:
-#if MIGRATION
+    #if MIGRATION
                     this.CaptureMouse();
-#else
+    #else
                     this.CapturePointer(e.Pointer);
-#endif
+    #endif
                     // Remember that the pointer is currently captured:
                     _isPointerCaptured = true;
                     _capturedPointer = e.Pointer;
@@ -699,7 +699,7 @@ namespace Windows.UI.Xaml.Controls
                 // 2) Find the item to move from the list of the children of the DragDropTarget
                 int indexOfLastElementInList = ElementsBetweenClickedElementAndDragDropTarget.Count - 1;
                 int amoutOfElementsBetweenItemsRootAndDragDropTarget = dragDropTargetUnder.INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget();
-                if (indexOfLastElementInList < amoutOfElementsBetweenItemsRootAndDragDropTarget) //Note: this can happen while dragging: the element under the pointer can be closer to the DragDropTarget than the root of the item we are dragging.
+                if(indexOfLastElementInList < amoutOfElementsBetweenItemsRootAndDragDropTarget) //Note: this can happen while dragging: the element under the pointer can be closer to the DragDropTarget than the root of the item we are dragging.
                 {
                     itemContainerUnderPointer = null;
                     return dragDropTargetUnder;
