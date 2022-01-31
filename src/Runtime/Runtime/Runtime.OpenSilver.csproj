@@ -118,6 +118,8 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
+		<Compile Include="System.Windows.input\WORKINPROGRESS\StylusPoint.cs" />
+		<Compile Include="System.Windows.input\WORKINPROGRESS\StylusPointCollection.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTriggerBase.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolvedEventArgs.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolver.cs" />
