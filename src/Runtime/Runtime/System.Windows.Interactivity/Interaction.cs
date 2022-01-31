@@ -113,9 +113,14 @@ namespace System.Windows.Interactivity
             triggerCollection2.Attach(fElement);
         }
 
-
-
-
-
+        /// <summary>
+        /// A helper function to take the place of FrameworkElement.IsLoaded, as this property is not available in Silverlight.
+        /// </summary>
+        /// <param name="element">The element of interest.</param>
+        /// <returns>True if the element has been loaded; otherwise, False.</returns>
+        internal static bool IsElementLoaded(FrameworkElement element)
+        {
+            return element.IsLoaded;
+        }
     }
 }

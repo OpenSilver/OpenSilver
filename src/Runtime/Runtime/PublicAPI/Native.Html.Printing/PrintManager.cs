@@ -39,7 +39,7 @@ namespace CSHTML5.Native.Html.Printing
     /// </summary>
     public static class PrintManager
     {
-        static FrameworkElement CurrentPrintArea; // By default, the print area is set to Window.Current.Content. Please refer to the Setter of the property "Window.Current.Content" to see how the default print area is set.
+        static UIElement CurrentPrintArea; // By default, the print area is set to Window.Current.Content. Please refer to the Setter of the property "Window.Current.Content" to see how the default print area is set.
         internal static bool IsDefaultPrintArea = true;
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace CSHTML5.Native.Html.Printing
         /// Define the element that will be printed when pressing Ctrl+P or when clicking the Print command in the browser menu.
         /// </summary>
         /// <param name="element">An element in in the Visual Tree.</param>
-        public static void SetPrintArea(FrameworkElement element)
+        public static void SetPrintArea(UIElement element)
         {
             if (element != null)
             {
@@ -115,7 +115,7 @@ namespace CSHTML5.Native.Html.Printing
                 var root = Window.Current.Content;
                 if (root != null)
                 {
-                    SetPrintArea((FrameworkElement)root);
+                    SetPrintArea(root);
                 }
                 else
                 {
@@ -139,7 +139,7 @@ namespace CSHTML5.Native.Html.Printing
         /// Print a specific element.
         /// </summary>
         /// <param name="element">The element to print.</param>
-        public static void Print(FrameworkElement element)
+        public static void Print(UIElement element)
         {
 #if CSHTML5BLAZOR
             if (!Interop.IsRunningInTheSimulator_WorkAround)
@@ -214,7 +214,7 @@ namespace CSHTML5.Native.Html.Printing
                 MessageBox.Show("The application requested to print. This feature is not implemented in the Simulator. Please run the application in the browser instead.");
         }
 
-        private static void RestorePreviousPrintArea(FrameworkElement previousPrintArea)
+        private static void RestorePreviousPrintArea(UIElement previousPrintArea)
         {
             // Revert to the previous print area or the default one:
             if (previousPrintArea != null)

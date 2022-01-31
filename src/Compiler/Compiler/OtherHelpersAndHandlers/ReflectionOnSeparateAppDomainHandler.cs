@@ -13,13 +13,6 @@
 *  
 \*====================================================================================*/
 
-
-
-extern alias wpf;
-#if !BRIDGE && !CSHTML5BLAZOR
-extern alias custom;
-extern alias DotNetForHtml5Core;
-#endif
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,9 +21,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-#if !BRIDGE && !CSHTML5BLAZOR
-using custom::System.Windows.Markup;
-#endif
 using System.Xml.Linq;
 using DotNetForHtml5.Compiler.Common;
 using DotNetForHtml5.Compiler.OtherHelpersAndHandlers;
@@ -861,7 +851,7 @@ namespace DotNetForHtml5.Compiler
                 }
 
                 if (!doNotRaiseExceptionIfNotFound)
-                    throw new wpf::System.Windows.Markup.XamlParseException(
+                    throw new XamlParseException(
                         "Type not found: \"" + localTypeName + "\""
                         + (!string.IsNullOrEmpty(namespaceName) ? " in namespace: \"" + namespaceName + "\"" : "")
                         + (!string.IsNullOrEmpty(filterAssembliesAndRetainOnlyThoseThatHaveThisName) ? " in assembly: \"" + filterAssembliesAndRetainOnlyThoseThatHaveThisName + "\"" : "")
@@ -883,7 +873,7 @@ namespace DotNetForHtml5.Compiler
                 var contentProperty = Attribute.GetCustomAttribute(type, contentPropertyAttributeType, true);
 
                 if (contentProperty == null && !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny)) //if the element is a collection, it is possible to add the children directly to this element.
-                    throw new wpf::System.Windows.Markup.XamlParseException("No default content property exists for element: " + localTypeName.ToString());
+                    throw new XamlParseException("No default content property exists for element: " + localTypeName.ToString());
 
                 if (contentProperty == null)
                     return null;
@@ -925,7 +915,7 @@ namespace DotNetForHtml5.Compiler
                     }
                     else
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Type \"{0}\" not found in namespace \"{1}\".", localTypeName, namespaceName));
+                        throw new XamlParseException(string.Format("Type \"{0}\" not found in namespace \"{1}\".", localTypeName, namespaceName));
                     }
                 }
                 else
@@ -980,7 +970,7 @@ namespace DotNetForHtml5.Compiler
                         }
                         else
                         {
-                            throw new wpf::System.Windows.Markup.XamlParseException(
+                            throw new XamlParseException(
                                 $"Type '{localTypeName}' not found in namespace '{namespaceName}'."
                             );
                         }
@@ -1021,7 +1011,7 @@ namespace DotNetForHtml5.Compiler
                     }
                     else
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException(string.Format("Type \"{0}\" not found in namespace \"{1}\".", localTypeName, namespaceName));
+                        throw new XamlParseException(string.Format("Type \"{0}\" not found in namespace \"{1}\".", localTypeName, namespaceName));
                     }
                 }
                 else
@@ -1219,7 +1209,7 @@ namespace DotNetForHtml5.Compiler
                 MethodInfo methodInfo = elementType.GetMethod(methodName);
                 if (methodInfo == null)
                 {
-                    throw new wpf::System.Windows.Markup.XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType.ToString() + "\".");
+                    throw new XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType.ToString() + "\".");
                 }
                 declaringTypeName = "global::" + (!string.IsNullOrEmpty(methodInfo.DeclaringType.Namespace) ? methodInfo.DeclaringType.Namespace + "." : "") + GetTypeNameIncludingGenericArguments(methodInfo.DeclaringType);
                 returnValueNamespaceName = this.BuildPropertyPathRecursively(methodInfo.ReturnType);
@@ -1257,7 +1247,7 @@ namespace DotNetForHtml5.Compiler
                     FieldInfo fieldInfo = elementType.GetField(propertyOrFieldName);
                     if (fieldInfo == null)
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException("Property or field \"" + propertyOrFieldName + "\" not found in type \"" + elementType.ToString() + "\".");
+                        throw new XamlParseException("Property or field \"" + propertyOrFieldName + "\" not found in type \"" + elementType.ToString() + "\".");
                     }
                     else
                     {
@@ -1341,7 +1331,7 @@ namespace DotNetForHtml5.Compiler
                     if (returnNullIfNotFoundInsteadOfException)
                         return null;
                     else
-                        throw new wpf::System.Windows.Markup.XamlParseException("Member \"" + memberName + "\" not found in type \"" + elementType.ToString() + "\".");
+                        throw new XamlParseException("Member \"" + memberName + "\" not found in type \"" + elementType.ToString() + "\".");
                 }
                 MemberInfo memberInfo = membersFound[0];
                 return memberInfo;
@@ -1370,7 +1360,7 @@ namespace DotNetForHtml5.Compiler
                         FieldInfo fieldInfo = elementType.GetField(propertyName);
                         if (fieldInfo == null)
                         {
-                            throw new wpf::System.Windows.Markup.XamlParseException("Property or field \"" + propertyName + "\" not found in type \"" + elementType.ToString() + "\".");
+                            throw new XamlParseException("Property or field \"" + propertyName + "\" not found in type \"" + elementType.ToString() + "\".");
                         }
                         else
                         {
@@ -1417,7 +1407,7 @@ namespace DotNetForHtml5.Compiler
                 }
 
                 if (methodInfo == null)
-                    throw new wpf::System.Windows.Markup.XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType.ToString() + "\".");
+                    throw new XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType.ToString() + "\".");
                 Type methodType = methodInfo.ReturnType;
                 return methodType;
             }
@@ -1791,7 +1781,7 @@ namespace DotNetForHtml5.Compiler
             {
                 Type type = FindType(namespaceName, localTypeName, assemblyIfAny);
 
-                if (type == null) throw new wpf::System.Windows.Markup.XamlParseException($"Type '{localTypeName}' not found in namepsace '{namespaceName}'.");
+                if (type == null) throw new XamlParseException($"Type '{localTypeName}' not found in namepsace '{namespaceName}'.");
 
                 FieldInfo field;
                 if (type.IsEnum)
@@ -1812,7 +1802,7 @@ namespace DotNetForHtml5.Compiler
                     field = type.GetField(fieldNameIgnoreCase, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
                 }
 
-                return field.Name ?? throw new wpf::System.Windows.Markup.XamlParseException($"Field '{fieldNameIgnoreCase}' not found in type: '{type.FullName}'.");
+                return field.Name ?? throw new XamlParseException($"Field '{fieldNameIgnoreCase}' not found in type: '{type.FullName}'.");
             }
 
             // note: this method has been abandonned because fieldInfo.GetValue(null) can 

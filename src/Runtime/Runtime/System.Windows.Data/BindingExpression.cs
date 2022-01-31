@@ -612,7 +612,7 @@ namespace Windows.UI.Xaml.Data
                 else
                 {
                     Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
-                    _bindingSource = Target.InheritedParent;
+                    _bindingSource = FrameworkElement.FindMentor(Target);
                 }
             }
         }

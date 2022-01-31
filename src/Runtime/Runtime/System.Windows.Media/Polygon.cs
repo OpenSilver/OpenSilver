@@ -167,7 +167,7 @@ namespace Windows.UI.Xaml.Shapes
 				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = 'transparent'", context);
 			}
 
-			INTERNAL_ShapesDrawHelpers.PreparePolygon(_canvasDomElement, Points);
+			INTERNAL_ShapesDrawHelpers.PrepareLines(_canvasDomElement, Points, StrokeThickness, true);
 
 			if (strokeValue != null)
 				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.strokeStyle = $1", context, strokeValue);

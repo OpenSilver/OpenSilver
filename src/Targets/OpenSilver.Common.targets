@@ -26,18 +26,13 @@
   <!--============================================================
   LOCATION OF COMPILER TASKS
   ============================================================-->
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyReferenceValidator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.EntryPointGenerator" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AssemblyAttributesGenerator" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ServiceReferenceFixer" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResXProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.BeforeXamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.XamlPreprocessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.AfterXamlPreprocessor" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.OutputPathsEraser" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesExtractorAndCopier" />
-  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.Wrapper_BridgeVersion" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.TypeScriptDefToCSharp" />
 
   <ItemGroup>
@@ -259,12 +254,12 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(IsBrowserProject)' == 'false'">
-      <EmbeddedResource Include="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
-      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
+      <EmbeddedResource Include="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
+      <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
       <EmbeddedResource Include="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
       <None Remove="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
-      <EmbeddedResource Include="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx' "/>
-      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx'"/>
+      <EmbeddedResource Include="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.woff2' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx' "/>
+      <Resource Remove="@(Resource)" Condition="'%(Resource.Extension)'=='.js' Or '%(Resource.Extension)'=='.css' Or '%(Resource.Extension)'=='.png' Or '%(Resource.Extension)'=='.jpg' Or '%(Resource.Extension)'=='.gif' Or '%(Resource.Extension)'=='.ico' Or '%(Resource.Extension)'=='.mp4' Or '%(Resource.Extension)'=='.ogv' Or '%(Resource.Extension)'=='.webm' Or '%(Resource.Extension)'=='.3gp' Or '%(Resource.Extension)'=='.mp3' Or '%(Resource.Extension)'=='.ogg' Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.ttf' Or '%(Resource.Extension)'=='.woff' Or '%(Resource.Extension)'=='.woff2' Or '%(Resource.Extension)'=='.cur' Or '%(Resource.Extension)'=='.json' Or '%(Resource.Extension)'=='.config'  Or '%(Resource.Extension)'=='.ClientConfig' Or '%(Resource.Extension)'=='.htm' Or '%(Resource.Extension)'=='.html' Or '%(Resource.Extension)'=='.svg' Or '%(Resource.Extension)'=='.resx'"/>
     </ItemGroup>
 
     <!--============================================================
@@ -273,35 +268,6 @@
     <Error
       Condition="'%(Content.Extension)'=='.xaml' And '%(Content.Generator)'=='' And '$(IsSecondPass)'!='True' And '$(IgnoreMissingCustomTool)'!='True'"
       Text="Before you can build the project, please go to Solution Explorer, select the file '%(Content.FileName).xaml', hit F4, and enter 'MSBuild:Compile' (without the quotes) in the 'Custom Tool' property. You will need to do the same for all XAML files in the project."/>
-
-    <!--============================================================
-      EntryPointGenerator (only during Pass 2)
-      ============================================================-->
-    <!--<EntryPointGenerator
-      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True'"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSHTML5_Entry_Point.cs"
-      />-->
-
-    <!--The AssemblyAttributeGenerator is disabled as it is not working with the open silver version-->
-    <!--============================================================
-      AssemblyAttributesGenerator
-      ============================================================-->
-    <!--
-    <Message
-      Text="Starting AssemblyAttributesGenerator"
-      Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
-      Importance="normal"/>
-    <AssemblyAttributesGenerator
-      Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
-      IsSLMigration="$(IsSLMigration)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSharpXamlForHtml5_AssemblyAttributes.cs"
-      IntermediateOutputAbsolutePath="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)"
-      />
-    <ItemGroup>
-      <Compile
-        Condition="'$(SkipAssemblyAttributesGenerator)'!='true'"
-        Include="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)CSharpXamlForHtml5_AssemblyAttributes.cs" />
-    </ItemGroup>-->
 
     <!--============================================================
       ServiceReferenceFixer (case insensitive) (only during Pass 2)
@@ -395,23 +361,6 @@
     <Message
           Text="OpenSilver Before compile. IsSecondPass=$(IsSecondPass)"
           Importance="normal"/>
-
-    <!--============================================================
-      AssemblyReferenceValidator (only during Pass 1)
-      ============================================================-->
-    <!--Disabled for now as we use reference without any metadata from package reference-->
-    <!--<AssemblyReferenceValidator
-      Condition="'$(IsSecondPass)'!='True' And '$(AllowAnyReferences)'!='True'"
-      References="@(Reference)"
-      AllowedAssemblies="mscorlib|System.Core|Microsoft.CSharp|CSHTML5.Blazor|CSHTML5.Migration.Blazor|CSHTML5.Stubs|Bridge"
-      Flags="$(Flags)"
-      IsBridgeBasedVersion="true"
-      TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
-      NameOfAssembliesThatDoNotContainUserCode="Bridge"
-      ProjectDir="$(MSBuildProjectDirectory)"
-      ReferencesPaths="@(ReferenceCopyLocalPaths)"
-      ContinueOnError="ErrorAndStop"
-      />-->
 
     <!--============================================================
       XamlPreprocessor (during Pass 1 and Pass 2)
@@ -514,18 +463,6 @@
     </ItemGroup>
 
     <!--============================================================
-      OutputPathsEraser (only during Pass 2)
-      ============================================================-->
-    <!--<OutputPathsEraser
-      Condition="'$(CSharpXamlForHtml5OutputType)'!='Library' And '$(IsSecondPass)'=='True'"
-      SourceAssembly="$(OutputAssemblyDirectory)\$(AssemblyName).dll"
-      OutputRootPath="$(Cshtml5OutputRootPath)"
-      OutputAppFilesPath="$(Cshtml5OutputAppFilesPath)"
-      OutputLibrariesPath="$(Cshtml5OutputLibrariesPath)"
-      OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
-      />-->
-
-    <!--============================================================
       Setting the proper path for copying the resources:
       ============================================================-->
     <PropertyGroup Condition="'$(IsBrowserProject)' == 'false'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
@@ -574,7 +511,7 @@
       OutputRootPath="$(ResourcesRootOutput)"
       OutputResourcesPath="$(Cshtml5OutputResourcesPath)"
       AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp|JSIL.Meta|Bridge"
-      SupportedExtensions=".js|.css|.png|.jpg|.gif|.ico|.mp4|.ogv|.webm|.3gp|.mp3|.ogg|.txt|.xml|.ttf|.woff|.cur|.config|.ClientConfig|.htm|.html|.svg"
+      SupportedExtensions=".js|.css|.png|.jpg|.gif|.ico|.mp4|.ogv|.webm|.3gp|.mp3|.ogg|.txt|.xml|.ttf|.woff|.woff2|.cur|.config|.ClientConfig|.htm|.html|.svg"
       IsBridgeBasedVersion="true"
       TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
       NameOfAssembliesThatDoNotContainUserCode="DotNetBrowser.Chromium"
@@ -666,23 +603,6 @@
       <Compile
         Include="$(GeneratedFiles)"/>
     </ItemGroup>
-
-    <!--============================================================
-      AssemblyReferenceValidator
-      ============================================================-->
-    <!--Disabled for now as we use reference without any metadata from package reference-->
-    <!--<AssemblyReferenceValidator
-      Condition="'$(IsSecondPass)'!='True' And '$(AllowAnyReferences)'!='True'"
-      References="@(Reference)"
-      AllowedAssemblies="mscorlib|System.Core|Microsoft.CSharp|CSHTML5.Blazor|CSHTML5.Migration.Blazor|CSHTML5.Stubs|Bridge"
-      Flags="$(Flags)"
-      IsBridgeBasedVersion="true"
-      TypeForwardingAssemblyPath="$(MSBuildThisFileDirectory)..\tools\CSharpXamlForHtml5.Bridge.TypeForwarding.dll"
-      NameOfAssembliesThatDoNotContainUserCode="Bridge"
-      ProjectDir="$(MSBuildProjectDirectory)"
-      ReferencesPaths="@(ReferenceCopyLocalPaths)"
-      ContinueOnError="ErrorAndStop"
-      />-->
 
     <!--============================================================
       XamlPreprocessor

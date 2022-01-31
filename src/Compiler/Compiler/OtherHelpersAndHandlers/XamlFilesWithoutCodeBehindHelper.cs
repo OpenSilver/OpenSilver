@@ -27,48 +27,6 @@ namespace DotNetForHtml5.Compiler
 {
     internal static class XamlFilesWithoutCodeBehindHelper
     {
-        internal static string GenerateClassNameFromAssemblyAndPath(string fileNameWithPathRelativeToProjectRoot, string assemblyNameWithoutExtension)
-        {
-            // This method is used to convert the XAML files that have no code-behind into a C# class. The name of that C# class is what this method generates.
-
-            return GenerateClassName("/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot);
-        }
-
-        internal static string GenerateClassNameFromAbsoluteUri(string absoluteUri)
-        {
-            // This method is used to convert the XAML files that have no code-behind into a C# class. The name of that C# class is what this method generates.
-
-            return GenerateClassName(absoluteUri);
-        }
-
-        private static string GenerateClassName(string value)
-        {
-            // CREDITS: http://stackoverflow.com/questions/25139734/how-can-i-generate-a-safe-class-name-from-a-file-name
-
-            // Note: an interesting alternative is available at: http://stackoverflow.com/questions/29303672/are-there-methods-to-convert-between-any-string-and-a-valid-variable-name-in-c-s
-
-            // Convert to TitleCase (so that when we remove the spaces, it is easily readable):
-            string className = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value);
-
-            // If file name contains invalid chars, remove them:
-            Regex regex = new Regex(@"[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Nl}\p{Mn}\p{Mc}\p{Cf}\p{Pc}\p{Lm}]");
-            className = regex.Replace(className, "__");
-
-            // If class name doesn't begin with a letter, insert an underscore:
-            if (!char.IsLetter(className, 0))
-            {
-                className = className.Insert(0, "_");
-            }
-
-            // Remove white space:
-            className = className.Replace(" ", string.Empty);
-
-            return className;
-
-            //todo: ensure that 2 different file names cannot end up with the same class name.
-            //todo: throw exception is invalid input (such as empty string).
-        }
-
         /// <summary>
         /// Generates a class name from the uri for the class that will allow us to instantiate the Page defined in the file at the given Uri.
         /// This class is used in System.Windows.Controls.Frame to create an instance of the page (for example when using MyFrame.Source = new Uri("/InnerPage.xaml", UriKind.Relative);).

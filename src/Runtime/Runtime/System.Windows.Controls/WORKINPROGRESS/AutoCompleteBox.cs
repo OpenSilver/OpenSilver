@@ -149,5 +149,20 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnPopulated(PopulatedEventArgs e)
         {
         }
+
+        /// <summary>Gets the identifier for the <see cref="P:System.Windows.Controls.AutoCompleteBox.FilterMode" /> dependency property.</summary>
+        public static readonly DependencyProperty FilterModeProperty = DependencyProperty.Register("FilterMode", typeof(AutoCompleteFilterMode), typeof(AutoCompleteBox), new PropertyMetadata(AutoCompleteFilterMode.StartsWith, OnFilterModePropertyChanged));
+        private static void OnFilterModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            AutoCompleteBox autoCompleteBox = d as AutoCompleteBox;
+            AutoCompleteFilterMode autoCompleteFilterMode = (AutoCompleteFilterMode)e.NewValue;
+            if (autoCompleteFilterMode != AutoCompleteFilterMode.Contains && autoCompleteFilterMode != AutoCompleteFilterMode.ContainsCaseSensitive && autoCompleteFilterMode != AutoCompleteFilterMode.ContainsOrdinal && autoCompleteFilterMode != AutoCompleteFilterMode.ContainsOrdinalCaseSensitive && autoCompleteFilterMode != AutoCompleteFilterMode.Custom && autoCompleteFilterMode != AutoCompleteFilterMode.Equals && autoCompleteFilterMode != AutoCompleteFilterMode.EqualsCaseSensitive && autoCompleteFilterMode != AutoCompleteFilterMode.EqualsOrdinal && autoCompleteFilterMode != AutoCompleteFilterMode.EqualsOrdinalCaseSensitive && autoCompleteFilterMode != 0 && autoCompleteFilterMode != AutoCompleteFilterMode.StartsWith && autoCompleteFilterMode != AutoCompleteFilterMode.StartsWithCaseSensitive && autoCompleteFilterMode != AutoCompleteFilterMode.StartsWithOrdinal && autoCompleteFilterMode != AutoCompleteFilterMode.StartsWithOrdinalCaseSensitive)
+            {
+                autoCompleteBox.SetValue(e.Property, e.OldValue);
+                throw new ArgumentException("Invalid value.");
+            }
+            AutoCompleteFilterMode filterMode = (AutoCompleteFilterMode)e.NewValue;
+            autoCompleteBox.TextFilter = AutoCompleteSearch.GetFilter(filterMode);
+        }
     }
 }

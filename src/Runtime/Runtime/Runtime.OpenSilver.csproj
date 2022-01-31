@@ -21,12 +21,16 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;GD_WIP</DefineConstants>
+		<DefineConstants>TRACE;CSHTML5BLAZOR;CSHTML5NETSTANDARD;MIGRATION;OPENSILVER;GD_WIP</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-		<DefineConstants>TRACE;DEBUG;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
+		<DefineConstants>TRACE;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 	</PropertyGroup>
+
+  <PropertyGroup Condition="$(Optimize) != true">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -46,6 +50,12 @@
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\DataStateBehavior.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\GoToStateAction.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\ComparisonLogic.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\TypeConverterHelper.cs" />
+		<Compile Include="Microsoft.Expression.Interactivity\WORKINPROGRESS\VisualStateUtilities.cs" />
+		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ChangePropertyAction.cs" />
 		<Compile Include="Microsoft.Expression.Interactivity.Core\WORKINPROGRESS\ComparisonConditionType.cs" />
@@ -95,17 +105,24 @@
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\SelectorSelectionAdapter.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarButton.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DomainUpDown.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
 		<Compile Include="System.ComponentModel\ReflectedPropertyCollection.cs" />
 		<Compile Include="System.ComponentModel\ReflectedPropertyData.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
+		<Compile Include="OpenSilver\Internal\Xaml\IXamlComponentFactory.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTrigger.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTriggerBase.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolvedEventArgs.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolver.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TypeConstraintAttribute.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ListBoxDragDropTarget.cs" />
@@ -166,8 +183,6 @@
 		<Compile Include="Microsoft.Expression.Interactivity.Core\CallMethodAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TargetedTriggerAction_1.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
 		<Compile Include="System.Windows.Media.Animation\PowerEase.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\BlurEffect.cs" />
 		<Compile Include="System.Windows.Messaging\WORKINPROGRESS\ListenFailedException.cs" />
@@ -359,7 +374,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\FontVariants.cs" />
 		<Compile Include="System.Windows\TextMeasurementService.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
 		<Compile Include="System.Windows\FrameworkPropertyMetadata.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
 		<Compile Include="Empty Namespaces\WORKINPROGRESS\SystemXaml.cs" />
@@ -481,7 +495,7 @@
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintDocument.cs" />
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrinterFallbackSettings.cs" />
 		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintPageEventArgs.cs" />
-		<Compile Include="System.Windows.Shapes\WORKINPROGRESS\Polyline.cs" />
+		<Compile Include="System.Windows.Shapes\Polyline.cs" />
 		<Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherSynchronizationContext.cs" />
 		<Compile Include="APP_SUPPORT\ClientSideResourceManager.cs" />
 		<Compile Include="APP_SUPPORT\Cshtml5Initializer.cs" />
@@ -627,7 +641,6 @@
 		<Compile Include="System.Windows.input\Cursors.cs" />
 		<Compile Include="System.Windows.input\Keyboard.cs" />
 		<Compile Include="System.Windows.input\MouseButtonEventArgs.cs" />
-		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
 		<Compile Include="System.Windows.Interactivity\AttachableCollection_1.cs" />
 		<Compile Include="System.Windows.Interactivity\Behavior.cs" />
@@ -1240,6 +1253,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultCalendarDayButtonStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
 	</ItemGroup>

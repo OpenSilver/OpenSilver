@@ -526,22 +526,21 @@ namespace Windows.UI.Xaml.Media.Animation
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
             //ComputeDuration();
+            _parameters = parameters;
             if (Duration.HasTimeSpan)
             {
                 if (Duration.TimeSpan.TotalMilliseconds > 0)
                 {
-                    _parameters = parameters;
                     _animationTimer.Interval = Duration.TimeSpan;
                     _animationTimer.Tick -= _animationTimer_Tick;
                     _animationTimer.Tick += _animationTimer_Tick;
                     _isAnimationDurationReached = false;
                     _animationTimer.Start();
+                    return;
                 }
-                else
-                {
-                    _isAnimationDurationReached = true;
-                }
-            }
+            } 
+            
+            _isAnimationDurationReached = true;
         }
 
 
@@ -591,7 +590,7 @@ namespace Windows.UI.Xaml.Media.Animation
         }
 
         bool _isAnimationDurationReached = false;
-        IterationParameters _parameters;
+        internal IterationParameters _parameters;
         void _animationTimer_Tick(object sender, object e)
         {
             _animationTimer.Stop();

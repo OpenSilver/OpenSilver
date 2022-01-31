@@ -180,40 +180,32 @@ namespace Windows.UI.Xaml.Media.Animation
         internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
         {
             this.IsUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user synchronously Starts then Stops then Starts an animation, we want it to be in the started state.
-#if MIGRATION
-            Dispatcher
-#else
-            CoreDispatcher
-#endif
-            // Note: we use a Dispatcher in order to ensure that the page is fully loaded when starting the animation.
-            .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
+
+            try
             {
-                try
+                if (!this._isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
                 {
-                    if (!this._isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
+                    Guid guid = Guid.NewGuid();
+                    IterationParameters parameters = new IterationParameters()
                     {
-                        Guid guid = Guid.NewGuid();
-                        IterationParameters parameters = new IterationParameters()
-                        {
-                            Target = target,
-                            Guid = guid,
-                            UseTransitions = useTransitions,
-                            VisualStateGroupName = visualStateGroupName,
-                            IsVisualStateChange = isVisualStateChange
-                        };
+                        Target = target,
+                        Guid = guid,
+                        UseTransitions = useTransitions,
+                        VisualStateGroupName = visualStateGroupName,
+                        IsVisualStateChange = isVisualStateChange
+                    };
 
-                        InitializeIteration();
+                    InitializeIteration();
 
-                        bool isThisSingleLoop = RepeatBehavior.HasCount && RepeatBehavior.Count == 1;
+                    bool isThisSingleLoop = RepeatBehavior.HasCount && RepeatBehavior.Count == 1;
 
-                        StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
-                    }
+                    StartFirstIteration(parameters, isThisSingleLoop, new TimeSpan()); //todo: use a parameter instead of just a new TimeSpan since we can have a Storyboard inside a Storyboard.
                 }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-            });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
 
@@ -228,10 +220,9 @@ namespace Windows.UI.Xaml.Media.Animation
         object thisLock = new object();
         internal void NotifyStoryboardOfTimelineEnd(Timeline timeline)
         {
-            HashSet2<Guid> completedguids = timeline.CompletedGuids;
-            List<Guid> guidsDealtWith = new List<Guid>();
-            foreach (Guid guid in completedguids)
+            if (timeline != null && timeline._parameters != null)
             {
+                Guid guid = timeline._parameters.Guid;
                 bool raiseEvent = false;
                 lock (thisLock)
                 {
@@ -241,7 +232,6 @@ namespace Windows.UI.Xaml.Media.Animation
                         --_expectedAmountOfTimelineEnds;
                         --expectedAmount;
                         _expectedAmountOfTimelineEndsDict[guid] = expectedAmount;
-                        guidsDealtWith.Add(guid);
                         if (expectedAmount <= 0)
                         {
                             raiseEvent = true;
@@ -250,13 +240,16 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
                 if (raiseEvent)
                 {
-                    OnIterationCompleted(_guidToIterationParametersDict[guid]);
-                    _guidToIterationParametersDict.Remove(guid);
+                    if (_guidToIterationParametersDict.ContainsKey(guid))
+                    {
+                        _guidToIterationParametersDict.Remove(guid);
+
+                        if (_guidToIterationParametersDict.Count == 0)
+                        {
+                             OnIterationCompleted(this._parameters);
+                        }
+                    }
                 }
-            }
-            foreach (Guid guid in guidsDealtWith)
-            {
-                timeline.CompletedGuids.Remove(guid);
             }
         }
 

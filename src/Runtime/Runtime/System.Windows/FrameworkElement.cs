@@ -48,6 +48,89 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class FrameworkElement : UIElement
     {
+        #region Inheritance Context
+
+        internal static FrameworkElement FindMentor(DependencyObject d)
+        {
+            // Find the nearest FE InheritanceContext
+            while (d != null)
+            {
+                FrameworkElement fe = d as FrameworkElement;
+
+                if (fe != null)
+                {
+                    return fe;
+                }
+                else
+                {
+                    d = d.InheritanceContext;
+                }
+            }
+
+            return null;
+        }
+
+        internal override bool ShouldProvideInheritanceContext(DependencyObject target, DependencyProperty property)
+        {
+            return base.ShouldProvideInheritanceContext(target, property) || property == ResourceDictionary.ResourceKeyProperty;
+        }
+
+        internal FrameworkElement InheritedParent { get; private set; }
+
+        internal override void OnInheritanceContextChangedCore(EventArgs args)
+        {
+            FrameworkElement oldMentor = InheritedParent;
+            FrameworkElement newMentor = FindMentor(InheritanceContext);
+
+            if (oldMentor != newMentor)
+            {
+                InheritedParent = newMentor;
+
+                if (oldMentor != null)
+                {
+                    DisconnectMentor(oldMentor);
+                }
+
+                if (newMentor != null)
+                {
+                    ConnectMentor(newMentor);
+                }
+            }
+        }
+
+        private void ConnectMentor(FrameworkElement mentor)
+        {
+            mentor.InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+            
+            InvalidateInheritedProperties(this, mentor);
+        }
+
+        private void DisconnectMentor(FrameworkElement mentor)
+        {
+            mentor.InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+
+            InvalidateInheritedProperties(this, mentor);
+        }
+
+        // handle the InheritedPropertyChanged event from the mentor
+        private void OnMentorInheritedPropertyChanged(object sender, InheritedPropertyChangedEventArgs e)
+        {
+            TreeWalkHelper.InvalidateOnInheritablePropertyChange(this, e.Info, false);
+        }
+
+        internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
+
+        internal static void OnInheritedPropertyChanged(FrameworkElement fe, InheritablePropertyChangeInfo info)
+        {
+            var handler = fe.InheritedPropertyChanged;
+            if (handler != null)
+            {
+                handler(fe, new InheritedPropertyChangedEventArgs(ref info));
+            }
+        }
+
+        #endregion Inheritance Context
+
         #region Visual Children
 
         internal override void OnVisualParentChanged(DependencyObject oldParent)

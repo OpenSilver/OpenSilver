@@ -101,7 +101,8 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.IsTabStop dependency property.
-        public static readonly DependencyProperty IsTabStopProperty;
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty IsTabStopProperty = DependencyProperty.Register(nameof(IsTabStop), typeof(bool), typeof(Calendar), new PropertyMetadata(true));
 
         //
         // Summary:
@@ -110,7 +111,12 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     true if the control is included in tab navigation; otherwise, false. The default
         //     is true.
-        public bool IsTabStop { get; set; }
+        [OpenSilver.NotImplemented]
+        public bool IsTabStop
+        {
+            get { return (bool)GetValue(IsTabStopProperty); }
+            set { SetValue(IsTabStopProperty, value); }
+        }
 
         //
         // Summary:
@@ -119,7 +125,8 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.Background dependency
         //     property.
-        public static readonly DependencyProperty BackgroundProperty;
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(Calendar), new PropertyMetadata((object)null));
 
         //
         // Summary:
@@ -127,7 +134,12 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The brush that provides the background of the control. The default is null.
-        public Brush Background { get; set; }
+        [OpenSilver.NotImplemented]
+        public Brush Background
+        {
+            get { return (Brush)GetValue(BackgroundProperty); }
+            set { SetValue(BackgroundProperty, value); }
+        }
 
         //
         // Summary:
@@ -135,7 +147,8 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.Padding dependency property.
-        public static readonly DependencyProperty PaddingProperty;
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty PaddingProperty = DependencyProperty.Register(nameof(Padding), typeof(Thickness), typeof(Calendar), new PropertyMetadata(new Thickness()));
 
         //
         // Summary:
@@ -145,7 +158,12 @@ namespace Windows.UI.Xaml.Controls
         //     The amount of space between the content of a System.Windows.Controls.Control
         //     and its System.Windows.FrameworkElement.Margin or System.Windows.Controls.Border.
         //     The default is a thickness of 0 on all four sides.
-        public Thickness Padding { get; set; }
+        [OpenSilver.NotImplemented]
+        public Thickness Padding
+        {
+            get { return (Thickness)GetValue(PaddingProperty); }
+            set { SetValue(PaddingProperty, value); }
+        }
 
         //
         // Summary:
@@ -154,7 +172,8 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.BorderThickness dependency
         //     property.
-        public static readonly DependencyProperty BorderThicknessProperty;
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty BorderThicknessProperty = DependencyProperty.Register(nameof(BorderThickness), typeof(Thickness), typeof(Calendar), new PropertyMetadata(new Thickness()));
 
         //
         // Summary:
@@ -162,7 +181,12 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     A thickness value; the default is a thickness of 0 on all four sides.
-        public Thickness BorderThickness { get; set; }
+        [OpenSilver.NotImplemented]
+        public Thickness BorderThickness
+        {
+            get { return (Thickness)GetValue(BorderThicknessProperty); }
+            set { SetValue(BorderThicknessProperty, value); }
+        }
 
         //
         // Summary:
@@ -171,7 +195,8 @@ namespace Windows.UI.Xaml.Controls
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.BorderBrush dependency
         //     property.
-        public static readonly DependencyProperty BorderBrushProperty;
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty BorderBrushProperty = DependencyProperty.Register(nameof(BorderBrush), typeof(Brush), typeof(Calendar), new PropertyMetadata((object)null));
 
         //
         // Summary:
@@ -179,7 +204,12 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The brush that is used to fill the control's border; the default is null.
-        public Brush BorderBrush { get; set; }
+        [OpenSilver.NotImplemented]
+        public Brush BorderBrush
+        {
+            get { return (Brush)GetValue(BorderBrushProperty); }
+            set { SetValue(BorderBrushProperty, value); }
+        }
 
         //
         // Summary:
@@ -187,7 +217,8 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The identifier for the System.Windows.Controls.Control.Template dependency property.
-        public static readonly DependencyProperty TemplateProperty;
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty TemplateProperty = DependencyProperty.Register(nameof(Template), typeof(ControlTemplate), typeof(Calendar), new PropertyMetadata((object)null));
 
         //
         // Summary:
@@ -195,6 +226,24 @@ namespace Windows.UI.Xaml.Controls
         //
         // Returns:
         //     The template that defines the appearance of the System.Windows.Controls.Control.
-        public ControlTemplate Template { get; set; }
+        [OpenSilver.NotImplemented]
+        public ControlTemplate Template
+        {
+            get { return (ControlTemplate)GetValue(TemplateProperty); }
+            set { SetValue(TemplateProperty, value); }
+        }
+
+        [OpenSilver.NotImplemented]
+        public double FontSize
+        {
+            get { return (double)GetValue(FontSizeProperty); }
+            set { SetValue(FontSizeProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Control.FontSize"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(Calendar), new PropertyMetadata(11d));
     }
 }

@@ -176,13 +176,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderBrush), 
                 typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata((object)null)
-                {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Name = new List<string> { "borderColor" },
-                    }
-                });
+                new PropertyMetadata((object)null));
 
         //-----------------------
         // BORDERTHICKNESS
@@ -204,22 +198,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderThickness), 
                 typeof(Thickness), 
                 typeof(Control), 
-                new PropertyMetadata(new Thickness())
-                {
-                    MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
-                });
-
-        private static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var control = (Control)d;
-            if (!control.HasTemplate)
-            {
-                var newThickness = (Thickness)newValue;
-                var domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
-                domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-                domElement.borderWidth = $"{newThickness.Top.ToString(CultureInfo.InvariantCulture)}px {newThickness.Right.ToString(CultureInfo.InvariantCulture)}px {newThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px {newThickness.Left.ToString(CultureInfo.InvariantCulture)}px";
-            }
-        }
+                new PropertyMetadata(new Thickness()));
 
         //-----------------------
         // FONTWEIGHT
@@ -792,9 +771,15 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool Focus()
         {
-            if (IsTabStop)
+            if (Visibility == Visibility.Visible &&
+                IsTabStop &&
+                IsEnabled &&
+                IsConnectedToLiveTree)
             {
                 INTERNAL_HtmlDomManager.SetFocus(this);
+                
+                FocusManager.SetFocusedElement(this.INTERNAL_ParentWindow, this);
+
                 return true; //todo: see if there is a way for this to fail, in which case we want to return false.
             }
             return false;
@@ -1100,18 +1085,17 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             set { SetValue(FontStretchProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Called before the System.Windows.UIElement.TextInput event occurs.
-        //
-        // Parameters:
-        //   e:
-        //     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
-        [OpenSilver.NotImplemented]
-        protected virtual void OnTextInput(TextCompositionEventArgs e)
-        {
+        ////
+        //// Summary:
+        ////     Called before the System.Windows.UIElement.TextInput event occurs.
+        ////
+        //// Parameters:
+        ////   e:
+        ////     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
+        //protected virtual void OnTextInput(TextCompositionEventArgs e)
+        //{
 
-        }
+        //}
 
         [OpenSilver.NotImplemented]
         protected virtual void OnDrop(DragEventArgs e)

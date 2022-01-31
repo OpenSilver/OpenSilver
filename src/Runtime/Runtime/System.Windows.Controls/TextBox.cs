@@ -14,6 +14,7 @@
 using System;
 using System.Linq;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -610,6 +611,17 @@ namespace Windows.UI.Xaml.Controls
         {
             INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
             UpdateTabIndex(IsTabStop, TabIndex);
+        }
+
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+
+            var view = _textViewHost?.View;
+            if (view != null)
+            {
+                INTERNAL_HtmlDomManager.SetFocus(view);
+            }
         }
 
         private void ClearContentElement()

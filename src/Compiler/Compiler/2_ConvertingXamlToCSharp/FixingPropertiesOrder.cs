@@ -1,6 +1,4 @@
-﻿extern alias wpf;
-
-
+﻿
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -14,14 +12,12 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using wpf::System.Windows.Controls.Primitives;
 
 namespace DotNetForHtml5.Compiler
 {

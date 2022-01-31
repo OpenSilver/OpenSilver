@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Contains state information and event data associated with a routed event.
     /// </summary>
-    public partial class RoutedEventArgs
+    public class RoutedEventArgs
 #if MIGRATION
         : EventArgs
 #endif

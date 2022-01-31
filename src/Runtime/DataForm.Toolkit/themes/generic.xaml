@@ -280,13 +280,13 @@
                                                                        Storyboard.TargetProperty="Visibility"
                                                                        Duration="0">
                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="{TemplateBinding CommitButton.Visibility}" />
+                                                                    Value="Visible" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CancelButton"
                                                                        Storyboard.TargetProperty="Visibility"
                                                                        Duration="0">
                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="{TemplateBinding CancelButton.Visibility}" />
+                                                                    Value="Visible" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
