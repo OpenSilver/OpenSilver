@@ -12,6 +12,9 @@
 \*====================================================================================*/
 
 using System;
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Browser
 {
