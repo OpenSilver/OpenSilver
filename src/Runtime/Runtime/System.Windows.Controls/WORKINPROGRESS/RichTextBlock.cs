@@ -181,6 +181,35 @@ namespace Windows.UI.Xaml.Controls
             set { this.SetValue(LineHeightProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether text selection is enabled
+        /// in System.Windows.Controls.RichTextBlock.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public bool IsTextSelectionEnabled
+        {
+            get { return (bool)GetValue(IsTextSelectionEnabledProperty); }
+            set { SetValue(IsTextSelectionEnabledProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsTextSelectionEnabledProperty =
+            DependencyProperty.Register("IsTextSelectionEnabled", typeof(bool), typeof(RichTextBlock), new PropertyMetadata());
+
+        /// <summary>
+        /// Gets or sets a brush that describes the foreground color.
+        /// </summary>
+        /// <remarks>The brush that paints the foreground of the control.
+        /// The default value is System.Windows.Media.Colors.Black.</remarks>
+        [OpenSilver.NotImplemented]
+        public Brush Foreground
+        {
+            get { return (Brush)GetValue(ForegroundProperty); }
+            set { SetValue(ForegroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty ForegroundProperty =
+            DependencyProperty.Register("Foreground", typeof(Brush), typeof(RichTextBlock), new PropertyMetadata(new SolidColorBrush(Colors.Black)));
+
         #endregion Dependency Properties
 
         #endregion Public Properties

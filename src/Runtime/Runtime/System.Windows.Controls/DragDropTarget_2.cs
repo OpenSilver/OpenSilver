@@ -81,6 +81,32 @@ namespace Windows.UI.Xaml.Controls
         UIElement _iconStop;
         UIElement _iconArrow;
 
+        #region public DragDropEffects AllowedSourceEffects
+        /// <summary>
+        /// Gets or sets the allowed effects when this DragDropTarget is the drag source.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public DragDropEffects AllowedSourceEffects
+        {
+            get { return (DragDropEffects)GetValue(AllowedSourceEffectsProperty); }
+            set { SetValue(AllowedSourceEffectsProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the AllowedSourceEffects dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AllowedSourceEffectsProperty =
+            DependencyProperty.Register(
+                "AllowedSourceEffects",
+                typeof(DragDropEffects),
+                typeof(DragDropTarget<TItemsControlType, TItemContainerType>),
+#if unsupported
+                new PropertyMetadata(DragDropEffects.Link | DragDropEffects.Move | DragDropEffects.Scroll));
+#else
+                new PropertyMetadata(DragDropEffects.None));
+#endif
+        #endregion public DragDropEffects AllowedSourceEffects
+
 
         /// <summary>
         /// Initializes a new instance of the DragDropTarget class.
@@ -139,11 +165,11 @@ namespace Windows.UI.Xaml.Controls
                     _sourceItemsControl = (TItemsControlType)this.Content; // Note: there is no risk of InvalidCastException because the type has been tested before, and the derived class (PanelDragDropTarget) also verifies the type in the "OnContentChanged" method.
 
                     // Capture the pointer so that when dragged outside the DragDropPanel, we can still get its position:
-    #if MIGRATION
+#if MIGRATION
                     this.CaptureMouse();
-    #else
+#else
                     this.CapturePointer(e.Pointer);
-    #endif
+#endif
                     // Remember that the pointer is currently captured:
                     _isPointerCaptured = true;
                     _capturedPointer = e.Pointer;
@@ -673,7 +699,7 @@ namespace Windows.UI.Xaml.Controls
                 // 2) Find the item to move from the list of the children of the DragDropTarget
                 int indexOfLastElementInList = ElementsBetweenClickedElementAndDragDropTarget.Count - 1;
                 int amoutOfElementsBetweenItemsRootAndDragDropTarget = dragDropTargetUnder.INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget();
-                if(indexOfLastElementInList < amoutOfElementsBetweenItemsRootAndDragDropTarget) //Note: this can happen while dragging: the element under the pointer can be closer to the DragDropTarget than the root of the item we are dragging.
+                if (indexOfLastElementInList < amoutOfElementsBetweenItemsRootAndDragDropTarget) //Note: this can happen while dragging: the element under the pointer can be closer to the DragDropTarget than the root of the item we are dragging.
                 {
                     itemContainerUnderPointer = null;
                     return dragDropTargetUnder;
