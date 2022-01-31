@@ -106,11 +106,16 @@ window.onCallBack = (function() {
 	}
 	
 	return {
-		OnCallbackFromJavaScript : function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue) {
+		OnCallbackFromJavaScript : function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue, runAscync) {
 			let formattedArgs = prepareCallbackArgs(callbackArgsObject);
-			const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
-			if (returnValue) {
-				return res;
+			if(runAscync) {
+				DotNet.invokeMethodAsync(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, false);
+			}
+			else {
+				const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
+				if (returnValue) {
+					return res;
+				}
 			}
 		},
 		
@@ -133,7 +138,10 @@ window.callJS = function (javaScriptToExecute) {
     }
     else {
         //console.log("not supported");
-        return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
+		if (resultType === 'undefined')
+			return BINDING.js_to_mono_obj("[UNDEFINED]");
+		else
+			return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
     }
 };
 
@@ -145,6 +153,9 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
         return BINDING.js_to_mono_obj(result);
     }
     else {
-        return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
+		if (resultType === 'undefined')
+			return BINDING.js_to_mono_obj("[UNDEFINED]");
+		else
+			return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
 };

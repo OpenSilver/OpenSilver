@@ -58,7 +58,7 @@ namespace CSHTML5
             // This dictionary is named "jsObjRef". It associates a unique integer ID to each JavaScript
             // object. In C# we only manipulate those IDs by manipulating instances of the "JSObjectReference" class.
             // When we need to re-use those JavaScript objects, the C# code passes to the JavaScript context the ID
-            // of the object, so that the JavaScript code can retrieve the JavaScript object instance by using the 
+            // of the object, so that the JavaScript code can retrieve the JavaScript object instance by using the
             // aforementioned dictionary.
             //---------------
 
@@ -95,7 +95,7 @@ namespace CSHTML5
             // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
             // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
             // 10 arguments and using "$10".
-            for (int i = variables.Length - 1; i >= 0; i--)  
+            for (int i = variables.Length - 1; i >= 0; i--)
             {
                 var variable = variables[i];
                 if (variable is INTERNAL_JSObjectReference)
@@ -180,6 +180,10 @@ namespace CSHTML5
                     //--------------------
 
                     javascript = javascript.Replace("$" + i.ToString(), "null");
+                }
+                else if (variable.ToString().StartsWith("function"))    //if the argument is a JS function replace it as is
+                {
+                    javascript = javascript.Replace("$" + i.ToString(), variable.ToString());
                 }
                 else
                 {
@@ -331,7 +335,7 @@ namespace CSHTML5
         private static Dictionary<string, List<Tuple<Action, Action>>> _pendingJSFile = new Dictionary<string, List<Tuple<Action, Action>>>();
 
         // To know which files have already been successfully loaded so can we simply call the OnSuccess callback.
-        private static HashSet<string> _loadedFiles = new HashSet<string>(); 
+        private static HashSet<string> _loadedFiles = new HashSet<string>();
 
         internal static void LoadJavaScriptFile(string url, string callerAssemblyName, Action callbackOnSuccess, Action callbackOnFailure = null)
         {
@@ -371,7 +375,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); 
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -383,7 +387,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); 
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();
