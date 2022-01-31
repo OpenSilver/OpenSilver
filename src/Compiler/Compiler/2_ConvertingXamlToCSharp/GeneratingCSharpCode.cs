@@ -768,8 +768,8 @@ else
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
                     }
-                    #endregion
-                    #region CASE: the element is an Object
+#endregion
+#region CASE: the element is an Object
                     else
                     {
                         //-----------------------------
@@ -973,6 +973,13 @@ else
                                         }
                                         //todo: throw an exception when both "x:Name" and "Name" are specified in the XAML.
 
+                                    }
+                                    else if (IsEventTriggerRoutedEventProperty(element.Name, attributeLocalName))
+                                    {
+                                        // TODO Check that 'attributeLocalName' is effectively the LoadedEvent routed event.
+                                        // Silverlight only allows the FrameworkElement.LoadedEvent as value for the EventTrigger.RoutedEvent
+                                        // property, so for now we assume the xaml is always valid.
+                                        stringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent = {namespaceSystemWindows}.FrameworkElement.LoadedEvent;");
                                     }
                                     else if (string.IsNullOrEmpty(attribute.Name.NamespaceName))
                                     {
@@ -1289,7 +1296,7 @@ dependencyPropertyPath);
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
                     }
-                    #endregion
+#endregion
                 }
                 catch (XamlParseException xamlParseException)
                 {
@@ -1379,9 +1386,9 @@ dependencyPropertyPath);
                                                            assemblyNameWithoutExtension,
                                                            listOfAllTheTypesUsedInThisXamlFile,
                                                            hasCodeBehind,
-#if BRIDGE                                                 
+#if BRIDGE
                                                            addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
-#else                                                      
+#else
                                                            addApplicationEntryPoint: false
 #endif
 );
@@ -2749,6 +2756,26 @@ namespace {namespaceStringIfAny}
             );
         }
 
+        private static bool IsEventTriggerRoutedEventProperty(XName xName, string propertyName)
+        {
+            if (xName.LocalName != "EventTrigger" || propertyName != "RoutedEvent")
+            {
+                return false;
+            }
+
+            if (xName.NamespaceName.StartsWith("clr-namespace:"))
+            {
+                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(xName.NamespaceName, out string ns, out string assembly);
+#if MIGRATION
+                return ns == "System.Windows" && (assembly == "System.Windows" || assembly == Constants.GetCurrentCoreAssemblyName());
+#else
+                return ns == "Windows.UI.Xaml" && assembly == Constants.GetCurrentCoreAssemblyName();
+#endif
+            }
+
+            return xName.Namespace == DefaultXamlNamespace;
+        }
+
         private static bool IsReservedAttribute(string attributeName)
         {
             if (attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
@@ -2868,12 +2895,12 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
     {{
         var {rootElementName} = new {typeFullName}();
     
-    #pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
+#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
         if ({rootElementName} is {uiElementFullName})
         {{
             (({uiElementFullName})(object){rootElementName}).XamlSourcePath = @""{assemblyNameWithoutExtension}\{fileNameWithPathRelativeToProjectRoot}"";
         }}
-    #pragma warning restore 0184
+#pragma warning restore 0184
     
         {body}
     

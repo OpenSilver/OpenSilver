@@ -165,6 +165,7 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />
     <Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
     <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
     <Compile Include="System.Windows.Media\TransformConverter.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="System.Windows.Navigation\NavigationMode.cs" />
     <Compile Include="System.Windows\ApplicationServiceContext.cs" />
     <Compile Include="System.Windows\DataTemplateKey.cs" />
+    <Compile Include="System.Windows\EventTrigger.cs" />
     <Compile Include="System.Windows\FontStretchConverter.cs" />
     <Compile Include="System.Windows\FontStyleConverter.cs" />
     <Compile Include="System.Windows\FullScreenOptions.cs" />
@@ -183,6 +185,10 @@
     <Compile Include="System.Windows\RectConverter.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
+    <Compile Include="System.Windows\TriggerAction.cs" />
+    <Compile Include="System.Windows\TriggerActionCollection.cs" />
+    <Compile Include="System.Windows\TriggerBase.cs" />
+    <Compile Include="System.Windows\TriggerCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\CheckAndDownloadUpdateCompletedEventArgs.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
@@ -1005,16 +1011,11 @@
     <Compile Include="System.Windows\WORKINPROGRESS\AssemblyPartCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\DragEventArgs.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\DragEventHandler.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\EventTrigger.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\FontStretch.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\OutOfBrowserSettings.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TabletDeviceType.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerAction.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerActionCollection.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerBase.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\VisualTransition.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\WindowCollection.cs" />

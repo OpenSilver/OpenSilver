@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
 #if MIGRATION
@@ -21,8 +19,11 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-	[OpenSilver.NotImplemented]
-    public abstract partial class TriggerBase : DependencyObject
+    /// <summary>
+    /// Serves as the base class for <see cref="EventTrigger"/>.
+    /// </summary>
+    public abstract class TriggerBase : DependencyObject
     {
+        internal TriggerBase() { }
     }
 }

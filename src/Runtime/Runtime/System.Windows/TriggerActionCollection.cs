@@ -14,17 +14,26 @@
 using System;
 
 #if MIGRATION
+using System.Windows.Media.Animation;
+#else
+using Windows.UI.Xaml.Media.Animation;
+#endif
+
+#if MIGRATION
 namespace System.Windows
 #else
 namespace Windows.UI.Xaml
 #endif
 {
-	[OpenSilver.NotImplemented]
-    public sealed partial class TriggerActionCollection : PresentationFrameworkCollection<TriggerAction>
+    /// <summary>
+    /// Represents a collection of <see cref="BeginStoryboard"/> objects.
+    /// </summary>
+    public sealed class TriggerActionCollection : PresentationFrameworkCollection<TriggerAction>
     {
-        public TriggerActionCollection() : base(false)
-        {
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TriggerActionCollection"/> class.
+        /// </summary>
+        public TriggerActionCollection() : base(false) { }
 
         internal override void AddOverride(TriggerAction value)
         {
