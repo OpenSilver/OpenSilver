@@ -1802,7 +1802,7 @@ namespace DotNetForHtml5.Compiler
                     field = type.GetField(fieldNameIgnoreCase, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
                 }
 
-                return field.Name ?? throw new XamlParseException($"Field '{fieldNameIgnoreCase}' not found in type: '{type.FullName}'.");
+                return field?.Name ?? throw new XamlParseException($"Field '{fieldNameIgnoreCase}' not found in type: '{type.FullName}'.");
             }
 
             // note: this method has been abandonned because fieldInfo.GetValue(null) can 
