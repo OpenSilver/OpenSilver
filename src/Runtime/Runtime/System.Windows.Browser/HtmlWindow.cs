@@ -92,7 +92,11 @@ namespace System.Windows.Browser
 #endif
         public void Alert(string alertText)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                MessageBox.Show(alertText);
+            }
+            else
             {
                 OpenSilver.Interop.ExecuteJavaScript("alert($0)", alertText);
             }
@@ -113,12 +117,14 @@ namespace System.Windows.Browser
 #endif
         public bool Confirm(string confirmText)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                return MessageBox.Show(confirmText, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
+            }
+            else
             {
                 return Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("confirm($0)", confirmText));
             }
-
-            return false;
         }
 
         /// <summary>
