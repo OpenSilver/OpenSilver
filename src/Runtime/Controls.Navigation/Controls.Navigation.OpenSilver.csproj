@@ -14,6 +14,7 @@
     <OpenSilverVersion>1.0.0</OpenSilverVersion>
     <Optimize>true</Optimize>
     <DefineSilverlight>true</DefineSilverlight>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">

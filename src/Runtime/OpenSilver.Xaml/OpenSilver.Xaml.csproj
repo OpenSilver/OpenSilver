@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 </Project>
