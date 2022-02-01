@@ -187,7 +187,10 @@ namespace Windows.UI.Xaml.Controls
 
                     RefreshPopup(target, errors);
 
-                    ((Control)target).HideValidationError();
+                    if (target is Control c)
+                    {
+                        c.HideValidationError();
+                    }
                 }
             }
         }
@@ -270,7 +273,10 @@ namespace Windows.UI.Xaml.Controls
 
                 RefreshPopup(target, validationErrors);
 
-                ((Control)target).ShowValidationError();
+                if (target is Control c)
+                {
+                    c.ShowValidationError();
+                }
             }
 
         }

@@ -141,6 +141,9 @@
                                 <ToolTip x:Name="validationTooltip" Template="{StaticResource ValidationToolTipTemplate}" Placement="Right" 
                            PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                            DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                                    <!-- WORKINPROGRESS -->
+                                    <!-- Triggers unsupported -->
+                                    <!--
                                     <ToolTip.Triggers>
                                         <EventTrigger RoutedEvent="Canvas.Loaded">
                                             <EventTrigger.Actions>
@@ -158,6 +161,7 @@
                                             </EventTrigger.Actions>
                                         </EventTrigger>
                                     </ToolTip.Triggers>
+                                    -->
                                 </ToolTip>
                             </ToolTipService.ToolTip>
                            
