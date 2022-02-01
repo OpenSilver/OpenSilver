@@ -26,6 +26,7 @@
   <!--============================================================
   LOCATION OF COMPILER TASKS
   ============================================================-->
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ValidateCompilerVersion" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ServiceReferenceFixer" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesProcessor" />
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResXProcessor" />
@@ -65,9 +66,10 @@
 
   <PropertyGroup>
     <BuildDependsOn>
-      CSharpXamlForHtml5BeforeBuild;
-      $(BuildDependsOn);
-    </BuildDependsOn>
+		CheckCompilerVersion;
+		CSharpXamlForHtml5BeforeBuild;
+		$(BuildDependsOn);
+	</BuildDependsOn>
   </PropertyGroup>
 
   <!--============================================================
@@ -103,6 +105,9 @@
   <!--============================================================
   Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
   ============================================================-->
+  <PropertyGroup Condition="'$(CompilerBuildNumber)'==''">
+	  <CompilerBuildNumber>1</CompilerBuildNumber>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(IsSecondPass)'==''">
     <IsSecondPass>False</IsSecondPass>
   </PropertyGroup>
@@ -144,6 +149,24 @@
         >$(OutputPath)</OutputAssemblyDirectory>
   </PropertyGroup>
 
+	<!--============================================================
+      Check if msbuild is using the compiler adapted to the package:
+	 ============================================================-->
+	<Target Name="MessageWrongCompiler">
+		<Error Condition="$(IsCompilerVersionChecked)==''"
+			 Text="Compiler mismatch. Please restart Visual Studio or manually kill the Msbuild process, then recompile the solution to fix this error."/>
+	</Target>
+	
+	<Target Name="CheckCompilerVersion">
+		<ValidateCompilerVersion
+			TargetCompilerBuildNumber="$(CompilerBuildNumber)" ContinueOnError="ErrorAndStop">
+			<Output TaskParameter="IsCompilerVersionChecked" PropertyName="IsCompilerVersionChecked"/>
+		</ValidateCompilerVersion>
+		<OnError ExecuteTargets="MessageWrongCompiler"/>
+	</Target>
+	
+	
+	
   <!--============================================================
       Change the names of the EmbeddedResources so they keep their original names.
    ============================================================-->
@@ -183,7 +206,11 @@
       Text="OpenSilver Pass 2. Assembly name - $(AssemblyName)"
       Importance="normal"/>
 
-    <!--============================================================
+	  <Error Condition="$(IsCompilerVersionChecked)==''"
+			 Text="Compiler mismatch. Please restart Visual Studio or manually kill the Msbuild process, then recompile the solution to fix this error."/>
+	  
+
+	  <!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
     <PropertyGroup>

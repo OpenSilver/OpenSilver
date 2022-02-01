@@ -26,6 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
+    <Compile Include="OtherHelpersAndHandlers\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\CoreTypesHelper.cs" />
