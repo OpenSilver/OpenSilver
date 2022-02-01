@@ -201,6 +201,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 tc.SelectedIndex = index;
                 tc.SelectItem(oldItem, tabItem);
+                if (tabItem != null)
+                    tabItem.UpdateVisualState();
             }
         }
 #endregion SelectedItem
