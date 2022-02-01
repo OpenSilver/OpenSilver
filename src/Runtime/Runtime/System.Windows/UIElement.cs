@@ -1648,7 +1648,7 @@ document.ondblclick = null;
         internal void InvalidateParentMeasure()
         {
             UIElement parent = VisualTreeHelper.GetParent(this) as UIElement;
-            if (parent as GridNotLogical != null)
+            if (parent is GridNotLogical)
             {
                 parent.InvalidateParentMeasure();
                 return;
@@ -1659,7 +1659,7 @@ document.ondblclick = null;
         internal void InvalidateParentArrange()
         {
             UIElement parent = VisualTreeHelper.GetParent(this) as UIElement;
-            if (parent as GridNotLogical != null)
+            if (parent is GridNotLogical)
             {
                 parent.InvalidateParentArrange();
                 return;
