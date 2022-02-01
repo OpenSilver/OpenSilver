@@ -607,6 +607,8 @@ namespace Windows.UI.Xaml.Controls
         internal virtual void UpdateTabIndex(bool isTabStop, int tabIndex)
         {
             var domElementConcernedByFocus = this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement;
+            if (domElementConcernedByFocus == null)
+                return;
             if (!isTabStop || !this.IsEnabled)
             {
                 this.PreventFocusEvents();
