@@ -1647,12 +1647,24 @@ document.ondblclick = null;
 
         internal void InvalidateParentMeasure()
         {
-            (VisualTreeHelper.GetParent(this) as UIElement)?.InvalidateMeasure();
+            UIElement parent = VisualTreeHelper.GetParent(this) as UIElement;
+            if (parent is GridNotLogical)
+            {
+                parent.InvalidateParentMeasure();
+                return;
+            }
+            parent?.InvalidateMeasure();
         }
 
         internal void InvalidateParentArrange()
         {
-            (VisualTreeHelper.GetParent(this) as UIElement)?.InvalidateArrange();
+            UIElement parent = VisualTreeHelper.GetParent(this) as UIElement;
+            if (parent is GridNotLogical)
+            {
+                parent.InvalidateParentArrange();
+                return;
+            }
+            parent?.InvalidateArrange();
         }
         
         public void InvalidateMeasure()
