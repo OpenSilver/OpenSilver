@@ -113,6 +113,9 @@ namespace Windows.UI.Xaml.Controls
 
             this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = passwordField;
 
+            this.Host.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = passwordField;
+            this.Host.UpdateTabIndex(this.Host.IsTabStop, this.Host.TabIndex);
+
             _passwordInputField = passwordField;
 
             domElementWhereToPlaceChildren = passwordField; // Note: this value is used by the Padding_Changed method to set the padding of the PasswordBox.

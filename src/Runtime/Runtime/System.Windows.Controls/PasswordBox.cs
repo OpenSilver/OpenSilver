@@ -205,6 +205,14 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
+        {
+            if (this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus != null)
+            {
+                base.UpdateTabIndex(this.IsTabStop, this.TabIndex);
+            }
+        }
+
         private PasswordBoxView CreateView()
         {
             return new PasswordBoxView(this);
