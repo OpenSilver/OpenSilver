@@ -2769,7 +2769,7 @@ namespace {namespaceStringIfAny}
 #if MIGRATION
                 return ns == "System.Windows" && (assembly == "System.Windows" || assembly == GetCurrentCoreAssemblyName());
 #else
-                return ns == "Windows.UI.Xaml" && assembly == Constants.GetCurrentCoreAssemblyName();
+                return ns == "Windows.UI.Xaml" && assembly == GetCurrentCoreAssemblyName();
 #endif
             }
 
