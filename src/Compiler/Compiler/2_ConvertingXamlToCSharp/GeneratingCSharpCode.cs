@@ -2767,13 +2767,34 @@ namespace {namespaceStringIfAny}
             {
                 GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(xName.NamespaceName, out string ns, out string assembly);
 #if MIGRATION
-                return ns == "System.Windows" && (assembly == "System.Windows" || assembly == Constants.GetCurrentCoreAssemblyName());
+                return ns == "System.Windows" && (assembly == "System.Windows" || assembly == GetCurrentCoreAssemblyName());
 #else
                 return ns == "Windows.UI.Xaml" && assembly == Constants.GetCurrentCoreAssemblyName();
 #endif
             }
 
             return xName.Namespace == DefaultXamlNamespace;
+        }
+
+        private static string GetCurrentCoreAssemblyName()
+        {
+#if MIGRATION
+
+#if CSHTML5BLAZOR
+            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
+#elif BRIDGE
+            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
+#endif
+
+#else
+
+#if CSHTML5BLAZOR
+            return Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
+#elif BRIDGE
+            return Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE;
+#endif
+
+#endif
         }
 
         private static bool IsReservedAttribute(string attributeName)

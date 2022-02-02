@@ -50,26 +50,5 @@ namespace DotNetForHtml5.Compiler
         public const string COMMERCIAL_EDITION_L_FRIENDLY_NAME = "Commercial Edition (L)";
         public const string PREMIUM_SUPPORT_EDITION_FRIENDLY_NAME = "Premium Support Edition";
         public const string COMMUNITY_EDITION_FRIENDLY_NAME = "Community Edition";
-
-        public static string GetCurrentCoreAssemblyName()
-        {
-#if MIGRATION
-
-#if CSHTML5BLAZOR
-            return NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
-#elif BRIDGE
-            return NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
-#endif
-
-#else
-
-#if CSHTML5BLAZOR
-            return NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
-#elif BRIDGE
-            return NAME_OF_CORE_ASSEMBLY_USING_BRIDGE;
-#endif
-
-#endif
-        }
     }
 }
