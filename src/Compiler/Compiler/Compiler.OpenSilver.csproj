@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\XamlResourcesHelper.cs">
+      <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\CoreTypesHelper.cs" />
@@ -64,7 +67,6 @@
     <Compile Include="OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
-    <Compile Include="OtherHelpersAndHandlers\XamlFilesWithoutCodeBehindHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\XamlParseException.cs" />
     <Compile Include="Loggers\LoggerBase.cs" />
     <Compile Include="Loggers\LoggerThatUsesTaskOutput.cs" />

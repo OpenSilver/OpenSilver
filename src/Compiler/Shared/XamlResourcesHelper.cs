@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,30 +12,29 @@
 *  
 \*====================================================================================*/
 
-
+// ************************* WARNING ************************* //
+// *** This file is shared by the Runtime and the Compiler *** //
+// *********************************************************** //
 
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Internal
 {
-    internal static class XamlFilesWithoutCodeBehindHelper
+    internal static class XamlResourcesHelper
     {
         /// <summary>
-        /// Generates a class name from the uri for the class that will allow us to instantiate the Page defined in the file at the given Uri.
-        /// This class is used in System.Windows.Controls.Frame to create an instance of the page (for example when using MyFrame.Source = new Uri("/InnerPage.xaml", UriKind.Relative);).
+        /// Generates a class name from the uri for the class that will allow us to 
+        /// instantiate the Page defined in the file at the given <see cref="Uri"/>.
+        /// This class is used in <b>Frame</b> to create an instance of the page 
+        /// (for example when using MyFrame.Source = new Uri("/InnerPage.xaml", UriKind.Relative);).
         /// </summary>
-        /// <param name="absoluteSourceUri">The Uri from which to generate the class name.</param>
+        /// <param name="componentUri">The Uri from which to generate the class name.</param>
         /// <returns>The newly generated class name.</returns>
-        internal static string GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(string absoluteSourceUri)
+        internal static string GenerateClassNameFromComponentUri(string componentUri)
         {
             // Convert to TitleCase (so that when we remove the spaces, it is easily readable):
-            string className = MakeTitleCase(absoluteSourceUri);
+            string className = MakeTitleCase(componentUri);
 
             // If file name contains invalid chars, remove them:
             className = Regex.Replace(className, @"\W", "ǀǀ"); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
@@ -55,7 +53,7 @@ namespace DotNetForHtml5.Compiler
             return className;
         }
 
-        static string MakeTitleCase(string str)
+        internal static string MakeTitleCase(string str)
         {
             string result = "";
             string lowerStr = str.ToLower();
@@ -99,23 +97,6 @@ namespace DotNetForHtml5.Compiler
                 result += str.Substring(lastCopiedIndex + 1);
             }
             return result;
-
-
-            //bool isFirst = true;
-            //string[] spaceSplittedString = str.Split(' ');
-            //foreach (string s in spaceSplittedString)
-            //{
-            //    if (isFirst)
-            //    {
-            //        isFirst = false;
-            //    }
-            //    else
-            //    {
-            //        result += " ";
-            //    }
-            //    result += MakeFirstCharUpperAndRestLower(s);
-            //}
-            //return result;
         }
     }
 }

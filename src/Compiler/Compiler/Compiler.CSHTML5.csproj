@@ -77,6 +77,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\XamlResourcesHelper.cs">
+      <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
+    </Compile>
     <Compile Include="1_CheckingProjectConformity\CheckingThatAnAssemblyCanBeReferenced.cs" />
     <Compile Include="1_CheckingProjectConformity\CheckingThatNoAssemblyReferenceIsMissing.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
@@ -137,7 +140,6 @@
     <Compile Include="OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\WrapperHelpers.cs" />
-    <Compile Include="OtherHelpersAndHandlers\XamlFilesWithoutCodeBehindHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\XamlParseException.cs" />
     <Compile Include="Tests\Program.cs" />
     <Compile Include="Tests\StandaloneCompilerTest.cs" />

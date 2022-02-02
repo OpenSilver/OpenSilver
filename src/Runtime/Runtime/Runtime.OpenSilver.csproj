@@ -77,7 +77,10 @@
 		<Compile Include="Microsoft.Expression.Media.Effects\TransitionEffect.cs" />
 		<Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
 		<Compile Include="OpenSilver\Internal\Parsers.cs" />
-		<Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
+    <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
+      <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
+    </Compile>
+    <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />

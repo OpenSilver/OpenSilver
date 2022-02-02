@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using OpenSilver.Internal;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -884,7 +885,7 @@ else
                                             "var {0} = (({1})new {2}()).CreateComponent();",
                                             elementUniqueNameOrThisKeyword,
                                             $"{IXamlComponentFactoryClass}<{namespaceSystemWindows}.ResourceDictionary>",
-                                            XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri)
+                                            XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri)
                                         )
                                     );
                                 }
@@ -2258,8 +2259,7 @@ public static void Main()
                 fileNameWithPathRelativeToProjectRoot : 
                 "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot;
             
-            string classToInstantiateName = 
-                XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
+            string classToInstantiateName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
 
             string methodsMergedCode = string.Join(Environment.NewLine + Environment.NewLine, methods);
             
@@ -2852,8 +2852,7 @@ namespace {namespaceStringIfAny}
                     fileNameWithPathRelativeToProjectRoot :
                     "/" + assemblyName + ";component/" + fileNameWithPathRelativeToProjectRoot;
 
-            string factoryName =
-                XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
+            string factoryName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
 
             string finalCode = $@"
 //------------------------------------------------------------------------------

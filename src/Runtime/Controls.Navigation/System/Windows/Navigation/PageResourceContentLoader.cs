@@ -16,6 +16,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Resources;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Navigation;
 
 #if MIGRATION
@@ -370,7 +371,9 @@ namespace Windows.UI.Xaml.Navigation
                 return null;
             }
 
-            string factoryTypeName = GetXamlPageFactoryTypeName("/" + assemblyPartSource + UriParsingHelper.ComponentDelimiterWithoutSlash + pagePathAndNameWithoutAssembly);
+            string factoryTypeName = XamlResourcesHelper.GenerateClassNameFromComponentUri(
+                "/" + assemblyPartSource + UriParsingHelper.ComponentDelimiterWithoutSlash + pagePathAndNameWithoutAssembly
+            );
 
             return Type.GetType(string.Concat(factoryTypeName, ", ", assemblyPartSource));
         }
@@ -407,74 +410,6 @@ namespace Windows.UI.Xaml.Navigation
             assemblyPartSource = Uri.EscapeUriString(assemblyPartSource);
 
             return true;
-        }
-
-        private static string GetXamlPageFactoryTypeName(string pagePath)
-        {
-            // Convert to TitleCase (so that when we remove the spaces, it is easily readable):
-            string className = MakeTitleCase(pagePath);
-
-            // If file name contains invalid chars, remove them:
-            className = Regex.Replace(className, @"\W", "ǀǀ"); //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
-
-            // If class name doesn't begin with a letter, insert an underscore:
-            if (char.IsDigit(className, 0))
-            {
-                className = className.Insert(0, "_");
-            }
-
-            // Remove white space:
-            className = className.Replace(" ", string.Empty);
-
-            className += "ǀǀFactory"; //Note: this is not a pipe (the thing we get with ctrl+alt+6), it is U+01C0
-
-            return className;
-        }
-
-        private static string MakeTitleCase(string str)
-        {
-            string result = "";
-            string lowerStr = str.ToLower();
-            int length = str.Length;
-            bool makeUpper = true;
-            int lastCopiedIndex = -1;
-            /****************************
-            * HOW THIS WORKS
-            *
-            * We go through all the characters of the string.
-            * If any is not an alphanumerical character, we make the next alphanumerical character uppercase.
-            * To do so, we copy the string (on which we call toLower) bit by bit into a new variable,
-            * each bit being the part between two uppercase characters, and while inserting the
-            * uppercase version of the character between each bit. then we add the end of the string.
-            *****************************/
-
-            for (int i = 0; i < length; ++i)
-            {
-                char ch = lowerStr[i];
-                if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '0'))
-                {
-                    if (makeUpper && ch >= 'a' && ch <= 'z')
-                    {
-                        if (!(lastCopiedIndex == -1 && i == 0))
-                        {
-                            result += lowerStr.Substring(lastCopiedIndex + 1, i - lastCopiedIndex - 1);
-                        }
-                        result += (char)(ch - 32);
-                        lastCopiedIndex = i;
-                    }
-                    makeUpper = false;
-                }
-                else
-                {
-                    makeUpper = true;
-                }
-            }
-
-            if (lastCopiedIndex < length - 1)
-            {
-                result += str.Substring(lastCopiedIndex + 1);
-            }
-            return result;
         }
 #endif
 

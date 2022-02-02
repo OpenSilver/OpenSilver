@@ -38,6 +38,9 @@
     <DocumentationFile>$(BinFolder)\Migration\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
+      <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
+    </Compile>
     <Compile Include="..\OpenSilver.Xaml\System.Windows.Markup\ContentPropertyAttribute.cs">
       <Link>System.Windows.Markup\ContentPropertyAttribute.cs</Link>
     </Compile>
