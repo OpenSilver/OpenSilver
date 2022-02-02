@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -205,6 +206,17 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+
+            var view = _textViewHost?.View;
+            if (view != null)
+            {
+                INTERNAL_HtmlDomManager.SetFocus(view);
+            }
+        }
+
         private PasswordBoxView CreateView()
         {
             return new PasswordBoxView(this);
@@ -229,7 +241,7 @@ namespace Windows.UI.Xaml.Controls
                 _textViewHost = null;
             }
         }
-        
+
         /// <summary>
         /// Selects all the character in the PasswordBox.
         /// </summary>
