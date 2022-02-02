@@ -406,7 +406,6 @@ sel.addRange(range);
             object contentEditableDiv;
             var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", middleDiv, this, out contentEditableDiv);
             _contentEditableDiv = contentEditableDiv;
-            Host.UpdateFocusContentEditable(_contentEditableDiv);
             if (INTERNAL_HtmlDomManager.IsInternetExplorer())
             {
                 //set the class to remove margins on <p> inside the contentEditableDiv

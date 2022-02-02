@@ -607,12 +607,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal void UpdateFocusContentEditable(object contentEditableDiv)
-        {
-            INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
-            UpdateTabIndex(IsTabStop, TabIndex);
-        }
-
         protected override void OnGotFocus(RoutedEventArgs e)
         {
             base.OnGotFocus(e);
