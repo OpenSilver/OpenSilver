@@ -233,6 +233,39 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(TemplateProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets a brush that describes the foreground color.
+        /// </summary>
+        /// <remarks>
+        /// The brush that paints the foreground of the control.
+        /// The default value is System.Windows.Media.Colors.Black.
+        /// </remarks>
+        [OpenSilver.NotImplemented]
+        public Brush Foreground
+        {
+            get { return (Brush)GetValue(ForegroundProperty); }
+            set { SetValue(ForegroundProperty, value); }
+        }
+
+        public static readonly DependencyProperty ForegroundProperty =
+            DependencyProperty.Register("Foreground", typeof(Brush), typeof(Calendar), new PropertyMetadata(new SolidColorBrush(Colors.Black)));
+
+        /// <summary>
+        /// Gets or sets the font used to display text in the control.
+        /// </summary>
+        /// <remarks>
+        /// The font used to display text in the control. The default is the "Portable User Interface".
+        /// </remarks>
+        [OpenSilver.NotImplemented]
+        public FontFamily FontFamily
+        {
+            get { return (FontFamily)GetValue(FontFamilyProperty); }
+            set { SetValue(FontFamilyProperty, value); }
+        }
+
+        public static readonly DependencyProperty FontFamilyProperty =
+            DependencyProperty.Register("FontFamily", typeof(FontFamily), typeof(Calendar), new PropertyMetadata(new FontFamily("Portable User Interface")));
+
         [OpenSilver.NotImplemented]
         public double FontSize
         {

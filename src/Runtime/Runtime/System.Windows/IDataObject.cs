@@ -37,7 +37,14 @@ namespace System.Windows
         /// is not available in the specified format.</returns>
         object GetData(string format);
 
-
+        /// <summary>
+        /// Retrieves a data object in a specified format; the data format is specified by
+        /// a System.Type object.
+        /// </summary>
+        /// <param name="format">A System.Type object that specifies what format to retrieve the data as.</param>
+        /// <returns>A data object with the data in the specified format, or null if the data
+        /// is not available in the specified format.</returns>
+        object GetData(Type format);
 
         /// <summary>
         /// Checks to see whether the data is available in, or can be converted 

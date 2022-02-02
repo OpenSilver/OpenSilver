@@ -81,6 +81,32 @@ namespace Windows.UI.Xaml.Controls
         UIElement _iconStop;
         UIElement _iconArrow;
 
+        #region public DragDropEffects AllowedSourceEffects
+        /// <summary>
+        /// Gets or sets the allowed effects when this DragDropTarget is the drag source.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public DragDropEffects AllowedSourceEffects
+        {
+            get { return (DragDropEffects)GetValue(AllowedSourceEffectsProperty); }
+            set { SetValue(AllowedSourceEffectsProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the AllowedSourceEffects dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AllowedSourceEffectsProperty =
+            DependencyProperty.Register(
+                "AllowedSourceEffects",
+                typeof(DragDropEffects),
+                typeof(DragDropTarget<TItemsControlType, TItemContainerType>),
+#if unsupported
+                new PropertyMetadata(DragDropEffects.Link | DragDropEffects.Move | DragDropEffects.Scroll));
+#else
+                new PropertyMetadata(DragDropEffects.None));
+#endif
+        #endregion public DragDropEffects AllowedSourceEffects
+
 
         /// <summary>
         /// Initializes a new instance of the DragDropTarget class.

@@ -82,4 +82,14 @@ namespace Windows.UI.Xaml.Controls
         }
         #endregion public Style SpinnerStyle
     }
+
+    /// <summary>
+    /// Base class for all controls that provide value manipulation with a Spinner and a text box.
+    /// </summary>
+    /// <typeparam name="T">Type of Value property.</typeparam>
+    [OpenSilver.NotImplemented]
+    public class UpDownBase<T> : UpDownBase
+    {
+
+    }
 }
