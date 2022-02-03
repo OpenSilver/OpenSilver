@@ -1,8 +1,24 @@
-﻿#if MIGRATION
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System.Collections.Generic;
 using System.Globalization;
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Represents the short time format used for parsing and formatting.
@@ -29,7 +45,7 @@ namespace System.Windows.Controls
             return formats.ToArray();
         }
 
-        #region Equals and hashcode.
+#region Equals and hashcode.
         /// <summary>
         /// Determines whether the specified <see cref="T:System.Object"/> is 
         /// equal to the current <see cref="T:System.Object"/>.
@@ -91,7 +107,6 @@ namespace System.Windows.Controls
         {
             return GetType().Name.GetHashCode();
         }
-        #endregion
+#endregion
     }
 }
-#endif

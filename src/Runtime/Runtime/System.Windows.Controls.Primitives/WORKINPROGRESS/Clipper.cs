@@ -1,5 +1,21 @@
-﻿#if MIGRATION
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.Primitives
+#endif
 {
     /// <summary>
     /// Clips a ratio of its content.
@@ -7,7 +23,7 @@ namespace System.Windows.Controls.Primitives
     [OpenSilver.NotImplemented]
     public abstract class Clipper : ContentControl
     {
-        #region public double RatioVisible
+#region public double RatioVisible
         /// <summary>
         /// Gets or sets the percentage of the item visible.
         /// </summary>
@@ -64,7 +80,7 @@ namespace System.Windows.Controls.Primitives
             }
         }
 
-        #endregion public double RatioVisible
+#endregion public double RatioVisible
 
         /// <summary>
         /// Initializes a new instance of the Clipper class.
@@ -80,4 +96,3 @@ namespace System.Windows.Controls.Primitives
         protected abstract void ClipContent();
     }
 }
-#endif

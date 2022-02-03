@@ -1,7 +1,28 @@
-﻿#if MIGRATION
-using System.Windows.Media;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.Primitives
+#endif
 {
     /// <summary>
     /// Clips the content of the control in a given direction.
@@ -9,7 +30,7 @@ namespace System.Windows.Controls.Primitives
     [OpenSilver.NotImplemented]
     public class LinearClipper : Clipper
     {
-        #region public ExpandDirection ExpandDirection
+#region public ExpandDirection ExpandDirection
         /// <summary>
         /// Gets or sets the clipped edge.
         /// </summary>
@@ -51,7 +72,7 @@ namespace System.Windows.Controls.Primitives
         {
             ClipContent();
         }
-        #endregion public ExpandDirection ExpandDirection
+#endregion public ExpandDirection ExpandDirection
 
         /// <summary>
         /// Updates the clip geometry.
@@ -83,4 +104,3 @@ namespace System.Windows.Controls.Primitives
         }
     }
 }
-#endif
