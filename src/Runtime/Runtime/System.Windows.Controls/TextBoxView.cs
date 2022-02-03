@@ -44,6 +44,8 @@ namespace Windows.UI.Xaml.Controls
 
         internal TextBox Host { get; }
 
+        internal object InputDiv => _contentEditableDiv;
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var div = AddContentEditableDomElement(parentRef, out domElementWhereToPlaceChildren);
@@ -282,13 +284,13 @@ element.setAttribute(""data-maxlength"", ""{maxLength}"");");
         internal void OnTextDecorationsChanged(TextDecorationCollection tdc)
         {
             string cssValue = tdc?.ToHtmlString() ?? string.Empty;
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).textDecoration = cssValue;
         }
 #else
         internal void OnTextDecorationsChanged(TextDecorations? tdc)
         {
             string cssValue = TextDecorationsToHtmlString(tdc);
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).textDecoration = cssValue;
         }
 
         private static string TextDecorationsToHtmlString(TextDecorations? tdc)
@@ -433,7 +435,6 @@ sel.addRange(range);
 
             string isContentEditable = (!isReadOnly).ToString().ToLower();
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "contentEditable", isContentEditable);
-            this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
 
             contentEditableDivStyle.minWidth = "14px";
@@ -945,7 +946,7 @@ var range,selection;
         private void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
         {
 #if BRIDGE
-            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
+            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv);
 #endif
         }
 
@@ -957,7 +958,7 @@ var range,selection;
         private void InternetExplorer_RaiseTextChangedIfNecessary()
         {
 #if BRIDGE
-            string newInnerText = OpenSilver.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
+            string newInnerText = OpenSilver.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv);
             if (newInnerText != previousInnerText)
             {
                 TextAreaValueChanged();

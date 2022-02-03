@@ -38,6 +38,8 @@ namespace Windows.UI.Xaml.Controls
 
         internal PasswordBox Host { get; }
 
+        internal object InputDiv => _passwordInputField;
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var div = AddPasswordInputDomElement(parentRef, out domElementWhereToPlaceChildren, false);
@@ -110,8 +112,6 @@ namespace Windows.UI.Xaml.Controls
         {
             object passwordField;
             var passwordFieldStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("input", parentRef, this, out passwordField);
-
-            this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = passwordField;
 
             _passwordInputField = passwordField;
 

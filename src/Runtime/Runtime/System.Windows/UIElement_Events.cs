@@ -950,9 +950,9 @@ namespace Windows.UI.Xaml
                 if (_textInputEventManager == null)
                 {
 #if MIGRATION
-                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "input", ProcessOnTextInput);
+                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => GetFocusTarget(), "input", ProcessOnTextInput);
 #else
-                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "input", ProcessOnTextInput);
+                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => GetFocusTarget(), "input", ProcessOnTextInput);
 #endif
                 }
                 return _textInputEventManager;
@@ -1329,9 +1329,9 @@ namespace Windows.UI.Xaml
                 if (_keyDownEventManager == null)
                 {
 #if MIGRATION
-                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown);
+                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => GetFocusTarget(), "keydown", ProcessOnKeyDown);
 #else
-                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown);
+                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => GetFocusTarget(), "keydown", ProcessOnKeyDown);
 #endif
                 }
                 return _keyDownEventManager;
@@ -1445,9 +1445,9 @@ namespace Windows.UI.Xaml
                 if (_keyUpEventManager == null)
                 {
 #if MIGRATION
-                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "keyup", ProcessOnKeyUp);
+                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => GetFocusTarget(), "keyup", ProcessOnKeyUp);
 #else
-                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement, "keyup", ProcessOnKeyUp);
+                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => GetFocusTarget(), "keyup", ProcessOnKeyUp);
 #endif
                 }
                 return _keyUpEventManager;
@@ -1554,7 +1554,7 @@ namespace Windows.UI.Xaml
             {
                 if (_gotFocusEventManager == null)
                 {
-                    _gotFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => (this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement), "focusin", ProcessOnGotFocus);
+                    _gotFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => GetFocusTarget(), "focusin", ProcessOnGotFocus);
                 }
                 return _gotFocusEventManager;
             }
@@ -1620,7 +1620,7 @@ namespace Windows.UI.Xaml
             {
                 if (_lostFocusEventManager == null)
                 {
-                    _lostFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => (this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement), "focusout", ProcessOnLostFocus);
+                    _lostFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => GetFocusTarget(), "focusout", ProcessOnLostFocus);
                 }
                 return _lostFocusEventManager;
             }
@@ -1730,7 +1730,7 @@ namespace Windows.UI.Xaml
             {
                 if (_gotFocusForIsTabStopEventManager == null)
                 {
-                    _gotFocusForIsTabStopEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => (this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement), "focusin", ProcessOnGotFocusForIsTabStop);
+                    _gotFocusForIsTabStopEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => GetFocusTarget(), "focusin", ProcessOnGotFocusForIsTabStop);
                 }
                 return _gotFocusForIsTabStopEventManager;
             }
@@ -1793,19 +1793,15 @@ namespace Windows.UI.Xaml
 
                 GotFocusForIsTabStop -= UIElement_GotFocusForIsTabStop; //just in case.
                 GotFocusForIsTabStop += UIElement_GotFocusForIsTabStop;
-                //var domElementConcernedByFocus = INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? INTERNAL_OuterDomElement;
-
-                //_preventFocusProxy = INTERNAL_EventsHelper.AttachToDomEvents("focusin", domElementConcernedByFocus, (Action<object>)(jsEventArg =>
-                //{
-                //    PreventFocus(jsEventArg);
-                //}));
             }
         }
+
+        internal virtual object GetFocusTarget() => INTERNAL_OuterDomElement;
 
         void UIElement_GotFocusForIsTabStop(object sender, RoutedEventArgs e)
         {
             UIElement element = (UIElement)sender; //jsEvent should be called "sender" but I kept the former implementation so I also kept the name.
-            var elementToBlur = element.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? element.INTERNAL_OuterDomElement;
+            var elementToBlur = element.GetFocusTarget();
             if (elementToBlur != null)
                 CSHTML5.Interop.ExecuteJavaScript(@"$0.blur()", elementToBlur);
         }
@@ -1818,12 +1814,6 @@ namespace Windows.UI.Xaml
 
                 INTERNAL_AttachToFocusEvents();
                 GotFocusForIsTabStop -= UIElement_GotFocusForIsTabStop; //just in case.
-
-
-                //_preventFocusProxy.Dispose();
-                //var domElementConcernedByFocus = INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? INTERNAL_OuterDomElement;
-
-                //INTERNAL_EventsHelper.DetachEvent("focusin", domElementConcernedByFocus, _preventFocusProxy, (Action<object>)PreventFocus);
             }
         }
 
@@ -1867,7 +1857,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #region first try at this (would be better than the current one but It doesn't work for whatever reason).
+#region first try at this (would be better than the current one but It doesn't work for whatever reason).
 
         //        private HtmlEventProxy _preventFocusProxy = null;
 
@@ -1911,9 +1901,9 @@ namespace Windows.UI.Xaml
         //            }
         //        }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
         void ProcessPointerEvent(
             object jsEventArg,

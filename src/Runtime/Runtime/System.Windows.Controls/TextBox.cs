@@ -59,10 +59,9 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(TextBox);
         }
 
-        internal sealed override bool INTERNAL_GetFocusInBrowser
-        {
-            get { return true; }
-        }
+        internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+
+        internal sealed override bool INTERNAL_GetFocusInBrowser => true;
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -603,18 +602,9 @@ namespace Windows.UI.Xaml.Controls
             if (_textViewHost != null)
             {
                 TextBoxView view = CreateView();
+                view.Loaded += new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.AttachView(view);
-            }
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-
-            var view = _textViewHost?.View;
-            if (view != null)
-            {
-                INTERNAL_HtmlDomManager.SetFocus(view);
             }
         }
 
@@ -622,9 +612,16 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_textViewHost != null)
             {
+                _textViewHost.View.Loaded -= new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
+        }
+
+        private void OnViewLoaded(object sender, RoutedEventArgs e) 
+        { 
+            UpdateTabIndex(IsTabStop, TabIndex);
         }
 
         internal static ITextBoxViewHost<T> GetContentHost<T>(FrameworkElement contentElement) where T : FrameworkElement, ITextBoxView

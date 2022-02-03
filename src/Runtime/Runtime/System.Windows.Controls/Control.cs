@@ -600,14 +600,10 @@ namespace Windows.UI.Xaml.Controls
 
         private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
-        internal virtual bool INTERNAL_GetFocusInBrowser
-        {
-            get { return false; }
-        }
-
+        internal virtual bool INTERNAL_GetFocusInBrowser => false;
         internal virtual void UpdateTabIndex(bool isTabStop, int tabIndex)
         {
-            var domElementConcernedByFocus = this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement;
+            var domElementConcernedByFocus = GetFocusTarget();
             if (domElementConcernedByFocus == null)
                 return;
             if (!isTabStop || !this.IsEnabled)
