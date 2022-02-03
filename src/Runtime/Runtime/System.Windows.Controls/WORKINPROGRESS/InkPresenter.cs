@@ -1,15 +1,20 @@
 ﻿#if MIGRATION
 using System.Windows.Ink;
-using System.Windows.Media;
 
 namespace System.Windows.Controls
 {
+    /// <summary>
+    /// Implements a rectangular surface that displays ink strokes.
+    /// </summary>
     [OpenSilver.NotImplemented]
-    public class InkPresenter : Decorator
+    public class InkPresenter : Canvas
     {
         /// <summary>
-        /// Gets or sets the strokes that the System.Windows.Controls.InkPresenter displays.
+        /// Gets or sets the strokes that the <see cref="InkPresenter"/> displays.
         /// </summary>
+        /// <returns>
+        /// The collection of ink strokes that are displayed by the <see cref="InkPresenter"/>.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public StrokeCollection Strokes
         {
@@ -19,19 +24,6 @@ namespace System.Windows.Controls
 
         public static readonly DependencyProperty StrokesProperty =
             DependencyProperty.Register("Strokes", typeof(StrokeCollection), typeof(InkPresenter), new PropertyMetadata());
-
-        /// <summary>
-        /// Gets or sets a brush that provides the background of the control.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public Brush Background
-        {
-            get { return (Brush)GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
-        }
-
-        public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(Brush), typeof(Calendar), new PropertyMetadata());
     }
 }
 #endif

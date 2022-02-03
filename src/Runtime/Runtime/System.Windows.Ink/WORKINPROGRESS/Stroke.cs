@@ -1,38 +1,29 @@
 ﻿#if MIGRATION
-using System.ComponentModel;
 using System.Windows.Input;
 
-//https://github.com/dotnet/wpf/blob/main/src/Microsoft.DotNet.Wpf/src/PresentationCore/System/Windows/Ink/Stroke.cs
 namespace System.Windows.Ink
 {
     /// <summary>
-    /// Represents a single ink stroke.
+    /// Represents a collection of points that correspond to a stylus-down, move, and stylus-up sequence.
     /// </summary>
-    /// <remarks>A Stroke is the data object that is collected from a pointing device, such as a tablet pen or a mouse.
-    /// The Stroke can be created and manipulated programmatically, and can be represented visually on an ink-enabled element,
-    /// such as the InkCanvas. A Stroke contains information about both its position and appearance.
-    /// The StylusPoints property is a collection of StylusPoint objects that specifies the position of the Stroke.
-    /// The DrawingAttributes property specifies a stroke's appearance.</remarks>
     [OpenSilver.NotImplemented]
-    public class Stroke : INotifyPropertyChanged
+    public class Stroke : DependencyObject
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         /// <summary>
-        /// StylusPoints
+        /// Gets or sets the stylus points of the <see cref="Stroke"/>.
         /// </summary>
+        /// <returns>
+        /// The <see cref="StylusPointCollection"/> that contains the stylus points that represent the current <see cref="Stroke"/>.
+        /// </returns>
         [OpenSilver.NotImplemented]
         public StylusPointCollection StylusPoints
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get { return (StylusPointCollection)GetValue(StylusPointsProperty); }
+            set { SetValue(StylusPointsProperty, value); }
         }
+
+        public static readonly DependencyProperty StylusPointsProperty =
+            DependencyProperty.Register("StylusPoints", typeof(StylusPointCollection), typeof(Stroke), new PropertyMetadata());
     }
 }
 #endif

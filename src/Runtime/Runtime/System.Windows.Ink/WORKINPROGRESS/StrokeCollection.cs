@@ -2,11 +2,14 @@
 namespace System.Windows.Ink
 {
     /// <summary>
-    /// Collection of strokes objects which can be operated on in aggregate.
+    /// Represents a collection of <see cref="Stroke"/> objects.
     /// </summary>
     [OpenSilver.NotImplemented]
     public sealed class StrokeCollection : PresentationFrameworkCollection<Stroke>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StrokeCollection"/> class.
+        /// </summary>
         [OpenSilver.NotImplemented]
         public StrokeCollection() : base(false)
         {
