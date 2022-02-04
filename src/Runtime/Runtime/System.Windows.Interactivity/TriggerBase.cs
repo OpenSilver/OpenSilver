@@ -62,14 +62,14 @@ namespace System.Windows.Interactivity
                 throw new InvalidOperationException("The Behavior is already hosted on a different element.");
             }
             _associatedObject = dependencyObject;
+            this.Actions.Attach(_associatedObject);
             OnAttached();
         }
 
         protected virtual void OnAttached()
         {
-            this.Actions.Attach(_associatedObject);
-
         }
+
         #endregion
 
         internal TriggerBase(Type associatedObjectTypeConstraint)
@@ -117,6 +117,11 @@ namespace System.Windows.Interactivity
         }
 
         /// <summary>
+		/// Event handler for registering to PreviewInvoke.
+		/// </summary>
+		public event EventHandler<PreviewInvokeEventArgs> PreviewInvoke;
+
+        /// <summary>
         /// Invoke all actions associated with this trigger.
         /// </summary>
         /// 
@@ -125,6 +130,18 @@ namespace System.Windows.Interactivity
         /// </remarks>
         protected void InvokeActions(object parameter)
         {
+            if (this.PreviewInvoke != null)
+            {
+                // Fire the previewInvoke event 
+                PreviewInvokeEventArgs previewInvokeEventArg = new PreviewInvokeEventArgs();
+                this.PreviewInvoke(this, previewInvokeEventArg);
+                // If a handler has cancelled the event, abort the invoke
+                if (previewInvokeEventArg.Cancelling == true)
+                {
+                    return;
+                }
+            }
+
             foreach (TriggerAction triggerAction in this.Actions)
             {
                 triggerAction.CallInvoke(parameter);
