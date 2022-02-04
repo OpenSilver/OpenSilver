@@ -14,7 +14,6 @@
 \*====================================================================================*/
 
 using System.Windows.Interactivity;
-using System.Windows;
 
 #if MIGRATION
 using System.Windows;

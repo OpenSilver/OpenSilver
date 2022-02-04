@@ -36,5 +36,32 @@ namespace Microsoft.Expression.Interactivity.Core
 		public ConditionBehavior()
 		{
 		}
+
+		protected override void OnAttached()
+		{
+			base.OnAttached();
+			this.AssociatedObject.PreviewInvoke += this.OnPreviewInvoke;
+		}
+
+		protected override void OnDetaching()
+		{
+			this.AssociatedObject.PreviewInvoke -= this.OnPreviewInvoke;
+			base.OnDetaching();
+		}
+
+		/// <summary>
+		/// The event handler that is listening to the preview invoke event that is fired by 
+		/// the trigger. Setting PreviewInvokeEventArgs.Cancelling to True will
+		/// cancel the invocation.
+		/// </summary>
+		/// <param name="sender">The trigger base object.</param>
+		/// <param name="e">An object of type PreviewInvokeEventArgs where e.Cancelling can be set to True.</param>
+		private void OnPreviewInvoke(object sender, PreviewInvokeEventArgs e)
+		{
+			if (this.Condition != null)
+			{
+				e.Cancelling = !this.Condition.Evaluate();
+			}
+		}
 	}
 }

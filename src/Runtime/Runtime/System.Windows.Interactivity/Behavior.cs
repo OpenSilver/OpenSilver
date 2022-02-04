@@ -41,6 +41,11 @@ namespace System.Windows.Interactivity
         /// </summary>
         public DependencyObject AssociatedObject { get { return _associatedObject; } }  //todo: was protected but it has to be public because it comes from an interface si I don't really understand.
 
+        internal Behavior(Type associatedType)
+        {
+            _associatedType = associatedType;
+        }
+
         internal event EventHandler AssociatedObjectChanged;
 
         internal Type _associatedType = null;
@@ -95,6 +100,7 @@ namespace System.Windows.Interactivity
         {
             OnDetaching();
             _associatedObject = null;
+            this.OnAssociatedObjectChanged();
         }
 
         /// <summary>
@@ -113,6 +119,18 @@ namespace System.Windows.Interactivity
             if (this.AssociatedObjectChanged != null)
             {
                 this.AssociatedObjectChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+		/// Gets the associated object.
+		/// </summary>
+		/// <value>The associated object.</value>
+		DependencyObject IAttachedObject.AssociatedObject
+        {
+            get
+            {
+                return this.AssociatedObject;
             }
         }
     }

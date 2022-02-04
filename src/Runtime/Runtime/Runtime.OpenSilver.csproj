@@ -146,6 +146,7 @@
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTriggerBase.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolvedEventArgs.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolver.cs" />
+		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\PreviewInvokeEventArgs.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerBase_1.cs" />
 		<Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TypeConstraintAttribute.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
