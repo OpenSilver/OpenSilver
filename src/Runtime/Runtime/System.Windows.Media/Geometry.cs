@@ -33,6 +33,14 @@ namespace Windows.UI.Xaml.Media
     /// </summary>
     public abstract partial class Geometry : DependencyObject
     {
+        /// <summary>
+        /// Gets an empty geometry object.
+        /// </summary>
+        /// <returns>
+        /// The empty geometry object.
+        /// </returns>
+        public static Geometry Empty => new PathGeometry();
+
         internal Geometry() { }
 
         internal Path ParentPath { get; private set; }
