@@ -300,7 +300,7 @@ namespace Windows.UI.Xaml.Controls
             // Prepare the "DragEventArgs" to pass to the raised events:
             Selection selection = new Selection(_sourceItemContainer);
             SelectionCollection selectionCollection = SelectionCollection.ToSelectionCollection(selection);
-            DataObject dataObject = new DataObject();
+            MS.DataObject dataObject = new MS.DataObject();
             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
             MS.DragEventArgs dragOverEventArgs = new MS.DragEventArgs(dataObject);
 
@@ -448,7 +448,7 @@ namespace Windows.UI.Xaml.Controls
                         if (dragDropTargetUnderPointer.ItemDroppedOnSource != null)
                         {
                             // Prepare the event args:
-                            DataObject dataObject = new DataObject();
+                            MS.DataObject dataObject = new MS.DataObject();
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
 #if !(BRIDGE && MIGRATION)
@@ -470,7 +470,7 @@ namespace Windows.UI.Xaml.Controls
                         if (dragDropTargetUnderPointer.Drop != null)
                         {
                             // Prepare the event args:
-                            DataObject dataObject = new DataObject();
+                            MS.DataObject dataObject = new MS.DataObject();
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
                             // Raise the Drop event:
