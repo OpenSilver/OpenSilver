@@ -41,6 +41,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
+		<Compile Include="Core\Events\INTERNAL_EventManager.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
 		<Compile Include="Core\Main\DescendentsWalker.cs" />
 		<Compile Include="Core\Main\DescendentsWalkerBase.cs" />
