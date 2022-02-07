@@ -501,8 +501,8 @@
 		<Compile Include="APP_SUPPORT\Cshtml5Initializer.cs" />
 		<Compile Include="APP_SUPPORT\StaticConstructorsCaller.cs" />
 		<Compile Include="Core\Events\HtmlEventProxy.cs" />
-    <Compile Include="Core\Events\INTERNAL_EventManager.cs" />
-    <Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
+		<Compile Include="Core\Events\INTERNAL_EventManager.cs" />
+		<Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
 		<Compile Include="Core\Main\DelegateUtility.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
 		<Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
