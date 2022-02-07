@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:OpenSilver.Internal.Controls">
 
 
     <Style TargetType="DataGridColumnHeader">
@@ -102,7 +103,7 @@
                                 <RowDefinition Height="Auto" x:Name="PART_HeadersRow" />
                             </Grid.RowDefinitions>
                         </Grid>
-                        <DataPager x:Name="PART_Pager" 
+                        <local:DataPager x:Name="PART_Pager" 
                                    Grid.Row="1"
                                    PageSize="{TemplateBinding PageSize}"
                                    DisplayMode="FirstLastPreviousNext"/>

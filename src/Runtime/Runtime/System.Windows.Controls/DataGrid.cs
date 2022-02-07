@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;

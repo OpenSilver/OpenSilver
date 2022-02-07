@@ -26,21 +26,24 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 #if MIGRATION
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Controls;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+
+
+
+namespace OpenSilver.Internal.Controls
 {
     public enum DataPager_DisplayMode
     {

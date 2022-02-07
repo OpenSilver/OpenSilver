@@ -10,12 +10,13 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
-namespace System.Windows.Controls
+using System.Windows.Controls;
 #else
-namespace Windows.UI.Xaml.Controls
+using Windows.UI.Xaml.Controls;
 #endif
+
+namespace OpenSilver.Internal.Controls
 {
 #if MIGRATION
     public partial class DataPager : Control

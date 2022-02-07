@@ -16,7 +16,8 @@
 		<DebugType>full</DebugType>
 		<Optimize>true</Optimize>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
-		<EnableDefaultItems>false</EnableDefaultItems> <!-- This emluates the behavior of NET Framework, which excludes every files by default -->
+		<EnableDefaultItems>false</EnableDefaultItems>
+		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
 		<OpenSilverVersion>1.0.0</OpenSilverVersion>
 	</PropertyGroup>
 
@@ -28,9 +29,9 @@
 		<DefineConstants>TRACE;CSHTML5BLAZOR;CSHTML5NETSTANDARD;OPENSILVER</DefineConstants>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="$(Optimize) != true">
-    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -58,10 +59,10 @@
 		<Compile Include="OpenSilver\Internal\NameScope.cs" />
 		<Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
 		<Compile Include="OpenSilver\Internal\Parsers.cs" />
-    <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
-      <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
-    </Compile>
-    <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
+		<Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
+			<Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
+		</Compile>
+		<Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
@@ -94,6 +95,21 @@
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LinearClipper.cs" />
 		<Compile Include="System.Windows.Controls\CalendarDayButton.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\DataPager\DataPager.cs" />
+		<Compile Include="System.Windows.Controls\DataPager\DataPagerAutomationPeer.cs" />
+		<Compile Include="System.Windows.Controls\DataPager\Extensions.cs" />
+		<Compile Include="System.Windows.Controls\DataPager\PagerDisplayMode.cs" />
+		<Compile Include="System.Windows.Controls\DataPager\PagerResources.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>PagerResources.resx</DependentUpon>
+		</Compile>
+		<Compile Include="System.Windows.Controls\DataPager\Resource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Resource.resx</DependentUpon>
+		</Compile>
+		<Compile Include="System.Windows.Controls\DataPager\WeakEventListener.cs" />
 		<Compile Include="System.Windows.Controls\ISelectionAdapter.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
@@ -535,8 +551,8 @@
 		<Compile Include="Core\Other\Tuple2_5.cs" />
 		<Compile Include="Core\Other\Tuple2_6.cs" />
 		<Compile Include="Core\Other\Windows.ApplicationModel.Activation.LaunchActivatedEventArgs.cs" />
-    <Compile Include="Core\Other\WorkaroundFixMe.cs" />
-    <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+		<Compile Include="Core\Other\WorkaroundFixMe.cs" />
+		<Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_Html2dContextReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
@@ -1070,7 +1086,7 @@
 		<Compile Include="System.Windows\VerticalAlignment.cs" />
 		<Compile Include="System.Windows\Visibility.cs" />
 		<Compile Include="System.Windows\VisualState.cs" />
-    <Compile Include="System.Windows\VisualStateChangedEventArgs.cs" />
+		<Compile Include="System.Windows\VisualStateChangedEventArgs.cs" />
 		<Compile Include="System.Windows\VisualStateGroup.cs" />
 		<Compile Include="System.Windows\VisualStateManager.cs" />
 		<Compile Include="System.Windows\WhenToCallPropertyChangedEnum.cs" />
@@ -1110,6 +1126,10 @@
 		<Compile Include="__SPECIFIC__\IJavaScriptExecutionHandler.cs" />
 	</ItemGroup>
 	<ItemGroup>
+		<Content Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle_Internal.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
 		<Content Include="Themes\generic.xaml">
 			<SubType>Designer</SubType>
 			<Generator>MSBuild:Compile</Generator>
@@ -1213,42 +1233,54 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultDataGridStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultDatePickerTextBoxStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultPasswordBoxStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTextBoxStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultContentControlStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultHeaderedItemsControlStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTreeViewItemStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultTreeViewStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultCalendarDayButtonStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultDatePickerTextBoxStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultPasswordBoxStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultTextBoxStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultContentControlStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultHeaderedItemsControlStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultTreeViewItemStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultTreeViewStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultCalendarDayButtonStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
+		<EmbeddedResource Include="System.Windows.Controls\DataPager\PagerResources.resx">
+			<LastGenOutput>PagerResources.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>OpenSilver.DataPager</CustomToolNamespace>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="System.Windows.Controls\DataPager\Resource.resx">
+			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>OpenSilver.DataPager</CustomToolNamespace>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
@@ -1256,7 +1288,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
 	</ItemGroup>
-  
+
 	<!-- See ths comment on the first <Import> -->
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
