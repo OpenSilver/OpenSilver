@@ -308,7 +308,7 @@
     <Compile Include="Core\Main\NamespacesDocumentation.cs" />
     <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Events\HtmlEventProxy.cs" />
-    <Compile Include="Core\Events\INTERNAL_EventManager_2.cs" />
+    <Compile Include="Core\Events\INTERNAL_EventManager.cs" />
     <Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs.cs" />
