@@ -1234,30 +1234,18 @@ else
                                             //              getVisualStateProperty65675669834683448390));
                                             //      Storyboard.SetTarget(colorAnimation7637478638468367843, canvas67567345673874893);
 
-                                            string findAName = string.Format(@"
-{1}.Storyboard.SetTargetProperty({2},
-    new {0}.PropertyPath(
-        ""{6}"",
-        ""{5}"",
-        access{3},
-        set{3},
-        setAnimation{3},                                     
-        setLocal{3},
-        get{3}));
-{1}.Storyboard.SetTarget({2}, {4});
-", 
-namespaceSystemWindows, 
-namespaceSystemWindowsMediaAnimation, 
-element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value, 
-accessorsUniqueNamePart, 
-targetElementUniqueName != null ? targetElementUniqueName : "null", 
-dependencyPropertyName, 
-dependencyPropertyPath);
-
-                                            // 4) put all the code generated above in the Dictionary of the code to add to the end of the storyboard :
-                                            List<string> storyboardsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToStoryboardsAdditionalCode);
-                                            //storyboardsAdditionalCode.Add(codeForStoryboardAccessToProperty);
-                                            storyboardsAdditionalCode.Add(findAName);
+                                            string timeline = element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
+                                            stringBuilder.AppendLine($@"
+{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTargetProperty({timeline},
+    new {namespaceSystemWindows}.PropertyPath(
+        ""{dependencyPropertyPath}"",
+        ""{dependencyPropertyName}"",
+        access{accessorsUniqueNamePart},
+        set{accessorsUniqueNamePart},
+        setAnimation{accessorsUniqueNamePart},                                     
+        setLocal{accessorsUniqueNamePart},
+        get{accessorsUniqueNamePart}));
+{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTarget({timeline}, {targetElementUniqueName ?? "null"});");
                                         }
                                     }
                                 }
