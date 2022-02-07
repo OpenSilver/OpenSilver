@@ -225,6 +225,11 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
                 var domElementRefConcernedByFocus = element.GetFocusTarget();
+                if (domElementRefConcernedByFocus == null)
+                {
+                    return;
+                }
+
 #if CSHTML5BLAZOR
                 // In the OpenSilver we can never be running in javascript but we may not be in the simulator
                 // todo: find a way to use a more generic method (see: IsRunningInTheSimulator)
