@@ -1,37 +1,40 @@
 ﻿<Project>
 
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <EnableDefaultItems>false</EnableDefaultItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>OpenSilver.Controls.Navigation</AssemblyName>
-    <RootNamespace>System.Windows.Navigation</RootNamespace>
-    <Configurations>SL;UWP</Configurations>
-    <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <OpenSilverVersion>1.0.0</OpenSilverVersion>
-    <Optimize>true</Optimize>
-    <DefineSilverlight>true</DefineSilverlight>
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<EnableDefaultItems>false</EnableDefaultItems>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AssemblyName>OpenSilver.Controls.Navigation</AssemblyName>
+		<RootNamespace>System.Windows.Navigation</RootNamespace>
+		<Configurations>SL;UWP</Configurations>
+		<IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
+		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+		<OpenSilverVersion>1.0.0</OpenSilverVersion>
+		<Optimize>true</Optimize>
+		<DefineSilverlight>true</DefineSilverlight>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;MIGRATION</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
+		<DefineConstants>TRACE;MIGRATION</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
+		<DefineConstants>TRACE</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="$(Optimize) != true">
-    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+	</ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
@@ -82,9 +85,9 @@
     </Page>
   </ItemGroup>
 
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
-  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
-  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+	<Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
+	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
 
 </Project>

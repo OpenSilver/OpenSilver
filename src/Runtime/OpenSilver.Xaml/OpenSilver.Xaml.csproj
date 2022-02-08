@@ -3,6 +3,9 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 

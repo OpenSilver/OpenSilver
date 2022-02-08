@@ -1,99 +1,102 @@
 ﻿<Project>
 
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <EnableDefaultItems>false</EnableDefaultItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>OpenSilver.Controls.Data.DataForm.Toolkit</AssemblyName>
-    <RootNamespace>System.Windows.Controls</RootNamespace>
-    <Configurations>SL;UWP</Configurations>
-    <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <OpenSilverVersion>1.0.0</OpenSilverVersion>
-    <DebugType>embedded</DebugType>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<EnableDefaultItems>false</EnableDefaultItems>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<AssemblyName>OpenSilver.Controls.Data.DataForm.Toolkit</AssemblyName>
+		<RootNamespace>System.Windows.Controls</RootNamespace>
+		<Configurations>SL;UWP</Configurations>
+		<IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
+		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+		<OpenSilverVersion>1.0.0</OpenSilverVersion>
+		<Optimize>true</Optimize>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;OPENSILVER;MIGRATION</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
+		<DefineConstants>TRACE;OPENSILVER;MIGRATION</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>TRACE;OPENSILVER</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
+		<DefineConstants>TRACE;OPENSILVER</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="$(Optimize) != true">
-    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
-    <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="Common\Extensions.cs" />
-    <Compile Include="Common\TypeHelper.cs" />
-    <Compile Include="DataField\DataField.cs" />
-    <Compile Include="DataField\DataFieldEnums\DataFieldDescriptionViewerPosition.cs" />
-    <Compile Include="DataField\DataFieldEnums\DataFieldLabelPosition.cs" />
-    <Compile Include="DataField\DataFieldEnums\DataFieldMode.cs" />
-    <Compile Include="DataForm\Automation\DataFormAutomationPeer.cs" />
-    <Compile Include="DataForm\DataForm.cs" />
-    <Compile Include="DataForm\DataFormBindingInfo.cs" />
-    <Compile Include="DataForm\DataFormCommandButtonsVisibilityTypeConverter.cs" />
-    <Compile Include="DataForm\DataFormEnums\DataFormCommandButtonsVisibility.cs" />
-    <Compile Include="DataForm\DataFormEnums\DataFormEditAction.cs" />
-    <Compile Include="DataForm\DataFormEnums\DataFormMode.cs" />
-    <Compile Include="DataForm\DataFormEventArgs\DataFormAddingNewItemEventArgs.cs" />
-    <Compile Include="DataForm\DataFormEventArgs\DataFormAutoGeneratingFieldEventArgs.cs" />
-    <Compile Include="DataForm\DataFormEventArgs\DataFormContentLoadEventArgs.cs" />
-    <Compile Include="DataForm\DataFormEventArgs\DataFormEditEndedEventArgs.cs" />
-    <Compile Include="DataForm\DataFormEventArgs\DataFormEditEndingEventArgs.cs" />
-    <Compile Include="DataForm\DataFormToStringConverter.cs" />
-    <Compile Include="DataForm\DataFormValueConverter.cs" />
-    <Compile Include="DataForm\PathOrderPair.cs" />
-    <Compile Include="DataForm\ValidationUtil.cs" />
-    <Compile Include="DataForm\WeakEventListener.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Common\CommonResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CommonResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="themes\generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+		<ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Public>True</Public>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>OpenSilver.Internal.Controls.Data.DataForm.Toolkit</CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Common\CommonResources.resx">
-      <Public>True</Public>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>CommonResources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>OpenSilver.Internal.Controls.Data.DataForm.Toolkit</CustomToolNamespace>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="Common\Extensions.cs" />
+		<Compile Include="Common\TypeHelper.cs" />
+		<Compile Include="DataField\DataField.cs" />
+		<Compile Include="DataField\DataFieldEnums\DataFieldDescriptionViewerPosition.cs" />
+		<Compile Include="DataField\DataFieldEnums\DataFieldLabelPosition.cs" />
+		<Compile Include="DataField\DataFieldEnums\DataFieldMode.cs" />
+		<Compile Include="DataForm\Automation\DataFormAutomationPeer.cs" />
+		<Compile Include="DataForm\DataForm.cs" />
+		<Compile Include="DataForm\DataFormBindingInfo.cs" />
+		<Compile Include="DataForm\DataFormCommandButtonsVisibilityTypeConverter.cs" />
+		<Compile Include="DataForm\DataFormEnums\DataFormCommandButtonsVisibility.cs" />
+		<Compile Include="DataForm\DataFormEnums\DataFormEditAction.cs" />
+		<Compile Include="DataForm\DataFormEnums\DataFormMode.cs" />
+		<Compile Include="DataForm\DataFormEventArgs\DataFormAddingNewItemEventArgs.cs" />
+		<Compile Include="DataForm\DataFormEventArgs\DataFormAutoGeneratingFieldEventArgs.cs" />
+		<Compile Include="DataForm\DataFormEventArgs\DataFormContentLoadEventArgs.cs" />
+		<Compile Include="DataForm\DataFormEventArgs\DataFormEditEndedEventArgs.cs" />
+		<Compile Include="DataForm\DataFormEventArgs\DataFormEditEndingEventArgs.cs" />
+		<Compile Include="DataForm\DataFormToStringConverter.cs" />
+		<Compile Include="DataForm\DataFormValueConverter.cs" />
+		<Compile Include="DataForm\PathOrderPair.cs" />
+		<Compile Include="DataForm\ValidationUtil.cs" />
+		<Compile Include="DataForm\WeakEventListener.cs" />
+		<Compile Include="Properties\AssemblyInfo.cs" />
+		<Compile Include="Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Include="Common\CommonResources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>CommonResources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+	<ItemGroup>
+		<Content Include="themes\generic.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Content>
+	</ItemGroup>
 
-  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
-  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
+	<ItemGroup>
+		<EmbeddedResource Include="Resources.resx">
+			<Public>True</Public>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>OpenSilver.Internal.Controls.Data.DataForm.Toolkit</CustomToolNamespace>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Common\CommonResources.resx">
+			<Public>True</Public>
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>CommonResources.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>OpenSilver.Internal.Controls.Data.DataForm.Toolkit</CustomToolNamespace>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+	<Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
+	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
 
 </Project>

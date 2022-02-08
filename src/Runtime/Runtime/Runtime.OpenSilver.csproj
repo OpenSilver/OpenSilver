@@ -13,8 +13,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
-		<DebugType>embedded</DebugType>
-		<Optimize>true</Optimize>
+		<Optimize>false</Optimize>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
@@ -31,6 +30,10 @@
 
 	<PropertyGroup Condition="$(Optimize) != true">
 		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
