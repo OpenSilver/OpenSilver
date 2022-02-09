@@ -32,6 +32,40 @@ namespace OpenSilver.Analyzers.Test
         #region Member access (SyntaxKind.ObjectCreationExpression)
 
         [TestMethod]
+        public async Task When_Accessing_Not_Implemented_Assembly()
+        {
+            var source = @"
+            [assembly: OpenSilver.NotImplemented]
+            namespace OpenSilver
+            {
+                public class Class
+                {
+                    public int TestMethod() { return 1; }
+                }
+            }
+
+            namespace OpenSilverApplication1
+            {
+                using OpenSilver;
+
+                public class App
+                {
+                    public int Method1(Class obj)
+                    {
+                        return obj.{|#0:TestMethod|#0}();
+                    }
+                }
+            }
+            " + NotImplementedAttribute;
+
+            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+                .WithArguments("TestProject, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
+                .WithLocation(0);
+
+            await VerifyAnalyzerAsync(source, expected);
+        }
+
+        [TestMethod]
         public async Task When_Accessing_Implemented_Member()
         {
             var source = @"
@@ -605,6 +639,40 @@ namespace OpenSilver.Analyzers.Test
         #endregion Member access (SyntaxKind.ObjectCreationExpression)
 
         #region Object creation (SyntaxKind.ObjectCreationExpression)
+
+        [TestMethod]
+        public async Task When_Not_Implemented_Assembly()
+        {
+            var source = @"
+            [assembly: OpenSilver.NotImplemented]
+            namespace OpenSilver
+            {
+                public class Class
+                {
+                    public int TestMethod() { return 1; }
+                }
+            }
+
+            namespace OpenSilverApplication1
+            {
+                using OpenSilver;
+
+                public class App
+                {
+                    public object Method1()
+                    {
+                        return new {|#0:Class|#0}();
+                    }
+                }
+            }
+            " + NotImplementedAttribute;
+
+            var expected = new DiagnosticResult(NotImplementedAnalyzer.OS0001)
+                .WithArguments("TestProject, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
+                .WithLocation(0);
+
+            await VerifyAnalyzerAsync(source, expected);
+        }
 
         [TestMethod]
         public async Task When_Constructor_Is_Not_Implemented()

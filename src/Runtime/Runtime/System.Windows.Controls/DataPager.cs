@@ -67,6 +67,9 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(DataPager);
         }
 
+        [OpenSilver.NotImplemented]
+        public bool IsTotalItemCountFixed { get; set; }
+
 #region DisplayMode
 
         /// <summary>

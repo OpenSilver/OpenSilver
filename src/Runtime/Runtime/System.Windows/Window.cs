@@ -67,6 +67,28 @@ namespace Windows.UI.Xaml
         /// </summary>
         public static Window Current { get; set; }
 
+        #region Out-of browser properties
+        /// <summary>
+        /// Gets or sets the position of the left edge of the application window; see Remarks
+        /// for restrictions on setting this property at run time.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double Left { get; set; }
+
+        /// <summary>
+        /// Gets or sets the position of the top edge of the application window; see Remarks
+        /// for restrictions on setting this property at run time.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double Top { get; set; }
+
+        /// <summary>
+        /// Gets or sets the window title bar text.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public string Title { get; set; }
+        #endregion
+
         internal PositionsWatcher INTERNAL_PositionsWatcher = new PositionsWatcher(); //Note: this is to handle the changes of position of elements (for example for when we want a popup to stick to a given UIElement - see Popup.PlacementTarget).
         internal object INTERNAL_RootDomElement;
 

@@ -18,17 +18,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Controls.Primitives;
 
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Data;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Text;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
 using Windows.Foundation;
+using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
 #if MIGRATION
@@ -176,13 +177,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderBrush), 
                 typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata((object)null)
-                {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Name = new List<string> { "borderColor" },
-                    }
-                });
+                new PropertyMetadata((object)null));
 
         //-----------------------
         // BORDERTHICKNESS
@@ -204,22 +199,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(BorderThickness), 
                 typeof(Thickness), 
                 typeof(Control), 
-                new PropertyMetadata(new Thickness())
-                {
-                    MethodToUpdateDom = BorderThickness_MethodToUpdateDom,
-                });
-
-        private static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var control = (Control)d;
-            if (!control.HasTemplate)
-            {
-                var newThickness = (Thickness)newValue;
-                var domElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
-                domElement.borderStyle = "solid"; //todo: see if we should put this somewhere else
-                domElement.borderWidth = $"{newThickness.Top.ToString(CultureInfo.InvariantCulture)}px {newThickness.Right.ToString(CultureInfo.InvariantCulture)}px {newThickness.Bottom.ToString(CultureInfo.InvariantCulture)}px {newThickness.Left.ToString(CultureInfo.InvariantCulture)}px";
-            }
-        }
+                new PropertyMetadata(new Thickness()));
 
         //-----------------------
         // FONTWEIGHT
@@ -620,14 +600,12 @@ namespace Windows.UI.Xaml.Controls
 
         private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
-        internal virtual bool INTERNAL_GetFocusInBrowser
-        {
-            get { return false; }
-        }
-
+        internal virtual bool INTERNAL_GetFocusInBrowser => false;
         internal virtual void UpdateTabIndex(bool isTabStop, int tabIndex)
         {
-            var domElementConcernedByFocus = this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement;
+            var domElementConcernedByFocus = GetFocusTarget();
+            if (domElementConcernedByFocus == null)
+                return;
             if (!isTabStop || !this.IsEnabled)
             {
                 this.PreventFocusEvents();
@@ -792,9 +770,15 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool Focus()
         {
-            if (IsTabStop)
+            if (Visibility == Visibility.Visible &&
+                IsTabStop &&
+                IsEnabled &&
+                IsConnectedToLiveTree)
             {
                 INTERNAL_HtmlDomManager.SetFocus(this);
+                
+                FocusManager.SetFocusedElement(this.INTERNAL_ParentWindow, this);
+
                 return true; //todo: see if there is a way for this to fail, in which case we want to return false.
             }
             return false;
@@ -913,12 +897,20 @@ namespace Windows.UI.Xaml.Controls
         {
             _isFocused = false;
             UpdateVisualStatesForFocus();
+
+            if (!this._isInvalid)
+                return;
+            this.UpdateValidationState();
         }
 
         void Control_GotFocus(object sender, RoutedEventArgs e)
         {
             _isFocused = true;
             UpdateVisualStatesForFocus();
+
+            if (!this._isInvalid)
+                return;
+            this.UpdateValidationState();
         }
 
         bool _isPointerOver = false;
@@ -1042,6 +1034,36 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             VisualStateManager.GoToState(this, state, true);
         }
 
+        private bool _isInvalid;
+
+        internal void ShowValidationError()
+        {
+            this._isInvalid = true;
+            this.UpdateValidationState();
+        }
+
+        internal void HideValidationError()
+        {
+            this._isInvalid = false;
+            this.UpdateValidationState();
+        }
+
+        internal void UpdateValidationState()
+        {
+            if (!this._isInvalid)
+                VisualStateManager.GoToState(this, "Valid", true);
+            else
+            {
+                VisualStateManager.GoToState(this, _isFocused ? "InvalidFocused" : "InvalidUnfocused", true);
+
+                Popup popup = this.INTERNAL_ValidationErrorPopup;
+                if (popup != null)
+                {
+                    popup.IsOpen = _isFocused;
+                }
+            }
+        }
+
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CharacterSpacingProperty =
             DependencyProperty.Register(
@@ -1100,18 +1122,17 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             set { SetValue(FontStretchProperty, value); }
         }
 
-        //
-        // Summary:
-        //     Called before the System.Windows.UIElement.TextInput event occurs.
-        //
-        // Parameters:
-        //   e:
-        //     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
-        [OpenSilver.NotImplemented]
-        protected virtual void OnTextInput(TextCompositionEventArgs e)
-        {
+        ////
+        //// Summary:
+        ////     Called before the System.Windows.UIElement.TextInput event occurs.
+        ////
+        //// Parameters:
+        ////   e:
+        ////     A System.Windows.Input.TextCompositionEventArgs that contains the event data.
+        //protected virtual void OnTextInput(TextCompositionEventArgs e)
+        //{
 
-        }
+        //}
 
         [OpenSilver.NotImplemented]
         protected virtual void OnDrop(DragEventArgs e)

@@ -248,6 +248,7 @@
     <Compile Include="Tests\TwoTextBoxesHorizontallyTest.xaml.cs">
       <DependentUpon>TwoTextBoxesHorizontallyTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\ValidationSummaryTest.xaml.cs" />
     <Compile Include="Tests\ValidationTest.xaml.cs">
       <DependentUpon>ValidationTest.xaml</DependentUpon>
     </Compile>
@@ -597,6 +598,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Tests\PopupZIndexTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\ValidationSummaryTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

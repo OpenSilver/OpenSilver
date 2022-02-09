@@ -13,10 +13,6 @@
 *  
 \*====================================================================================*/
 
-
-
-extern alias wpf;
-
 using DotNetForHtml5.Compiler.OtherHelpersAndHandlers;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;

@@ -14,6 +14,7 @@
 using System;
 using System.Linq;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -58,10 +59,9 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(TextBox);
         }
 
-        internal sealed override bool INTERNAL_GetFocusInBrowser
-        {
-            get { return true; }
-        }
+        internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+
+        internal sealed override bool INTERNAL_GetFocusInBrowser => true;
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -602,23 +602,26 @@ namespace Windows.UI.Xaml.Controls
             if (_textViewHost != null)
             {
                 TextBoxView view = CreateView();
+                view.Loaded += new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.AttachView(view);
             }
-        }
-
-        internal void UpdateFocusContentEditable(object contentEditableDiv)
-        {
-            INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
-            UpdateTabIndex(IsTabStop, TabIndex);
         }
 
         private void ClearContentElement()
         {
             if (_textViewHost != null)
             {
+                _textViewHost.View.Loaded -= new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
+        }
+
+        private void OnViewLoaded(object sender, RoutedEventArgs e) 
+        { 
+            UpdateTabIndex(IsTabStop, TabIndex);
         }
 
         internal static ITextBoxViewHost<T> GetContentHost<T>(FrameworkElement contentElement) where T : FrameworkElement, ITextBoxView

@@ -486,7 +486,7 @@ namespace CSHTML5.Internal
                 }
 
                 // Propagate to children if property is inherited
-                if (storage.TypeMetadata.Inherits && propagateChanges)
+                if (storage.TypeMetadata.Inherits)
                 {
                     if (storage.Owner is FrameworkElement rootElement)
                     {
@@ -494,7 +494,13 @@ namespace CSHTML5.Internal
                             storage.Property,
                             oldValue, oldBaseValueSource,
                             computedValue, newValueSource);
-                        TreeWalkHelper.InvalidateOnInheritablePropertyChange(rootElement, info);
+
+                        if (propagateChanges)
+                        {
+                            TreeWalkHelper.InvalidateOnInheritablePropertyChange(rootElement, info, true);
+                        }
+
+                        FrameworkElement.OnInheritedPropertyChanged(rootElement, info);
                     }
                 }
                 storage.INTERNAL_IsVisualValueDirty = false;

@@ -48,6 +48,89 @@ namespace Windows.UI.Xaml
     /// </summary>
     public abstract partial class FrameworkElement : UIElement
     {
+        #region Inheritance Context
+
+        internal static FrameworkElement FindMentor(DependencyObject d)
+        {
+            // Find the nearest FE InheritanceContext
+            while (d != null)
+            {
+                FrameworkElement fe = d as FrameworkElement;
+
+                if (fe != null)
+                {
+                    return fe;
+                }
+                else
+                {
+                    d = d.InheritanceContext;
+                }
+            }
+
+            return null;
+        }
+
+        internal override bool ShouldProvideInheritanceContext(DependencyObject target, DependencyProperty property)
+        {
+            return base.ShouldProvideInheritanceContext(target, property) || property == ResourceDictionary.ResourceKeyProperty;
+        }
+
+        internal FrameworkElement InheritedParent { get; private set; }
+
+        internal override void OnInheritanceContextChangedCore(EventArgs args)
+        {
+            FrameworkElement oldMentor = InheritedParent;
+            FrameworkElement newMentor = FindMentor(InheritanceContext);
+
+            if (oldMentor != newMentor)
+            {
+                InheritedParent = newMentor;
+
+                if (oldMentor != null)
+                {
+                    DisconnectMentor(oldMentor);
+                }
+
+                if (newMentor != null)
+                {
+                    ConnectMentor(newMentor);
+                }
+            }
+        }
+
+        private void ConnectMentor(FrameworkElement mentor)
+        {
+            mentor.InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+            
+            InvalidateInheritedProperties(this, mentor);
+        }
+
+        private void DisconnectMentor(FrameworkElement mentor)
+        {
+            mentor.InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+
+            InvalidateInheritedProperties(this, mentor);
+        }
+
+        // handle the InheritedPropertyChanged event from the mentor
+        private void OnMentorInheritedPropertyChanged(object sender, InheritedPropertyChangedEventArgs e)
+        {
+            TreeWalkHelper.InvalidateOnInheritablePropertyChange(this, e.Info, false);
+        }
+
+        internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
+
+        internal static void OnInheritedPropertyChanged(FrameworkElement fe, InheritablePropertyChangeInfo info)
+        {
+            var handler = fe.InheritedPropertyChanged;
+            if (handler != null)
+            {
+                handler(fe, new InheritedPropertyChangedEventArgs(ref info));
+            }
+        }
+
+        #endregion Inheritance Context
+
         #region Visual Children
 
         internal override void OnVisualParentChanged(DependencyObject oldParent)
@@ -919,7 +1002,42 @@ namespace Windows.UI.Xaml
         /// <summary>Occurs when the data context for this element changes. </summary>
         public event DependencyPropertyChangedEventHandler DataContextChanged;
 
-#endregion
+        #endregion
+
+        #region Triggers
+
+        /// <summary>
+        /// Gets the collection of triggers for animations that are defined for a <see cref="FrameworkElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The collection of triggers for animations that are defined for this object.
+        /// </returns>
+        public TriggerCollection Triggers
+        {
+            get
+            {
+                TriggerCollection triggers = (TriggerCollection)GetValue(TriggersProperty);
+                if (triggers == null)
+                {
+                    triggers = new TriggerCollection(this);
+                    SetValue(TriggersProperty, triggers);
+                }
+
+                return triggers;
+            }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Triggers"/> dependency property.
+        /// </summary>
+        internal static readonly DependencyProperty TriggersProperty =
+            DependencyProperty.Register(
+                nameof(Triggers),
+                typeof(TriggerCollection),
+                typeof(FrameworkElement),
+                null);
+
+        #endregion Triggers
 
         public event EventHandler LayoutUpdated;
 
@@ -928,27 +1046,7 @@ namespace Windows.UI.Xaml
             LayoutUpdated?.Invoke(this, new EventArgs());
         }
 
-#region Work in progress
-#region Triggers
-
-        [OpenSilver.NotImplemented]
-        public TriggerCollection Triggers
-        {
-            get
-            {
-                return (TriggerCollection)this.GetValue(FrameworkElement.TriggersProperty);
-            }
-        }
-
-        [OpenSilver.NotImplemented]
-        public static DependencyProperty TriggersProperty =
-            DependencyProperty.Register(
-                nameof(Triggers),
-                typeof(TriggerCollection),
-                typeof(FrameworkElement),
-                new PropertyMetadata(new TriggerCollection()));
-
-#endregion
+        #region Work in progress
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FlowDirectionProperty =
@@ -1632,11 +1730,13 @@ namespace Windows.UI.Xaml
             get { return _themeStyleCache; }
         }
 
-#endregion DefaultStyleKey
+        #endregion DefaultStyleKey
 
-#endregion Handling Styles
+        #endregion Handling Styles
 
-#region Loaded/Unloaded events
+        #region Loaded/Unloaded events
+
+        public static readonly RoutedEvent LoadedEvent = new RoutedEvent("Loaded");
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.

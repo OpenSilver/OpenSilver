@@ -35,7 +35,7 @@ namespace System.Windows.Interactivity
         /// attached property.
         /// </summary>
         public static readonly DependencyProperty BehaviorsProperty =
-            DependencyProperty.RegisterAttached("Behaviors", typeof(BehaviorCollection), typeof(Interaction), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached("Behaviors", typeof(BehaviorCollection), typeof(Interaction), new PropertyMetadata(null, new PropertyChangedCallback(OnBehaviorsChanged)));
 
         /// <summary>
         /// Gets the System.Windows.Interactivity.BehaviorCollection associated with
@@ -51,7 +51,13 @@ namespace System.Windows.Interactivity
             if (obj.GetValue(BehaviorsProperty) == null)
             {
                 BehaviorCollection col = new BehaviorCollection();
-                col.Attach(obj);
+                
+                // pymendoza: Do not attach here because OpenSilver internally raises the collection changed event
+                //            on SetValue that will in effect attach the dependency object to the collection. Calling Attach to an already attached
+                //            collection will throw an InvalidOperationException.
+
+                //col.Attach(obj);
+
                 obj.SetValue(BehaviorsProperty, col);
             }
             return (BehaviorCollection)obj.GetValue(BehaviorsProperty);
@@ -113,9 +119,39 @@ namespace System.Windows.Interactivity
             triggerCollection2.Attach(fElement);
         }
 
+        /// <summary>
+        /// A helper function to take the place of FrameworkElement.IsLoaded, as this property is not available in Silverlight.
+        /// </summary>
+        /// <param name="element">The element of interest.</param>
+        /// <returns>True if the element has been loaded; otherwise, False.</returns>
+        internal static bool IsElementLoaded(FrameworkElement element)
+        {
+            return element.IsLoaded;
+        }
 
+        /// <exception cref="InvalidOperationException">Cannot host the same BehaviorCollection on more than one object at a time.</exception>
+		private static void OnBehaviorsChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
+            BehaviorCollection oldCollection = (BehaviorCollection)args.OldValue;
+            BehaviorCollection newCollection = (BehaviorCollection)args.NewValue;
 
+            if (oldCollection != newCollection)
+            {
+                if (oldCollection != null && ((IAttachedObject)oldCollection).AssociatedObject != null)
+                {
+                    oldCollection.Detach();
+                }
 
+                if (newCollection != null && obj != null)
+                {
+                    if (((IAttachedObject)newCollection).AssociatedObject != null)
+                    {
+                        throw new InvalidOperationException("An instance of a Behavior cannot be attached to more than one object at a time.");
+                    }
 
+                    newCollection.Attach(obj);
+                }
+            }
+        }
     }
 }

@@ -13,13 +13,6 @@
 *  
 \*====================================================================================*/
 
-
-
-#if !BRIDGE && !CSHTML5BLAZOR
-extern alias custom;
-#endif
-extern alias wpf;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,10 +21,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
-#if !BRIDGE && !CSHTML5BLAZOR
-using custom::System.Windows.Markup;
-#endif
 using System.IO;
+using OpenSilver.Internal;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -125,48 +116,69 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            // Create the "IntializeComponent()" method:
-            string initializeComponentMethod = CreateInitializeComponentMethod(null, new List<string>(0), null, null, null,
-                isSLMigration, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot);
-
-            resultingMethods.Add(initializeComponentMethod);
-
-            // Add a contructor if there is no code behind:
-            if (!hasCodeBehind)
+            if (hasCodeBehind)
             {
-                string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-                resultingMethods.Add(string.Format(@"
-        public {0}()
-        {{
-            this.InitializeComponent();
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-            if (this is {1})
-            {{
-                (({1})(object)this).XamlSourcePath = @""{2}\{3}"";
-            }}
-#pragma warning restore 0184
-        }}
-", className, uiElementFullyQualifiedTypeName, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot));
-            }
+                // Create the "IntializeComponent()" method:
+                string initializeComponentMethod = CreateInitializeComponentMethod(GetUniqueName(doc.Root), null, new List<string>(0), null, null, null,
+                    isSLMigration, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot);
 
-            // Wrap everything into a partial class:
-            string finalCode = GeneratePartialClass(resultingMethods,
-                                                    resultingFieldsForNamedElements,
-                                                    className,
-                                                    namespaceStringIfAny,
-                                                    baseType,
-                                                    fileNameWithPathRelativeToProjectRoot,
-                                                    assemblyNameWithoutExtension,
-                                                    listOfAllTheTypesUsedInThisXamlFile,
-                                                    hasCodeBehind,
-#if BRIDGE
-                                                    addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
-#else
-                                                    addApplicationEntryPoint: false
+                resultingMethods.Add(initializeComponentMethod);
+
+                // Wrap everything into a partial class:
+                string partialClass = GeneratePartialClass(resultingMethods,
+                                                           resultingFieldsForNamedElements,
+                                                           className,
+                                                           namespaceStringIfAny,
+                                                           baseType,
+                                                           fileNameWithPathRelativeToProjectRoot,
+                                                           assemblyNameWithoutExtension,
+                                                           listOfAllTheTypesUsedInThisXamlFile,
+                                                           hasCodeBehind,
+#if BRIDGE                                                 
+                                                           addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
+#else                                                      
+                                                           addApplicationEntryPoint: false
 #endif
 );
 
-            return finalCode;
+                string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
+
+                string factoryClass = GenerateFactoryClass(
+                    componentTypeFullName,
+                    CreateFactoryMethod(componentTypeFullName),
+                    Enumerable.Empty<string>(),
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = $@"
+{factoryClass}
+{partialClass}";
+
+                return finalCode;
+            }
+            else
+            {
+                string factoryImpl = CreateFactoryMethod(
+                    GetUniqueName(doc.Root),
+                    baseType,
+                    null, 
+                    new List<string>(0), 
+                    null, 
+                    null, 
+                    null,
+                    isSLMigration, 
+                    assemblyNameWithoutExtension, 
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = GenerateFactoryClass(
+                    baseType,
+                    factoryImpl,
+                    Enumerable.Empty<string>(),
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                return finalCode;
+            }
         }
 
         public static string GenerateCSharpCodeForPass2(XDocument doc,
@@ -261,9 +273,9 @@ namespace DotNetForHtml5.Compiler
                                 //------------------------------
 
                                 if (codeStack.Count == 0 || element.Elements().FirstOrDefault() == null)
-                                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot be empty.", typeName));
+                                    throw new XamlParseException(string.Format("A {0} cannot be empty.", typeName));
                                 else if (element.Elements().Count() > 1)
-                                    throw new wpf::System.Windows.Markup.XamlParseException(string.Format("A {0} cannot contain more than one child element.", typeName));
+                                    throw new XamlParseException(string.Format("A {0} cannot contain more than one child element.", typeName));
 
                                 // Create the method to instantiate the DataTemplate:
                                 //we create a frameworkTemplate element to allow Binding with RelativeSource = TemplatedParent:
@@ -274,12 +286,10 @@ namespace DotNetForHtml5.Compiler
                                 //we replace the Placeholder that was put for the template name:
                                 codeToInstantiateTheDataTemplate = codeToInstantiateTheDataTemplate.Replace(GeneratingCSharpCode.TemplateOwnerValuePlaceHolder, templateInstanceUniqueName);
 
-                                XElement frameworkTemplateRoot = element.Parent;
-                                string frameworkTemplateUniqueName = GetUniqueName(frameworkTemplateRoot);
+                                XElement frameworkTemplateRoot = element.Elements().First();
+                                string frameworkTemplateUniqueName = GetUniqueName(element.Parent);
                                 string childUniqueName = GetUniqueName(element.Elements().First());
-                                string objectsToInstantiateAtTheBeginningOfTheDataTemplate = string.Join("\r\n",
-                                   GetNameToUniqueNameDictionary(frameworkTemplateRoot,
-                                       namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
+                                string objectsToInstantiateAtTheBeginningOfTheDataTemplate = string.Empty;
                                 string markupExtensionsAdditionalCode = string.Join("\r\n",
                                     GetListThatContainsAdditionalCodeFromDictionary(frameworkTemplateRoot,
                                         namescopeRootToMarkupExtensionsAdditionalCode));
@@ -302,7 +312,7 @@ namespace DotNetForHtml5.Compiler
                                     templateNameScope,
                                     namespaceSystemWindows);
                                 // Create the code that sets the "MethodToInstantiateDataTemplate":
-                                string codeToSetTheMethod = string.Format("{0}.SetMethodToInstantiateFrameworkTemplate({1});", frameworkTemplateUniqueName, dataTemplateMethod);
+                                string codeToSetTheMethod = $"{frameworkTemplateUniqueName}.SetMethodToInstantiateFrameworkTemplate({dataTemplateMethod});";
 
                                 stringBuilder.AppendLine(codeToSetTheMethod);
                             }
@@ -379,7 +389,6 @@ namespace DotNetForHtml5.Compiler
                                         if (!first)
                                         {
                                             //TODO: check wether WPF & UWP also allow that silently
-                                            //throw new wpf::System.Windows.Markup.XamlParseException(string.Format("The property '{0}' is set more than once.", propertyName));
                                             logger.WriteWarning($"The property \"{propertyName}\" is set more than once.", sourceFile, GetLineNumber(element));
                                         }
 
@@ -416,22 +425,20 @@ namespace DotNetForHtml5.Compiler
                                                 string nameForParentsCollection = GeneratingUniqueNames.GenerateUniqueNameFromString("parents"); // Example: parents_4541C363579C48A981219C392BF8ACD5
                                                 stringBuilder.AppendLine(string.Format("var {0} = new global::System.Collections.Generic.List<global::System.Object>();",
                                                     nameForParentsCollection));
-                                                while (elementForSearch != null && elementForSearch.Parent != null) //we check for the parent because the last parent will be the container(for example a Page) and the generated code doesn't create an instance for itself.
+
+                                                while (elementForSearch != null)
                                                 {
-                                                    if (elementForSearch != elementThatIsRootOfTheCurrentNamescope)
+                                                    if (!elementForSearch.Name.LocalName.Contains('.'))
                                                     {
-                                                        if (!elementForSearch.Name.LocalName.Contains('.'))
+                                                        if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(elementForSearch, reflectionOnSeparateAppDomain)) //we don't want to add the MarkupExtensions in the list of the parents (A MarkupExtension is not a DependencyObject)
                                                         {
-                                                            if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(elementForSearch, reflectionOnSeparateAppDomain)) //we don't want to add the MarkupExtensions in the list of the parents (A MarkupExtension is not a DependencyObject)
-                                                            {
-                                                                stringBuilder.AppendLine(string.Format("{0}.Add({1});",
-                                                                    nameForParentsCollection, GetUniqueName(elementForSearch)));
-                                                            }
+                                                            stringBuilder.AppendLine(string.Format("{0}.Add({1});",
+                                                                nameForParentsCollection, GetUniqueName(elementForSearch)));
                                                         }
                                                     }
+
                                                     elementForSearch = elementForSearch.Parent;
                                                 }
-                                                stringBuilder.AppendLine(string.Format("{0}.Add(this);", nameForParentsCollection));
 
                                                 string[] splittedLocalName = element.Name.LocalName.Split('.');
                                                 string propertyKey = GettingInformationAboutXamlTypes.GetKeyNameOfProperty(
@@ -762,8 +769,8 @@ else
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
                     }
-                    #endregion
-                    #region CASE: the element is an Object
+#endregion
+#region CASE: the element is an Object
                     else
                     {
                         //-----------------------------
@@ -791,6 +798,21 @@ else
                         // (unless this is the root element)
                         string elementUniqueNameOrThisKeyword = GetUniqueName(element);
                         stringBuilder.Clear();
+
+                        if (element == elementThatIsRootOfTheCurrentNamescope)
+                        {
+                            stringBuilder.AppendLine(
+                                string.Join(
+                                    Environment.NewLine,
+                                    GetNameToUniqueNameDictionary(
+                                        elementThatIsRootOfTheCurrentNamescope,
+                                        namescopeRootToElementsUniqueNameToInstantiatedObjects
+                                    )
+                                    .Select(x => x.Value)
+                                )
+                            );
+                        }
+
                         if (!isRootElement)
                         {
                             // Instantiate the object if it has not been done yet in the 'PopulateDictionaryThatAssociatesNamesToUniqueNames()' method.
@@ -853,9 +875,19 @@ else
                                     // Add the type initialization from "Source" URI:
                                     //------------------------------------------------
                                     string sourceUri = element.Attribute("Source").Value; // Note: this attribute exists because we have checked earlier.
-                                    string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(sourceUri, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension);
+                                    string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(
+                                        sourceUri,
+                                        fileNameWithPathRelativeToProjectRoot,
+                                        assemblyNameWithoutExtension);
 
-                                    stringBuilder.AppendLine(string.Format("var {0} = new global::{1}();", elementUniqueNameOrThisKeyword, XamlFilesWithoutCodeBehindHelper.GenerateClassNameFromAbsoluteUri(absoluteSourceUri)));
+                                    stringBuilder.AppendLine(
+                                        string.Format(
+                                            "var {0} = (({1})new {2}()).CreateComponent();",
+                                            elementUniqueNameOrThisKeyword,
+                                            $"{IXamlComponentFactoryClass}<{namespaceSystemWindows}.ResourceDictionary>",
+                                            XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri)
+                                        )
+                                    );
                                 }
                                 else
                                 {
@@ -943,6 +975,13 @@ else
                                         //todo: throw an exception when both "x:Name" and "Name" are specified in the XAML.
 
                                     }
+                                    else if (IsEventTriggerRoutedEventProperty(element.Name, attributeLocalName))
+                                    {
+                                        // TODO Check that 'attributeLocalName' is effectively the LoadedEvent routed event.
+                                        // Silverlight only allows the FrameworkElement.LoadedEvent as value for the EventTrigger.RoutedEvent
+                                        // property, so for now we assume the xaml is always valid.
+                                        stringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent = {namespaceSystemWindows}.FrameworkElement.LoadedEvent;");
+                                    }
                                     else if (string.IsNullOrEmpty(attribute.Name.NamespaceName))
                                     {
                                         //-------------
@@ -1004,13 +1043,13 @@ else
                                                                     codeForInstantiatingTheAttributeValue = GenerateCodeForInstantiatingAttributeValue(name, propertyName, isSetterForAttachedProperty, attributeValue, element, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain);
                                                                 }
                                                                 else
-                                                                    throw new wpf::System.Windows.Markup.XamlParseException(@"The <Setter> element must declare a ""Property"" attribute.");
+                                                                    throw new XamlParseException(@"The <Setter> element must declare a ""Property"" attribute.");
                                                             }
                                                             else
-                                                                throw new wpf::System.Windows.Markup.XamlParseException(@"The <Setter> element cannot have attributes other than ""Property"" and ""Value"".");
+                                                                throw new XamlParseException(@"The <Setter> element cannot have attributes other than ""Property"" and ""Value"".");
                                                         }
                                                         else
-                                                            throw new wpf::System.Windows.Markup.XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
+                                                            throw new XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
                                                     }
                                                     else if (elementTypeInCSharp == namespaceSystemWindowsData + ".Binding"
                                                         && memberName == "ElementName")
@@ -1029,7 +1068,6 @@ else
                                                             else
                                                             {
                                                                 //TODO: check wether WPF & UWP also allow that silently
-                                                                // throw new wpf::System.Windows.Markup.XamlParseException("The \"ElementName\" specified in the Binding was not found: " + attributeValue);
                                                                 logger.WriteWarning($"The \"ElementName\" specified in the Binding was not found: {attributeValue}", sourceFile, GetLineNumber(element));
                                                             }
                                                         }
@@ -1196,35 +1234,18 @@ else
                                             //              getVisualStateProperty65675669834683448390));
                                             //      Storyboard.SetTarget(colorAnimation7637478638468367843, canvas67567345673874893);
 
-                                            string findAName = string.Format(@"
-{1}.Storyboard.SetTargetProperty({2},
-    new {0}.PropertyPath(
-        ""{6}"",
-        ""{5}"",
-        access{3},
-        set{3},
-        setAnimation{3},                                     
-        setLocal{3},
-        get{3}));
-{1}.Storyboard.SetTarget({2}, {4});
-", 
-namespaceSystemWindows, 
-namespaceSystemWindowsMediaAnimation, 
-element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value, 
-accessorsUniqueNamePart, 
-targetElementUniqueName != null ? targetElementUniqueName : "null", 
-dependencyPropertyName, 
-dependencyPropertyPath);
-
-                                            // 4) put all the code generated above in the Dictionary of the code to add to the end of the storyboard :
-                                            List<string> storyboardsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToStoryboardsAdditionalCode);
-                                            //storyboardsAdditionalCode.Add(codeForStoryboardAccessToProperty);
-                                            storyboardsAdditionalCode.Add(findAName);
-                                            //}
-                                            //else
-                                            //{
-                                            //    throw new wpf::System.Windows.Markup.XamlParseException(@"An element with a ""Storyboard.TargetProperty"" attribute must declare a ""Storyboard.TargetName"" attribute.");
-                                            //}
+                                            string timeline = element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
+                                            stringBuilder.AppendLine($@"
+{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTargetProperty({timeline},
+    new {namespaceSystemWindows}.PropertyPath(
+        ""{dependencyPropertyPath}"",
+        ""{dependencyPropertyName}"",
+        access{accessorsUniqueNamePart},
+        set{accessorsUniqueNamePart},
+        setAnimation{accessorsUniqueNamePart},                                     
+        setLocal{accessorsUniqueNamePart},
+        get{accessorsUniqueNamePart}));
+{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTarget({timeline}, {targetElementUniqueName ?? "null"});");
                                         }
                                     }
                                 }
@@ -1264,14 +1285,14 @@ dependencyPropertyPath);
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
                     }
-                    #endregion
+#endregion
                 }
-                catch (wpf::System.Windows.Markup.XamlParseException xamlParseException)
+                catch (XamlParseException xamlParseException)
                 {
                     // We create and throw a copy of the "XamlParseException" in order to add the line number information:
                     int lineNumber = GetLineNumber(element);
                     var newXamlParseException =
-                        new wpf::System.Windows.Markup.XamlParseException(
+                        new XamlParseException(
                             xamlParseException.Message,
                             lineNumber,
                             -1,
@@ -1282,81 +1303,124 @@ dependencyPropertyPath);
 
             // Process the code that remains in the stack:
             if (codeStack.Count != 1)
-                throw new wpf::System.Windows.Markup.XamlParseException("At the end of the parsing, the code stack should contain exactly one item.");
+                throw new XamlParseException("At the end of the parsing, the code stack should contain exactly one item.");
             string codeToWorkWithTheRootElement = codeStack.Pop();
 
             // Get general information about the class:
             string className, namespaceStringIfAny, baseType;
             bool hasCodeBehind;
-            GetClassInformationFromXaml(doc, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
+            GetClassInformationFromXaml(doc, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain,
+                out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
 
             // Create the "IntializeComponent()" method:
-            string objectsToInstantiateEarly = string.Join("\r\n", GetNameToUniqueNameDictionary(doc.Root, namescopeRootToElementsUniqueNameToInstantiatedObjects).Select(x => x.Value));
-            string markupExtensionsAdditionalCodeForElementsInRootNamescope = string.Join("\r\n", GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToMarkupExtensionsAdditionalCode));
-            string storyboardsAdditionalCodeForElementsInRootNamescope = string.Join("\r\n", GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToStoryboardsAdditionalCode));
-            bool isClassTheApplicationClass = IsClassTheApplicationClass(baseType);
-            string additionalCodeToPlaceAtTheBeginningOfInitializeComponent = (isClassTheApplicationClass ? codeToPutInTheInitializeComponentOfTheApplicationClass : "") + objectsToInstantiateEarly;
-            string additionalCodeToPlaceAtTheEndOfInitializeComponent = markupExtensionsAdditionalCodeForElementsInRootNamescope + Environment.NewLine + storyboardsAdditionalCodeForElementsInRootNamescope;
-            string nameScope = null;
-            if (hasCodeBehind &&
-                reflectionOnSeparateAppDomain.IsAssignableFrom(namespaceSystemWindows, "DependencyObject",
-                    doc.Root.Name.NamespaceName, doc.Root.Name.LocalName))
-            {
-                nameScope = CreateNameScope(
-                    "this",
-                    GetNameToUniqueNameDictionary(doc.Root, namescopeRootToNameToUniqueNameDictionary)
+            string markupExtensionsAdditionalCodeForElementsInRootNamescope = 
+                string.Join(
+                    Environment.NewLine, 
+                    GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToMarkupExtensionsAdditionalCode)
                 );
-            }
-
-            string initializeComponentMethod = CreateInitializeComponentMethod(
-                codeToWorkWithTheRootElement, 
-                resultingFindNameCalls, 
-                additionalCodeToPlaceAtTheBeginningOfInitializeComponent, 
-                additionalCodeToPlaceAtTheEndOfInitializeComponent,
-                nameScope,
-                isSLMigration, 
-                assemblyNameWithoutExtension, 
-                fileNameWithPathRelativeToProjectRoot
-            );
             
-            resultingMethods.Insert(0, initializeComponentMethod);
+            string storyboardsAdditionalCodeForElementsInRootNamescope = 
+                string.Join(
+                    Environment.NewLine, 
+                    GetListThatContainsAdditionalCodeFromDictionary(doc.Root, namescopeRootToStoryboardsAdditionalCode)
+                );
+            
+            bool isClassTheApplicationClass = IsClassTheApplicationClass(baseType);
 
-            // Add a contructor if there is no code behind:
-            if (!hasCodeBehind)
+            string additionalCodeToPlaceAtTheBeginningOfInitializeComponent =
+                isClassTheApplicationClass ?
+                codeToPutInTheInitializeComponentOfTheApplicationClass :
+                string.Empty;
+            
+            string additionalCodeToPlaceAtTheEndOfInitializeComponent = 
+                markupExtensionsAdditionalCodeForElementsInRootNamescope + 
+                Environment.NewLine + 
+                storyboardsAdditionalCodeForElementsInRootNamescope;
+            
+            string nameScope = null;
+
+            if (hasCodeBehind)
             {
-                string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-                resultingMethods.Add(string.Format(@"
-        public {0}()
-        {{
-            this.InitializeComponent();
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-            if (this is {1})
-            {{
-                (({1})(object)this).XamlSourcePath = @""{2}\{3}"";
-            }}
-#pragma warning restore 0184
-        }}
-", className, uiElementFullyQualifiedTypeName, assemblyNameWithoutExtension, fileNameWithPathRelativeToProjectRoot));
-            }
+                if (reflectionOnSeparateAppDomain.IsAssignableFrom(namespaceSystemWindows, "DependencyObject",
+                        doc.Root.Name.NamespaceName, doc.Root.Name.LocalName))
+                {
+                    nameScope = CreateNameScope(
+                        GetUniqueName(doc.Root),
+                        GetNameToUniqueNameDictionary(doc.Root, namescopeRootToNameToUniqueNameDictionary)
+                    );
+                }
 
-            // Wrap everything into a partial class:
-            string finalCode = GeneratePartialClass(resultingMethods,
-                                                    resultingFieldsForNamedElements,
-                                                    className,
-                                                    namespaceStringIfAny,
-                                                    baseType,
-                                                    fileNameWithPathRelativeToProjectRoot,
-                                                    assemblyNameWithoutExtension,
-                                                    listOfAllTheTypesUsedInThisXamlFile,
-                                                    hasCodeBehind,
+                // Create the "IntializeComponent()" method:
+                string initializeComponentMethod = CreateInitializeComponentMethod(
+                    GetUniqueName(doc.Root),
+                    codeToWorkWithTheRootElement,
+                    resultingFindNameCalls,
+                    additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
+                    additionalCodeToPlaceAtTheEndOfInitializeComponent,
+                    nameScope,
+                    isSLMigration,
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot
+                );
+
+                resultingMethods.Insert(0, initializeComponentMethod);
+
+                // Wrap everything into a partial class:
+                string partialClass = GeneratePartialClass(resultingMethods,
+                                                           resultingFieldsForNamedElements,
+                                                           className,
+                                                           namespaceStringIfAny,
+                                                           baseType,
+                                                           fileNameWithPathRelativeToProjectRoot,
+                                                           assemblyNameWithoutExtension,
+                                                           listOfAllTheTypesUsedInThisXamlFile,
+                                                           hasCodeBehind,
 #if BRIDGE
-                                                    addApplicationEntryPoint: isClassTheApplicationClass
+                                                           addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
 #else
- addApplicationEntryPoint: false
+                                                           addApplicationEntryPoint: false
 #endif
 );
 
-            return finalCode;
+                string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
+
+                string factoryClass = GenerateFactoryClass(
+                    componentTypeFullName,
+                    CreateFactoryMethod(componentTypeFullName),
+                    Enumerable.Empty<string>(),
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = $@"
+{factoryClass}
+{partialClass}";
+
+                return finalCode;
+            }
+            else
+            {
+                string factoryImpl = CreateFactoryMethod(
+                    GetUniqueName(doc.Root),
+                    baseType,
+                    codeToWorkWithTheRootElement,
+                    resultingFindNameCalls,
+                    additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
+                    additionalCodeToPlaceAtTheEndOfInitializeComponent,
+                    nameScope,
+                    isSLMigration,
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                string finalCode = GenerateFactoryClass(
+                    baseType,
+                    factoryImpl,
+                    resultingMethods,
+                    assemblyNameWithoutExtension,
+                    fileNameWithPathRelativeToProjectRoot);
+
+                return finalCode;
+            }
+
         }
 
         /// <summary>
@@ -1624,24 +1688,26 @@ var {4} = {2}.GetValue({1});
         private static XElement GetRootOfCurrentNamescopeForRuntime(XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
             XElement currentElement = element;
-            bool skipTemplateNode = true;
             while (currentElement.Parent != null)
             {
-                if (!currentElement.Name.LocalName.Contains("."))
+                int index = currentElement.Parent.Name.LocalName.IndexOf(".");
+                if (index > - 1)
                 {
-                    if (reflectionOnSeparateAppDomain.IsAssignableFrom(DefaultXamlNamespace.NamespaceName, "FrameworkTemplate",
-                        currentElement.Name.NamespaceName, currentElement.Name.LocalName))
+                    string namespaceName = currentElement.Parent.Name.NamespaceName;
+                    string typeName = currentElement.Parent.Name.LocalName.Substring(0, index);
+                    string propertyName = currentElement.Parent.Name.LocalName.Substring(index + 1);                    
+
+                    if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
+                        reflectionOnSeparateAppDomain.IsAssignableFrom(DefaultXamlNamespace.NamespaceName, "FrameworkTemplate",
+                        namespaceName, typeName))
                     {
-                        if (!skipTemplateNode)
-                        {
-                            return currentElement;
-                        }
+                        return currentElement;
                     }
-                    skipTemplateNode = false;
                 }
 
                 currentElement = currentElement.Parent;
             }
+
             return currentElement;
         }
 
@@ -1768,7 +1834,7 @@ var {4} = {2}.GetValue({1});
                         // Remember the "Name to UniqueName" association:
                         Dictionary<string, string> nameToUniqueNameDictionary = GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToNameToUniqueNameDictionary);
                         if (nameToUniqueNameDictionary.ContainsKey(name))
-                            throw new wpf::System.Windows.Markup.XamlParseException("The name already exists in the tree: " + name);
+                            throw new XamlParseException("The name already exists in the tree: " + name);
                         nameToUniqueNameDictionary.Add(name, elementUniqueNameOrThisKeyword);
                         if (element != elementThatIsRootOfTheCurrentNamescope)
                         {
@@ -1996,14 +2062,14 @@ var {4} = {2}.GetValue({1});
                 currentXElement = setterElement;
                 attributeToLookAt = currentXElement.Attribute("Property");
                 if (attributeToLookAt == null)
-                    throw new wpf::System.Windows.Markup.XamlParseException("Setter must declare a Property.");
+                    throw new XamlParseException("Setter must declare a Property.");
             }
             else
             {
                 currentXElement = setterElement.Parent.Parent;
                 attributeToLookAt = currentXElement.Attribute("TargetType");
                 if (attributeToLookAt == null)
-                    throw new wpf::System.Windows.Markup.XamlParseException("Style must declare a TargetType.");
+                    throw new XamlParseException("Style must declare a TargetType.");
             }
 
             string attributeTypeString;
@@ -2020,7 +2086,7 @@ var {4} = {2}.GetValue({1});
                     }
                     else
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException(@"Namespaces or prefixes must be followed by a type.");
+                        throw new XamlParseException(@"Namespaces or prefixes must be followed by a type.");
                     }
                 }
                 else
@@ -2044,7 +2110,7 @@ var {4} = {2}.GetValue({1});
             string assemblyNameIfAny;
             var targetTypeAttribute = styleElement.Attribute(isDataType ? "DataType" : "TargetType");
             if (targetTypeAttribute == null)
-                throw new wpf::System.Windows.Markup.XamlParseException(isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.");
+                throw new XamlParseException(isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.");
             string targetTypeString = targetTypeAttribute.Value;
             GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(targetTypeString, styleElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
             string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: false);
@@ -2062,6 +2128,7 @@ var {4} = {2}.GetValue({1});
         }
 
         private static string CreateInitializeComponentMethod(
+            string rootElementName,
             string codeToWorkWithTheRootElement, 
             List<string> findNameCalls, 
             string codeToPlaceAtTheBeginningOfInitializeComponent, 
@@ -2072,7 +2139,13 @@ var {4} = {2}.GetValue({1});
             string fileNameWithPathRelativeToProjectRoot)
         {
             string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-            string findNameCallsMerged = string.Join("\r\n", findNameCalls);
+
+            string body = CreateMethodBody(
+                codeToWorkWithTheRootElement,
+                findNameCalls,
+                codeToPlaceAtTheBeginningOfInitializeComponent,
+                codeToPlaceAtTheEndOfInitializeComponent,
+                nameScope);
 
             return $@"
         private bool _contentLoaded;
@@ -2089,15 +2162,8 @@ var {4} = {2}.GetValue({1});
             }}
 #pragma warning restore 0184
 
-{codeToPlaceAtTheBeginningOfInitializeComponent}
-
-{codeToWorkWithTheRootElement}
-
-{findNameCallsMerged}
-
-{nameScope}
-
-{codeToPlaceAtTheEndOfInitializeComponent}    
+            var {rootElementName} = this;
+            {body}
         }}
 ";
         }
@@ -2127,14 +2193,7 @@ return {templateInstanceUniqueName};
 
         static string GetUniqueName(XElement element)
         {
-            if (element == element.Document.Root)
-            {
-                return "this";
-            }
-            else
-            {
-                return element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value; // Note: this is supposed to exist because we have added it in a prior code.
-            }
+            return element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
         }
 
         static string GetElementXKey(XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain, out bool isImplicitStyle, out bool isImplicitDataTemplate)
@@ -2158,7 +2217,7 @@ return {templateInstanceUniqueName};
                 return GetCSharpFullTypeNameFromTargetTypeString(element, reflectionOnSeparateAppDomain, isDataType: true);
             }
             else
-                throw new wpf::System.Windows.Markup.XamlParseException("Each dictionary entry must have an associated key. The element named '" + element.Name.LocalName + "' does not have a key.");
+                throw new XamlParseException("Each dictionary entry must have an associated key. The element named '" + element.Name.LocalName + "' does not have a key.");
         }
 
         static string GeneratePartialClass(
@@ -2173,78 +2232,73 @@ return {templateInstanceUniqueName};
             bool hasCodeBehind,
             bool addApplicationEntryPoint)
         {
-            string classFactoryCode = @"
-public static class {1}
+            string applicationEntryPointIfAny = string.Empty;
+            if (addApplicationEntryPoint)
+            {
+                applicationEntryPointIfAny = $@"
+public static void Main()
 {{
-    public static object Instantiate()
-    {{
-        global::System.Type type = typeof({0});
-        return global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(type);
-    }}
-}}
-";
+    new {className}();
+}}";
+            }
 
-            string classCode = @"
-//------------------------------------------------------------------------------
-// <auto-generated>
-//     This code was auto-generated by ""C#/XAML for HTML5""
-//
-//     Changes to this file may cause incorrect behavior and will be lost if
-//     the code is regenerated.
-// </auto-generated>
-//------------------------------------------------------------------------------
+            string absoluteSourceUri = 
+                fileNameWithPathRelativeToProjectRoot.Contains(';') ? 
+                fileNameWithPathRelativeToProjectRoot : 
+                "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot;
+            
+            string classToInstantiateName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
 
+            string methodsMergedCode = string.Join(Environment.NewLine + Environment.NewLine, methods);
+            
+            string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
+            // Note: This is useful because we need to generate some c# code for every type used in the XAML
+            // file because otherwise the types risk not being found at "Pass2" of the compilation. In fact,
+            // Visual Studio automatically removes project references that are not referenced from C#, so if
+            // a type is present only in XAML and not in C#, its DLL risks not being referenced.
+            string fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced = 
+                string.Join(
+                    Environment.NewLine, 
+                    listOfAllTheTypesUsedInThisXamlFile.Select(
+                        x => $"private {x} {GeneratingUniqueNames.GenerateUniqueNameFromString("Unused")};"
+                    )
+                );
 
-{5}partial class {0} : {1}
+            string classAccessModifier = hasCodeBehind ? "" : "public ";
+
+            string classCodeFilled = $@"
+public partial class {className} : {baseType}
 {{
 
 #pragma warning disable 169, 649, 0628 // Prevents warning CS0169 ('field ... is never used'), CS0649 ('field ... is never assigned to, and will always have its default value null'), and CS0628 ('member : new protected member declared in sealed class')
-{3}
+{fieldsForNamedElementsMergedCode}
 
-{4}
+{fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced}
 #pragma warning restore 169, 649, 0628
 
-{2}
+{methodsMergedCode}
 
-{6}
-
-}}
-";
-            string namespaceWrapperIfNecessary = @"
-{2}
-namespace {0}
-{{
-
-{1}
+{applicationEntryPointIfAny}
 
 }}
 ";
-            string applicationEntryPointIfAny =
-                (addApplicationEntryPoint ?
-                string.Format(@"
-public static void Main()
-{{
-    new {0}();
-}}", className) : "");
-            string absoluteSourceUri = (fileNameWithPathRelativeToProjectRoot.Contains(';') ? fileNameWithPathRelativeToProjectRoot : "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot); // This line ensures that the Uri is in the absolute form: "/assemblyName;component/RelativePath/FileName.xaml"
-            string classToInstantiateName = XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
-            string methodsMergedCode = string.Join("\r\n\r\n", methods);
-            string fieldsForNamedElementsMergedCode = string.Join("\r\n", fieldsForNamedElements);
-            string fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced = string.Join("\r\n", listOfAllTheTypesUsedInThisXamlFile.Select<string, string>(x => string.Format("private {0} Unused_{1};", x, Guid.NewGuid().ToString("N")))); // Note: This is useful because we need to generate some c# code for every type used in the XAML file because otherwise the types risk not being found at "Pass2" of the compilation. In fact, Visual Studio automatically removes project references that are not referenced from C#, so if a type is present only in XAML and not in C#, its DLL risks not being referenced.
-            string classAccessModifier = (hasCodeBehind ? "" : "public "); // Note: if the class has code-behind, we do not specify an access modifier so that the user can specify it by setting an access modifier in the partial class of the code-behind. If there is no code-behind (such as for resource dictionaries), we set it to "public".
-            string classCodeFilled = string.Format(classCode, className, baseType, methodsMergedCode, fieldsForNamedElementsMergedCode, fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced, classAccessModifier, applicationEntryPointIfAny);
+            
             string finalCode;
             if (!string.IsNullOrEmpty(namespaceStringIfAny))
             {
-                classFactoryCode = string.Format(classFactoryCode, namespaceStringIfAny + "." + className, classToInstantiateName);
-                finalCode = string.Format(namespaceWrapperIfNecessary, namespaceStringIfAny, classCodeFilled, classFactoryCode);
+                finalCode = $@"
+namespace {namespaceStringIfAny}
+{{
+{classCodeFilled}
+}}
+";
             }
             else
             {
-                classFactoryCode = string.Format(classFactoryCode, className, classToInstantiateName);
-                finalCode = classFactoryCode + classCodeFilled;
+                finalCode = classCodeFilled;
             }
+
             return finalCode;
         }
 
@@ -2278,7 +2332,7 @@ public static void Main()
                 // XAML files without code-behind (such as ResourceDictionaries)
                 //-----------------
 
-                className = XamlFilesWithoutCodeBehindHelper.GenerateClassNameFromAssemblyAndPath(fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension);
+                className = null;
                 namespaceStringIfAny = null;
                 hasCodeBehind = false;
                 //todo: handle the case where there is a code-behing but the user has simply forgotten the "x:Class" attribute, in which case the user will currently get strange error messages.
@@ -2690,6 +2744,47 @@ public static void Main()
             );
         }
 
+        private static bool IsEventTriggerRoutedEventProperty(XName xName, string propertyName)
+        {
+            if (xName.LocalName != "EventTrigger" || propertyName != "RoutedEvent")
+            {
+                return false;
+            }
+
+            if (xName.NamespaceName.StartsWith("clr-namespace:"))
+            {
+                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(xName.NamespaceName, out string ns, out string assembly);
+#if MIGRATION
+                return ns == "System.Windows" && (assembly == "System.Windows" || assembly == GetCurrentCoreAssemblyName());
+#else
+                return ns == "Windows.UI.Xaml" && assembly == GetCurrentCoreAssemblyName();
+#endif
+            }
+
+            return xName.Namespace == DefaultXamlNamespace;
+        }
+
+        private static string GetCurrentCoreAssemblyName()
+        {
+#if MIGRATION
+
+#if CSHTML5BLAZOR
+            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
+#elif BRIDGE
+            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
+#endif
+
+#else
+
+#if CSHTML5BLAZOR
+            return Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
+#elif BRIDGE
+            return Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE;
+#endif
+
+#endif
+        }
+
         private static bool IsReservedAttribute(string attributeName)
         {
             if (attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
@@ -2723,6 +2818,131 @@ public static void Main()
             return string.Concat("@\"", stringValue.Replace("\"", "\"\""), "\"");
         }
 
+        private static string GetFullTypeName(string namespaceName, string typeName)
+        {
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                return $"global::{typeName}";
+            }
+
+            return $"global::{namespaceName}.{typeName}";
+        }
+
+        private static string GenerateFactoryClass(
+            string componentTypeFullName,
+            string factoryImpl,
+            IEnumerable<string> additionalMethods,
+            string assemblyName,
+            string fileNameWithPathRelativeToProjectRoot)
+        {
+            string absoluteSourceUri =
+                    fileNameWithPathRelativeToProjectRoot.Contains(';') ?
+                    fileNameWithPathRelativeToProjectRoot :
+                    "/" + assemblyName + ";component/" + fileNameWithPathRelativeToProjectRoot;
+
+            string factoryName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
+
+            string finalCode = $@"
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was auto-generated by ""C#/XAML for HTML5""
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>
+{{
+    public static object Instantiate()
+    {{
+        return new {factoryName}().CreateComponentImpl();
+    }}
+
+    {componentTypeFullName} {IXamlComponentFactoryClass}<{componentTypeFullName}>.CreateComponent()
+    {{
+        return CreateComponentImpl();
+    }}
+
+    object {IXamlComponentFactoryClass}.CreateComponent()
+    {{
+        return CreateComponentImpl();
+    }}
+    {factoryImpl}
+
+    {string.Join(Environment.NewLine + Environment.NewLine, additionalMethods)}
+}}
+";
+
+            return finalCode;
+        }
+
+        private static string CreateFactoryMethod(
+            string rootElementName,
+            string typeFullName,
+            string codeToWorkWithTheRootElement,
+            List<string> findNameCalls,
+            string codeToPlaceAtTheBeginningOfInitializeComponent,
+            string codeToPlaceAtTheEndOfInitializeComponent,
+            string nameScope,
+            bool isSLMigration,
+            string assemblyNameWithoutExtension,
+            string fileNameWithPathRelativeToProjectRoot)
+        {
+            string body = CreateMethodBody(
+                codeToWorkWithTheRootElement,
+                findNameCalls,
+                codeToPlaceAtTheBeginningOfInitializeComponent,
+                codeToPlaceAtTheEndOfInitializeComponent,
+                nameScope);
+            string uiElementFullName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
+
+            return $@"
+    private {typeFullName} CreateComponentImpl()
+    {{
+        var {rootElementName} = new {typeFullName}();
+    
+#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
+        if ({rootElementName} is {uiElementFullName})
+        {{
+            (({uiElementFullName})(object){rootElementName}).XamlSourcePath = @""{assemblyNameWithoutExtension}\{fileNameWithPathRelativeToProjectRoot}"";
+        }}
+#pragma warning restore 0184
+    
+        {body}
+    
+        return {rootElementName};
+    }}";
+        }
+
+        private static string CreateFactoryMethod(string componentType)
+        {
+            return $@"
+    private {componentType} CreateComponentImpl()
+    {{
+        return ({componentType})global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof({componentType}));
+    }}
+";
+        }
+
+        private static string CreateMethodBody(
+            string codeToWorkWithTheRootElement,
+            List<string> findNameCalls,
+            string codeToPlaceAtTheBeginningOfInitializeComponent,
+            string codeToPlaceAtTheEndOfInitializeComponent,
+            string nameScope)
+        {
+            return $@"
+{codeToPlaceAtTheBeginningOfInitializeComponent}
+{codeToWorkWithTheRootElement}
+{string.Join("\r\n", findNameCalls)}
+{nameScope}
+{codeToPlaceAtTheEndOfInitializeComponent}    
+";
+        }
+
         private const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
+        private const string IXamlComponentFactoryClass = "global::OpenSilver.Internal.Xaml.IXamlComponentFactory";
     }
 }

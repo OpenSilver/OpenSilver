@@ -25,39 +25,39 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-	//
-	// Summary:
-	//     Provides data for the System.Windows.UIElement.TextInput routed event.
-    [OpenSilver.NotImplemented]
+	/// <summary>
+	/// Provides data for the <see cref="UIElement.TextInput"/> routed event.
+	/// </summary>
 	public sealed partial class TextCompositionEventArgs : RoutedEventArgs
 	{
-		//
-		// Summary:
-		//     Gets or sets a value that marks the routed event as handled, and prevents most
-		//     handlers along the event route from handling the same event again.
-		//
-		// Returns:
-		//     true to mark the routed event handled. false to leave the routed event unhandled,
-		//     which permits the event to potentially route further and be acted on by other
-		//     handlers. The default is false.
-        [OpenSilver.NotImplemented]
+		internal TextCompositionEventArgs() { }
+
+		/// <summary>
+		/// Gets or sets a value that marks the routed event as handled, and prevents most
+		/// handlers along the event route from handling the same event again.
+		/// </summary>
+		/// <returns>
+		/// true to mark the routed event handled. false to leave the routed event unhandled,
+		/// which permits the event to potentially route further and be acted on by other
+		/// handlers. The default is false.
+		/// </returns>
 		public bool Handled { get; set; }
-		//
-		// Summary:
-		//     Gets or sets the text string that of the text composition.
-		//
-		// Returns:
-		//     The text string of the text composition.
-        [OpenSilver.NotImplemented]
-		public string Text { get; }
-		//
-		// Summary:
-		//     Gets or sets the text in the composition as a System.Windows.Input.TextComposition
-		//     object.
-		//
-		// Returns:
-		//     The text in the composition, as a System.Windows.Input.TextComposition object.
-        [OpenSilver.NotImplemented]
-		public TextComposition TextComposition { get; }
+
+		/// <summary>
+		/// Gets or sets the text string that of the text composition.
+		/// </summary>
+		/// <returns>
+		/// The text string of the text composition.
+		/// </returns>
+		public string Text { get; internal set; }
+
+		/// <summary>
+		/// Gets or sets the text in the composition as a <see cref="Input.TextComposition"/>
+		/// object.
+		/// </summary>
+		/// <returns>
+		/// The text in the composition, as a <see cref="Input.TextComposition"/> object.
+		/// </returns>
+		public TextComposition TextComposition { get; internal set; }
 	}
 }

@@ -62,15 +62,22 @@ namespace System.Windows.Interactivity
                 throw new InvalidOperationException("The Behavior is already hosted on a different element.");
             }
             _associatedObject = dependencyObject;
+            this.Actions.Attach(_associatedObject);
             OnAttached();
         }
 
         protected virtual void OnAttached()
         {
-            this.Actions.Attach(_associatedObject);
-
         }
-#endregion
+
+        #endregion
+
+        internal TriggerBase(Type associatedObjectTypeConstraint)
+        {
+            this.associatedObjectTypeConstraint = associatedObjectTypeConstraint;
+            TriggerActionCollection newCollection = new TriggerActionCollection();
+            this.SetValue(ActionsProperty, newCollection);
+        }
 
         public static readonly DependencyProperty ActionsProperty = DependencyProperty.Register("Actions", typeof(TriggerActionCollection), typeof(TriggerBase), null);
 
@@ -95,6 +102,25 @@ namespace System.Windows.Interactivity
             }
         }
 
+        private Type associatedObjectTypeConstraint;
+
+        /// <summary>
+		/// Gets the type constraint of the associated object.
+		/// </summary>
+		/// <value>The associated object type constraint.</value>
+		protected virtual Type AssociatedObjectTypeConstraint
+        {
+            get
+            {
+                return this.associatedObjectTypeConstraint;
+            }
+        }
+
+        /// <summary>
+		/// Event handler for registering to PreviewInvoke.
+		/// </summary>
+		public event EventHandler<PreviewInvokeEventArgs> PreviewInvoke;
+
         /// <summary>
         /// Invoke all actions associated with this trigger.
         /// </summary>
@@ -104,6 +130,18 @@ namespace System.Windows.Interactivity
         /// </remarks>
         protected void InvokeActions(object parameter)
         {
+            if (this.PreviewInvoke != null)
+            {
+                // Fire the previewInvoke event 
+                PreviewInvokeEventArgs previewInvokeEventArg = new PreviewInvokeEventArgs();
+                this.PreviewInvoke(this, previewInvokeEventArg);
+                // If a handler has cancelled the event, abort the invoke
+                if (previewInvokeEventArg.Cancelling == true)
+                {
+                    return;
+                }
+            }
+
             foreach (TriggerAction triggerAction in this.Actions)
             {
                 triggerAction.CallInvoke(parameter);
@@ -140,6 +178,13 @@ namespace System.Windows.Interactivity
         {
             this._associatedObject = null;
             this.Actions.Detach();
+        }
+
+        /// <summary>
+        /// Called when the trigger is being detached from its AssociatedObject, but before it has actually occurred.
+        /// </summary>
+        protected virtual void OnDetaching()
+        {
         }
     }
 }

@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,13 @@ namespace System.Windows.Interactivity
         /// </summary>
         public DependencyObject AssociatedObject { get { return _associatedObject; } }  //todo: was protected but it has to be public because it comes from an interface si I don't really understand.
 
+        internal Behavior(Type associatedType)
+        {
+            _associatedType = associatedType;
+        }
+
+        internal event EventHandler AssociatedObjectChanged;
+
         internal Type _associatedType = null;
         /// <summary>
         /// The type to which this behavior can be attached.
@@ -58,18 +66,30 @@ namespace System.Windows.Interactivity
         /// <param name="dependencyObject">The object to attach to.</param>
         public void Attach(DependencyObject dependencyObject)
         {
-            if(_associatedObject != null)
+            if (dependencyObject != this.AssociatedObject)
             {
-                throw new InvalidOperationException("The Behavior is already hosted on a different element.");
-            }
-            if (AssociatedType != null && !AssociatedType.IsAssignableFrom(dependencyObject.GetType()))
-            {
-                throw new InvalidOperationException("dependencyObject does not satisfy the Behavior type constraint.");
-            }
-            else
-            {
+                if (this.AssociatedObject != null)
+                {
+                    throw new InvalidOperationException("An instance of a Behavior cannot be attached to more than one object at a time.");
+                }
+
+                // todo jekelly: what do we do if dependencyObject is null?
+
+                // Ensure the type constraint is met
+                if (dependencyObject != null && !this.AssociatedType.IsAssignableFrom(dependencyObject.GetType()))
+                {
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                                                                        "Cannot attach type '{0}' to type '{1}'. Instances of type '{0}' can only be attached to objects of type '{2}'.",
+                                                                        this.GetType().Name,
+                                                                        dependencyObject.GetType().Name,
+                                                                        this.AssociatedType.Name));
+                }
+
                 _associatedObject = dependencyObject;
-                OnAttached();
+
+                this.OnAssociatedObjectChanged();
+
+                this.OnAttached();
             }
         }
 
@@ -80,6 +100,7 @@ namespace System.Windows.Interactivity
         {
             OnDetaching();
             _associatedObject = null;
+            this.OnAssociatedObjectChanged();
         }
 
         /// <summary>
@@ -92,5 +113,25 @@ namespace System.Windows.Interactivity
         /// before it has actually occurred.
         /// </summary>
         protected virtual void OnDetaching() { } //does nothing?
+
+        private void OnAssociatedObjectChanged()
+        {
+            if (this.AssociatedObjectChanged != null)
+            {
+                this.AssociatedObjectChanged(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+		/// Gets the associated object.
+		/// </summary>
+		/// <value>The associated object.</value>
+		DependencyObject IAttachedObject.AssociatedObject
+        {
+            get
+            {
+                return this.AssociatedObject;
+            }
+        }
     }
 }

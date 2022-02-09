@@ -81,6 +81,32 @@ namespace Windows.UI.Xaml.Controls
         UIElement _iconStop;
         UIElement _iconArrow;
 
+        #region public DragDropEffects AllowedSourceEffects
+        /// <summary>
+        /// Gets or sets the allowed effects when this DragDropTarget is the drag source.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public DragDropEffects AllowedSourceEffects
+        {
+            get { return (DragDropEffects)GetValue(AllowedSourceEffectsProperty); }
+            set { SetValue(AllowedSourceEffectsProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the AllowedSourceEffects dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AllowedSourceEffectsProperty =
+            DependencyProperty.Register(
+                "AllowedSourceEffects",
+                typeof(DragDropEffects),
+                typeof(DragDropTarget<TItemsControlType, TItemContainerType>),
+#if unsupported
+                new PropertyMetadata(DragDropEffects.Link | DragDropEffects.Move | DragDropEffects.Scroll));
+#else
+                new PropertyMetadata(DragDropEffects.None));
+#endif
+        #endregion public DragDropEffects AllowedSourceEffects
+
 
         /// <summary>
         /// Initializes a new instance of the DragDropTarget class.
@@ -274,7 +300,7 @@ namespace Windows.UI.Xaml.Controls
             // Prepare the "DragEventArgs" to pass to the raised events:
             Selection selection = new Selection(_sourceItemContainer);
             SelectionCollection selectionCollection = SelectionCollection.ToSelectionCollection(selection);
-            DataObject dataObject = new DataObject();
+            MS.DataObject dataObject = new MS.DataObject();
             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
             MS.DragEventArgs dragOverEventArgs = new MS.DragEventArgs(dataObject);
 
@@ -422,7 +448,7 @@ namespace Windows.UI.Xaml.Controls
                         if (dragDropTargetUnderPointer.ItemDroppedOnSource != null)
                         {
                             // Prepare the event args:
-                            DataObject dataObject = new DataObject();
+                            MS.DataObject dataObject = new MS.DataObject();
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
 #if !(BRIDGE && MIGRATION)
@@ -444,7 +470,7 @@ namespace Windows.UI.Xaml.Controls
                         if (dragDropTargetUnderPointer.Drop != null)
                         {
                             // Prepare the event args:
-                            DataObject dataObject = new DataObject();
+                            MS.DataObject dataObject = new MS.DataObject();
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
                             // Raise the Drop event:

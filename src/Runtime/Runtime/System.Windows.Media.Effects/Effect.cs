@@ -18,8 +18,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 #if !MIGRATION
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
 #endif
 
 namespace System.Windows.Media.Effects
@@ -42,13 +44,15 @@ namespace System.Windows.Media.Effects
         /// </summary>
         protected Effect() { }
 
-        //// Returns:
-        ////     The transform to apply. The default is the identity transform.
-        ///// <summary>
-        ///// When overridden in a derived class, transforms mouse input and coordinate
-        ///// systems through the effect.
-        ///// </summary>
-        //protected internal virtual GeneralTransform EffectMapping { get; }
+        /// <summary>
+        /// When overridden in a derived class, transforms mouse input and coordinate systems
+        /// through the effect.
+        /// </summary>
+        /// <returns>
+        /// The transform to apply. The default is the identity transform.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        protected internal virtual GeneralTransform EffectMapping => new MatrixTransform();
 
         ///// <summary>
         ///// Gets a System.Windows.Media.Brush that, when it is used as an input for an
@@ -69,7 +73,7 @@ namespace System.Windows.Media.Effects
         ///// </summary>
         ///// <returns></returns>
         //public Effect Clone();
-        
+
         //// Returns:
         ////     A modifiable clone of the current object. The cloned object's System.Windows.Freezable.IsFrozen
         ////     property will be false even if the source's System.Windows.Freezable.IsFrozen

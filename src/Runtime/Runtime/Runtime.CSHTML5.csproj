@@ -38,6 +38,9 @@
     <DocumentationFile>$(BinFolder)\Migration\CSHTML5.Migration.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
+      <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
+    </Compile>
     <Compile Include="..\OpenSilver.Xaml\System.Windows.Markup\ContentPropertyAttribute.cs">
       <Link>System.Windows.Markup\ContentPropertyAttribute.cs</Link>
     </Compile>
@@ -73,12 +76,14 @@
     <Compile Include="OpenSilver\Internal\ApplicationLifetimeObjectsCollection.cs" />
     <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
     <Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
+    <Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
     <Compile Include="OpenSilver\Internal\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
+    <Compile Include="OpenSilver\Internal\Xaml\IXamlComponentFactory.cs" />
     <Compile Include="OpenSilver\NotImplementedAttribute.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
     <Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
@@ -97,6 +102,7 @@
     <Compile Include="PublicAPI\Performance\Performance.cs" />
     <Compile Include="System.Collections.Generic\WORKINPROGRESS\PriorityQueue.cs" />
     <Compile Include="System.Collections.ObjectModel\WORKINPROGRESS\ReadOnlyObservableCollection_1.cs" />
+    <Compile Include="System.ComponentModel\AsyncOperation.cs" />
     <Compile Include="System.ComponentModel\CurrentChangingEventArgs.cs" />
     <Compile Include="System.ComponentModel\GroupDescription.cs" />
     <Compile Include="System.ComponentModel\ICollectionView.cs" />
@@ -162,6 +168,7 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />
     <Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
     <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
     <Compile Include="System.Windows.Media\TransformConverter.cs" />
@@ -171,14 +178,20 @@
     <Compile Include="System.Windows.Navigation\NavigationMode.cs" />
     <Compile Include="System.Windows\ApplicationServiceContext.cs" />
     <Compile Include="System.Windows\DataTemplateKey.cs" />
+    <Compile Include="System.Windows\EventTrigger.cs" />
     <Compile Include="System.Windows\FontStretchConverter.cs" />
     <Compile Include="System.Windows\FontStyleConverter.cs" />
+    <Compile Include="System.Windows\FullScreenOptions.cs" />
     <Compile Include="System.Windows\IApplicationService.cs" />
     <Compile Include="System.Windows\InstallState.cs" />
     <Compile Include="System.Windows\NullableBoolConverter.cs" />
     <Compile Include="System.Windows\RectConverter.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
+    <Compile Include="System.Windows\TriggerAction.cs" />
+    <Compile Include="System.Windows\TriggerActionCollection.cs" />
+    <Compile Include="System.Windows\TriggerBase.cs" />
+    <Compile Include="System.Windows\TriggerCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\CheckAndDownloadUpdateCompletedEventArgs.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
@@ -295,7 +308,7 @@
     <Compile Include="Core\Main\NamespacesDocumentation.cs" />
     <Compile Include="Core\Main\TypeFromStringConverters.cs" />
     <Compile Include="Core\Events\HtmlEventProxy.cs" />
-    <Compile Include="Core\Events\INTERNAL_EventManager_2.cs" />
+    <Compile Include="Core\Events\INTERNAL_EventManager.cs" />
     <Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />
     <Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs.cs" />
@@ -1001,17 +1014,11 @@
     <Compile Include="System.Windows\WORKINPROGRESS\AssemblyPartCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\DragEventArgs.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\DragEventHandler.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\EventTrigger.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\FontStretch.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\IDataObject.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\LineStackingStrategy.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\OutOfBrowserSettings.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\TabletDeviceType.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\RoutedEventArgs.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerAction.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerActionCollection.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerBase.cs" />
-    <Compile Include="System.Windows\WORKINPROGRESS\TriggerCollection.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\UIElement.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\VisualTransition.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\WindowCollection.cs" />
@@ -1172,6 +1179,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultListBoxStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultCalendarDayButtonStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

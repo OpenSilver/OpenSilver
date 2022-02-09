@@ -39,9 +39,8 @@ namespace System.Windows.Interactivity
         /// Initializes a new instance of the System.Windows.Interactivity.Behavior`1
         /// class.
         /// </summary>
-        protected Behavior()
+        protected Behavior() : base(typeof(T))
         {
-            _associatedType = typeof(T);
         }
 
         //private T _associatedObject = null;
@@ -49,6 +48,6 @@ namespace System.Windows.Interactivity
         /// Gets the object to which this System.Windows.Interactivity.Behavior`1 is
         /// attached.
         /// </summary>
-        public T AssociatedObject { get { return (T)_associatedObject; } }  //todo: was protected but it has to be public because it comes from an interface si I don't really understand.
+        public new T AssociatedObject { get { return (T)base.AssociatedObject; } }
     }
 }

@@ -17,13 +17,17 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION</DefineConstants>
+    <DefineConstants>TRACE;OPENSILVER;MIGRATION</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
+    <DefineConstants>TRACE;OPENSILVER</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(Optimize) != true">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
     <ProjectReference Include="..\Controls.Data.Input\Controls.Data.Input.OpenSilver.csproj" />

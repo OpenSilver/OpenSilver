@@ -6,12 +6,19 @@
 
     <!--<Style x:Key="DefaultSliderStyle" TargetType="Slider">-->
     <Style TargetType="Slider">
-        <Setter Property="Background" Value="White" />
         <Setter Property="Foreground" Value="#FF333333" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Slider">
                     <Grid x:Name="Root">
+                        <Grid.Resources>
+                            <Style x:Key="RepeatButtonStyle" TargetType="RepeatButton">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Opacity" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Style>
+                        </Grid.Resources>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
@@ -21,9 +28,9 @@
                         </VisualStateManager.VisualStateGroups>
                         <Canvas x:Name="HorizontalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
                             <Rectangle x:Name="HorizontalRail" Fill="#FFF1F1F1" Stroke="Gray" StrokeThickness="1" Height="3" Width="{TemplateBinding Width}"/>
-                            <RepeatButton x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" Background="Transparent"/>
-                            <RepeatButton x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" Background="Transparent"/>
-                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow">
+                            <RepeatButton x:Name="HorizontalLargeDecrease" Style="{StaticResource RepeatButtonStyle}" Height="18"/>
+                            <RepeatButton x:Name="HorizontalLargeIncrease" Style="{StaticResource RepeatButtonStyle}" Height="18"/>
+                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow" Width="9" Height="18">
                                 <Thumb.Template>
                                     <ControlTemplate>
                                         <Border BorderBrush="Black" BorderThickness="1" Width="9" Height="18" CornerRadius="2">
@@ -46,9 +53,9 @@
                         </Canvas>
                         <Canvas x:Name="VerticalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
                             <Rectangle x:Name="VerticalRail" Fill="#FFF1F1F1" Stroke="Gray" StrokeThickness="1" Width="3" Height="{TemplateBinding Height}"/>
-                            <RepeatButton x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" Background="Transparent"/>
-                            <RepeatButton x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" Background="Transparent"/>
-                            <Thumb x:Name="VerticalThumb" Background="#FFBBBBBB" Cursor="Arrow">
+                            <RepeatButton x:Name="VerticalLargeDecrease" Style="{StaticResource RepeatButtonStyle}" Width="18"/>
+                            <RepeatButton x:Name="VerticalLargeIncrease" Style="{StaticResource RepeatButtonStyle}" Width="18"/>
+                            <Thumb x:Name="VerticalThumb" Background="#FFBBBBBB" Cursor="Arrow" Width="18" Height="9">
                                 <Thumb.Template>
                                     <ControlTemplate>
                                         <Border BorderBrush="Black" BorderThickness="1" Width="18" Height="9" CornerRadius="2">

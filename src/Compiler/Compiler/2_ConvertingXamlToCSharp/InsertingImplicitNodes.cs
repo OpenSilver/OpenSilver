@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-extern alias wpf;
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -190,7 +188,7 @@ namespace DotNetForHtml5.Compiler
                                 // Verify that the attribute is not already set
                                 if (currentElement.Attribute(contentPropertyName) != null)
                                 {
-                                    throw new wpf::System.Windows.Markup.XamlParseException(
+                                    throw new XamlParseException(
                                         string.Format("The property '{0}' is set more than once.", contentPropertyName)
                                     );
                                 }
@@ -212,7 +210,7 @@ namespace DotNetForHtml5.Compiler
                             }
                             else
                             {
-                                throw new wpf::System.Windows.Markup.XamlParseException(
+                                throw new XamlParseException(
                                     string.Format("The element '{0}' does not support direct content.", currentElement.Name)
                                 );
                             }
@@ -258,7 +256,7 @@ namespace DotNetForHtml5.Compiler
                     // Verify that the attribute is not already set:
                     if (currentElement.Attribute(contentPropertyName) != null)
                     {
-                        throw new wpf::System.Windows.Markup.XamlParseException(
+                        throw new XamlParseException(
                             string.Format("The property '{0}' is set more than once.", contentPropertyName)
                         );
                     }

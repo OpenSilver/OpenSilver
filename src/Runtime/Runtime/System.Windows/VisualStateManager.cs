@@ -17,6 +17,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -111,6 +112,24 @@ namespace Windows.UI.Xaml
             FrameworkElement stateGroupsRoot = control.StateGroupsRoot;
 
             return GoToStateCommon(control, stateGroupsRoot, stateName, useTransitions);
+        }
+
+        /// <summary>
+        /// Transitions a control's state.
+        /// </summary>
+        /// <param name="stateGroupsRoot">The root element that contains the VisualStateManager.</param>
+        /// <param name="stateName">The new state that the control is in.</param>
+        /// <param name="useTransitions">Whether to use transition animations.</param>
+        /// <returns>true if the state changed successfully, false otherwise.</returns>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static bool GoToElementState(FrameworkElement stateGroupsRoot, string stateName, bool useTransitions)
+        {
+            if (stateGroupsRoot == null)
+            {
+                throw new ArgumentNullException("stateGroupsRoot");
+            }
+
+            return GoToStateCommon(null, stateGroupsRoot, stateName, useTransitions);
         }
 
         /// <summary>

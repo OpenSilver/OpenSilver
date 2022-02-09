@@ -12,8 +12,6 @@
 *  
 \*====================================================================================*/
 
-extern alias wpf;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -82,14 +80,14 @@ namespace DotNetForHtml5.Compiler
 
             if (stringValue == "Uniform" || stringValue == "Paced")
             {
-                throw new wpf::System.Windows.Markup.XamlParseException(
+                throw new XamlParseException(
                     $"The '{destinationType}.{stringValue}' property is not supported yet."
                 );
             }
             else if (stringValue.Length > 0 &&
                      stringValue[stringValue.Length - 1] == '%')
             {
-                throw new wpf::System.Windows.Markup.XamlParseException(
+                throw new XamlParseException(
                     $"Percentage values for '{destinationType}' are not supported yet."
                 );
             }
@@ -655,7 +653,7 @@ namespace DotNetForHtml5.Compiler
 
         private static Exception GetConvertException(string value, string destinationTypeFullName)
         {
-            return new wpf::System.Windows.Markup.XamlParseException(
+            return new XamlParseException(
                 $"Cannot convert '{value}' to '{destinationTypeFullName}'."
             );
         }

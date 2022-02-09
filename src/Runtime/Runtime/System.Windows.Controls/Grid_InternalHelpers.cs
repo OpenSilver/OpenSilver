@@ -780,24 +780,27 @@ namespace Windows.UI.Xaml.Controls
                 // Handle the column visibility (mainly changed by the DataGrid)
                 //---------------------------------------------------------------
                 //go through the children and set their overflow to hidden for those that are only in Collapsed columns, and to visible for the other ones:
-                foreach (UIElement child in grid.Children)
+                if (grid.HasChildren)
                 {
-                    if (INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
+                    foreach (UIElement child in grid.Children)
                     {
-                        int startColumn = Grid.GetColumn(child);
-                        int endColumn = startColumn + Grid.GetColumnSpan(child) - 1; //Note: the element does not reach the index of endColumn (example: span = 1, the element is only in one column but endColumn is still biger than starColumn.
-                        //Note: in the line above, "-1" because span includes the first column.
-                        if (IsAllCollapsedColumns(grid, startColumn, endColumn))
+                        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(child))
                         {
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.style.overflow = 'hidden'", child.INTERNAL_OuterDomElement);
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.setAttribute('data-isCollapsedDueToHiddenColumn', true)", child.INTERNAL_OuterDomElement);
-                        }
-                        else
-                        {
-                            // Note: we set to Visible only if it was previously Hidden due to the fact that a Grid column is hidden, to avoid conflicts such as replacing the "overflow" property set by the ScrollViewer or by the "ClipToBounds" property.
-                            // setAttribute('data-isCollapsedDueToHiddenColumn', false)
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setGridCollapsedDuetoHiddenColumn($0)",
-                                ((INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement).UniqueIdentifier);
+                            int startColumn = Grid.GetColumn(child);
+                            int endColumn = startColumn + Grid.GetColumnSpan(child) - 1; //Note: the element does not reach the index of endColumn (example: span = 1, the element is only in one column but endColumn is still biger than starColumn.
+                                                                                         //Note: in the line above, "-1" because span includes the first column.
+                            if (IsAllCollapsedColumns(grid, startColumn, endColumn))
+                            {
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.style.overflow = 'hidden'", child.INTERNAL_OuterDomElement);
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.setAttribute('data-isCollapsedDueToHiddenColumn', true)", child.INTERNAL_OuterDomElement);
+                            }
+                            else
+                            {
+                                // Note: we set to Visible only if it was previously Hidden due to the fact that a Grid column is hidden, to avoid conflicts such as replacing the "overflow" property set by the ScrollViewer or by the "ClipToBounds" property.
+                                // setAttribute('data-isCollapsedDueToHiddenColumn', false)
+                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setGridCollapsedDuetoHiddenColumn($0)",
+                                    ((INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement).UniqueIdentifier);
+                            }
                         }
                     }
                 }

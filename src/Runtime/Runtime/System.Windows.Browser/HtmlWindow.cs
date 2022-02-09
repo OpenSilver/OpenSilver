@@ -12,6 +12,9 @@
 \*====================================================================================*/
 
 using System;
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Browser
 {
@@ -92,7 +95,11 @@ namespace System.Windows.Browser
 #endif
         public void Alert(string alertText)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                MessageBox.Show(alertText);
+            }
+            else
             {
                 OpenSilver.Interop.ExecuteJavaScript("alert($0)", alertText);
             }
@@ -113,12 +120,52 @@ namespace System.Windows.Browser
 #endif
         public bool Confirm(string confirmText)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                return MessageBox.Show(confirmText, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
+            }
+            else
             {
                 return Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("confirm($0)", confirmText));
             }
+        }
 
-            return false;
+        /// <summary>
+        /// Gets the value of a property that is identified by name on the current <see cref="HtmlWindow" />
+        /// </summary>
+        /// <param name="name">
+        /// The name of the property.
+        /// </param>
+        /// <returns>
+        /// <see langword="null" /> if the property does not exist.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="name"/> is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="name"/> is an empty string or contains an embedded null character (\0).
+        /// </exception>
+        public override object GetProperty(string name)
+        {
+            var result = default(object);
+
+            if (name is null)
+            {
+                throw new ArgumentNullException(name);
+            }
+            else if (string.IsNullOrEmpty(name) || name.Contains("\\0"))
+            {
+                throw new ArgumentException($"{nameof(name)} is an empty string or contains an embedded null character (\0)");
+            }
+
+            var jsObject = OpenSilver.Interop.ExecuteJavaScript(name);
+
+            if (!jsObject.ToString().Equals("undefined"))
+            {
+                result = jsObject;
+            }
+
+            return result;
         }
     }
 }

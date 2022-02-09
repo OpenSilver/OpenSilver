@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using OpenSilver.Internal;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Media;
@@ -84,7 +85,7 @@ namespace CSHTML5.Internal
                 string assemblyName = INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(assemblyWhereGenericXamlIsLocated);
 #endif
                 assemblyName = assemblyName.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
-                string factoryTypeName = MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
+                string factoryTypeName = XamlResourcesHelper.MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
                 Type resourceDictionaryFactoryType = assemblyWhereGenericXamlIsLocated.GetType(factoryTypeName);
 
                 if (resourceDictionaryFactoryType != null)
@@ -273,71 +274,6 @@ namespace CSHTML5.Internal
 
             }
             return null;
-        }
-
-        //Note on the following method: I took it from XamlFilesWithoutCodeBehindHelper.cs so that it is the same as used by the Compiler.
-        //      It is used when generating the (name of) ResourcesDictionaty factories so we need it here too.
-        static string MakeTitleCase(string str)
-        {
-            string result = "";
-            string lowerStr = str.ToLower();
-            int length = str.Length;
-            bool makeUpper = true;
-            int lastCopiedIndex = -1;
-            //****************************
-            //HOW THIS WORKS:
-            //
-            //  We go through all the characters of the string.
-            //  If any is not an alphanumerical character, we make the next alphanumerical character uppercase.
-            //  To do so, we copy the string (on which we call toLower) bit by bit into a new variable,
-            //  each bit being the part between two uppercase characters, and while inserting the uppercase version of the character between each bit.
-            //  then we add the end of the string.
-            //****************************
-
-            for (int i = 0; i < length; ++i)
-            {
-                char ch = lowerStr[i];
-                if (ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '0')
-                {
-                    if (makeUpper && ch >= 'a' && ch <= 'z') //if we have a letter, we make it uppercase. otherwise, it is a number so we let it as is.
-                    {
-                        if (!(lastCopiedIndex == -1 && i == 0)) //except this very specific case, we should never have makeUpper at true while i = lastCopiedindex + 1 (since we made lowerStr[lastCopiedindex] into an uppercase letter.
-                        {
-                            result += lowerStr.Substring(lastCopiedIndex + 1, i - lastCopiedIndex - 1); //i - lastCopied - 1 because we do not want to copy the current index since we want to make it uppercase:
-                        }
-                        result += (char)(ch - 32); //32 is the difference between the lower case and the upper case, meaning that (char)('a' - 32) --> 'A'.
-                        lastCopiedIndex = i;
-                    }
-                    makeUpper = false;
-                }
-                else
-                {
-                    makeUpper = true;
-                }
-            }
-            //we copy the rest of the string:
-            if (lastCopiedIndex < length - 1)
-            {
-                result += str.Substring(lastCopiedIndex + 1);
-            }
-            return result;
-
-
-            //bool isFirst = true;
-            //string[] spaceSplittedString = str.Split(' ');
-            //foreach (string s in spaceSplittedString)
-            //{
-            //    if (isFirst)
-            //    {
-            //        isFirst = false;
-            //    }
-            //    else
-            //    {
-            //        result += " ";
-            //    }
-            //    result += MakeFirstCharUpperAndRestLower(s);
-            //}
-            //return result;
         }
 
         void EnsureDefaultResources()

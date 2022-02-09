@@ -11,7 +11,10 @@
       "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",
       "Runtime\\Controls.Data.Input\\Controls.Data.Input.OpenSilver.csproj",
 	  "Runtime\\Controls.Navigation\\Controls.Navigation.OpenSilver.csproj",
-      "Runtime\\Runtime\\Runtime.OpenSilver.csproj"
-    ]
+      "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
+	  "Runtime\\Blend\\Interactivity\\Interactivity.OpenSilver.csproj",
+	  "Runtime\\Blend\\Interactions\\Expression.Interactions.OpenSilver.csproj",
+	  "Runtime\\Blend\\Effects\\Expression.Effects.OpenSilver.csproj"
+	]
   }
 }

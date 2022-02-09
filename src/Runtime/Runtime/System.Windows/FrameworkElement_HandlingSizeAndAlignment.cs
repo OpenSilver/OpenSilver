@@ -410,6 +410,8 @@ namespace Windows.UI.Xaml
                         styleOfOuterDomElement.marginRight = "0px"; // Default value
                         styleOfOuterDomElement.display = "block"; // Default value
                         styleOfOuterDomElement.width = "100%";
+                        styleOfOuterDomElement.maxWidth = "none";
+                        styleOfOuterDomElement.maxHeight = "none";
                         return;
                     }
 
@@ -747,6 +749,17 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
+            if (fe.IsUnderCustomLayout)
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
+                    && fe.Visibility != Visibility.Collapsed
+                    && !double.IsNaN(fe.Height))
+                {
+                    var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(fe);
+                    styleOfOuterDomElement.height = fe.Height.ToInvariantString() + "px";
+                }
+                return;
+            }
 
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
                 && fe.Visibility != Visibility.Collapsed)

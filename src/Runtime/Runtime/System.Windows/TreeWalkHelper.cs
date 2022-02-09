@@ -24,14 +24,21 @@ namespace Windows.UI.Xaml
     {
         #region InheritablePropertyChange
 
-        internal static void InvalidateOnInheritablePropertyChange(FrameworkElement fe, InheritablePropertyChangeInfo info)
+        internal static void InvalidateOnInheritablePropertyChange(FrameworkElement fe, InheritablePropertyChangeInfo info, bool skipStartNode)
         {
             if (HasChildren(fe))
             {
                 DescendentsWalker<InheritablePropertyChangeInfo> walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
                     TreeWalkPriority.LogicalTree, InheritablePropertyChangeDelegate, info);
 
-                walker.StartWalk(fe, true);
+                walker.StartWalk(fe, skipStartNode);
+            }
+            else if (!skipStartNode)
+            {
+                // Degenerate case when the current node is a leaf node and has no children.
+                // If the current node needs a notification, do so now.
+                bool visitedViaVisualTree = false;
+                OnInheritablePropertyChanged(fe, info, visitedViaVisualTree);
             }
         }
 
