@@ -27,16 +27,35 @@ namespace System.Windows.Interactivity
     /// </summary>
     public sealed partial class BehaviorCollection : AttachableCollection<Behavior>
     {
-        /// <summary>
-        /// Called immediately after the collection is attached to an AssociatedObject.
-        /// </summary>
-        protected override void OnAttached() { }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="BehaviorCollection"/> class.
+		/// </summary>
+		/// <remarks>Internal, because this should not be inherited outside this assembly.</remarks>
+		internal BehaviorCollection()
+		{
+		}
 
-        
+		/// <summary>
+		/// Called immediately after the collection is attached to an AssociatedObject.
+		/// </summary>
+		protected override void OnAttached()
+        {
+            foreach (Behavior behavior in this)
+            {
+                behavior.Attach(this.AssociatedObject);
+            }
+        }
+
+
         /// <summary>
-        /// Called when the collection is being detached from its AssociatedObject, but
-        /// before it has actually occurred.
-        /// </summary>
-        protected override void OnDetaching() { }
-    }
+		/// Called when the collection is being detached from its AssociatedObject, but before it has actually occurred.
+		/// </summary>
+		protected override void OnDetaching()
+        {
+            foreach (Behavior behavior in this)
+            {
+                behavior.Detach();
+            }
+        }
+	}
 }

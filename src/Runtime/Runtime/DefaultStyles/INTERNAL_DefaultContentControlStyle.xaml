@@ -557,24 +557,8 @@
                                         <!-- #endif  -->
                                     </ToolTip>
                                 </ToolTipService.ToolTip>
-                                <Grid Width="10"
-                                      Height="10"
-                                      HorizontalAlignment="Right"
-                                      Margin="0,-4,-4,0"
-                                      VerticalAlignment="Top"
-                                      Background="Transparent">
-                                    <Path 
-                                          Width="10"
-                                          Height="7"
-                                          Margin="0,3,0,0"
-                                          Data="M 1,0 L5,0 A 2,2 90 0 1 7,2 L7,6 z"
-                                          Fill="#FFDC000C" />
-                                    <Path 
-                                          Width="10"
-                                          Height="7"
-                                          Margin="0,3,0,0"
-                                          Data="M 0,0 L2,0 L 7,5 L7,7"
-                                          Fill="#ffffff" />
+                                <Grid Width="12" Height="12" HorizontalAlignment="Right" Margin="1,-4,-4,0" VerticalAlignment="Top" Background="Transparent">
+                                    <Path Margin="1,3,0,0" Data="M0,0L8,0L8,8z" Fill="red"/>
                                 </Grid>
                             </Border>
 

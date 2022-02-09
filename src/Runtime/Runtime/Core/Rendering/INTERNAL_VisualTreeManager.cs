@@ -725,12 +725,11 @@ if(nextSibling != undefined) {
             // HANDLE TABINDEX:
             //--------------------------------------------------------
 
-            // For GotFocus and LostFocus to work, the DIV specified by "INTERNAL_OptionalSpecifyDomElementConcernedByFocus"
-            // (or the OuterDomElement otherwise) needs to have the "tabIndex" attribute set. Therefore we need to always set
-            // it (unless IsTabStop is False) to its current value (default is Int32.MaxValue). At the time when this code was
-            // written, there was no way to automatically call the "OnChanged" on a dependency property if no value was set.
+            // For GotFocus and LostFocus to work, the DIV specified by UIElement.GetFocusTarget() needs to have the "tabIndex"
+            // attribute set. Therefore we need to always set it (unless IsTabStop is False) to its current value (default is
+            // Int32.MaxValue). At the time when this code was written, there was no way to automatically call the "OnChanged"
+            // on a dependency property if no value was set.
 
-            // IMPORTANT: This needs to be done AFTER the "OnApplyTemplate" (for example, the TextBox sets the "INTERNAL_OptionalSpecifyDomElementConcernedByFocus" in the "OnApplyTemplate").
             if (isChildAControl)
             {
                 if (!(child is TextBlock)) // TextBlock should not count in tabbing (TextBlock is not supposed to be a Control).

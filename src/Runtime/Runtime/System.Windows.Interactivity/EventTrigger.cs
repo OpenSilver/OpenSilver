@@ -35,13 +35,10 @@ namespace System.Windows.Interactivity
     /// A trigger that listens for a specified event on its source and fires when that event is fired.
     /// 
     /// </summary>
-    public partial class EventTrigger : EventTriggerBase<object> //EventTriggerBase<object> For simplicity's sake, we inherited directly from TriggerBase and will currently only support the properties EventName and Actions directly here.
+    public partial class EventTrigger : EventTriggerBase<object>
     {
-        //Based on the code that can be found at https://github.com/jlaanstra/Windows.UI.Interactivity/tree/master/Windows.UI.Interactivity.
-
         public static readonly DependencyProperty EventNameProperty =
-            DependencyProperty.Register("EventName", typeof(string), typeof(EventTrigger), new PropertyMetadata("Loaded", new PropertyChangedCallback(EventTrigger.OnEventNameChanged))
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register("EventName", typeof(string), typeof(EventTrigger), new PropertyMetadata("Loaded", new PropertyChangedCallback(EventTrigger.OnEventNameChanged)));
 
         /// <summary>
         /// Gets or sets the name of the event to listen for. This is a dependency property.
@@ -75,7 +72,6 @@ namespace System.Windows.Interactivity
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Interactivity.EventTrigger"/> class.
-        /// 
         /// </summary>
         /// <param name="eventName">Name of the event.</param>
         public EventTrigger(string eventName)
@@ -83,140 +79,14 @@ namespace System.Windows.Interactivity
             this.EventName = eventName;
         }
 
-        //protected string GetEventName() //should be an override but we changed the heritage
-        //{
-        //    return this.EventName;
-        //}
-
         private static void OnEventNameChanged(object sender, DependencyPropertyChangedEventArgs args)
         {
-            EventTrigger eventTrigger = (EventTrigger)sender;
-            if (eventTrigger.AssociatedObject != null) //Making sure the source of the event is set. Note: The source can apparently be something other than the AssociatedObject but we ignore this case for now.
-            {
-                string oldEventName = (string)args.OldValue;
-                string newEventName = (string)args.NewValue;
-                if (!string.IsNullOrWhiteSpace(oldEventName))
-                {
-                    eventTrigger.UnregisterEvent(eventTrigger.AssociatedObject, oldEventName);
-                }
-                if (!string.IsNullOrWhiteSpace(newEventName))
-                {
-                    eventTrigger.RegisterEvent(eventTrigger.AssociatedObject, newEventName);
-                }
-            }
+            ((EventTrigger)sender).OnEventNameChanged((string)args.OldValue, (string)args.NewValue);
         }
 
         protected override string GetEventName()
         {
             return this.EventName;
         }
-
-        #region added because we changed heritage
-
-        private void UnregisterEvent(DependencyObject associatedObject, string eventName)
-        {
-            Type type = associatedObject.GetType();
-            EventInfo eventInfo = type.GetEvent(eventName);
-            if (eventInfo != null)
-            {
-                EventHandler eventHandler = OnEventImpl;
-                eventInfo.RemoveEventHandler(associatedObject, eventHandler);
-            }
-        }
-
-        private void RegisterEvent(DependencyObject associatedObject, string eventName)
-        {
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                RegisterEvent_SimulatorOnly(associatedObject, eventName);
-            }
-            else
-            {
-                Type type = associatedObject.GetType();
-                EventInfo eventInfo = type.GetEvent(eventName);
-                if (eventInfo != null)
-                {
-                    EventHandler eventHandler = OnEventImpl; //Note: Bridge doesn't care about the type of the Delegate so we can do this. In the Simulator, it causes an exception on the lines below.
-                    eventInfo.RemoveEventHandler(associatedObject, eventHandler);
-                    eventInfo.AddEventHandler(associatedObject, eventHandler);
-                }
-            }
-        }
-
-        private void RegisterEvent_SimulatorOnly(DependencyObject associatedObject, string eventName)
-        {
-            Type type = associatedObject.GetType();
-            EventInfo eventInfo = type.GetEvent(eventName);
-            if (eventInfo != null)
-            {
-                //We get the expected Event handler type. Note: we have to do it through Reflection because Bridge does not implement the EventHandlerType property so we cannot directly call it.
-                var eventInfoType = eventInfo.GetType();
-                PropertyInfo eventhandlerTypeProperty = eventInfoType.GetProperty("EventHandlerType", BindingFlags.Public | BindingFlags.Instance);
-                Type eventHandlerType = (Type)eventhandlerTypeProperty.GetValue(eventInfo);
-
-                if(eventHandlerType == typeof(EventHandler)) //todo: find a better way to do this.
-                {
-                        EventHandler eventHandler = OnEventImpl;
-                        eventInfo.RemoveEventHandler(associatedObject, eventHandler);
-                        eventInfo.AddEventHandler(associatedObject, eventHandler);
-                }
-                else if(eventHandlerType == typeof(RoutedEventHandler))
-                {
-                    RoutedEventHandler eventHandler = OnEventImpl;
-                    eventInfo.RemoveEventHandler(associatedObject, eventHandler);
-                    eventInfo.AddEventHandler(associatedObject, eventHandler);
-                }
-                else if (eventHandlerType == typeof(DragEventHandler))
-                {
-                    DragEventHandler eventHandler = OnEventImpl;
-                    eventInfo.RemoveEventHandler(associatedObject, eventHandler);
-                    eventInfo.AddEventHandler(associatedObject, eventHandler);
-                }
-#if MIGRATION
-                else if (eventHandlerType == typeof(MouseEventHandler))
-#else
-                else if (eventHandlerType == typeof(PointerEventHandler))
-#endif
-                {
-#if MIGRATION
-                    MouseEventHandler eventHandler = OnEventImpl;
-#else
-                    PointerEventHandler eventHandler = OnEventImpl;
-#endif
-                    eventInfo.RemoveEventHandler(associatedObject, eventHandler);
-                    eventInfo.AddEventHandler(associatedObject, eventHandler);
-                }
-
-            }
-        }
-
-        private void OnEventImpl(object sender, object eventArgs)
-        {
-            OnEvent(eventArgs);
-        }
-
-        protected virtual void OnEvent(object eventArgs)
-        {
-            this.InvokeActions(eventArgs);
-        }
-
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-            //Note: the following line might be useless since right now, AssociatedObject is set in the same method as the one that calls OnAttached. We keep it just in case.
-            if (AssociatedObject != null) //Making sure the source of the event is set. Note: The source can apparently be something other than the AssociatedObject but we ignore this case for now.
-            {
-                string eventName = EventName;
-                if (!string.IsNullOrWhiteSpace(eventName))
-                {
-                    this.RegisterEvent(AssociatedObject, eventName);
-                }
-            }
-        }
-#endregion
     }
 }

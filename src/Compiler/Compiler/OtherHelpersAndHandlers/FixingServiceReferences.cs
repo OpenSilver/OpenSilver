@@ -39,63 +39,103 @@ namespace DotNetForHtml5.Compiler
 
         // this struct is used to find a given substring in a text when reading it character by character 
         // (in this class, we use it to find the substring "base.Channel" efficiently and the interface type in System.ServiceModel.ClientBase<...>).
-        internal class SubStringFinderCharByChar
+        internal interface ISubstringFinderCharByChar
         {
-            private string SubString { get; set; }
+            bool IsMatch { get; }
 
-            private int CurrentIndex { get; set; }
+            void Reset();
 
-            internal bool IsMatch { get; private set; }
+            void MoveNext(char c);
 
-            private int _matchStartIndex;
-            internal int MatchStartIndex
+            string Match { get; }
+        }
+
+        internal class SubstringFinderCharByChar : ISubstringFinderCharByChar
+        {
+            private readonly string _subString;
+            private int _position;
+            private bool _isMatch;
+
+            public SubstringFinderCharByChar(string subString)
             {
-                get
+                _subString = subString;
+                _position = 0;
+                _isMatch = false;
+            }
+
+            public bool IsMatch => _isMatch;
+
+            public string Match => _isMatch ? _subString : throw new InvalidOperationException();
+
+            public void Reset()
+            {
+                _position = 0;
+                _isMatch = false;
+            }
+
+            public void MoveNext(char c)
+            {
+                if (_isMatch)
                 {
-                    if (!IsMatch)
+                    return;
+                }
+
+                if (_subString[_position] == c)
+                {
+                    if (++_position == _subString.Length)
                     {
-                        return -1;
+                        _isMatch = true;
                     }
-                    else
-                    {
-                        return _matchStartIndex;
-                    }
+                }
+                else
+                {
+                    Reset();
+                }
+            }
+        }
+
+        internal class ArrayOfSubstringFinderCharByChar : ISubstringFinderCharByChar
+        {
+            private readonly ISubstringFinderCharByChar[] _subStringFinders;
+            private int _matchIndex = -1;
+            public ArrayOfSubstringFinderCharByChar(IList<string> subStrings)
+            {
+                _subStringFinders = new ISubstringFinderCharByChar[subStrings.Count];
+                for (int i = 0; i < subStrings.Count; i++)
+                {
+                    _subStringFinders[i] = new SubstringFinderCharByChar(subStrings[i]);
                 }
             }
 
-            internal SubStringFinderCharByChar(string subString)
-            {
-                _matchStartIndex = -1;
-                SubString = subString;
-                CurrentIndex = 0;
-                IsMatch = false;
-            }
+            public bool IsMatch => _matchIndex > -1;
 
-            internal void Reset()
-            {
-                CurrentIndex = 0;
-                IsMatch = false;
-                _matchStartIndex = -1;
-            }
+            public string Match => IsMatch ? _subStringFinders[_matchIndex].Match : throw new InvalidOperationException();
 
-            internal void CheckNextChar(char currentChar, int charIndexInBaseString)
+            public void Reset()
             {
-                if (!IsMatch)
+                for (int i = 0; i < _subStringFinders.Length; i++)
                 {
-                    if (SubString[CurrentIndex] == currentChar)
+                    _subStringFinders[i].Reset();
+                }
+
+                _matchIndex = -1;
+            }
+
+            public void MoveNext(char c)
+            {
+                if (IsMatch)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < _subStringFinders.Length; i++)
+                {
+                    ISubstringFinderCharByChar finder = _subStringFinders[i];
+                    finder.MoveNext(c);
+                    if (finder.IsMatch)
                     {
-                        if (CurrentIndex == 0)
-                        {
-                            _matchStartIndex = charIndexInBaseString;
-                        }
-                        if (++CurrentIndex == SubString.Length)
-                        {
-                            IsMatch = true;
-                        }
-                    }
-                    else
-                    {
-                        Reset();
+                        _matchIndex = i;
+                        break;
                     }
                 }
             }
@@ -121,6 +161,9 @@ namespace DotNetForHtml5.Compiler
             }
         }
 
+        private static readonly string[] SupportedClientBaseTypes = new string[2] { "System.ServiceModel.ClientBase", "System.ServiceModel.DuplexClientBase" };
+        private const string CSHTML5_ClientBaseType = "System.ServiceModel.CSHTML5_ClientBase";
+        
         internal static string Fix(string inputText, string clientBaseForcedToken, string clientBaseForcedInterfaceName, string endpointCode, string soapVersion, out bool wasAnythingFixed)
         {
             soapVersion = string.IsNullOrEmpty(soapVersion) ? "1.1" : soapVersion;
@@ -139,8 +182,12 @@ namespace DotNetForHtml5.Compiler
             int numberOfOpenedSquaredBrackets = 0;
             int previousNumberOfOpenedSquaredBrackets = 0;
 
-            // used to find the interface in "System.ServiceModel.ClientBase<...>", so we don't need to it every time we call FixBlock().
-            SubStringFinderCharByChar clientBaseInterfaceFinder = new SubStringFinderCharByChar("System.ServiceModel.ClientBase<");
+            // used to find the interface in "System.ServiceModel.ClientBase<...>" or
+            // "System.ServiceModel.DuplexClientBase<...>" so we don't need to it every
+            // time we call FixBlock().
+            ISubstringFinderCharByChar clientBaseInterfaceFinder = new ArrayOfSubstringFinderCharByChar(
+                SupportedClientBaseTypes.Select(s => $"{s}<").ToArray());
+
             bool isClientBaseInterfaceFound = false;
             string clientBaseInterfaceName = "";
 
@@ -214,7 +261,7 @@ namespace DotNetForHtml5.Compiler
                             }
                             else
                             {
-                                clientBaseInterfaceFinder.CheckNextChar(c, charIndex);
+                                clientBaseInterfaceFinder.MoveNext(c);
                             }
                         }
                         // this means we just entered in a type
@@ -298,7 +345,10 @@ namespace DotNetForHtml5.Compiler
             ExtractServiceKnownTypeAttributesToInterfaceItself(ref finalText);
 
             //Replace the inheritance to ClientBase with an inheritance to CSHTML5_ClientBase
-            finalText = finalText.Replace("System.ServiceModel.ClientBase<", "System.ServiceModel.CSHTML5_ClientBase<");
+            for (int i = 0; i < SupportedClientBaseTypes.Length; i++)
+            {
+                finalText = finalText.Replace($"{SupportedClientBaseTypes[i]}<", $"{CSHTML5_ClientBaseType}<");
+            }
 
             finalText = FixBasicHttpBinding(finalText);
 

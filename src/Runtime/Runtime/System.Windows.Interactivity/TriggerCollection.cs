@@ -39,15 +39,25 @@ namespace System.Windows.Interactivity
         internal TriggerCollection() { }
 
         /// <summary>
-        /// Called immediately after the collection is attached to an AssociatedObject.
-        /// 
-        /// </summary>
-        protected override void OnAttached() { }
+		/// Called immediately after the collection is attached to an AssociatedObject.
+		/// </summary>
+		protected override void OnAttached()
+        {
+            foreach (TriggerBase trigger in this)
+            {
+                trigger.Attach(this.AssociatedObject);
+            }
+        }
 
         /// <summary>
-        /// Called when the collection is being detached from its AssociatedObject, but before it has actually occurred.
-        /// 
-        /// </summary>
-        protected override void OnDetaching() { }
+		/// Called when the collection is being detached from its AssociatedObject, but before it has actually occurred.
+		/// </summary>
+		protected override void OnDetaching()
+        {
+            foreach (TriggerBase trigger in this)
+            {
+                trigger.Detach();
+            }
+        }
     }
 }

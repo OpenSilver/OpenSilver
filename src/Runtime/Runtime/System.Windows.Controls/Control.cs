@@ -18,17 +18,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Controls.Primitives;
 
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Data;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Text;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
 using Windows.Foundation;
+using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
 #if MIGRATION
@@ -599,14 +600,12 @@ namespace Windows.UI.Xaml.Controls
 
         private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
-        internal virtual bool INTERNAL_GetFocusInBrowser
-        {
-            get { return false; }
-        }
-
+        internal virtual bool INTERNAL_GetFocusInBrowser => false;
         internal virtual void UpdateTabIndex(bool isTabStop, int tabIndex)
         {
-            var domElementConcernedByFocus = this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus ?? this.INTERNAL_OuterDomElement;
+            var domElementConcernedByFocus = GetFocusTarget();
+            if (domElementConcernedByFocus == null)
+                return;
             if (!isTabStop || !this.IsEnabled)
             {
                 this.PreventFocusEvents();
@@ -898,12 +897,20 @@ namespace Windows.UI.Xaml.Controls
         {
             _isFocused = false;
             UpdateVisualStatesForFocus();
+
+            if (!this._isInvalid)
+                return;
+            this.UpdateValidationState();
         }
 
         void Control_GotFocus(object sender, RoutedEventArgs e)
         {
             _isFocused = true;
             UpdateVisualStatesForFocus();
+
+            if (!this._isInvalid)
+                return;
+            this.UpdateValidationState();
         }
 
         bool _isPointerOver = false;
@@ -1025,6 +1032,36 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         internal void GoToState(string state)
         {
             VisualStateManager.GoToState(this, state, true);
+        }
+
+        private bool _isInvalid;
+
+        internal void ShowValidationError()
+        {
+            this._isInvalid = true;
+            this.UpdateValidationState();
+        }
+
+        internal void HideValidationError()
+        {
+            this._isInvalid = false;
+            this.UpdateValidationState();
+        }
+
+        internal void UpdateValidationState()
+        {
+            if (!this._isInvalid)
+                VisualStateManager.GoToState(this, "Valid", true);
+            else
+            {
+                VisualStateManager.GoToState(this, _isFocused ? "InvalidFocused" : "InvalidUnfocused", true);
+
+                Popup popup = this.INTERNAL_ValidationErrorPopup;
+                if (popup != null)
+                {
+                    popup.IsOpen = _isFocused;
+                }
+            }
         }
 
         [OpenSilver.NotImplemented]

@@ -65,8 +65,14 @@ namespace OpenSilver.Analyzers
         private void OnMemberAccessExpression(SyntaxNodeAnalysisContext contextAnalysis, INamedTypeSymbol notImplSymbol)
         {
             var memberAccess = contextAnalysis.Node as MemberAccessExpressionSyntax;
-            
+
             var member = contextAnalysis.SemanticModel.GetSymbolInfo(memberAccess);
+
+            if (HasNotImplementedAttribute(notImplSymbol, member.Symbol.ContainingAssembly))
+            {
+                ReportDiagnostic(contextAnalysis, memberAccess.Name.GetLocation(), member.Symbol.ContainingAssembly.ToDisplayString());
+                return;
+            }
 
             ISymbol symbol;
             bool isMemberNotImplemented;
@@ -102,12 +108,7 @@ namespace OpenSilver.Analyzers
 
             if (isMemberNotImplemented)
             {
-                var diagnostic = Diagnostic.Create(
-                    OS0001,
-                    memberAccess.Name.GetLocation(),
-                    symbol.ToDisplayString()
-                );
-                contextAnalysis.ReportDiagnostic(diagnostic);
+                ReportDiagnostic(contextAnalysis, memberAccess.Name.GetLocation(), symbol.ToDisplayString());
             }
         }
 
@@ -122,19 +123,22 @@ namespace OpenSilver.Analyzers
 
                 ISymbol symbol;
 
-                if (HasNotImplementedAttribute(notImplSymbol, 
-                    contextAnalysis.SemanticModel.GetSymbolInfo(objectCreation).Symbol as IMethodSymbol, 
-                    out symbol) 
-                    || HasNotImplementedAttribute(notImplSymbol,
-                    contextAnalysis.SemanticModel.GetSymbolInfo(objectCreation.Type).Symbol as INamedTypeSymbol,
-                    out symbol))
+                IMethodSymbol ctorSymbol = contextAnalysis.SemanticModel.GetSymbolInfo(objectCreation).Symbol as IMethodSymbol;
+
+                if (HasNotImplementedAttribute(notImplSymbol, ctorSymbol, out symbol))
                 {
-                    var diagnostic = Diagnostic.Create(
-                        OS0001,
-                        objectCreation.Type.GetLocation(),
-                        symbol.ToDisplayString()
-                    );
-                    contextAnalysis.ReportDiagnostic(diagnostic);
+                    ReportDiagnostic(contextAnalysis, objectCreation.Type.GetLocation(), symbol.ToDisplayString());
+                }
+                else if (contextAnalysis.SemanticModel.GetSymbolInfo(objectCreation.Type).Symbol is INamedTypeSymbol typeSymbol)
+                {
+                    if (HasNotImplementedAttribute(notImplSymbol, typeSymbol.ContainingAssembly))
+                    {
+                        ReportDiagnostic(contextAnalysis, objectCreation.Type.GetLocation(), typeSymbol.ContainingAssembly.ToDisplayString());
+                    }
+                    else if (HasNotImplementedAttribute(notImplSymbol, typeSymbol, out symbol))
+                    {
+                        ReportDiagnostic(contextAnalysis, objectCreation.Type.GetLocation(), symbol.ToDisplayString());
+                    }
                 }
             }
         }
@@ -151,12 +155,7 @@ namespace OpenSilver.Analyzers
                 // will never be an opensilver symbol.
                 if (HasNotImplementedAttribute(notImplSymbol, symbol?.OverriddenMethod, out ISymbol notImplMethod))
                 {
-                    var diagnostic = Diagnostic.Create(
-                        OS0001,
-                        methodDeclaration.Identifier.GetLocation(),
-                        notImplMethod.ToDisplayString()
-                    );
-                    contextAnalysis.ReportDiagnostic(diagnostic);
+                    ReportDiagnostic(contextAnalysis, methodDeclaration.Identifier.GetLocation(), notImplMethod.ToDisplayString());
                 }
             }
         }
@@ -173,12 +172,7 @@ namespace OpenSilver.Analyzers
                 // will never be an opensilver symbol.
                 if (HasNotImplementedAttribute(notImplSymbol, symbol?.OverriddenProperty, out ISymbol notImplProperty))
                 {
-                    var diagnostic = Diagnostic.Create(
-                        OS0001,
-                        propertyDeclaration.Identifier.GetLocation(),
-                        notImplProperty.ToDisplayString()
-                    );
-                    contextAnalysis.ReportDiagnostic(diagnostic);
+                    ReportDiagnostic(contextAnalysis, propertyDeclaration.Identifier.GetLocation(), notImplProperty.ToDisplayString());
                 }
             }
         }
@@ -195,12 +189,7 @@ namespace OpenSilver.Analyzers
                 // will never be an opensilver symbol.
                 if (HasNotImplementedAttribute(notImplSymbol, symbol?.OverriddenEvent, out ISymbol notImplEvent))
                 {
-                    var diagnostic = Diagnostic.Create(
-                        OS0001,
-                        eventDeclaration.Identifier.GetLocation(),
-                        notImplEvent.ToDisplayString()
-                    );
-                    contextAnalysis.ReportDiagnostic(diagnostic);
+                    ReportDiagnostic(contextAnalysis, eventDeclaration.Identifier.GetLocation(), notImplEvent.ToDisplayString());
                 }
             }
         }
@@ -215,14 +204,14 @@ namespace OpenSilver.Analyzers
 
                 if (HasNotImplementedAttribute(notImplSymbol, symbol.Symbol as INamedTypeSymbol, out ISymbol notImplType))
                 {
-                    var diagnostic = Diagnostic.Create(
-                        OS0001,
-                        baseType.Type.GetLocation(),
-                        notImplType.ToDisplayString()
-                    );
-                    contextAnalysis.ReportDiagnostic(diagnostic);
+                    ReportDiagnostic(contextAnalysis, baseType.Type.GetLocation(), notImplType.ToDisplayString());
                 }
             }
+        }
+
+        private static void ReportDiagnostic(SyntaxNodeAnalysisContext context, Location location, string messageArg)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(OS0001, location, messageArg));
         }
 
         /// <summary>
@@ -243,8 +232,8 @@ namespace OpenSilver.Analyzers
         /// <c>true</c> if the type or any of its base types is not implemented
         /// in OpenSilver, <c>false</c> otherwise.
         /// </returns>
-        private static bool HasNotImplementedAttribute(INamedTypeSymbol notImplSymbol, 
-            INamedTypeSymbol namedTypeSymbol, 
+        private static bool HasNotImplementedAttribute(INamedTypeSymbol notImplSymbol,
+            INamedTypeSymbol namedTypeSymbol,
             out ISymbol notImplType)
         {
             for (var type = namedTypeSymbol; type != null; type = type.BaseType)
@@ -329,12 +318,12 @@ namespace OpenSilver.Analyzers
 
         private static bool HasNotImplementedAttribute(INamedTypeSymbol notImplSymbol, ISymbol symbol)
         {
-            if (symbol.GetAttributes().FirstOrDefault(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, notImplSymbol)) != null)
-            {
-                return true;
-            }
-
-            return false;
+            return symbol != null 
+                && symbol
+                .GetAttributes()
+                .FirstOrDefault(
+                    a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, notImplSymbol)
+                ) != null;
         }
 
         private static bool IsOpenSilverSymbol(ISymbol member)
@@ -347,7 +336,7 @@ namespace OpenSilver.Analyzers
             return (name.StartsWith("OpenSilver", StringComparison.Ordinal) ||
                     (name.Equals("TestProject", StringComparison.Ordinal) &&
                      (member?.ContainingNamespace?.Name ?? "").Equals("OpenSilver", StringComparison.Ordinal)));
-            
+
         }
     }
 }

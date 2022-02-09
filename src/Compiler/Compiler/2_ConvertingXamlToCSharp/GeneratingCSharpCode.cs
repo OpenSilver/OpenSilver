@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using OpenSilver.Internal;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -768,8 +769,8 @@ else
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
                     }
-                    #endregion
-                    #region CASE: the element is an Object
+#endregion
+#region CASE: the element is an Object
                     else
                     {
                         //-----------------------------
@@ -884,7 +885,7 @@ else
                                             "var {0} = (({1})new {2}()).CreateComponent();",
                                             elementUniqueNameOrThisKeyword,
                                             $"{IXamlComponentFactoryClass}<{namespaceSystemWindows}.ResourceDictionary>",
-                                            XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri)
+                                            XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri)
                                         )
                                     );
                                 }
@@ -973,6 +974,13 @@ else
                                         }
                                         //todo: throw an exception when both "x:Name" and "Name" are specified in the XAML.
 
+                                    }
+                                    else if (IsEventTriggerRoutedEventProperty(element.Name, attributeLocalName))
+                                    {
+                                        // TODO Check that 'attributeLocalName' is effectively the LoadedEvent routed event.
+                                        // Silverlight only allows the FrameworkElement.LoadedEvent as value for the EventTrigger.RoutedEvent
+                                        // property, so for now we assume the xaml is always valid.
+                                        stringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent = {namespaceSystemWindows}.FrameworkElement.LoadedEvent;");
                                     }
                                     else if (string.IsNullOrEmpty(attribute.Name.NamespaceName))
                                     {
@@ -1226,30 +1234,18 @@ else
                                             //              getVisualStateProperty65675669834683448390));
                                             //      Storyboard.SetTarget(colorAnimation7637478638468367843, canvas67567345673874893);
 
-                                            string findAName = string.Format(@"
-{1}.Storyboard.SetTargetProperty({2},
-    new {0}.PropertyPath(
-        ""{6}"",
-        ""{5}"",
-        access{3},
-        set{3},
-        setAnimation{3},                                     
-        setLocal{3},
-        get{3}));
-{1}.Storyboard.SetTarget({2}, {4});
-", 
-namespaceSystemWindows, 
-namespaceSystemWindowsMediaAnimation, 
-element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value, 
-accessorsUniqueNamePart, 
-targetElementUniqueName != null ? targetElementUniqueName : "null", 
-dependencyPropertyName, 
-dependencyPropertyPath);
-
-                                            // 4) put all the code generated above in the Dictionary of the code to add to the end of the storyboard :
-                                            List<string> storyboardsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToStoryboardsAdditionalCode);
-                                            //storyboardsAdditionalCode.Add(codeForStoryboardAccessToProperty);
-                                            storyboardsAdditionalCode.Add(findAName);
+                                            string timeline = element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
+                                            stringBuilder.AppendLine($@"
+{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTargetProperty({timeline},
+    new {namespaceSystemWindows}.PropertyPath(
+        ""{dependencyPropertyPath}"",
+        ""{dependencyPropertyName}"",
+        access{accessorsUniqueNamePart},
+        set{accessorsUniqueNamePart},
+        setAnimation{accessorsUniqueNamePart},                                     
+        setLocal{accessorsUniqueNamePart},
+        get{accessorsUniqueNamePart}));
+{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTarget({timeline}, {targetElementUniqueName ?? "null"});");
                                         }
                                     }
                                 }
@@ -1289,7 +1285,7 @@ dependencyPropertyPath);
                         var resultingForTheElementAndAllItsChildren = stringBuilder.ToString();
                         codeStack.Push(resultingForTheElementAndAllItsChildren);
                     }
-                    #endregion
+#endregion
                 }
                 catch (XamlParseException xamlParseException)
                 {
@@ -1379,9 +1375,9 @@ dependencyPropertyPath);
                                                            assemblyNameWithoutExtension,
                                                            listOfAllTheTypesUsedInThisXamlFile,
                                                            hasCodeBehind,
-#if BRIDGE                                                 
+#if BRIDGE
                                                            addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
-#else                                                      
+#else
                                                            addApplicationEntryPoint: false
 #endif
 );
@@ -2251,8 +2247,7 @@ public static void Main()
                 fileNameWithPathRelativeToProjectRoot : 
                 "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot;
             
-            string classToInstantiateName = 
-                XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
+            string classToInstantiateName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
 
             string methodsMergedCode = string.Join(Environment.NewLine + Environment.NewLine, methods);
             
@@ -2749,6 +2744,47 @@ namespace {namespaceStringIfAny}
             );
         }
 
+        private static bool IsEventTriggerRoutedEventProperty(XName xName, string propertyName)
+        {
+            if (xName.LocalName != "EventTrigger" || propertyName != "RoutedEvent")
+            {
+                return false;
+            }
+
+            if (xName.NamespaceName.StartsWith("clr-namespace:"))
+            {
+                GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(xName.NamespaceName, out string ns, out string assembly);
+#if MIGRATION
+                return ns == "System.Windows" && (assembly == "System.Windows" || assembly == GetCurrentCoreAssemblyName());
+#else
+                return ns == "Windows.UI.Xaml" && assembly == GetCurrentCoreAssemblyName();
+#endif
+            }
+
+            return xName.Namespace == DefaultXamlNamespace;
+        }
+
+        private static string GetCurrentCoreAssemblyName()
+        {
+#if MIGRATION
+
+#if CSHTML5BLAZOR
+            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
+#elif BRIDGE
+            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
+#endif
+
+#else
+
+#if CSHTML5BLAZOR
+            return Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
+#elif BRIDGE
+            return Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE;
+#endif
+
+#endif
+        }
+
         private static bool IsReservedAttribute(string attributeName)
         {
             if (attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
@@ -2804,8 +2840,7 @@ namespace {namespaceStringIfAny}
                     fileNameWithPathRelativeToProjectRoot :
                     "/" + assemblyName + ";component/" + fileNameWithPathRelativeToProjectRoot;
 
-            string factoryName =
-                XamlFilesWithoutCodeBehindHelper.GenerateClassFactoryNameFromAbsoluteUri_ForRuntimeAccess(absoluteSourceUri);
+            string factoryName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
 
             string finalCode = $@"
 //------------------------------------------------------------------------------
@@ -2868,12 +2903,12 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
     {{
         var {rootElementName} = new {typeFullName}();
     
-    #pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
+#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
         if ({rootElementName} is {uiElementFullName})
         {{
             (({uiElementFullName})(object){rootElementName}).XamlSourcePath = @""{assemblyNameWithoutExtension}\{fileNameWithPathRelativeToProjectRoot}"";
         }}
-    #pragma warning restore 0184
+#pragma warning restore 0184
     
         {body}
     

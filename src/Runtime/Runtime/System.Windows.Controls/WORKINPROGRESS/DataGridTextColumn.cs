@@ -18,6 +18,7 @@ using System.ComponentModel;
 #if MIGRATION
 using System.Windows.Media;
 #else
+using Windows.UI.Text;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -104,6 +105,29 @@ namespace Windows.UI.Xaml.Controls
                 {
                     this._foreground = value;
                     //NotifyPropertyChanged(DATAGRIDTEXTCOLUMN_foregroundName);
+                }
+            }
+        }
+
+        private FontWeight? _fontWeight;
+
+        /// <summary>
+        /// Gets or sets the font weight of the contents of cells in the column.
+        /// </summary>
+        /// <returns>The font weight of the contents of cells in the column. The default is <see cref="P:System.Windows.FontWeights.Normal" />.</returns>
+        [OpenSilver.NotImplemented]
+        public FontWeight FontWeight
+        {
+            get
+            {
+                return _fontWeight ?? FontWeights.Normal;
+            }
+            set
+            {
+                if (_fontWeight != value)
+                {
+                    _fontWeight = value;
+                    //NotifyPropertyChanged("FontWeight");
                 }
             }
         }
