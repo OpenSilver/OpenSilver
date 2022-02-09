@@ -11,7 +11,7 @@
 		<DefineConstants>$(DefineConstants);TRACE</DefineConstants>
 		<DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
 		<NoWarn>$(NoWarn);CS1591</NoWarn>
-		<Optimize>true</Optimize>
+		<Optimize>false</Optimize>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">

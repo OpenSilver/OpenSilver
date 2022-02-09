@@ -3,6 +3,11 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+		<Optimize>false</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">

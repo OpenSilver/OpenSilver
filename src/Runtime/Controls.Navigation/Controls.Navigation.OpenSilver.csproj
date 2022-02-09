@@ -12,7 +12,7 @@
 		<IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<OpenSilverVersion>1.0.0</OpenSilverVersion>
-		<Optimize>true</Optimize>
+		<Optimize>false</Optimize>
 		<DefineSilverlight>true</DefineSilverlight>
 	</PropertyGroup>
 
