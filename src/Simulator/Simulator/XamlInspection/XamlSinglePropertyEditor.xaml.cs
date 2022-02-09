@@ -54,8 +54,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             {
                 if (value)
                 {
-                    ButtonOK.Content = "Re-Eval";
-                    ButtonOK.Visibility = Visibility.Visible;
+                    ButtonOK.Visibility = Visibility.Collapsed;
 
                 }
                 else
@@ -82,7 +81,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             Refresh();
         }
 
-        void Refresh()
+        public void Refresh()
         {
             try
             {
@@ -100,7 +99,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 }
                 else
                 {
-                    ButtonOK.Visibility = Visibility.Visible;
                     PropertyValueTextBox.IsReadOnly = IsReadOnly;
                 }
 

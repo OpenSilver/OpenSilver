@@ -83,5 +83,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             else
                 this.Width = 0;
         }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            var readonlyPropertyElements = ReadOnlyPanel.Children.Cast<XamlSinglePropertyEditor>();
+            foreach (var element in readonlyPropertyElements)
+            {
+                element.Refresh();
+            }
+        }
     }
 }
