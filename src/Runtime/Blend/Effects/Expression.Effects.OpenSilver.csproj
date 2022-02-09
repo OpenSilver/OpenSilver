@@ -1,20 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>OpenSilver.Expression.Effects</AssemblyName>
-    <RootNamespace>Microsoft.Expression.Media.Effects</RootNamespace>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Configurations>SL;UWP</Configurations>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-    <DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>OpenSilver.Expression.Effects</AssemblyName>
+		<RootNamespace>Microsoft.Expression.Media.Effects</RootNamespace>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Configurations>SL;UWP</Configurations>
+		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+		<DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+		<DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
+		<Optimize>true</Optimize>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Interactions\Expression.Interactions.OpenSilver.csproj" />
-    <ProjectReference Include="..\..\Runtime\Runtime.OpenSilver.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Interactions\Expression.Interactions.OpenSilver.csproj" />
+		<ProjectReference Include="..\..\Runtime\Runtime.OpenSilver.csproj" />
+	</ItemGroup>
 
 </Project>
