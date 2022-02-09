@@ -91,6 +91,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             {
                 element.Refresh();
             }
+
+            var writablePropertyElements = WritablesPanel.Children.Cast<XamlSinglePropertyEditor>();
+            foreach (var element in readonlyPropertyElements)
+            {
+                element.Refresh();
+            }
         }
     }
 }
