@@ -64,5 +64,53 @@ namespace Windows.UI.Xaml.Controls.Tests
                 .Should()
                 .Be(Visibility.Collapsed);
         }
+
+        [TestMethod]
+        public void AutoCompleteBox_DropDownOpening_CallsDelegates()
+        {
+            AutoCompleteBox autoCompleteBox = new AutoCompleteBox();
+            
+            int dropDownOpeningCallCount = 0;
+            autoCompleteBox.DropDownOpening += (sender, e) => dropDownOpeningCallCount++;
+            TestSetup.AttachVisualChild(autoCompleteBox);
+
+            autoCompleteBox.IsDropDownOpen = true;
+
+            dropDownOpeningCallCount.Should()
+                .Be(1, "should be called once as dropdown was opened");
+        }
+
+        [TestMethod]
+        public void AutoCompleteBox_DropDownClosing_CallsDelegates()
+        {
+            AutoCompleteBox autoCompleteBox = new AutoCompleteBox();
+            // IsDropDownOpen needs to initially be different than the value being set
+            autoCompleteBox.IsDropDownOpen = true;
+
+            int dropDownClosingCallCount = 0;
+            autoCompleteBox.DropDownClosing += (sender, e) => dropDownClosingCallCount++;
+            TestSetup.AttachVisualChild(autoCompleteBox);
+
+            autoCompleteBox.IsDropDownOpen = false;
+
+            dropDownClosingCallCount.Should()
+                .Be(1, "should be called once as dropdown was closed");
+        }
+
+        [TestMethod]
+        public void AutoCompleteBox_DropDownOpening_DoesNotCallsDelegatesWithNoValueChange()
+        {
+            AutoCompleteBox autoCompleteBox = new AutoCompleteBox();
+            autoCompleteBox.IsDropDownOpen = true;
+
+            int dropDownOpeningCallCount = 0;
+            autoCompleteBox.DropDownOpening += (sender, e) => dropDownOpeningCallCount++;
+            TestSetup.AttachVisualChild(autoCompleteBox);
+
+            autoCompleteBox.IsDropDownOpen = true;
+
+            dropDownOpeningCallCount.Should()
+                .Be(0, "should not be called since dropdown was already open");
+        }
     }
 }

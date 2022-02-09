@@ -119,25 +119,6 @@ namespace Windows.UI.Xaml.Controls
             set => SetValue(TextFilterProperty, value);
         }
 
-        /// <summary>Raises the <see cref="E:System.Windows.Controls.AutoCompleteBox.DropDownClosing" /> event.</summary>
-        /// <param name="e">A <see cref="T:System.Windows.Controls.RoutedPropertyChangingEventArgs`1" /> that contains the event data.</param>
-        [OpenSilver.NotImplemented]
-        protected virtual void OnDropDownClosing(RoutedPropertyChangingEventArgs<bool> e)
-        {
-        }
-
-        /// <summary>
-        /// Raises the System.Windows.Controls.AutoCompleteBox.DropDownOpening event.
-        /// </summary>
-        /// <param name="e">
-        /// A <see cref="RoutedPropertyChangingEventArgs{T}"/> that contains
-        /// the event data.
-        /// </param>
-        [OpenSilver.NotImplemented]
-        protected virtual void OnDropDownOpening(RoutedPropertyChangingEventArgs<bool> e)
-        {
-        }
-
         //
         // Summary:
         //     Raises the System.Windows.Controls.AutoCompleteBox.Populated event
