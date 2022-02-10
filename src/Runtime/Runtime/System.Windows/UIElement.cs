@@ -1376,7 +1376,7 @@ document.ondblclick = null;
             }
             //#endif
 
-            return new TranslateTransform() { X = offsetLeft, Y = offsetTop };
+            return new MatrixTransform(new Matrix(1, 0, 0, 1, offsetLeft, offsetTop));
         }
 
         //internal virtual void INTERNAL_Render()
