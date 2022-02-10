@@ -93,7 +93,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             }
 
             var writablePropertyElements = WritablesPanel.Children.Cast<XamlSinglePropertyEditor>();
-            foreach (var element in readonlyPropertyElements)
+            foreach (var element in writablePropertyElements)
             {
                 element.Refresh();
             }
