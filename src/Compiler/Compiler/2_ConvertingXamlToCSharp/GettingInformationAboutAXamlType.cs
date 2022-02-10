@@ -268,6 +268,9 @@ namespace DotNetForHtml5.Compiler
                     case "System.Windows.Controls.Navigation":
                         assemblyName = "OpenSilver.Controls.Navigation";
                         return;
+                    case "System.Windows.Controls.Input":
+                        assemblyName = "OpenSilver.Controls.Input";
+                        return;
                     case "System.Windows.Interactivity":
                         assemblyName = "OpenSilver.Interactivity";
                         return;
@@ -289,6 +292,9 @@ namespace DotNetForHtml5.Compiler
                 {
                     case "System.Windows.Controls.Data.Input":
                         assemblyName = "CSHTML5.Controls.Data.Input";
+                        return;
+                    case "System.Windows.Controls.Input":
+                        assemblyName = "CSHTML5.Controls.Input";
                         return;
                     default:
                         if (assemblyName == "System" || assemblyName.StartsWith("System."))

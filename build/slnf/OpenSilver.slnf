@@ -10,6 +10,7 @@
       "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
       "Runtime\\DataForm.Toolkit\\DataForm.Toolkit.OpenSilver.csproj",
       "Runtime\\Controls.Data.Input\\Controls.Data.Input.OpenSilver.csproj",
+	  "Runtime\\Controls.Input\\Controls.Input.OpenSilver.csproj",
 	  "Runtime\\Controls.Navigation\\Controls.Navigation.OpenSilver.csproj",
       "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
 	  "Runtime\\Blend\\Interactivity\\Interactivity.OpenSilver.csproj",

@@ -34,6 +34,8 @@
     <file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" />
     <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.dll" />
     <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" />
+	<file src="../../src/Runtime/Controls.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Input.dll" target="lib/netstandard2.0/OpenSilver.Controls.Input.dll" />
+    <file src="../../src/Runtime/Controls.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Input.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Input.pdb" />
     <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.dll" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.dll" />
     <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.pdb" />
     <file src="../../src/Runtime/Blend/Interactivity/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Interactivity.dll" target="lib/netstandard2.0/OpenSilver.Interactivity.dll" />

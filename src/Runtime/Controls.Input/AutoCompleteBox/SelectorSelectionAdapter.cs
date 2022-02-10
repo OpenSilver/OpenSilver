@@ -1,28 +1,24 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System.Collections;
+using System.Linq;
 using System.Windows.Input;
 
 #if MIGRATION
+using System.Windows;
 using System.Windows.Automation.Peers;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 #else
+using Windows.System;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
-using Windows.System;
-using Key = Windows.System.VirtualKey;
 #endif
 
 #if MIGRATION
@@ -185,9 +181,16 @@ namespace Windows.UI.Xaml.Controls
         /// If the control contains a ScrollViewer, this will reset the viewer 
         /// to be scrolled to the top.
         /// </summary>
-        [OpenSilver.NotImplemented]
         private void ResetScrollViewer()
         {
+            if (SelectorControl != null)
+            {
+                ScrollViewer sv = SelectorControl.GetLogicalChildrenBreadthFirst().OfType<ScrollViewer>().FirstOrDefault();
+                if (sv != null)
+                {
+                    sv.ScrollToTop();
+                }
+            }
         }
 
         /// <summary>
@@ -278,17 +281,29 @@ namespace Windows.UI.Xaml.Controls
         {
             switch (e.Key)
             {
+#if MIGRATION
                 case Key.Enter:
+#else
+                case VirtualKey.Enter:
+#endif
                     OnCommit();
                     e.Handled = true;
                     break;
 
+#if MIGRATION
                 case Key.Up:
+#else
+                case VirtualKey.Up:
+#endif
                     SelectedIndexDecrement();
                     e.Handled = true;
                     break;
 
+#if MIGRATION
                 case Key.Down:
+#else
+                case VirtualKey.Down:
+#endif
 #if MIGRATION
                     if ((ModifierKeys.Alt & Keyboard.Modifiers) == ModifierKeys.None)
 #else
@@ -300,7 +315,11 @@ namespace Windows.UI.Xaml.Controls
                     }
                     break;
 
+#if MIGRATION
                 case Key.Escape:
+#else
+                case VirtualKey.Escape:
+#endif
                     OnCancel();
                     e.Handled = true;
                     break;

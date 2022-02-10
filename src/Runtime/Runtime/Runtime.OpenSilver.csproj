@@ -113,14 +113,11 @@
 		  <DependentUpon>Resource.resx</DependentUpon>
 		</Compile>
 		<Compile Include="System.Windows.Controls\DataPager\WeakEventListener.cs" />
-		<Compile Include="System.Windows.Controls\ISelectionAdapter.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
-		<Compile Include="System.Windows.Controls\PopulatedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
-		<Compile Include="System.Windows.Controls\SelectorSelectionAdapter.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarButton.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePickerDateValidationErrorEventArgs.cs" />
@@ -284,13 +281,11 @@
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\ExpandableContentControl.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
 		<Compile Include="System.Windows.Controls\AccordionSelectionMode.cs" />
-		<Compile Include="System.Windows.Controls\AutoCompleteSearch.cs" />
 		<Compile Include="System.Windows.Controls\DataGridEditAction.cs" />
 		<Compile Include="System.Windows.Controls\DataGridHeadersVisibility.cs" />
 		<Compile Include="System.Windows.Controls\DataGridRowDetailsVisibilityMode.cs" />
 		<Compile Include="System.Windows.Controls\ExpandDirection.cs" />
 		<Compile Include="System.Windows.Controls\IGeneratorHost.cs" />
-		<Compile Include="System.Windows.Controls\PopulatingEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\RangeObservableCollection.cs" />
 		<Compile Include="System.Windows.Controls\SelectionSequence.cs" />
 		<Compile Include="System.Windows.Controls\TileView.cs" />
@@ -298,7 +293,6 @@
 		<Compile Include="System.Windows.Controls\TimePickerPopupTemplate.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Accordion.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\AccordionItem.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\BusyIndicator.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Calendar.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -744,8 +738,6 @@
 		<Compile Include="System.Windows.Controls.Primitives\Thumb.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\ToggleButton.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\UpDownTextBox.cs" />
-		<Compile Include="System.Windows.Controls\AutoCompleteBox.cs" />
-		<Compile Include="System.Windows.Controls\AutoCompleteFilterPredicate.cs" />
 		<Compile Include="System.Windows.Controls\BooleanToVisibilityConverter.cs" />
 		<Compile Include="System.Windows.Controls\Border.cs" />
 		<Compile Include="System.Windows.Controls\Button.cs" />
@@ -1141,10 +1133,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="DefaultStyles\INTERNAL_DefaultButtonSpinnerStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>

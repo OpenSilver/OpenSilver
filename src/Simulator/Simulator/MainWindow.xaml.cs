@@ -318,6 +318,7 @@ ends with "".Browser"" in your solution.";
                 case "OpenSilver.Controls.Data.Input":
                 case "OpenSilver.Controls.Data.DataForm.Toolkit":
                 case "OpenSilver.Controls.Navigation":
+                case "OpenSilver.Controls.Input":
                 case "OpenSilver.Interactivity":
                 case "OpenSilver.Expression.Interactions":
                 case "OpenSilver.Expression.Effects":

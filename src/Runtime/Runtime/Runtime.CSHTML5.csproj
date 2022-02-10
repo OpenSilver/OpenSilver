@@ -162,7 +162,6 @@
     <Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
     <Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
     <Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
-    <Compile Include="System.Windows.Controls\PopulatedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
     <Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
     <Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
@@ -243,7 +242,6 @@
     <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\DataGridRowHeader.cs" />
     <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
     <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
-    <Compile Include="System.Windows.Controls\AutoCompleteSearch.cs" />
     <Compile Include="System.Windows.Controls\CalendarExtensions.cs" />
     <Compile Include="System.Windows.Controls\DataGridEditAction.cs" />
     <Compile Include="System.Windows.Controls\DataGridHeadersVisibility.cs" />
@@ -256,14 +254,12 @@
     <Compile Include="System.Windows.Controls\ItemsControlHelper.cs" />
     <Compile Include="System.Windows.Controls\IUpdateVisualState.cs" />
     <Compile Include="System.Windows.Controls\NumericExtensions.cs" />
-    <Compile Include="System.Windows.Controls\PopulatingEventArgs.cs" />
     <Compile Include="System.Windows.Controls\RangeObservableCollection.cs" />
     <Compile Include="System.Windows.Controls\ScrollExtensions.cs" />
     <Compile Include="System.Windows.Controls\TileView.cs" />
     <Compile Include="System.Windows.Controls\TileViewItem.cs" />
     <Compile Include="System.Windows.Controls\TreeView.cs" />
     <Compile Include="System.Windows.Controls\TreeViewItem.cs" />
-    <Compile Include="System.Windows.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\BusyIndicator.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\Calendar.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
@@ -673,8 +669,6 @@
     <Compile Include="System.Windows.Controls.Primitives\Thumb.cs" />
     <Compile Include="System.Windows.Controls.Primitives\ToggleButton.cs" />
     <Compile Include="System.Windows.Controls.Primitives\UpDownTextBox.cs" />
-    <Compile Include="System.Windows.Controls\AutoCompleteBox.cs" />
-    <Compile Include="System.Windows.Controls\AutoCompleteFilterPredicate.cs" />
     <Compile Include="System.Windows.Controls\BooleanToVisibilityConverter.cs" />
     <Compile Include="System.Windows.Controls\Border.cs" />
     <Compile Include="System.Windows.Controls\Button.cs" />
@@ -1076,10 +1070,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -393,7 +393,7 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register("Text", 
                                         typeof(string), 
                                         typeof(AutoCompleteBox),
-                                        new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextChanged));
+                                        new PropertyMetadata(string.Empty, OnTextChanged));
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

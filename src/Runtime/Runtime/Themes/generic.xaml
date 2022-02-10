@@ -3,7 +3,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultContentControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultItemsControlStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultAutoCompleteBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonSpinnerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultChildWindowStyle.xaml" />
