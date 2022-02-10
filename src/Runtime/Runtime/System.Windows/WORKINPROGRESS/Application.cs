@@ -77,7 +77,10 @@ namespace Windows.UI.Xaml
         //        }
 
         [OpenSilver.NotImplemented]
-        public bool IsRunningOutOfBrowser { get; set; }
+        public bool IsRunningOutOfBrowser
+        {
+            get { return Application.Current.Host.Settings.IsRunningOutOfBrowser; }
+        }
 
         /// <summary>Gets the current out-of-browser installation state of the application.</summary>
         /// <returns>The out-of-browser installation state of the application.</returns>
