@@ -15,6 +15,7 @@
 
 using CSHTML5.Internal;
 using System;
+using System.ComponentModel;
 using System.Net;
 
 #if MIGRATION
@@ -128,6 +129,7 @@ namespace System
         /// Gets or sets a value that indicates whether the application was launched from the out-of-browser state.
         /// Specified value can be received from <see cref="Application.IsRunningOutOfBrowser"/> property.
         /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsRunningOutOfBrowser { get; set; }
     }
 }
