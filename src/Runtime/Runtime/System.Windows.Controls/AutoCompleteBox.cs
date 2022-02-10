@@ -206,6 +206,10 @@ namespace Windows.UI.Xaml.Controls
                     // Show the Popup
                     //-----------------------------
 
+                    RoutedPropertyChangingEventArgs<bool> args = new RoutedPropertyChangingEventArgs<bool>(
+                        IsDropDownOpenProperty, (bool)e.OldValue, true, true);
+                    autoCompleteBox.OnDropDownOpening(args);
+
                     // Show the popup:
                     if (autoCompleteBox._popup != null)
                     {
@@ -247,6 +251,10 @@ namespace Windows.UI.Xaml.Controls
                     //-----------------------------
                     // Hide the Popup
                     //-----------------------------
+
+                    RoutedPropertyChangingEventArgs<bool> args = new RoutedPropertyChangingEventArgs<bool>(
+                        IsDropDownOpenProperty, (bool)e.OldValue, false, true);
+                    autoCompleteBox.OnDropDownClosing(args);
 
                     // Close the popup:
                     if (autoCompleteBox._popup != null)
@@ -812,6 +820,39 @@ namespace Windows.UI.Xaml.Controls
                 DropDownOpened(this, e);
         }
 
+        /// <summary>Raises the <see cref="E:System.Windows.Controls.AutoCompleteBox.DropDownClosing" /> event.</summary>
+        /// <param name="e">A <see cref="T:System.Windows.Controls.RoutedPropertyChangingEventArgs`1" /> that contains the event data.</param>
+#if MIGRATION
+        protected virtual void OnDropDownClosing(RoutedPropertyChangingEventArgs<bool> e)
+#else
+        protected virtual void OnDropDownClosing(RoutedEventArgs e)
+#endif
+        {
+            if (DropDownClosing != null)
+            {
+                DropDownClosing(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the System.Windows.Controls.AutoCompleteBox.DropDownOpening event.
+        /// </summary>
+        /// <param name="e">
+        /// A <see cref="RoutedPropertyChangingEventArgs{T}"/> that contains
+        /// the event data.
+        /// </param>
+#if MIGRATION
+        protected virtual void OnDropDownOpening(RoutedPropertyChangingEventArgs<bool> e)
+#else
+        protected virtual void OnDropDownOpening(RoutedEventArgs e)
+#endif
+        {
+            if (DropDownOpening != null)
+            {
+                DropDownOpening(this, e);
+            }
+        }
+
         /// <summary>
         /// Gets or sets the maximum height for a combo box drop-down.
         /// </summary>
@@ -858,11 +899,19 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Occurs when the drop-down portion of the ComboBox is closing.
         /// </summary>
-        [OpenSilver.NotImplemented]
 #if MIGRATION
         public event RoutedPropertyChangingEventHandler<bool> DropDownClosing;
 #else
         public event RoutedEventHandler DropDownClosing;
+#endif
+
+        /// <summary>
+        /// Occurs when the drop-down portion of the ComboBox is opening.
+        /// </summary>
+#if MIGRATION
+        public event RoutedPropertyChangingEventHandler<bool> DropDownOpening;
+#else
+        public event RoutedEventHandler DropDownOpening;
 #endif
 
 #endregion
