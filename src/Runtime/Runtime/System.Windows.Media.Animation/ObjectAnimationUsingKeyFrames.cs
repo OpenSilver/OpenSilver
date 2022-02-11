@@ -193,7 +193,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
             object castedValue = DynamicCast(value, _propDp.PropertyType);
 
-            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, castedValue, _parameters.IsVisualStateChange);
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, castedValue);
         }
 
         private ObjectKeyFrame GetNextKeyFrame()

@@ -1202,50 +1202,13 @@ else
                                                     }
                                                 }
                                             }
-                                            // Note: if none is found, it is not a problem, because the user can specify a target via the method Storyboard.Begin(target).
-
-                                            string accessorsUniqueNamePart = GeneratingUniqueNames.GenerateUniqueNameFromString("VisualStateProperty");
-                                            //todo:
-                                            // 1) generate the code to access the property from the target root (defined by the "TargetName" or "Target" property) and put it in a Function<DependencyObject, DependencyObject>
-                                            // 2) generate the codes to set and get the property accessed in the previous code and put it in an Action<DependencyObject, object> and a Function<DependencyObject, object> respectively.
-                                            GenerateCodeForStoryboardAccessToPropertyFromTargetRoot(namespaceName, assemblyNameIfAny, attributeValue, accessorsUniqueNamePart, resultingMethods, element, reflectionOnSeparateAppDomain, namespaceSystemWindows);
-
-                                            string[] splittedPropertyPath = attributeValue.Split('.');
-                                            string dependencyPropertyName = splittedPropertyPath[splittedPropertyPath.Length - 1];
-                                            if (dependencyPropertyName.EndsWith(")"))
-                                            {
-                                                dependencyPropertyName = dependencyPropertyName.Substring(0, dependencyPropertyName.Length - 1);
-                                            }
-                                            if (dependencyPropertyName.EndsWith("]"))
-                                            {
-                                                throw new NotSupportedException("PropertyPaths that end with brackets are not supported yet.");
-                                            }
-                                            string dependencyPropertyPath = GeneratePropertyPathFromAttributeValue(attributeValue, element, reflectionOnSeparateAppDomain);
-                                            //todo: if needed, uncomment the folling line then change the way it is accessed in the TimeLine.Apply overrides (ex: ObjectAnimationUsingKeyFrames).
-                                            //dependencyPropertyName += "Property";
-
-
-
-                                            // 3) Add this (roughly):
-                                            //      Storyboard.SetTargetProperty(colorAnimation7637478638468367843,
-                                            //          new PropertyPath(
-                                            //              accessVisualStateProperty65675669834683448390,
-                                            //              setVisualStateProperty65675669834683448390,
-                                            //              getVisualStateProperty65675669834683448390));
-                                            //      Storyboard.SetTarget(colorAnimation7637478638468367843, canvas67567345673874893);
 
                                             string timeline = element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
-                                            stringBuilder.AppendLine($@"
-{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTargetProperty({timeline},
-    new {namespaceSystemWindows}.PropertyPath(
-        ""{dependencyPropertyPath}"",
-        ""{dependencyPropertyName}"",
-        access{accessorsUniqueNamePart},
-        set{accessorsUniqueNamePart},
-        setAnimation{accessorsUniqueNamePart},                                     
-        setLocal{accessorsUniqueNamePart},
-        get{accessorsUniqueNamePart}));
-{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTarget({timeline}, {targetElementUniqueName ?? "null"});");
+                                            stringBuilder.AppendLine($"{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTargetProperty({timeline}, new {namespaceSystemWindows}.PropertyPath(\"{attributeValue}\"));");
+                                            if (targetElementUniqueName != null)
+                                            {
+                                                stringBuilder.AppendLine($"{namespaceSystemWindowsMediaAnimation}.Storyboard.SetTarget({timeline}, {targetElementUniqueName});");
+                                            }
                                         }
                                     }
                                 }

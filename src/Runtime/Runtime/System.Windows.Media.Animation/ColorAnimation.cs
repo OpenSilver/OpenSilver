@@ -205,7 +205,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 {
                     if (isLastLoop && _animationID == callBackGuid)
                     {
-                        AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                        AnimationHelpers.ApplyValue(target, propertyPath, value);
                     }
                     OnIterationCompleted(parameters);
                 }
@@ -337,20 +337,12 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                Type lastElementType = _propertyContainer.GetType();
-                PropertyInfo propertyInfo = lastElementType.GetProperty(_targetProperty.INTERNAL_DependencyPropertyName);
-
                 //todo: find out why we put the test on target and put it back? (I removed it because it kept ScaleTransform from working properly)
                 if (To != null)// && target is FrameworkElement)
                 {
-                    Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
-                    FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(_targetProperty.INTERNAL_DependencyPropertyName + "Property");
-                    // - Get the DependencyProperty
-#if MIGRATION
-                    DependencyProperty dp = (global::System.Windows.DependencyProperty)dependencyPropertyField.GetValue(null);
-#else
-                DependencyProperty dp = (global::Windows.UI.Xaml.DependencyProperty)dependencyPropertyField.GetValue(null);
-#endif
+                    DependencyProperty dp = CSHTML5.Internal.INTERNAL_TypeToStringsToDependencyProperties
+                        .GetPropertyInTypeOrItsBaseTypes(_propertyContainer.GetType(), _targetProperty.SVI[_targetProperty.SVI.Length - 1].propertyName);
+
                     // - Get the propertyMetadata from the property
                     PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
                     // - Get the cssPropertyName from the PropertyMetadata

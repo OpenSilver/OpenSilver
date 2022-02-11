@@ -86,16 +86,9 @@ $0.complete = $4;
                                                      domElement, jsFromToValues, options, visualStateGroupName);
         }
 
-        internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value, bool isVisualStateChange)
+        internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value)
         {
-            if (isVisualStateChange)
-            {
-                propertyPath.INTERNAL_PropertySetVisualState(target, value);
-            }
-            else
-            {
-                propertyPath.INTERNAL_PropertySetAnimationValue(target, value);
-            }
+            propertyPath.INTERNAL_PropertySetAnimationValue(target, value);
         }
 
         //Note: this method is needed because JSIL doesn't know that a nullable whose value is null is equal to null. (Color? v = null; if(v == null) ...)

@@ -154,7 +154,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 {
                     if (isLastLoop && _animationID == callBackGuid)
                     {
-                        AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                        AnimationHelpers.ApplyValue(target, propertyPath, value);
                     }
                     OnIterationCompleted(parameters);
                 }

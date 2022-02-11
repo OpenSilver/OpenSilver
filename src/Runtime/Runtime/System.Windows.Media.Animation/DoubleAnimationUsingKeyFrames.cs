@@ -216,7 +216,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 {
                     if (_animationID == callBackGuid)
                     {
-                        AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                        AnimationHelpers.ApplyValue(target, propertyPath, value);
                         _appliedKeyFramesCount++;
                         if (!CheckTimeLineEndAndRaiseCompletedEvent(_parameters))
                         {
@@ -245,7 +245,7 @@ namespace Windows.UI.Xaml.Media.Animation
             if (!_cancelledAnimation)
             {
                 DoubleKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
-                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, lastKeyFrame.Value, _parameters.IsVisualStateChange);
+                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, lastKeyFrame.Value);
             }
         }
 
