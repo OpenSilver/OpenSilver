@@ -950,9 +950,9 @@ namespace Windows.UI.Xaml
                 if (_textInputEventManager == null)
                 {
 #if MIGRATION
-                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => GetFocusTarget(), "input", ProcessOnTextInput);
+                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => INTERNAL_OuterDomElement, "input", ProcessOnTextInput);
 #else
-                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => GetFocusTarget(), "input", ProcessOnTextInput);
+                    _textInputEventManager = new INTERNAL_EventManager<TextCompositionEventHandler, TextCompositionEventArgs>(() => INTERNAL_OuterDomElement, "input", ProcessOnTextInput);
 #endif
                 }
                 return _textInputEventManager;
@@ -1329,9 +1329,9 @@ namespace Windows.UI.Xaml
                 if (_keyDownEventManager == null)
                 {
 #if MIGRATION
-                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => GetFocusTarget(), "keydown", ProcessOnKeyDown);
+                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown);
 #else
-                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => GetFocusTarget(), "keydown", ProcessOnKeyDown);
+                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown);
 #endif
                 }
                 return _keyDownEventManager;
@@ -1445,9 +1445,9 @@ namespace Windows.UI.Xaml
                 if (_keyUpEventManager == null)
                 {
 #if MIGRATION
-                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => GetFocusTarget(), "keyup", ProcessOnKeyUp);
+                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => INTERNAL_OuterDomElement, "keyup", ProcessOnKeyUp);
 #else
-                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => GetFocusTarget(), "keyup", ProcessOnKeyUp);
+                    _keyUpEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => INTERNAL_OuterDomElement, "keyup", ProcessOnKeyUp);
 #endif
                 }
                 return _keyUpEventManager;
@@ -1554,7 +1554,7 @@ namespace Windows.UI.Xaml
             {
                 if (_gotFocusEventManager == null)
                 {
-                    _gotFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => GetFocusTarget(), "focusin", ProcessOnGotFocus);
+                    _gotFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => INTERNAL_OuterDomElement, "focusin", ProcessOnGotFocus);
                 }
                 return _gotFocusEventManager;
             }
@@ -1620,7 +1620,7 @@ namespace Windows.UI.Xaml
             {
                 if (_lostFocusEventManager == null)
                 {
-                    _lostFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => GetFocusTarget(), "focusout", ProcessOnLostFocus);
+                    _lostFocusEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => INTERNAL_OuterDomElement, "focusout", ProcessOnLostFocus);
                 }
                 return _lostFocusEventManager;
             }
@@ -1730,7 +1730,7 @@ namespace Windows.UI.Xaml
             {
                 if (_gotFocusForIsTabStopEventManager == null)
                 {
-                    _gotFocusForIsTabStopEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => GetFocusTarget(), "focusin", ProcessOnGotFocusForIsTabStop);
+                    _gotFocusForIsTabStopEventManager = new INTERNAL_EventManager<RoutedEventHandler, RoutedEventArgs>(() => INTERNAL_OuterDomElement, "focusin", ProcessOnGotFocusForIsTabStop);
                 }
                 return _gotFocusForIsTabStopEventManager;
             }
