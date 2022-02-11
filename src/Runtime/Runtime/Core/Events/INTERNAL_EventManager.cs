@@ -47,6 +47,7 @@ namespace CSHTML5.Internal
         private string[] _domEventsNamesToListenTo;
         private Action<object> _actionOnEvent;
         private Func<object> _domElementProvider;
+        private readonly bool _isSync;
 
         private List<EVENT_HANDLER> _handlers = new List<EVENT_HANDLER>();
         private List<EVENT_HANDLER> _handlersForHandledEventsToo = new List<EVENT_HANDLER>();
@@ -61,11 +62,16 @@ namespace CSHTML5.Internal
             get { return _handlersForHandledEventsToo; }
         }
 
+        public bool IsSync
+        {
+            get { return _isSync && !OpenSilver.Interop.IsRunningInTheSimulator; }
+        }
+
         private bool _isListeningToDomEvents = false; // Note: we listen to DOM events only when there is at least one C# event handler that is attached to this class, for best performance.
 
         //todo: see if we handle the case where an event is always attached here or in the class that has the event (the class attaches itself to the event)
         // Note: "domElement" here must be of type "object" rather than "dynamic" otherwise JSIL is unable to translate the calling method.
-        public INTERNAL_EventManager(Func<object> domElementProvider, string domEventsNamesToListenTo, Action<object> actionOnEvent)
+        public INTERNAL_EventManager(Func<object> domElementProvider, string domEventsNamesToListenTo, Action<object> actionOnEvent, bool sync = false)
         {
             //-----------------------------------
             // We instantiate this class once for each DOM event type and for each DOM element.
@@ -74,9 +80,10 @@ namespace CSHTML5.Internal
             _domEventsNamesToListenTo = new string[] { domEventsNamesToListenTo };
             _actionOnEvent = actionOnEvent;
             _domElementProvider = domElementProvider;
+            _isSync = sync;
         }
 
-        public INTERNAL_EventManager(Func<object> domElementProvider, string[] domEventsNamesToListenTo, Action<object> actionOnEvent)
+        public INTERNAL_EventManager(Func<object> domElementProvider, string[] domEventsNamesToListenTo, Action<object> actionOnEvent, bool sync = false)
         {
             //-----------------------------------
             // Alternatively, when multiple DOM event types correspond to the same behavior,
@@ -87,6 +94,7 @@ namespace CSHTML5.Internal
             _domEventsNamesToListenTo = domEventsNamesToListenTo;
             _actionOnEvent = actionOnEvent;
             _domElementProvider = domElementProvider;
+            _isSync = sync;
         }
 
         public void Add(EVENT_HANDLER value, bool handledEventsToo = false)
@@ -216,7 +224,7 @@ namespace CSHTML5.Internal
                         _htmlEventProxies.Add(INTERNAL_EventsHelper.AttachToDomEvents(eventName, domElement, (Action<object>)(jsEventArg =>
                         {
                             OnEvent(jsEventArg);
-                        })));
+                        }), IsSync));
                     }
 
                     _isListeningToDomEvents = true;

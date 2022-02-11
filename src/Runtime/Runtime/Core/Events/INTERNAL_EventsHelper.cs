@@ -38,9 +38,9 @@ namespace CSHTML5.Internal
 {
     static class INTERNAL_EventsHelper
     {
-        public static HtmlEventProxy AttachToDomEvents(string eventName, object domElementRef, Action<object> eventHandlerWithJsEventArg)
+        public static HtmlEventProxy AttachToDomEvents(string eventName, object domElementRef, Action<object> eventHandlerWithJsEventArg, bool isSync = false)
         {
-            HtmlEventProxy newProxy = new HtmlEventProxy(eventName, domElementRef, eventHandlerWithJsEventArg);
+            HtmlEventProxy newProxy = new HtmlEventProxy(eventName, domElementRef, eventHandlerWithJsEventArg, isSync);
             AttachEvent(eventName, domElementRef, newProxy, eventHandlerWithJsEventArg);
             return newProxy;
         }
@@ -56,9 +56,9 @@ namespace CSHTML5.Internal
         {
 #if !BUILDINGDOCUMENTATION
             if (domElementRef is INTERNAL_HtmlDomElementReference)
-                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier, eventName, (Action<object>)newProxy.OnEvent);
+                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier, eventName, newProxy.Handler);
             else
-                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, (Action<object>)newProxy.OnEvent);
+                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, newProxy.Handler);
 
             /*
             DOMEventType eventType;
@@ -87,7 +87,7 @@ namespace CSHTML5.Internal
         internal static void DetachEvent(string eventName, object domElementRef, HtmlEventProxy proxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
-            Interop.ExecuteJavaScriptAsync(@"document.removeEventListenerSafe($0, $1, $2)", domElementRef, eventName, (Action<object>)proxy.OnEvent);
+            Interop.ExecuteJavaScriptAsync(@"document.removeEventListenerSafe($0, $1, $2)", domElementRef, eventName, proxy.Handler);
 
             /*
             DOMEventType eventType;
