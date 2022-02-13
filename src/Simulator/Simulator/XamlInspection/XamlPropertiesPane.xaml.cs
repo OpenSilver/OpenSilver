@@ -98,5 +98,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 element.Refresh();
             }
         }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            scrollViewer.MaxHeight = ActualHeight - 60;
+        }
     }
 }
