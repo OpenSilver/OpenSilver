@@ -424,6 +424,15 @@ namespace Windows.UI.Xaml
         [OpenSilver.NotImplemented]
         public WindowState WindowState { get; set; }
 
+        /// <summary>
+        ///     Show the window
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public void Show()
+        {
+        
+        }
+
         [OpenSilver.NotImplemented]
         public void Close()
         {
