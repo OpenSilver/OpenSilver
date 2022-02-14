@@ -277,6 +277,75 @@ namespace Windows.UI.Xaml.Controls
             this.Unloaded += this.OnUnloaded;
         }
 
+#if MIGRATION
+        /// <summary>
+        /// Identifies the Maximum dependency property.
+        /// </summary>
+        public static readonly new DependencyProperty MaximumProperty =
+            DependencyProperty.Register("Maximum", typeof(double), typeof(RangeBase), new PropertyMetadata(100d, Maximum_Changed));
+
+        private static void Maximum_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var numericUpDown = (NumericUpDown)d;
+            object newValue = e.NewValue;
+
+            double newMax = newValue is double ? (double)newValue : double.NaN;
+            double oldMax = e.OldValue is double ? (double)e.OldValue : double.NaN;
+
+            numericUpDown.CoerceValue(ValueProperty);
+            numericUpDown.OnMaximumChanged(oldMax, newMax);
+        }
+
+        /// <summary>
+        /// Gets or sets the highest possible Value of the range element. The default is 100.
+        /// </summary>
+        public new double Maximum
+        {
+            get { return (double)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the current setting of the range control, which may be coerced. The default is 0.
+        /// </summary>
+        public new double Value
+        {
+            get { return (double)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        /// <summary>
+        /// The identifier for the Value dependency property.
+        /// </summary>
+        public static readonly new DependencyProperty ValueProperty =
+            DependencyProperty.Register("Value", typeof(double), typeof(RangeBase), new PropertyMetadata(0d, Value_Changed, CoerceValue));
+
+        private static object CoerceValue(DependencyObject d, object baseValue)
+        {
+            var numericUpDown = (NumericUpDown)d;
+            double returnValue = baseValue is double ? (double)baseValue : Convert.ToDouble(baseValue);
+            double minimum = numericUpDown.Minimum;
+            if (!double.IsNaN(minimum) && returnValue < minimum)
+            {
+                return minimum;
+            }
+            double maximum = numericUpDown.Maximum;
+            if (!double.IsNaN(maximum) && returnValue > maximum)
+            {
+                return maximum;
+            }
+            return returnValue;
+        }
+
+        private static void Value_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var numericUpDown = (NumericUpDown)d;
+            object newValue = e.NewValue;
+            object oldValue = e.OldValue;
+            numericUpDown.OnValueChanged(newValue is double ? (double)newValue : double.NaN, oldValue is double ? (double)oldValue : double.NaN);
+        }
+#endif
+
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (_dragOverlay != null)
