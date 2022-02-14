@@ -59,18 +59,15 @@ namespace Windows.UI.Xaml
                 string[] splittedInitParams = initParamsAsString.Split(',');
                 foreach (string fullParam in splittedInitParams)
                 {
-                    string[] splittedParam = fullParam.Split('=');
-                    if (splittedParam.Length == 2) //normal case
+                    int index = fullParam.IndexOf('=');
+                    if (index == -1)
                     {
-                        initParameters[splittedParam[0]] = splittedParam[1];
+                        initParameters[fullParam] = string.Empty;
                     }
-                    else if (splittedParam.Length == 1) //case of an empty string as a value:
+                    else
                     {
-                        initParameters[fullParam] = "";
+                        initParameters[fullParam.Substring(0, index)] = fullParam.Substring(index + 1);
                     }
-                    //else I don't know what we should do?
-                    //      One possibility would be to consider that it is unlikely for the key to contain '=' so we just take the first part as the key and the rest as the value
-                    //      Another possibility would be to make them use '"' to differentiate the key from the value (i.e: someKey=stillKey=someValue=stillValue should be: "someKey=stillKey"="someValue=stillValue"
                 }
             }
             return initParameters;
