@@ -25,6 +25,16 @@ namespace OpenSilver.Internal
             return obj is IFormattable formattable ? formattable.ToInvariantString() : obj.ToString();
         }
 
+        internal static string ToInvariantString(this double d)
+        {
+            return d.ToString(CultureInfo.InvariantCulture);
+        }
+
+        internal static string ToInvariantString(this double d, string format)
+        {
+            return d.ToString(format, CultureInfo.InvariantCulture);
+        }
+
         internal static string ToInvariantString(this IFormattable formattable)
         {
             Debug.Assert(formattable != null);
