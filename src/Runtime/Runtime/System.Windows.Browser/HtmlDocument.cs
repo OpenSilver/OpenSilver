@@ -49,24 +49,28 @@ namespace System.Windows.Browser
         {
             get
             {
-                //get the current page's URL
-                //get what is after '?'
-                //split it using '&'
-                //for each element of the array we obtained, split it (with '=') and put the first element in the "key" and the second in the "value"
-                Dictionary<string, string> returnValue = new Dictionary<string, string>();
-                string url = CSHTML5.Interop.ExecuteJavaScript("document.URL").ToString();
-                int index = url.IndexOf('?');
-                if (index != -1)
+                Dictionary<string, string> query = new Dictionary<string, string>();
+                
+                string url = OpenSilver.Interop.ExecuteJavaScript("window.location.search").ToString();
+                if (!string.IsNullOrEmpty(url))
                 {
-                    url = url.Substring(index + 1);
-                    string[] splittedParameters = url.Split('&');
-                    foreach (string str in splittedParameters)
+                    string[] parts = url.Substring(1).Split(new char[1] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (string part in parts)
                     {
-                        string[] splittedParameter = str.Split('=');
-                        returnValue.Add(splittedParameter[0], splittedParameter[1]);
+                        int index = part.IndexOf('=');
+                        if (index == -1)
+                        {
+                            query.Add(part, string.Empty);
+                        }
+                        else
+                        {
+                            query.Add(part.Substring(0, index), part.Substring(index + 1));
+                        }
                     }
                 }
-                return returnValue;
+
+                return query;
             }
         }
         //

@@ -36,8 +36,7 @@ namespace Windows.UI.Xaml
 
         static StartupEventArgs()
         {
-            var document = new HtmlDocument();
-            Query = document.QueryString;
+            Query = HtmlPage.Document.QueryString;
         }
 
         /// <summary>
