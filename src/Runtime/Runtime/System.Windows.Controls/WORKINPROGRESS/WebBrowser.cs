@@ -59,5 +59,11 @@ namespace Windows.UI.Xaml.Controls
         {
             return "";
         }
+
+        /// <summary>
+        /// Occurs when the content contained in the WebBrowser control passes a string to the Silverlight plug-in by using JavaScript.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event EventHandler<NotifyEventArgs> ScriptNotify;
     }
 }
