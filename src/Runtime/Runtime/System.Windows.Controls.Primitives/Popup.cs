@@ -744,9 +744,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return finalSize;
         }
 
-        public void EnsurePopupStaysWithinScreenBounds(Size size)
+        public void EnsurePopupStaysWithinScreenBounds(double forcedWidth = double.NaN, double forcedHeight = double.NaN)
         {
-            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this, size);
+            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this, forcedWidth, forcedHeight);
         }
     }
 }
