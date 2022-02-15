@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System;
+
 #if MIGRATION
 namespace System.Windows.Controls
 #else
@@ -21,12 +23,10 @@ namespace Windows.UI.Xaml.Controls
     /// Provides data for the <see cref="WebBrowser.ScriptNotify"/> event.
     /// </summary>
     [OpenSilver.NotImplemented]
-#if MIGRATION
     public class NotifyEventArgs : EventArgs
-#else
-    public class NotifyEventArgs
-#endif
     {
+        internal NotifyEventArgs() { }
+
         /// <summary>
         /// Gets or sets the JavaScript method name that is passed to the Silverlight plug-in.
         /// </summary>
