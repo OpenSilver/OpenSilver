@@ -22,46 +22,46 @@ namespace Windows.UI.Xaml.Controls
 {
     public partial class NumericUpDown
     {
-        #region DecimalPlaces
-        /// <summary>
-        /// Gets or sets the number of decimal places that are displayed in the 
-        /// NumericUpDown. 
-        /// </summary>
-        /// <remarks>
-        /// The default value is zero.
-        /// 
-        /// DecimalPlaces decides output format of Value property.
-        /// It is implemented via formatString field and FormatValue override.
-        /// </remarks>
-        [OpenSilver.NotImplemented]
-        public int DecimalPlaces
-        {
-            get => (int)GetValue(DecimalPlacesProperty);
-            set => SetValue(DecimalPlacesProperty, value);
-        }
+        //#region DecimalPlaces
+        ///// <summary>
+        ///// Gets or sets the number of decimal places that are displayed in the 
+        ///// NumericUpDown. 
+        ///// </summary>
+        ///// <remarks>
+        ///// The default value is zero.
+        ///// 
+        ///// DecimalPlaces decides output format of Value property.
+        ///// It is implemented via formatString field and FormatValue override.
+        ///// </remarks>
+        //[OpenSilver.NotImplemented]
+        //public int DecimalPlaces
+        //{
+        //    get => (int)GetValue(DecimalPlacesProperty);
+        //    set => SetValue(DecimalPlacesProperty, value);
+        //}
 
-        /// <summary>
-        /// Identifies the DecimalPlaces dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty DecimalPlacesProperty =
-            DependencyProperty.Register(
-                "DecimalPlaces",
-                typeof(int),
-                typeof(NumericUpDown),
-                new PropertyMetadata(0, OnDecimalPlacesPropertyChanged));
+        ///// <summary>
+        ///// Identifies the DecimalPlaces dependency property.
+        ///// </summary>
+        //[OpenSilver.NotImplemented]
+        //public static readonly DependencyProperty DecimalPlacesProperty =
+        //    DependencyProperty.Register(
+        //        "DecimalPlaces",
+        //        typeof(int),
+        //        typeof(NumericUpDown),
+        //        new PropertyMetadata(0, OnDecimalPlacesPropertyChanged));
 
-        /// <summary>
-        /// DecimalPlacesProperty property changed handler.
-        /// </summary>
-        /// <param name="d">NumericUpDown that changed its DecimalPlaces.</param>
-        /// <param name="e">DependencyPropertyChangedEventArgs for DecimalPlaces property.</param>
-        private static void OnDecimalPlacesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// DecimalPlacesProperty property changed handler.
+        ///// </summary>
+        ///// <param name="d">NumericUpDown that changed its DecimalPlaces.</param>
+        ///// <param name="e">DependencyPropertyChangedEventArgs for DecimalPlaces property.</param>
+        //private static void OnDecimalPlacesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        #endregion DecimalPlaces
+        //#endregion DecimalPlaces
 
 
     }

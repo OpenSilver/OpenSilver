@@ -39,5 +39,16 @@ namespace Windows.UI.Xaml.Controls
         public const string StateValid = "ValidDomain";
         public const string StateInvalid = "InvalidDomain";
 
+        [OpenSilver.NotImplemented]
+        public override object GetValue()
+        {
+            throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        public override void SetValue(object value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -87,6 +87,8 @@
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\CSHTML5_DuplexClientBase.cs" />
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\InstanceContext.cs" />
 		<Compile Include="System.Windows.Automation.Peers\CalendarDayButtonAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\NumericUpDownAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\UpDownBaseAutomationPeer.cs" />
 		<Compile Include="System.Windows.Browser\EventSubscriber.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
@@ -119,6 +121,9 @@
 		<Compile Include="System.ComponentModel\ReflectedPropertyData.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\IXamlComponentFactory.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\UpDownParseErrorEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\UpDownParsingEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ValidSpinDirections.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowserBrush.cs" />
 		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
@@ -1252,6 +1257,14 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultButtonSpinnerStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="DefaultStyles\INTERNAL_DefaultUpDownBaseStyle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />

@@ -277,6 +277,18 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        [OpenSilver.NotImplemented]
+        public override object GetValue()
+        {
+            throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        public override void SetValue(object value)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Gets the actual TimeGlobalization info used by the control.
         /// </summary>

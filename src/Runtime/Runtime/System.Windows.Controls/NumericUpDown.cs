@@ -12,18 +12,16 @@
 *  
 \*====================================================================================*/
 
-
 using System;
+using System.Diagnostics;
 using System.Globalization;
-using System.Threading.Tasks;
 
 #if MIGRATION
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
+using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 #else
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Input;
-using Windows.System;
+using Windows.UI.Xaml.Automation;
+using Windows.UI.Xaml.Automation.Peers;
 #endif
 
 #if MIGRATION
@@ -33,284 +31,395 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Determins whether the value bar behind the value text should be visible
+    /// Represents a control that enables single value selection from a numeric
+    /// range of values through a Spinner and TextBox.
     /// </summary>
-    public enum NumericUpDownValueBarVisibility
+    /// <QualityBand>Stable</QualityBand>
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StatePressed, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+
+    [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
+
+    [TemplatePart(Name = UpDownBase.ElementTextName, Type = typeof(TextBox))]
+    [TemplatePart(Name = UpDownBase.ElementSpinnerName, Type = typeof(Spinner))]
+    [StyleTypedProperty(Property = UpDownBase.SpinnerStyleName, StyleTargetType = typeof(ButtonSpinner))]
+    public partial class NumericUpDown : UpDownBase<double>, IUpdateVisualState
     {
+        #region Minimum
         /// <summary>
-        /// Visible
+        /// Gets or sets the Minimum possible Value.
         /// </summary>
-        Visible,
+        /// <remarks>
+        /// The default value is zero.
+        /// </remarks>
+        public double Minimum
+        {
+            get { return (double)GetValue(MinimumProperty); }
+            set { SetValue(MinimumProperty, value); }
+        }
+
         /// <summary>
-        /// Collapsed
+        /// Identifies the Minimum dependency property.
         /// </summary>
-        Collapsed
-    }
-
-    /// <summary>
-    /// NumericUpDown control - for representing values that can be
-    /// entered with keyboard,
-    /// using increment/decrement buttons
-    /// as well as swiping over the control.
-    /// </summary>
-    [TemplatePart(Name = ValueTextBoxName, Type = typeof(TextBox))]
-    [TemplatePart(Name = ValueBarName, Type = typeof(FrameworkElement))]
-    [TemplatePart(Name = DragOverlayName, Type = typeof(UIElement))]
-    [TemplatePart(Name = DecrementButtonName, Type = typeof(RepeatButton))]
-    [TemplatePart(Name = IncrementButtonName, Type = typeof(RepeatButton))]
-    [TemplateVisualState(GroupName = "IncrementalButtonStates", Name = "IncrementEnabled")]
-    [TemplateVisualState(GroupName = "IncrementalButtonStates", Name = "IncrementDisabled")]
-    [TemplateVisualState(GroupName = "DecrementalButtonStates", Name = "DecrementEnabled")]
-    [TemplateVisualState(GroupName = "DecrementalButtonStates", Name = "DecrementDisabled")]
-    public partial class NumericUpDown : RangeBase
-    {
-        private const string DecrementButtonName = "PART_DecrementButton";
-        private const string IncrementButtonName = "PART_IncrementButton";
-        private const string DragOverlayName = "PART_DragOverlay";
-        private const string ValueTextBoxName = "PART_ValueTextBox";
-        private const string ValueBarName = "PART_ValueBar";
-        private UIElement _dragOverlay;
-        private UpDownTextBox _valueTextBox;
-        private RepeatButton _decrementButton;
-        private RepeatButton _incrementButton;
-        private FrameworkElement _valueBar;
-        private bool _isDragUpdated;
-        private bool _isChangingTextWithCode;
-        private bool _isChangingValueWithCode;
-        private double _unusedManipulationDelta;
-
-        private bool _isDraggingWithMouse;
-#if false
-        private MouseDevice _mouseDevice;
-#endif
-        private const double MinMouseDragDelta = 2;
-        private double _totalDeltaX;
-        private double _totalDeltaY;
-
-#if false
-        #region ValueFormat
-        /// <summary>
-        /// ValueFormat Dependency Property
-        /// </summary>
-        public static readonly DependencyProperty ValueFormatProperty =
+        public static readonly DependencyProperty MinimumProperty =
             DependencyProperty.Register(
-                "ValueFormat",
-                typeof(string),
-                typeof(NumericUpDown),
-                new PropertyMetadata("F2", OnValueFormatChanged));
-
-        /// <summary>
-        /// Gets or sets the ValueFormat property. This dependency property 
-        /// indicates the format of the value string.
-        /// </summary>
-        public string ValueFormat
-        {
-            get { return (string)this.GetValue(ValueFormatProperty); }
-            set { this.SetValue(ValueFormatProperty, value); }
-        }
-
-        /// <summary>
-        /// Handles changes to the ValueFormat property.
-        /// </summary>
-        /// <param name="d">
-        /// The <see cref="DependencyObject"/> on which
-        /// the property has changed value.
-        /// </param>
-        /// <param name="e">
-        /// Event data that is issued by any event that
-        /// tracks changes to the effective value of this property.
-        /// </param>
-        private static void OnValueFormatChanged(
-            DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var target = (NumericUpDown)d;
-            target.OnValueFormatChanged();
-        }
-
-        /// <summary>
-        /// Provides derived classes an opportunity to handle changes
-        /// to the ValueFormat property.
-        /// </summary>
-        private void OnValueFormatChanged()
-        {
-            this.UpdateValueText();
-        }
-        #endregion
-#endif
-
-        #region ValueBarVisibility
-        /// <summary>
-        /// ValueBarVisibility Dependency Property
-        /// </summary>
-        public static readonly DependencyProperty ValueBarVisibilityProperty =
-            DependencyProperty.Register(
-                "ValueBarVisibility",
-                typeof(NumericUpDownValueBarVisibility),
-                typeof(NumericUpDown),
-                new PropertyMetadata(NumericUpDownValueBarVisibility.Visible, OnValueBarVisibilityChanged)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        /// <summary>
-        /// Gets or sets the ValueBarVisibility property. This dependency property 
-        /// indicates whether the value bar should be shown.
-        /// </summary>
-        public NumericUpDownValueBarVisibility ValueBarVisibility
-        {
-            get { return (NumericUpDownValueBarVisibility)this.GetValue(ValueBarVisibilityProperty); }
-            set { this.SetValue(ValueBarVisibilityProperty, value); }
-        }
-
-        /// <summary>
-        /// Handles changes to the ValueBarVisibility property.
-        /// </summary>
-        /// <param name="d">
-        /// The <see cref="DependencyObject"/> on which
-        /// the property has changed value.
-        /// </param>
-        /// <param name="e">
-        /// Event data that is issued by any event that
-        /// tracks changes to the effective value of this property.
-        /// </param>
-        private static void OnValueBarVisibilityChanged(
-            DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var target = (NumericUpDown)d;
-            target.OnValueBarVisibilityChanged();
-        }
-
-        /// <summary>
-        /// Provides derived classes an opportunity to handle changes
-        /// to the ValueBarVisibility property.
-        /// </summary>
-        private void OnValueBarVisibilityChanged()
-        {
-            this.UpdateValueBar();
-        }
-        #endregion
-
-        #region IsReadOnly
-        /// <summary>
-        /// IsReadOnly Dependency Property
-        /// </summary>
-        public static readonly DependencyProperty IsReadOnlyProperty =
-            DependencyProperty.Register(
-                "IsReadOnly",
-                typeof(bool),
-                typeof(NumericUpDown),
-                new PropertyMetadata(false, OnIsReadOnlyChanged)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-
-        /// <summary>
-        /// Gets or sets the IsReadOnly property. This dependency property 
-        /// indicates whether the box should only allow to read the values by copying and pasting them.
-        /// </summary>
-        public bool IsReadOnly
-        {
-            get { return (bool)this.GetValue(IsReadOnlyProperty); }
-            set { this.SetValue(IsReadOnlyProperty, value); }
-        }
-
-        /// <summary>
-        /// Handles changes to the IsReadOnly property.
-        /// </summary>
-        /// <param name="d">
-        /// The <see cref="DependencyObject"/> on which
-        /// the property has changed value.
-        /// </param>
-        /// <param name="e">
-        /// Event data that is issued by any event that
-        /// tracks changes to the effective value of this property.
-        /// </param>
-        private static void OnIsReadOnlyChanged(
-            DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var target = (NumericUpDown)d;
-            target.OnIsReadOnlyChanged();
-        }
-
-        /// <summary>
-        /// Provides derived classes an opportunity to handle changes
-        /// to the IsReadOnly property.
-        /// </summary>
-        private void OnIsReadOnlyChanged()
-        {
-            this.UpdateIsReadOnlyDependants();
-        }
-        #endregion
-
-        #region DragSpeed
-        /// <summary>
-        /// DragSpeed Dependency Property
-        /// </summary>
-        public static readonly DependencyProperty DragSpeedProperty =
-            DependencyProperty.Register(
-                "DragSpeed",
+                "Minimum",
                 typeof(double),
                 typeof(NumericUpDown),
-                new PropertyMetadata(double.NaN));
+                new PropertyMetadata(0d, OnMinimumPropertyChanged));
 
         /// <summary>
-        /// Gets or sets the DragSpeed property. This dependency property 
-        /// indicates the speed with which the value changes when manipulated with dragging.
-        /// The default value of double.NaN indicates that the value will change by (Maximum - Minimum),
-        /// when the control is dragged a full screen length.
+        /// MinimumProperty property changed handler.
         /// </summary>
-        public double DragSpeed
+        /// <param name="d">NumericUpDown that changed its Minimum.</param>
+        /// <param name="e">DependencyPropertyChangedEventArgs for Minimum property.</param>
+        private static void OnMinimumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            get { return (double)this.GetValue(DragSpeedProperty); }
-            set { this.SetValue(DragSpeedProperty, value); }
+            NumericUpDown nud = (NumericUpDown)d;
+            EnsureValidDoubleValue(d, e);
+
+            // Note: this section is a workaround, containing my
+            // logic to hold all calls to the property changed
+            // methods until after all coercion has completed
+            // ----------
+            if (nud._levelsFromRootCall == 0)
+            {
+                nud._requestedMin = (double)e.NewValue;
+                nud._initialMin = (double)e.OldValue;
+                nud._initialMax = nud.Maximum;
+                nud._initialVal = nud.Value;
+
+                nud._levelsFromRootCall++;
+                // do a check before set to avoid blowing away binding unnecessarily.
+                if (nud.Minimum != nud._requestedMin)
+                {
+                    nud.Minimum = nud._requestedMin;
+                }
+                nud._levelsFromRootCall--;
+            }
+            nud._levelsFromRootCall++;
+            // ----------
+
+            nud.CoerceMaximum();
+            nud.CoerceValue();
+
+            // Note: this section completes my workaround to call 
+            // the property changed logic if all coercion has completed
+            // ----------
+            nud._levelsFromRootCall--;
+            if (nud._levelsFromRootCall == 0)
+            {
+                NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
+
+                double minimum = nud.Minimum;
+                if (nud._initialMin != minimum)
+                {
+                    if (peer != null)
+                    {
+                        peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MinimumProperty, nud._initialMin, minimum);
+                    }
+
+                    nud.OnMinimumChanged(nud._initialMin, minimum);
+                }
+
+                double maximum = nud.Maximum;
+                if (nud._initialMax != maximum)
+                {
+                    if (peer != null)
+                    {
+                        peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MaximumProperty, nud._initialMax, maximum);
+                    }
+
+                    nud.OnMaximumChanged(nud._initialMax, maximum);
+                }
+
+                // reevaluate the valid spin direction
+                nud.SetValidSpinDirection();
+            }
+            // ----------
+        }
+
+        /// <summary>
+        /// Called when the Minimum property value has changed.
+        /// </summary>
+        /// <param name="oldValue">Old value of the Minimum property.</param>
+        /// <param name="newValue">New value of the Minimum property.</param>
+        protected virtual void OnMinimumChanged(double oldValue, double newValue)
+        {
+        }
+        #endregion Minimum
+
+        #region Maximum
+        /// <summary>
+        /// Gets or sets the Maximum possible Value.
+        /// </summary>
+        /// <remarks>
+        /// The default values is one.
+        /// </remarks>
+        public double Maximum
+        {
+            get { return (double)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the Maximum dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register(
+                "Maximum",
+                typeof(double),
+                typeof(NumericUpDown),
+                new PropertyMetadata(100d, OnMaximumPropertyChanged));
+
+        /// <summary>
+        /// MaximumProperty property changed handler.
+        /// </summary>
+        /// <param name="d">NumericUpDown that changed its Maximum.</param>
+        /// <param name="e">DependencyPropertyChangedEventArgs for Maximum property.</param>
+        private static void OnMaximumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            EnsureValidDoubleValue(d, e);
+            NumericUpDown nud = d as NumericUpDown;
+
+            // Note: this section is a workaround, containing my
+            // logic to hold all calls to the property changed
+            // methods until after all coercion has completed
+            // ----------
+            if (nud._levelsFromRootCall == 0)
+            {
+                nud._requestedMax = (double)e.NewValue;
+                nud._initialMax = (double)e.OldValue;
+                nud._initialVal = nud.Value;
+            }
+            nud._levelsFromRootCall++;
+            // ----------
+
+            nud.CoerceMaximum();
+            nud.CoerceValue();
+
+            // Note: this section completes my workaround to call 
+            // the property changed logic if all coercion has completed
+            // ----------
+            nud._levelsFromRootCall--;
+            if (nud._levelsFromRootCall == 0)
+            {
+                NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
+
+                double maximum = nud.Maximum;
+                if (nud._initialMax != maximum)
+                {
+                    if (peer != null)
+                    {
+                        peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MaximumProperty, nud._initialMax, maximum);
+                    }
+
+                    nud.OnMaximumChanged(nud._initialMax, maximum);
+                }
+
+                // reevaluate the valid spin direction
+                nud.SetValidSpinDirection();
+            }
+            // ----------
+        }
+
+        /// <summary>
+        /// Called when the Maximum property value has changed.
+        /// </summary>
+        /// <param name="oldValue">Old value of the Maximum property.</param>
+        /// <param name="newValue">New value of the Maximum property.</param>
+        protected virtual void OnMaximumChanged(double oldValue, double newValue)
+        {
+        }
+        #endregion Maximum
+
+        #region Increment
+        /// <summary>
+        /// Gets or sets a value added or subtracted from the value property.
+        ///  </summary>
+        /// <remarks>
+        /// The default values is one.
+        /// </remarks>
+        public double Increment
+        {
+            get { return (double)GetValue(IncrementProperty); }
+            set { SetValue(IncrementProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the Increment dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IncrementProperty =
+            DependencyProperty.Register(
+                "Increment",
+                typeof(double),
+                typeof(NumericUpDown),
+                new PropertyMetadata(1d, OnIncrementPropertyChanged));
+
+        /// <summary>
+        /// IncrementProperty property changed handler.
+        /// </summary>
+        /// <param name="d">NumericUpDown that changed its Increment property.</param>
+        /// <param name="e">DependencyPropertyChangedEventArgs for Increment property.</param>
+        private static void OnIncrementPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            NumericUpDown nud = (NumericUpDown)d;
+            EnsureValidIncrementValue(d, e);
+
+            // Note: this section is a workaround, containing my
+            // logic to hold all calls to the property changed
+            // methods until after all coercion has completed
+            // ----------
+            if (nud._levelsFromRootCall == 0)
+            {
+                nud._requestedInc = (double)e.NewValue;
+                nud._initialInc = (double)e.OldValue;
+
+                nud._levelsFromRootCall++;
+                // do a check before set to avoid blowing away binding unnecessarily.
+                if (nud.Increment != nud._requestedInc)
+                {
+                    nud.Increment = nud._requestedInc;
+                }
+                nud._levelsFromRootCall--;
+            }
+            // ----------
+
+            // Note: this section completes my workaround to call 
+            // the property changed logic if all coercion has completed
+            // ----------
+            if (nud._levelsFromRootCall == 0)
+            {
+                NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
+
+                double increment = nud.Increment;
+                if (nud._initialInc != increment)
+                {
+                    if (peer != null)
+                    {
+                        peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.SmallChangeProperty, nud._initialInc, increment);
+                    }
+
+                    nud.OnIncrementChanged(nud._initialInc, increment);
+                }
+            }
+            // ----------
+        }
+
+        /// <summary>
+        /// Called when the Increment property value has changed.
+        /// </summary>
+        /// <param name="oldValue">Old value of the Increment property.</param>
+        /// <param name="newValue">New value of the Increment property.</param>
+        protected virtual void OnIncrementChanged(double oldValue, double newValue)
+        {
         }
         #endregion
 
+        #region DecimalPlaces
         /// <summary>
-        /// Initializes a new instance of the <see cref="NumericUpDown" /> class.
+        /// Gets or sets the number of decimal places that are displayed in the 
+        /// NumericUpDown. 
         /// </summary>
-        public NumericUpDown()
+        /// <remarks>
+        /// The default value is zero.
+        /// 
+        /// DecimalPlaces decides output format of Value property.
+        /// It is implemented via formatString field and FormatValue override.
+        /// </remarks>
+        public int DecimalPlaces
         {
-#if false
-            this.DefaultStyleKey = typeof(NumericUpDown);
-#else
-            // Set default style:
-            this.DefaultStyleKey = typeof(NumericUpDown);
-#endif
-            this.Loaded += this.OnLoaded;
-            this.Unloaded += this.OnUnloaded;
+            get { return (int)GetValue(DecimalPlacesProperty); }
+            set { SetValue(DecimalPlacesProperty, value); }
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Identifies the DecimalPlaces dependency property.
+        /// </summary>
+        public static readonly DependencyProperty DecimalPlacesProperty =
+            DependencyProperty.Register(
+                "DecimalPlaces",
+                typeof(int),
+                typeof(NumericUpDown),
+                new PropertyMetadata(0, OnDecimalPlacesPropertyChanged));
+
+        /// <summary>
+        /// DecimalPlacesProperty property changed handler.
+        /// </summary>
+        /// <param name="d">NumericUpDown that changed its DecimalPlaces.</param>
+        /// <param name="e">DependencyPropertyChangedEventArgs for DecimalPlaces property.</param>
+        private static void OnDecimalPlacesPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (_dragOverlay != null)
+            EnsureValidDecimalPlacesValue(d, e);
+
+            NumericUpDown nud = d as NumericUpDown;
+            nud.OnDecimalPlacesChanged((int)e.OldValue, (int)e.NewValue);
+        }
+
+        /// <summary>
+        /// Called when the DecimalPlaces property value has changed.
+        /// </summary>
+        /// <param name="oldValue">Old value of the DecimalPlaces property.</param>
+        /// <param name="newValue">New value of the DecimalPlaces property.</param>
+        protected virtual void OnDecimalPlacesChanged(int oldValue, int newValue)
+        {
+            formatString = string.Format(NumberFormatInfo.InvariantInfo, "F{0:D}", newValue);
+
+            _levelsFromRootCall++;
+            // force display refresh even when there is no value change.
+            SetTextBoxText();
+            _levelsFromRootCall--;
+        }
+
+        /// <summary>
+        /// Format string used to display Value property.
+        /// </summary>
+        /// <seealso cref="DecimalPlaces"/>
+        /// <seealso cref="FormatValue"/>
+        private string formatString = "F0";
+        #endregion DecimalPlaces
+
+        /// <summary>
+        /// Initializes a new instance of the NumericUpDown class.
+        /// </summary>
+        public NumericUpDown() : base()
+        {
+            DefaultStyleKey = typeof(NumericUpDown);
+            Interaction = new InteractionHelper(this);
+        }
+
+        /// <summary>
+        /// Sets the valid spin direction based on current value, minimum and maximum.
+        /// </summary>
+        private void SetValidSpinDirection()
+        {
+            ValidSpinDirections validDirections = ValidSpinDirections.None;
+            if (Value < Maximum)
             {
-#if false
-                Window.Current.CoreWindow.PointerReleased += this.CoreWindowOnPointerReleased;
-                Window.Current.CoreWindow.VisibilityChanged += this.OnCoreWindowVisibilityChanged;
-#else
-#if MIGRATION
-                Window.Current.MouseLeftButtonUp += this.CoreWindowOnPointerReleased;
-#else
-                Window.Current.PointerReleased += this.CoreWindowOnPointerReleased;
-#endif
-#endif
+                validDirections = validDirections | ValidSpinDirections.Increase;
+            }
+            if (Value > Minimum)
+            {
+                validDirections = validDirections | ValidSpinDirections.Decrease;
+            }
+
+            if (Spinner != null)
+            {
+                Spinner.ValidSpinDirection = validDirections;
             }
         }
 
-        private void OnUnloaded(object sender, RoutedEventArgs e)
-        {
-#if false
-            Window.Current.CoreWindow.PointerReleased -= this.CoreWindowOnPointerReleased;
-            Window.Current.CoreWindow.VisibilityChanged -= this.OnCoreWindowVisibilityChanged;
-#else
-#if MIGRATION
-            Window.Current.MouseLeftButtonUp -= this.CoreWindowOnPointerReleased;
-#else
-            Window.Current.PointerReleased -= this.CoreWindowOnPointerReleased;
-#endif
-#endif
-        }
-
-        #region OnApplyTemplate()
+        #region Overrides
         /// <summary>
-        /// Invoked whenever application code or internal processes (such as a rebuilding layout pass) call ApplyTemplate. In simplest terms, this means the method is called just before a UI element displays in your app. Override this method to influence the default post-template logic of a class.
+        /// Builds the visual tree for the NumericUpDown control when a new
+        /// template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -320,654 +429,361 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
-#if false
-            if (DesignMode.DesignModeEnabled)
-            {
-                return;
-            }
-#endif
-
-            this.GotFocus += this.OnGotFocus;
-            this.LostFocus += this.OnLostFocus;
-#if false
-            this.PointerWheelChanged += this.OnPointerWheelChanged;
-#endif
-            _valueTextBox = this.GetTemplateChild(ValueTextBoxName) as UpDownTextBox;
-            _dragOverlay = this.GetTemplateChild(DragOverlayName) as UIElement;
-            _decrementButton = this.GetTemplateChild(DecrementButtonName) as RepeatButton;
-            _incrementButton = this.GetTemplateChild(IncrementButtonName) as RepeatButton;
-            _valueBar = this.GetTemplateChild(ValueBarName) as FrameworkElement;
-
-            if (_valueTextBox != null)
-            {
-                _valueTextBox.LostFocus += this.OnValueTextBoxLostFocus;
-                _valueTextBox.GotFocus += this.OnValueTextBoxGotFocus;
-#if false
-                _valueTextBox.Text = this.Value.ToString(CultureInfo.CurrentCulture);
-#else
-                _valueTextBox.Text = this.Value.ToString();
-#endif
-                _valueTextBox.TextChanged += this.OnValueTextBoxTextChanged;
-                _valueTextBox.KeyDown += this.OnValueTextBoxKeyDown;
-                _valueTextBox.UpPressed += (s, e) => this.DoIncrement();
-                _valueTextBox.DownPressed += (s, e) => this.DoDecrement();
-#if false
-                _valueTextBox.PointerExited += this.OnValueTextBoxPointerExited;
-#endif
-            }
-
-            if (_dragOverlay != null)
-            {
-#if false
-                _dragOverlay.Tapped += this.OnDragOverlayTapped;
-                _dragOverlay.ManipulationMode = ManipulationModes.TranslateX | ManipulationModes.TranslateY;
-#endif
-#if MIGRATION
-                _dragOverlay.MouseLeftButtonDown += this.OnDragOverlayPointerPressed;
-                _dragOverlay.MouseLeftButtonUp += this.OnDragOverlayPointerReleased;
-                _dragOverlay.LostMouseCapture += this.OnDragOverlayPointerCaptureLost;
-#else
-                _dragOverlay.PointerPressed += this.OnDragOverlayPointerPressed;
-                _dragOverlay.PointerReleased += this.OnDragOverlayPointerReleased;
-                _dragOverlay.PointerCaptureLost += this.OnDragOverlayPointerCaptureLost;
-#endif
-            }
-
-            if (_decrementButton != null)
-            {
-                _decrementButton.Click += this.OnDecrementButtonClick;
-#if false
-                var pcc =
-                    new PropertyChangeEventSource<bool>
-                        (_decrementButton, "IsPressed");
-                pcc.ValueChanged += this.OnDecrementButtonIsPressedChanged;
-#endif
-            }
-
-            if (_incrementButton != null)
-            {
-                _incrementButton.Click += this.OnIncrementButtonClick;
-#if false
-                var pcc =
-                    new PropertyChangeEventSource<bool>
-                        (_incrementButton, "IsPressed");
-                pcc.ValueChanged += this.OnIncrementButtonIsPressedChanged;
-#endif
-            }
-
-            if (_valueBar != null)
-            {
-                _valueBar.SizeChanged += this.OnValueBarSizeChanged;
-
-                this.UpdateValueBar();
-            }
-
-            this.UpdateIsReadOnlyDependants();
-            this.SetValidIncrementDirection();
+            SetValidSpinDirection();
         }
 
-#if false
-        private void OnPointerWheelChanged(object sender, PointerRoutedEventArgs pointerRoutedEventArgs)
+        /// <summary>
+        /// Returns a NumericUpDownAutomationPeer for use by the Silverlight
+        /// automation infrastructure.
+        /// </summary>
+        /// <returns>A NumericUpDownAutomationPeer object for the NumericUpDown.</returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
         {
-            if (!_hasFocus)
+            return new NumericUpDownAutomationPeer(this);
+        }
+
+        /// <summary>
+        /// Override UpDownBase&lt;T&gt;.OnValueChanging to do validation and coercion.
+        /// </summary>
+        /// <param name="e">Event args.</param>
+        protected override void OnValueChanging(RoutedPropertyChangingEventArgs<double> e)
+        {
+            // Note: this section is a workaround, containing my
+            // logic to hold all calls to the property changed
+            // methods until after all coercion has completed
+            // ----------
+            if (_levelsFromRootCall == 0)
             {
-                return;
+                // validation
+                EnsureValidDoubleValue(this, e.Property, e.OldValue, e.NewValue);
+
+                _initialVal = e.OldValue;
+                _requestedVal = e.NewValue;
+                e.InCoercion = true;
             }
+            _levelsFromRootCall++;
+            // ----------
 
-            var delta = pointerRoutedEventArgs.GetCurrentPoint(this).Properties.MouseWheelDelta;
+            CoerceValue();
 
-            if (delta < 0)
+            // Note: this section completes my workaround to call 
+            // the property changed logic if all coercion has completed
+            // ----------
+            _levelsFromRootCall--;
+            if (_levelsFromRootCall == 0)
             {
-                this.Decrement();
-            }
-            else
-            {
-                this.Increment();
-            }
-
-            pointerRoutedEventArgs.Handled = true;
-        }
-#endif
-
-        private bool _hasFocus;
-        private const double Epsilon = .00001;
-
-        private void OnLostFocus(object sender, RoutedEventArgs routedEventArgs)
-        {
-            _hasFocus = false;
-        }
-
-        private void OnGotFocus(object sender, RoutedEventArgs routedEventArgs)
-        {
-            _hasFocus = true;
-        }
-
-        private void OnValueTextBoxTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
-        {
-            this.UpdateValueFromText();
-        }
-
-#if MIGRATION
-        private void OnValueTextBoxKeyDown(object sender, KeyEventArgs e)
-#else
-        private void OnValueTextBoxKeyDown(object sender, KeyRoutedEventArgs e)
-#endif
-        {
-#if MIGRATION
-            if (e.Key == Key.Enter)
-#else
-            if (e.Key == VirtualKey.Enter)
-#endif
-            {
-                if (this.UpdateValueFromText())
+                e.InCoercion = false;
+                double value = Value;
+                if (_initialVal != value)
                 {
-                    this.UpdateValueText();
-                    _valueTextBox.SelectAll();
-                    e.Handled = true;
+                    e.NewValue = Value;
+                    base.OnValueChanging(e);
                 }
             }
-        }
-
-        private bool UpdateValueFromText()
-        {
-            if (_isChangingTextWithCode)
-            {
-                return false;
-            }
-
-            double val;
-
-#if false
-            if (double.TryParse(_valueTextBox.Text, NumberStyles.Any, CultureInfo.CurrentUICulture, out val) ||
-                Calculator.TryCalculate(_valueTextBox.Text, out val))
-#else
-            if (double.TryParse(_valueTextBox.Text, out val))
-#endif
-            {
-                _isChangingValueWithCode = true;
-                this.SetValueAndUpdateValidDirections(val);
-                _isChangingValueWithCode = false;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        #endregion
-
-        #region Button event handlers
-#if false
-        private void OnDecrementButtonIsPressedChanged(object decrementButton, bool isPressed)
-        {
-            // TODO: The thinking was to handle speed and acceleration of value changes manually on a regular Button when it is pressed.
-            // Currently just using RepeatButtons
-        }
-
-        private void OnIncrementButtonIsPressedChanged(object incrementButton, bool isPressed)
-        {
-        }
-#endif
-        private void OnDecrementButtonClick(object sender, RoutedEventArgs routedEventArgs)
-        {
-#if false
-            if (Window.Current.CoreWindow.IsInputEnabled)
-            {
-#endif
-                this.DoDecrement();
-#if false
-            }
-#endif
-        }
-
-        private void OnIncrementButtonClick(object sender, RoutedEventArgs routedEventArgs)
-        {
-#if false
-            if (Window.Current.CoreWindow.IsInputEnabled)
-            {
-#endif
-                this.DoIncrement();
-#if false
-            }
-#endif
-        }
-        #endregion
-
-        /// <summary>
-        /// Decrements the value by Increment.
-        /// </summary>
-        /// <returns><c>true</c> if the value was decremented by exactly <c>Increment</c>; <c>false</c> if it was constrained.</returns>
-        protected bool DoDecrement()
-        {
-#if !BRIDGE
-            return this.SetValueAndUpdateValidDirections(Math.Round(value: this.Value - this.Increment, digits: 5));
-#else
-            return this.SetValueAndUpdateValidDirections(Math.Round(d: this.Value - this.Increment, digits: 5));
-#endif
-        }
-
-        protected bool DoIncrement()
-        {
-#if !BRIDGE
-            return this.SetValueAndUpdateValidDirections(Math.Round(value: this.Value + this.Increment, digits: 5));
-#else
-            return this.SetValueAndUpdateValidDirections(Math.Round(d: this.Value + this.Increment, digits: 5));
-#endif
+            // ----------
         }
 
         /// <summary>
-        /// Gets or sets a value added or subtracted from the value property. The default values is one.
+        /// Override UpDownBase&lt;T&gt;.OnValueChanged to raise value changed automation event and 
+        /// determine if a maximum or minimum has been reached.
         /// </summary>
-        public double Increment
+        /// <param name="e">Event args.</param>
+        protected override void OnValueChanged(RoutedPropertyChangedEventArgs<double> e)
         {
-            get { return (double)GetValue(IncrementProperty); }
-            set { SetValue(IncrementProperty, value); }
+            NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(this) as NumericUpDownAutomationPeer;
+            if (peer != null)
+            {
+                peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.ValueProperty, e.OldValue, e.NewValue);
+            }
+
+            // reevaluate the valid spin direction
+            SetValidSpinDirection();
+
+            base.OnValueChanged(e);
         }
+
         /// <summary>
-        /// The identifier for the Increment dependency property.
+        /// Called by ApplyValue to parse user input as a decimal number.
         /// </summary>
-        public static readonly DependencyProperty IncrementProperty =
-            DependencyProperty.Register("Increment", typeof(double), typeof(NumericUpDown), new PropertyMetadata(1.0));
-
-        private void OnValueTextBoxGotFocus(object sender, RoutedEventArgs routedEventArgs)
+        /// <param name="text">User input.</param>
+        /// <returns>Value parsed from user input.</returns>
+        protected override double ParseValue(string text)
         {
-            if (_dragOverlay != null)
-            {
-                _dragOverlay.IsHitTestVisible = false;
-            }
-
-            _valueTextBox.SelectAll();
+            return double.Parse(text, CultureInfo.CurrentCulture);
         }
 
-        private void OnValueTextBoxLostFocus(object sender, RoutedEventArgs routedEventArgs)
+        /// <summary>
+        /// Provides decimal specific value formatting for the value property.
+        /// </summary>
+        /// <returns>Formatted Value.</returns>
+        protected internal override string FormatValue()
         {
-#if false
-            if (_dragOverlay != null)
-            {
-                _dragOverlay.IsHitTestVisible = true;
-                this.UpdateValueText();
-            }
-#else
-            //---------------------------------------------------------------
-            // If the value of the TextBox is invalid or out of range
-            // (note: value coercion is handled by the base RangeBase class),
-            // we need to update the TextBox to reflect the current Value:
-            //---------------------------------------------------------------
-            double val;
-            if (_valueTextBox != null && (!double.TryParse(_valueTextBox.Text, out val) || val != this.Value))
-            {
-                UpdateValueText();
-            }
-#endif
+            return Value.ToString(formatString, CultureInfo.CurrentCulture);
         }
 
-#if MIGRATION
-        private void OnDragOverlayPointerPressed(object sender, MouseEventArgs e)
-#else
-        private void OnDragOverlayPointerPressed(object sender, PointerRoutedEventArgs e)
-#endif
+        /// <summary>
+        /// Called by OnSpin when the spin direction is SpinDirection.Increase.
+        /// </summary>
+        protected override void OnIncrement()
         {
-#if false
-#if MIGRATION
-            _dragOverlay.CaptureMouse();
-#else
-            _dragOverlay.CapturePointer(e.Pointer);
-#endif
-#endif
-            _totalDeltaX = 0;
-            _totalDeltaY = 0;
-
-#if false
-            if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
-            {
-                _isDraggingWithMouse = true;
-                _mouseDevice = MouseDevice.GetForCurrentView();
-                _mouseDevice.MouseMoved += this.OnMouseDragged;
-                Window.Current.CoreWindow.PointerCursor = null;
-            }
-            else
-            {
-                _dragOverlay.ManipulationDelta += this.OnDragOverlayManipulationDelta;
-            }
-#endif
+            Value = (double)((decimal)Value + (decimal)Increment);
+            _requestedVal = Value;
         }
 
-#if false
-        private void CoreWindowOnPointerReleased(CoreWindow sender, PointerEventArgs args)
-#else
-#if MIGRATION
-        private void CoreWindowOnPointerReleased(object sender, MouseEventArgs args)
-#else
-        private void CoreWindowOnPointerReleased(object sender, PointerRoutedEventArgs args)
-#endif
-#endif
+        /// <summary>
+        /// Called by OnSpin when the spin direction is SpinDirection.Decrease.
+        /// </summary>
+        protected override void OnDecrement()
         {
-            if (_isDragUpdated)
-            {
-                args.Handled = true;
-                this.ResumeValueTextBoxTabStopAsync();
-            }
+            Value = (double)((decimal)Value - (decimal)Increment);
+            _requestedVal = Value;
         }
+#endregion
 
-#if false
-        private void SuspendValueTextBoxTabStop()
+#region Property Coersion and validation
+        /// <summary>
+        /// Levels from root call.
+        /// </summary>
+        private int _levelsFromRootCall;
+
+        /// <summary>
+        /// Initial Increment value.
+        /// </summary>
+        private double _initialInc = 1;
+
+        /// <summary>
+        /// Initial Minimum value.
+        /// </summary>
+        private double _initialMin;
+
+        /// <summary>
+        /// Initial Maximum value.
+        /// </summary>
+        private double _initialMax = 100;
+
+        /// <summary>
+        /// Initial Minimum value.
+        /// </summary>
+        private double _initialVal;
+
+        /// <summary>
+        /// Requested Increment value.
+        /// </summary>
+        private double _requestedInc = 1;
+
+        /// <summary>
+        /// Requested Minimum value.
+        /// </summary>
+        private double _requestedMin;
+
+        /// <summary>
+        /// Requested Maximum value.
+        /// </summary>
+        private double _requestedMax = 100;
+
+        /// <summary>
+        /// Requested Value value.
+        /// </summary>
+        private double _requestedVal;
+
+        /// <summary>
+        /// Ensure the Maximum is greater than or equal to the Minimum.
+        /// </summary>
+        private void CoerceMaximum()
         {
-            if (_valueTextBox != null)
-            {
-                _valueTextBox.IsTabStop = false;
-            }
-        }
-#endif
+            double minimum = Minimum;
+            double maximum = Maximum;
 
-        private async void ResumeValueTextBoxTabStopAsync()
-        {
-            // We need to wait for just a bit to allow manipulation events to complete.
-            // It's a bit hacky, but it's the simplest solution.
-            await Task.Delay(100);
-
-#if false
-            if (_valueTextBox != null)
+            // first check whether _requestedMax is good
+            // second, check against Minimum to enforce coercion
+            // last, handle DecimalPlaces change.
+            if (_requestedMax != maximum)
             {
-                _valueTextBox.IsTabStop = true;
-            }
-#endif
-        }
-
-#if MIGRATION
-        private void OnDragOverlayPointerReleased(object sender, MouseEventArgs args)
-#else
-        private void OnDragOverlayPointerReleased(object sender, PointerRoutedEventArgs args)
-#endif
-        {
-            this.EndDragging(args);
-        }
-
-#if MIGRATION
-        private void OnDragOverlayPointerCaptureLost(object sender, MouseEventArgs args)
-#else
-        private void OnDragOverlayPointerCaptureLost(object sender, PointerRoutedEventArgs args)
-#endif
-        {
-            this.EndDragging(args);
-        }
-
-#if MIGRATION
-        private void EndDragging(MouseEventArgs args)
-#else
-        private void EndDragging(PointerRoutedEventArgs args)
-#endif
-        {
-#if false
-            if (_isDraggingWithMouse)
-            {
-                _isDraggingWithMouse = false;
-                _mouseDevice.MouseMoved -= this.OnMouseDragged;
-                Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.SizeAll, 1);
-                _mouseDevice = null;
-            }
-            else if (_dragOverlay != null)
-            {
-                _dragOverlay.ManipulationDelta -= this.OnDragOverlayManipulationDelta;
-            }
-#endif
-            if (_isDragUpdated)
-            {
-                if (args != null)
+                // _requestedMax != maximum, because:
+                // * Minimum changed, adjust Maximum
+                //   - either _requestedMax good again
+                //   - or new Minimum decides new Maximum
+                // * Maximum changed and coerced (maximum == minimum), do nothing
+                if (_requestedMax >= minimum)
                 {
-                    args.Handled = true;
+                    SetValue(MaximumProperty, _requestedMax);
                 }
-
-                this.ResumeValueTextBoxTabStopAsync();
+                else if (maximum != minimum)
+                {
+                    SetValue(MaximumProperty, minimum);
+                }
+            }
+            else if (maximum < minimum)
+            {
+                // _requestedMax == maximum, enforce coercion
+                SetValue(MaximumProperty, minimum);
             }
         }
-
-#if false
-        private void OnCoreWindowVisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
-        {
-            // There are cases where pointer isn't getting released - this should hopefully end dragging too.
-            if (!args.Visible)
-            {
-#pragma warning disable 4014
-                this.EndDragging(null);
-#pragma warning restore 4014
-            }
-        }
-#endif
-
-#if false
-        private void OnMouseDragged(MouseDevice sender, MouseEventArgs args)
-        {
-            var dx = args.MouseDelta.X;
-            var dy = args.MouseDelta.Y;
-
-            if (dx > 200 || dx < -200 || dy > 200 || dy < -200)
-            {
-                return;
-            }
-
-            _totalDeltaX += dx;
-            _totalDeltaY += dy;
-
-            if (_totalDeltaX > MinMouseDragDelta ||
-                _totalDeltaX < -MinMouseDragDelta ||
-                _totalDeltaY > MinMouseDragDelta ||
-                _totalDeltaY < -MinMouseDragDelta)
-            {
-                this.UpdateByDragging(_totalDeltaX, _totalDeltaY);
-                _totalDeltaX = 0;
-                _totalDeltaY = 0;
-            }
-        }
-
-        private void OnDragOverlayManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs manipulationDeltaRoutedEventArgs)
-        {
-            var dx = manipulationDeltaRoutedEventArgs.Delta.Translation.X;
-            var dy = manipulationDeltaRoutedEventArgs.Delta.Translation.Y;
-
-            if (this.UpdateByDragging(dx, dy))
-                return;
-
-            manipulationDeltaRoutedEventArgs.Handled = true;
-        }
-
-        private bool UpdateByDragging(double dx, double dy)
-        {
-            if (!this.IsEnabled ||
-                this.IsReadOnly ||
-                // ReSharper disable CompareOfFloatsByEqualityOperator
-                dx == 0 && dy == 0)
-            // ReSharper restore CompareOfFloatsByEqualityOperator
-            {
-                return false;
-            }
-
-            double delta;
-
-            if (Math.Abs(dx) > Math.Abs(dy))
-            {
-                delta = dx;
-            }
-            else
-            {
-                delta = -dy;
-            }
-
-            this.ApplyManipulationDelta(delta);
-
-#if false
-            this.SuspendValueTextBoxTabStop();
-#endif
-
-            _isDragUpdated = true;
-
-            return true;
-        }
-
-#endif
-        private void ApplyManipulationDelta(double delta)
-        {
-            if (Math.Sign(delta) == Math.Sign(_unusedManipulationDelta))
-                _unusedManipulationDelta += delta;
-            else
-                _unusedManipulationDelta = delta;
-
-            if (_unusedManipulationDelta <= 0 && this.Value == this.Minimum)
-            {
-                _unusedManipulationDelta = 0;
-                return;
-            }
-
-            if (_unusedManipulationDelta >= 0 && this.Value == this.Maximum)
-            {
-                _unusedManipulationDelta = 0;
-                return;
-            }
-
-            double smallerScreenDimension;
-
-            if (Window.Current != null)
-            {
-                smallerScreenDimension = Math.Min(Window.Current.Bounds.Width, Window.Current.Bounds.Height);
-            }
-            else
-            {
-                smallerScreenDimension = 768;
-            }
-
-            var speed = this.DragSpeed;
-
-            if (double.IsNaN(speed) ||
-                double.IsInfinity(speed))
-            {
-                speed = this.Maximum - this.Minimum;
-            }
-
-            if (double.IsNaN(speed) ||
-                double.IsInfinity(speed))
-            {
-                speed = double.MaxValue;
-            }
-
-            var screenAdjustedDelta = speed * _unusedManipulationDelta / smallerScreenDimension;
-            this.SetValueAndUpdateValidDirections(this.Value + screenAdjustedDelta);
-            _unusedManipulationDelta = 0;
-        }
-
-#if false
-        private void OnDragOverlayTapped(object sender, TappedRoutedEventArgs tappedRoutedEventArgs)
-        {
-            if (this.IsEnabled &&
-                _valueTextBox != null &&
-                _valueTextBox.IsTabStop)
-            {
-                _valueTextBox.Focus(FocusState.Programmatic);
-                Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.IBeam, 0);
-            }
-        }
-        private void OnValueTextBoxPointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            if (Window.Current.CoreWindow.PointerCursor.Type == CoreCursorType.IBeam)
-            {
-                Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 0);
-            }
-        }
-#endif
 
         /// <summary>
-        /// Fires the ValueChanged routed event.
+        /// Ensure the value falls between the Minimum and Maximum values.
+        /// This function assumes that (Maximum >= Minimum).
         /// </summary>
-        /// <param name="oldValue">Old value of the Value property.</param>
-        /// <param name="newValue">New value of the Value property.</param>
-        protected override void OnValueChanged(double oldValue, double newValue)
+        private void CoerceValue()
         {
-            base.OnValueChanged(oldValue, newValue);
+            double minimum = Minimum;
+            double maximum = Maximum;
+            Debug.Assert(maximum >= minimum, "Maximum value should have been coerced already!");
+            double value = Value;
 
-            this.UpdateValueBar();
-
-            if (!_isChangingValueWithCode)
+            if (_requestedVal != value)
             {
-                this.UpdateValueText();
-            }
-        }
-
-        private void UpdateValueBar()
-        {
-            if (_valueBar == null)
-                return;
-
-            var effectiveValueBarVisibility = this.ValueBarVisibility;
-
-            if (effectiveValueBarVisibility == NumericUpDownValueBarVisibility.Collapsed)
-            {
-                _valueBar.Visibility = Visibility.Collapsed;
-
-                return;
-            }
-
-#if false
-            _valueBar.Clip =
-                new RectangleGeometry
+                if (_requestedVal >= minimum && _requestedVal <= maximum)
                 {
-                    Rect = new Rect
-                    {
-                        X = 0,
-                        Y = 0,
-                        Height = _valueBar.ActualHeight,
-                        Width = _valueBar.ActualWidth * (this.Value - this.Minimum) / (this.Maximum - this.Minimum)
-                    }
-                };
-#endif
-
-            //_valueBar.Width =
-            //    _valueTextBox.ActualWidth * (Value - Minimum) / (Maximum - Minimum);
-        }
-
-        private void OnValueBarSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
-        {
-            this.UpdateValueBar();
-        }
-
-        private void UpdateValueText()
-        {
-            if (_valueTextBox != null)
+                    SetValue(ValueProperty, _requestedVal);
+                }
+                else if (_requestedVal < minimum && value != minimum)
+                {
+                    SetValue(ValueProperty, minimum);
+                }
+                else if (_requestedVal > maximum && value != maximum)
+                {
+                    SetValue(ValueProperty, maximum);
+                }
+            }
+            else if (value < minimum)
             {
-                _isChangingTextWithCode = true;
-#if false
-                _valueTextBox.Text = this.Value.ToString(this.ValueFormat);
-#else
-                _valueTextBox.Text = this.Value.ToString();
-#endif
-                _isChangingTextWithCode = false;
+                SetValue(ValueProperty, minimum);
+            }
+            else if (value > maximum)
+            {
+                SetValue(ValueProperty, maximum);
             }
         }
 
-        private void UpdateIsReadOnlyDependants()
+        /// <summary>
+        /// Check if an object value is a valid double value.
+        /// </summary>
+        /// <param name="value">The value to be checked.</param>
+        /// <param name="number">The double value to be returned.</param>
+        /// <returns>true if a valid double; false otherwise.</returns>
+        private static bool IsValidDoubleValue(object value, out double number)
         {
-            if (_decrementButton != null)
+            number = (double)value;
+            return !double.IsNaN(number) && !double.IsInfinity(number)
+                && number <= (double)decimal.MaxValue && number >= (double)decimal.MinValue;
+        }
+
+        /// <summary>
+        /// Ensure the new value of a dependency property change is a valid double value, 
+        /// or revert the change and throw an exception.
+        /// </summary>
+        /// <remarks>
+        /// EnsureValidDoubleValue(DependencyObject d, DependencyPropertyChangedEventArgs e) is simply a wrapper for 
+        /// EnsureValidDoubleValue(DependencyObject d, DependencyProperty property, object oldValue, object newValue).
+        /// </remarks>
+        /// <param name="d">The DependencyObject whose DependencyProperty is changed.</param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
+        private static void EnsureValidDoubleValue(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            EnsureValidDoubleValue(d, e.Property, e.OldValue, e.NewValue);
+        }
+
+        /// <summary>
+        /// Ensure the new value of a dependency property change is a valid double value, 
+        /// or revert the change and throw an exception.
+        /// </summary>
+        /// <param name="d">The DependencyObject whose DependencyProperty is changed.</param>
+        /// <param name="property">The DependencyProperty that changed.</param>
+        /// <param name="oldValue">The old value.</param>
+        /// <param name="newValue">The new value.</param>
+        private static void EnsureValidDoubleValue(DependencyObject d, DependencyProperty property, object oldValue, object newValue)
+        {
+            NumericUpDown nud = d as NumericUpDown;
+            double number;
+            if (!IsValidDoubleValue(newValue, out number))
             {
-                _decrementButton.Visibility = this.IsReadOnly ? Visibility.Collapsed : Visibility.Visible;
-            }
+                // revert back to old value
+                nud._levelsFromRootCall++;
+                nud.SetValue(property, oldValue);
+                nud._levelsFromRootCall--;
 
-            if (_incrementButton != null)
+                // throw ArgumentException
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Invalid double value '{0}': valid value is of double type and within decimal range.",
+                    newValue);
+                throw new ArgumentException(message, "newValue");
+            }
+        }
+
+        /// <summary>
+        /// Ensure the new value of Increment dependency property change is valid, 
+        /// or revert the change and throw an exception.
+        /// </summary>
+        /// <param name="d">The DependencyObject whose DependencyProperty is changed.</param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
+        private static void EnsureValidIncrementValue(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            NumericUpDown nud = (NumericUpDown)d;
+            double number;
+            if (!IsValidDoubleValue(e.NewValue, out number) || number <= 0)
             {
-                _incrementButton.Visibility = this.IsReadOnly ? Visibility.Collapsed : Visibility.Visible;
+                // revert back to old value.
+                nud._levelsFromRootCall++;
+                nud.SetValue(e.Property, e.OldValue);
+                nud._levelsFromRootCall--;
+
+                // throw ArgumentException
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Invalid Increment value '{0}': valid value is of double type, within decimal range, and positive",
+                    e.NewValue);
+                throw new ArgumentException(message, "e");
             }
         }
 
-        private bool SetValueAndUpdateValidDirections(double value)
+        /// <summary>
+        /// Ensure the new value of DecimalPlaces dependency property change is valid, 
+        /// or revert the change and throw an exception.
+        /// </summary>
+        /// <param name="d">The DependencyObject whose DecimalPlaces DependencyProperty is changed.</param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs.</param>
+        private static void EnsureValidDecimalPlacesValue(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // Range coercion is handled by base class.
-            var oldValue = this.Value;
-            this.Value = value;
-            this.SetValidIncrementDirection();
+            NumericUpDown nud = d as NumericUpDown;
+            int decimalPlaces = (int)e.NewValue;
+            if (decimalPlaces < 0 || decimalPlaces > 15)
+            {
+                // revert the change
+                nud._levelsFromRootCall++;
+                nud.DecimalPlaces = (int)e.OldValue;
+                nud._levelsFromRootCall--;
 
-            return Math.Abs(this.Value - oldValue) > Epsilon;
+                // throw exception
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Invalid DecimalPlaces value '{0}': valid value is of int type and within 0 and 15 inclusive.",
+                    e.NewValue);
+                throw new ArgumentException(message, "e");
+            }
+        }
+#endregion
+
+#region visual state management
+        /// <summary>
+        /// Update current visual state.
+        /// </summary>
+        /// <param name="useTransitions">True to use transitions when updating the visual state, false to snap directly to the new visual state.</param>
+        internal override void UpdateVisualState(bool useTransitions)
+        {
+            // handle common states
+            base.UpdateVisualState(useTransitions);
         }
 
-        private void SetValidIncrementDirection()
+        /// <summary>
+        /// Update the visual state of the control.
+        /// </summary>
+        /// <param name="useTransitions">A value indicating whether to automatically generate transitions to the new state, or instantly transition to the new state.</param>
+        void IUpdateVisualState.UpdateVisualState(bool useTransitions)
         {
-            VisualStateManager.GoToState(this, this.Value < this.Maximum ? "IncrementEnabled" : "IncrementDisabled", true);
-            VisualStateManager.GoToState(this, this.Value > this.Minimum ? "DecrementEnabled" : "DecrementDisabled", true);
+            UpdateVisualState(useTransitions);
         }
+#endregion
     }
 }
