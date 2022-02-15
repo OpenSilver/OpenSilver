@@ -125,7 +125,7 @@
                                             </VisualState>
                                         </VisualStateGroup>
                                         <VisualStateGroup x:Name="FocusStates">
-                                            < x:Name="Focused">
+                                            <VisualState x:Name="Focused">
                                                 <Storyboard>
                                                     <ObjectAnimationUsingKeyFrames
                             Duration="0"
@@ -136,7 +136,7 @@
                               Value="Visible" />
                                                     </ObjectAnimationUsingKeyFrames>
                                                 </Storyboard>
-                                            </>
+                                            </VisualState>
                                             <VisualState x:Name="Unfocused" />
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>

@@ -306,7 +306,6 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MediaElement.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NumericUpDown.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Picker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlock.cs" />
