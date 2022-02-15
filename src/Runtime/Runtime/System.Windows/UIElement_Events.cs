@@ -1329,9 +1329,9 @@ namespace Windows.UI.Xaml
                 if (_keyDownEventManager == null)
                 {
 #if MIGRATION
-                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown);
+                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyEventArgs>(() => INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown, true);
 #else
-                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown);
+                    _keyDownEventManager = new INTERNAL_EventManager<KeyEventHandler, KeyRoutedEventArgs>(() => INTERNAL_OuterDomElement, "keydown", ProcessOnKeyDown, true);
 #endif
                 }
                 return _keyDownEventManager;
