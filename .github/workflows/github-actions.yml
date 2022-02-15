@@ -7,7 +7,7 @@ jobs:
   OpenSilver-Build:
     #We should not run these steps on the forks by default.
     if: github.repository_owner == 'OpenSilver'
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - uses: microsoft/setup-msbuild@v1.0.3
       - name: Inject slug/short variables
