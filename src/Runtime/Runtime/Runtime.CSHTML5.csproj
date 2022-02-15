@@ -504,6 +504,8 @@
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\OperationContextScope.cs" />
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\UnknownMessageReceivedEventArgs.cs" />
     <Compile Include="System.ServiceModel\XmlSerializerFormatAttribute.cs" />
+    <Compile Include="System.ServiceModel\WORKINPROGRESS\CSHTML5_DuplexClientBase.cs" />
+    <Compile Include="System.ServiceModel\WORKINPROGRESS\InstanceContext.cs" />
     <Compile Include="System.Windows.Browser\HtmlDocument.cs" />
     <Compile Include="System.Windows.Browser\HtmlPage.cs" />
     <Compile Include="System.Windows.Browser\HtmlWindow.cs" />

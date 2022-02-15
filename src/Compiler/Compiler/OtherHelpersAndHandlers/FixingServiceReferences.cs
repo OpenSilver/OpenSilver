@@ -161,8 +161,12 @@ namespace DotNetForHtml5.Compiler
             }
         }
 
-        private static readonly string[] SupportedClientBaseTypes = new string[2] { "System.ServiceModel.ClientBase", "System.ServiceModel.DuplexClientBase" };
-        private const string CSHTML5_ClientBaseType = "System.ServiceModel.CSHTML5_ClientBase";
+        private static readonly Dictionary<string, string> SupportedClientBaseTypes = 
+            new Dictionary<string, string>()
+            {
+                ["System.ServiceModel.ClientBase"] = "System.ServiceModel.CSHTML5_ClientBase",
+                ["System.ServiceModel.DuplexClientBase"] = "System.ServiceModel.CSHTML5_DuplexClientBase",
+            };
         
         internal static string Fix(string inputText, string clientBaseForcedToken, string clientBaseForcedInterfaceName, string endpointCode, string soapVersion, out bool wasAnythingFixed)
         {
@@ -186,7 +190,7 @@ namespace DotNetForHtml5.Compiler
             // "System.ServiceModel.DuplexClientBase<...>" so we don't need to it every
             // time we call FixBlock().
             ISubstringFinderCharByChar clientBaseInterfaceFinder = new ArrayOfSubstringFinderCharByChar(
-                SupportedClientBaseTypes.Select(s => $"{s}<").ToArray());
+                SupportedClientBaseTypes.Keys.Select(s => $"{s}<").ToArray());
 
             bool isClientBaseInterfaceFound = false;
             string clientBaseInterfaceName = "";
@@ -344,10 +348,11 @@ namespace DotNetForHtml5.Compiler
             //extract the ServiceKnownTypesAttribute that are assigned to the Methods of the interfaces, to assign them to the interface itself (our version of JSIL is unable to get the custom Attributes from interfaces' methods, but not from the interface's type itself.
             ExtractServiceKnownTypeAttributesToInterfaceItself(ref finalText);
 
-            //Replace the inheritance to ClientBase with an inheritance to CSHTML5_ClientBase
-            for (int i = 0; i < SupportedClientBaseTypes.Length; i++)
+            // Replace the inheritance to ClientBase with an inheritance to CSHTML5_ClientBase 
+            // and DuplexClientBase with an inheritance to CSHTML5_DuplexClientBase
+            foreach (var pair in SupportedClientBaseTypes)
             {
-                finalText = finalText.Replace($"{SupportedClientBaseTypes[i]}<", $"{CSHTML5_ClientBaseType}<");
+                finalText = finalText.Replace($"{pair.Key}<", $"{pair.Value}<");
             }
 
             finalText = FixBasicHttpBinding(finalText);
