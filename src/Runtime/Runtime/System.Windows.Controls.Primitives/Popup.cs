@@ -14,8 +14,9 @@
 
 
 using System;
-using CSHTML5.Internal;
+using System.ComponentModel;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 
 #if MIGRATION
@@ -742,6 +743,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 _popupRoot.InvalidateArrange();
             }
             return finalSize;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void EnsurePopupStaysWithinScreenBounds(double forcedWidth = double.NaN, double forcedHeight = double.NaN)
+        {
+            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this, forcedWidth, forcedHeight);
         }
     }
 }
