@@ -13,9 +13,13 @@
 
 #if MIGRATION
 using System.Windows.Controls;
-namespace System.Windows.Media
 #else
 using Windows.UI.Xaml.Controls;
+#endif
+
+#if MIGRATION
+namespace System.Windows.Media
+#else
 namespace Windows.UI.Xaml.Media
 #endif
 {
@@ -32,10 +36,25 @@ namespace Windows.UI.Xaml.Media
         public VideoBrush() { }
 
         /// <summary>
+        /// The identifier for the <see cref="SourceName"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty SourceNameProperty =
+            DependencyProperty.Register(
+                nameof(SourceName),
+                typeof(string),
+                typeof(VideoBrush),
+                new PropertyMetadata(string.Empty));
+
+        /// <summary>
         ///  The name of the <see cref="MediaElement"/> to use as the source of the <see cref="VideoBrush"/>.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public string SourceName { get; set; }
+        public string SourceName
+        {
+            get => (string)GetValue(SourceNameProperty);
+            set => SetValue(SourceNameProperty, value);
+        }
 
         /// <summary>
         /// Sets the source of the <see cref="VideoBrush"/> using a media file source from an intermediary <see cref="MediaElement"/> control.
@@ -45,12 +64,5 @@ namespace Windows.UI.Xaml.Media
         /// </param>
         [OpenSilver.NotImplemented]
         public void SetSource(MediaElement source) { }
-
-        /// <summary>
-        /// The identifier for the <see cref="SourceName"/> dependency property.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-
-        public static readonly DependencyProperty SourceNameProperty;
     }
 }
