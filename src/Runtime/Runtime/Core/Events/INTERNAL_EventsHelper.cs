@@ -55,7 +55,7 @@ namespace CSHTML5.Internal
         static void AttachEvent(string eventName, object domElementRef, HtmlEventProxy newProxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
-            string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS((Action<object>)newProxy.Handler);
+            string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(newProxy.Handler);
             if (domElementRef is INTERNAL_HtmlDomElementReference)
                 Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
             else
@@ -88,7 +88,7 @@ namespace CSHTML5.Internal
         internal static void DetachEvent(string eventName, object domElementRef, HtmlEventProxy proxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
-            string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS((Action<object>)proxy.Handler);
+            string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(proxy.Handler);
             if (domElementRef is INTERNAL_HtmlDomElementReference)
                 Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
             else
