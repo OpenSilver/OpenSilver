@@ -492,13 +492,20 @@ namespace Windows.UI.Xaml
 
             object div1;
             var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            object div2;
-            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
-            div2style.width = "100%";
-            div2style.height = "100%";
-            if (INTERNAL_ForceEnableAllPointerEvents)
-                div2style.pointerEvents = "all";
-            domElementWhereToPlaceChildren = div2;
+            if (!this.IsUnderCustomLayout || INTERNAL_ForceEnableAllPointerEvents)
+            {
+                object div2;
+                var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
+                div2style.width = "100%";
+                div2style.height = "100%";
+                if (INTERNAL_ForceEnableAllPointerEvents)
+                    div2style.pointerEvents = "all";
+                domElementWhereToPlaceChildren = div2;
+            }
+            else
+            {
+                domElementWhereToPlaceChildren = div1;
+            }
             return div1;
         }
 

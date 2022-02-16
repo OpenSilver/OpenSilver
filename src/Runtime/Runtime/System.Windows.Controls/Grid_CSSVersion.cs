@@ -69,9 +69,12 @@ namespace Windows.UI.Xaml.Controls
             // Set the element on which the "MaxWidth" and "MaxHeight" properties should be applied (cf. zendesk ticket #1178 where scrollbars inside the ChildWindow did not function properly):
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = _innerDiv;
 
-            // Set the "display" CSS property:
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv);
-            style.display = !Grid_InternalHelpers.isMSGrid() ? style.display = "grid" : Grid_InternalHelpers.INTERNAL_CSSGRID_MS_PREFIX + "grid";
+            if (this.IsUnderCustomLayout == false)
+            {
+                // Set the "display" CSS property:
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv);
+                style.display = !Grid_InternalHelpers.isMSGrid() ? style.display = "grid" : Grid_InternalHelpers.INTERNAL_CSSGRID_MS_PREFIX + "grid";
+            }
 
             // Normalize the sizes of the rows and columns:
             List<ColumnDefinition> normalizedColumnDefinitions = null;
