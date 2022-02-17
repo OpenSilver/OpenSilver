@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Constants
+        #region Constants
 
         // Automation Id constants
         private const string DATAPAGER_currentPageTextBoxAutomationId = "CurrentPage";
@@ -153,9 +153,9 @@ namespace Windows.UI.Xaml.Controls
         private const int DATAPAGER_defaultNumericButtonCount = 5;
         private const int DATAPAGER_defaultPageIndex = -1;
 
-#endregion Constants
+        #endregion Constants
 
-#region Static Fields
+        #region Static Fields
 
         /// <summary>
         /// Identifies the AutoEllipsis dependency property.
@@ -319,7 +319,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(DataPager),
                 new PropertyMetadata(OnSourcePropertyChanged));
 
-#endregion Static Fields
+        #endregion Static Fields
 
         ////------------------------------------------------------
         ////
@@ -327,7 +327,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Private Fields
+        #region Private Fields
 
         /// <summary>
         /// Private accessor for the text block appearing before the current page text box.
@@ -415,7 +415,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>Boolean value for whether the operation succeeded</returns>
         private delegate bool PageMoveOperationDelegate();
 
-#endregion Private Fields
+        #endregion Private Fields
 
         ////------------------------------------------------------
         ////
@@ -423,7 +423,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the DataPager class.
@@ -442,7 +442,7 @@ namespace Windows.UI.Xaml.Controls
             this.SetBinding(DataPager.PrivateForegroundProperty, foregroundBinding);
         }
 
-#endregion Constructors
+        #endregion Constructors
 
         ////------------------------------------------------------
         ////
@@ -450,7 +450,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Events
+        #region Events
 
         /// <summary>
         /// EventHandler for when PageIndex is changing.
@@ -462,7 +462,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event EventHandler<EventArgs> PageIndexChanged;
 
-#endregion Events
+        #endregion Events
 
         ////------------------------------------------------------
         ////
@@ -470,7 +470,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Public Properties
+        #region Public Properties
 
         /// <summary>
         /// Gets or sets a value that indicates whether or not to use an ellipsis as the last button.
@@ -720,7 +720,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Public Properties
+        #endregion Public Properties
 
         ////------------------------------------------------------
         ////
@@ -728,7 +728,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Internal Properties
+        #region Internal Properties
 
         /// <summary>
         /// Gets the TextBox holding the current PageIndex value, if any.
@@ -752,7 +752,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Internal Properties
+        #endregion Internal Properties
 
 
         /// <summary>
@@ -777,7 +777,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Applies the control's template, retrieves the elements
@@ -890,15 +890,15 @@ namespace Windows.UI.Xaml.Controls
             this.UpdateControl();
         }
 
-#endregion Public Methods
+        #endregion Public Methods
 
-////------------------------------------------------------
-////
-////  Protected Methods
-////
-////------------------------------------------------------ 
+        ////------------------------------------------------------
+        ////
+        ////  Protected Methods
+        ////
+        ////------------------------------------------------------ 
 
-#region Protected Methods
+        #region Protected Methods
 
 #if OPENSILVER
         /// <summary>
@@ -911,7 +911,7 @@ namespace Windows.UI.Xaml.Controls
         }
 #endif
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
         ////------------------------------------------------------
         ////
@@ -919,7 +919,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Private Static Methods
+        #region Private Static Methods
 
         /// <summary>
         /// AutoEllipsis property changed handler.
@@ -1250,7 +1250,7 @@ namespace Windows.UI.Xaml.Controls
             pager.UpdateControl();
         }
 
-#endregion Private Static Methods
+        #endregion Private Static Methods
 
         ////------------------------------------------------------
         ////
@@ -1258,7 +1258,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Private Methods
+        #region Private Methods
 
         /// <summary>
         /// Gets the starting index that our buttons should be labeled with.
@@ -1338,7 +1338,7 @@ namespace Windows.UI.Xaml.Controls
 
         {
 #if MIGRATION
-        if (e.Key == System.Windows.Input.Key.Enter)
+            if (e.Key == System.Windows.Input.Key.Enter)
 #else
         if (e.Key == Windows.System.VirtualKey.Enter)
 #endif
@@ -2107,6 +2107,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
     }
 }

@@ -164,7 +164,7 @@ namespace Windows.UI.Xaml.Controls
                 // Does the list have anything in it?
 
                 IEnumerator en = list.GetEnumerator();
-                if (en.MoveNext() && en.Current != null) 
+                if (en.MoveNext() && en.Current != null)
                 {
                     return en.Current.GetType();
                 }
@@ -181,7 +181,7 @@ namespace Windows.UI.Xaml.Controls
                 element.Style = style;
             }
         }
-       
+
         internal static Point Translate(this UIElement fromElement, UIElement toElement, Point fromPoint)
         {
             if (fromElement == toElement)
