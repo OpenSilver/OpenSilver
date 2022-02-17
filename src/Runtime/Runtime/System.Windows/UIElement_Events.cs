@@ -572,12 +572,12 @@ namespace Windows.UI.Xaml
                     _pointerReleasedEventManager = new INTERNAL_EventManager<MouseButtonEventHandler, MouseButtonEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                         {
                             ProcessPointerEvent(jsEventArg, (Action<MouseButtonEventArgs>)OnMouseLeftButtonUp, (Action<MouseButtonEventArgs>)OnMouseLeftButtonUp_ForHandledEventsToo, checkForDivsThatAbsorbEvents: true);
-                        });
+                        }, true);
 #else
                     _pointerReleasedEventManager = new INTERNAL_EventManager<PointerEventHandler, PointerRoutedEventArgs>(() => this.INTERNAL_OuterDomElement, eventsNames, (jsEventArg) =>
                     {
                         ProcessPointerEvent(jsEventArg, (Action<PointerRoutedEventArgs>)OnPointerReleased, (Action<PointerRoutedEventArgs>)OnPointerReleased_ForHandledEventsToo, checkForDivsThatAbsorbEvents: true);
-                    });
+                    }, true);
 #endif
                 }
                 return _pointerReleasedEventManager;
