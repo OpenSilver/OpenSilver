@@ -72,6 +72,7 @@
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
     <Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
     <Compile Include="Core\Other\INTERNAL_DispatcherQueueHandler.cs" />
+    <Compile Include="OpenSilver\Internal\Controls\DataPager.cs" />
     <Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
     <Compile Include="OpenSilver\Internal\ApplicationLifetimeObjectsCollection.cs" />
     <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\CommunicationObject.cs" />
     <Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IHttpCookieContainerManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
+    <Compile Include="System.Windows.Automation\WORKINPROGRESS\AutomationProperties.cs" />
     <Compile Include="System.Windows.Browser\EventSubscriber.cs" />
     <Compile Include="System.Windows.Browser\HttpUtility.CSHTML5.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\BrowserInformation.cs" />
@@ -142,6 +144,21 @@
     <Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\VisualTreeExtensions.cs" />
     <Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
     <Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
+    <Compile Include="System.Windows.Controls\DataPager\DataPager.cs" />
+    <Compile Include="System.Windows.Controls\DataPager\DataPagerAutomationPeer.cs" />
+    <Compile Include="System.Windows.Controls\DataPager\Extensions.cs" />
+    <Compile Include="System.Windows.Controls\DataPager\PagerDisplayMode.cs" />
+    <Compile Include="System.Windows.Controls\DataPager\PagerResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PagerResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="System.Windows.Controls\DataPager\Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="System.Windows.Controls\DataPager\WeakEventListener.cs" />
     <Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
     <Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
     <Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
@@ -686,7 +703,6 @@
     <Compile Include="System.Windows.Controls\DataGridSelectionUnit.cs" />
     <Compile Include="System.Windows.Controls\DataGridTemplateColumn.cs" />
     <Compile Include="System.Windows.Controls\DataGridTextColumn.cs" />
-    <Compile Include="System.Windows.Controls\DataPager.cs" />
     <Compile Include="System.Windows.Controls\DatePicker.cs" />
     <Compile Include="System.Windows.Controls\DragDropEffects.cs" />
     <Compile Include="System.Windows.Controls\DragDropKeyStates.cs" />
@@ -1083,6 +1099,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultDataPagerStyle_Internal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultDatePickerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1202,6 +1222,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
+    <EmbeddedResource Include="System.Windows.Controls\DataPager\PagerResources.resx">
+      <LastGenOutput>PagerResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.DataPager</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="System.Windows.Controls\DataPager\Resource.resx">
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.DataPager</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Bridge, Version=17.9.0.0, Culture=neutral, processorArchitecture=MSIL">

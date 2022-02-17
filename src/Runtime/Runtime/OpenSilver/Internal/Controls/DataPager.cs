@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
 using System.Linq;
@@ -22,25 +20,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
-
 using System.Windows.Input;
 
 #if MIGRATION
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Controls;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+namespace OpenSilver.Internal.Controls
 {
     public enum DataPager_DisplayMode
     {
@@ -67,10 +64,13 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(DataPager);
         }
 
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public bool IsTotalItemCountFixed { get; set; }
 
-#region DisplayMode
+        [NotImplemented]
+        public bool AutoEllipsis { get; set; }
+
+        #region DisplayMode
 
         /// <summary>
         /// Gets or sets the currently selected mode.
