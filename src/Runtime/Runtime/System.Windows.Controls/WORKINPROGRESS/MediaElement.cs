@@ -14,6 +14,11 @@
 
 using System;
 using System.IO;
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -35,21 +40,74 @@ namespace Windows.UI.Xaml.Controls
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        ///  The amount of time to buffer. The default value is a <see cref="TimeSpan"/> with value of 5 seconds (0:0:05).
+        /// </summary>
         [OpenSilver.NotImplemented]
         public TimeSpan BufferingTime { get; set; }
 
-        [OpenSilver.NotImplemented]
-        public event RoutedEventHandler MediaEnded;
-
+        /// <summary>
+        /// Gets or sets the current position of progress through the media's playback time.
+        /// </summary>
         [OpenSilver.NotImplemented]
         public TimeSpan Position { get; set; }
 
+        /// <summary>
+        /// Gets the duration of the media file currently opened.
+        /// </summary>
         [OpenSilver.NotImplemented]
         public Duration NaturalDuration { get; }
 
+        /// <summary>
+        /// Gets the status of the <see cref="MediaElement"/>.
+        /// </summary>
         [OpenSilver.NotImplemented]
-        public void SetSource(Stream stream)
-        {
-        }
+        public MediaElementState CurrentState { get; }
+
+        /// <summary>
+        ///  The collection of timeline markers (represented as <see cref="TimelineMarker"/> objects) associated
+        ///  with the currently loaded media file.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public TimelineMarkerCollection Markers { get; }
+
+        /// <summary>
+        /// Gets a percentage value indicating the amount of download completed for content located on a remote server.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double DownloadProgress { get; }
+
+        /// <summary>
+        /// Gets the offset of the download progress.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double DownloadProgressOffset { get; }
+
+        /// <summary>
+        /// Sets the <see cref="Source"/> property using the supplied stream.
+        /// </summary>
+        /// <param name="stream">
+        /// A stream that contains a natively supported media source.
+        /// </param>
+        [OpenSilver.NotImplemented]
+        public void SetSource(Stream stream) { }
+
+        /// <summary>
+        /// Occurs when the <see cref="MediaElement"/> is no longer playing audio or video.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event RoutedEventHandler MediaEnded;
+
+        /// <summary>
+        /// Occurs when the value of the <see cref="CurrentState"/> property changes.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event RoutedEventHandler CurrentStateChanged;
+
+        /// <summary>
+        /// Occurs when the <see cref="DownloadProgress"/> property has changed.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event RoutedEventHandler DownloadProgressChanged;
     }
 }
