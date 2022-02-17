@@ -15,46 +15,40 @@
 //
 //===============================================================================
 
-
-
-#if WCF_STACK
-
-#if UNIMPLEMENTED_MEMBERS
+#if WCF_STACK || BRIDGE
 
 using System;
 
 namespace System.ServiceModel
 {
-    // Summary:
-    //     Enables an object to extend another object through aggregation.
-    //
-    // Type parameters:
-    //   T:
-    //     The object that participates in the custom behavior.
-    public partial interface IExtension<T> where T : System.ServiceModel.IExtensibleObject<T>
+    /// <summary>
+    /// Enables an object to extend another object through aggregation.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The object that participates in the custom behavior.
+    /// </typeparam>
+    public partial interface IExtension<T> where T : IExtensibleObject<T>
     {
-        // Summary:
-        //     Enables an extension object to find out when it has been aggregated. Called
-        //     when the extension is added to the System.ServiceModel.IExtensibleObject<T>.Extensions
-        //     property.
-        //
-        // Parameters:
-        //   owner:
-        //     The extensible object that aggregates this extension.
+        /// <summary>
+        /// Enables an extension object to find out when it has been aggregated. Called
+        /// when the extension is added to the <see cref="IExtensibleObject{T}.Extensions"/>
+        /// property.
+        /// </summary>
+        /// <param name="owner">
+        /// The extensible object that aggregates this extension.
+        /// </param>
         void Attach(T owner);
-        //
-        // Summary:
-        //     Enables an object to find out when it is no longer aggregated. Called when
-        //     an extension is removed from the System.ServiceModel.IExtensibleObject<T>.Extensions
-        //     property.
-        //
-        // Parameters:
-        //   owner:
-        //     The extensible object that aggregates this extension.
+
+        /// <summary>
+        /// Enables an object to find out when it is no longer aggregated. Called when
+        /// an extension is removed from the <see cref="IExtensibleObject{T}.Extensions"/>
+        /// property.
+        /// </summary>
+        /// <param name="owner">
+        /// The extensible object that aggregates this extension.
+        /// </param>
         void Detach(T owner);
     }
 }
-
-#endif
 
 #endif

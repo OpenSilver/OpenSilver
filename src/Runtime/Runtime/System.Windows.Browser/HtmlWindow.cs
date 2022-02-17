@@ -145,6 +145,9 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// <paramref name="name"/> is an empty string or contains an embedded null character (\0).
         /// </exception>
+#if BRIDGE
+        [Bridge.Template("{name}")]
+#endif
         public override object GetProperty(string name)
         {
             var result = default(object);

@@ -15,33 +15,27 @@
 //
 //===============================================================================
 
-
-
-#if WCF_STACK
-
-#if UNIMPLEMENTED_MEMBERS
+#if WCF_STACK || BRIDGE
 
 namespace System.ServiceModel
 {
-    // Summary:
-    //     Enable an object to participate in custom behavior, such as registering for
-    //     events, or watching state transitions.
-    //
-    // Type parameters:
-    //   T:
-    //     The type of the extension class.
-    public partial interface IExtensibleObject<T> where T : System.ServiceModel.IExtensibleObject<T>
+    /// <summary>
+    /// Enable an object to participate in custom behavior, such as registering for
+    /// events, or watching state transitions.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of the extension class.
+    /// </typeparam>
+    public partial interface IExtensibleObject<T> where T : IExtensibleObject<T>
     {
-        // Summary:
-        //     Gets a collection of extension objects for this extensible object.
-        //
-        // Returns:
-        //     A System.ServiceModel.IExtensionCollection<T> of extension objects.
+        /// <summary>
+        /// Gets a collection of extension objects for this extensible object.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="IExtensionCollection{T}"/> of extension objects.
+        /// </returns>
         IExtensionCollection<T> Extensions { get; }
     }
 }
-
-
-#endif
 
 #endif

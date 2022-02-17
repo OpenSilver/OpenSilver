@@ -126,6 +126,7 @@
     <Compile Include="System.Net\WORKINPROGRESS\WebRequest.cs" />
     <Compile Include="System.Reflection\ICustomTypeProvider.cs" />
     <Compile Include="System.Resources\ResourceManager.cs" />
+    <Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\CommunicationObject.cs" />
     <Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IHttpCookieContainerManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
     <Compile Include="System.Windows.Browser\EventSubscriber.cs" />
@@ -158,14 +159,20 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
     <Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
+    <Compile Include="System.Windows.Input\WORKINPROGRESS\StylusPoint.cs" />
+    <Compile Include="System.Windows.Input\WORKINPROGRESS\StylusPointCollection.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerActionCollection.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerBase.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerCollection.cs" />
-    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\EventTriggerBase.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolvedEventArgs.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\NameResolver.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\PreviewInvokeEventArgs.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
+    <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TypeConstraintAttribute.cs" />
     <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />
@@ -494,9 +501,9 @@
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IChannel.cs" />
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\ICommunicationObject.cs" />
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IContextChannel.cs" />
-    <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IExtensibleObject.cs" />
-    <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IExtension.cs" />
-    <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\IExtensionCollection.cs" />
+    <Compile Include="System.ServiceModel\WORKINPROGRESS\IExtensibleObject.cs" />
+    <Compile Include="System.ServiceModel\WORKINPROGRESS\IExtension.cs" />
+    <Compile Include="System.ServiceModel\WORKINPROGRESS\IExtensionCollection.cs" />
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\ISession.cs" />
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\MessageHeader.cs" />
     <Compile Include="System.ServiceModel\UNIMPLEMENTED_MEMBERS\MessageHeaders.cs" />
@@ -1120,6 +1127,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Page Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultSliderStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

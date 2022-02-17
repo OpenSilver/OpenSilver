@@ -14,6 +14,8 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -112,7 +114,7 @@ namespace System.Windows.Interactivity
         {
             get
             {
-                AttributeCollection attributes = TypeDescriptor.GetAttributes(this.GetType());
+                IReadOnlyDictionary<Type, Attribute> attributes = GetAttributes(this.GetType());
                 TypeConstraintAttribute typeConstraintAttribute = attributes[typeof(TypeConstraintAttribute)] as TypeConstraintAttribute;
 
                 if (typeConstraintAttribute != null)
@@ -121,6 +123,32 @@ namespace System.Windows.Interactivity
                 }
                 return typeof(DependencyObject);
             }
+        }
+
+        private static IReadOnlyDictionary<Type, Attribute> GetAttributes(Type componentType)
+        {
+            Stack<Type> types = new Stack<Type>();
+            for (Type t = componentType; t != typeof(object); t = t.BaseType)
+            {
+                types.Push(t);
+            }
+
+            Dictionary<Type, Attribute> attributesMap = new Dictionary<Type, Attribute>();
+
+            while (types.Count != 0)
+            {
+                Type t = types.Pop();
+                object[] attrs = t.GetCustomAttributes(false);
+                for (int i = 0; i < attrs.Length; i++)
+                {
+                    if (attrs[i] is Attribute a)
+                    {
+                        attributesMap[a.GetType()] = a;
+                    }
+                }
+            }
+
+            return new ReadOnlyDictionary<Type, Attribute>(attributesMap);
         }
 
         /// <summary>
@@ -474,13 +502,13 @@ namespace System.Windows.Interactivity
                 }
             }
             this.eventHandlerMethodInfo = typeof(EventTriggerBase).GetMethod("OnEventImpl", BindingFlags.NonPublic | BindingFlags.Instance);
-            eventInfo.AddEventHandler(obj, Delegate.CreateDelegate(eventInfo.EventHandlerType, this, this.eventHandlerMethodInfo));
+            eventInfo.AddEventHandler(obj, Delegate.CreateDelegate(eventInfo.EventHandlerType(), this, this.eventHandlerMethodInfo));
         }
 
         private static bool IsValidEvent(EventInfo eventInfo)
         {
-            Type eventHandlerType = eventInfo.EventHandlerType;
-            if (typeof(Delegate).IsAssignableFrom(eventInfo.EventHandlerType))
+            Type eventHandlerType = eventInfo.EventHandlerType();
+            if (typeof(Delegate).IsAssignableFrom(eventInfo.EventHandlerType()))
             {
                 MethodInfo invokeMethod = eventHandlerType.GetMethod("Invoke");
                 ParameterInfo[] parameters = invokeMethod.GetParameters();
@@ -517,7 +545,7 @@ namespace System.Windows.Interactivity
 
             EventInfo eventInfo = targetType.GetEvent(eventName);
             Debug.Assert(eventInfo != null, "Should not try to unregister an event that we successfully registered");
-            eventInfo.RemoveEventHandler(obj, Delegate.CreateDelegate(eventInfo.EventHandlerType, this, this.eventHandlerMethodInfo));
+            eventInfo.RemoveEventHandler(obj, Delegate.CreateDelegate(eventInfo.EventHandlerType(), this, this.eventHandlerMethodInfo));
             this.eventHandlerMethodInfo = null;
         }
 

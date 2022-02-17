@@ -946,7 +946,7 @@ var range,selection;
         private void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
         {
 #if BRIDGE
-            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv);
+            previousInnerText = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv));
 #endif
         }
 
@@ -958,7 +958,7 @@ var range,selection;
         private void InternetExplorer_RaiseTextChangedIfNecessary()
         {
 #if BRIDGE
-            string newInnerText = OpenSilver.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv);
+            string newInnerText = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv));
             if (newInnerText != previousInnerText)
             {
                 TextAreaValueChanged();

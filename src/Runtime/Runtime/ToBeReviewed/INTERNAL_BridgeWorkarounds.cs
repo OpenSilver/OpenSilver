@@ -326,5 +326,15 @@ public static class INTERNAL_BridgeWorkarounds
 
         return null;
     }
+
+    public static Type EventHandlerType(this EventInfo eventInfo)
+    {
+        if (eventInfo == null)
+        {
+            throw new ArgumentNullException(nameof(eventInfo));
+        }
+
+        return eventInfo.AddMethod.GetParameters()[0].ParameterType;
+    }
 }
 #endif
