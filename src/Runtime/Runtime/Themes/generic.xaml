@@ -5,6 +5,7 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultItemsControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultAutoCompleteBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultButtonSpinnerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultChildWindowStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultComboBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDataGridStyle.xaml" />

@@ -11,10 +11,10 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-/// <summary>
-/// Provides data for the Spinner.Spin event.
-/// </summary>
-/// <QualityBand>Preview</QualityBand>
+    /// <summary>
+    /// Provides data for the Spinner.Spin event.
+    /// </summary>
+    /// <QualityBand>Preview</QualityBand>
     public partial class SpinEventArgs : RoutedEventArgs
     {
         /// <summary>

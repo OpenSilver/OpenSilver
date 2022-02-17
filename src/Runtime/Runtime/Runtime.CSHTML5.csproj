@@ -167,6 +167,15 @@
     <Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
     <Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
     <Compile Include="System.Windows.Controls\TextBoxView.cs" />
+    <Compile Include="System.Windows.Controls\Spinner.cs" />
+    <Compile Include="System.Windows.Controls\ButtonSpinner.cs" />
+    <Compile Include="System.Windows.Controls\UpDownBase.cs" />
+    <Compile Include="System.Windows.Controls\UpDownBase.Generic.cs" />
+    <Compile Include="System.Windows.Controls\UpDownParseErrorEventArgs.cs" />
+    <Compile Include="System.Windows.Controls\UpDownParsingEventArgs.cs" />
+    <Compile Include="System.Windows.Controls\ValidSpinDirections.cs" />
+    <Compile Include="System.Windows.Controls\SpinDirection.cs" />
+    <Compile Include="System.Windows.Controls\SpinEventArgs.cs" />
     <Compile Include="System.Windows.Controls\VirtualizingPanel.cs" />
     <Compile Include="System.Windows.Controls\VirtualizingStackPanel.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
@@ -1074,6 +1083,10 @@
     <Page Include="DefaultStyles\INTERNAL_DefaultBusyIndicatorStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultButtonSpinnerStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultButtonStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
