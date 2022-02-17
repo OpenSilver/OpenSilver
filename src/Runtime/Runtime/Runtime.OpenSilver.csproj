@@ -1121,6 +1121,10 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
+		<Content Include="DefaultStyles\INTERNAL_DefaultButtonSpinnerStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultAutoCompleteBoxStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
@@ -1249,9 +1253,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-    <Content Include="DefaultStyles\INTERNAL_DefaultButtonSpinnerStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
 	</ItemGroup>
