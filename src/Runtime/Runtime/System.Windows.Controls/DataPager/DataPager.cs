@@ -18,13 +18,17 @@ using OpenSilver.DataPager;
 
 #if MIGRATION
 using System.Windows.Automation;
+#if OPENSILVER
 using System.Windows.Automation.Peers;
+#endif
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Automation;
+#if OPENSILVER
 using Windows.UI.Xaml.Automation.Peers;
+#endif
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
@@ -77,7 +81,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Constants
+#region Constants
 
         // Automation Id constants
         private const string DATAPAGER_currentPageTextBoxAutomationId = "CurrentPage";
@@ -149,9 +153,9 @@ namespace Windows.UI.Xaml.Controls
         private const int DATAPAGER_defaultNumericButtonCount = 5;
         private const int DATAPAGER_defaultPageIndex = -1;
 
-        #endregion Constants
+#endregion Constants
 
-        #region Static Fields
+#region Static Fields
 
         /// <summary>
         /// Identifies the AutoEllipsis dependency property.
@@ -315,7 +319,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(DataPager),
                 new PropertyMetadata(OnSourcePropertyChanged));
 
-        #endregion Static Fields
+#endregion Static Fields
 
         ////------------------------------------------------------
         ////
@@ -323,7 +327,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Private Fields
+#region Private Fields
 
         /// <summary>
         /// Private accessor for the text block appearing before the current page text box.
@@ -411,7 +415,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>Boolean value for whether the operation succeeded</returns>
         private delegate bool PageMoveOperationDelegate();
 
-        #endregion Private Fields
+#endregion Private Fields
 
         ////------------------------------------------------------
         ////
@@ -419,7 +423,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the DataPager class.
@@ -438,7 +442,7 @@ namespace Windows.UI.Xaml.Controls
             this.SetBinding(DataPager.PrivateForegroundProperty, foregroundBinding);
         }
 
-        #endregion Constructors
+#endregion Constructors
 
         ////------------------------------------------------------
         ////
@@ -446,7 +450,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Events
+#region Events
 
         /// <summary>
         /// EventHandler for when PageIndex is changing.
@@ -458,7 +462,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event EventHandler<EventArgs> PageIndexChanged;
 
-        #endregion Events
+#endregion Events
 
         ////------------------------------------------------------
         ////
@@ -466,7 +470,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
         /// Gets or sets a value that indicates whether or not to use an ellipsis as the last button.
@@ -716,7 +720,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion Public Properties
+#endregion Public Properties
 
         ////------------------------------------------------------
         ////
@@ -724,7 +728,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Internal Properties
+#region Internal Properties
 
         /// <summary>
         /// Gets the TextBox holding the current PageIndex value, if any.
@@ -748,7 +752,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion Internal Properties
+#endregion Internal Properties
 
 
         /// <summary>
@@ -773,7 +777,7 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-        #region Public Methods
+#region Public Methods
 
         /// <summary>
         /// Applies the control's template, retrieves the elements
@@ -878,7 +882,7 @@ namespace Windows.UI.Xaml.Controls
                 this._currentPageTextBox.KeyDown += new System.Windows.Input.KeyEventHandler(this.OnCurrentPageTextBoxKeyDown);
 #else
                 this._currentPageTextBox.KeyDown += new Windows.UI.Xaml.Input.KeyEventHandler(this.OnCurrentPageTextBoxKeyDown);
-#endif                
+#endif
                 this._currentPageTextBox.LostFocus += new RoutedEventHandler(this.OnCurrentPageTextBoxLostFocus);
                 AutomationProperties.SetAutomationId(this._currentPageTextBox, DATAPAGER_currentPageTextBoxAutomationId);
             }
@@ -888,14 +892,15 @@ namespace Windows.UI.Xaml.Controls
 
 #endregion Public Methods
 
-        ////------------------------------------------------------
-        ////
-        ////  Protected Methods
-        ////
-        ////------------------------------------------------------ 
+////------------------------------------------------------
+////
+////  Protected Methods
+////
+////------------------------------------------------------ 
 
 #region Protected Methods
 
+#if OPENSILVER
         /// <summary>
         /// Creates an AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
         /// </summary>
@@ -904,6 +909,7 @@ namespace Windows.UI.Xaml.Controls
         {
             return new DataPagerAutomationPeer(this);
         }
+#endif
 
 #endregion Protected Methods
 
@@ -1224,7 +1230,11 @@ namespace Windows.UI.Xaml.Controls
                 IEnumerable enumerable = e.NewValue as IEnumerable;
                 if (enumerable != null)
                 {
+#if BRIDGE
+                    IEnumerable<object> genericEnumerable = INTERNAL_BridgeWorkarounds.Cast<object>(enumerable);
+#else
                     IEnumerable<object> genericEnumerable = enumerable.Cast<object>();
+#endif
                     pager.ItemCount = genericEnumerable.Count();
                     pager.PageCount = 1;
                     pager.PageIndex = pager.PageSize == 0 ? -1 : 0;
@@ -1270,6 +1280,16 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void MoveCurrentPageToTextboxValue()
         {
+#if BRIDGE
+            if (this._currentPageTextBox.Text != (this.PageIndex + 1).ToString())
+            {
+                if (this.PagedSource != null && this.TryParseTextBoxPage())
+                {
+                    this.MoveToRequestedPage();
+                }
+                this._currentPageTextBox.Text = (this.PageIndex + 1).ToString();
+            }
+#else
             if (this._currentPageTextBox.Text != (this.PageIndex + 1).ToString(CultureInfo.CurrentCulture))
             {
                 if (this.PagedSource != null && this.TryParseTextBoxPage())
@@ -1278,6 +1298,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 this._currentPageTextBox.Text = (this.PageIndex + 1).ToString(CultureInfo.CurrentCulture);
             }
+#endif
         }
 
         /// <summary>
@@ -1482,11 +1503,13 @@ namespace Windows.UI.Xaml.Controls
                     this.PageIndex = this.PagedSource.PageIndex;
                     this.RaisePageIndexChanged();
 
+#if OPENSILVER
                     DataPagerAutomationPeer peer = DataPagerAutomationPeer.FromElement(this) as DataPagerAutomationPeer;
                     if (peer != null && oldPageIndex != this.PageIndex)
                     {
                         peer.RefreshPageIndex(oldPageIndex);
                     }
+#endif
                     break;
 
                 case "PageSize":
@@ -1587,7 +1610,11 @@ namespace Windows.UI.Xaml.Controls
 
             if (this._currentPageTextBox != null)
             {
+#if BRIDGE
+                this._currentPageTextBox.Text = (this.PageIndex + 1).ToString();
+#else
                 this._currentPageTextBox.Text = (this.PageIndex + 1).ToString(CultureInfo.CurrentCulture);
+#endif
             }
         }
 
@@ -1692,7 +1719,11 @@ namespace Windows.UI.Xaml.Controls
         {
             // 
 
+#if BRIDGE
+            bool successfullyParsed = int.TryParse(this._currentPageTextBox.Text, out this._requestedPageIndex);
+#else
             bool successfullyParsed = int.TryParse(this._currentPageTextBox.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out this._requestedPageIndex);
+#endif
 
             if (successfullyParsed)
             {
@@ -1831,7 +1862,11 @@ namespace Windows.UI.Xaml.Controls
                             isToggleButtonFocused = true;
                         }
 
+#if BRIDGE
+                        AutomationProperties.SetAutomationId(button, DATAPAGER_numericalButtonAutomationId + index.ToString());
+#else
                         AutomationProperties.SetAutomationId(button, DATAPAGER_numericalButtonAutomationId + index.ToString(CultureInfo.CurrentCulture));
+#endif
 
                         index++;
                     }
@@ -1900,11 +1935,13 @@ namespace Windows.UI.Xaml.Controls
                 this.UpdateCanPageNextAndLast();
             }
 
+#if OPENSILVER
             DataPagerAutomationPeer peer = DataPagerAutomationPeer.FromElement(this) as DataPagerAutomationPeer;
             if (peer != null)
             {
                 peer.RefreshProperties();
             }
+#endif
         }
 
         /// <summary>
@@ -1947,10 +1984,17 @@ namespace Windows.UI.Xaml.Controls
                     }
                     else
                     {
+#if BRIDGE
+                        textBlockCaption = string.Format(
+                            CultureInfo.InvariantCulture,
+                            PagerResources.CurrentPagePrefix_TotalPageCountKnown,
+                            this.PageCount.ToString());
+#else
                         textBlockCaption = string.Format(
                             CultureInfo.InvariantCulture,
                             PagerResources.CurrentPagePrefix_TotalPageCountKnown,
                             this.PageCount.ToString(CultureInfo.CurrentCulture));
+#endif
                     }
 
                     this._currentPagePrefixTextBlock.Text = textBlockCaption;
@@ -1973,10 +2017,17 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
+#if BRIDGE
+                    textBlockCaption = string.Format(
+                        CultureInfo.InvariantCulture,
+                        PagerResources.CurrentPageSuffix_TotalPageCountKnown,
+                        this.PageCount.ToString());
+#else
                     textBlockCaption = string.Format(
                         CultureInfo.InvariantCulture,
                         PagerResources.CurrentPageSuffix_TotalPageCountKnown,
                         this.PageCount.ToString(CultureInfo.CurrentCulture));
+#endif
                 }
 
                 this._currentPageSuffixTextBlock.Text = textBlockCaption;

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using CSHTML5.Internal;
 using System;
 using System.Linq;
@@ -22,7 +20,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
-
 using System.Windows.Input;
 
 #if MIGRATION
@@ -39,9 +36,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Controls;
 #endif
-
-
-
 
 namespace OpenSilver.Internal.Controls
 {
@@ -70,10 +64,13 @@ namespace OpenSilver.Internal.Controls
             this.DefaultStyleKey = typeof(DataPager);
         }
 
-        [OpenSilver.NotImplemented]
+        [NotImplemented]
         public bool IsTotalItemCountFixed { get; set; }
 
-#region DisplayMode
+        [NotImplemented]
+        public bool AutoEllipsis { get; set; }
+
+        #region DisplayMode
 
         /// <summary>
         /// Gets or sets the currently selected mode.

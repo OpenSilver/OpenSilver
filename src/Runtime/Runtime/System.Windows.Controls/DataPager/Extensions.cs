@@ -22,7 +22,6 @@ using Windows.UI.Xaml.Media;
 using Windows.Foundation;
 #endif
 
-
 #if MIGRATION
 namespace System.Windows.Controls
 #else

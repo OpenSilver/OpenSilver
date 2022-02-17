@@ -7,11 +7,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 #if MIGRATION
 namespace System.Windows.Controls
 #else
-using System;
-
 namespace Windows.UI.Xaml.Controls
 #endif
 {

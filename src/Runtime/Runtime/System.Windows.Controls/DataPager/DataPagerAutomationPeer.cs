@@ -7,9 +7,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#if OPENSILVER
+
+using System;
 using System.Globalization;
 using OpenSilver.DataPager;
-using System;
 #if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
@@ -467,3 +469,5 @@ namespace Windows.UI.Xaml.Automation.Peers
         #endregion Methods
     }
 }
+
+#endif
