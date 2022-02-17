@@ -1,27 +1,20 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
 using System.Diagnostics;
 using System.Globalization;
 
+#if OPENSILVER
 #if MIGRATION
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 #else
 using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Automation.Peers;
+#endif
 #endif
 
 #if MIGRATION
@@ -116,15 +109,19 @@ namespace Windows.UI.Xaml.Controls
             nud._levelsFromRootCall--;
             if (nud._levelsFromRootCall == 0)
             {
+#if OPENSILVER
                 NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
+#endif
 
                 double minimum = nud.Minimum;
                 if (nud._initialMin != minimum)
                 {
+#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MinimumProperty, nud._initialMin, minimum);
                     }
+#endif
 
                     nud.OnMinimumChanged(nud._initialMin, minimum);
                 }
@@ -132,10 +129,12 @@ namespace Windows.UI.Xaml.Controls
                 double maximum = nud.Maximum;
                 if (nud._initialMax != maximum)
                 {
+#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MaximumProperty, nud._initialMax, maximum);
                     }
+#endif
 
                     nud.OnMaximumChanged(nud._initialMax, maximum);
                 }
@@ -211,15 +210,19 @@ namespace Windows.UI.Xaml.Controls
             nud._levelsFromRootCall--;
             if (nud._levelsFromRootCall == 0)
             {
+#if OPENSILVER
                 NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
+#endif
 
                 double maximum = nud.Maximum;
                 if (nud._initialMax != maximum)
                 {
+#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MaximumProperty, nud._initialMax, maximum);
                     }
+#endif
 
                     nud.OnMaximumChanged(nud._initialMax, maximum);
                 }
@@ -297,15 +300,19 @@ namespace Windows.UI.Xaml.Controls
             // ----------
             if (nud._levelsFromRootCall == 0)
             {
+#if OPENSILVER
                 NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(nud) as NumericUpDownAutomationPeer;
+#endif
 
                 double increment = nud.Increment;
                 if (nud._initialInc != increment)
                 {
+#if OPENSILVER
                     if (peer != null)
                     {
                         peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.SmallChangeProperty, nud._initialInc, increment);
                     }
+#endif
 
                     nud.OnIncrementChanged(nud._initialInc, increment);
                 }
@@ -432,6 +439,7 @@ namespace Windows.UI.Xaml.Controls
             SetValidSpinDirection();
         }
 
+#if OPENSILVER
         /// <summary>
         /// Returns a NumericUpDownAutomationPeer for use by the Silverlight
         /// automation infrastructure.
@@ -441,6 +449,7 @@ namespace Windows.UI.Xaml.Controls
         {
             return new NumericUpDownAutomationPeer(this);
         }
+#endif
 
         /// <summary>
         /// Override UpDownBase&lt;T&gt;.OnValueChanging to do validation and coercion.
@@ -490,11 +499,13 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">Event args.</param>
         protected override void OnValueChanged(RoutedPropertyChangedEventArgs<double> e)
         {
+#if OPENSILVER
             NumericUpDownAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(this) as NumericUpDownAutomationPeer;
             if (peer != null)
             {
                 peer.RaisePropertyChangedEvent(RangeValuePatternIdentifiers.ValueProperty, e.OldValue, e.NewValue);
             }
+#endif
 
             // reevaluate the valid spin direction
             SetValidSpinDirection();
@@ -538,9 +549,9 @@ namespace Windows.UI.Xaml.Controls
             Value = (double)((decimal)Value - (decimal)Increment);
             _requestedVal = Value;
         }
-#endregion
+        #endregion
 
-#region Property Coersion and validation
+        #region Property Coersion and validation
         /// <summary>
         /// Levels from root call.
         /// </summary>
@@ -763,9 +774,9 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentException(message, "e");
             }
         }
-#endregion
+        #endregion
 
-#region visual state management
+        #region visual state management
         /// <summary>
         /// Update current visual state.
         /// </summary>
@@ -784,6 +795,6 @@ namespace Windows.UI.Xaml.Controls
         {
             UpdateVisualState(useTransitions);
         }
-#endregion
+        #endregion
     }
 }

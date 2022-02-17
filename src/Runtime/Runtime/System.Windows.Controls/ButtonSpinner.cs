@@ -1,18 +1,9 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
+using System;
 using System.Diagnostics;
 using System.Windows.Markup;
 
@@ -57,9 +48,9 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = ButtonSpinner.ElementDecreaseButtonName, Type = typeof(ButtonBase))]
 
     [ContentProperty("Content")]
-    public class ButtonSpinner : Spinner
+    public partial class ButtonSpinner : Spinner
     {
-#region template parts
+        #region template parts
         /// <summary>
         /// Name constant of the IncreaseButton template part.
         /// </summary>
@@ -123,9 +114,9 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-#endregion
+        #endregion
 
-#region public object Content
+        #region public object Content
         /// <summary>
         /// Gets or sets the content that is contained within the button spinner.
         /// </summary>
@@ -155,7 +146,7 @@ namespace Windows.UI.Xaml.Controls
             ButtonSpinner source = d as ButtonSpinner;
             source.OnContentChanged(e.OldValue, e.NewValue);
         }
-#endregion public object Content
+        #endregion public object Content
 
         /// <summary>
         /// Initializes a new instance of the ButtonSpinner class.
@@ -336,7 +327,6 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="T:System.Windows.Input.MouseButtonEventArgs" /> that
         /// contains the event data.
         /// </param>
-
 #if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 #else

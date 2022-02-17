@@ -1,9 +1,16 @@
-﻿#if MIGRATION
-using System.Windows.Controls;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+#if OPENSILVER
+
+#if MIGRATION
 using System.Windows.Automation.Provider;
+using System.Windows.Controls;
 #else
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Automation.Provider;
+using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION
@@ -36,7 +43,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         {
         }
 
-        #region AutomationPeer Overrides
+#region AutomationPeer Overrides
         /// <summary>
         /// Gets the control type for the UpDownBase that is associated
         /// with this UpDownBaseAutomationPeer.  This method is called by
@@ -74,9 +81,9 @@ namespace Windows.UI.Xaml.Automation.Peers
 
             return base.GetPattern(patternInterface);
         }
-        #endregion
+#endregion
 
-        #region IValueProvider Members
+#region IValueProvider Members
 
         /// <summary>
         /// Gets a value indicating whether the value of a control is read-only.
@@ -131,6 +138,8 @@ namespace Windows.UI.Xaml.Automation.Peers
                 return OwnerUpDown.FormatValue();
             }
         }
-        #endregion
+#endregion
     }
 }
+
+#endif

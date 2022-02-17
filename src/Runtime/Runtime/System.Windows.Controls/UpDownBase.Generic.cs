@@ -1,22 +1,14 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
 
 #if MIGRATION
 using System.Windows.Input;
 #else
+using Windows.System;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -26,104 +18,6 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    /// <summary>
-    /// Base class for all controls that provide value manipulation with a 
-    /// Spinner and a text box.
-    /// </summary>
-    /// <remarks>
-    /// This non generic base class is used to specify default template,
-    /// and simulate covariance among sub classes of UpDownBase&lt;T&gt;.
-    /// </remarks>
-    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StatePressed, GroupName = VisualStates.GroupCommon)]
-    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
-
-    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
-    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
-
-    [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
-    [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
-    [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
-
-    [TemplatePart(Name = UpDownBase.ElementTextName, Type = typeof(TextBox))]
-    [TemplatePart(Name = UpDownBase.ElementSpinnerName, Type = typeof(Spinner))]
-    [StyleTypedProperty(Property = UpDownBase.SpinnerStyleName, StyleTargetType = typeof(Spinner))]
-    public abstract class UpDownBase : Control
-    {
-#region Template Parts Name Constants
-        /// <summary>
-        /// Name constant for Text template part.
-        /// </summary>
-        internal const string ElementTextName = "Text";
-
-        /// <summary>
-        /// Name constant for Spinner template part.
-        /// </summary>
-        internal const string ElementSpinnerName = "Spinner";
-
-        /// <summary>
-        /// Name constant for SpinnerStyle property.
-        /// </summary>
-        internal const string SpinnerStyleName = "SpinnerStyle";
-#endregion
-
-#region public Style SpinnerStyle
-
-        /// <summary>
-        /// Initializes a new instance of the UpDownBase class.
-        /// </summary>
-        internal UpDownBase()
-        {
-            DefaultStyleKey = typeof(UpDownBase);
-            Interaction = new InteractionHelper(this);
-        }
-
-        /// <summary>
-        /// Called when SpinnerStyle property value has changed.
-        /// </summary>
-        /// <param name="oldValue">The old value.</param>
-        /// <param name="newValue">The new value.</param>
-        protected virtual void OnSpinnerStyleChanged(Style oldValue, Style newValue)
-        {
-        }
-
-        /// <summary>
-        /// GetValue method for returning UpDownBase&lt;T&gt;.Value as object.
-        /// </summary>
-        /// <returns>Value as object type.</returns>
-        public abstract object GetValue();
-
-        /// <summary>
-        /// SetValue method for setting UpDownBase&lt;T&gt;.Value through object type parameter.
-        /// </summary>
-        /// <param name="value">New value in object type.</param>
-        public abstract void SetValue(object value);
-
-#endregion public Style SpinnerStyle
-
-#region visual state management
-        /// <summary>
-        /// Gets or sets the helper that provides all of the standard
-        /// interaction functionality. Making it internal for subclass access.
-        /// </summary>
-        internal InteractionHelper Interaction { get; set; }
-
-        /// <summary>
-        /// Update current visual state.
-        /// </summary>
-        /// <param name="useTransitions">
-        /// True to use transitions when updating the visual state, false to
-        /// snap directly to the new visual state.
-        /// </param>
-        internal virtual void UpdateVisualState(bool useTransitions)
-        {
-            // Handle the Common and Focused states
-            Interaction.UpdateVisualStateBase(useTransitions);
-        }
-#endregion
-    }
-
     /// <summary>
     /// Base class for all controls that provide value manipulation with a 
     /// Spinner and a text box.
@@ -141,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = UpDownBase.ElementTextName, Type = typeof(TextBox))]
     [TemplatePart(Name = UpDownBase.ElementSpinnerName, Type = typeof(Spinner))]
     [StyleTypedProperty(Property = UpDownBase.SpinnerStyleName, StyleTargetType = typeof(Spinner))]
-    public abstract class UpDownBase<T> : UpDownBase
+    public abstract partial class UpDownBase<T> : UpDownBase
     {
 #region Template Parts
         /// <summary>
@@ -413,9 +307,6 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">Key event args.</param>
 #if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
-#else
-        protected override void OnKeyDown(KeyRoutedEventArgs e)
-#endif
         {
             base.OnKeyDown(e);
 
@@ -426,7 +317,6 @@ namespace Windows.UI.Xaml.Controls
 
             switch (e.Key)
             {
-#if MIGRATION
                 case Key.Up:
                     DoIncrement();
                     e.Handled = true;
@@ -441,24 +331,37 @@ namespace Windows.UI.Xaml.Controls
                     ProcessUserInput();
                     e.Handled = true;
                     break;
+            }
+        }
 #else
-                case System.VirtualKey.Up:
+        protected override void OnKeyDown(KeyRoutedEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (e.Handled)
+            {
+                return;
+            }
+
+            switch (e.Key)
+            {
+                case VirtualKey.Up:
                     DoIncrement();
                     e.Handled = true;
                     break;
 
-                case System.VirtualKey.Down:
+                case VirtualKey.Down:
                     DoDecrement();
                     e.Handled = true;
                     break;
 
-                case System.VirtualKey.Enter:
+                case VirtualKey.Enter:
                     ProcessUserInput();
                     e.Handled = true;
                     break;
-#endif
             }
         }
+#endif
 
         /// <summary>
         /// Provides handling for the MouseWheel event.
@@ -466,11 +369,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="e">Mouse wheel event args.</param>
 #if MIGRATION
         protected override void OnMouseWheel(MouseWheelEventArgs e)
-#else
-        protected override void OnPointerWheelChanged(PointerRoutedEventArgs e)
-#endif
         {
-#if MIGRATION
             base.OnMouseWheel(e);
 
             if (!e.Handled)
@@ -486,24 +385,14 @@ namespace Windows.UI.Xaml.Controls
 
                 e.Handled = true;
             }
-#else
-            base.OnPointerWheelChanged(e);
-            if (!e.Handled)
-            {
-                var delta = e.GetCurrentPoint(null).Properties.MouseWheelDelta;
-                if (delta < 0)
-                {
-                    DoDecrement();
-                }
-                else if (0 < delta)
-                {
-                    DoIncrement();
-                }
-
-                e.Handled = true;
-            }
-#endif
         }
+#else
+        protected override void OnPointerWheelChanged(PointerRoutedEventArgs e)
+        {
+            base.OnPointerWheelChanged(e);
+        }
+#endif
+
 #endregion
 
 #region private methods
@@ -693,7 +582,7 @@ namespace Windows.UI.Xaml.Controls
         /// Raises the <see cref="E:Parsing"/> event, to allow easily hooking
         /// into the parse logic.
         /// </summary>
-        /// <param name="e">The <see cref="System.Windows.Controls.UpDownParsingEventArgs&lt;T&gt;"/> 
+        /// <param name="e">The <see cref="UpDownParsingEventArgs&lt;T&gt;"/> 
         /// instance containing the event data.</param>
         protected virtual void OnParsing(UpDownParsingEventArgs<T> e)
         {

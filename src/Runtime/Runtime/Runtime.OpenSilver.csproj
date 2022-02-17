@@ -87,8 +87,8 @@
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\CSHTML5_DuplexClientBase.cs" />
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\InstanceContext.cs" />
 		<Compile Include="System.Windows.Automation.Peers\CalendarDayButtonAutomationPeer.cs" />
-		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\NumericUpDownAutomationPeer.cs" />
-		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\UpDownBaseAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\NumericUpDownAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\UpDownBaseAutomationPeer.cs" />
 		<Compile Include="System.Windows.Browser\EventSubscriber.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
@@ -121,9 +121,15 @@
 		<Compile Include="System.ComponentModel\ReflectedPropertyData.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\IXamlComponentFactory.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\UpDownParseErrorEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\UpDownParsingEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ValidSpinDirections.cs" />
+		<Compile Include="System.Windows.Controls\SpinDirection.cs" />
+		<Compile Include="System.Windows.Controls\SpinEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\Spinner.cs" />
+		<Compile Include="System.Windows.Controls\ButtonSpinner.cs" />
+		<Compile Include="System.Windows.Controls\UpDownBase.cs" />
+		<Compile Include="System.Windows.Controls\UpDownBase.Generic.cs" />
+		<Compile Include="System.Windows.Controls\UpDownParseErrorEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\UpDownParsingEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\ValidSpinDirections.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowserBrush.cs" />
 		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
@@ -277,7 +283,6 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\AccordionItem.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\AutoCompleteBox.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\BusyIndicator.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ButtonSpinner.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Calendar.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarDateRange.cs" />
@@ -311,10 +316,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlock.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlockOverflow.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Separator.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SpinDirection.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SpinEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Spinner.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextBlock.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextSearch.cs" />
@@ -324,7 +326,6 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimePicker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimePickerPopup.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimeUpDown.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\UpDownBase.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="System.Windows.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="System.Windows.Data\CollectionView.cs" />
@@ -1250,20 +1251,15 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultProgressBarStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultButtonSpinnerStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Page Include="DefaultStyles\INTERNAL_DefaultButtonSpinnerStyle.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Include="DefaultStyles\INTERNAL_DefaultUpDownBaseStyle.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
