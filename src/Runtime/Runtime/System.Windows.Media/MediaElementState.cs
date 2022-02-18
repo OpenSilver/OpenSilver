@@ -12,9 +12,15 @@
 \*====================================================================================*/
 
 #if MIGRATION
-namespace System.Windows.Controls
+using System.Windows.Controls;
 #else
-namespace Windows.UI.Xaml.Controls
+using Windows.UI.Xaml.Controls;
+#endif
+
+#if MIGRATION
+namespace System.Windows.Media
+#else
+namespace Windows.UI.Xaml.Media
 #endif
 {
     /// <summary>
@@ -33,18 +39,6 @@ namespace Windows.UI.Xaml.Controls
         /// or <see cref="MediaElement.Stop"/> commands it receives and processes them if the media is successfully opened.
         /// </summary>
         Opening,
-
-        /// <summary>
-        /// The <see cref="MediaElement"/> is in the process of ensuring that proper individualization components (only applicable when
-        /// playing DRM protected content) are installed on the user's computer.
-        /// </summary>
-        Individualizing,
-
-        /// <summary>
-        /// The <see cref="MediaElement"/> is acquiring a license required to play DRM protected content. Once OnAcquireLicense has
-        /// been called, the MediaElement will remain in this state until SetLicenseResponse has been called.
-        /// </summary>
-        AcquiringLicense,
 
         /// <summary>
         /// The <see cref="MediaElement"/> is loading the media for playback. Its <see cref="MediaElement.Position"/> does not advance
@@ -67,6 +61,18 @@ namespace Windows.UI.Xaml.Controls
         /// The <see cref="MediaElement"/> contains media but is not playing or paused. Its <see cref="MediaElement.Position"/> is 0 and does not advance.
         /// If the loaded media is video, the <see cref="MediaElement"/> displays the first frame.
         /// </summary>
-        Stopped
+        Stopped,
+
+        /// <summary>
+        /// The <see cref="MediaElement"/> is in the process of ensuring that proper individualization components (only applicable when
+        /// playing DRM protected content) are installed on the user's computer.
+        /// </summary>
+        Individualizing,
+
+        /// <summary>
+        /// The <see cref="MediaElement"/> is acquiring a license required to play DRM protected content. Once OnAcquireLicense has
+        /// been called, the MediaElement will remain in this state until SetLicenseResponse has been called.
+        /// </summary>
+        AcquiringLicense,
     }
 }
