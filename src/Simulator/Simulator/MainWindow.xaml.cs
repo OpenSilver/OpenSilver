@@ -2242,7 +2242,8 @@ Click OK to continue.";
         {
             if (fileName == null)
             {
-                fileName = "HtmlSnapshot-" + DateTime.Now.ToString("yy.MM.dd.hh.mm.ss") + ".html";
+                var elementName = htmlElementId ?? xamlElementName ?? "";
+                fileName = $"HtmlSnapshot-{elementName}-" + DateTime.Now.ToString("yy.MM.dd.hh.mm.ss") + ".html";
             }
             string simulatorExePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -2251,8 +2252,6 @@ Click OK to continue.";
                 Directory.CreateDirectory(debuggingFolder);
 
             File.WriteAllText(Path.Combine(debuggingFolder, fileName), Instance.getHtmlSnapshot(osRootOnly, htmlElementId, xamlElementName));
-            //var html = Instance.getHtmlSnapshot(osRootOnly, htmlElementId, xamlElementName);
-            //Debug.WriteLine(html);
         }
     }
 }
