@@ -6,7 +6,6 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Globalization = System.Globalization;
 
 #if MIGRATION
 using System.Windows.Automation.Provider;
@@ -251,7 +250,7 @@ namespace Windows.UI.Xaml.Automation.Peers
             if (button != null && button.DataContext != null && button.DataContext is DateTime)
             {
                 DateTime dataContext = (DateTime)OwningCalendarDayButton.DataContext;
-                Globalization.DateTimeFormatInfo info = DateTimeHelper.GetCurrentDateFormat();
+                var info = DateTimeHelper.GetCurrentDateFormat();
 
                 return !button.IsBlackout ?
                     dataContext.Date.ToString(info.LongDatePattern, info) :
@@ -324,7 +323,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// Sends a request to activate the control and to initiate its single,
         /// unambiguous action.
         /// </summary>
-      [OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
         void IInvokeProvider.Invoke()
         {
             throw new NotImplementedException();
@@ -428,217 +427,6 @@ namespace Windows.UI.Xaml.Automation.Peers
         IRawElementProviderSimple[] ITableItemProvider.GetRowHeaderItems()
         {
             return null;
-        }
-    }
-
-    internal static class DateTimeHelper
-    {
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="time">Inherited code: Requires comment 1.</param>
-        /// <param name="days">Inherited code: Requires comment 2.</param>
-        /// <returns>Inherited code: Requires comment 3.</returns>
-        public static DateTime? AddDays(DateTime time, int days)
-        {
-            try
-            {
-                return time.AddDays(days);
-            }
-            catch (ArgumentException)
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="time">Inherited code: Requires comment 1.</param>
-        /// <param name="months">Inherited code: Requires comment 2.</param>
-        /// <returns>Inherited code: Requires comment 3.</returns>
-        public static DateTime? AddMonths(DateTime time, int months)
-        {
-            try
-            {
-                return time.AddMonths(months);
-            }
-            catch (ArgumentException)
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="time">Inherited code: Requires comment 1.</param>
-        /// <param name="years">Inherited code: Requires comment 2.</param>
-        /// <returns>Inherited code: Requires comment 3.</returns>
-        public static DateTime? AddYears(DateTime time, int years)
-        {
-            try
-            {
-                return time.AddYears(years);
-            }
-            catch (ArgumentException)
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="dt1">Inherited code: Requires comment 1.</param>
-        /// <param name="dt2">Inherited code: Requires comment 2.</param>
-        /// <returns>Inherited code: Requires comment 3.</returns>
-        public static int CompareDays(DateTime dt1, DateTime dt2)
-        {
-            return DateTime.Compare(DiscardTime(dt1).Value, DiscardTime(dt2).Value);
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="dt1">Inherited code: Requires comment 1.</param>
-        /// <param name="dt2">Inherited code: Requires comment 2.</param>
-        /// <returns>Inherited code: Requires comment 3.</returns>
-        public static int CompareYearMonth(DateTime dt1, DateTime dt2)
-        {
-            return (dt1.Year - dt2.Year) * 12 + (dt1.Month - dt2.Month);
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="date">Inherited code: Requires comment 1.</param>
-        /// <returns>Inherited code: Requires comment 2.</returns>
-        public static int DecadeOfDate(DateTime date)
-        {
-            return date.Year - (date.Year % 10);
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="d">Inherited code: Requires comment 1.</param>
-        /// <returns>Inherited code: Requires comment 2.</returns>
-        public static DateTime DiscardDayTime(DateTime d)
-        {
-            int year = d.Year;
-            int month = d.Month;
-            DateTime newD = new DateTime(year, month, 1, 0, 0, 0);
-            return newD;
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="d">Inherited code: Requires comment 1.</param>
-        /// <returns>Inherited code: Requires comment 2.</returns>
-        public static DateTime? DiscardTime(DateTime? d)
-        {
-            if (d == null)
-            {
-                return null;
-            }
-            return d.Value.Date;
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <param name="date">Inherited code: Requires comment 1.</param>
-        /// <returns>Inherited code: Requires comment 2.</returns>
-        public static int EndOfDecade(DateTime date)
-        {
-            return DecadeOfDate(date) + 9;
-        }
-
-        /// <summary>
-        /// Inherited code: Requires comment.
-        /// </summary>
-        /// <returns>Inherited code: Requires comment 1.</returns>
-        public static Globalization.DateTimeFormatInfo GetCurrentDateFormat()
-        {
-            if (Globalization.CultureInfo.CurrentCulture.Calendar is Globalization.DateTimeFormatInfo)
-            {
-                return Globalization.CultureInfo.CurrentCulture.DateTimeFormat;
-            }
-            else
-            {
-                foreach (Globalization.Calendar cal in Globalization.CultureInfo.CurrentCulture.OptionalCalendars)
-                {
-                    if (cal is Globalization.DateTimeFormatInfo)
-                    {
-                        // if the default calendar is not Gregorian, return the
-                        // first supported Globalization.DateTimeFormatInfo dtfi
-                        Globalization.DateTimeFormatInfo dtfi = new Globalization.CultureInfo(Globalization.CultureInfo.CurrentCulture.Name).DateTimeFormat;
-                        dtfi.Calendar = cal;
-                        return dtfi;
-                    }
-                }
-
-                // if there are no Globalization.DateTimeFormatInfos in the OptionalCalendars
-                // list, use the invariant dtfi
-                Globalization.DateTimeFormatInfo dt = new Globalization.CultureInfo(Globalization.CultureInfo.InvariantCulture.Name).DateTimeFormat;
-                return dt;
-            }
-        }
-
-        /// <summary>
-        /// Returns if the date is included in the range.
-        /// </summary>
-        /// <param name="date">Inherited code: Requires comment 1.</param>
-        /// <param name="range">Inherited code: Requires comment 2.</param>
-        /// <returns>Inherited code: Requires comment 3.</returns>
-        public static bool InRange(DateTime date, CalendarDateRange range)
-        {
-            Debug.Assert(DateTime.Compare(range.Start, range.End) < 1, "The range should start before it ends!");
-
-            if (CompareDays(date, range.Start) > -1 && CompareDays(date, range.End) < 1)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Gets a localized string for the specified date using the YearMonthPattern format.
-        /// </summary>
-        /// <param name="date">Date to convert.</param>
-        /// <returns>Localized string.</returns>
-        public static string ToYearMonthPatternString(DateTime date)
-        {
-            string result = string.Empty;
-            Globalization.DateTimeFormatInfo format = GetCurrentDateFormat();
-
-            if (format != null)
-            {
-                result = date.ToString(format.YearMonthPattern, format);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Gets a localized string for the specified date's year.
-        /// </summary>
-        /// <param name="date">Date to convert.</param>
-        /// <returns>Localized string.</returns>
-        public static string ToYearString(DateTime date)
-        {
-            string result = string.Empty;
-            Globalization.DateTimeFormatInfo format = GetCurrentDateFormat();
-
-            if (format != null)
-            {
-                result = date.Year.ToString(format);
-            }
-
-            return result;
         }
     }
 }
