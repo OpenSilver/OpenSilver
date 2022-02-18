@@ -22,34 +22,41 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     ///Represents a collection of <see cref="TimelineMarker"/> objects that can be individually accessed by index.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public sealed class TimelineMarkerCollection : PresentationFrameworkCollection<TimelineMarker>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TimelineMarkerCollection"/> class.
         /// </summary>
-        [OpenSilver.NotImplemented]
-        public TimelineMarkerCollection() : base(true) { }
+        public TimelineMarkerCollection() : base(false) { }
 
-        [OpenSilver.NotImplemented]
-        internal override void AddOverride(TimelineMarker value) { }
-
-        [OpenSilver.NotImplemented]
-        internal override void ClearOverride() { }
-
-        [OpenSilver.NotImplemented]
-        internal override TimelineMarker GetItemOverride(int index)
+        internal override void AddOverride(TimelineMarker value)
         {
-            throw new NotImplementedException();
+            this.AddDependencyObjectInternal(value);
         }
 
-        [OpenSilver.NotImplemented]
-        internal override void InsertOverride(int index, TimelineMarker value) { }
+        internal override void ClearOverride()
+        {
+            this.ClearDependencyObjectInternal();
+        }
 
-        [OpenSilver.NotImplemented]
-        internal override void RemoveAtOverride(int index) { }
+        internal override TimelineMarker GetItemOverride(int index)
+        {
+            return this.GetItemInternal(index);
+        }
 
-        [OpenSilver.NotImplemented]
-        internal override void SetItemOverride(int index, TimelineMarker value) { }
+        internal override void InsertOverride(int index, TimelineMarker value)
+        {
+            this.InsertDependencyObjectInternal(index, value);
+        }
+
+        internal override void RemoveAtOverride(int index)
+        {
+            this.RemoveAtDependencyObjectInternal(index);
+        }
+
+        internal override void SetItemOverride(int index, TimelineMarker value)
+        {
+            this.SetItemDependencyObjectInternal(index, value);
+        }
     }
 }
