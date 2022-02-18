@@ -41,30 +41,6 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        ///  The amount of time to buffer. The default value is a <see cref="TimeSpan"/> with value of 5 seconds (0:0:05).
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public TimeSpan BufferingTime { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current position of progress through the media's playback time.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public TimeSpan Position { get; set; }
-
-        /// <summary>
-        /// Gets the duration of the media file currently opened.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public Duration NaturalDuration { get; }
-
-        /// <summary>
-        /// Gets the status of the <see cref="MediaElement"/>.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public MediaElementState CurrentState { get; }
-
-        /// <summary>
         ///  The collection of timeline markers (represented as <see cref="TimelineMarker"/> objects) associated
         ///  with the currently loaded media file.
         /// </summary>
@@ -72,16 +48,96 @@ namespace Windows.UI.Xaml.Controls
         public TimelineMarkerCollection Markers { get; }
 
         /// <summary>
+        /// Identifies the <see cref="BufferingTime"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public DependencyProperty BufferingTimeProperty = DependencyProperty.Register(nameof(BufferingTime), typeof(TimeSpan), typeof(MediaElement), new PropertyMetadata(new TimeSpan(0,0,5)));
+
+        /// <summary>
+        /// The amount of time to buffer. The default value is a <see cref="TimeSpan"/> with value of 5 seconds (0:0:05).
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public TimeSpan BufferingTime
+        {
+            get { return (TimeSpan)GetValue(BufferingTimeProperty); }
+            set { SetValue(BufferingTimeProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Position"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public DependencyProperty PositionProperty = DependencyProperty.Register(nameof(Position), typeof(TimeSpan), typeof(MediaElement), new PropertyMetadata(new TimeSpan(0)));
+
+        /// <summary>
+        /// Gets or sets the current position of progress through the media's playback time.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public TimeSpan Position
+        {
+            get { return (TimeSpan)GetValue(PositionProperty); }
+            set { SetValue(PositionProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="NaturalDuration"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public DependencyProperty NaturalDurationProperty = DependencyProperty.Register(nameof(NaturalDuration), typeof(Duration), typeof(MediaElement), new PropertyMetadata(new Duration(new TimeSpan(0))));
+
+        /// <summary>
+        /// Gets the duration of the media file currently opened.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public Duration NaturalDuration
+        { 
+            get { return (Duration)GetValue(NaturalDurationProperty); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="CurrentState"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public DependencyProperty CurrentStateProperty = DependencyProperty.Register(nameof(CurrentState), typeof(MediaElementState), typeof(MediaElement), new PropertyMetadata(MediaElementState.Closed));
+
+        /// <summary>
+        /// Gets the status of the <see cref="MediaElement"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public MediaElementState CurrentState
+        {
+            get { return (MediaElementState)GetValue(CurrentStateProperty); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="DownloadProgress"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty DownloadProgressProperty = DependencyProperty.Register(nameof(DownloadProgress), typeof(double), typeof(MediaElement), new PropertyMetadata(0d));
+
+        /// <summary>
         /// Gets a percentage value indicating the amount of download completed for content located on a remote server.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public double DownloadProgress { get; }
+        public string DownloadProgress
+        {
+            get { return (string)GetValue(DownloadProgressProperty); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="DownloadProgressOffset"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty DownloadProgressOffsetProperty = DependencyProperty.Register(nameof(DownloadProgressOffset), typeof(double), typeof(MediaElement), new PropertyMetadata(0d));
 
         /// <summary>
         /// Gets the offset of the download progress.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public double DownloadProgressOffset { get; }
+        public string DownloadProgressOffset
+        {
+            get { return (string)GetValue(DownloadProgressOffsetProperty); }
+        }
 
         /// <summary>
         /// Sets the <see cref="Source"/> property using the supplied stream.

@@ -32,20 +32,52 @@ namespace Windows.UI.Xaml.Media
         public TimelineMarker() { }
 
         /// <summary>
-        ///  The text value of the <see cref="TimelineMarker"/>. The default value is an empty string.
-        /// </summary>
-        public string Text { get; set; }
-
-        /// <summary>
-        ///  The time at which the <see cref="TimelineMarker"/> is reached. The default value is nulla null reference.
+        /// Identifies the <see cref="Text"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public TimeSpan Time { get; set; }
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(TimelineMarker), new PropertyMetadata(""));
+
+        /// <summary>
+        ///  The text value of the <see cref="TimelineMarker"/>. The default value is an empty string.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public string Text
+        {
+            get { return (string)GetValue(TextProperty); }
+            set { SetValue(TextProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Time"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty TimeProperty = DependencyProperty.Register(nameof(Time), typeof(TimeSpan), typeof(TimelineMarker), new PropertyMetadata(null));
+
+        /// <summary>
+        ///  The time at which the <see cref="TimelineMarker"/> is reached. The default value is a null reference.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public TimeSpan Time
+        {
+            get { return (TimeSpan)GetValue(TimeProperty); }
+            set { SetValue(TimeProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Type"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty TypeProperty = DependencyProperty.Register(nameof(Type), typeof(string), typeof(TimelineMarker), new PropertyMetadata(""));
 
         /// <summary>
         ///  A string that describes the type of this <see cref="TimelineMarker"/>. The default value is an empty string.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public string Type { get; set; }
+        public string Type
+        {
+            get { return (string)GetValue(TextProperty); }
+            set { SetValue(TextProperty, value); }
+        }
+
     }
 }
