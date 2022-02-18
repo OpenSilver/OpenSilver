@@ -170,6 +170,9 @@
 		<Compile Include="System.Windows.Navigation\NavigatingCancelEventArgs.cs" />
 		<Compile Include="System.Windows.Navigation\NavigatingCancelEventHandler.cs" />
 		<Compile Include="System.Windows.Navigation\NavigationMode.cs" />
+		<Compile Include="System.Windows.Printing\EndPrintEventArgs.cs" />
+		<Compile Include="System.Windows.Printing\PrintDocument.cs" />
+		<Compile Include="System.Windows.Printing\PrintPageEventArgs.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows.input\CursorConverter.cs" />
 		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
@@ -510,11 +513,8 @@
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\ShaderEffect.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\WriteableBitmap.cs" />
 		<Compile Include="System.Windows.Media.Media3D\WORKINPROGRESS\Matrix3D.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\BeginPrintEventArgs.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\EndPrintEventArgs.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintDocument.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrinterFallbackSettings.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintPageEventArgs.cs" />
+		<Compile Include="System.Windows.Printing\BeginPrintEventArgs.cs" />
+		<Compile Include="System.Windows.Printing\PrinterFallbackSettings.cs" />
 		<Compile Include="System.Windows.Shapes\Polyline.cs" />
 		<Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherSynchronizationContext.cs" />
 		<Compile Include="APP_SUPPORT\ClientSideResourceManager.cs" />

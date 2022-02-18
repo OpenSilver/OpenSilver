@@ -17,6 +17,7 @@
     <Compile Include="Converters\BooleanVisibilityConverter.cs" />
     <Compile Include="HintBehavior.cs" />
     <Compile Include="LinqSamples.cs" />
+    <Compile Include="Tests\PrintDocumentTest.xaml.cs" />
     <Compile Include="Registry\ITreeItem.cs" />
     <Compile Include="Registry\Test.cs" />
     <Compile Include="Registry\TestCategory.cs" />
@@ -597,6 +598,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Tests\PrintDocumentTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tests\PopupZIndexTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
