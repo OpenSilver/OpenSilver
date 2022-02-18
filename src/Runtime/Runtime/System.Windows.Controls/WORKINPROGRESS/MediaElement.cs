@@ -144,9 +144,9 @@ namespace Windows.UI.Xaml.Controls
         /// Gets a percentage value indicating the amount of download completed for content located on a remote server.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public string DownloadProgress
+        public double DownloadProgress
         {
-            get { return (string)GetValue(DownloadProgressProperty); }
+            get { return (double)GetValue(DownloadProgressProperty); }
         }
 
         /// <summary>
@@ -164,9 +164,9 @@ namespace Windows.UI.Xaml.Controls
         /// Gets the offset of the download progress.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public string DownloadProgressOffset
+        public double DownloadProgressOffset
         {
-            get { return (string)GetValue(DownloadProgressOffsetProperty); }
+            get { return (double)GetValue(DownloadProgressOffsetProperty); }
         }
 
         /// <summary>
