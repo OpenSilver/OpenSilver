@@ -647,7 +647,8 @@ namespace DotNetForHtml5.Compiler
                                                         out propertyAssemblyName,
                                                         out isTypeString,
                                                         out isTypeEnum,
-                                                        assemblyNameIfAny
+                                                        assemblyNameIfAny,
+                                                        true
                                                     );
 
                                                     string propertyType = string.Format(
