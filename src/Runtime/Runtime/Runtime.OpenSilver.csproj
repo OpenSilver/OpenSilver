@@ -163,7 +163,7 @@
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Media\ColorConverter.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TimelineMarker.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\TimelineMarkerCollection.cs" />
+		<Compile Include="System.Windows.Media\TimelineMarkerCollection.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\VideoBrush.cs" />
 		<Compile Include="System.Windows.Navigation\WORKINPROGRESS\LoadCompletedEventHandler.cs" />
 		<Compile Include="System.Windows.Navigation\NavigatingCancelEventArgs.cs" />
