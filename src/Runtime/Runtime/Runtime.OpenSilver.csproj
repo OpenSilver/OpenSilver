@@ -113,6 +113,7 @@
 		  <DependentUpon>Resource.resx</DependentUpon>
 		</Compile>
 		<Compile Include="System.Windows.Controls\DataPager\WeakEventListener.cs" />
+		<Compile Include="System.Windows.Controls\DateTimeHelper.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
