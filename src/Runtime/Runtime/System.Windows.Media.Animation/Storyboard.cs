@@ -282,13 +282,21 @@ namespace Windows.UI.Xaml.Media.Animation
         ///// </summary>
         //public void Resume();
         //public void Seek(TimeSpan offset);
-        //public void SeekAlignedToLastTick(TimeSpan offset);
 
-
-
-
-
-
+        /// <summary>
+        /// Moves the storyboard to the specified animation position immediately(synchronously).
+        /// </summary>
+        /// <param name="offset">
+        /// A positive or negative time value that describes the amount by which the timeline should move
+        /// forward or backward from the beginning of the animation. By using the TimeSpan Parse behavior,
+        /// a TimeSpan can be specified as a string in the following format (in this syntax, the [] characters
+        /// denote optional components of the string, but the quotes, colons, and periods are all a literal part of the syntax):
+        ///"[days.]hours:minutes:seconds[.fractionalSeconds]"
+        ///- or -
+        ///"days"
+        /// </param>
+        [OpenSilver.NotImplemented]
+        public void SeekAlignedToLastTick(TimeSpan offset) { }
 
         /// <summary>
         /// Gets the value of the Storyboard.Target XAML attached property from a
