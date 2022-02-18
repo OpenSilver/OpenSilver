@@ -45,13 +45,18 @@ namespace Windows.UI.Xaml.Controls
         ///  with the currently loaded media file.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public TimelineMarkerCollection Markers { get; }
+        public TimelineMarkerCollection Markers { get; } = new TimelineMarkerCollection();
 
         /// <summary>
         /// Identifies the <see cref="BufferingTime"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty BufferingTimeProperty = DependencyProperty.Register(nameof(BufferingTime), typeof(TimeSpan), typeof(MediaElement), new PropertyMetadata(new TimeSpan(0,0,5)));
+        public DependencyProperty BufferingTimeProperty =
+            DependencyProperty.Register(
+                nameof(BufferingTime),
+                typeof(TimeSpan),
+                typeof(MediaElement),
+                new PropertyMetadata(TimeSpan.FromSeconds(5)));
 
         /// <summary>
         /// The amount of time to buffer. The default value is a <see cref="TimeSpan"/> with value of 5 seconds (0:0:05).
@@ -67,7 +72,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="Position"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty PositionProperty = DependencyProperty.Register(nameof(Position), typeof(TimeSpan), typeof(MediaElement), new PropertyMetadata(new TimeSpan(0)));
+        public DependencyProperty PositionProperty =
+            DependencyProperty.Register(
+                nameof(Position),
+                typeof(TimeSpan),
+                typeof(MediaElement),
+                new PropertyMetadata(TimeSpan.Zero));
 
         /// <summary>
         /// Gets or sets the current position of progress through the media's playback time.
@@ -83,14 +93,19 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="NaturalDuration"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty NaturalDurationProperty = DependencyProperty.Register(nameof(NaturalDuration), typeof(Duration), typeof(MediaElement), new PropertyMetadata(new Duration(new TimeSpan(0))));
+        public DependencyProperty NaturalDurationProperty =
+            DependencyProperty.Register(
+                nameof(NaturalDuration),
+                typeof(Duration),
+                typeof(MediaElement),
+                new PropertyMetadata(new Duration(TimeSpan.Zero)));
 
         /// <summary>
         /// Gets the duration of the media file currently opened.
         /// </summary>
         [OpenSilver.NotImplemented]
         public Duration NaturalDuration
-        { 
+        {
             get { return (Duration)GetValue(NaturalDurationProperty); }
         }
 
@@ -98,7 +113,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="CurrentState"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty CurrentStateProperty = DependencyProperty.Register(nameof(CurrentState), typeof(MediaElementState), typeof(MediaElement), new PropertyMetadata(MediaElementState.Closed));
+        public DependencyProperty CurrentStateProperty =
+            DependencyProperty.Register(
+                nameof(CurrentState),
+                typeof(MediaElementState),
+                typeof(MediaElement),
+                new PropertyMetadata(MediaElementState.Closed));
 
         /// <summary>
         /// Gets the status of the <see cref="MediaElement"/>.
@@ -113,7 +133,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="DownloadProgress"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty DownloadProgressProperty = DependencyProperty.Register(nameof(DownloadProgress), typeof(double), typeof(MediaElement), new PropertyMetadata(0d));
+        public static readonly DependencyProperty DownloadProgressProperty =
+            DependencyProperty.Register(
+                nameof(DownloadProgress),
+                typeof(double),
+                typeof(MediaElement),
+                new PropertyMetadata(0d));
 
         /// <summary>
         /// Gets a percentage value indicating the amount of download completed for content located on a remote server.
@@ -128,7 +153,12 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="DownloadProgressOffset"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty DownloadProgressOffsetProperty = DependencyProperty.Register(nameof(DownloadProgressOffset), typeof(double), typeof(MediaElement), new PropertyMetadata(0d));
+        public static readonly DependencyProperty DownloadProgressOffsetProperty =
+            DependencyProperty.Register(
+                nameof(DownloadProgressOffset),
+                typeof(double),
+                typeof(MediaElement),
+                new PropertyMetadata(0d));
 
         /// <summary>
         /// Gets the offset of the download progress.
