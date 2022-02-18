@@ -14,7 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 using CSHTML5.Internal;
 
 #if MIGRATION
@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml
             Path = dependencyProperty.Name;
             DependencyProperty = dependencyProperty;
 
-            INTERNAL_AccessPropertyContainer = (d) => Array.Empty<Tuple<DependencyObject, DependencyProperty, int?>>();
+            INTERNAL_AccessPropertyContainer = (d) => Enumerable.Empty<Tuple<DependencyObject, DependencyProperty, int?>>();
             INTERNAL_PropertySetAnimationValue = (target, value) => target.SetAnimationValue(DependencyProperty, value);
         }
 
