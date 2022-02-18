@@ -1,6 +1,20 @@
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Security;
 
 #if MIGRATION
 using System.Windows.Threading;
@@ -22,6 +36,9 @@ namespace Windows.UI.Xaml.Printing
 #endif
 {
     /// <summary>
+    /// Provides printing capabilities for a Silverlight application.
+    /// </summary>
+    /// <remarks>
     /// 1. All elements are collected using the PrintPage event and then 'print-section' class is added to all of them.
     /// 2. A separate 'print-section' div is created inside 'beforeprint' event and all 'print-section' elements
     ///    added to it with different class name to be printed later - 'print-document-section-to-print'
@@ -34,70 +51,67 @@ namespace Windows.UI.Xaml.Printing
     /// 
     /// 'beforeprint' and 'afterprint' events registered only once and @media print rule is added/removed by
     /// JavaScript which guarantees no side effects after print.
-    /// </summary>
+    /// </remarks>
     public partial class PrintDocument : DependencyObject
     {
-        //
-        // Summary:
-        //     Gets the identifier for the System.Windows.Printing.PrintDocument.PrintedPageCount
-        //     dependency property.
-        //
-        // Returns:
-        //     The identifier for the System.Windows.Printing.PrintDocument.PrintedPageCount
-        //     dependency property.
-        public static readonly DependencyProperty PrintedPageCountProperty = DependencyProperty.Register(
-            nameof(PrintedPageCount),
-            typeof(int),
-            typeof(PrintDocument),
-            new PropertyMetadata(0));
+        private readonly List<UIElement> elements;
 
-        private List<UIElement> elements;
-        //
-        // Summary:
-        //     Initializes a new instance of the System.Windows.Printing.PrintDocument class.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PrintDocument"/> class.
+        /// </summary>
         public PrintDocument()
         {
             elements = new List<UIElement>();
         }
 
-        //
-        // Summary:
-        //     Gets the number of pages that have printed.
-        //
-        // Returns:
-        //     The number of pages that have printed.
-        public int PrintedPageCount { get; }
+        /// <summary>
+        /// Gets the identifier for the <see cref="PrintedPageCount"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PrintedPageCountProperty = 
+            DependencyProperty.Register(
+                nameof(PrintedPageCount),
+                typeof(int),
+                typeof(PrintDocument),
+                new PropertyMetadata(0));
 
-        //
-        // Summary:
-        //     Occurs after the System.Windows.Printing.PrintDocument.Print(System.String) method
-        //     is called and the print dialog box successfully returns, but before the System.Windows.Printing.PrintDocument.PrintPage
-        //     event is raised.
+        /// <summary>
+        /// Gets the number of pages that have printed.
+        /// </summary>
+        /// <returns>
+        /// The number of pages that have printed.
+        /// </returns>
+        public int PrintedPageCount
+        {
+            get => (int)GetValue(PrintedPageCountProperty);
+        }
+
+        /// <summary>
+        /// Occurs after the <see cref="Print(string)"/> method is called and the print 
+        /// dialog box successfully returns, but before the <see cref="PrintPage"/>
+        /// event is raised.
+        /// </summary>
         public event EventHandler<BeginPrintEventArgs> BeginPrint;
 
-        //
-        // Summary:
-        //     Occurs when the printing operation is passed to the print spooler or when the
-        //     print operation is cancelled by the application author.
+        /// <summary>
+        /// Occurs when the printing operation is passed to the print spooler or when the
+        /// print operation is cancelled by the application author.
+        /// </summary>
         public event EventHandler<EndPrintEventArgs> EndPrint;
 
-        //
-        // Summary:
-        //     Occurs when each page is printing.
+        /// <summary>
+        /// Occurs when each page is printing.
+        /// </summary>
         public event EventHandler<PrintPageEventArgs> PrintPage;
 
-        //
-        // Summary:
-        //     Starts the printing process for the specified document by opening the print dialog
-        //     box.
-        //
-        // Parameters:
-        //   documentName:
-        //     The name of the document to print.
-        //
-        // Exceptions:
-        //   T:System.Security.SecurityException:
-        //     The print operation is not user-initiated.
+        /// <summary>
+        /// Starts the printing process for the specified document by opening the print dialog box.
+        /// </summary>
+        /// <param name="documentName">
+        /// The name of the document to print.
+        /// </param>
+        /// <exception cref="SecurityException">
+        /// The print operation is not user-initiated.
+        /// </exception>
         public void Print(string documentName)
         {
             elements.Clear();
@@ -197,12 +211,7 @@ namespace Windows.UI.Xaml.Printing
 
             stackPanel.Loaded += (s, e) =>
             {
-#if MIGRATION
-                Dispatcher
-#else
-                CoreDispatcher
-#endif
-                .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
+                this.Dispatcher.BeginInvoke(() =>
                 {
                     foreach (var el in NotLoadedElements)
                     {
@@ -328,6 +337,43 @@ function addStyle() {
     document.head.prepend(element);
 }
 ", beginCallback, endCallback, documentName);
+        }
+
+        /// <summary>
+        /// Starts the vector printing process for the specified document by optionally opening
+        /// the print dialog box or printing directly to the default printer for trusted
+        /// applications.
+        /// </summary>
+        /// <param name="documentName">
+        /// The name of the document to print.
+        /// </param>
+        /// <param name="printerFallbackSettings">
+        /// The settings to use to enable vector printing for printers with limited support.
+        /// </param>
+        /// <param name="useDefaultPrinter">
+        /// Whether or not to automatically print to the default printer for the computer
+        /// without showing a print dialog. This parameter can only be true in trusted applications,
+        /// otherwise an exception will occur.
+        /// </param>
+        /// <exception cref="SecurityException">
+        /// The print operation is not user-initiated.-or-useDefaultPrinter is set to true
+        /// and the application is not a trusted application.
+        /// </exception>
+        [OpenSilver.NotImplemented]
+        public void Print(string documentName, PrinterFallbackSettings printerFallbackSettings, bool useDefaultPrinter = false)
+        {
+        }
+
+        /// <summary>
+        /// Starts the bitmap printing process for the specified document by opening the
+        /// print dialog box.
+        /// </summary>
+        /// <param name="documentName">
+        /// The name of the document to print.
+        /// </param>
+        [OpenSilver.NotImplemented]
+        public void PrintBitmap(string documentName)
+        {
         }
     }
 }

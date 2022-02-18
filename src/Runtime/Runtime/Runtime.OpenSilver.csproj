@@ -494,10 +494,7 @@
 		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\WriteableBitmap.cs" />
 		<Compile Include="System.Windows.Media.Media3D\WORKINPROGRESS\Matrix3D.cs" />
 		<Compile Include="System.Windows.Printing\BeginPrintEventArgs.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\EndPrintEventArgs.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintDocument.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrinterFallbackSettings.cs" />
-		<Compile Include="System.Windows.Printing\WORKINPROGRESS\PrintPageEventArgs.cs" />
+		<Compile Include="System.Windows.Printing\PrinterFallbackSettings.cs" />
 		<Compile Include="System.Windows.Shapes\Polyline.cs" />
 		<Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherSynchronizationContext.cs" />
 		<Compile Include="APP_SUPPORT\ClientSideResourceManager.cs" />
