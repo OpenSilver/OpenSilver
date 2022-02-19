@@ -404,11 +404,6 @@ namespace Windows.UI.Xaml.Navigation
                 return false;
             }
 
-            // In case the Uri contains international characters (ex: 完全采用统.xaml), we need to escape them.
-            // because Application.GetResourceStream expects an escaped Uri.
-            pagePathAndNameWithoutAssembly = Uri.EscapeUriString(pagePathAndNameWithoutAssembly);
-            assemblyPartSource = Uri.EscapeUriString(assemblyPartSource);
-
             return true;
         }
 #endif
