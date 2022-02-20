@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -18,16 +17,14 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-    //
-    // Summary:
-    //     Represents the method that will handle the System.Windows.UIElement.TextInput
-    //     routed event.
-    //
-    // Parameters:
-    //   sender:
-    //     The object where the event handler is attached.
-    //
-    //   e:
-    //     Event data for the event.
+    /// <summary>
+    /// Represents the method that will handle the <see cref="UIElement.TextInput"/> routed event.
+    /// </summary>
+    /// <param name="sender">
+    /// The object where the event handler is attached.
+    /// </param>
+    /// <param name="e">
+    /// Event data for the event.
+    /// </param>
     public delegate void TextCompositionEventHandler(object sender, TextCompositionEventArgs e);
 }

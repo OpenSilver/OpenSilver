@@ -42,21 +42,9 @@ namespace Windows.UI.Xaml.Input
         : PointerRoutedEventArgs
 #endif
     {
-        ///// <summary>
-        ///// Initializes a new instance of the TappedRoutedEventArgs class.
-        ///// </summary>
-        //public TappedRoutedEventArgs()
-        //{
-
-        //}
-
-        //
-        // Summary:
-        //     Gets the PointerDeviceType for the pointer device that initiated the associated
-        //     input event.
-        //
-        // Returns:
-        //     The PointerDeviceType for this event occurrence.
-        //public PointerDeviceType PointerDeviceType { get; }
+        internal override void InvokeHandler(Delegate handler, object target)
+        {
+            ((TappedEventHandler)handler)(target, this);
+        }
     }
 }

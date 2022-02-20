@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
 #if MIGRATION
@@ -21,22 +19,42 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public partial class RoutedEvent
+    /// <summary>
+    /// Represents a routed event to the Silverlight event system.
+    /// </summary>
+    public sealed class RoutedEvent
     {
-        string _eventName;
+        private readonly string _name;
+        private readonly Type _handlerType;
+        private readonly Type _ownerType;
 
-        public RoutedEvent(string eventName)
+        internal RoutedEvent(string name, Type handlerType, Type ownerType)
         {
-            _eventName = eventName;
+            _name = name;
+            _handlerType = handlerType;
+            _ownerType = ownerType;
         }
 
         /// <summary>
         /// Returns the string representation of the routed event.
         /// </summary>
-        /// <returns>The name of the routed event.</returns>
+        /// <returns>
+        /// The name of the routed event.
+        /// </returns>
         public override string ToString()
         {
-            return _eventName;
+            return $"{_ownerType.Name}.{_name}";
+        }
+
+        // Check to see if the given delegate is a legal handler for this type.
+        //  It either needs to be a type that the registering class knows how to
+        //  handle, or a RoutedEventHandler which we can handle without the help
+        //  of the registering class.
+        internal bool IsLegalHandler(Delegate handler)
+        {
+            Type handlerType = handler.GetType();
+
+            return handlerType == _handlerType || handlerType == typeof(RoutedEventHandler);
         }
     }
 }

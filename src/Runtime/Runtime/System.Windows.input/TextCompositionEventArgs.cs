@@ -12,12 +12,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Input
@@ -28,20 +23,29 @@ namespace Windows.UI.Xaml.Input
 	/// <summary>
 	/// Provides data for the <see cref="UIElement.TextInput"/> routed event.
 	/// </summary>
-	public sealed partial class TextCompositionEventArgs : RoutedEventArgs
+	public sealed class TextCompositionEventArgs : RoutedEventArgs
 	{
 		internal TextCompositionEventArgs() { }
 
-		/// <summary>
-		/// Gets or sets a value that marks the routed event as handled, and prevents most
-		/// handlers along the event route from handling the same event again.
-		/// </summary>
-		/// <returns>
-		/// true to mark the routed event handled. false to leave the routed event unhandled,
-		/// which permits the event to potentially route further and be acted on by other
-		/// handlers. The default is false.
-		/// </returns>
-		public bool Handled { get; set; }
+        internal override void InvokeHandler(Delegate handler, object target)
+        {
+			((TextCompositionEventHandler)handler)(target, this);
+        }
+
+        /// <summary>
+        /// Gets or sets a value that marks the routed event as handled, and prevents most
+        /// handlers along the event route from handling the same event again.
+        /// </summary>
+        /// <returns>
+        /// true to mark the routed event handled. false to leave the routed event unhandled,
+        /// which permits the event to potentially route further and be acted on by other
+        /// handlers. The default is false.
+        /// </returns>
+        public bool Handled
+        {
+			get => HandledImpl;
+			set => HandledImpl = value;
+		}
 
 		/// <summary>
 		/// Gets or sets the text string that of the text composition.

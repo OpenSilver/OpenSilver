@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 #if MIGRATION
 namespace System.Windows.Input
@@ -33,15 +26,22 @@ namespace Windows.UI.Xaml.Input
 #endif
     {
 #if MIGRATION
-        public int Delta { get; internal set; }
+        internal override void InvokeHandler(Delegate handler, object target)
+        {
+            ((MouseWheelEventHandler)handler)(target, this);
+        }
+#endif
+
+#if MIGRATION
+        public new int Delta { get; internal set; }
 #endif
 
         internal static int GetPointerWheelDelta(object jsEventArg)
         {
-            int rawDelta = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.delta || 0", jsEventArg)); // we use || 0 just in case delta is undefined.
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.wheelDelta != undefined", jsEventArg)))
+            int rawDelta = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("$0.delta || 0", jsEventArg)); // we use || 0 just in case delta is undefined.
+            if (Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0.wheelDelta != undefined", jsEventArg)))
             {
-                rawDelta = Convert.ToInt32(CSHTML5.Interop.ExecuteJavaScript("$0.wheelDelta", jsEventArg));
+                rawDelta = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("$0.wheelDelta", jsEventArg));
                 // Note: wheelDelta originated from the js mousewheel event which is deprecated. It still exists in the js wheel event but should still be considered deprecated (it also has never existed on FireFox).
                 // We're using it because I could not find another way of getting the values in the same way as was returned in Silverlight.
                 // What happens is as follows:

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using System;
 using System.Collections.Generic;
@@ -29,7 +27,7 @@ namespace Windows.UI.Xaml.Input
 	/// Represents a composition related to text input which includes the composition
 	/// text itself.
 	/// </summary>
-	public sealed partial class TextComposition
+	public sealed class TextComposition
 	{
 		internal TextComposition(string compositionText)
         {

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -36,12 +29,50 @@ namespace Windows.UI.Xaml
 #endif
     {
         /// <summary>
-        /// Initializes a new instance of the RoutedEventArgs class.
+        /// Initializes a new instance of the <see cref="RoutedEventArgs"/> class.
         /// </summary>
         public RoutedEventArgs() { }
 
+        internal bool HandledImpl { get; set; }
+
+        // Calls the InvokeEventHandler protected
+        // virtual method
+        //
+        // This method is needed because
+        // delegates are invoked from
+        // RoutedEventHandler which is not a
+        // sub-class of RoutedEventArgs
+        // and hence cannot invoke protected
+        // method RoutedEventArgs.FireEventHandler
+        internal virtual void InvokeHandler(Delegate handler, object target)
+        {
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            if (handler is RoutedEventHandler)
+            {
+                ((RoutedEventHandler)handler)(target, this);
+            }
+            else
+            {
+#if BRIDGE
+                handler.Apply(new object[] { target, this });
+#else
+                // Restricted Action - reflection permission required
+                handler.DynamicInvoke(new object[] { target, this });
+#endif
+            }
+        }
 
         private DependencyObject _originalSource;
+
         /// <summary>
         /// Gets a reference to the object that raised the event.
         /// </summary>
@@ -87,6 +118,5 @@ namespace Windows.UI.Xaml
                 _originalJSEventArg = value;
             }
         }
-
     }
 }

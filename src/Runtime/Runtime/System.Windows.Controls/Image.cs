@@ -344,9 +344,27 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             }
         }
 
-#region Image failed event
+        #region Image failed event
 
-        INTERNAL_EventManager<EventHandler<ExceptionRoutedEventArgs>, ExceptionRoutedEventArgs> _imageFailedEventManager = null;
+        private DOMEventManager _imageFailedEventManager;
+
+        private DOMEventManager ImageFailedEventManager
+        {
+            get
+            {
+                if (_imageFailedEventManager == null)
+                {
+                    _imageFailedEventManager = new DOMEventManager(
+                        () => _imageDiv,
+                        "error",
+                        ProcessOnImageFailed);
+                }
+
+                return _imageFailedEventManager;
+            }
+        }
+
+        private EventHandler<ExceptionRoutedEventArgs> _imageFailed;
 
         /// <summary>
         /// Occurs when there is an error associated with image retrieval or format.
@@ -355,23 +373,21 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         {
             add
             {
-                if (_imageFailedEventManager == null)
+                _imageFailed += value;
+
+                if (_imageFailed != null)
                 {
-                    _imageFailedEventManager = new INTERNAL_EventManager<EventHandler<ExceptionRoutedEventArgs>, ExceptionRoutedEventArgs>(() => _imageDiv, "error", ProcessOnImageFailed);
-                    _imageFailedEventManager.Add(value);
-                }
-                else
-                {
-                    _imageFailedEventManager.Add(value);
+                    ImageFailedEventManager.AttachToDomEvents();
                 }
             }
             remove
             {
-                if (_imageFailedEventManager != null)
+                _imageFailed -= value;
+                
+                if (_imageFailed == null && _imageFailedEventManager != null)
                 {
-                    _imageFailedEventManager.Remove(value);
+                    _imageFailedEventManager.DetachFromDomEvents();
                 }
-
             }
         }
 
@@ -392,29 +408,33 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         /// </summary>
         void OnImageFailed(ExceptionRoutedEventArgs eventArgs)
         {
-            foreach (EventHandler<ExceptionRoutedEventArgs> handler in _imageFailedEventManager.Handlers.ToList<EventHandler<ExceptionRoutedEventArgs>>())
-            {
-                handler(this, eventArgs);
-            }
+            _imageFailed?.Invoke(this, eventArgs);
         }
 
-#endregion
+        #endregion
 
 
-#region Image opened event
+        #region Image opened event
 
-        INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs> _imageOpenedEventManager = null;
-        INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs> ImageOpenedEventManager
+        private DOMEventManager _imageOpenedEventManager;
+        
+        private DOMEventManager ImageOpenedEventManager
         {
             get
             {
                 if (_imageOpenedEventManager == null)
                 {
-                    _imageOpenedEventManager = new INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs>(() => _imageDiv, "load", ProcessOnImageOpened);
+                    _imageOpenedEventManager = new DOMEventManager(
+                        () => _imageDiv, 
+                        "load", 
+                        ProcessOnImageOpened);
                 }
+
                 return _imageOpenedEventManager;
             }
         }
+
+        private EventHandler<RoutedEventArgs> _imageOpened;
 
         /// <summary>
         /// Occurs when the image source is downloaded and decoded with no failure.
@@ -423,21 +443,20 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         {
             add
             {
-                if (_imageOpenedEventManager == null)
+                _imageOpened += value;
+
+                if (_imageOpened != null)
                 {
-                    _imageOpenedEventManager = new INTERNAL_EventManager<EventHandler<RoutedEventArgs>, RoutedEventArgs>(() => _imageDiv, "load", ProcessOnImageOpened);
-                    _imageOpenedEventManager.Add(value);
-                }
-                else
-                {
-                    _imageOpenedEventManager.Add(value);
+                    ImageOpenedEventManager.AttachToDomEvents();
                 }
             }
             remove
             {
-                if (_imageOpenedEventManager != null)
+                _imageOpened -= value;
+
+                if (_imageOpened == null && _imageOpenedEventManager != null)
                 {
-                    _imageOpenedEventManager.Remove(value);
+                    _imageOpenedEventManager.DetachFromDomEvents();
                 }
             }
         }
@@ -459,49 +478,33 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         /// </summary>
         void OnImageOpened(RoutedEventArgs eventArgs)
         {
-            foreach (EventHandler<RoutedEventArgs> handler in _imageOpenedEventManager.Handlers.ToList<EventHandler<RoutedEventArgs>>())
-            {
-                handler(this, eventArgs);
-            }
+            _imageOpened?.Invoke(this, eventArgs);
         }
 
-#endregion
+        #endregion
 
         //todo: create a test case for those events.
         public override void INTERNAL_AttachToDomEvents()
         {
             base.INTERNAL_AttachToDomEvents();
-            Type[] methodParameters = { typeof(RoutedEventArgs) };
-            if (_imageOpenedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(Image), "OnImageOpened", methodParameters))
+            
+            if (_imageOpened != null)
             {
-                var v = ImageOpenedEventManager; //forces the creation of the event manager.
+                ImageOpenedEventManager.AttachToDomEvents();
             }
-            if (_imageOpenedEventManager != null)
+
+            if (_imageFailed != null)
             {
-                _imageOpenedEventManager.AttachToDomEvents(this, typeof(Image), "OnImageOpened", methodParameters);
-            }
-            methodParameters = new Type[] { typeof(ExceptionRoutedEventArgs) };
-            if (_imageFailedEventManager == null && INTERNAL_EventsHelper.IsEventCallbackOverridden(this, typeof(Image), "OnImageFailed", methodParameters))
-            {
-                var v = _imageFailedEventManager; //forces the creation of the event manager.
-            }
-            if (_imageFailedEventManager != null)
-            {
-                _imageFailedEventManager.AttachToDomEvents(this, typeof(Image), "OnImageFailed", methodParameters);
+                ImageFailedEventManager.AttachToDomEvents();
             }
         }
 
         public override void INTERNAL_DetachFromDomEvents()
         {
             base.INTERNAL_DetachFromDomEvents();
-            if (_imageOpenedEventManager != null)
-            {
-                _imageOpenedEventManager.DetachFromDomEvents();
-            }
-            if (_imageFailedEventManager != null)
-            {
-                _imageFailedEventManager.DetachFromDomEvents();
-            }
+            
+            _imageOpenedEventManager?.DetachFromDomEvents();
+            _imageFailedEventManager?.DetachFromDomEvents();
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)

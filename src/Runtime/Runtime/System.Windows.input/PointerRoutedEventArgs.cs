@@ -48,18 +48,26 @@ namespace Windows.UI.Xaml.Input
     public partial class PointerRoutedEventArgs : RoutedEventArgs
 #endif
     {
+        internal override void InvokeHandler(Delegate handler, object target)
+        {
+#if MIGRATION
+            ((MouseEventHandler)handler)(target, this);
+#else
+            ((PointerEventHandler)handler)(target, this);
+#endif
+        }
+
         internal double _pointerAbsoluteX = 0d; // Note: they are actually "relative" to the XAML Window root.
         internal double _pointerAbsoluteY = 0d; // Note: they are actually "relative" to the XAML Window root.
 
-        bool _handled = false;
         /// <summary>
         /// Gets or sets a value that marks the routed event as handled, and prevents
         /// most handlers along the event route from handling the same event again.
         /// </summary>
         public bool Handled
         {
-            get { return _handled; }
-            set { _handled = value; }
+            get => HandledImpl;
+            set => HandledImpl = value;
         }
 
 #if MIGRATION

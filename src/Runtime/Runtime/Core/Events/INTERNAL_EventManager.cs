@@ -29,6 +29,7 @@ using Windows.UI.Xaml;
 
 namespace CSHTML5.Internal
 {
+    [Obsolete]
     public class INTERNAL_EventManager<EVENT_HANDLER, EVENT_ARGS>
     {
         //-----------------------------------------------------------

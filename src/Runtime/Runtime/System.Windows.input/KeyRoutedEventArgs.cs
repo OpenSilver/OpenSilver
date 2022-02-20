@@ -36,7 +36,11 @@ namespace Windows.UI.Xaml.Input
     public sealed partial class KeyRoutedEventArgs : RoutedEventArgs
 #endif
     {
-        bool _handled = false;
+        internal override void InvokeHandler(Delegate handler, object target)
+        {
+            ((KeyEventHandler)handler)(target, this);
+        }
+
 #if MIGRATION
         Key _key;
 #else
@@ -51,8 +55,8 @@ namespace Windows.UI.Xaml.Input
         /// </summary>
         public bool Handled
         {
-            get { return _handled; }
-            set { _handled = value; }
+            get => HandledImpl;
+            set => HandledImpl = value;
         }
 
         // Returns:

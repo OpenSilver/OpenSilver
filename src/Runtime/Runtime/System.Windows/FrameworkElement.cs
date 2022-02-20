@@ -1736,7 +1736,11 @@ namespace Windows.UI.Xaml
 
         #region Loaded/Unloaded events
 
-        public static readonly RoutedEvent LoadedEvent = new RoutedEvent("Loaded");
+        public static readonly RoutedEvent LoadedEvent = 
+            new RoutedEvent(
+                nameof(Loaded), 
+                typeof(RoutedEventHandler), 
+                typeof(FrameworkElement));
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.

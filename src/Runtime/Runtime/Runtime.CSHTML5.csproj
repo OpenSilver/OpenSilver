@@ -65,6 +65,7 @@
     <Compile Include="..\OpenSilver.Xaml\System.Xaml\IMarkupExtension.cs">
       <Link>System.Xaml\IMarkupExtension.cs</Link>
     </Compile>
+    <Compile Include="Core\Events\DOMEventManager.cs" />
     <Compile Include="Core\Main\DescendentsWalker.cs" />
     <Compile Include="Core\Main\DescendentsWalkerBase.cs" />
     <Compile Include="Core\Main\EmptyEnumerator.cs" />
@@ -184,6 +185,11 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
     <Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
+    <Compile Include="System.Windows.Input\MouseWheelEventArgs.cs" />
+    <Compile Include="System.Windows.Input\MouseWheelEventHandler.cs" />
+    <Compile Include="System.Windows.Input\TextComposition.cs" />
+    <Compile Include="System.Windows.Input\TextCompositionEventArgs.cs" />
+    <Compile Include="System.Windows.Input\TextCompositionEventHandler.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\StylusPoint.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\StylusPointCollection.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
@@ -210,6 +216,7 @@
     <Compile Include="System.Windows.Navigation\NavigationMode.cs" />
     <Compile Include="System.Windows\ApplicationServiceContext.cs" />
     <Compile Include="System.Windows\DataTemplateKey.cs" />
+    <Compile Include="System.Windows\EventHandlersStore.cs" />
     <Compile Include="System.Windows\EventTrigger.cs" />
     <Compile Include="System.Windows\FontStretchConverter.cs" />
     <Compile Include="System.Windows\FontStyleConverter.cs" />
@@ -218,12 +225,14 @@
     <Compile Include="System.Windows\InstallState.cs" />
     <Compile Include="System.Windows\NullableBoolConverter.cs" />
     <Compile Include="System.Windows\RectConverter.cs" />
+    <Compile Include="System.Windows\RoutedEventHandlerInfo.cs" />
     <Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
     <Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
     <Compile Include="System.Windows\TriggerAction.cs" />
     <Compile Include="System.Windows\TriggerActionCollection.cs" />
     <Compile Include="System.Windows\TriggerBase.cs" />
     <Compile Include="System.Windows\TriggerCollection.cs" />
+    <Compile Include="System.Windows\UIElement.EventManager.cs" />
     <Compile Include="System.Windows\WORKINPROGRESS\CheckAndDownloadUpdateCompletedEventArgs.cs" />
     <Compile Include="System.Xml\WORKINPROGRESS\XmlSerializer.cs" />
     <Compile Include="System\TypeExtensions.cs" />
@@ -312,7 +321,6 @@
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\TextElementCollection_1.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\TextPointer.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\TextSelection.cs" />
-    <Compile Include="System.Windows.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\EasingFunctionBase.cs" />
     <Compile Include="System.Windows.Media\RectangleGeometry.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CompositeTransform.cs" />
@@ -827,12 +835,8 @@
     <Compile Include="System.Windows.Input\RightTappedRoutedEventArgs.cs" />
     <Compile Include="System.Windows.Input\TappedEventHandler.cs" />
     <Compile Include="System.Windows.Input\TappedRoutedEventArgs.cs" />
-    <Compile Include="System.Windows.Input\WORKINPROGRESS\MouseWheelEventHandler.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\StylusDevice.cs" />
-    <Compile Include="System.Windows.Input\WORKINPROGRESS\TextComposition.cs" />
     <Compile Include="System.Windows.Input\WORKINPROGRESS\KeyboardNavigationMode.cs" />
-    <Compile Include="System.Windows.Input\WORKINPROGRESS\MouseWheelEventArgs.cs" />
-    <Compile Include="System.Windows.Input\WORKINPROGRESS\TextCompositionEventArgs.cs" />
     <Compile Include="System.Windows.Media.Animation\AnimationHelpers.cs" />
     <Compile Include="System.Windows.Media.Animation\CircleEase.cs" />
     <Compile Include="System.Windows.Media.Animation\ClockState.cs" />

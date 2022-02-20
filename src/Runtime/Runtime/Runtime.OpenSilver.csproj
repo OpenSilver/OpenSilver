@@ -42,6 +42,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
+		<Compile Include="Core\Events\DOMEventManager.cs" />
 		<Compile Include="Core\Main\CopyOnWriteList.cs" />
 		<Compile Include="Core\Main\DescendentsWalker.cs" />
 		<Compile Include="Core\Main\DescendentsWalkerBase.cs" />
@@ -180,6 +181,7 @@
 		<Compile Include="System.Windows\DataTemplateKey.cs" />
 		<Compile Include="System.Windows\DurationConverter.cs" />
 		<Compile Include="System.Windows.Media\FontFamilyConverter.cs" />
+		<Compile Include="System.Windows\EventHandlersStore.cs" />
 		<Compile Include="System.Windows\FontStretchConverter.cs" />
 		<Compile Include="System.Windows\FontStyleConverter.cs" />
 		<Compile Include="System.Windows\FontWeightConverter.cs" />
@@ -194,6 +196,7 @@
 		<Compile Include="System.Windows\PropertyPathConverter.cs" />
 		<Compile Include="System.Windows\RectConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\RepeatBehaviorConverter.cs" />
+		<Compile Include="System.Windows\RoutedEventHandlerInfo.cs" />
 		<Compile Include="System.Windows\SizeConverter.cs" />
 		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
 		<Compile Include="System.Windows\ThicknessConverter.cs" />
@@ -228,6 +231,7 @@
 		<Compile Include="System.Windows\InstallState.cs" />
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
+		<Compile Include="System.Windows\UIElement.EventManager.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ExpanderAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\TreeViewAutomationPeer.cs" />
@@ -913,13 +917,13 @@
 		<Compile Include="System.Windows.Input\TappedEventHandler.cs" />
 		<Compile Include="System.Windows.Input\TappedRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Input\WORKINPROGRESS\KeyboardNavigationMode.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\MouseWheelEventArgs.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\TextComposition.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\TextCompositionEventArgs.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\MouseWheelEventHandler.cs" />
+		<Compile Include="System.Windows.input\MouseWheelEventArgs.cs" />
+		<Compile Include="System.Windows.input\TextComposition.cs" />
+		<Compile Include="System.Windows.input\TextCompositionEventArgs.cs" />
+		<Compile Include="System.Windows.input\MouseWheelEventHandler.cs" />
 		<Compile Include="System.Windows.Input\WORKINPROGRESS\StylusDevice.cs" />
 		<Compile Include="System.Windows.Input\WORKINPROGRESS\TabletDeviceType.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\TextCompositionEventHandler.cs" />
+		<Compile Include="System.Windows.input\TextCompositionEventHandler.cs" />
 		<Compile Include="System.Windows.Media.Animation\AnimationHelpers.cs" />
 		<Compile Include="System.Windows.Media.Animation\AnimationTimeline.cs" />
 		<Compile Include="System.Windows.Media.Animation\CircleEase.cs" />
