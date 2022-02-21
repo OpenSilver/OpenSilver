@@ -14,6 +14,10 @@
 		<Optimize>false</Optimize>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>

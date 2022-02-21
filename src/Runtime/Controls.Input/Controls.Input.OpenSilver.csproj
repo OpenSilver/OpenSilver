@@ -1,113 +1,121 @@
 ﻿<Project>
 
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <EnableDefaultItems>false</EnableDefaultItems>
-    <AssemblyName>OpenSilver.Controls.Input</AssemblyName>
-    <RootNamespace>System.Windows.Controls</RootNamespace>
-    <Configurations>SL;UWP</Configurations>
-    <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
-    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
-    <OpenSilverVersion>1.0.0</OpenSilverVersion>
-    <Optimize>true</Optimize>
-    <DefineTrace>true</DefineTrace>
-    <DefineConstants>$(DefineConstants);SILVERLIGHT</DefineConstants>
-    <DefineConstants Condition="$(Optimize) != true">$(DefineConstants);DEBUG</DefineConstants>
-    <DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<EnableDefaultItems>false</EnableDefaultItems>
+		<AssemblyName>OpenSilver.Controls.Input</AssemblyName>
+		<RootNamespace>System.Windows.Controls</RootNamespace>
+		<Configurations>SL;UWP</Configurations>
+		<IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
+		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+		<OpenSilverVersion>1.0.0</OpenSilverVersion>
+		<Optimize>false</Optimize>
+		<DefineTrace>true</DefineTrace>
+		<DefineConstants>$(DefineConstants);SILVERLIGHT</DefineConstants>
+		<DefineConstants Condition="$(Optimize) != true">$(DefineConstants);DEBUG</DefineConstants>
+		<DefineConstants Condition=" '$(Configuration)' == 'SL' ">$(DefineConstants);MIGRATION</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="$(Optimize) != true">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="AutoCompleteBox\PopupHelper.cs" />
-    <Compile Include="Common\WeakEventListener.cs" />
-    <!--
+	<PropertyGroup Condition="$(DefineConstants.Contains('DEBUG'))">
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="AutoCompleteBox\PopupHelper.cs" />
+		<Compile Include="Common\WeakEventListener.cs" />
+		<!--
     <Compile Include="..\Controls\Common\BindingEvaluator.cs">
       <Link>Common\BindingEvaluator.cs</Link>
     </Compile>
     -->
-    <Compile Include="Common\BindingEvaluator.cs" />
-    <!--
+		<Compile Include="Common\BindingEvaluator.cs" />
+		<!--
     <Compile Include="..\Controls\Common\InteractionHelper.cs">
       <Link>Common\InteractionHelper.cs</Link>
     </Compile>
     -->
-    <Compile Include="..\Runtime\System.Windows.Controls\InteractionHelper.cs">
-      <Link>Common\InteractionHelper.cs</Link>
-    </Compile>
-    <!--
+		<Compile Include="..\Runtime\System.Windows.Controls\InteractionHelper.cs">
+			<Link>Common\InteractionHelper.cs</Link>
+		</Compile>
+		<!--
     <Compile Include="..\Controls\Common\IUpdateVisualState.cs">
       <Link>Common\IUpdateVisualState.cs</Link>
     </Compile>
     -->
-    <Compile Include="..\Runtime\System.Windows.Controls\IUpdateVisualState.cs">
-      <Link>Common\IUpdateVisualState.cs</Link>
-    </Compile>
-    <!--
+		<Compile Include="..\Runtime\System.Windows.Controls\IUpdateVisualState.cs">
+			<Link>Common\IUpdateVisualState.cs</Link>
+		</Compile>
+		<!--
     <Compile Include="..\Controls\Common\ScrollExtensions.cs">
       <Link>Common\ScrollExtensions.cs</Link>
     </Compile>
     -->
-    <!--
+		<!--
     <Compile Include="..\Controls\Common\VisualStates.cs">
       <Link>Common\VisualStates.cs</Link>
     </Compile>
     -->
-    <Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">
-      <Link>Common\VisualStates.cs</Link>
-    </Compile>
-    <Compile Include="AutoCompleteBox\AutoCompleteBox.cs" />
-    <Compile Include="AutoCompleteBox\AutoCompleteBoxAutomationPeer.cs" />
-    <Compile Include="AutoCompleteBox\AutoCompleteFilter.cs" />
-    <Compile Include="AutoCompleteBox\AutoCompleteFilterMode.cs" />
-    <Compile Include="AutoCompleteBox\AutoCompleteFilterPredicate.cs" />
-    <Compile Include="AutoCompleteBox\ISelectionAdapter.cs" />
-    <Compile Include="AutoCompleteBox\PopulatedEventArgs.cs" />
-    <Compile Include="AutoCompleteBox\PopulatedEventHandler.cs" />
-    <Compile Include="AutoCompleteBox\PopulatingEventArgs.cs" />
-    <Compile Include="AutoCompleteBox\PopulatingEventHandler.cs" />
-    <Compile Include="AutoCompleteBox\SelectorSelectionAdapter.cs" />
-    <Compile Include="Common\Extensions.cs" />
-    <Compile Include="Common\VisualTreeExtensions.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>OpenSilver.Controls.Input.Properties</CustomToolNamespace>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Themes\generic.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AutoCompleteBox\AutoCompleteBox.xaml" />
-    <!--
+		<Compile Include="..\Runtime\System.Windows.Controls\VisualStates.cs">
+			<Link>Common\VisualStates.cs</Link>
+		</Compile>
+		<Compile Include="AutoCompleteBox\AutoCompleteBox.cs" />
+		<Compile Include="AutoCompleteBox\AutoCompleteBoxAutomationPeer.cs" />
+		<Compile Include="AutoCompleteBox\AutoCompleteFilter.cs" />
+		<Compile Include="AutoCompleteBox\AutoCompleteFilterMode.cs" />
+		<Compile Include="AutoCompleteBox\AutoCompleteFilterPredicate.cs" />
+		<Compile Include="AutoCompleteBox\ISelectionAdapter.cs" />
+		<Compile Include="AutoCompleteBox\PopulatedEventArgs.cs" />
+		<Compile Include="AutoCompleteBox\PopulatedEventHandler.cs" />
+		<Compile Include="AutoCompleteBox\PopulatingEventArgs.cs" />
+		<Compile Include="AutoCompleteBox\PopulatingEventHandler.cs" />
+		<Compile Include="AutoCompleteBox\SelectorSelectionAdapter.cs" />
+		<Compile Include="Common\Extensions.cs" />
+		<Compile Include="Common\VisualTreeExtensions.cs" />
+		<Compile Include="GlobalSuppressions.cs" />
+		<Compile Include="Properties\AssemblyInfo.cs" />
+		<Compile Include="Properties\Resources.Designer.cs">
+			<DependentUpon>Resources.resx</DependentUpon>
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+			<CustomToolNamespace>OpenSilver.Controls.Input.Properties</CustomToolNamespace>
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Include="Themes\generic.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="AutoCompleteBox\AutoCompleteBox.xaml" />
+		<!--
     <None Include="..\Controls\Common\Common.xaml">
       <Link>Common\Common.xaml</Link>
     </None>
     -->
-    <None Include="Common\Common.xaml" />
-  </ItemGroup>
+		<None Include="Common\Common.xaml" />
+	</ItemGroup>
 
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
-  <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)' == 'SL' " />
-  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)' == 'UWP' " />
+	<Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)' == 'SL' " />
+	<Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)' == 'UWP' " />
 
 </Project>
