@@ -563,7 +563,8 @@ namespace DotNetForHtml5.Compiler
                                                 }
                                                 string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
 
-                                                if (BindingRelativeSourceIsTemplatedParent(child))
+                                                if (BindingRelativeSourceIsTemplatedParent(child) && 
+                                                    !IsStyleSetter(parent, isSLMigration, reflectionOnSeparateAppDomain))
                                                 {
                                                     stringBuilder.AppendLine(string.Format("{0}.TemplateOwner = {1};", GetUniqueName(child), GeneratingCSharpCode.TemplateOwnerValuePlaceHolder));
                                                 }
@@ -2493,6 +2494,13 @@ namespace {namespaceStringIfAny}
                 }
             }
             return false;
+        }
+
+        private static bool IsStyleSetter(XElement element, bool isSLMigration, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        {
+            string setterFullName = isSLMigration ? "global::System.Windows.Setter" : "global::Windows.UI.Xaml.Setter";
+
+            return reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(element.Name.NamespaceName, element.Name.LocalName) == setterFullName;
         }
 
         static void ChangeRelativePathIntoAbsolutePathIfNecessary(ref string path, string valueTypeFullName, string propertyName, string fileNameWithPathRelativeToProjectRoot, string assemblyNameWithoutExtension, XName parentXName)
