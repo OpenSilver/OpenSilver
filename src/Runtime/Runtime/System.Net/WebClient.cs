@@ -808,10 +808,15 @@ namespace System.Net
             }
         }
 
-
+        /// <summary>
+        /// Gets or sets a value that indicates whether to buffer the data read from the
+        /// Internet resource for a <see cref="WebClient"/> instance.
+        /// </summary>
+        /// <returns>
+        /// true to enable buffering of the data received from the Internet resource; false
+        /// to disable buffering. The default is true.
+        /// </returns>
         [OpenSilver.NotImplemented]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This API supports the .NET Framework infrastructure and is not intended to be used directly from your code.", false)]
         public bool AllowReadStreamBuffering { get; set; }
 
         //[EditorBrowsable(EditorBrowsableState.Never)]

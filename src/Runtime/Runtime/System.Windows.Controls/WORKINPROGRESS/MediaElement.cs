@@ -188,7 +188,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Stretch),
                 typeof(Stretch),
                 typeof(MediaElement),
-                new PropertyMetadata(Media.Stretch.Uniform));
+                new PropertyMetadata(Stretch.Uniform));
 
         /// <summary>
         /// Sets the <see cref="Source"/> property using the supplied stream.
