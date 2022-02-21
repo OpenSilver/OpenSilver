@@ -170,6 +170,27 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Gets or sets a <see cref="Media.Stretch"/> value that describes how a <see cref="MediaElement"/> fills the destination rectangle.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public Stretch Stretch
+        {
+            get { return (Stretch)GetValue(StretchProperty); }
+            set { SetValue(StretchProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Stretch"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty StretchProperty =
+            DependencyProperty.Register(
+                nameof(Stretch),
+                typeof(Stretch),
+                typeof(MediaElement),
+                new PropertyMetadata(Stretch.Uniform));
+
+        /// <summary>
         /// Sets the <see cref="Source"/> property using the supplied stream.
         /// </summary>
         /// <param name="stream">
