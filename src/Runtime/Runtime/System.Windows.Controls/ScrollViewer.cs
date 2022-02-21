@@ -172,7 +172,7 @@ namespace Windows.UI.Xaml.Controls
                 var scrollViewer = (ScrollViewer)d;
                 ScrollBarVisibility newValue = (ScrollBarVisibility)e.NewValue;
 
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer))
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer) && !scrollViewer.IsUnderCustomLayout)
                 {
                     //-----------------------------
                     // Gain access to the styles:
@@ -496,7 +496,7 @@ namespace Windows.UI.Xaml.Controls
                 var scrollViewer = (ScrollViewer)d;
                 ScrollBarVisibility newValue = (ScrollBarVisibility)e.NewValue;
 
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer))
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(scrollViewer) && !scrollViewer.IsUnderCustomLayout)
                 {
                     //-----------------------------
                     // Gain access to the styles:

@@ -1329,7 +1329,8 @@ namespace Windows.UI.Xaml
         {
             var frameworkElement = (FrameworkElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double)
+                && e.NewValue is double
+                && frameworkElement.IsUnderCustomLayout == false)
             {
                 double newValue = (double)e.NewValue;
                 var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
@@ -1373,7 +1374,8 @@ namespace Windows.UI.Xaml
         {
             var frameworkElement = (FrameworkElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double)
+                && e.NewValue is double
+                && frameworkElement.IsUnderCustomLayout == false)
             {
                 double newValue = (double)e.NewValue;
                 var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
@@ -1414,7 +1416,8 @@ namespace Windows.UI.Xaml
         {
             var frameworkElement = (FrameworkElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double)
+                && e.NewValue is double
+                && frameworkElement.IsUnderCustomLayout == false)
             {
                 double newValue = (double)e.NewValue;
                 var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
@@ -1458,7 +1461,8 @@ namespace Windows.UI.Xaml
         {
             var frameworkElement = (FrameworkElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double)
+                && e.NewValue is double
+                && frameworkElement.IsUnderCustomLayout == false)
             {
                 double newValue = (double)e.NewValue;
                 var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
