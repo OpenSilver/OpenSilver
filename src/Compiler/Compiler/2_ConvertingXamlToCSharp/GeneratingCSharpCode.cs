@@ -551,15 +551,15 @@ namespace DotNetForHtml5.Compiler
                                                 }
                                                 else
                                                 {
-                                                    reflectionOnSeparateAppDomain.GetMethodInfo("Get" + propertyName,
-                                                                                                elementName.Namespace.NamespaceName,
-                                                                                                elementName.LocalName,
-                                                                                                out propertyDeclaringTypeName,
-                                                                                                out propertyTypeNamespace,
-                                                                                                out propertyTypeName,
-                                                                                                out isTypeString,
-                                                                                                out isTypeEnum,
-                                                                                                assemblyNameIfAny);
+                                                    reflectionOnSeparateAppDomain.GetAttachedPropertyGetMethodInfo("Get" + propertyName,
+                                                        elementName.Namespace.NamespaceName,
+                                                        elementName.LocalName,
+                                                        out propertyDeclaringTypeName,
+                                                        out propertyTypeNamespace,
+                                                        out propertyTypeName,
+                                                        out isTypeString,
+                                                        out isTypeEnum,
+                                                        assemblyNameIfAny);
                                                 }
                                                 string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
 

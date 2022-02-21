@@ -200,9 +200,9 @@ namespace DotNetForHtml5.Compiler
             _marshalledObject.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out returnValueAssemblyName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
-        public void GetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+        public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
         {
-            _marshalledObject.GetMethodInfo(methodName, namespaceName, localTypeName, out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
+            _marshalledObject.GetAttachedPropertyGetMethodInfo(methodName, namespaceName, localTypeName, out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
         public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
@@ -1203,14 +1203,59 @@ namespace DotNetForHtml5.Compiler
                 isTypeEnum = (type.IsEnum);
             }
 
-            public void GetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+            private Type GetDependencyObjectType()
             {
-                var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-                MethodInfo methodInfo = elementType.GetMethod(methodName);
+#if CSHTML5BLAZOR
+#if MIGRATION
+                return FindType("System.Windows", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR);
+#else
+                return FindType("Windows.UI.Xaml", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR);
+#endif
+#elif BRIDGE
+#if MIGRATION
+                return FindType("System.Windows", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE);
+#else
+                return FindType("Windows.UI.Xaml", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE);
+#endif
+#endif
+            }
+
+            public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+            {
+                Type dependencyObjectType = GetDependencyObjectType();
+
+                Type elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+                MethodInfo methodInfo = null;
+                for (Type t = elementType; t != null; t = t.BaseType)
+                {
+                    methodInfo = t.GetMethods(BindingFlags.Static | BindingFlags.Public)
+                        .FirstOrDefault(m =>
+                        {
+                            if (m.Name != methodName)
+                            {
+                                return false;
+                            }
+
+                            ParameterInfo[] parameterInfos = m.GetParameters();
+                            if (parameterInfos.Length != 1)
+                            {
+                                return false;
+                            }
+
+                            return dependencyObjectType.IsAssignableFrom(parameterInfos[0].ParameterType);
+                        });
+
+                    if (methodInfo != null)
+                    {
+                        break;
+                    }
+                }
+
                 if (methodInfo == null)
                 {
                     throw new XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType.ToString() + "\".");
                 }
+
                 declaringTypeName = "global::" + (!string.IsNullOrEmpty(methodInfo.DeclaringType.Namespace) ? methodInfo.DeclaringType.Namespace + "." : "") + GetTypeNameIncludingGenericArguments(methodInfo.DeclaringType);
                 returnValueNamespaceName = this.BuildPropertyPathRecursively(methodInfo.ReturnType);
                 returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(methodInfo.ReturnType);
