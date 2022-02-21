@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="BufferingTime"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty BufferingTimeProperty =
+        public static readonly DependencyProperty BufferingTimeProperty =
             DependencyProperty.Register(
                 nameof(BufferingTime),
                 typeof(TimeSpan),
@@ -72,7 +72,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="Position"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty PositionProperty =
+        public static readonly DependencyProperty PositionProperty =
             DependencyProperty.Register(
                 nameof(Position),
                 typeof(TimeSpan),
@@ -93,7 +93,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="NaturalDuration"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty NaturalDurationProperty =
+        public static readonly DependencyProperty NaturalDurationProperty =
             DependencyProperty.Register(
                 nameof(NaturalDuration),
                 typeof(Duration),
@@ -113,7 +113,7 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="CurrentState"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public DependencyProperty CurrentStateProperty =
+        public static readonly DependencyProperty CurrentStateProperty =
             DependencyProperty.Register(
                 nameof(CurrentState),
                 typeof(MediaElementState),
