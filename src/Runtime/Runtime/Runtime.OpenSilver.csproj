@@ -182,6 +182,7 @@
 		<Compile Include="System.Windows\DurationConverter.cs" />
 		<Compile Include="System.Windows.Media\FontFamilyConverter.cs" />
 		<Compile Include="System.Windows\EventHandlersStore.cs" />
+		<Compile Include="System.Windows\EventRoute.cs" />
 		<Compile Include="System.Windows\FontStretchConverter.cs" />
 		<Compile Include="System.Windows\FontStyleConverter.cs" />
 		<Compile Include="System.Windows\FontWeightConverter.cs" />
@@ -197,6 +198,7 @@
 		<Compile Include="System.Windows\RectConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\RepeatBehaviorConverter.cs" />
 		<Compile Include="System.Windows\RoutedEventHandlerInfo.cs" />
+		<Compile Include="System.Windows\RouteItem.cs" />
 		<Compile Include="System.Windows\SizeConverter.cs" />
 		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
 		<Compile Include="System.Windows\ThicknessConverter.cs" />

@@ -466,11 +466,9 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         /// </summary>
         void ProcessOnImageOpened(object jsEventArg)
         {
-            var eventArgs = new RoutedEventArgs() //todo: fill the rest
-            {
-                OriginalSource = this
-            };
-            OnImageOpened(eventArgs);
+            RoutedEventArgs e = new RoutedEventArgs();
+            e.OriginalSource = this;
+            OnImageOpened(e);
         }
 
         /// <summary>

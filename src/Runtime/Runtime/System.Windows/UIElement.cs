@@ -50,87 +50,85 @@ namespace Windows.UI.Xaml
         static UIElement()
         {
 #if MIGRATION
-            MouseMoveEvent = new RoutedEvent(nameof(MouseMove), typeof(MouseEventHandler), typeof(UIElement));
-            MouseLeftButtonDownEvent = new RoutedEvent(nameof(MouseLeftButtonDown), typeof(MouseButtonEventHandler), typeof(UIElement));
-            MouseRightButtonDownEvent = new RoutedEvent(nameof(MouseRightButtonDown), typeof(MouseButtonEventHandler), typeof(UIElement));
-            MouseWheelEvent = new RoutedEvent(nameof(MouseWheel), typeof(MouseWheelEventHandler), typeof(UIElement));
-            MouseLeftButtonUpEvent = new RoutedEvent(nameof(MouseLeftButtonUp), typeof(MouseButtonEventHandler), typeof(UIElement));
-            MouseEnterEvent = new RoutedEvent(nameof(MouseEnter), typeof(MouseEventHandler), typeof(UIElement));
-            MouseLeaveEvent = new RoutedEvent(nameof(MouseLeave), typeof(MouseEventHandler), typeof(UIElement));
-            TextInputEvent = new RoutedEvent(nameof(TextInput), typeof(TextCompositionEventHandler), typeof(UIElement));
-            TextInputStartEvent = new RoutedEvent(nameof(TextInputStart), typeof(TextCompositionEventHandler), typeof(UIElement));
-            TextInputUpdateEvent = new RoutedEvent(nameof(TextInputUpdate), typeof(TextCompositionEventHandler), typeof(UIElement));
-            TappedEvent = new RoutedEvent(nameof(Tapped), typeof(TappedEventHandler), typeof(UIElement));
-            MouseRightButtonUpEvent = new RoutedEvent(nameof(MouseRightButtonUp), typeof(MouseButtonEventHandler), typeof(UIElement));
-            KeyDownEvent = new RoutedEvent(nameof(KeyDown), typeof(KeyEventHandler), typeof(UIElement));
-            KeyUpEvent = new RoutedEvent(nameof(KeyUp), typeof(KeyEventHandler), typeof(UIElement));
-            GotFocusEvent = new RoutedEvent(nameof(GotFocus), typeof(RoutedEventHandler), typeof(UIElement));
-            LostFocusEvent = new RoutedEvent(nameof(LostFocus), typeof(RoutedEventHandler), typeof(UIElement));
-            GotFocusForIsTabStopEvent = new RoutedEvent(nameof(GotFocusForIsTabStop), typeof(RoutedEventHandler), typeof(UIElement));
+            MouseMoveEvent = new RoutedEvent(nameof(MouseMove), RoutingStrategy.Bubble, typeof(MouseEventHandler), typeof(UIElement));
+            MouseLeftButtonDownEvent = new RoutedEvent(nameof(MouseLeftButtonDown), RoutingStrategy.Bubble, typeof(MouseButtonEventHandler), typeof(UIElement));
+            MouseRightButtonDownEvent = new RoutedEvent(nameof(MouseRightButtonDown), RoutingStrategy.Bubble, typeof(MouseButtonEventHandler), typeof(UIElement));
+            MouseWheelEvent = new RoutedEvent(nameof(MouseWheel), RoutingStrategy.Bubble, typeof(MouseWheelEventHandler), typeof(UIElement));
+            MouseLeftButtonUpEvent = new RoutedEvent(nameof(MouseLeftButtonUp), RoutingStrategy.Bubble, typeof(MouseButtonEventHandler), typeof(UIElement));
+            MouseEnterEvent = new RoutedEvent(nameof(MouseEnter), RoutingStrategy.Direct, typeof(MouseEventHandler), typeof(UIElement));
+            MouseLeaveEvent = new RoutedEvent(nameof(MouseLeave), RoutingStrategy.Direct, typeof(MouseEventHandler), typeof(UIElement));
+            TextInputEvent = new RoutedEvent(nameof(TextInput), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
+            TextInputStartEvent = new RoutedEvent(nameof(TextInputStart), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
+            TextInputUpdateEvent = new RoutedEvent(nameof(TextInputUpdate), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
+            TappedEvent = new RoutedEvent(nameof(Tapped), RoutingStrategy.Bubble, typeof(TappedEventHandler), typeof(UIElement));
+            MouseRightButtonUpEvent = new RoutedEvent(nameof(MouseRightButtonUp), RoutingStrategy.Bubble, typeof(MouseButtonEventHandler), typeof(UIElement));
+            KeyDownEvent = new RoutedEvent(nameof(KeyDown), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
+            KeyUpEvent = new RoutedEvent(nameof(KeyUp), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
+            GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
+            LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
 
-            DOMEventManagerFactory = new Dictionary<RoutedEvent, Func<UIElement, DOMEventManager>>
+            RoutedEventToEventManagerID = new Dictionary<RoutedEvent, int>(16)
             {
-                [MouseMoveEvent] = CreateMouseMoveManager,
-                [MouseLeftButtonDownEvent] = CreateMouseLeftButtonDownManager,
-                [MouseRightButtonDownEvent] = CreateMouseRightButtonDownManager,
-                [MouseWheelEvent] = CreateMouseWheelManager,
-                [MouseLeftButtonUpEvent] = CreateMouseLeftButtonUpManager,
-                [MouseEnterEvent] = CreateMouseEnterManager,
-                [MouseLeaveEvent] = CreateMouseLeaveManager,
-                [TextInputEvent] = CreateTextInputManager,
-                [TextInputStartEvent] = CreateTextInputStartManager,
-                [TextInputUpdateEvent] = CreateTextInputUpdateManager,
-                [TappedEvent] = CreateTappedManager,
-                [MouseRightButtonUpEvent] = CreateMouseRightButtonUpManager,
-                [KeyDownEvent] = CreateKeyDownManager,
-                [KeyUpEvent] = CreateKeyUpManager,
-                [GotFocusEvent] = CreateGotFocusManager,
-                [LostFocusEvent] = CreateLostFocusManager,
-                [GotFocusForIsTabStopEvent] = CreateGotFocusForIsTabStopManager,
+                [TextInputStartEvent] = ID_UNSUPPORTED,
+                [TextInputUpdateEvent] = ID_UNSUPPORTED,
+                [MouseMoveEvent] = ID_MOUSEMOVE,
+                [MouseLeftButtonDownEvent] = ID_MOUSEDOWN,
+                [MouseRightButtonDownEvent] = ID_MOUSEDOWN,
+                [MouseLeftButtonUpEvent] = ID_MOUSEUP,
+                [MouseRightButtonUpEvent] = ID_MOUSEUP,
+                [TappedEvent] = ID_MOUSEUP,
+                [MouseWheelEvent] = ID_WHEEL,
+                [MouseEnterEvent] = ID_MOUSEENTER,
+                [MouseLeaveEvent] = ID_MOUSELEAVE,
+                [TextInputEvent] = ID_INPUT,
+                [KeyDownEvent] = ID_KEYDOWN,
+                [KeyUpEvent] = ID_KEYUP,
+                [GotFocusEvent] = ID_FOCUSIN,
+                [LostFocusEvent] = ID_FOCUSOUT,
             };
-#else  
-            PointerMovedEvent = new RoutedEvent(nameof(PointerMoved), typeof(PointerEventHandler), typeof(UIElement));
-            PointerPressedEvent = new RoutedEvent(nameof(PointerPressed), typeof(PointerEventHandler), typeof(UIElement));
-            PointerWheelChangedEvent = new RoutedEvent(nameof(PointerWheelChanged), typeof(PointerEventHandler), typeof(UIElement));
-            PointerReleasedEvent = new RoutedEvent(nameof(PointerReleased), typeof(PointerEventHandler), typeof(UIElement));
-            PointerEnteredEvent = new RoutedEvent(nameof(PointerEntered), typeof(PointerEventHandler), typeof(UIElement));
-            PointerExitedEvent = new RoutedEvent(nameof(PointerExited), typeof(PointerEventHandler), typeof(UIElement));
-            TextInputEvent = new RoutedEvent(nameof(TextInput), typeof(TextCompositionEventHandler), typeof(UIElement));
-            TextInputStartEvent = new RoutedEvent(nameof(TextInputStart), typeof(TextCompositionEventHandler), typeof(UIElement));
-            TextInputUpdateEvent = new RoutedEvent(nameof(TextInputUpdate), typeof(TextCompositionEventHandler), typeof(UIElement));
-            TappedEvent = new RoutedEvent(nameof(Tapped), typeof(TappedEventHandler), typeof(UIElement));
-            RightTappedEvent = new RoutedEvent(nameof(RightTapped), typeof(RightTappedEventHandler), typeof(UIElement));
-            KeyDownEvent = new RoutedEvent(nameof(KeyDown), typeof(KeyEventHandler), typeof(UIElement));
-            KeyUpEvent = new RoutedEvent(nameof(KeyUp), typeof(KeyEventHandler), typeof(UIElement));
-            GotFocusEvent = new RoutedEvent(nameof(GotFocus), typeof(RoutedEventHandler), typeof(UIElement));
-            LostFocusEvent = new RoutedEvent(nameof(LostFocus), typeof(RoutedEventHandler), typeof(UIElement));
-            GotFocusForIsTabStopEvent = new RoutedEvent(nameof(GotFocusForIsTabStop), typeof(RoutedEventHandler), typeof(UIElement));
+#else
+            PointerMovedEvent = new RoutedEvent(nameof(PointerMoved), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
+            PointerPressedEvent = new RoutedEvent(nameof(PointerPressed), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
+            PointerWheelChangedEvent = new RoutedEvent(nameof(PointerWheelChanged), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
+            PointerReleasedEvent = new RoutedEvent(nameof(PointerReleased), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
+            PointerEnteredEvent = new RoutedEvent(nameof(PointerEntered), RoutingStrategy.Direct, typeof(PointerEventHandler), typeof(UIElement));
+            PointerExitedEvent = new RoutedEvent(nameof(PointerExited), RoutingStrategy.Direct, typeof(PointerEventHandler), typeof(UIElement));
+            TextInputEvent = new RoutedEvent(nameof(TextInput), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
+            TextInputStartEvent = new RoutedEvent(nameof(TextInputStart), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
+            TextInputUpdateEvent = new RoutedEvent(nameof(TextInputUpdate), RoutingStrategy.Bubble, typeof(TextCompositionEventHandler), typeof(UIElement));
+            TappedEvent = new RoutedEvent(nameof(Tapped), RoutingStrategy.Bubble, typeof(TappedEventHandler), typeof(UIElement));
+            RightTappedEvent = new RoutedEvent(nameof(RightTapped), RoutingStrategy.Bubble, typeof(RightTappedEventHandler), typeof(UIElement));
+            KeyDownEvent = new RoutedEvent(nameof(KeyDown), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
+            KeyUpEvent = new RoutedEvent(nameof(KeyUp), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
+            GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
+            LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
 
-            DOMEventManagerFactory = new Dictionary<RoutedEvent, Func<UIElement, DOMEventManager>>
+            RoutedEventToEventManagerID = new Dictionary<RoutedEvent, int>(15)
             {
-                [PointerMovedEvent] = CreateMouseMoveManager,
-                [PointerPressedEvent] = CreateMouseLeftButtonDownManager,
-                [PointerWheelChangedEvent] = CreateMouseWheelManager,
-                [PointerReleasedEvent] = CreateMouseLeftButtonUpManager,
-                [PointerEnteredEvent] = CreateMouseEnterManager,
-                [PointerExitedEvent] = CreateMouseLeaveManager,
-                [TextInputEvent] = CreateTextInputManager,
-                [TextInputStartEvent] = CreateTextInputStartManager,
-                [TextInputUpdateEvent] = CreateTextInputUpdateManager,
-                [TappedEvent] = CreateTappedManager,
-                [RightTappedEvent] = CreateMouseRightButtonUpManager,
-                [KeyDownEvent] = CreateKeyDownManager,
-                [KeyUpEvent] = CreateKeyUpManager,
-                [GotFocusEvent] = CreateGotFocusManager,
-                [LostFocusEvent] = CreateLostFocusManager,
-                [GotFocusForIsTabStopEvent] = CreateGotFocusForIsTabStopManager,
+                [TextInputStartEvent] = ID_UNSUPPORTED,
+                [TextInputUpdateEvent] = ID_UNSUPPORTED,
+                [PointerMovedEvent] = ID_MOUSEMOVE,
+                [PointerPressedEvent] = ID_MOUSEDOWN,
+                [PointerReleasedEvent] = ID_MOUSEUP,
+                [RightTappedEvent] = ID_MOUSEUP,
+                [TappedEvent] = ID_MOUSEUP,
+                [PointerWheelChangedEvent] = ID_WHEEL,
+                [PointerEnteredEvent] = ID_MOUSEENTER,
+                [PointerExitedEvent] = ID_MOUSELEAVE,
+                [TextInputEvent] = ID_INPUT,
+                [KeyDownEvent] = ID_KEYDOWN,
+                [KeyUpEvent] = ID_KEYUP,
+                [GotFocusEvent] = ID_FOCUSIN,
+                [LostFocusEvent] = ID_FOCUSOUT,
             };
 #endif
+
+            RegisterEvents(typeof(UIElement));
         }
 
         internal bool IsConnectedToLiveTree { get; set; }
 
-        #region Visual Parent
+#region Visual Parent
 
         private DependencyObject _parent;
 
@@ -145,9 +143,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion Visual Parent
+#endregion Visual Parent
 
-        #region Visual Children
+#region Visual Children
 
         /// <summary>
         /// Derived class must implement to support UIElement children. The method must return
@@ -266,7 +264,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion Visual Children
+#endregion Visual Children
 
         internal virtual Size MeasureCore()
         {
@@ -1003,7 +1001,7 @@ namespace Windows.UI.Xaml
 
 #endregion
 
-        #region pointer-events
+#region pointer-events
 
         internal static bool EnablePointerEventsBase(UIElement uie)
         {
@@ -1031,7 +1029,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #endregion pointer-events
+#endregion pointer-events
 
         internal static void SetPointerEvents(UIElement element)
         {
@@ -1464,7 +1462,7 @@ document.ondblclick = null;
         //{
         //}
 
-        #region ForceInherit property support
+#region ForceInherit property support
 
         internal static void SynchronizeForceInheritProperties(UIElement uiE, DependencyObject parent)
         {
@@ -1500,7 +1498,7 @@ document.ondblclick = null;
             }
         }
 
-        #endregion ForceInherit property support
+#endregion ForceInherit property support
 
         internal bool MeasureDirty
         {

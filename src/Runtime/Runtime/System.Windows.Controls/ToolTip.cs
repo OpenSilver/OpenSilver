@@ -113,7 +113,10 @@ namespace Windows.UI.Xaml.Controls
 
                 if (toolTip.Opened != null)
                 {
-                    toolTip.Opened(toolTip, new RoutedEventArgs());
+                    toolTip.Opened(toolTip, new RoutedEventArgs
+                    {
+                        OriginalSource = toolTip
+                    });
                 }
             }
             else
@@ -124,7 +127,10 @@ namespace Windows.UI.Xaml.Controls
 
                     // Raise the "Closed" event:
                     if (toolTip.Closed != null)
-                        toolTip.Closed(toolTip, new RoutedEventArgs());
+                        toolTip.Closed(toolTip, new RoutedEventArgs
+                        {
+                            OriginalSource = toolTip
+                        });
                 }
             }
         }

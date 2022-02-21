@@ -449,9 +449,6 @@ sel.addRange(range);
 
             domElementWhereToPlaceChildren = contentEditableDiv;
 
-            // Set the mark saying that the pointer events must be "absorbed" by the TextBox:
-            INTERNAL_HtmlDomManager.SetDomElementProperty(outerDiv, "data-absorb-events", true);
-
             //-----------------------
             // Prepare to raise the "TextChanged" event and to update the value of the "Text" property when the DOM text changes:
             //-----------------------

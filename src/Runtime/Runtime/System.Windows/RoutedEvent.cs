@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,12 +28,25 @@ namespace Windows.UI.Xaml
         private readonly string _name;
         private readonly Type _handlerType;
         private readonly Type _ownerType;
+        private readonly RoutingStrategy _routingStrategy;
+        private Delegate _classHandler;
 
-        internal RoutedEvent(string name, Type handlerType, Type ownerType)
+        internal RoutedEvent(string name, RoutingStrategy routingStrategy, Type handlerType, Type ownerType)
         {
             _name = name;
+            _routingStrategy = routingStrategy;
             _handlerType = handlerType;
             _ownerType = ownerType;
+        }
+
+        /// <summary>
+        ///     Returns the <see cref="RoutingStrategy"/> 
+        ///     of the RoutedEvent
+        /// </summary>
+        /// <ExternalAPI/>
+        internal RoutingStrategy RoutingStrategy
+        {
+            get { return _routingStrategy; }
         }
 
         /// <summary>
@@ -56,5 +70,53 @@ namespace Windows.UI.Xaml
 
             return handlerType == _handlerType || handlerType == typeof(RoutedEventHandler);
         }
+
+        internal static void RegisterClassHandler(RoutedEvent routedEvent, Delegate handler)
+        {
+            if (routedEvent  == null)
+            {
+                throw new ArgumentNullException(nameof(routedEvent));
+            }
+
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+
+            routedEvent._classHandler = handler;
+        }
+
+        internal static Delegate GetClassHandler(RoutedEvent routedEvent)
+        {
+            if (routedEvent == null)
+            {
+                throw new ArgumentNullException(nameof(routedEvent));
+            }
+
+            return routedEvent._classHandler;
+        }
+    }
+
+    /// <summary>
+    ///     Routing Strategy can be either of or Bubble or Direct
+    /// </summary>
+    internal enum RoutingStrategy
+    {
+        /// <summary>
+        ///     Bubble 
+        /// </summary>
+        /// <remarks>
+        ///     Route the event starting at the source 
+        ///     and ending with the root of the visual tree
+        /// </remarks>
+        Bubble,
+
+        /// <summary>
+        ///     Direct 
+        /// </summary>
+        /// <remarks>
+        ///     Raise the event at the source only.
+        /// </remarks>
+        Direct
     }
 }

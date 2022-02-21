@@ -173,16 +173,10 @@ namespace CSHTML5.Internal
 
         static void DetachVisualChidrenRecursively(UIElement element)
         {
-            if (element.INTERNAL_isPointerInside)
+            if (element.IsPointerOver)
             {
-#if MIGRATION
-                element.OnMouseLeave(new MouseEventArgs());
-#else
-                element.OnPointerExited(new PointerRoutedEventArgs());
-#endif
+                element.RaiseMouseLeave();
             }
-            element.isAlreadySubscribedToMouseEnterAndLeave = false;
-            element.INTERNAL_isPointerInside = false;
 
             // Call the "OnDetached" of the element. This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
             element.INTERNAL_OnDetachedFromVisualTree();
@@ -769,8 +763,6 @@ if(nextSibling != undefined) {
             {
                 ((FrameworkElement)child).INTERNAL_RaiseLoadedEvent();
             }
-
-            child.StartManagingPointerPositionForPointerExitedEventIfNeeded();
 
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Raise Loaded event", t11);

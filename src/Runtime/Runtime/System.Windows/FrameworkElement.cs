@@ -1742,7 +1742,8 @@ namespace Windows.UI.Xaml
 
         public static readonly RoutedEvent LoadedEvent = 
             new RoutedEvent(
-                nameof(Loaded), 
+                nameof(Loaded),
+                RoutingStrategy.Direct,
                 typeof(RoutedEventHandler), 
                 typeof(FrameworkElement));
 

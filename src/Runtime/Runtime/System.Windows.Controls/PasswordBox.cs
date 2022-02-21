@@ -143,7 +143,10 @@ namespace Windows.UI.Xaml.Controls
                 pwb._textViewHost.View.OnPasswordChanged((string)e.NewValue);
             }
 
-            pwb.OnPasswordChanged(new RoutedEventArgs() { OriginalSource = pwb });
+            pwb.OnPasswordChanged(new RoutedEventArgs
+            {
+                OriginalSource = pwb
+            });
         }
 
         private static object CoercePassword(DependencyObject d, object baseValue)

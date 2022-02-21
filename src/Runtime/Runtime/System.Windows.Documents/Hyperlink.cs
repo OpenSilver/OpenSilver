@@ -77,7 +77,12 @@ namespace Windows.UI.Xaml.Documents
 #endif
         {
             if (Click != null)
-                Click(this, new RoutedEventArgs());
+            {
+                Click(this, new RoutedEventArgs
+                {
+                    OriginalSource = this
+                });
+            }
 
             if (_uri != null)
                 HtmlPage.Window.Navigate(_uri, "_blank");

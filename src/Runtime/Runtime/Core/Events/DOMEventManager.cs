@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections.Generic;
 
 namespace CSHTML5.Internal
 {
@@ -28,33 +27,18 @@ namespace CSHTML5.Internal
         // then call all the C# handlers associated to that event.
         //-----------------------------------------------------------
 
-        // Keeping this allows us to detach it from the Dom element when there is no subscriber left:
-        private List<HtmlEventProxy> _htmlEventProxies = new List<HtmlEventProxy>();
+        private readonly Func<object> _domElementProvider;
+        private readonly string[] _domEventsNamesToListenTo;
+        private readonly Delegate _handler;
 
-        private string[] _domEventsNamesToListenTo;
-        private Action<object> _actionOnEvent;
-        private Func<object> _domElementProvider;
-        private readonly bool _isSync;
-
-        public bool IsSync
-        {
-            get { return _isSync && !OpenSilver.Interop.IsRunningInTheSimulator; }
-        }
-
+        private object _domElement;
         private bool _isListeningToDomEvents = false; // Note: we listen to DOM events only when there is at least one C# event handler that is attached to this class, for best performance.
 
         //todo: see if we handle the case where an event is always attached here or in the class that has the event (the class attaches itself to the event)
         // Note: "domElement" here must be of type "object" rather than "dynamic" otherwise JSIL is unable to translate the calling method.
         public DOMEventManager(Func<object> domElementProvider, string domEventsNamesToListenTo, Action<object> actionOnEvent, bool sync = false)
-        {
-            //-----------------------------------
-            // We instantiate this class once for each DOM event type and for each DOM element.
-            //-----------------------------------
-
-            _domEventsNamesToListenTo = new string[] { domEventsNamesToListenTo };
-            _actionOnEvent = actionOnEvent;
-            _domElementProvider = domElementProvider;
-            _isSync = sync;
+            : this(domElementProvider, new string[1] { domEventsNamesToListenTo }, actionOnEvent, sync) 
+        { 
         }
 
         public DOMEventManager(Func<object> domElementProvider, string[] domEventsNamesToListenTo, Action<object> actionOnEvent, bool sync = false)
@@ -65,70 +49,60 @@ namespace CSHTML5.Internal
             // listen to simultaneously.
             //-----------------------------------
 
+            _domElementProvider = domElementProvider ?? throw new ArgumentNullException(nameof(domElementProvider));
             _domEventsNamesToListenTo = domEventsNamesToListenTo;
-            _actionOnEvent = actionOnEvent;
-            _domElementProvider = domElementProvider;
-            _isSync = sync;
+            _handler = CreateHandler(actionOnEvent, sync);
         }
 
-        /// <summary>
-        /// Raises the event
-        /// </summary>
-        /// <param name="jsEventArg">The javascript event argument.</param>
-        void OnEvent(object jsEventArg)
+        private Delegate CreateHandler(Action<object> handler, bool sync)
         {
-            if (_htmlEventProxies != null && _htmlEventProxies.Count != 0)
+            if (sync && !OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                _actionOnEvent(jsEventArg);
+                return new Func<object, string>(jsEventArg =>
+                {
+                    handler?.Invoke(jsEventArg);
+                    return "";
+                });
             }
+
+            return new Action<object>(jsEventArg => handler?.Invoke(jsEventArg));
         }
 
         public void AttachToDomEvents()
         {
-            StartListeningToDomEventsIfNotAlreadyListening();
+            if (_isListeningToDomEvents)
+            {
+                return;
+            }
+
+            object domElement = _domElementProvider();
+            if (domElement != null)
+            {
+                foreach (string eventName in _domEventsNamesToListenTo)
+                {
+                    OpenSilver.Interop.ExecuteJavaScriptAsync(
+                        "document.bindEventHandler($0, $1, $2)", domElement, eventName, _handler
+                    );
+                }
+
+                _domElement = domElement;
+                _isListeningToDomEvents = true;
+            }
         }
 
         public void DetachFromDomEvents()
         {
-            if (_isListeningToDomEvents && _htmlEventProxies != null)
+            if (_isListeningToDomEvents)
             {
-                StopListeningToDomEvents();
-            }
-        }
-
-        void StartListeningToDomEventsIfNotAlreadyListening()
-        {
-            if (!_isListeningToDomEvents)
-            {
-                var domElement = _domElementProvider();
-                if (domElement != null)
+                for (int i = _domEventsNamesToListenTo.Length - 1; i >= 0; i--)
                 {
-                    if (_htmlEventProxies == null)
-                        _htmlEventProxies = new List<HtmlEventProxy>();
-
-                    foreach (string eventName in _domEventsNamesToListenTo)
-                    {
-                        _htmlEventProxies.Add(INTERNAL_EventsHelper.AttachToDomEvents(eventName, domElement, (Action<object>)(jsEventArg =>
-                        {
-                            OnEvent(jsEventArg);
-                        }), IsSync));
-                    }
-
-                    _isListeningToDomEvents = true;
+                    OpenSilver.Interop.ExecuteJavaScriptAsync(
+                        "document.unbindEventHandler($0, $1)", _domElement, _domEventsNamesToListenTo[i]
+                    );
                 }
             }
-        }
 
-        void StopListeningToDomEvents() // Note: we stop listening to DOM events if there are no more C# event handlers attached to this class, for best performance, or when detaching the object from the visual tree.
-        {
-            if (_isListeningToDomEvents && _htmlEventProxies != null)
-            {
-                for (int i = _htmlEventProxies.Count - 1; i >= 0; i--)
-                {
-                    _htmlEventProxies[i].Dispose(); // Note: this will detach the DOM event.
-                    _htmlEventProxies.RemoveAt(i);
-                }
-            }
+            _domElement = null;
             _isListeningToDomEvents = false;
         }
     }

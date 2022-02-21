@@ -12,7 +12,7 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -28,10 +28,35 @@ namespace Windows.UI.Xaml
         : EventArgs
 #endif
     {
+        private object _originalSource;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RoutedEventArgs"/> class.
         /// </summary>
         public RoutedEventArgs() { }
+
+        /// <summary>
+        /// Gets a reference to the object that raised the event.
+        /// </summary>
+        public object OriginalSource
+        {
+            get { return _originalSource; }
+            internal set
+            {
+                if (value == null || !(value is DependencyObject))
+                {
+                    throw new ArgumentException();
+                }
+
+                _originalSource = value;
+            }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="RoutedEvent"/> associated
+        /// with this <see cref="RoutedEventArgs"/>
+        /// </summary>
+        internal RoutedEvent RoutedEvent { get; set; }
 
         internal bool HandledImpl { get; set; }
 
@@ -71,52 +96,11 @@ namespace Windows.UI.Xaml
             }
         }
 
-        private DependencyObject _originalSource;
-
-        /// <summary>
-        /// Gets a reference to the object that raised the event.
-        /// </summary>
-        public object OriginalSource
-        {
-            get
-            {
-                if (_originalSource != null)
-                {
-                    return _originalSource;
-                }
-                else if (_originalJSEventArg != null)
-                {
-                    object jsTarget = CSHTML5.Interop.ExecuteJavaScript(@"$0.target || $0.srcElement", _originalJSEventArg);
-                    UIElement correspondingUiElementIfFound = INTERNAL_HtmlDomManager.GetUIElementFromDomElement(jsTarget); //Note: already handles the possibility that "jsTarget" is null or undefined.
-                    return correspondingUiElementIfFound;
-                }
-                else
-                    return null;
-            }
-            set
-            {
-                if (value == null || !(value is DependencyObject))
-                {
-                    throw new ArgumentException();
-                }
-                _originalSource = (DependencyObject)value;
-            }
-        }
-
-        object _originalJSEventArg;
         /// <summary>
         /// (Optional) Gets the original javascript event arg.
         /// </summary>
-        public object INTERNAL_OriginalJSEventArg
-        {
-            get
-            {
-                return _originalJSEventArg;
-            }
-            set
-            {
-                _originalJSEventArg = value;
-            }
-        }
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object INTERNAL_OriginalJSEventArg { get; set; }
     }
 }

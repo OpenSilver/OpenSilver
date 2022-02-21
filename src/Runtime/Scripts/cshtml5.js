@@ -192,6 +192,20 @@ document.getElementByIdSafe = function (id) {
     return element;
 }
 
+document.enableFocus = function (id) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    element.onfocus = null;
+}
+
+document.disableFocus = function (id) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    element.onfocus = function (e) {
+        e.target.blur();
+    };
+}
+
 document.setGridCollapsedDuetoHiddenColumn = function (id) {
     const element = document.getElementById(id);
     if (!element)
@@ -311,6 +325,51 @@ document.addEventListenerSafe = function (element, method, func) {
         }
         else {
             element.addEventListener(method, func);
+        }
+    }
+}
+
+document.bindEventHandler = function (element, event, handler) {
+    if (typeof element === 'string') {
+        element = document.getElementById(element);
+    }
+
+    if (element) {
+        if (!element._eventsStore) {
+            element._eventsStore = {};
+        }
+
+        const store = element._eventsStore;
+        if (!store[event]) {
+            const h = function (e) {
+                if (!e.isHandled) {
+                    e.isHandled = true;
+                    handler(e);
+                }
+            }
+
+            store[event] = h;
+
+            if (event === 'touchstart' || event === 'wheel' || event === 'touchmove') {
+                element.addEventListener(event, h, { passive: true });
+            }
+            else {
+                element.addEventListener(event, h);
+            }
+        }
+    }
+}
+
+document.unbindEventHandler = function (element, event) {
+    if (typeof element === 'string') {
+        element = document.getElementById(element);
+    }
+
+    if (element && element._eventsStore) {
+        const handler = element._eventsStore[event];
+        if (handler) {
+            element._eventsStore[event] = undefined;
+            element.removeEventListener(event, handler);
         }
     }
 }

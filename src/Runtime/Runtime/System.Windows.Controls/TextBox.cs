@@ -19,10 +19,12 @@ using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Input;
 #else
 using Windows.Foundation;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -543,6 +545,49 @@ namespace Windows.UI.Xaml.Controls
                 _contentElement = contentElement;
                 InitializeContentElement();
             }
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+
+            if (e.Handled)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            Focus();
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+
+            e.Handled = true;
+        }
+
+        protected override void OnTextInput(TextCompositionEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            e.Handled = true;
         }
 
         /// <summary>

@@ -43,7 +43,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
     {
         public ButtonBase()
         {
-            _reactsToKeyboardEventsWhenFocused = true;
             UseSystemFocusVisuals = true;
 
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Interval = new TimeSpan(0, 0, 5); // See comment where this variable is defined.
@@ -231,11 +230,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (Click != null)
             {
-                Click(this, new RoutedEventArgs()
-                {
-                    // todo: the OriginalSource should not aways be the button itself: if the button
-                    // contains inner elements, it is supposed to be the inner element on which the
-                    // user has clicked.
+                Click(this, new RoutedEventArgs 
+                { 
                     OriginalSource = this 
                 });
             }
@@ -368,24 +364,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         #region handling the behavior towards keyboard events
 
-
 #if MIGRATION
-        internal override void OnKeyDownWhenFocused(object sender, KeyEventArgs e)
+        protected override void OnKeyDown(KeyEventArgs e)
 #else
-        internal override void OnKeyDownWhenFocused(object sender, KeyRoutedEventArgs e)
+        protected override void OnKeyDown(KeyRoutedEventArgs e)
 #endif
         {
-            //We can completely remove RadioButton from this method because we can let the default browser behaviour which is completely different than Silverlight's and might be very tricky to fix.
-            // For reference:
-            //      Silverlight: focus on the radioButtons separately (pressing tab will go to the next element, no matter if it is a radioButton of the same group),
-            //                  arrows do nothing,
-            //                  space selects the current RadioButton.
-            //      Browsers: focus on the RadioButtons as a whole (pressing tab will go to the next element that is not one of the radioButtons of the current group of radioButtons
-            //                  arrows move the selection (and focus) on the different radioButtons of the group,
-            //                  space does nothing.
+            base.OnKeyDown(e);
 
-            //space --> click
-            //enter --> click unless checkbox and radioButton (I think those are the only exceptions, and for now we will "click" even if it is checkbox because it spares us a test and still makes sense).
 #if MIGRATION
             if ((e.Key == Key.Space) || (e.Key == Key.Enter))
 #else
@@ -393,6 +379,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
             {
                 OnClick();
+
+                e.Handled = true;
             }
         }
 

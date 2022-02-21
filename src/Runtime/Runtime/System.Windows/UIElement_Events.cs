@@ -13,14 +13,17 @@
 
 using System;
 using System.Collections.Generic;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using Windows.System;
 #endif
 
@@ -32,6 +35,8 @@ namespace Windows.UI.Xaml
 {
     partial class UIElement
     {
+        internal const int MAX_ELEMENTS_IN_ROUTE = 4096;
+
         private EventHandlersStore _eventHandlersStore;
 
         private void EnsureEventHandlersStore()
@@ -41,6 +46,97 @@ namespace Windows.UI.Xaml
                 _eventHandlersStore = new EventHandlersStore();
             }
         }
+
+#if MIGRATION
+        private static void RegisterEvents(Type type)
+        {
+            RoutedEvent.RegisterClassHandler(MouseMoveEvent, new MouseEventHandler(OnMouseMoveThunk));
+            RoutedEvent.RegisterClassHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseLeftButtonDownThunk));
+            RoutedEvent.RegisterClassHandler(MouseRightButtonDownEvent, new MouseButtonEventHandler(OnMouseRightButtonDownThunk));
+            RoutedEvent.RegisterClassHandler(MouseWheelEvent, new MouseWheelEventHandler(OnMouseWheelThunk));
+            RoutedEvent.RegisterClassHandler(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnMouseLeftButtonUpThunk));
+            RoutedEvent.RegisterClassHandler(MouseEnterEvent, new MouseEventHandler(OnMouseEnterThunk));
+            RoutedEvent.RegisterClassHandler(MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveThunk));
+            RoutedEvent.RegisterClassHandler(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk));
+            RoutedEvent.RegisterClassHandler(TappedEvent, new TappedEventHandler(OnTappedThunk));
+            RoutedEvent.RegisterClassHandler(MouseRightButtonUpEvent, new MouseButtonEventHandler(OnMouseRightButtonUpThunk));
+            RoutedEvent.RegisterClassHandler(KeyDownEvent, new KeyEventHandler(OnKeyDownThunk));
+            RoutedEvent.RegisterClassHandler(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk));
+            RoutedEvent.RegisterClassHandler(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk));
+            RoutedEvent.RegisterClassHandler(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk));
+        }
+
+        private static void OnMouseMoveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseMove(e);
+
+        private static void OnMouseLeftButtonDownThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseLeftButtonDown(e);
+
+        private static void OnMouseRightButtonDownThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonDown(e);
+
+        private static void OnMouseWheelThunk(object sender, MouseWheelEventArgs e) => ((UIElement)sender).OnMouseWheel(e);
+
+        private static void OnMouseLeftButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseLeftButtonUp(e);
+
+        private static void OnMouseEnterThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseEnter(e);
+
+        private static void OnMouseLeaveThunk(object sender, MouseEventArgs e) => ((UIElement)sender).OnMouseLeave(e);
+
+        private static void OnTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInput(e);
+
+        private static void OnTappedThunk(object sender, TappedRoutedEventArgs e) => ((UIElement)sender).OnTapped(e);
+
+        private static void OnMouseRightButtonUpThunk(object sender, MouseButtonEventArgs e) => ((UIElement)sender).OnMouseRightButtonUp(e);
+
+        private static void OnKeyDownThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnKeyDown(e);
+
+        private static void OnKeyUpThunk(object sender, KeyEventArgs e) => ((UIElement)sender).OnKeyUp(e);
+
+        private static void OnGotFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnGotFocus(e);
+
+        private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
+#else
+        private static void RegisterEvents(Type type)
+        {
+            RoutedEvent.RegisterClassHandler(PointerMovedEvent, new PointerEventHandler(OnMouseMoveThunk));
+            RoutedEvent.RegisterClassHandler(PointerPressedEvent, new PointerEventHandler(OnMouseLeftButtonDownThunk));
+            RoutedEvent.RegisterClassHandler(PointerWheelChangedEvent, new PointerEventHandler(OnMouseWheelThunk));
+            RoutedEvent.RegisterClassHandler(PointerReleasedEvent, new PointerEventHandler(OnMouseLeftButtonUpThunk));
+            RoutedEvent.RegisterClassHandler(PointerEnteredEvent, new PointerEventHandler(OnMouseEnterThunk));
+            RoutedEvent.RegisterClassHandler(PointerExitedEvent, new PointerEventHandler(OnMouseLeaveThunk));
+            RoutedEvent.RegisterClassHandler(TextInputEvent, new TextCompositionEventHandler(OnTextInputThunk));
+            RoutedEvent.RegisterClassHandler(TappedEvent, new TappedEventHandler(OnTappedThunk));
+            RoutedEvent.RegisterClassHandler(RightTappedEvent, new RightTappedEventHandler(OnMouseRightButtonUpThunk));
+            RoutedEvent.RegisterClassHandler(KeyDownEvent, new KeyEventHandler(OnKeyDownThunk));
+            RoutedEvent.RegisterClassHandler(KeyUpEvent, new KeyEventHandler(OnKeyUpThunk));
+            RoutedEvent.RegisterClassHandler(GotFocusEvent, new RoutedEventHandler(OnGotFocusThunk));
+            RoutedEvent.RegisterClassHandler(LostFocusEvent, new RoutedEventHandler(OnLostFocusThunk));
+        }
+
+        private static void OnMouseMoveThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerMoved(e);
+
+        private static void OnMouseLeftButtonDownThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerPressed(e);
+
+        private static void OnMouseWheelThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerWheelChanged(e);
+
+        private static void OnMouseLeftButtonUpThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerReleased(e);
+
+        private static void OnMouseEnterThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerEntered(e);
+
+        private static void OnMouseLeaveThunk(object sender, PointerRoutedEventArgs e) => ((UIElement)sender).OnPointerExited(e);
+
+        private static void OnTextInputThunk(object sender, TextCompositionEventArgs e) => ((UIElement)sender).OnTextInput(e);
+
+        private static void OnTappedThunk(object sender, TappedRoutedEventArgs e) => ((UIElement)sender).OnTapped(e);
+
+        private static void OnMouseRightButtonUpThunk(object sender, RightTappedRoutedEventArgs e) => ((UIElement)sender).OnRightTapped(e);
+
+        private static void OnKeyDownThunk(object sender, KeyRoutedEventArgs e) => ((UIElement)sender).OnKeyDown(e);
+
+        private static void OnKeyUpThunk(object sender, KeyRoutedEventArgs e) => ((UIElement)sender).OnKeyUp(e);
+
+        private static void OnGotFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnGotFocus(e);
+
+        private static void OnLostFocusThunk(object sender, RoutedEventArgs e) => ((UIElement)sender).OnLostFocus(e);
+#endif
 
         /// <summary>
         /// Adds a routed event handler for a specified routed event, adding the handler
@@ -91,7 +187,7 @@ namespace Windows.UI.Xaml
             EnsureEventHandlersStore();
             _eventHandlersStore.AddRoutedEventHandler(routedEvent, handler, handledEventsToo);
 
-            HookUpRoutedEvent(routedEvent);
+            WireUpRoutedEvent(routedEvent);
         }
 
         /// <summary>
@@ -139,40 +235,114 @@ namespace Windows.UI.Xaml
             }
         }
 
-        private RoutedEventHandlerInfo[] GetRoutedEventHandlers(RoutedEvent key)
+        /// <summary>
+        /// Raise the events specified by
+        /// <see cref="RoutedEventArgs.RoutedEvent"/>
+        /// </summary>
+        internal void RaiseEvent(RoutedEventArgs e)
         {
-            if (_eventHandlersStore != null)
+            if (e == null)
             {
-                List<RoutedEventHandlerInfo> handlers = _eventHandlersStore[key];
-                if (handlers != null)
+                throw new ArgumentNullException(nameof(e));
+            }
+
+            if (e.OriginalSource == null)
+            {
+                e.OriginalSource = this;
+            }
+
+            EventRoute route = new EventRoute(e.RoutedEvent);
+
+            BuildRouteHelper(this, route, e);
+            
+            route.InvokeHandlers(e);
+        }
+
+        internal static void BuildRouteHelper(DependencyObject e, EventRoute route, RoutedEventArgs args)
+        {
+            if (route == null)
+            {
+                throw new ArgumentNullException(nameof(route));
+            }
+
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+
+            if (args.RoutedEvent != route.RoutedEvent)
+            {
+                throw new ArgumentException("RoutedEvent in RoutedEventArgs and EventRoute are mismatched.");
+            }
+
+            if (args.RoutedEvent.RoutingStrategy == RoutingStrategy.Direct)
+            {
+                UIElement uiElement = e as UIElement;
+
+                // Add this element to route
+                if (uiElement != null)
                 {
-                    return handlers.ToArray();
+                    uiElement.AddToEventRoute(route, args);
                 }
             }
-
-#if BRIDGE
-            return EmptyArray<RoutedEventHandlerInfo>.Value;
-#else
-            return Array.Empty<RoutedEventHandlerInfo>();
-#endif
-        }
-
-        private void InvokeRoutedEventHandlers(RoutedEvent routedEvent, RoutedEventArgs eventArgs)
-        {
-            RoutedEventHandlerInfo[] handlers = GetRoutedEventHandlers(routedEvent);
-            for (int i = 0; i < handlers.Length; i++)
+            else
             {
-                RoutedEventHandlerInfo handler = handlers[i];
-                handler.InvokeHandler(this, eventArgs);
+                int cElements = 0;
+
+                while (e != null)
+                {
+                    UIElement uiElement = e as UIElement;
+
+                    // Protect against infinite loops by limiting the number of elements
+                    // that we will process.
+                    if (cElements++ > MAX_ELEMENTS_IN_ROUTE)
+                    {
+                        throw new InvalidOperationException("Potential cycle in tree found while building the event route.");
+                    }
+
+                    // Invoke BuildRouteCore
+                    if (uiElement != null)
+                    {
+                        // Add this element to route
+                        uiElement.AddToEventRoute(route, args);
+
+                        // Get element's visual parent
+                        e = VisualTreeHelper.GetParent(uiElement);
+                    }
+                }
             }
         }
 
-        static bool ignoreMouseEvents = false; // This boolean is useful because we want to ignore mouse events when touch events have happened so the same user inputs are not handled twice. (Note: when using touch events, the browsers fire the touch events at the moment of the action, then throw the mouse events once touchend is fired)
-        private static DispatcherTimer _ignoreMouseEventsTimer = null;
-        private void _ignoreMouseEventsTimer_Tick(object sender, object e)
+        /// <summary>
+        ///     Add the event handlers for this element to the route.
+        /// </summary>
+        internal void AddToEventRoute(EventRoute route, RoutedEventArgs e)
         {
-            ignoreMouseEvents = false;
-            _ignoreMouseEventsTimer.Stop();
+            if (route == null)
+            {
+                throw new ArgumentNullException(nameof(route));
+            }
+            if (e == null)
+            {
+                throw new ArgumentNullException(nameof(e));
+            }
+
+            route.Add(this, RoutedEvent.GetClassHandler(e.RoutedEvent), false);
+
+            EventHandlersStore store = _eventHandlersStore;
+            if (store != null)
+            {
+                List<RoutedEventHandlerInfo> instanceListeners = store[e.RoutedEvent];
+
+                // Add all instance listeners for this UIElement
+                if (instanceListeners != null)
+                {
+                    for (int i = 0; i < instanceListeners.Count; i++)
+                    {
+                        route.Add(this, instanceListeners[i].Handler, instanceListeners[i].InvokeHandledEventsToo);
+                    }
+                }
+            }
         }
 
         #region Pointer moved event
@@ -222,12 +392,10 @@ namespace Windows.UI.Xaml
 #if MIGRATION
         protected virtual void OnMouseMove(MouseEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(MouseMoveEvent, eventArgs);
         }
 #else
         protected virtual void OnPointerMoved(PointerRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(PointerMovedEvent, eventArgs);
         }
 #endif
 
@@ -272,7 +440,6 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-
         /// <summary>
         /// Raises the PointerPressed event
         /// </summary>
@@ -280,15 +447,12 @@ namespace Windows.UI.Xaml
 #if MIGRATION
         protected virtual void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(MouseLeftButtonDownEvent, eventArgs);
         }
 #else
         protected virtual void OnPointerPressed(PointerRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(PointerPressedEvent, eventArgs);
         }
 #endif
-
 
         #endregion
 
@@ -299,7 +463,6 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Identifies the <see cref="MouseRightButtonDown"/> routed event.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly RoutedEvent MouseRightButtonDownEvent;
 
         public event MouseButtonEventHandler MouseRightButtonDown
@@ -320,7 +483,6 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnMouseRightButtonDown(MouseButtonEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(MouseRightButtonDownEvent, eventArgs);
         }
 
 #endif
@@ -331,12 +493,12 @@ namespace Windows.UI.Xaml
 
 #if MIGRATION
         /// <summary>
-        /// Identifies the <see cref="UIElement.MouseWheel"/> routed event.
+        /// Identifies the <see cref="MouseWheel"/> routed event.
         /// </summary>
         public static readonly RoutedEvent MouseWheelEvent;
 #else
         /// <summary>
-        /// Identifies the <see cref="UIElement.PointerWheelChanged"/> routed event.
+        /// Identifies the <see cref="PointerWheelChanged"/> routed event.
         /// </summary>
         public static readonly RoutedEvent PointerWheelChangedEvent;
 #endif
@@ -375,7 +537,6 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-
         /// <summary>
         /// Raises the PointerWheelChanged event
         /// </summary>
@@ -383,43 +544,10 @@ namespace Windows.UI.Xaml
 #if MIGRATION
         protected virtual void OnMouseWheel(MouseWheelEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(MouseWheelEvent, eventArgs);
         }
 #else
         protected virtual void OnPointerWheelChanged(PointerRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(PointerWheelChangedEvent, eventArgs);
-        }
-#endif
-
-
-#if MIGRATION
-        /// <summary>
-        /// Raises the Tapped event
-        /// </summary>
-        void ProcessOnPointerWheelChangedEvent(object jsEventArg)
-        {
-            var eventArgs = new MouseWheelEventArgs()
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
-            };
-
-            if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
-            {
-                // Fill the position of the pointer and the key modifiers:
-                eventArgs.FillEventArgs(this, jsEventArg);
-
-                //fill the Mouse Wheel delta:
-                eventArgs.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
-
-                OnMouseWheel(eventArgs);
-
-                if (eventArgs.Handled)
-                {
-                    OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                }
-            }
         }
 #endif
 
@@ -468,21 +596,17 @@ namespace Windows.UI.Xaml
         /// Raises the PointerReleased event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
-
 #if MIGRATION
         protected virtual void OnMouseLeftButtonUp(MouseButtonEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(MouseLeftButtonUpEvent, eventArgs);
         }
 #else
         protected virtual void OnPointerReleased(PointerRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(PointerReleasedEvent, eventArgs);
         }
 #endif
 
         #endregion
-
 
         #region Pointer entered event
 
@@ -521,22 +645,6 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-
-        /// <summary>
-        /// Creates the eventArgs from the infos in the javascript's version of the event then raises the PointerEntered event
-        /// </summary>
-#if MIGRATION
-        private void ProcessOnMouseEnter(object jsEventArg)
-        {
-            ProcessPointerEvent(jsEventArg, OnMouseEnter, preventTextSelectionWhenPointerIsCaptured: true);
-        }
-#else
-        private void ProcessOnPointerEntered(object jsEventArg)
-        {
-            ProcessPointerEvent(jsEventArg, OnPointerEntered, preventTextSelectionWhenPointerIsCaptured: true);
-        }
-#endif
-
         /// <summary>
         /// Raises the PointerEntered event
         /// </summary>
@@ -544,17 +652,14 @@ namespace Windows.UI.Xaml
 #if MIGRATION
         protected virtual void OnMouseEnter(MouseEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(MouseEnterEvent, eventArgs);
         }
 #else
         protected virtual void OnPointerEntered(PointerRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(PointerEnteredEvent, eventArgs);
         }
 #endif
 
         #endregion
-
 
         #region Pointer exited event
 
@@ -572,20 +677,11 @@ namespace Windows.UI.Xaml
         {
             add
             {
-                StartManagingPointerPositionForPointerExitedEvent();
                 AddHandler(MouseLeaveEvent, value, false);
             }
             remove
             {
                 RemoveHandler(MouseLeaveEvent, value);
-                if (_eventHandlersStore != null)
-                {
-                    List<RoutedEventHandlerInfo> handlers = _eventHandlersStore[MouseLeaveEvent];
-                    if (handlers == null || handlers.Count == 0)
-                    {
-                        StopManagingPointerPositionForPointerExitedEvent();
-                    }
-                }
             }
         }
 #else
@@ -593,76 +689,12 @@ namespace Windows.UI.Xaml
         {
             add
             {
-                StartManagingPointerPositionForPointerExitedEvent();
                 AddHandler(PointerExitedEvent, value, false);
             }
             remove
             {
                 RemoveHandler(PointerExitedEvent, value);
-                if (_eventHandlersStore != null)
-                {
-                    List<RoutedEventHandlerInfo> handlers = _eventHandlersStore[PointerExitedEvent];
-                    if (handlers == null || handlers.Count == 0)
-                    {
-                        StopManagingPointerPositionForPointerExitedEvent();
-                    }
-                }
             }
-        }
-#endif
-
-        internal bool isAlreadySubscribedToMouseEnterAndLeave = false;
-        /// <summary>
-        /// IMPORTANT NOTE: This boolean is only updated in the case the PointerExited/MouseLeave event is used on this element.
-        /// It states whether the pointer is currently inside the UIElement.
-        /// </summary>
-        internal bool INTERNAL_isPointerInside = false;
-        void SetIsPointerInsideToTrue() { this.INTERNAL_isPointerInside = true; }
-        void StartManagingPointerPositionForPointerExitedEvent()
-        {
-            if (!isAlreadySubscribedToMouseEnterAndLeave && this.INTERNAL_OuterDomElement != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.addEventListener(""mouseenter"", $1, false);", this.INTERNAL_OuterDomElement, (Action)SetIsPointerInsideToTrue);
-
-                isAlreadySubscribedToMouseEnterAndLeave = true;
-            }
-        }
-        void StopManagingPointerPositionForPointerExitedEvent()
-        {
-            if (isAlreadySubscribedToMouseEnterAndLeave && this.INTERNAL_OuterDomElement != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.removeEventListener(""mouseenter"", $1);", this.INTERNAL_OuterDomElement, (Action)SetIsPointerInsideToTrue);
-
-                INTERNAL_isPointerInside = false; //don't know if this is useful but just in case.
-                isAlreadySubscribedToMouseEnterAndLeave = false;
-            }
-        }
-
-
-        internal void StartManagingPointerPositionForPointerExitedEventIfNeeded()
-        {
-#if MIGRATION
-            if (_domEventManagersStore != null && _domEventManagersStore.ContainsKey(MouseLeaveEvent))
-#else
-            if (_domEventManagersStore != null && _domEventManagersStore.ContainsKey(PointerExitedEvent))
-#endif
-            {
-                StartManagingPointerPositionForPointerExitedEvent();
-            }
-        }
-
-        /// <summary>
-        /// Creates the eventArgs from the infos in the javascript's version of the event then raises the PointerExited event
-        /// </summary>
-#if MIGRATION
-        internal void ProcessOnMouseLeave(object jsEventArg)
-        {
-            ProcessPointerEvent(jsEventArg, OnMouseLeave, preventTextSelectionWhenPointerIsCaptured: true);
-        }
-#else
-        internal void ProcessOnPointerExited(object jsEventArg)
-        {
-            ProcessPointerEvent(jsEventArg, OnPointerExited, preventTextSelectionWhenPointerIsCaptured: true);
         }
 #endif
 
@@ -673,19 +705,14 @@ namespace Windows.UI.Xaml
 #if MIGRATION
         protected internal virtual void OnMouseLeave(MouseEventArgs eventArgs)
         {
-            INTERNAL_isPointerInside = false;
-            InvokeRoutedEventHandlers(MouseLeaveEvent, eventArgs);
         }
 #else
         protected internal virtual void OnPointerExited(PointerRoutedEventArgs eventArgs)
         {
-            INTERNAL_isPointerInside = false;
-            InvokeRoutedEventHandlers(PointerExitedEvent, eventArgs);
         }
 #endif
 
         #endregion
-
 
         #region Text events
 
@@ -693,57 +720,6 @@ namespace Windows.UI.Xaml
         /// Identifies the <see cref="TextInput"/> routed event.
         /// </summary>
         public static readonly RoutedEvent TextInputEvent;
-
-        /// <summary>
-        /// Raises the TextInput event
-        /// </summary>
-        void ProcessOnTextInput(object jsEventArg)
-        {
-            var inputText = OpenSilver.Interop.ExecuteJavaScript("$0.data", jsEventArg).ToString();
-            if (inputText == null)
-                return;
-
-#if MIGRATION
-            var eventArgs = new TextCompositionEventArgs()
-#else
-            var eventArgs = new TextCompositionEventArgs()
-#endif
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg,
-                Text = inputText,
-                Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled"),
-                TextComposition = new TextComposition("")
-            };
-
-            OnTextInput(eventArgs);
-
-            if (eventArgs.Handled)
-            {
-                OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
-            }
-        }
-
-        /// <summary>
-        /// Raises the TextInput event
-        /// </summary>
-        /// <param name="eventArgs">The arguments for the event.</param>
-        protected virtual void OnTextInput(TextCompositionEventArgs eventArgs)
-        {
-            InvokeRoutedEventHandlers(TextInputEvent, eventArgs);
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="TextInputStart"/> routed event.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly RoutedEvent TextInputStartEvent;
-
-        /// <summary>
-        /// Identifies the <see cref="TextInputUpdate"/> routed event.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public static readonly RoutedEvent TextInputUpdateEvent;
 
         /// <summary>
         /// Occurs when a UI element gets text in a device-independent manner.
@@ -764,6 +740,26 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
+        /// Raises the TextInput event
+        /// </summary>
+        /// <param name="eventArgs">The arguments for the event.</param>
+        protected virtual void OnTextInput(TextCompositionEventArgs eventArgs)
+        {
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TextInputStart"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly RoutedEvent TextInputStartEvent;
+
+        /// <summary>
+        /// Identifies the <see cref="TextInputUpdate"/> routed event.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly RoutedEvent TextInputUpdateEvent;
+
+        /// <summary>
         /// Occurs when a UI element initially gets text in a device-independent manner.
         /// </summary>
         [OpenSilver.NotImplemented]
@@ -776,7 +772,6 @@ namespace Windows.UI.Xaml
         public event TextCompositionEventHandler TextInputUpdate;
 
         #endregion
-
 
         #region Tapped event
 
@@ -801,39 +796,12 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Raises the Tapped event
         /// </summary>
-        void ProcessOnTapped(object jsEventArg)
-        {
-            var eventArgs = new TappedRoutedEventArgs()
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
-            };
-
-            if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
-            {
-                // Fill the position of the pointer and the key modifiers:
-                eventArgs.FillEventArgs(this, jsEventArg);
-
-                OnTapped(eventArgs);
-
-                if (eventArgs.Handled)
-                {
-                    OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Raises the Tapped event
-        /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnTapped(TappedRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(TappedEvent, eventArgs);
         }
 
         #endregion
-
 
         #region RightTapped (aka MouseRightButtonUp) event
 
@@ -876,58 +844,14 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Raises the RightTapped event
         /// </summary>
-#if MIGRATION
-        void ProcessOnMouseRightButtonUp(object jsEventArg)
-#else
-        void ProcessOnRightTapped(object jsEventArg)
-#endif
-        {
-#if MIGRATION
-            var eventArgs = new MouseButtonEventArgs()
-#else
-            var eventArgs = new RightTappedRoutedEventArgs()
-#endif
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg,
-                Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
-            };
-
-            if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
-            {
-                // Fill the position of the pointer and the key modifiers:
-                eventArgs.FillEventArgs(this, jsEventArg);
-
-                // Prevent the default behavior (which is to show the browser context menu):
-                OpenSilver.Interop.ExecuteJavaScript(@"
-                    if ($0.preventDefault)
-                        $0.preventDefault();", jsEventArg);
-
-#if MIGRATION
-                OnMouseRightButtonUp(eventArgs);
-#else
-                OnRightTapped(eventArgs);
-#endif
-
-                if (eventArgs.Handled)
-                {
-                    OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Raises the RightTapped event
-        /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
 #if MIGRATION
         protected virtual void OnMouseRightButtonUp(MouseButtonEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(MouseRightButtonUpEvent, eventArgs);
         }
 #else
         protected virtual void OnRightTapped(RightTappedRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(RightTappedEvent, eventArgs);
         }
 #endif
 
@@ -953,56 +877,20 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Raises the OnKeyDown event
-        /// </summary>
-        void ProcessOnKeyDown(object jsEventArg)
-        {
-            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
-                return;
-
-#if MIGRATION
-            keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
-            var eventArgs = new KeyEventArgs()
-#else
-            var eventArgs = new KeyRoutedEventArgs()
-#endif
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg,
-                PlatformKeyCode = keyCode,
-                Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-                Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
-            };
-
-            // Add the key modifier to the eventArgs:
-            eventArgs.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
-
-            OnKeyDown(eventArgs);
-
-            if (eventArgs.Handled)
-            {
-                OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
-            }
-        }
-
-        /// <summary>
         /// Raises the KeyDown event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
 #if MIGRATION
         protected virtual void OnKeyDown(KeyEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(KeyDownEvent, eventArgs);
         }
 #else
         protected virtual void OnKeyDown(KeyRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(KeyDownEvent, eventArgs);
         }
 #endif
 
         #endregion
-
 
         #region KeyUp event
 
@@ -1024,50 +912,16 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Raises the OnKeyUp event
-        /// </summary>
-        void ProcessOnKeyUp(object jsEventArg)
-        {
-            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
-                return;
-
-#if MIGRATION
-            keyCode = INTERNAL_VirtualKeysHelpers.FixKeyCodeForSilverlight(keyCode);
-            var eventArgs = new KeyEventArgs()
-#else
-            var eventArgs = new KeyRoutedEventArgs()
-#endif
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg,
-                PlatformKeyCode = keyCode,
-                Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
-                Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
-            };
-
-            // Add the key modifier to the eventArgs:
-            eventArgs.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
-
-            OnKeyUp(eventArgs);
-
-            if (eventArgs.Handled)
-            {
-                OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-            }
-        }
-
-        /// <summary>
         /// Raises the KeyUp event
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
 #if MIGRATION
         protected virtual void OnKeyUp(KeyEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(KeyUpEvent, eventArgs);
         }
 #else
         protected virtual void OnKeyUp(KeyRoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(KeyUpEvent, eventArgs);
         }
 #endif
 
@@ -1097,25 +951,9 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Raises the GotFocus event
         /// </summary>
-        void ProcessOnGotFocus(object jsEventArg)
-        {
-            var eventArgs = new RoutedEventArgs() //todo: fill the rest
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg
-            };
-
-            FocusManager.SetFocusedElement(this.INTERNAL_ParentWindow, this);
-
-            OnGotFocus(eventArgs); //todo: should we skip this method if "handled" is true? (test by overriding "OnGotFocus" method below and see how it works in this case in WPF)
-        }
-
-        /// <summary>
-        /// Raises the GotFocus event
-        /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnGotFocus(RoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(GotFocusEvent, eventArgs);
         }
 
         #endregion
@@ -1142,532 +980,109 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Raises the LostFocus event
         /// </summary>
-        void ProcessOnLostFocus(object jsEventArg)
-        {
-            var eventArgs = new RoutedEventArgs() //todo: fill the rest
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg
-            };
-
-            OnLostFocus(eventArgs); //todo: should we skip this method if "handled" is true? (test by overriding "OnLostFocus" method below and see how it works in this case in WPF)
-        }
-
-        /// <summary>
-        /// Raises the LostFocus event
-        /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnLostFocus(RoutedEventArgs eventArgs)
         {
-            InvokeRoutedEventHandlers(LostFocusEvent, eventArgs);
         }
 
         #endregion
-
-
-        #region Handle keyboard events when focused
-
-        /// <summary>
-        /// Set this boolean to true for the UIElements that have to react to keyboard events when they are focused.
-        /// It activates the mechanic used to handle those events.
-        /// It is used with the method OnKeyDownWhenFocused which is overriden and does the specific handling of the events.
-        /// </summary>
-        internal bool _reactsToKeyboardEventsWhenFocused = false;
-
-        void StartListeningToKeyboardEvents(object sender, RoutedEventArgs e)
-        {
-            //the following test is for cases such as focusing a TextBox that is inside a Button for example.
-            if (!Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", e.INTERNAL_OriginalJSEventArg)))
-            {
-                this.KeyDown -= OnKeyDownWhenFocused; //just in case but we shouldn't need it (if we need it here, it means that the keyboard events kept getting taken into consideration even though it didn't have the focus).
-                this.KeyDown += OnKeyDownWhenFocused;
-            }
-        }
-
-        void StopListeningToKeyboardEvents(object sender, RoutedEventArgs e)
-        {
-            this.KeyDown -= OnKeyDownWhenFocused; //just in case but we shouldn't need it (if we need it here, it means that the button kept getting triggered by keyboard events even though it didn't have the focus).
-        }
-
-        /// <summary>
-        /// This method is to be overriden by UIElements that react to keyboard events when they are focused, to handle those events properly.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-#if MIGRATION
-        internal virtual void OnKeyDownWhenFocused(object sender, KeyEventArgs e)
-#else
-        internal virtual void OnKeyDownWhenFocused(object sender, KeyRoutedEventArgs e)
-#endif
-        {
-            //if(e.Key == ...)
-            //{
-            //    Do something...
-            //}
-        }
-
-        #endregion
-
 
         #region Allow or Prevent Focus events for IsTabStop
 
-        //todo-perf: use the code that is in the "first try at this" region rather than creating a full-fledged event and find out why it doesn't work (going from IsTabStop = false to IsTabStop = true doesn't succeed to remove the listener that calls blur on the dom element and it is thus for the element to get the focus despite having IsTabStop to true).
-
-        #region GotFocusForIsTabStop event
-
-        private static readonly RoutedEvent GotFocusForIsTabStopEvent;
-
-        /// <summary>
-        /// Occurs when the pointer device that previously initiated a Press action is
-        /// pressed, while within this element.
-        /// Note that ONLY sender's informations are currently filled (not pointer's)
-        /// </summary>
-        private event RoutedEventHandler GotFocusForIsTabStop
-        {
-            add
-            {
-                AddHandler(GotFocusForIsTabStopEvent, value, false);
-            }
-            remove
-            {
-                RemoveHandler(GotFocusForIsTabStopEvent, value);
-            }
-        }
-
-        /// <summary>
-        /// Raises the GotFocus event
-        /// </summary>
-        void ProcessOnGotFocusForIsTabStop(object jsEventArg)
-        {
-            var eventArgs = new RoutedEventArgs() //todo: fill the rest
-            {
-                INTERNAL_OriginalJSEventArg = jsEventArg
-            };
-            OnGotFocusForIsTabStop(eventArgs); //todo: should we skip this method if "handled" is true? (test by overriding "OnGotFocus" method below and see how it works in this case in WPF)
-        }
-
-        /// <summary>
-        /// Raises the GotFocus event
-        /// </summary>
-        /// <param name="eventArgs">The arguments for the event.</param>
-        private void OnGotFocusForIsTabStop(RoutedEventArgs eventArgs)
-        {
-            InvokeRoutedEventHandlers(GotFocusForIsTabStopEvent, eventArgs);
-        }
-
-        #endregion
-
-        private bool INTERNAL_AreFocusEventsAllowed = true;
-
-        internal void PreventFocusEvents()
-        {
-            if (INTERNAL_AreFocusEventsAllowed)
-            {
-                INTERNAL_AreFocusEventsAllowed = false;
-
-                INTERNAL_DetachFromFocusEvents();
-
-                GotFocusForIsTabStop -= UIElement_GotFocusForIsTabStop; //just in case.
-                GotFocusForIsTabStop += UIElement_GotFocusForIsTabStop;
-            }
-        }
-
         internal virtual object GetFocusTarget() => INTERNAL_OuterDomElement;
-
-        void UIElement_GotFocusForIsTabStop(object sender, RoutedEventArgs e)
-        {
-            UIElement element = (UIElement)sender; //jsEvent should be called "sender" but I kept the former implementation so I also kept the name.
-            var elementToBlur = element.GetFocusTarget();
-            if (elementToBlur != null)
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.blur()", elementToBlur);
-        }
 
         internal void AllowFocusEvents()
         {
-            if (!INTERNAL_AreFocusEventsAllowed)
+            object target = GetFocusTarget();
+            if (target != null)
             {
-                INTERNAL_AreFocusEventsAllowed = true;
+                OpenSilver.Interop.ExecuteJavaScript("document.enableFocus($0)", ((INTERNAL_HtmlDomElementReference)target).UniqueIdentifier);
+            }
 
-                INTERNAL_AttachToFocusEvents();
-                GotFocusForIsTabStop -= UIElement_GotFocusForIsTabStop; //just in case.
+            if (ShouldHookUpFocusInEvent())
+            {
+                HookUpFocusInEvent();
+            }
+
+            if (ShouldHookUpFocusOutEvent())
+            {
+                HookUpFocusOutEvent();
             }
         }
 
-        /// <summary>
-        /// DO NOT USE THIS, IT IS ONLY FOR THE ALLOWFOCUSEVENTS METHOD
-        /// </summary>
-        private void INTERNAL_AttachToFocusEvents()
+        internal void PreventFocusEvents()
         {
-            Type[] methodParameters = { typeof(RoutedEventArgs) };
+            UnHookDOMEvent(ID_FOCUSIN);
+            UnHookDOMEvent(ID_FOCUSOUT);
 
-            if (ShouldHookUpRoutedEvent(GotFocusEvent, typeof(UIElement), nameof(OnGotFocus), methodParameters))
+            object target = GetFocusTarget();
+            if (target != null)
             {
-                HookUpRoutedEvent(GotFocusEvent);
+                OpenSilver.Interop.ExecuteJavaScript("document.disableFocus($0)", ((INTERNAL_HtmlDomElementReference)target).UniqueIdentifier);
             }
-
-            if (ShouldHookUpRoutedEvent(LostFocusEvent, typeof(UIElement), nameof(OnLostFocus), methodParameters))
-            {
-                HookUpRoutedEvent(LostFocusEvent);
-            }
-        }
-
-        /// <summary>
-        /// DO NOT USE THIS, IT IS ONLY FOR THE PREVENTFOCUSEVENTS METHOD
-        /// </summary>
-        private void INTERNAL_DetachFromFocusEvents()
-        {
-            UnHookRoutedEvent(GotFocusEvent);
-            UnHookRoutedEvent(LostFocusEvent);
         }
 
         #endregion
 
-        void ProcessMouseButtonEvent(
-            object jsEventArg,
-#if MIGRATION
-            Action<MouseButtonEventArgs> onEvent,
-#else
-            Action<PointerRoutedEventArgs> onEvent,
-#endif
-            bool preventTextSelectionWhenPointerIsCaptured = false,
-            bool checkForDivsThatAbsorbEvents = false,  //Note: this is currently true only for PointerPressed and PointerReleased
-                                                        //because those are the events we previously attached ourselves to for TextBox
-                                                        //so that it would set the event to handled to prevent the click in a TextBox (to change the text) located
-                                                        //in a button or any other control that reacts to clicks from also triggering the click from that control
-            bool refreshClickCount = false)
-        {
-            bool isMouseEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0.type.startsWith('mouse')", jsEventArg));
-            if (!(ignoreMouseEvents && isMouseEvent)) //Ignore mousedown, mousemove and mouseup if the touch equivalents have been handled.
-            {
-#if MIGRATION
-                var eventArgs = new MouseButtonEventArgs()
-#else
-                var eventArgs = new PointerRoutedEventArgs()
-#endif
-                {
-                    INTERNAL_OriginalJSEventArg = jsEventArg,
-                    Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
-                };
-                if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
-                {
-                    eventArgs.Handled = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
-                }
-
-                if (refreshClickCount)
-                {
-                    eventArgs.RefreshClickCount(this);
-                }
-
-                if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
-                {
-                    // Fill the position of the pointer and the key modifiers:
-                    eventArgs.FillEventArgs(this, jsEventArg);
-
-                    // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
-                    onEvent(eventArgs);
-
-                    if (eventArgs.Handled)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                    }
-                }
-
-                //Prevent text selection when the pointer is captured:
-                if (preventTextSelectionWhenPointerIsCaptured && Pointer.INTERNAL_captured != null)
-                {
-                    OpenSilver.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
-                }
-                bool isTouchEndEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0.type == 'touchend'", jsEventArg));
-                if (isTouchEndEvent) //prepare to ignore the mouse events since they were already handled as touch events
-                {
-                    ignoreMouseEvents = true;
-                    if (_ignoreMouseEventsTimer == null)
-                    {
-                        _ignoreMouseEventsTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, 100) }; //I arbitrarily picked 100ms because at 30ms with throttling x6, it didn't work every time (but sometimes did so it should be alright, also, I tested with 100ms and it worked everytime)
-                        _ignoreMouseEventsTimer.Tick += _ignoreMouseEventsTimer_Tick;
-
-                    }
-                    _ignoreMouseEventsTimer.Stop();
-                    _ignoreMouseEventsTimer.Start();
-                }
-            }
-        }
-
-        void ProcessPointerEvent(
-            object jsEventArg,
-#if MIGRATION
-            Action<MouseEventArgs> onEvent,
-#else
-            Action<PointerRoutedEventArgs> onEvent,
-#endif
-            bool preventTextSelectionWhenPointerIsCaptured = false,
-            bool checkForDivsThatAbsorbEvents = false,  //Note: this is currently true only for PointerPressed and PointerReleased
-                                                        //because those are the events we previously attached ourselves to for TextBox
-                                                        //so that it would set the event to handled to prevent the click in a TextBox (to change the text) located
-                                                        //in a button or any other control that reacts to clicks from also triggering the click from that control
-            bool refreshClickCount = false)
-        {
-            bool isMouseEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0.type.startsWith('mouse')", jsEventArg));
-            if (!(ignoreMouseEvents && isMouseEvent)) //Ignore mousedown, mousemove and mouseup if the touch equivalents have been handled.
-            {
-#if MIGRATION
-                var eventArgs = new MouseEventArgs()
-#else
-                var eventArgs = new PointerRoutedEventArgs()
-#endif
-                {
-                    INTERNAL_OriginalJSEventArg = jsEventArg,
-                    Handled = ((OpenSilver.Interop.ExecuteJavaScript("$0.handled", jsEventArg) ?? "").ToString() == "handled")
-                };
-                if (!eventArgs.Handled && checkForDivsThatAbsorbEvents)
-                {
-                    eventArgs.Handled = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", jsEventArg));
-                }
-
-                if (refreshClickCount)
-                {
-                    eventArgs.RefreshClickCount(this);
-                }
-
-                if (eventArgs.CheckIfEventShouldBeTreated(this, jsEventArg))
-                {
-                    // Fill the position of the pointer and the key modifiers:
-                    eventArgs.FillEventArgs(this, jsEventArg);
-
-                    // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
-                    onEvent(eventArgs);
-
-                    if (eventArgs.Handled)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScript("$0.handled = 'handled'", jsEventArg);
-                    }
-                }
-
-                //Prevent text selection when the pointer is captured:
-                if (preventTextSelectionWhenPointerIsCaptured && Pointer.INTERNAL_captured != null)
-                {
-                    OpenSilver.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
-                }
-                bool isTouchEndEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("$0.type == 'touchend'", jsEventArg));
-                if (isTouchEndEvent) //prepare to ignore the mouse events since they were already handled as touch events
-                {
-                    ignoreMouseEvents = true;
-                    if (_ignoreMouseEventsTimer == null)
-                    {
-                        _ignoreMouseEventsTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, 100) }; //I arbitrarily picked 100ms because at 30ms with throttling x6, it didn't work every time (but sometimes did so it should be alright, also, I tested with 100ms and it worked everytime)
-                        _ignoreMouseEventsTimer.Tick += _ignoreMouseEventsTimer_Tick;
-
-                    }
-                    _ignoreMouseEventsTimer.Stop();
-                    _ignoreMouseEventsTimer.Start();
-                }
-            }
-        }
-
         public virtual void INTERNAL_AttachToDomEvents()
         {
-            if (_reactsToKeyboardEventsWhenFocused)
+            if (ShouldHookUpMouseMoveEvent())
             {
-                GotFocus -= StartListeningToKeyboardEvents;
-                GotFocus += StartListeningToKeyboardEvents;
-                LostFocus -= StopListeningToKeyboardEvents;
-                LostFocus += StopListeningToKeyboardEvents;
+                HookUpMouseMoveEvent();
             }
 
-#if MIGRATION
-            Type[] methodParameters = new Type[] { typeof(MouseEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(MouseMoveEvent, typeof(UIElement), nameof(OnMouseMove), methodParameters))
+            if (ShouldHookUpMouseDownEvent())
             {
-                HookUpRoutedEvent(MouseMoveEvent);
+                HookUpMouseDownEvent();
             }
 
-            if (ShouldHookUpRoutedEvent(MouseEnterEvent, typeof(UIElement), nameof(OnMouseEnter), methodParameters))
+            if (ShouldHookUpMouseUpEvent())
             {
-                HookUpRoutedEvent(MouseEnterEvent);
+                HookUpMouseUpEvent();
             }
 
-            if (ShouldHookUpRoutedEvent(MouseLeaveEvent, typeof(UIElement), nameof(OnMouseLeave), methodParameters))
+            if (ShouldHookUpWheelEvent())
             {
-                HookUpRoutedEvent(MouseLeaveEvent);
+                HookUpWheelEvent();
             }
 
-            methodParameters = new Type[] { typeof(TappedRoutedEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(TappedEvent, typeof(UIElement), nameof(OnTapped), methodParameters))
+            // Note: we either attach both 'mouseenter' and 'mouseleave' events or none,
+            // because we need to be able to reset the value of 'IsPointerOver'.
+            if (ShouldHookUpMouseEnterEvent() || ShouldHookUpMouseLeaveEvent())
             {
-                HookUpRoutedEvent(TappedEvent);
+                HookUpMouseEnterEvent();
+                HookUpMouseLeaveEvent();
             }
 
-            methodParameters = new Type[] { typeof(MouseButtonEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(MouseLeftButtonDownEvent, typeof(UIElement), nameof(OnMouseLeftButtonDown), methodParameters))
+            if (ShouldHookUpInputEvent())
             {
-                HookUpRoutedEvent(MouseLeftButtonDownEvent);
+                HookUpInputEvent();
             }
 
-            if (ShouldHookUpRoutedEvent(MouseLeftButtonUpEvent, typeof(UIElement), nameof(OnMouseLeftButtonUp), methodParameters))
+            if (ShouldHookUpKeyDownEvent())
             {
-                HookUpRoutedEvent(MouseLeftButtonUpEvent);
+                HookUpKeyDownEvent();
             }
 
-            if (ShouldHookUpRoutedEvent(MouseRightButtonDownEvent, typeof(UIElement), nameof(OnMouseRightButtonDown), methodParameters))
+            if (ShouldHookUpKeyUpEvent())
             {
-                HookUpRoutedEvent(MouseRightButtonDownEvent);
+                HookUpKeyUpEvent();
             }
 
-            if (ShouldHookUpRoutedEvent(MouseRightButtonUpEvent, typeof(UIElement), nameof(OnMouseRightButtonUp), methodParameters))
+            if (ShouldHookUpFocusInEvent())
             {
-                HookUpRoutedEvent(MouseRightButtonUpEvent);
+                HookUpFocusInEvent();
             }
 
-            methodParameters = new Type[] { typeof(MouseWheelEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(MouseWheelEvent, typeof(UIElement), nameof(OnMouseWheel), methodParameters))
+            if (ShouldHookUpFocusOutEvent())
             {
-                HookUpRoutedEvent(MouseWheelEvent);
+                HookUpFocusOutEvent();
             }
-
-            methodParameters = new Type[] { typeof(KeyEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(KeyDownEvent, typeof(UIElement), nameof(OnKeyDown), methodParameters))
-            {
-                HookUpRoutedEvent(KeyDownEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(KeyUpEvent, typeof(UIElement), nameof(OnKeyUp), methodParameters))
-            {
-                HookUpRoutedEvent(KeyUpEvent);
-            }
-
-            methodParameters = new Type[] { typeof(RoutedEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(GotFocusEvent, typeof(UIElement), nameof(OnGotFocus), methodParameters))
-            {
-                HookUpRoutedEvent(GotFocusEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(LostFocusEvent, typeof(UIElement), nameof(OnLostFocus), methodParameters))
-            {
-                HookUpRoutedEvent(LostFocusEvent);
-            }
-
-            methodParameters = new Type[] { typeof(TextCompositionEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(TextInputEvent, typeof(UIElement), nameof(OnTextInput), methodParameters))
-            {
-                HookUpRoutedEvent(TextInputEvent);
-            }
-#else
-            Type[] methodParameters = new Type[] { typeof(PointerRoutedEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(PointerMovedEvent, typeof(UIElement), nameof(OnPointerMoved), methodParameters))
-            {
-                HookUpRoutedEvent(PointerMovedEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(PointerPressedEvent, typeof(UIElement), nameof(OnPointerPressed), methodParameters))
-            {
-                HookUpRoutedEvent(PointerPressedEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(PointerReleasedEvent, typeof(UIElement), nameof(OnPointerReleased), methodParameters))
-            {
-                HookUpRoutedEvent(PointerReleasedEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(PointerEnteredEvent, typeof(UIElement), nameof(OnPointerEntered), methodParameters))
-            {
-                HookUpRoutedEvent(PointerEnteredEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(PointerExitedEvent, typeof(UIElement), nameof(OnPointerExited), methodParameters))
-            {
-                HookUpRoutedEvent(PointerExitedEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(PointerWheelChangedEvent, typeof(UIElement), nameof(OnPointerWheelChanged), methodParameters))
-            {
-                HookUpRoutedEvent(PointerWheelChangedEvent);
-            }
-            
-            methodParameters = new Type[] { typeof(TappedRoutedEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(TappedEvent, typeof(UIElement), nameof(OnTapped), methodParameters))
-            {
-                HookUpRoutedEvent(TappedEvent);
-            }
-
-            methodParameters = new Type[] { typeof(RightTappedRoutedEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(RightTappedEvent, typeof(UIElement), nameof(OnRightTapped), methodParameters))
-            {
-                HookUpRoutedEvent(RightTappedEvent);
-            }
-
-            methodParameters = new Type[] { typeof(KeyRoutedEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(KeyDownEvent, typeof(UIElement), nameof(OnKeyDown), methodParameters))
-            {
-                HookUpRoutedEvent(KeyDownEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(KeyUpEvent, typeof(UIElement), nameof(OnKeyUp), methodParameters))
-            {
-                HookUpRoutedEvent(KeyUpEvent);
-            }
-
-            methodParameters = new Type[] { typeof(RoutedEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(GotFocusEvent, typeof(UIElement), nameof(OnGotFocus), methodParameters))
-            {
-                HookUpRoutedEvent(GotFocusEvent);
-            }
-
-            if (ShouldHookUpRoutedEvent(LostFocusEvent, typeof(UIElement), nameof(OnLostFocus), methodParameters))
-            {
-                HookUpRoutedEvent(LostFocusEvent);
-            }
-
-            methodParameters = new Type[] { typeof(TextCompositionEventArgs) };
-
-            if (ShouldHookUpRoutedEvent(TextInputEvent, typeof(UIElement), nameof(OnTextInput), methodParameters))
-            {
-                HookUpRoutedEvent(TextInputEvent);
-            }
-#endif
         }
 
         public virtual void INTERNAL_DetachFromDomEvents()
         {
-#if MIGRATION
-            UnHookRoutedEvent(MouseMoveEvent);
-            UnHookRoutedEvent(MouseLeftButtonDownEvent);
-            UnHookRoutedEvent(MouseLeftButtonUpEvent);
-            UnHookRoutedEvent(MouseEnterEvent);
-            UnHookRoutedEvent(MouseLeaveEvent);
-            UnHookRoutedEvent(MouseWheelEvent);
-            UnHookRoutedEvent(TappedEvent);
-            UnHookRoutedEvent(MouseRightButtonUpEvent);
-            UnHookRoutedEvent(KeyDownEvent);
-            UnHookRoutedEvent(KeyUpEvent);
-            UnHookRoutedEvent(GotFocusEvent);
-            UnHookRoutedEvent(LostFocusEvent);
-            UnHookRoutedEvent(TextInputEvent);
-#else
-            UnHookRoutedEvent(PointerMovedEvent);
-            UnHookRoutedEvent(PointerPressedEvent);
-            UnHookRoutedEvent(PointerReleasedEvent);
-            UnHookRoutedEvent(PointerEnteredEvent);
-            UnHookRoutedEvent(PointerExitedEvent);
-            UnHookRoutedEvent(PointerWheelChangedEvent);
-            UnHookRoutedEvent(TappedEvent);
-            UnHookRoutedEvent(RightTappedEvent);
-            UnHookRoutedEvent(KeyDownEvent);
-            UnHookRoutedEvent(KeyUpEvent);
-            UnHookRoutedEvent(GotFocusEvent);
-            UnHookRoutedEvent(LostFocusEvent);
-            UnHookRoutedEvent(TextInputEvent);
-#endif
+            UnHookDOMEvents();
         }
     }
 }
