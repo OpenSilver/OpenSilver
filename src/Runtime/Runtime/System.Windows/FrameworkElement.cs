@@ -501,6 +501,11 @@ namespace Windows.UI.Xaml
                 if (INTERNAL_ForceEnableAllPointerEvents)
                     div2style.pointerEvents = "all";
                 domElementWhereToPlaceChildren = div2;
+
+                if (this.IsCustomLayoutRoot)
+                {
+                    div1style.position = "relative";
+                }
             }
             else
             {
