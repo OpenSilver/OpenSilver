@@ -102,5 +102,39 @@ namespace Windows.UI.Xaml.Controls
             }
             while (true);
         }
+
+        /// <summary>
+        /// Returns the maximum value or null if sequence is empty.
+        /// </summary>
+        /// <typeparam name="T">The type of the sequence.</typeparam>
+        /// <param name="that">The sequence to retrieve the maximum value from.
+        /// </param>
+        /// <returns>The maximum value or null.</returns>
+        public static T? MaxOrNullable<T>(this IEnumerable<T> that)
+            where T : struct, IComparable
+        {
+            if (!that.Any())
+            {
+                return null;
+            }
+            return that.Max();
+        }
+
+        /// <summary>
+        /// Returns the minimum value or null if sequence is empty.
+        /// </summary>
+        /// <typeparam name="T">The type of the sequence.</typeparam>
+        /// <param name="that">The sequence to retrieve the minimum value from.
+        /// </param>
+        /// <returns>The minimum value or null.</returns>
+        public static T? MinOrNullable<T>(this IEnumerable<T> that)
+            where T : struct, IComparable
+        {
+            if (!that.Any())
+            {
+                return null;
+            }
+            return that.Min();
+        }
     }
 }
