@@ -266,7 +266,7 @@ namespace Windows.UI.Xaml
                 savedTextBlockPadding = padding;
 
             // UGiacobbi 18022022 If we pass a quoted font family we need to escape it
-            var escapedstrFontFamily = strFontFamily.Replace("\"", "\\\"");
+            var escapedstrFontFamily = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(strFontFamily);
 
             string javaScriptCodeToExecute = $@"document.measureTextBlock(""{strText}"",""{strFontSize}"",""{escapedstrFontFamily}"",""{strFontStyle}"",""{strFontWeight}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
 #if OPENSILVER
