@@ -190,9 +190,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
             DependencyProperty.Register(
-                nameof(Background), 
-                typeof(Brush), 
-                typeof(Border), 
+                nameof(Background),
+                typeof(Brush),
+                typeof(Border),
                 new PropertyMetadata((object)null)
                 {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
@@ -219,15 +219,42 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty BorderBrushProperty =
             DependencyProperty.Register(
-                nameof(BorderBrush), 
-                typeof(Brush), 
-                typeof(Border), 
+                nameof(BorderBrush),
+                typeof(Brush),
+                typeof(Border),
                 new PropertyMetadata((object)null)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
+                    //GetCSSEquivalent = (instance) => new CSSEquivalent
+                    //{
+                    //    Value = (inst, value) => value ?? "transparent",
+                    //    Name = new List<string> { "borderColor" },
+                    //}
+                    GetCSSEquivalents = (instance) =>
                     {
-                        Value = (inst, value) => value ?? "transparent",
-                        Name = new List<string> { "borderColor" },
+                        var cssList = new List<CSSEquivalent>();
+                        var brush = ((Border)instance).Background;
+                        if (brush is LinearGradientBrush)
+                        {
+                            cssList.Add(new CSSEquivalent
+                            {
+                                Name = new List<string> { "border-image-source" },
+                            });
+                            cssList.Add(new CSSEquivalent
+                            {
+                                Name = new List<string> { "border-image-slice" },
+                                Value = (d, value) => { return "1"; },
+                            });
+                        }
+                        else
+                        {
+                            cssList.Add(new CSSEquivalent
+                            {
+                                Name = new List<string> { "borderColor" },
+                                Value = (inst, value) => value ?? "transparent"
+                            });
+
+                        }
+                        return cssList;
                     }
                 });
 
@@ -239,17 +266,17 @@ namespace Windows.UI.Xaml.Controls
             get { return (Thickness)GetValue(BorderThicknessProperty); }
             set { SetValue(BorderThicknessProperty, value); }
         }
-        
+
         /// <summary>
         /// Identifies the <see cref="Border.BorderThickness"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
             DependencyProperty.Register(
-                nameof(BorderThickness), 
-                typeof(Thickness), 
+                nameof(BorderThickness),
+                typeof(Thickness),
                 typeof(Border),
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-                { 
+                {
                     MethodToUpdateDom = BorderThickness_MethodToUpdateDom
                 });
 
@@ -277,11 +304,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty CornerRadiusProperty =
             DependencyProperty.Register(
-                nameof(CornerRadius), 
-                typeof(CornerRadius), 
-                typeof(Border), 
-                new PropertyMetadata(new CornerRadius()) 
-                { 
+                nameof(CornerRadius),
+                typeof(CornerRadius),
+                typeof(Border),
+                new PropertyMetadata(new CornerRadius())
+                {
                     MethodToUpdateDom = CornerRadius_MethodToUpdateDom
                 });
 
@@ -307,11 +334,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
             DependencyProperty.Register(
-                nameof(Padding), 
-                typeof(Thickness), 
+                nameof(Padding),
+                typeof(Thickness),
                 typeof(Border),
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-                { 
+                {
                     MethodToUpdateDom = Padding_MethodToUpdateDom
                 });
 
@@ -351,7 +378,6 @@ namespace Windows.UI.Xaml.Controls
                 Point PaddingLocation = new Point(Padding.Left, Padding.Top);
                 Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
                 Size PaddingSize = new Size(Padding.Left + Padding.Right, Padding.Top + Padding.Bottom);
-                
                 Child.Arrange(new Rect(PaddingLocation, finalSize.Subtract(BorderThicknessSize).Subtract(PaddingSize).Max(new Size())));
             }
 
