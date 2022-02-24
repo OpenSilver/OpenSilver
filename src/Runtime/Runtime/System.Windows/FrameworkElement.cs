@@ -566,8 +566,6 @@ namespace Windows.UI.Xaml
             this.OnPreApplyTemplate();
 
             bool visualsCreated = false;
-            FrameworkElement visualChild = null;
-
             if (this.TemplateInternal != null)
             {
                 FrameworkTemplate template = this.TemplateInternal;
@@ -576,18 +574,12 @@ namespace Windows.UI.Xaml
                 // rendered already for this control.
                 if (this.TemplateChild == null)
                 {
-                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
-                    if (visualChild != null)
-                    {
-                        visualsCreated = true;
-                    }
+                    visualsCreated = template.ApplyTemplateContent(this);
                 }
             }
 
             if (visualsCreated)
             {
-                this.TemplateChild = visualChild;
-
                 // Call the OnApplyTemplate method
                 this.OnApplyTemplate();
             }

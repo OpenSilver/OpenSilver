@@ -142,17 +142,14 @@ namespace Windows.UI.Xaml.Controls
 
         private static ItemsPanelTemplate GetDefaultItemsPanel()
         {
-            ItemsPanelTemplate template = new ItemsPanelTemplate()
-            {
-                _methodToInstantiateFrameworkTemplate = (FrameworkElement templateOwner) =>
+            ItemsPanelTemplate template = new ItemsPanelTemplate();
+            template.SetMethodToInstantiateFrameworkTemplate(owner =>
+                new TemplateInstance
                 {
-                    return new TemplateInstance()
-                    {
-                        TemplateOwner = templateOwner,
-                        TemplateContent = new StackPanel()
-                    };
-                }
-            };
+                    TemplateOwner = owner,
+                    TemplateContent = new StackPanel()
+                });
+
             template.Seal();
 
             // Note: We seal the template in order to avoid letting the user modify the 
@@ -843,7 +840,7 @@ namespace Windows.UI.Xaml.Controls
         {
             DataTemplate template = new DataTemplate();
 
-            template._methodToInstantiateFrameworkTemplate = control =>
+            template.SetMethodToInstantiateFrameworkTemplate(control =>
             {
                 TemplateInstance templateInstance = new TemplateInstance();
 
@@ -853,7 +850,7 @@ namespace Windows.UI.Xaml.Controls
                 templateInstance.TemplateContent = textBlock;
 
                 return templateInstance;
-            };
+            });
 
             return template;
         }

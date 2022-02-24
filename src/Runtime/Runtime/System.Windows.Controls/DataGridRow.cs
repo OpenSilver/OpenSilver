@@ -49,7 +49,14 @@ namespace Windows.UI.Xaml.Controls
         internal int _rowIndex; //todo: replace this with the method GetIndex? (see wpf)
         private DataGridSelectionMode _currentSelectionMode;
 
-        internal static DataTemplate DefaultTemplateForExtendedSelectionMode = new DataTemplate() { _methodToInstantiateFrameworkTemplate = GenerateDefaultHeaderTemplateForExtendedSelectionMode };
+        internal static DataTemplate DefaultTemplateForExtendedSelectionMode = CreateDefaultTemplateForExtendedSelectionMode();
+
+        private static DataTemplate CreateDefaultTemplateForExtendedSelectionMode()
+        {
+            DataTemplate template = new DataTemplate();
+            template.SetMethodToInstantiateFrameworkTemplate(GenerateDefaultHeaderTemplateForExtendedSelectionMode);
+            return template;
+        }
 
 #if MIGRATION
         public event MouseButtonEventHandler MouseLeftButtonUp;

@@ -507,36 +507,34 @@ namespace Windows.UI.Xaml.Controls
 
         private class UseContentTemplate : DataTemplate
         {
-            public UseContentTemplate()
+            internal override bool BuildVisualTree(FrameworkElement container)
             {
-                SetMethodToInstantiateFrameworkTemplate(container =>
+                FrameworkElement child = ((ContentPresenter)container).Content as FrameworkElement;
+                if (child != null)
                 {
-                    TemplateInstance template = new TemplateInstance();
+                    FrameworkElement parent = VisualTreeHelper.GetParent(child) as FrameworkElement;
+                    if (parent != null)
+                    {
+                        parent.TemplateChild = null;
+                    }
+                }
 
-                    FrameworkElement root = ((ContentPresenter)container).Content as FrameworkElement;
+                container.TemplateChild = child;
 
-                    template.TemplateContent = root;
-
-                    return template;
-                });
+                return true;
             }
         }
 
         private class DefaultTemplate : DataTemplate
         {
-            public DefaultTemplate()
+            internal override bool BuildVisualTree(FrameworkElement container)
             {
-                SetMethodToInstantiateFrameworkTemplate(container =>
-                {
-                    TemplateInstance template = new TemplateInstance();
+                ContentPresenter cp = (ContentPresenter)container;
+                FrameworkElement result = DefaultExpansion(cp.Content, cp);
 
-                    ContentPresenter cp = (ContentPresenter)container;
-                    FrameworkElement result = DefaultExpansion(cp.Content, cp);
+                container.TemplateChild = result;
 
-                    template.TemplateContent = result;
-
-                    return template;
-                });
+                return result != null;
             }
 
             private FrameworkElement DefaultExpansion(object content, ContentPresenter container)
