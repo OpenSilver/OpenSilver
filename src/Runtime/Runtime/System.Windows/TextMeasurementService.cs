@@ -265,7 +265,10 @@ namespace Windows.UI.Xaml
             else
                 savedTextBlockPadding = padding;
 
-            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{strText}"",""{strFontSize}"",""{strFontFamily}"",""{strFontStyle}"",""{strFontWeight}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
+            // UGiacobbi 18022022 If we pass a quoted font family we need to escape it
+            var escapedstrFontFamily = INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(strFontFamily);
+
+            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{strText}"",""{strFontSize}"",""{escapedstrFontFamily}"",""{strFontStyle}"",""{strFontWeight}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
 #if OPENSILVER
             string strTextSize = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(javaScriptCodeToExecute));
 #elif BRIDGE
