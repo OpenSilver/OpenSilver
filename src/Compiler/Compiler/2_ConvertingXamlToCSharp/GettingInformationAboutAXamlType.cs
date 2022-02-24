@@ -265,6 +265,9 @@ namespace DotNetForHtml5.Compiler
                     case "System.Windows.Controls.Data.DataForm.Toolkit":
                         assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
                         return;
+                    case "System.Windows.Controls.DataVisualization.Toolkit":
+                        assemblyName = "OpenSilver.Controls.DataVisualization";
+                        return;
                     case "System.Windows.Controls.Navigation":
                         assemblyName = "OpenSilver.Controls.Navigation";
                         return;
