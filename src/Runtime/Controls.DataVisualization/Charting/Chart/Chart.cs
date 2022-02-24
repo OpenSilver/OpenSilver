@@ -8,10 +8,21 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Windows.Controls.DataVisualization.Charting.Primitives;
-using System.Windows.Markup;
+using Properties = OpenSilver.Controls.DataVisualization.Properties;
 
+using System.Windows.Markup;
+#if MIGRATION
+using System.Windows.Controls.DataVisualization.Charting.Primitives;
+#else
+using System;
+using Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives;
+#endif
+
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a control that displays a Chart.
@@ -356,44 +367,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         [OpenSilver.NotImplemented]
         private void AddSeriesToPlotArea(ISeries series)
         {
-        }
-
-        /// <summary>
-        /// Builds the visual tree for the Chart control when a new template
-        /// is applied.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public override void OnApplyTemplate()
-        {
-            // Call base implementation
-            base.OnApplyTemplate();
-
-            // Unhook events from former template parts
-            if (null != ChartArea)
-            {
-                ChartArea.Children.Clear();
-            }
-
-            if (null != Legend)
-            {
-                Legend.ItemsSource = null;
-            }
-
-            // Access new template parts
-            ChartArea = GetTemplateChild(ChartAreaName) as EdgePanel;
-
-            Legend = GetTemplateChild(LegendName) as Legend;
-
-            if (ChartArea != null)
-            {
-                //_chartAreaChildrenListAdapter.TargetList = ChartArea.Children;
-                //_chartAreaChildrenListAdapter.Populate();
-            }
-
-            if (Legend != null)
-            {
-                Legend.ItemsSource = this.LegendItems;
-            }
         }
 
         /// <summary>

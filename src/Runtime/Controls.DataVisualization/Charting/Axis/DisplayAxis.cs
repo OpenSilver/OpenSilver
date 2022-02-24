@@ -4,9 +4,19 @@
 // All other rights reserved.
 
 using System.Diagnostics.CodeAnalysis;
+#if MIGRATION
 using System.Windows.Shapes;
+#else
+using System;
+using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis that has a range.
@@ -104,7 +114,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
             }
             else
             {
-                throw new InvalidOperationException(Properties.Resources.DisplayAxis_GetLength_CannotDetermineTheLengthOfAnAxisWithAnOrientationOfNone);
+                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DisplayAxis_GetLength_CannotDetermineTheLengthOfAnAxisWithAnOrientationOfNone);
             }
         }
 
@@ -285,7 +295,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets the Style of the Axis's gridlines.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
         public Style GridLineStyle
         {
             get { return GetValue(GridLineStyleProperty) as Style; }
@@ -295,7 +305,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the GridlineStyle dependency property.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
         public static readonly DependencyProperty GridLineStyleProperty =
             DependencyProperty.Register(
                 "GridLineStyle",
@@ -472,26 +482,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             label.DataContext = dataContext;
             //label.SetStyle(AxisLabelStyle);
-        }
-
-        /// <summary>
-        /// Retrieves template parts and configures layout.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            this.AxisGrid = GetTemplateChild(AxisGridName) as Grid;
-            this.AxisTitle = GetTemplateChild(AxisTitleName) as Title;
-            if (this.AxisTitle != null && this.AxisGrid.Children.Contains(this.AxisTitle))
-            {
-                this.AxisGrid.Children.Remove(this.AxisTitle);
-                //this.TitleLayoutTransformControl.Child = this.AxisTitle;
-                //this.AxisGrid.Children.Add(this.TitleLayoutTransformControl);
-            }
-
-            ArrangeAxisGrid();
         }
 
         /// <summary>

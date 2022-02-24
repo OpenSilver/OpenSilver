@@ -6,9 +6,19 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+#if MIGRATION
 using System.Windows.Shapes;
+#else
+using System;
+using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis that displays numeric values.

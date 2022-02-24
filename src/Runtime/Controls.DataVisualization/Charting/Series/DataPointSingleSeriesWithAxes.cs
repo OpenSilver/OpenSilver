@@ -6,9 +6,18 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+#if MIGRATION
 using System.Windows.Data;
+#else
+using System;
+using Windows.UI.Xaml.Data;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// A dynamic series with axes and only one legend item and style for all 
@@ -163,7 +172,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (!CustomTitleInUse && (null == GetBindingExpression(TitleProperty)))
             {
-                Title = newValue.HasValue ? string.Format(CultureInfo.CurrentCulture, Properties.Resources.Series_OnGlobalSeriesIndexPropertyChanged_UntitledSeriesFormatString, newValue.Value + 1) : null;
+                Title = newValue.HasValue ? string.Format(CultureInfo.CurrentCulture, OpenSilver.Controls.DataVisualization.Properties.Resources.Series_OnGlobalSeriesIndexPropertyChanged_UntitledSeriesFormatString, newValue.Value + 1) : null;
                 // Setting Title will set CustomTitleInUse; reset it now
                 CustomTitleInUse = false;
             }

@@ -5,7 +5,12 @@
 
 using System.ComponentModel;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using System;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis that displays numeric values.

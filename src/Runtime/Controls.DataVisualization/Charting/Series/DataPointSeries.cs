@@ -8,14 +8,26 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+#if MIGRATION
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+#else
+using System;
+using Windows.Foundation;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
+#endif
 #if !SILVERLIGHT
 using System.Diagnostics.CodeAnalysis;
 #endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a control that contains a dynamic data series.
@@ -668,7 +680,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Attaches handler plot area after loading it from XAML.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 

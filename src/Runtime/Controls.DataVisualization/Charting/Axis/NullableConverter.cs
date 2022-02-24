@@ -5,8 +5,16 @@
 
 using System.ComponentModel;
 using System.Globalization;
+#if MIGRATION
+#else
+using System;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Converts a string or base value to a <see cref="Nullable"/> value.

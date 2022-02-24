@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace System.Windows.Controls.DataVisualization.Properties {
+namespace OpenSilver.Controls.DataVisualization.Properties {
     using System;
     
     

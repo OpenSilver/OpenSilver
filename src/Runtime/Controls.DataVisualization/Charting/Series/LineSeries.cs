@@ -6,12 +6,22 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Shapes;
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Shapes;
+#endif
 
 #if !DEFINITION_SERIES_COMPATIBILITY_MODE
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a control that contains a data series to be rendered in X/Y 
@@ -52,7 +62,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// Gets or sets the style of the Polyline object that follows the data 
         /// points.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
         public Style PolylineStyle
         {
             get { return GetValue(PolylineStyleProperty) as Style; }
@@ -62,7 +72,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the PolylineStyle dependency property.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
         public static readonly DependencyProperty PolylineStyleProperty =
             DependencyProperty.Register(
                 "PolylineStyle",

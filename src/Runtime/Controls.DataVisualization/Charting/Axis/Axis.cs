@@ -6,7 +6,11 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis class used to determine the plot area coordinate of values.
@@ -126,7 +130,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">Information about the event.</param>
         [OpenSilver.NotImplemented]
-        private void RegisteredListenersCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void RegisteredListenersCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
         }
     }

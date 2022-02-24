@@ -5,9 +5,19 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+#if MIGRATION
 using System.Windows.Media;
+#else
+using System;
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
+#endif
 {
     /// <summary>
     /// Defines an area where you can arrange child elements either horizontally
@@ -104,7 +114,7 @@ namespace System.Windows.Controls.DataVisualization.Charting.Primitives
 
                 string message = string.Format(
                     CultureInfo.InvariantCulture,
-                    Properties.Resources.EdgePanel_OnEdgePropertyChanged,
+                    OpenSilver.Controls.DataVisualization.Properties.Resources.EdgePanel_OnEdgePropertyChanged,
                     value);
 
                 throw new ArgumentException(message, "value");

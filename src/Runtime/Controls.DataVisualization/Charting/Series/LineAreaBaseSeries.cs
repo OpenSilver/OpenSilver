@@ -6,8 +6,16 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+#if MIGRATION
+#else
+using Windows.Foundation;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// A base class that contains methods used by both the line and area series.
@@ -70,32 +78,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         protected LineAreaBaseSeries()
         {
-        }
-
-        /// <summary>
-        /// Creates a DataPoint for determining the line color.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-            if (null != PlotArea)
-            {
-                Grid grid = new Grid();
-                DataPoint dataPoint = CreateDataPoint();
-                dataPoint.Visibility = Visibility.Collapsed;
-                dataPoint.Loaded += delegate
-                {
-                    //dataPoint.SetStyle(ActualDataPointStyle);
-                    Background = dataPoint.Background;
-                    if (null != PlotArea)
-                    {
-                        PlotArea.Children.Remove(grid);
-                    }
-                };
-                grid.Children.Add(dataPoint);
-                PlotArea.Children.Add(grid);
-            }
         }
 
         /// <summary>

@@ -4,10 +4,18 @@
 // All other rights reserved.
 
 using System.Globalization;
-using System.Windows.Input;
+#if MIGRATION
 using System.Windows.Media;
+#else
+using System;
+using Windows.UI.Xaml.Media;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a control that displays a data point.
@@ -234,19 +242,19 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the ActualDependentValue dependency property.
         /// </summary>
-        public static readonly System.Windows.DependencyProperty ActualDependentValueProperty =
-            System.Windows.DependencyProperty.Register(
+        public static readonly DependencyProperty ActualDependentValueProperty =
+            DependencyProperty.Register(
                 "ActualDependentValue",
                 typeof(IComparable),
                 typeof(DataPoint),
-                new System.Windows.PropertyMetadata(0.0, OnActualDependentValuePropertyChanged));
+                new PropertyMetadata(0.0, OnActualDependentValuePropertyChanged));
 
         /// <summary>
         /// Called when the value of the ActualDependentValue property changes.
         /// </summary>
         /// <param name="d">Control that changed its ActualDependentValue.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnActualDependentValuePropertyChanged(System.Windows.DependencyObject d, System.Windows.DependencyPropertyChangedEventArgs e)
+        private static void OnActualDependentValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DataPoint source = (DataPoint)d;
             IComparable oldValue = (IComparable)e.OldValue;
@@ -648,14 +656,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         }
 
         /// <summary>
-        /// Builds the visual tree for the DataPoint when a new template is applied.
-        /// </summary>
-        [OpenSilver.NotImplemented]
-        public override void OnApplyTemplate()
-        {
-        }
-
-        /// <summary>
         /// Changes the DataPoint object's state after one of the VSM state animations completes.
         /// </summary>
         /// <param name="sender">Event source.</param>
@@ -673,62 +673,6 @@ namespace System.Windows.Controls.DataVisualization.Charting
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             GoToCurrentRevealState();
-        }
-
-        /// <summary>
-        /// Provides handling for the MouseEnter event.
-        /// </summary>
-        /// <param name="e">Event arguments.</param>
-        protected override void OnMouseEnter(MouseEventArgs e)
-        {
-            base.OnMouseEnter(e);
-
-            if (IsSelectionEnabled)
-            {
-                IsHovered = true;
-            }
-        }
-
-        /// <summary>
-        /// Provides handling for the MouseLeave event.
-        /// </summary>
-        /// <param name="e">Event arguments.</param>
-        protected override void OnMouseLeave(MouseEventArgs e)
-        {
-            base.OnMouseLeave(e);
-            if (IsSelectionEnabled)
-            {
-                IsHovered = false;
-            }
-        }
-
-        /// <summary>
-        /// Provides handling for the MouseLeftButtonDown event.
-        /// </summary>
-        /// <param name="e">Event arguments.</param>
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
-            if (DefinitionSeriesIsSelectionEnabledHandling)
-            {
-                // DefinitionSeries-compatible handling
-                if (!IsSelectionEnabled)
-                {
-                    // Prevents clicks from bubbling to background, but necessary
-                    // to avoid letting ListBoxItem select the item
-                    e.Handled = true;
-                }
-                base.OnMouseLeftButtonDown(e);
-            }
-            else
-            {
-                // Traditional handling
-                base.OnMouseLeftButtonDown(e);
-                if (IsSelectionEnabled)
-                {
-                    IsSelected = (ModifierKeys.None == (ModifierKeys.Control & Keyboard.Modifiers));
-                    e.Handled = true;
-                }
-            }
         }
 
         /// <summary>
