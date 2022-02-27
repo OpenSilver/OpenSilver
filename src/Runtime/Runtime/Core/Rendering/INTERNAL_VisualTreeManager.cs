@@ -317,7 +317,6 @@ if(nextSibling != undefined) {
             }
         }
 
-
         public static void AttachVisualChildIfNotAlreadyAttached(UIElement child, UIElement parent, int index = -1)
         {
             // Modify the visual tree only if the parent element is itself in the visual tree:
@@ -556,7 +555,9 @@ if(nextSibling != undefined) {
             child.IsConnectedToLiveTree = true;
 
             // Set the "ParentWindow" property so that the element knows where to display popups:
-            child.INTERNAL_ParentWindow = parent.INTERNAL_ParentWindow;
+            // I don't like it but the check for popup is specific to an orphan popup that has a Window parent that has a null ParentWindow
+            if (!(child is Popup && (child as Popup)._isOrphan))
+                child.INTERNAL_ParentWindow = parent.INTERNAL_ParentWindow;
 
             // Create and append the DOM structure of the Child:
             object domElementWhereToPlaceGrandChildren = null;
