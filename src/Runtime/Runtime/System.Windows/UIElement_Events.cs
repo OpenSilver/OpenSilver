@@ -281,45 +281,11 @@ namespace Windows.UI.Xaml
         protected virtual void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
         {
             InvokeRoutedEventHandlers(MouseLeftButtonDownEvent, eventArgs);
-
-            // Workaround so that the elements that capture the pointer events still get the focus:
-            // Note: we put this here instead of in OnPointerPressed_ForHandledEventsToo because this
-            // takes into consideration the checkForDivsThatAbsorbEvents thing (it broke the
-            // <Button><TextBox/></Button> case for example).
-            // It might be better in certain cases to have this in the other method and especially
-            // test for those event-absorbing divs at that moment but I'm not sure.
-            // todo: check if the position of this workaround is correct in the case of an Handled
-            // event without a div that absorbs the events.
-            if (this is Control)
-            {
-                Control thisAsControl = (Control)this;
-                if (thisAsControl.IsTabStop)
-                {
-                    thisAsControl.Focus();
-                }
-            }
         }
 #else
         protected virtual void OnPointerPressed(PointerRoutedEventArgs eventArgs)
         {
             InvokeRoutedEventHandlers(PointerPressedEvent, eventArgs);
-
-            // Workaround so that the elements that capture the pointer events still get the focus:
-            // Note: we put this here instead of in OnPointerPressed_ForHandledEventsToo because this
-            // takes into consideration the checkForDivsThatAbsorbEvents thing (it broke the
-            // <Button><TextBox/></Button> case for example).
-            // It might be better in certain cases to have this in the other method and especially
-            // test for those event-absorbing divs at that moment but I'm not sure.
-            // todo: check if the position of this workaround is correct in the case of an Handled
-            // event without a div that absorbs the events.
-            if (this is Control)
-            {
-                Control thisAsControl = (Control)this;
-                if (thisAsControl.IsTabStop)
-                {
-                    thisAsControl.Focus();
-                }
-            }
         }
 #endif
 
@@ -355,23 +321,6 @@ namespace Windows.UI.Xaml
         protected virtual void OnMouseRightButtonDown(MouseButtonEventArgs eventArgs)
         {
             InvokeRoutedEventHandlers(MouseRightButtonDownEvent, eventArgs);
-
-            // Workaround so that the elements that capture the pointer events still get the focus:
-            // Note: we put this here instead of in OnPointerPressed_ForHandledEventsToo because this
-            // takes into consideration the checkForDivsThatAbsorbEvents thing (it broke the
-            // <Button><TextBox/></Button> case for example).
-            // It might be better in certain cases to have this in the other method and especially
-            // test for those event-absorbing divs at that moment but I'm not sure.
-            // todo: check if the position of this workaround is correct in the case of an Handled
-            // event without a div that absorbs the events.
-            if (this is Control)
-            {
-                Control thisAsControl = (Control)this;
-                if (thisAsControl.IsTabStop)
-                {
-                    thisAsControl.Focus();
-                }
-            }
         }
 
 #endif
