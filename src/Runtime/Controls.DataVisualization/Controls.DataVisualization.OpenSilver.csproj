@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <EnableDefaultItems>false</EnableDefaultItems>
-    <AssemblyName>OpenSilver.Controls.DataVisualization</AssemblyName>
+    <AssemblyName>OpenSilver.Controls.DataVisualization.Toolkit</AssemblyName>
     <RootNamespace>System.Windows.Controls.DataVisualization</RootNamespace>
     <Configurations>SL;UWP</Configurations>
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
