@@ -796,7 +796,7 @@ namespace CSHTML5.Internal
                             {
                                 cssEquivalent.Value = (finalInstance, value) => { return ((ICanConvertToCSSValue)value).ConvertToCSSValue(); };
                             }
-                            if (newValue is ICanConvertToCSSValues)
+                            if (cssEquivalent.Value == null && newValue is ICanConvertToCSSValues)
                             {
                                 cssEquivalent.Values = (finalInstance, value) => { return ((ICanConvertToCSSValues)value).ConvertToCSSValues(sender); };
                             }
