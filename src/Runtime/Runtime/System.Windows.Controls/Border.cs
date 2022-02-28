@@ -224,15 +224,10 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Border),
                 new PropertyMetadata((object)null)
                 {
-                    //GetCSSEquivalent = (instance) => new CSSEquivalent
-                    //{
-                    //    Value = (inst, value) => value ?? "transparent",
-                    //    Name = new List<string> { "borderColor" },
-                    //}
                     GetCSSEquivalents = (instance) =>
                     {
                         var cssList = new List<CSSEquivalent>();
-                        var brush = ((Border)instance).Background;
+                        var brush = ((Border)instance).BorderBrush;
                         if (brush is LinearGradientBrush)
                         {
                             cssList.Add(new CSSEquivalent
@@ -252,7 +247,6 @@ namespace Windows.UI.Xaml.Controls
                                 Name = new List<string> { "borderColor" },
                                 Value = (inst, value) => value ?? "transparent"
                             });
-
                         }
                         return cssList;
                     }
