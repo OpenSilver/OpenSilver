@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31729.503
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32210.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Runtime.OpenSilver", "Runtime\Runtime\Runtime.OpenSilver.csproj", "{945935AC-0649-4054-A3E3-9671441A3343}"
 EndProject
@@ -76,6 +76,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blend", "Blend", "{6E2670FC-F5E6-40E4-8473-CEBE34D0456D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.Input.OpenSilver", "Runtime\Controls.Input\Controls.Input.OpenSilver.csproj", "{485D29E7-6C73-42A3-9976-0E3A995423AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Controls.DataVisualization.OpenSilver", "Runtime\Controls.DataVisualization\Controls.DataVisualization.OpenSilver.csproj", "{9F7D6B89-8C80-48A4-AB45-103828504796}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -156,6 +158,10 @@ Global
 		{485D29E7-6C73-42A3-9976-0E3A995423AF}.SL|Any CPU.Build.0 = SL|Any CPU
 		{485D29E7-6C73-42A3-9976-0E3A995423AF}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
 		{485D29E7-6C73-42A3-9976-0E3A995423AF}.UWP|Any CPU.Build.0 = UWP|Any CPU
+		{9F7D6B89-8C80-48A4-AB45-103828504796}.SL|Any CPU.ActiveCfg = SL|Any CPU
+		{9F7D6B89-8C80-48A4-AB45-103828504796}.SL|Any CPU.Build.0 = SL|Any CPU
+		{9F7D6B89-8C80-48A4-AB45-103828504796}.UWP|Any CPU.ActiveCfg = UWP|Any CPU
+		{9F7D6B89-8C80-48A4-AB45-103828504796}.UWP|Any CPU.Build.0 = UWP|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -185,6 +191,7 @@ Global
 		{46F93300-FC11-43F0-A974-6A515F0E6D12} = {6E2670FC-F5E6-40E4-8473-CEBE34D0456D}
 		{6E2670FC-F5E6-40E4-8473-CEBE34D0456D} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
 		{485D29E7-6C73-42A3-9976-0E3A995423AF} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
+		{9F7D6B89-8C80-48A4-AB45-103828504796} = {BDA9A1B3-15CD-4068-9A6D-BDA030FBEC5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A13C12CC-0544-49D7-A852-FCE1C884AA54}
