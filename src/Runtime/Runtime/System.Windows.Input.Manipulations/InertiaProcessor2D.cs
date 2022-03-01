@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.Text;
 
 #if MIGRATION
 namespace System.Windows.Input.Manipulations
