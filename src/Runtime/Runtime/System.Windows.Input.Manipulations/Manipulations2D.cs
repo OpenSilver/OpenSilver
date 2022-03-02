@@ -1,6 +1,8 @@
 ﻿#if MIGRATION
 namespace System.Windows.Input.Manipulations
 #else
+using System;
+
 namespace Windows.UI.Xaml.Input.Manipulations
 #endif
 {

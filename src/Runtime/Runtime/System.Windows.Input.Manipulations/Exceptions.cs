@@ -1,9 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows.Input.Manipulations
 #else
+using System.Windows.Input.Manipulations;
 namespace Windows.UI.Xaml.Input.Manipulations
 #endif
 {

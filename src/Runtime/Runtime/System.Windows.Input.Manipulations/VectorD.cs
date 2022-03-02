@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 #if MIGRATION
 namespace System.Windows.Input.Manipulations
 #else

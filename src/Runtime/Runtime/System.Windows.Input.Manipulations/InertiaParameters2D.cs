@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows.Input.Manipulations

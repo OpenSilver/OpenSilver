@@ -1,6 +1,6 @@
-﻿#if MIGRATION
+﻿using System;
 using System.Diagnostics;
-
+#if MIGRATION
 namespace System.Windows.Input.Manipulations
 #else
 namespace Windows.UI.Xaml.Input.Manipulations
