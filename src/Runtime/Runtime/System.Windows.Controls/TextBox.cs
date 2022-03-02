@@ -16,6 +16,7 @@ using System.Linq;
 using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -936,5 +937,12 @@ namespace Windows.UI.Xaml.Controls
 
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
+
+        [OpenSilver.NotImplemented]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Rect GetRectFromCharacterIndex(int charIndex)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
