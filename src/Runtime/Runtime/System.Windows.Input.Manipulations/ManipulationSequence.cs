@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 
 #if MIGRATION
 namespace System.Windows.Input.Manipulations
@@ -138,7 +139,7 @@ namespace Windows.UI.Xaml.Input.Manipulations
 					}
 					currentManipulatorCount++;
 					ManipulationSequence.ManipulatorState manipulatorState;
-					if (this.manipulatorStates == null || !this.manipulatorStates.TryGetValue(manipulator2D.Id, ref manipulatorState) || manipulatorState == null)
+					if (this.manipulatorStates == null || !this.manipulatorStates.TryGetValue(manipulator2D.Id, out manipulatorState) || manipulatorState == null)
 					{
 						manipulatorState = ManipulationSequence.CreateManipulatorState(manipulator2D);
 						if (addedManipulatorList == null)

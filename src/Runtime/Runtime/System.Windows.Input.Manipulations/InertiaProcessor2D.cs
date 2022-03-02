@@ -228,7 +228,7 @@ namespace Windows.UI.Xaml.Input.Manipulations
 			}
 			else
 			{
-				result = (!!0)((object)parameters);
+				result = (TBehavior)((object)parameters);
 			}
 			return result;
 		}
