@@ -206,6 +206,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
             var newContent = (UIElement)e.NewValue;
             var oldContent = (UIElement)e.OldValue;
 
+            if (oldContent != null)
+            {
+                popup.RemoveLogicalChild(oldContent);
+            }
+            if (newContent != null)
+            {
+                popup.AddLogicalChild(newContent);
+            }
+
             // Create a surrounding wrapper to enable positioning and alignment: //add once and keep empty until popup opened
             if (popup._childWrapper == null)
             {
