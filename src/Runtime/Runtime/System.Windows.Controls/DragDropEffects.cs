@@ -28,7 +28,6 @@ namespace System.Windows
     [Flags]
     public enum DragDropEffects
     {
-#if unsupported
         /// <summary>
         /// Scrolling is about to start or is currently occurring in the drop target.
         /// </summary>
@@ -39,12 +38,12 @@ namespace System.Windows
         /// target.
         /// </summary>
         All = -2147483645,
-#endif
+
         /// <summary>
         /// The drop target does not accept the data.
         /// </summary>
         None = 0,
-#if unsupported
+
         /// <summary>
         /// The data is copied to the drop target.
         /// </summary>
@@ -59,6 +58,5 @@ namespace System.Windows
         /// The data from the drag source is linked to the drop target.
         /// </summary>
         Link = 4,
-#endif
     }
 }

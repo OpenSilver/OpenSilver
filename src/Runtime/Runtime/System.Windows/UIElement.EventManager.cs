@@ -118,20 +118,15 @@ namespace Windows.UI.Xaml
                 new string[2] { "mousedown", "touchstart" },
                 jsEventArg =>
                 {
-                    // We shouldn't trigger OnMouseLeftButtonDown if only right mouse button has been 
-                    // triggered, continue as before otherwise
-                    //
-                    // Javascript Mouse events have a buttons property that can be a bitmask of:
-                    //
-                    // 0 : No button or un-initialized
-                    // 1 : Primary button (usually the left button)
-                    // 2 : Secondary button (usually the right button)
-                    // 4 : Auxiliary button (usually the mouse wheel button or middle button)
-                    // 8 : 4th button (typically the "Browser Back" button)
-                    // 16 : 5th button (typically the "Browser Forward" button)
-                    int mouseBtn = 0;
-                    int.TryParse((OpenSilver.Interop.ExecuteJavaScript("$0.buttons", jsEventArg) ?? 0).ToString(), out mouseBtn);
-                    if (mouseBtn != 2)
+                    // 0: Main button pressed, usually the left button or the un - initialized state
+                    // 1: Auxiliary button pressed, usually the wheel button or the middle button(if present)
+                    // 2: Secondary button pressed, usually the right button
+                    // 3: Fourth button, typically the Browser Back button
+                    // 4: Fifth button, typically the Browser Forward button
+
+                    int mouseBtn;
+                    int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.button", jsEventArg).ToString(), out mouseBtn);
+                    if (mouseBtn == 0)
                     {
 #if MIGRATION
                         uie.ProcessMouseButtonEvent(
@@ -160,18 +155,14 @@ namespace Windows.UI.Xaml
                 new string[2] { "mousedown", "touchstart" },
                 jsEventArg =>
                 {
-                    // We trigger OnMouseRightButtonDown only if right mouse button has been triggered.
+                    // 0: Main button pressed, usually the left button or the un - initialized state
+                    // 1: Auxiliary button pressed, usually the wheel button or the middle button(if present)
+                    // 2: Secondary button pressed, usually the right button
+                    // 3: Fourth button, typically the Browser Back button
+                    // 4: Fifth button, typically the Browser Forward button
 
-                    // Javascript Mouse events have a buttons property that can be a bitmask of:
-
-                    // 0 : No button or un-initialized
-                    // 1 : Primary button (usually the left button)
-                    // 2 : Secondary button (usually the right button)
-                    // 4 : Auxiliary button (usually the mouse wheel button or middle button)
-                    // 8 : 4th button (typically the "Browser Back" button)
-                    // 16 : 5th button (typically the "Browser Forward" button)
-                    int mouseBtn = 0;
-                    int.TryParse((OpenSilver.Interop.ExecuteJavaScript("$0.buttons", jsEventArg) ?? 0).ToString(), out mouseBtn);
+                    int mouseBtn;
+                    int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.button", jsEventArg).ToString(), out mouseBtn);
                     if (mouseBtn == 2)
                     {
                         uie.ProcessMouseButtonEvent(
@@ -205,25 +196,35 @@ namespace Windows.UI.Xaml
 
         private static DOMEventManager CreateMouseLeftButtonUpManager(UIElement uie)
         {
+            return new DOMEventManager(
+                () => uie.INTERNAL_OuterDomElement,
+                new string[2] { "mouseup", "touchend" },
+                jsEventArg =>
+                {
+                    // 0: Main button pressed, usually the left button or the un - initialized state
+                    // 1: Auxiliary button pressed, usually the wheel button or the middle button(if present)
+                    // 2: Secondary button pressed, usually the right button
+                    // 3: Fourth button, typically the Browser Back button
+                    // 4: Fifth button, typically the Browser Forward button
+
+                    int mouseBtn;
+                    int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.button", jsEventArg).ToString(), out mouseBtn);
+                    if (mouseBtn == 0)
+                    {
 #if MIGRATION
-            return new DOMEventManager(
-                () => uie.INTERNAL_OuterDomElement,
-                new string[2] { "mouseup", "touchend" },
-                jsEventArg => uie.ProcessMouseButtonEvent(
-                    jsEventArg,
-                    uie.OnMouseLeftButtonUp,
-                    checkForDivsThatAbsorbEvents: true),
-                true);
+                        uie.ProcessMouseButtonEvent(
+                            jsEventArg,
+                            uie.OnMouseLeftButtonUp,
+                            checkForDivsThatAbsorbEvents: true);
 #else
-            return new DOMEventManager(
-                () => uie.INTERNAL_OuterDomElement,
-                new string[2] { "mouseup", "touchend" },
-                jsEventArg => uie.ProcessMouseButtonEvent(
-                    jsEventArg,
-                    uie.OnPointerReleased,
-                    checkForDivsThatAbsorbEvents: true),
-                true);
+                        uie.ProcessMouseButtonEvent(
+                            jsEventArg,
+                            uie.OnPointerReleased,
+                            checkForDivsThatAbsorbEvents: true);
 #endif
+                    }
+                },
+                true);
         }
 
         private static DOMEventManager CreateMouseEnterManager(UIElement uie)

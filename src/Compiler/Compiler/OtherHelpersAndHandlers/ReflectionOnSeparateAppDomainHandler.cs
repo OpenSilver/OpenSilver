@@ -872,8 +872,13 @@ namespace DotNetForHtml5.Compiler
 #endif
                 var contentProperty = Attribute.GetCustomAttribute(type, contentPropertyAttributeType, true);
 
-                if (contentProperty == null && !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny)) //if the element is a collection, it is possible to add the children directly to this element.
+                if (contentProperty == null &&
+                    !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny) &&
+                    !IsElementADictionary(namespaceName, localTypeName, assemblyNameIfAny))
+                {
+                    //if the element is a collection, it is possible to add the children directly to this element.
                     throw new XamlParseException("No default content property exists for element: " + localTypeName.ToString());
+                }
 
                 if (contentProperty == null)
                     return null;
@@ -1108,50 +1113,51 @@ namespace DotNetForHtml5.Compiler
             public bool IsPropertyOrFieldACollection(string propertyOrFieldName, string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
             {
                 Type propertyOrFieldType = GetPropertyOrFieldType(propertyOrFieldName, parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
-                bool typeIsACollection = (typeof(IEnumerable).IsAssignableFrom(propertyOrFieldType) && propertyOrFieldType != typeof(string));
+                bool typeIsACollection = typeof(IList).IsAssignableFrom(propertyOrFieldType)
+                    || typeof(IDictionary).IsAssignableFrom(propertyOrFieldType);
+                
                 return typeIsACollection;
             }
 
             public bool IsPropertyOrFieldADictionary(string propertyName, string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
             {
                 Type propertyOrFieldType = GetPropertyOrFieldType(propertyName, parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
-                bool isTypeTheIDictionayType = propertyOrFieldType.IsGenericType && propertyOrFieldType.GetGenericTypeDefinition() == typeof(IDictionary<,>);
-                bool typeIsADictionary = isTypeTheIDictionayType
-                    || (propertyOrFieldType.GetInterface("IDictionary`2") != null && propertyOrFieldType != typeof(string));
-                //bool typeIsADictionary = (typeof(IDictionary).IsAssignableFrom(propertyOrFieldType) && propertyOrFieldType != typeof(string));
+                bool typeIsADictionary = typeof(IDictionary).IsAssignableFrom(propertyOrFieldType);
+                
                 return typeIsADictionary;
             }
 
             public bool DoesMethodReturnACollection(string methodName, string typeNamespaceName, string localTypeName, string typeAssemblyNameIfAny = null)
             {
                 Type propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
-                bool typeIsACollection = (typeof(IEnumerable).IsAssignableFrom(propertyType) && propertyType != typeof(string));
+                bool typeIsACollection = typeof(IList).IsAssignableFrom(propertyType) ||
+                    typeof(IDictionary).IsAssignableFrom(propertyType);
+                
                 return typeIsACollection;
             }
 
             public bool DoesMethodReturnADictionary(string methodName, string typeNamespaceName, string localTypeName, string typeAssemblyNameIfAny = null)
             {
                 Type propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
-                bool typeIsADictionary = (propertyType.GetInterface("IDictionary`2") != null && propertyType != typeof(string));
-                //bool typeIsADictionary = (typeof(IDictionary).IsAssignableFrom(propertyOrFieldType) && propertyOrFieldType != typeof(string));
+                bool typeIsADictionary = typeof(IDictionary).IsAssignableFrom(propertyType);
+                
                 return typeIsADictionary;
             }
 
             public bool IsElementACollection(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
             {
                 var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
-
-                bool typeIsACollection = (typeof(IEnumerable).IsAssignableFrom(elementType) && elementType != typeof(string));
+                bool typeIsACollection = typeof(IList).IsAssignableFrom(elementType);
+                
                 return typeIsACollection;
             }
 
             public bool IsElementADictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
             {
                 var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
-
-                bool typeIsADictionary = (elementType.GetInterface("IDictionary`2") != null && elementType != typeof(string));
+                bool typeIsADictionary = typeof(IDictionary).IsAssignableFrom(elementType);
+                
                 return typeIsADictionary;
-
             }
 
             public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)

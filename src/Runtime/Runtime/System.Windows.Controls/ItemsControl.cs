@@ -816,15 +816,7 @@ namespace Windows.UI.Xaml.Controls
                 throw new InvalidOperationException("Cannot set both DisplayMemberPath and ItemTemplate.");
             }
 
-            DataTemplate template = null;
-            if (!(item is UIElement))
-            {
-                template = this.ItemTemplate;
-                if (template == null)
-                {
-                    template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
-                }
-            }
+            DataTemplate template = this.SelectTemplate(element, item);
 
             if ((cc = element as ContentControl) != null)
             {
@@ -834,6 +826,25 @@ namespace Windows.UI.Xaml.Controls
             {
                 cp.PrepareContentPresenter(item, template);
             }
+        }
+
+        private DataTemplate SelectTemplate(DependencyObject element, object item)
+        {
+            DataTemplate template = null;
+            if (!(item is UIElement))
+            {
+                template = this.ItemTemplate;
+                if (template == null)
+                {
+                    template = (DataTemplate)ContentPresenter.FindTemplateResourceInternal(element, item);
+                    if (template == null)
+                    {
+                        template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
+                    }
+                }
+            }
+
+            return template;
         }
 
         internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
