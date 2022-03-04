@@ -100,11 +100,7 @@ namespace Windows.UI.Xaml.Controls
                 "AllowedSourceEffects",
                 typeof(DragDropEffects),
                 typeof(DragDropTarget<TItemsControlType, TItemContainerType>),
-#if unsupported
                 new PropertyMetadata(DragDropEffects.Link | DragDropEffects.Move | DragDropEffects.Scroll));
-#else
-                new PropertyMetadata(DragDropEffects.None));
-#endif
         #endregion public DragDropEffects AllowedSourceEffects
 
 
