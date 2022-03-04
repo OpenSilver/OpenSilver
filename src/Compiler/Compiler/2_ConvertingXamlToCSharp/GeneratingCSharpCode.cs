@@ -1935,7 +1935,7 @@ var {4} = {2}.GetValue({1});
                         if (!isChildAProperty) // This will skip for example "<ResourceDictionary.MergedDictionaries>". In fact, if we are inside a <ResourceDictionary></ResourceDictionary>, we want to add all the directly-defined children but not the property ".MergedDictionaries".
                         {
                             string childUniqueName = GetUniqueName(child);
-                            stringBuilder.AppendLine(string.Format("{0}.Add({1});", codeToAccessTheEnumerable, childUniqueName));
+                            stringBuilder.AppendLine($"((global::System.Collections.IList){codeToAccessTheEnumerable}).Add({childUniqueName});");
                         }
                     }
                     break;
@@ -1954,20 +1954,18 @@ var {4} = {2}.GetValue({1});
                             string childKey = GetElementXKey(child, reflectionOnSeparateAppDomain, out isImplicitStyle, out isImplicitDataTemplate);
                             if (isImplicitStyle)
                             {
-                                stringBuilder.AppendLine(string.Format("{0}[typeof({1})] = {2};", codeToAccessTheEnumerable, childKey, childUniqueName));
+                                stringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add(typeof({childKey}), {childUniqueName});");
                             }
                             else if (isImplicitDataTemplate)
                             {
-                                string key = string.Format(
-                                    "new global::{0}.DataTemplateKey(typeof({1}))",
-                                    isSLMigration ? "System.Windows" : "Windows.UI.Xaml",
-                                    childKey);
+                                string swNamespace = isSLMigration ? "System.Windows" : "Windows.UI.Xaml";
+                                string key = $"new global::{swNamespace}.DataTemplateKey(typeof({childKey}))";
 
-                                stringBuilder.AppendLine(string.Format("{0}[{1}] = {2};", codeToAccessTheEnumerable, key, childUniqueName));
+                                stringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add({key}, {childUniqueName});");
                             }
                             else
                             {
-                                stringBuilder.AppendLine(string.Format("{0}[\"{1}\"] = {2};", codeToAccessTheEnumerable, childKey, childUniqueName));
+                                stringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add(\"{childKey}\", {childUniqueName});");
                             }
                         }
                     }
