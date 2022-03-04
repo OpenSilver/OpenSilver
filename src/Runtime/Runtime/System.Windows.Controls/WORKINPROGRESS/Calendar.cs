@@ -92,6 +92,10 @@ namespace Windows.UI.Xaml.Controls
             throw new NotImplementedException();
         }
 
+        /// <summary>Occurs when the <see cref="System.Windows.Controls.Calendar.DisplayDate" /> property is changed.</summary>     
+        [OpenSilver.NotImplemented]
+        public event EventHandler<CalendarDateChangedEventArgs> DisplayDateChanged;
+
         [OpenSilver.NotImplemented]
         public Style CalendarDayButtonStyle { get; set; }
 
@@ -278,5 +282,67 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(nameof(FontSize), typeof(double), typeof(Calendar), new PropertyMetadata(11d));
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the calendar is displayed in months, years, or decades.
+        /// </summary>
+        /// <returns>
+        /// A value indicating what length of time the <see cref="System.Windows.Controls.Calendar" /> should display.
+        /// </returns>        
+        [OpenSilver.NotImplemented]
+        public CalendarMode DisplayMode
+        {
+            get
+            {
+                return (CalendarMode)base.GetValue(DisplayModeProperty);
+            }
+            set
+            {
+                base.SetValue(DisplayModeProperty, value);
+            }
+        }        
+
+        /// <summary>
+        /// Identifies the <see cref="System.Windows.Controls.Calendar.DisplayMode" /> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="System.Windows.Controls.Calendar.DisplayMode" /> dependency property.
+        /// </returns>
+        public static readonly DependencyProperty DisplayModeProperty =
+            DependencyProperty.Register("DisplayMode", typeof(CalendarMode), typeof(Calendar), new PropertyMetadata());
+
+        /// <summary>
+        /// Occurs when the <see cref="System.Windows.Controls.Calendar.DisplayMode" /> property is changed. 
+        /// </summary>       
+        [OpenSilver.NotImplemented]
+        public event EventHandler<CalendarModeChangedEventArgs> DisplayModeChanged;
+
+        /// <summary>
+        /// Gets or sets a value that indicates what kind of selections are allowed.
+        /// </summary>
+        /// <returns>
+        /// A value that indicates the current selection mode. The default is <see cref="System.Windows.Controls.CalendarSelectionMode.SingleDate" />.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public CalendarSelectionMode SelectionMode
+        {
+            get
+            {
+                return (CalendarSelectionMode)base.GetValue(SelectionModeProperty);
+            }
+            set
+            {
+                base.SetValue(SelectionModeProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="System.Windows.Controls.Calendar.SelectionMode" /> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="System.Windows.Controls.Calendar.SelectionMode" /> dependency property.
+        /// </returns>        
+        public static readonly DependencyProperty SelectionModeProperty = 
+            DependencyProperty.Register("SelectionMode", typeof(CalendarSelectionMode), typeof(Calendar), new PropertyMetadata());                
     }
 }
