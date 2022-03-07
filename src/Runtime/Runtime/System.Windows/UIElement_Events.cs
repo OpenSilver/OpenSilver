@@ -137,6 +137,8 @@ namespace Windows.UI.Xaml
             {
                 store.RemoveRoutedEventHandler(routedEvent, handler);
             }
+
+            UnHookRoutedEvent(routedEvent);
         }
 
         private RoutedEventHandlerInfo[] GetRoutedEventHandlers(RoutedEvent key)
