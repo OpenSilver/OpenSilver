@@ -87,6 +87,44 @@ namespace Windows.UI.Xaml
 #endif
         }
 
+
+        protected bool IsInsideAutoOrStarGridRow()
+        {
+            if (Parent == null || !(Parent is Grid))
+                return false;
+
+            var parentGrid = Parent as Grid;
+            var rowNo = Grid.GetRow(this);
+
+            if (parentGrid.RowDefinitions.Count < rowNo + 1)    //row def doesn't exist defaults to a row with star
+                return true;
+
+            var rowDef = parentGrid.RowDefinitions[rowNo];
+            if (rowDef.Height.IsAuto || rowDef.Height.IsStar)
+                return true;
+
+            return false;
+        }
+
+        protected bool IsInsideAutoOrStarGridColumn()
+        {
+            if (Parent == null || !(Parent is Grid))
+                return false;
+
+            var parentGrid = Parent as Grid;
+            var colNo = Grid.GetColumn(this);
+
+            if (parentGrid.ColumnDefinitions.Count < colNo + 1)     //col def doesn't exist defaults to a col with star
+                return true;
+
+            var colDef = parentGrid.ColumnDefinitions[colNo];
+            if (colDef.Width.IsAuto || colDef.Width.IsStar)
+                return true;
+
+            return false;
+        }
+
+
         /// <summary>
         /// Gets or sets the Auto Width to the root of CustomLayout
         /// </summary>
