@@ -68,6 +68,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         bool _htmlHasBeenLoaded = false;
         Assembly _entryPointAssembly;
         Type _applicationType;
+        SimulatorLaunchParameters _simulatorLaunchParameters;
         CompilationState _compilationState = CompilationState.Initializing;
         string _compilationLog;
         string _outputRootPath;
@@ -131,6 +132,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
 #if OPENSILVER
             _applicationType = userApplicationType ?? throw new ArgumentNullException(nameof(userApplicationType));
+            _simulatorLaunchParameters = simulatorLaunchParameters;
             ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out _coreAssembly);
             _entryPointAssembly = _applicationType.Assembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
@@ -641,6 +643,12 @@ ends with "".Browser"" in your solution.";
                 Dispatcher.BeginInvoke((Action)(() =>
                 {
                     bool success = StartApplication();
+
+                    if (success)
+                    {
+                        _simulatorLaunchParameters?.AppStartedCallback?.Invoke();
+                    }
+
                     HideLoadingMessage();
 
                     UpdateWebBrowserAndWebPageSizeBasedOnCurrentState();
