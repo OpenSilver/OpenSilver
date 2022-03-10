@@ -236,6 +236,10 @@ namespace Windows.UI.Xaml.Controls
 
                 if (!newDate.HasValue)
                 {
+                    // Clean DataPickerTextBox before setting watermark text
+                    if (datePicker._textBox != null)
+                        datePicker._textBox.Text = string.Empty;
+
                     datePicker.SetWaterMarkText();
                 }
                 else
