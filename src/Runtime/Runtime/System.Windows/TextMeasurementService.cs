@@ -106,14 +106,28 @@ namespace Windows.UI.Xaml
 
             associatedTextBox = new TextBox();
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBox, parent);
+
+            bool hasMarginDiv = false;
+            if (associatedTextBox.INTERNAL_AdditionalOutsideDivForMargins != null)
+            {
+                hasMarginDiv = true;
+
+                var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(associatedTextBox.INTERNAL_AdditionalOutsideDivForMargins);
+                wrapperDivStyle.position = "absolute";
+                wrapperDivStyle.visibility = "hidden";
+                wrapperDivStyle.left = "-100000px";
+                wrapperDivStyle.top = "-100000px";
+            }
+
             textBoxReference = associatedTextBox.INTERNAL_OuterDomElement;
             textBoxDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBoxReference);
             textBoxDivStyle.position = "absolute";
             textBoxDivStyle.visibility = "hidden";
             textBoxDivStyle.height = "";
             textBoxDivStyle.width = "";
-            textBoxDivStyle.top = "0px";
             textBoxDivStyle.borderWidth = "1";
+            textBoxDivStyle.left = hasMarginDiv ? "0px" : "-100000px";
+            textBoxDivStyle.top = hasMarginDiv ? "0px" : "-100000px";
 
             measureTextBoxElementID = ((INTERNAL_HtmlDomElementReference)textBoxReference).UniqueIdentifier;
 
@@ -125,16 +139,32 @@ namespace Windows.UI.Xaml
 
             associatedTextBlock = new TextBlock();
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBlock, parent);
+
+            hasMarginDiv = false;
+            if (associatedTextBlock.INTERNAL_AdditionalOutsideDivForMargins != null)
+            {
+                hasMarginDiv = true;
+
+                var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(associatedTextBlock.INTERNAL_AdditionalOutsideDivForMargins);
+                wrapperDivStyle.position = "absolute";
+                wrapperDivStyle.visibility = "hidden";
+                wrapperDivStyle.left = "-100000px";
+                wrapperDivStyle.top = "-100000px";
+            }
+
             textBlockReference = associatedTextBlock.INTERNAL_OuterDomElement;
             textBlockDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBlockReference);
             textBlockDivStyle.position = "absolute";
             textBlockDivStyle.visibility = "hidden";
             textBlockDivStyle.height = "";
             textBlockDivStyle.width = "";
-            textBlockDivStyle.top = "100px";
             textBlockDivStyle.borderWidth = "1";
             textBlockDivStyle.whiteSpace = "pre";
+            textBlockDivStyle.left = hasMarginDiv ? "0px" : "-100000px";
+            textBlockDivStyle.top = hasMarginDiv ? "0px" : "-100000px";
+
             associatedTextBlock.Text = "A";
+
             measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.measureTextBlockElement=$0", textBlockReference);
         }
