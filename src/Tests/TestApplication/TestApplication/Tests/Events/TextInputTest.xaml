@@ -30,7 +30,7 @@
         <TextBlock Text="Press any key when focus on button: event should fire for non editable elements" Margin="0,10,0,0" />
         <Button x:Name="button2" Content="type when I'm focused" Width="150" Height="30"/>
 
-        <TextBlock Text="Press any key when focus on button: event other handlers should still fire with OnTextInput and even with e.Handled=true before calling base" Margin="0,10,0,0" />
+        <TextBlock Text="Press any key when focus on button: event other handlers should still fire after OnTextInput and even with e.Handled=true before calling base" Margin="0,10,0,0" />
         <local:XButton x:Name="button3" Content="type when I'm focused" Width="150" Height="30"/>
         
         <Button x:Name="button1" Content="Clear" Width="100" Height="30" Margin="0,20,0,0"/>
