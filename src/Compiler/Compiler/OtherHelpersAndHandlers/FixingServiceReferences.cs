@@ -452,12 +452,19 @@ namespace DotNetForHtml5.Compiler
                 //Make a dictionary to know the parameters from the name:
                 //todo-perf: this and the "check the amount of parameters and adapt the body replacement:" part may be a bit redundant since they're both about the parameters of the method so we might be able to make the compilation slightly faster by changing this (probably unnoticeable).
                 Dictionary<string, string> parameterNamesToTheirDefinitions = new Dictionary<string, string>();
+                Dictionary<string, string> outParamDefinations = new Dictionary<string, string>();
                 if (!string.IsNullOrWhiteSpace(methodParametersDefinitions))
                 {
                     string[] splittedMethodParametersDefinition = SplitStringTakingAccountOfBrackets(methodParametersDefinitions, ',');
                     foreach (string parameterDefinition in splittedMethodParametersDefinition)
                     {
                         string paramDefinition = parameterDefinition.Trim();
+                        bool isOutParam = false;
+                        if (paramDefinition.StartsWith("out "))
+                        {
+                            paramDefinition = paramDefinition.Remove(0, 4);
+                            isOutParam = true;
+                        }
                         string[] splittedParamDefinition = SplitStringTakingAccountOfBrackets(paramDefinition, ' ');
                         //Note on the line above: very improbable scenario that would lead to problems: if the guy writes Paramtype1\r\nParamName (see it as a new line, not the actual characters)
                         bool isParameterTypeGotten = false;
@@ -479,6 +486,10 @@ namespace DotNetForHtml5.Compiler
                             }
                         }
 
+                        if (isOutParam)
+                        {
+                            outParamDefinations.Add(parameterName, parameterTypeAsString);
+                        }
                         parameterNamesToTheirDefinitions.Add(parameterName, string.Format(@"{0}", parameterName));
                     }
                 }
@@ -487,11 +498,17 @@ namespace DotNetForHtml5.Compiler
                 string newBody = "";
                 if (thereAreParameters)
                 {
-                    string parametersDictionaryDefinition = "new global::System.Collections.Generic.Dictionary<string, object>() {";
+                    string parametersDictionaryDefinition = "var data = new global::System.Collections.Generic.Dictionary<string, object>() {";
                     bool isFirst = true;
                     foreach (string paramName in splittedParameters)
                     {
                         string trimmedParamName = paramName.Trim();
+                        bool isOutParam = false;
+                        if (paramName.StartsWith("out "))
+                        {
+                            isOutParam = true;
+                            trimmedParamName = trimmedParamName.Remove(0, 4);
+                        }
 
                         if (trimmedParamName == "null") continue;
 
@@ -509,17 +526,32 @@ namespace DotNetForHtml5.Compiler
                         parametersDictionaryDefinition +=
                             string.Format("{{ \"{0}\", {1} }}",
                                           trimmedParamName,
-                                          parameterDefinition);
+                                          isOutParam ? "null" : parameterDefinition);
                         isFirst = false;
                     }
-                    parametersDictionaryDefinition += "}";
+                    parametersDictionaryDefinition += "};" + Environment.NewLine;
 
+                    string outParamString = String.Empty;
+                    if (outParamDefinations.Count > 0)
+                    {
+                        foreach (var defination in outParamDefinations)
+                        {
+                            outParamString += String.Format(Environment.NewLine + "{0} = data[\"{0}\"] as {1};", defination.Key, defination.Value);
+                        }
+                    }
+
+                    string bodyFormat = @"
+            {4}{6}System.ServiceModel.INTERNAL_WebMethodsCaller.{8}CallWebMethod{0}{7}<{1}{2}>({9}, ""{3}"", data, ""{10}"");{11}"; 
+                    if ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType)) 
+                    {
+                        bodyFormat = @"
+            {4}            var webMethodResult = System.ServiceModel.INTERNAL_WebMethodsCaller.{8}CallWebMethod{0}{7}<{1}{2}>({9}, ""{3}"", data, ""{10}"");{11}
+            return webMethodResult;
+        ";
+                    }
                     newBody = string.Format(
 
-    @"
-            {6}System.ServiceModel.INTERNAL_WebMethodsCaller.{8}CallWebMethod{0}{7}
-                <{1}{2}>({9}, ""{3}"", {4}, ""{10}"");
-",
+    bodyFormat,
      ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.AsyncWithReturnType) ? "Async" : string.Empty),
      ((methodType == MethodType.AsyncWithReturnType || methodType == MethodType.NotAsyncWithReturnType || methodType == MethodType.AsyncBegin || methodType == MethodType.AsyncEndWithReturnType) ? returnType + ", " : ""),
      interfaceType,
@@ -530,7 +562,7 @@ namespace DotNetForHtml5.Compiler
      ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : ""),
      ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : "")),
      endpointCode,
-     soapVersion
+     soapVersion, outParamString
      );
                 }
                 else //case where there are no parameters
