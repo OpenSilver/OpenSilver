@@ -1,0 +1,24 @@
+﻿<sdk:Page
+    x:Class="TestApplication.Tests.Events.KeyDownTest"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:TestApplication.Tests.Events"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Press Left arrow key when cursor not at first position: nothing should happen" Margin="0,10,0,0" />
+        <TextBox x:Name="box1" Text="box1" Width="100" Height="50"/>
+        <TextBlock Text="Press Right arrow key when cursor not at last position: nothing should happen" Margin="0,10,0,0" />
+        <TextBox x:Name="box2" Text="box2" Width="100" Height="50"/>
+        <TextBlock Text="Press Left or Right arrow keys when cursor not at first or last position: event fires with handledeventstoo" Margin="0,10,0,0" />
+        <TextBox x:Name="box3" Text="box3" Width="100" Height="50"/>
+        <StackPanel>
+            <TextBlock x:Name="blockx" Text="Press Left or Right arrow keys when cursor not at first or last position: event fires with OnKeyDown" Margin="0,10,0,0" />
+            <local:XTextBox x:Name="boxx" Text="boxx" Width="100" Height="50"/>
+        </StackPanel>
+        <Button x:Name="button1" Content="Clear" Width="100" Height="50" Margin="0,20,0,0"/>
+
+        <TextBlock Name="blockMsg" Margin="0,100,0,0" Foreground="Orange"/>
+    </StackPanel>
+
+</sdk:Page>
