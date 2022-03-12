@@ -153,9 +153,8 @@ namespace CSHTML5.Types
         }
 
         public static explicit operator bool(INTERNAL_JSObjectReference input)
-
         {
-            return input.IsUndefined() ? false : Convert.ToBoolean(input.GetActualValue());
+            return Convert.ToBoolean(input.GetActualValue());
         }
 
         public static explicit operator byte(INTERNAL_JSObjectReference input)
@@ -237,7 +236,7 @@ namespace CSHTML5.Types
 
         public bool ToBoolean(IFormatProvider provider)
         {
-            return IsUndefined() ? false : Convert.ToBoolean(this.GetActualValue());
+            return Convert.ToBoolean(this.GetActualValue());
         }
 
         public byte ToByte(IFormatProvider provider)
