@@ -42,7 +42,7 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
         static Dictionary<string, object> OrphanPopups = new Dictionary<string, object>();
 
         //Holds the currently opened popups that has false StayOpen
-        public static List<Popup> AutoCloseOpenedPopups { get; set; } = new List<Popup>();
+        public static List<Popup> AutoCloseOpenedPopups { get; } = new List<Popup>();
 
 #if MIGRATION
         internal static void OnClickOnPopupOrWindow(object sender, MouseButtonEventArgs e)
