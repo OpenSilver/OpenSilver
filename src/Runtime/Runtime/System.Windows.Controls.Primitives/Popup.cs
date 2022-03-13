@@ -20,7 +20,7 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using CSHTML5;
+
 
 #if MIGRATION
 using System.Windows.Media;
