@@ -853,7 +853,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             INTERNAL_OuterDomElement = INTERNAL_InnerDomElement = popupDiv;
 
-            INTERNAL_PopupsManager.TrackOrphanPopup(uniquePopupId, this);
+            INTERNAL_PopupsManager.OrphanPopups.Add(this);
         }
     }
 }

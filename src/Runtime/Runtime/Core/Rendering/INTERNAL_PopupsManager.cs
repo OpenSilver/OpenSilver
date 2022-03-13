@@ -39,7 +39,7 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
 {
     internal static class INTERNAL_PopupsManager // Important! DO NOT RENAME this class without updating the Simulator as well! // Note: this class is "internal" but still visible to the Emulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
     {
-        static Dictionary<string, object> OrphanPopups = new Dictionary<string, object>();
+        public static List<Popup> OrphanPopups { get; } = new List<Popup>();
 
         //Holds the currently opened popups that has false StayOpen
         public static List<Popup> AutoCloseOpenedPopups { get; } = new List<Popup>();
@@ -58,11 +58,6 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
             AutoCloseOpenedPopups.RemoveAll(p => p != sender);
         }
 
-        internal static void TrackOrphanPopup(string uniquePopupId, Popup popup)
-        {
-            OrphanPopups.Add(uniquePopupId, popup);
-        }
-
         public static IEnumerable GetAllRootUIElements() // IMPORTANT: This is called via reflection from the "Visual Tree Inspector" of the Simulator. If you rename or remove it, be sure to update the Simulator accordingly!
         {
             // Include the main window:
@@ -73,7 +68,7 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
 #if BRIDGE
                 INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(PopupRootIdentifierToInstance)
 #else
-                OrphanPopups.Values
+                OrphanPopups
 #endif
                 )
             {
