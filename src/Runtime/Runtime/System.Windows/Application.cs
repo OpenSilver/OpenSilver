@@ -129,7 +129,7 @@ namespace Windows.UI.Xaml
 
                 // Listen to clicks anywhere in the window (this is used to close the popups that are not supposed to stay open):
 #if MIGRATION
-                _mainWindow.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnWindow), true);
+                _mainWindow.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
 #else
                 _mainWindow.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnWindow), true);
 #endif

@@ -347,25 +347,20 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        //ams->
-        //private static void Popup_PopupMoved(object sender, EventArgs e)
-        //{
-        //    Popup popup = (Popup)sender;
-        //    PopupRoot popupRoot = popup.PopupRoot;
+        private static void Popup_PopupMoved(object sender, EventArgs e)
+        {
+            Popup popup = (Popup)sender;
 
-        //    // Hide the popup if the parent element is not visible (for example, if the 
-        //    // user scrolls and the TextBox becomes hidden under another control, cf. ZenDesk #628):
-        //    if (popup.PlacementTarget is FrameworkElement && popupRoot != null)
-        //    {
-        //        bool isParentVisible = INTERNAL_PopupsManager.IsPopupParentVisibleOnScreen(popup);
+            // Hide the popup if the parent element is not visible (for example, if the 
+            // user scrolls and the TextBox becomes hidden under another control, cf. ZenDesk #628):
+            if (popup.PlacementTarget is FrameworkElement && popup.Child != null)
+            {
+                bool isParentVisible = INTERNAL_PopupsManager.IsPopupParentVisibleOnScreen(popup);
 
-        //        popupRoot.Visibility = (isParentVisible ? Visibility.Visible : Visibility.Collapsed);
+                popup.IsOpen = isParentVisible;
 
-        //    }
-        //}
-
-
-
+            }
+        }
 
         #region to be implemented
 

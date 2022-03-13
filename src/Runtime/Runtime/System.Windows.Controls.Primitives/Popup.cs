@@ -20,6 +20,7 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CSHTML5;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -28,6 +29,7 @@ using System.Windows.Data;
 using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -57,6 +59,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal bool _isOrphan;
         private double _left, _top;
+        private static int _OrphanPopupIndentifier;
 
         ControlToWatch _controlToWatch; //Note: this is set when the popup is attached to an UIElement, so that we can remove it from the timer for refreshing the position of the popup when needed.
 
@@ -65,6 +68,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal Popup ParentPopup { get; private set; }
 
+        public Popup()
+        {
+            Loaded += Popup_Loaded;
+#if MIGRATION
+            AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
+#else
+            AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
+#endif
+        }
 
         /// <summary>
         /// Occurs when the System.Windows.Controls.Primitives.Popup.IsOpen property changes to true.
@@ -215,13 +227,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 popup.AddLogicalChild(newContent);
             }
 
-            // Create a surrounding wrapper to enable positioning and alignment: //add once and keep empty until popup opened
-            if (popup._childWrapper == null)
-            {
-                popup._childWrapper = new ContentPresenter();
-                popup.AddVisualChild(popup._childWrapper);
-                popup.Loaded += Popup_Loaded;
-            }
+            popup.CreateChildWrapper();
 
             if (popup._isVisible)
             {
@@ -235,6 +241,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // becomes visible (cf. method
                 // "ShowPopupIfNotAlreadyVisible").
                 //-----------------------------------------------------
+            }
+        }
+
+        private void CreateChildWrapper()
+        {
+            // Create a surrounding wrapper to enable positioning and alignment
+            if (_childWrapper == null)
+            {
+                _childWrapper = new ContentPresenter();
+                AddVisualChild(_childWrapper);
             }
         }
 
@@ -569,27 +585,24 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (!_isVisible)
             {
+                // Create a surrounding wrapper to enable positioning and alignment
+                CreateChildWrapper();
+
                 // Get the window that is supposed to contain the popup:
-                Window parentWindow = GetParentWindowOfPopup();
+                Window parentWindow = Application.Current.MainWindow;
+                INTERNAL_ParentWindow = parentWindow;
 
                 //handle the orphan popup ex. declared in code by new Popup() and not added to any container
                 if (Parent == null && VisualTreeHelper.GetParent(this) == null)
                 {
                     _isOrphan = true;
-                    parentWindow.AddVisualChild(this);
-                    INTERNAL_ParentWindow = parentWindow;
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this, parentWindow);
+
+                    AttachToDomElementWhenOrphan();
                 }
 
                 //---------------------
                 // Show the Popup:
                 //---------------------
-
-                if (!StayOpen)
-                {
-                    INTERNAL_PopupsManager.CurrentAutoCloseOpenedPopup = this;
-                }
-
                 if (_childWrapper.Content != null)
                 {
                     _childWrapper.Visibility = Visibility.Visible;
@@ -634,14 +647,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+        //private void _childWrapper_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    _childWrapperDomElement = _childWrapper.INTERNAL_AdditionalOutsideDivForMargins;
+        //    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_childWrapperDomElement).position = "fixed";
+        //    PositionChildWrapperDiv(_left, _top);
+        //}
+
         private void HidePopupIfVisible()
         {
             if (_isVisible)
             {
-                if (!StayOpen)
-                {
-                    INTERNAL_PopupsManager.CurrentAutoCloseOpenedPopup = null;
-                }
                 //---------------------
                 // If the popup being closed is the one with the highest zIndex, we decrement it to reduce the chances of reaching the maximum value:
                 //---------------------
@@ -700,7 +716,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public bool StayOpen
         {
             get { return _stayOpen; }
-            set { _stayOpen = value; }
+            set
+            {
+                if (!value && _stayOpen)
+                    INTERNAL_PopupsManager.AutoCloseOpenedPopups.Add(this);
+
+                if (value && !_stayOpen)
+                    INTERNAL_PopupsManager.AutoCloseOpenedPopups.Remove(this);
+
+                _stayOpen = value;
+            }
         }
 
 
@@ -791,6 +816,44 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_childWrapperDomElement).left = $"{x}px";
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_childWrapperDomElement).top = $"{y}px";
             }
+        }
+
+        private void AttachToDomElementWhenOrphan()
+        {
+            // Generate a unique identifier for the orphan Popup:
+            string uniquePopupId = "Popup_" + (++_OrphanPopupIndentifier).ToString();
+
+            //--------------------------------------
+            // Create a DIV for the Popup the DOM tree:
+            //--------------------------------------
+
+            CSHTML5.Interop.ExecuteJavaScriptAsync(
+                                                @"
+                                                var popupRoot = document.createElement('div');
+                                                popupRoot.setAttribute('id', $0);
+                                                popupRoot.style.position = 'absolute';
+                                                popupRoot.style.width = '100%';
+                                                popupRoot.style.height = '100%';
+                                                popupRoot.style.overflowX = 'hidden';
+                                                popupRoot.style.overflowY = 'hidden';
+                                                popupRoot.style.pointerEvents = 'none';
+                                                $1.appendChild(popupRoot);
+                                                ", uniquePopupId, Window.Current.INTERNAL_RootDomElement);
+
+            object popupDiv;
+
+#if OPENSILVER
+            if (true)
+#elif BRIDGE
+            if (Interop.IsRunningInTheSimulator)
+#endif
+                popupDiv = new INTERNAL_HtmlDomElementReference(uniquePopupId, null);
+            else
+                popupDiv = OpenSilver.Interop.ExecuteJavaScriptAsync("document.getElementByIdSafe($0)", uniquePopupId);
+
+            INTERNAL_OuterDomElement = INTERNAL_InnerDomElement = popupDiv;
+
+            INTERNAL_PopupsManager.TrackOrphanPopup(uniquePopupId, this);
         }
     }
 }

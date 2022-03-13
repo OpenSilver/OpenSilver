@@ -39,28 +39,28 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
 {
     internal static class INTERNAL_PopupsManager // Important! DO NOT RENAME this class without updating the Simulator as well! // Note: this class is "internal" but still visible to the Emulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
     {
-        static int CurrentPopupRootIndentifier = 0;
-        static Dictionary<string, object> PopupRootIdentifierToInstance = new Dictionary<string, object>();
+        static Dictionary<string, object> OrphanPopups = new Dictionary<string, object>();
 
-        //Holds the currently opened popup that has false StayOpen, only one exists at any given time
-        public static Popup CurrentAutoCloseOpenedPopup { get; set; }
+        //Holds the currently opened popups that has false StayOpen
+        public static List<Popup> AutoCloseOpenedPopups { get; set; } = new List<Popup>();
 
 #if MIGRATION
-        internal static void OnClickOnWindow(object sender, MouseButtonEventArgs e)
+        internal static void OnClickOnPopupOrWindow(object sender, MouseButtonEventArgs e)
 #else
-        internal static void OnClickOnWindow(object sender, PointerRoutedEventArgs e)
+        internal static void OnClickOnPopupOrWindow(object sender, PointerRoutedEventArgs e)
 #endif
         {
             // Note: If a popup has StayOpen=True, the value of "StayOpen" of its parents is ignored.
             // In other words, the parents of a popup that has StayOpen=True will always stay open
             // regardless of the value of their "StayOpen" property.
 
-            //check if the mouse is inside the currently opened popup
-            var mousePosition = new Point(e._pointerAbsoluteX, e._pointerAbsoluteY);
-            var clickedElements = VisualTreeHelper.FindElementsInHostCoordinates(mousePosition, CurrentAutoCloseOpenedPopup);
+            AutoCloseOpenedPopups.Where(p => p != sender).ForEach(p => p.CloseFromAnOutsideClick());
+            AutoCloseOpenedPopups.RemoveAll(p => p != sender);
+        }
 
-            if (CurrentAutoCloseOpenedPopup != null && clickedElements.Count() == 0)
-                CurrentAutoCloseOpenedPopup.CloseFromAnOutsideClick();
+        internal static void TrackOrphanPopup(string uniquePopupId, Popup popup)
+        {
+            OrphanPopups.Add(uniquePopupId, popup);
         }
 
         public static IEnumerable GetAllRootUIElements() // IMPORTANT: This is called via reflection from the "Visual Tree Inspector" of the Simulator. If you rename or remove it, be sure to update the Simulator accordingly!
@@ -69,15 +69,15 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
             yield return Window.Current;
 
             // And all the popups:
-            foreach (var popupRoot in
+            foreach (var popup in
 #if BRIDGE
                 INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(PopupRootIdentifierToInstance)
 #else
-                PopupRootIdentifierToInstance.Values
+                OrphanPopups.Values
 #endif
                 )
             {
-                yield return popupRoot;
+                yield return popup;
             }
         }
 
