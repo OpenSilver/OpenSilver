@@ -108,10 +108,10 @@ window.onCallBack = (function() {
 	return {
 		OnCallbackFromJavaScript : function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue) {
 			let formattedArgs = prepareCallbackArgs(callbackArgsObject);
-				const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
-				if (returnValue) {
-					return res;
-				}
+			const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
+			if (returnValue) {
+				return res;
+			}
 		},
 		
 		OnCallbackFromJavaScriptError : function (idWhereCallbackArgsAreStored) {
@@ -134,7 +134,7 @@ window.callJS = function (javaScriptToExecute) {
     else {
         //console.log("not supported");
 		if (resultType === 'undefined')
-			return BINDING.js_to_mono_obj("[UNDEFINED]");
+			return "[UNDEFINED]";
 		else
 			return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
     }
@@ -149,7 +149,7 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     }
     else {
 		if (resultType === 'undefined')
-			return BINDING.js_to_mono_obj("[UNDEFINED]");
+			BINDING.js_to_mono_obj("[UNDEFINED]");
 		else
 			return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
