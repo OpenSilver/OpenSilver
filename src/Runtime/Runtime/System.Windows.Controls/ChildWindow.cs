@@ -857,6 +857,8 @@ namespace Windows.UI.Xaml.Controls
                     {
                         Application.Current.RootVisual.GotFocus -= new RoutedEventHandler(this.RootVisual_GotFocus);
                     }
+
+                    this.OnLayoutUpdated();
                 }
             }
             else
@@ -1305,6 +1307,7 @@ namespace Windows.UI.Xaml.Controls
                 this.Focus();
             }
 #endif
+            this.OnLayoutUpdated();
         }
 
 #if SILVERLIGHT
