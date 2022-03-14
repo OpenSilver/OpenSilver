@@ -484,7 +484,7 @@ namespace System.ServiceModel
                 Action<string> callback,
                 string soapVersion)
             {
-                BeginCallWebMethod(webMethodName, interfaceType, methodReturnType, "", originalRequestObject,
+                BeginCallWebMethod(webMethodName, interfaceType, methodReturnType, null, "", originalRequestObject,
                     callback, soapVersion);
             }
 
@@ -498,7 +498,7 @@ namespace System.ServiceModel
                 Action<string> callback,
                 string soapVersion)
             {
-                BeginCallWebMethod(webMethodName, interfaceType, methodReturnType,
+                BeginCallWebMethod(webMethodName, interfaceType, methodReturnType, null,
                     GetEnvelopeHeaders(outgoingMessageHeaders?.ToList(), soapVersion), originalRequestObject,
                     callback, soapVersion);
             }
@@ -513,51 +513,19 @@ namespace System.ServiceModel
                 Action<string> callback,
                 string soapVersion)
             {
-                MethodInfo method = ResolveMethod(interfaceType, webMethodName, "Begin" + webMethodName);
-                bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
-
-                Dictionary<string, string> headers;
-                string request;
-                PrepareRequest(
-                    webMethodName,
-                    method,
-                    interfaceType,
-                    methodReturnType,
-                    messageHeaders,
-                    originalRequestObject,
-                    soapVersion,
-                    isXmlSerializer,
-                    out headers,
-                    out request);
-
-                Uri address = INTERNAL_UriHelper.EnsureAbsoluteUri(_addressOfService);
-
-                // Make the actual web service call
-                _webRequestHelper_JSVersion.MakeRequest(
-                    address,
-                    "POST",
-                    this,
-                    headers,
-                    request,
-                    (sender, e) =>
-                    {
-                        string xmlReturnedFromTheServer = e.Result;
-                        callback(xmlReturnedFromTheServer);
-                    },
-                    true,
-                    Application.Current.Host.Settings.DefaultSoapCredentialsMode);
+                BeginCallWebMethod(webMethodName, interfaceType, methodReturnType, null,
+                    messageHeaders, originalRequestObject, callback, soapVersion);
             }
 
-
             public void BeginCallWebMethod(
-               string webMethodName,
-               Type interfaceType,
-               Type methodReturnType,
-               IReadOnlyList<Type> knownTypes,
-               string messageHeaders,
-               IDictionary<string, object> originalRequestObject,
-               Action<string> callback,
-               string soapVersion)
+                string webMethodName,
+                Type interfaceType,
+                Type methodReturnType,
+                IReadOnlyList<Type> knownTypes,
+                string messageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                Action<string> callback,
+                string soapVersion)
             {
                 MethodInfo method = ResolveMethod(interfaceType, webMethodName, "Begin" + webMethodName);
                 bool isXmlSerializer = IsXmlSerializer(webMethodName, methodReturnType, method);
@@ -784,6 +752,7 @@ namespace System.ServiceModel
                     method,
                     interfaceType,
                     methodReturnType,
+                    null,
                     outgoingMessageHeadersString,
                     originalRequestObject,
                     soapVersion,
@@ -847,6 +816,7 @@ namespace System.ServiceModel
                     interfaceType,
                     methodReturnType,
                     null,
+                    "",
                     originalRequestObject,
                     soapVersion,
                     isXmlSerializer,
@@ -939,6 +909,7 @@ namespace System.ServiceModel
                     method,
                     interfaceType,
                     methodReturnType,
+                    null,
                     "",
                     originalRequestObject,
                     soapVersion,
@@ -1034,6 +1005,7 @@ namespace System.ServiceModel
                     method,
                     interfaceType,
                     methodReturnType,
+                    null,
                     outgoingMessageHeadersString,
                     originalRequestObject,
                     soapVersion,
@@ -1159,29 +1131,13 @@ namespace System.ServiceModel
                 MethodInfo method, // method to look for in 'interfaceType'
                 Type interfaceType,
                 Type methodReturnType,
+                IReadOnlyList<Type> knownTypes,
                 string envelopeHeaders,
                 IDictionary<string, object> requestParameters,
                 string soapVersion,
                 bool isXmlSerializer,
                 out Dictionary<string, string> headers,
                 out string request)
-            {
-                PrepareRequest(webMethodName, method, interfaceType, methodReturnType, null, envelopeHeaders, requestParameters, soapVersion, isXmlSerializer, out headers, out request);
-            }
-
-
-            private void PrepareRequest(
-    string webMethodName, // webMethod
-    MethodInfo method, // method to look for in 'interfaceType'
-    Type interfaceType,
-    Type methodReturnType,
-    IReadOnlyList<Type> knownTypes,
-    string envelopeHeaders,
-    IDictionary<string, object> requestParameters,
-    string soapVersion,
-    bool isXmlSerializer,
-    out Dictionary<string, string> headers,
-    out string request)
             {
                 headers = new Dictionary<string, string>();
                 string requestFormat = null;
@@ -1275,17 +1231,10 @@ namespace System.ServiceModel
                         object requestBody = requestParameters[parameterInfos[i].Name];
                         if (requestBody != null)
                         {
-                            //we serialize the body of the request
-                            //get the known types from the interface type
-                            IEnumerable<Type> serviceKnownTypes =
+                            var types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
+                            types.AddRange(
                                 interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true)
-                                             .Select(o => ((ServiceKnownTypeAttribute)o).Type);
-
-                            List<Type> types = new List<Type>(knownTypes ?? Enumerable.Empty<Type>());
-                            foreach (Type t in serviceKnownTypes)
-                            {
-                                types.Add(t);
-                            }
+                                             .Select(o => ((ServiceKnownTypeAttribute)o).Type));
 
                             DataContractSerializerCustom dataContractSerializer =
                                 new DataContractSerializerCustom(
@@ -1504,7 +1453,7 @@ namespace System.ServiceModel
                                          attr.Name == name.LocalName :
                                          type.Name == name.LocalName;
 
-                            if (nameMatch)
+                            if(nameMatch)
                             {
                                 bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
                                     attr.Namespace == name.NamespaceName :

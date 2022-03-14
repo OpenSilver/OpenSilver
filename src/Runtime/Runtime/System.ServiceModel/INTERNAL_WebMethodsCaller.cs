@@ -208,21 +208,21 @@ namespace System.ServiceModel
         }
 
         public static IAsyncResult BeginCallWebMethod<INTERFACE_TYPE>(
-           string endpointAddress,
-           string webMethodName,
-           Type methodReturnType,
-           string messageHeaders,
+            string endpointAddress,
+            string webMethodName,
+            Type methodReturnType,
+            string messageHeaders,
             IDictionary<string, object> requestParameters,
-        string soapVersion) where INTERFACE_TYPE : class
+            string soapVersion) where INTERFACE_TYPE : class
         {
             return BeginCallWebMethod<INTERFACE_TYPE>(
-              endpointAddress,
-              webMethodName,
-              methodReturnType,
-              null,
-              messageHeaders,
-              requestParameters,
-              soapVersion);
+                endpointAddress,
+                webMethodName,
+                methodReturnType,
+                null,
+                messageHeaders,
+                requestParameters,
+                soapVersion);
         }
 
         public static IAsyncResult BeginCallWebMethod<INTERFACE_TYPE>(
@@ -236,6 +236,7 @@ namespace System.ServiceModel
                 endpointAddress,
                 webMethodName,
                 methodReturnType,
+                null,
                 "",
                 requestParameters,
                 soapVersion);
@@ -251,6 +252,8 @@ namespace System.ServiceModel
                 endpointAddress,
                 webMethodName,
                 typeof(RETURN_TYPE),
+                null,
+                "",
                 requestParameters,
                 soapVersion);
         }
