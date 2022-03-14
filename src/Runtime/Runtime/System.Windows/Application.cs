@@ -131,7 +131,7 @@ namespace Windows.UI.Xaml
 #if MIGRATION
                 _mainWindow.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
 #else
-                _mainWindow.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnWindow), true);
+                _mainWindow.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
 #endif
 
 #if !CSHTML5NETSTANDARD
