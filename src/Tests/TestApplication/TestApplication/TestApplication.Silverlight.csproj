@@ -183,9 +183,16 @@
     <Compile Include="Tests\Events\GridWithMultipleElementsTest.xaml.cs">
       <DependentUpon>GridWithMultipleElementsTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\Events\KeyDownTest.xaml.cs">
+      <DependentUpon>KeyDownTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\Events\TextChangedTest.xaml.cs">
       <DependentUpon>TextChangedTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\Events\TextInputTest.xaml.cs">
+      <DependentUpon>TextInputTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tests\Events\XTextBox.cs" />
     <Compile Include="Tests\FileInfoTest.xaml.cs">
       <DependentUpon>FileInfoTest.xaml</DependentUpon>
     </Compile>
@@ -463,9 +470,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Tests\Events\KeyDownTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Tests\Events\TextChangedTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\Events\TextInputTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tests\FileInfoTest.xaml">
       <SubType>Designer</SubType>

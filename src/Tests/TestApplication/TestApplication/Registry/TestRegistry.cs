@@ -34,6 +34,8 @@ namespace TestApplication
             events.Add(new Test("Attach/Detach", "Events/AttachDetach"));
             events.Add(new Test("TextChanged", "Events/TextChanged"));
             events.Add(new Test("Focus", "Events/Focus"));
+            events.Add(new Test("KeyDown", "Events/KeyDown"));
+            events.Add(new Test("TextInput", "Events/TextInput"));
             Tests.Add(events);
 
             Tests.Add(new Test("Templated TextBox", "TemplatedTextBox"));

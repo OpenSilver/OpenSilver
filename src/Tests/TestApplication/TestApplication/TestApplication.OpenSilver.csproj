@@ -17,6 +17,11 @@
     <Compile Include="Converters\BooleanVisibilityConverter.cs" />
     <Compile Include="HintBehavior.cs" />
     <Compile Include="LinqSamples.cs" />
+    <Compile Include="Tests\Events\TextInputTest.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests\Events\KeyDownTest.xaml.cs" />
+    <Compile Include="Tests\Events\XTextBox.cs" />
     <Compile Include="Tests\PrintDocumentTest.xaml.cs" />
     <Compile Include="Registry\ITreeItem.cs" />
     <Compile Include="Registry\Test.cs" />
@@ -598,6 +603,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Tests\Events\TextInputTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\Events\KeyDownTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tests\PrintDocumentTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
