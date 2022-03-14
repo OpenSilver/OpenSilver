@@ -149,7 +149,7 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     }
     else {
         if (resultType === 'undefined')
-            BINDING.js_to_mono_obj("[UNDEFINED]");
+            return BINDING.js_to_mono_obj("[UNDEFINED]");
         else
             return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
