@@ -118,7 +118,7 @@ namespace CSHTML5.Types
             if (Interop.IsRunningInTheSimulator_WorkAround)
                 return (actualValue == null || actualValue.GetType().FullName == "DotNetBrowser.JSUndefined");
             else
-                return (actualValue == null);
+                return actualValue == null || actualValue.ToString() == "[UNDEFINED]";
 #else
             if (actualValue ==  null || !(actualValue is JSValue))
                 return false;
