@@ -133,10 +133,10 @@ window.callJS = function (javaScriptToExecute) {
     }
     else {
         //console.log("not supported");
-		if (resultType === 'undefined')
-			return "[UNDEFINED]";
-		else
-			return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
+        if (resultType === 'undefined')
+            return "[UNDEFINED]";
+        else
+            return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
     }
 };
 
@@ -148,9 +148,9 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
         return BINDING.js_to_mono_obj(result);
     }
     else {
-		if (resultType === 'undefined')
-			BINDING.js_to_mono_obj("[UNDEFINED]");
-		else
-			return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
+        if (resultType === 'undefined')
+            BINDING.js_to_mono_obj("[UNDEFINED]");
+        else
+            return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
 };
