@@ -523,32 +523,27 @@ document.setPosition = function(id, left, top, bSetAbsolutePosition, bSetZeroMar
     }
 }
 
-document.measureTextBlock = function(text, fontSize, fontFamily, fontStyle, fontWeight, textWrapping, padding, width, maxWidth) {
+document.measureTextBlock = function(uid, textWrapping, padding, width, maxWidth) {
     var element = document.measureTextBlockElement;
-    if (element)
+	var elToMeasure = document.getElementById(uid);
+    if (element && elToMeasure)
     {
+		var computedStyle = getComputedStyle(elToMeasure);
+		var fontSize = computedStyle.fontSize;
+		var fontWeight = computedStyle.fontWeight;
+
         var runElement = element.firstElementChild;
         if (runElement != null) {
-            runElement.innerText = text;
+            runElement.innerText = elToMeasure.textContent.length == 0 ? 'A' : elToMeasure.textContent;
             runElement.style.fontSize = fontSize;
             runElement.style.fontWeight = fontWeight;
         }
+	
+        element.style.fontSize = fontSize;
+        element.style.fontWeight = fontWeight;
+        element.style.fontFamily = computedStyle.fontFamily;
+		element.style.fontStyle = computedStyle.fontStyle;
 
-        if (fontSize.length > 0) {
-            element.style.fontSize = fontSize;
-        }
-        if (fontFamily.length > 0) {
-            if (fontFamily === "-") {
-                fontFamily = "";
-            }
-            element.style.fontFamily = fontFamily;
-        }
-        if (fontStyle.length > 0) {
-            element.style.fontStyle = fontStyle;
-        }
-        if (fontWeight.length > 0) {
-            element.style.fontWeight = fontWeight;
-        }
         if (textWrapping.length > 0) {
             element.style.whiteSpace = textWrapping;
         }
