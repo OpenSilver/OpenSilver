@@ -302,6 +302,7 @@ namespace Windows.UI.Xaml.Controls
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Move:
                     if (e.NewItems.Count != 1 || e.OldItems.Count != 1)
                     {
                         throw new NotSupportedException("Range actions are not supported.");
@@ -330,6 +331,9 @@ namespace Windows.UI.Xaml.Controls
                         break;
                     case NotifyCollectionChangedAction.Remove:
                         this._listWrapper.RemoveAt(e.OldStartingIndex);
+                        break;
+                    case NotifyCollectionChangedAction.Move:
+                        this._listWrapper.Move(e.OldStartingIndex, e.NewStartingIndex);
                         break;
                     case NotifyCollectionChangedAction.Replace:
                         this._listWrapper[e.OldStartingIndex] = e.NewItems[0];
@@ -404,6 +408,19 @@ namespace Windows.UI.Xaml.Controls
                 {
                     this.Add(enumerator.Current);
                 }
+            }
+
+            public void Move(int oldIndex, int newIndex)
+            {
+                if (oldIndex == newIndex)
+                {
+                    return;
+                }
+
+                var item = this[oldIndex];
+
+                this.RemoveAt(oldIndex);
+                this.Insert(newIndex, item);
             }
         }
     }
