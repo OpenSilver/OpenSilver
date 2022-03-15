@@ -1684,23 +1684,26 @@ document.ondblclick = null;
                 {
                     DesiredSize = new Size();
                     previousDesiredSize = Size.Empty;
+                    return;
                 }
                 else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
                 {
-                    DesiredSize = previousDesiredSize;
-                }
-                else
-                {
-                    Size previousDesiredSizeInMeasure = this.DesiredSize;
-                    DesiredSize = MeasureCore(availableSize);
-                    if (previousDesiredSizeInMeasure != DesiredSize)
+                    if (LayoutManager.Current.CheckChildMeasureValidation(this) == false)
                     {
-                        this.InvalidateArrange();
+                        DesiredSize = previousDesiredSize;
+                        return;
                     }
-
-                    PreviousAvailableSize = availableSize;
-                    previousDesiredSize = DesiredSize;
                 }
+
+                Size previousDesiredSizeInMeasure = this.DesiredSize;
+                DesiredSize = MeasureCore(availableSize);
+                if (previousDesiredSizeInMeasure != DesiredSize)
+                {
+                    this.InvalidateArrange();
+                }
+
+                PreviousAvailableSize = availableSize;
+                previousDesiredSize = DesiredSize;
             }
         }
 
