@@ -167,6 +167,22 @@ namespace Windows.UI.Xaml
             }
         }
 
+        public bool CheckChildMeasureValidation(UIElement parent)
+        {
+            lock (queueLock)
+            {
+                foreach (UIElement element in measureQueue)
+                {
+                    foreach (UIElement pathElement in GetElementPath(element))
+                    {
+                        if (pathElement == parent)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         private UIElement GetTopElement(IEnumerable<UIElement> measureQueue)
         {
             UIElement topElement = null;
