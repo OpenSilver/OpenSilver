@@ -523,24 +523,20 @@ document.setPosition = function(id, left, top, bSetAbsolutePosition, bSetZeroMar
     }
 }
 
-document.measureTextBlock = function(uid, textWrapping, padding, width, maxWidth) {
+document.measureTextBlock = function(uid, text, textWrapping, padding, width, maxWidth) {
     var element = document.measureTextBlockElement;
 	var elToMeasure = document.getElementById(uid);
     if (element && elToMeasure)
     {
 		var computedStyle = getComputedStyle(elToMeasure);
-		var fontSize = computedStyle.fontSize;
-		var fontWeight = computedStyle.fontWeight;
 
         var runElement = element.firstElementChild;
         if (runElement != null) {
-            runElement.innerText = elToMeasure.textContent.length == 0 ? 'A' : elToMeasure.textContent;
-            runElement.style.fontSize = fontSize;
-            runElement.style.fontWeight = fontWeight;
+            runElement.innerText = text;
         }
-	
-        element.style.fontSize = fontSize;
-        element.style.fontWeight = fontWeight;
+
+        element.style.fontSize = computedStyle.fontSize;
+        element.style.fontWeight = computedStyle.fontWeight;
         element.style.fontFamily = computedStyle.fontFamily;
 		element.style.fontStyle = computedStyle.fontStyle;
 
