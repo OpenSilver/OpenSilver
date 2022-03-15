@@ -452,12 +452,20 @@ namespace DotNetForHtml5.Compiler
                 //Make a dictionary to know the parameters from the name:
                 //todo-perf: this and the "check the amount of parameters and adapt the body replacement:" part may be a bit redundant since they're both about the parameters of the method so we might be able to make the compilation slightly faster by changing this (probably unnoticeable).
                 Dictionary<string, string> parameterNamesToTheirDefinitions = new Dictionary<string, string>();
+                Dictionary<string, string> outParamDefinitions = new Dictionary<string, string>();
                 if (!string.IsNullOrWhiteSpace(methodParametersDefinitions))
                 {
                     string[] splittedMethodParametersDefinition = SplitStringTakingAccountOfBrackets(methodParametersDefinitions, ',');
                     foreach (string parameterDefinition in splittedMethodParametersDefinition)
                     {
                         string paramDefinition = parameterDefinition.Trim();
+                        bool isOutParam = false;
+                        if (paramDefinition.StartsWith("out "))
+                        {
+                            paramDefinition = paramDefinition.Remove(0, 4).Trim();
+                            isOutParam = true;
+                        }
+
                         string[] splittedParamDefinition = SplitStringTakingAccountOfBrackets(paramDefinition, ' ');
                         //Note on the line above: very improbable scenario that would lead to problems: if the guy writes Paramtype1\r\nParamName (see it as a new line, not the actual characters)
                         bool isParameterTypeGotten = false;
@@ -479,7 +487,14 @@ namespace DotNetForHtml5.Compiler
                             }
                         }
 
-                        parameterNamesToTheirDefinitions.Add(parameterName, string.Format(@"{0}", parameterName));
+                        if (isOutParam)
+                        {
+                            outParamDefinitions.Add(parameterName, parameterTypeAsString);
+                        }
+                        else
+                        {
+                            parameterNamesToTheirDefinitions.Add(parameterName, string.Format(@"{0}", parameterName));
+                        }
                     }
                 }
                 //check the amount of parameters and adapt the body replacement:
@@ -488,17 +503,17 @@ namespace DotNetForHtml5.Compiler
                 if (thereAreParameters)
                 {
                     string parametersDictionaryDefinition = "new global::System.Collections.Generic.Dictionary<string, object>() {";
-                    bool isFirst = true;
                     foreach (string paramName in splittedParameters)
                     {
                         string trimmedParamName = paramName.Trim();
+                        bool isOutParam = false;
+                        if (paramName.StartsWith("out "))
+                        {
+                            isOutParam = true;
+                            trimmedParamName = trimmedParamName.Remove(0, 4).Trim();
+                        }
 
                         if (trimmedParamName == "null") continue;
-
-                        if (!isFirst)
-                        {
-                            parametersDictionaryDefinition += ", ";
-                        }
 
                         string parameterDefinition = parameterNamesToTheirDefinitions.ContainsKey(trimmedParamName) ?
                                                      parameterNamesToTheirDefinitions[trimmedParamName] :
@@ -506,17 +521,17 @@ namespace DotNetForHtml5.Compiler
 
                         // Note: Can the params names be different from trimmedParam and the one 
                         // in parameterNamesToTheirDefinitions? (probably not if properly trimmed and all)
-                        parametersDictionaryDefinition +=
-                            string.Format("{{ \"{0}\", {1} }}",
-                                          trimmedParamName,
-                                          parameterDefinition);
-                        isFirst = false;
+                        if (!isOutParam)
+                        {
+                            parametersDictionaryDefinition += $"{{ \"{trimmedParamName}\", {parameterDefinition} }},";
+                        }
                     }
                     parametersDictionaryDefinition += "}";
 
                     newBody = string.Format(
 
     @"
+            {11}
             {6}System.ServiceModel.INTERNAL_WebMethodsCaller.{8}CallWebMethod{0}{7}
                 <{1}{2}>({9}, ""{3}"", {4}, ""{10}"");
 ",
@@ -530,7 +545,8 @@ namespace DotNetForHtml5.Compiler
      ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : ""),
      ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : "")),
      endpointCode,
-     soapVersion
+     soapVersion,
+     string.Join(" ", outParamDefinitions.Select(def => $"{def.Key} = default({def.Value});"))
      );
                 }
                 else //case where there are no parameters
