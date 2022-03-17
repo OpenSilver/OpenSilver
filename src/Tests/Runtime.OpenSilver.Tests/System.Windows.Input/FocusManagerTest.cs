@@ -86,6 +86,7 @@ namespace Windows.UI.Xaml.Input.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void GetFocusedElement_ControlFocus()
         {
             var window = new Window();
@@ -101,6 +102,7 @@ namespace Windows.UI.Xaml.Input.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void GetFocusedElement_TwoControls_ControlFocus()
         {
             var window = new Window();
