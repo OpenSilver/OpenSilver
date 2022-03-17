@@ -297,14 +297,14 @@
       ResourcesProcessor (only during Pass 2)
       ============================================================-->
     <ResourcesProcessor
-      Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'"
-      SourceFile="%(Resource.FullPath)"
-      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Resource.RelativeDir)%(Resource.Filename)%(Resource.Extension).g.js"
+      Condition="((('%(EmbeddedResource.Extension)'=='.config' Or '%(EmbeddedResource.Extension)'=='.ClientConfig') And '%(EmbeddedResource.FileName)'!='packages') Or '%(EmbeddedResource.Extension)'=='.txt' Or '%(EmbeddedResource.Extension)'=='.xml' Or '%(EmbeddedResource.Extension)'=='.json') And '$(IsSecondPass)'=='True'"
+      SourceFile="%(EmbeddedResource.FullPath)"
+      OutputFile="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(EmbeddedResource.RelativeDir)%(EmbeddedResource.Filename)%(EmbeddedResource.Extension).g.js"
       />
     <ItemGroup>
-      <ResourcesProcessorProcessedFiles Include="@(Resource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.js')" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
-      <Resource Remove="@(Resource)" Condition="((('%(Resource.Extension)'=='.config' Or '%(Resource.Extension)'=='.ClientConfig') And '%(Resource.FileName)'!='packages') Or '%(Resource.Extension)'=='.txt' Or '%(Resource.Extension)'=='.xml' Or '%(Resource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
-      <Resource Include="@(ResourcesProcessorProcessedFiles)" />
+      <ResourcesProcessorProcessedFiles Include="@(EmbeddedResource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.js')" Condition="((('%(EmbeddedResource.Extension)'=='.config' Or '%(EmbeddedResource.Extension)'=='.ClientConfig') And '%(EmbeddedResource.FileName)'!='packages') Or '%(EmbeddedResource.Extension)'=='.txt' Or '%(EmbeddedResource.Extension)'=='.xml' Or '%(EmbeddedResource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
+      <EmbeddedResource Remove="@(EmbeddedResource)" Condition="((('%(EmbeddedResource.Extension)'=='.config' Or '%(EmbeddedResource.Extension)'=='.ClientConfig') And '%(EmbeddedResource.FileName)'!='packages') Or '%(EmbeddedResource.Extension)'=='.txt' Or '%(EmbeddedResource.Extension)'=='.xml' Or '%(EmbeddedResource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
+      <EmbeddedResource Include="@(ResourcesProcessorProcessedFiles)" />
       <FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
     </ItemGroup>
 
