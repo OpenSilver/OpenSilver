@@ -780,7 +780,7 @@ if(nextSibling != undefined) {
 
         public static bool IsElementInVisualTree(UIElement child)
         {
-            return (child.IsConnectedToLiveTree || child is Window || child is PopupRoot); //todo: replace "INTERNAL_VisualParent" with a check of the "_isLoaded" property? (it may work better with bindings, see for example the issue on March 22, where a "Binding" on ListBox.ItemsSource caused the selection to not work properly: it was fixed with a workaround to avoid possible regressions)
+            return (child.IsConnectedToLiveTree || child is Window || child is Popup); //todo: replace "INTERNAL_VisualParent" with a check of the "_isLoaded" property? (it may work better with bindings, see for example the issue on March 22, where a "Binding" on ListBox.ItemsSource caused the selection to not work properly: it was fixed with a workaround to avoid possible regressions)
         }
 
         static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(DependencyObject dependencyObject)
