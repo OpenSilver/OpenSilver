@@ -104,20 +104,21 @@ namespace Windows.UI.Xaml.Media
 
 
 
-        //private static void Color_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    SolidColorBrush brush = (SolidColorBrush)d;
-        //    PropertyMetadata metaData = ColorProperty.GetTypeMetaData(typeof(SolidColorBrush));
-        //    List<CSSEquivalent> cssEquivalents = metaData.GetCSSEquivalents(brush);
-        //    Color newValue = (Color)e.NewValue;
-        //    foreach (CSSEquivalent cssEquivalent in cssEquivalents)
-        //    {
-        //        if (cssEquivalent.ApplyWhenControlHasTemplate) //Note: this is to handle the case of a Control with a ControlTemplate (some properties must not be applied on the control itself)
-        //        {
-        //            INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newValue.INTERNAL_ToHtmlString(brush.Opacity));
-        //        }
-        //    }
-        //}
+        private static void Color_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue == e.NewValue) return;
+            SolidColorBrush brush = (SolidColorBrush)d;
+            PropertyMetadata metaData = ColorProperty.GetTypeMetaData(typeof(SolidColorBrush));
+            List<CSSEquivalent> cssEquivalents = metaData.GetCSSEquivalents(brush);
+            Color newValue = (Color)e.NewValue;
+            foreach (CSSEquivalent cssEquivalent in cssEquivalents)
+            {
+                //if (cssEquivalent.ApplyWhenControlHasTemplate) //Note: this is to handle the case of a Control with a ControlTemplate (some properties must not be applied on the control itself)
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newValue.INTERNAL_ToHtmlString(brush.Opacity), true);
+                }
+            }
+        }
 
 
         internal string INTERNAL_ToHtmlString()

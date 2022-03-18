@@ -21,13 +21,11 @@ namespace Windows.UI.Xaml.Media.Animation
     /// A class that enables you to associate easing functions with a 
     /// <see cref="ColorAnimationUsingKeyFrames"/> key frame animation.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public sealed class EasingColorKeyFrame : ColorKeyFrame
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EasingColorKeyFrame"/> class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public EasingColorKeyFrame()
         {
         }
@@ -35,7 +33,6 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Identifies the <see cref="EasingColorKeyFrame.EasingFunction"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty EasingFunctionProperty =
             DependencyProperty.Register(
                 "EasingFunction",
@@ -46,7 +43,6 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Gets or sets the easing function that is applied to the key frame.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public IEasingFunction EasingFunction
         {
             get { return (IEasingFunction)this.GetValue(EasingFunctionProperty); }
