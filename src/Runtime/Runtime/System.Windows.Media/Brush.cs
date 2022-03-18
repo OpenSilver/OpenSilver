@@ -106,6 +106,30 @@ namespace Windows.UI.Xaml.Media
                                 result.Add(newCSSEquivalent);
                             }
                         }
+                        else if (propertyMetadata.GetCSSEquivalents != null)
+                        {
+                            var parentPropertyCSSEquivalents = propertyMetadata.GetCSSEquivalents(uiElement);
+                            foreach (var parentPropertyCSSEquivalent in parentPropertyCSSEquivalents)
+                            {
+                                if (parentPropertyCSSEquivalent != null)
+                                {
+                                    CSSEquivalent newCSSEquivalent = new CSSEquivalent()
+                                    {
+                                        Name = parentPropertyCSSEquivalent.Name,
+                                        ApplyAlsoWhenThereIsAControlTemplate = parentPropertyCSSEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
+
+                                        Value = parentPropertyToValueToHtmlConverter(parentPropertyCSSEquivalent),
+                                        DomElement = parentPropertyCSSEquivalent.DomElement,
+                                        UIElement = uiElement
+                                    };
+                                    if (newCSSEquivalent.DomElement == null)
+                                    {
+                                        newCSSEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement;
+                                    }
+                                    result.Add(newCSSEquivalent);
+                                }
+                            }
+                        }
                         else
                         {
                             //we want to create a CSSEquivalent that will just make the UIElement call the property callback if any:

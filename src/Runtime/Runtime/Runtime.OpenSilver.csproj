@@ -164,6 +164,7 @@
 		<Compile Include="System.Windows.Media\Color.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
 		<Compile Include="System.Windows.Media\ColorConverter.cs" />
+		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\DiscreteColorKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TimelineMarker.cs" />
 		<Compile Include="System.Windows.Media\TimelineMarkerCollection.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\VideoBrush.cs" />
@@ -381,8 +382,8 @@
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SineEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplinePointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\CompositeTransform.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\EasingColorKeyFrame.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\LinearColorKeyFrame.cs" />
+		<Compile Include="System.Windows.Media.Animation\EasingColorKeyFrame.cs" />
+		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\LinearColorKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\MultiScaleTileSource.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\SkewTransform.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextFormattingMode.cs" />
@@ -961,7 +962,7 @@
 		<Compile Include="System.Windows.Media.Animation\Transition.cs" />
 		<Compile Include="System.Windows.Media.Animation\TransitionCollection.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\BackEase.cs" />
-		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorAnimationUsingKeyFrames.cs" />
+		<Compile Include="System.Windows.Media.Animation\ColorAnimationUsingKeyFrames.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\KeySpline.cs" />
