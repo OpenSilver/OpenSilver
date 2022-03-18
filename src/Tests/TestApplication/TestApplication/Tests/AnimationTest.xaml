@@ -550,5 +550,27 @@
                 <Button Content="Oooh! Pretty!" Style="{StaticResource TestObjectAnimationUsingKeyFramesStyle1}"/>
             </StackPanel>
         </StackPanel>
+        
+        <Border  BorderThickness="28" Margin="0,5,0,5" Padding="20" x:Name="borderAnim" VerticalAlignment="Bottom">
+            <Border.BorderBrush>
+                <SolidColorBrush x:Name="borderBrush" Color="LightGray"/>
+            </Border.BorderBrush>
+
+            <Border.Triggers>
+                <EventTrigger RoutedEvent="Border.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(SolidColorBrush.Color)" Storyboard.TargetName="borderBrush"
+                                                          Duration="0:0:6" FillBehavior="HoldEnd" RepeatBehavior="Forever">
+                                <EasingColorKeyFrame KeyTime="0:0:2" Value="Red"/>
+                                <EasingColorKeyFrame KeyTime="0:0:4" Value="Blue"/>
+                            </ColorAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Border.Triggers>
+
+            <TextBlock>ColorAnimationUsingKeyFrames example using SolidColorBrush as target</TextBlock>
+        </Border>
     </StackPanel>
 </sdk:Page>
