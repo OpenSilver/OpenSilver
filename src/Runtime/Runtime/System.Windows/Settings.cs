@@ -122,8 +122,8 @@ namespace System
 
         [OpenSilver.NotImplemented]
         public bool EnableAutoZoom { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Windowless { get; private set; }
+
+        public bool Windowless { get; internal set; }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the application was launched from the out-of-browser state.
