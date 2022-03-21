@@ -23,6 +23,7 @@ using CSHTML5;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using OpenSilver.Internal;
+using System.Linq;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
@@ -69,7 +70,7 @@ namespace Windows.UI.Xaml
         {
             // Keep a reference to the app:
             Application.Current = this;
-            
+
             // Initialize Deployment
             _ = Deployment.Current;
 
@@ -156,11 +157,15 @@ namespace Windows.UI.Xaml
                 StartAppServices();
 
                 // Raise the "Startup" event:
+                var startupEventArgs = new StartupEventArgs();
+                ApplyBuiltInInitParams(startupEventArgs);
+
                 if (this.Startup != null)
-                    Startup(this, new StartupEventArgs());
+                    Startup(this, startupEventArgs);
 
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());
+
             }));
 
         }
@@ -196,7 +201,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
+        #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
 
 #if !CSHTML5NETSTANDARD
         DispatcherTimer _timerForWorkaroundFireFoxIssue = new DispatcherTimer();
@@ -624,5 +629,22 @@ namespace Windows.UI.Xaml
                 );
         }
 #endif
+
+        private void ApplyBuiltInInitParams(StartupEventArgs startupEventArgs)
+        {
+            var builtInParams = new List<string>() { "windowless" };
+
+            var builtInParamsFromArgs = startupEventArgs.InitParams.Where(kv => builtInParams.Contains(kv.Key));
+
+            foreach (var param in builtInParamsFromArgs)
+            {
+                switch (param.Key)
+                {
+                    case "windowless":
+                        Current.Host.Settings.Windowless = Convert.ToBoolean(param.Value);
+                        break;
+                }
+            }
+        }
     }
 }
