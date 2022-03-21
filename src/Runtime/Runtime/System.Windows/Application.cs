@@ -53,7 +53,6 @@ namespace Windows.UI.Xaml
         private ApplicationLifetimeObjectsCollection lifetime_objects;
         private Window _mainWindow;
         private ResourceDictionary _resources;
-        private StartupEventArgs _StartupEventArgs;
 
         // Says if App.Resources has any implicit styles
         internal bool HasImplicitStylesInResources { get; set; }
@@ -158,14 +157,15 @@ namespace Windows.UI.Xaml
                 StartAppServices();
 
                 // Raise the "Startup" event:
-                _StartupEventArgs = new StartupEventArgs();
+                var startupEventArgs = new StartupEventArgs();
+                ApplyBuiltInInitParams(startupEventArgs);
+
                 if (this.Startup != null)
-                    Startup(this, _StartupEventArgs);
+                    Startup(this, startupEventArgs);
 
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());
 
-                ApplyBuiltInInitParams();
             }));
 
         }
@@ -630,11 +630,11 @@ namespace Windows.UI.Xaml
         }
 #endif
 
-        private void ApplyBuiltInInitParams()
+        private void ApplyBuiltInInitParams(StartupEventArgs startupEventArgs)
         {
             var builtInParams = new List<string>() { "windowless" };
 
-            var builtInParamsFromArgs = _StartupEventArgs.InitParams.Where(kv => builtInParams.Contains(kv.Key));
+            var builtInParamsFromArgs = startupEventArgs.InitParams.Where(kv => builtInParams.Contains(kv.Key));
 
             foreach (var param in builtInParamsFromArgs)
             {
