@@ -81,7 +81,7 @@ namespace CSHTML5.Internal
                 foreach (string eventName in _domEventsNamesToListenTo)
                 {
                     OpenSilver.Interop.ExecuteJavaScriptAsync(
-                        "document.bindEventHandler($0, $1, $2)", domElement, eventName, _handler
+                        "document.addEventListenerSafe($0, $1, $2)", domElement, eventName, _handler
                     );
                 }
 
@@ -97,7 +97,7 @@ namespace CSHTML5.Internal
                 for (int i = _domEventsNamesToListenTo.Length - 1; i >= 0; i--)
                 {
                     OpenSilver.Interop.ExecuteJavaScriptAsync(
-                        "document.unbindEventHandler($0, $1)", _domElement, _domEventsNamesToListenTo[i]
+                        "document.removeEventListenerSafe($0, $1)", _domElement, _domEventsNamesToListenTo[i]
                     );
                 }
             }

@@ -186,8 +186,6 @@ namespace Windows.UI.Xaml
 
             EnsureEventHandlersStore();
             _eventHandlersStore.AddRoutedEventHandler(routedEvent, handler, handledEventsToo);
-
-            WireUpRoutedEvent(routedEvent);
         }
 
         /// <summary>
@@ -998,23 +996,10 @@ namespace Windows.UI.Xaml
             {
                 OpenSilver.Interop.ExecuteJavaScript("document.enableFocus($0)", ((INTERNAL_HtmlDomElementReference)target).UniqueIdentifier);
             }
-
-            if (ShouldHookUpFocusInEvent())
-            {
-                HookUpFocusInEvent();
-            }
-
-            if (ShouldHookUpFocusOutEvent())
-            {
-                HookUpFocusOutEvent();
-            }
         }
 
         internal void PreventFocusEvents()
         {
-            UnHookDOMEvent(ID_FOCUSIN);
-            UnHookDOMEvent(ID_FOCUSOUT);
-
             object target = GetFocusTarget();
             if (target != null)
             {
@@ -1026,63 +1011,15 @@ namespace Windows.UI.Xaml
 
         public virtual void INTERNAL_AttachToDomEvents()
         {
-            if (ShouldHookUpMouseMoveEvent())
-            {
-                HookUpMouseMoveEvent();
-            }
-
-            if (ShouldHookUpMouseDownEvent())
-            {
-                HookUpMouseDownEvent();
-            }
-
-            if (ShouldHookUpMouseUpEvent())
-            {
-                HookUpMouseUpEvent();
-            }
-
-            if (ShouldHookUpWheelEvent())
-            {
-                HookUpWheelEvent();
-            }
-
-            // Note: we either attach both 'mouseenter' and 'mouseleave' events or none,
-            // because we need to be able to reset the value of 'IsPointerOver'.
-            if (ShouldHookUpMouseEnterEvent() || ShouldHookUpMouseLeaveEvent())
-            {
-                HookUpMouseEnterEvent();
-                HookUpMouseLeaveEvent();
-            }
-
-            if (ShouldHookUpInputEvent())
-            {
-                HookUpInputEvent();
-            }
-
-            if (ShouldHookUpKeyDownEvent())
-            {
-                HookUpKeyDownEvent();
-            }
-
-            if (ShouldHookUpKeyUpEvent())
-            {
-                HookUpKeyUpEvent();
-            }
-
-            if (ShouldHookUpFocusInEvent())
-            {
-                HookUpFocusInEvent();
-            }
-
-            if (ShouldHookUpFocusOutEvent())
-            {
-                HookUpFocusOutEvent();
-            }
+            _eventsManager = new NativeEventsManager(this);
+            _eventsManager.AttachEvents();
         }
 
         public virtual void INTERNAL_DetachFromDomEvents()
         {
-            UnHookDOMEvents();
+            NativeEventsManager eventsManager = _eventsManager;
+            _eventsManager = null;
+            eventsManager?.DetachEvents();
         }
     }
 }

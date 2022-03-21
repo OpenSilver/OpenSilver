@@ -329,49 +329,56 @@ document.addEventListenerSafe = function (element, method, func) {
     }
 }
 
-document.bindEventHandler = function (element, event, handler) {
-    if (typeof element === 'string') {
-        element = document.getElementById(element);
-    }
+document._attachEventListeners = function (element, handler) {
+    const view = typeof element === 'string' ? document.getElementById(element) : element;
+    if (!view || view._eventsStore) return;
 
-    if (element) {
-        if (!element._eventsStore) {
-            element._eventsStore = {};
-        }
-
-        const store = element._eventsStore;
-        if (!store[event]) {
-            const h = function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    handler(e);
-                }
-            }
-
-            store[event] = h;
-
-            if (event === 'touchstart' || event === 'wheel' || event === 'touchmove') {
-                element.addEventListener(event, h, { passive: true });
-            }
-            else {
-                element.addEventListener(event, h);
-            }
+    function bubblingEventHandler(e) {
+        if (!e.isHandled) {
+            e.isHandled = true;
+            handler(e);
         }
     }
+
+    const store = view._eventsStore = {};
+
+    view.addEventListener('mousedown', store['mousedown'] = bubblingEventHandler);
+    view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
+    view.addEventListener('mouseup', store['mouseup'] = bubblingEventHandler);
+    view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
+    view.addEventListener('mousemove', store['mousemove'] = bubblingEventHandler);
+    view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
+    view.addEventListener('wheel', store['wheel'] = bubblingEventHandler, { passive: true });
+    view.addEventListener('mouseenter', store['mouseenter'] = handler);
+    view.addEventListener('mouseleave', store['mouseleave'] = handler);
+    view.addEventListener('input', store['input'] = bubblingEventHandler);
+    view.addEventListener('keydown', store['keydown'] = bubblingEventHandler);
+    view.addEventListener('keyup', store['keyup'] = bubblingEventHandler);
+    view.addEventListener('focusin', store['focusin'] = bubblingEventHandler);
+    view.addEventListener('focusout', store['focusout'] = bubblingEventHandler);
 }
 
-document.unbindEventHandler = function (element, event) {
-    if (typeof element === 'string') {
-        element = document.getElementById(element);
-    }
+document._removeEventListeners = function (element) {
+    const view = typeof element === 'string' ? document.getElementById(element) : element;
+    if (!view || !view._eventsStore) return;
 
-    if (element && element._eventsStore) {
-        const handler = element._eventsStore[event];
-        if (handler) {
-            element._eventsStore[event] = undefined;
-            element.removeEventListener(event, handler);
-        }
-    }
+    const store = view._eventsStore;
+    view.removeEventListener('mousedown', store['mousedown']);
+    view.removeEventListener('touchstart', store['touchstart']);
+    view.removeEventListener('mouseup', store['mouseup']);
+    view.removeEventListener('touchend', store['touchend']);
+    view.removeEventListener('mousemove', store['mousemove']);
+    view.removeEventListener('touchmove', store['touchmove']);
+    view.removeEventListener('wheel', store['wheel']);
+    view.removeEventListener('mouseenter', store['mouseenter']);
+    view.removeEventListener('mouseleave', store['mouseleave']);
+    view.removeEventListener('input', store['input']);
+    view.removeEventListener('keydown', store['keydown']);
+    view.removeEventListener('keyup', store['keyup']);
+    view.removeEventListener('focusin', store['focusin']);
+    view.removeEventListener('focusout', store['focusout']);
+
+    delete view._eventsStore;
 }
 
 document.eventCallback = function (callbackId, arguments, sync) {

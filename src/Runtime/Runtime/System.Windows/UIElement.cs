@@ -66,26 +66,6 @@ namespace Windows.UI.Xaml
             KeyUpEvent = new RoutedEvent(nameof(KeyUp), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
             GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
             LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
-
-            RoutedEventToEventManagerID = new Dictionary<RoutedEvent, int>(16)
-            {
-                [TextInputStartEvent] = ID_UNSUPPORTED,
-                [TextInputUpdateEvent] = ID_UNSUPPORTED,
-                [MouseMoveEvent] = ID_MOUSEMOVE,
-                [MouseLeftButtonDownEvent] = ID_MOUSEDOWN,
-                [MouseRightButtonDownEvent] = ID_MOUSEDOWN,
-                [MouseLeftButtonUpEvent] = ID_MOUSEUP,
-                [MouseRightButtonUpEvent] = ID_MOUSEUP,
-                [TappedEvent] = ID_MOUSEUP,
-                [MouseWheelEvent] = ID_WHEEL,
-                [MouseEnterEvent] = ID_MOUSEENTER,
-                [MouseLeaveEvent] = ID_MOUSELEAVE,
-                [TextInputEvent] = ID_INPUT,
-                [KeyDownEvent] = ID_KEYDOWN,
-                [KeyUpEvent] = ID_KEYUP,
-                [GotFocusEvent] = ID_FOCUSIN,
-                [LostFocusEvent] = ID_FOCUSOUT,
-            };
 #else
             PointerMovedEvent = new RoutedEvent(nameof(PointerMoved), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
             PointerPressedEvent = new RoutedEvent(nameof(PointerPressed), RoutingStrategy.Bubble, typeof(PointerEventHandler), typeof(UIElement));
@@ -102,25 +82,6 @@ namespace Windows.UI.Xaml
             KeyUpEvent = new RoutedEvent(nameof(KeyUp), RoutingStrategy.Bubble, typeof(KeyEventHandler), typeof(UIElement));
             GotFocusEvent = new RoutedEvent(nameof(GotFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
             LostFocusEvent = new RoutedEvent(nameof(LostFocus), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(UIElement));
-
-            RoutedEventToEventManagerID = new Dictionary<RoutedEvent, int>(15)
-            {
-                [TextInputStartEvent] = ID_UNSUPPORTED,
-                [TextInputUpdateEvent] = ID_UNSUPPORTED,
-                [PointerMovedEvent] = ID_MOUSEMOVE,
-                [PointerPressedEvent] = ID_MOUSEDOWN,
-                [PointerReleasedEvent] = ID_MOUSEUP,
-                [RightTappedEvent] = ID_MOUSEUP,
-                [TappedEvent] = ID_MOUSEUP,
-                [PointerWheelChangedEvent] = ID_WHEEL,
-                [PointerEnteredEvent] = ID_MOUSEENTER,
-                [PointerExitedEvent] = ID_MOUSELEAVE,
-                [TextInputEvent] = ID_INPUT,
-                [KeyDownEvent] = ID_KEYDOWN,
-                [KeyUpEvent] = ID_KEYUP,
-                [GotFocusEvent] = ID_FOCUSIN,
-                [LostFocusEvent] = ID_FOCUSOUT,
-            };
 #endif
 
             RegisterEvents(typeof(UIElement));

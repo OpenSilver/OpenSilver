@@ -32,70 +32,94 @@ namespace Windows.UI.Xaml
 {
     public partial class UIElement
     {
-        private const int ID_UNSUPPORTED = -1;
-        private const int ID_MOUSEMOVE = 0;
-        private const int ID_MOUSEDOWN = 1;
-        private const int ID_MOUSEUP = 2;
-        private const int ID_WHEEL = 3;
-        private const int ID_MOUSEENTER = 4;
-        private const int ID_MOUSELEAVE = 5;
-        private const int ID_INPUT = 6;
-        private const int ID_KEYDOWN = 7;
-        private const int ID_KEYUP = 8;
-        private const int ID_FOCUSIN = 9;
-        private const int ID_FOCUSOUT = 10;
+        private NativeEventsManager _eventsManager;
 
-        private static readonly Dictionary<RoutedEvent, int> RoutedEventToEventManagerID;
-
-        private static readonly Func<UIElement, DOMEventManager>[] EventManagerFactory =
-            new Func<UIElement, DOMEventManager>[11]
-            {
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[2] { "mousemove", "touchmove" }, uie.ProcessOnMouseMove, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[2] { "mousedown", "touchstart" }, uie.ProcessOnMouseDown, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[2] { "mouseup", "touchend" }, uie.ProcessOnMouseUp, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "wheel" }, uie.ProcessOnWheel, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "mouseenter" }, uie.ProcessOnMouseEnter, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "mouseleave" }, uie.ProcessOnMouseLeave, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "input" }, uie.ProcessOnInput, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "keydown" }, uie.ProcessOnKeyDown, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "keyup" }, uie.ProcessOnKeyUp, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "focusin" }, uie.ProcessOnFocusIn, true),
-                uie => new DOMEventManager(() => uie.INTERNAL_OuterDomElement, new string[1] { "focusout" }, uie.ProcessOnFocusOut, true),
-            };
-
-        private DOMEventManager[] _eventManagersStore;
-
-        private static int GetEventManagerID(RoutedEvent routedEvent)
+        private class NativeEventsManager
         {
-            if (RoutedEventToEventManagerID.TryGetValue(routedEvent, out int id))
+            private readonly Delegate _handler;
+            private readonly UIElement _owner;
+
+            public NativeEventsManager(UIElement uie)
             {
-                return id;
+                _owner = uie;
+
+                if (OpenSilver.Interop.IsRunningInTheSimulator)
+                {
+                    _handler = new Action<object>(NativeEventCallback);
+                }
+                else
+                {
+                    _handler = new Func<object, string>(jsEventArg =>
+                    {
+                        NativeEventCallback(jsEventArg);
+                        return string.Empty;
+                    });
+                }
             }
 
-            return ID_UNSUPPORTED;
-        }
-
-        private void EnsureEventManagersStore()
-        {
-            if (_eventManagersStore == null)
+            public void AttachEvents()
             {
-                _eventManagersStore = new DOMEventManager[11];
-            }
-        }
-
-        private DOMEventManager GetOrCreateEventManager(int eventManagerID)
-        {
-            Debug.Assert(eventManagerID >= 0 && eventManagerID <= 10);
-
-            EnsureEventManagersStore();
-
-            DOMEventManager eventManager = _eventManagersStore[eventManagerID];
-            if (eventManager == null)
-            {
-                _eventManagersStore[eventManagerID] = eventManager = EventManagerFactory[eventManagerID](this);
+                OpenSilver.Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1)", _owner.INTERNAL_OuterDomElement, _handler);
             }
 
-            return eventManager;
+            public void DetachEvents()
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", _owner.INTERNAL_OuterDomElement);
+            }
+
+            private void NativeEventCallback(object jsEventArg)
+            {
+                string type = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+                switch (type)
+                {
+                    case "mousemove":
+                    case "touchmove":
+                        _owner.ProcessOnMouseMove(jsEventArg);
+                        break;
+
+                    case "mousedown":
+                    case "touchstart":
+                        _owner.ProcessOnMouseDown(jsEventArg);
+                        break;
+
+                    case "mouseup":
+                    case "touchend":
+                        _owner.ProcessOnMouseUp(jsEventArg);
+                        break;
+
+                    case "wheel":
+                        _owner.ProcessOnWheel(jsEventArg);
+                        break;
+
+                    case "mouseenter":
+                        _owner.ProcessOnMouseEnter(jsEventArg);
+                        break;
+
+                    case "mouseleave":
+                        _owner.ProcessOnMouseLeave(jsEventArg);
+                        break;
+
+                    case "keydown":
+                        _owner.ProcessOnKeyDown(jsEventArg);
+                        break;
+
+                    case "keyup":
+                        _owner.ProcessOnKeyUp(jsEventArg);
+                        break;
+
+                    case "focusin":
+                        _owner.ProcessOnFocusIn(jsEventArg);
+                        break;
+
+                    case "focusout":
+                        _owner.ProcessOnFocusOut(jsEventArg);
+                        break;
+
+                    case "input":
+                        _owner.ProcessOnInput(jsEventArg);
+                        break;
+                }
+            }
         }
 
         private void ProcessOnMouseMove(object jsEventArg)
@@ -540,226 +564,6 @@ namespace Windows.UI.Xaml
             };
 
             RaiseEvent(e);
-        }
-
-        private bool ShouldHookUpMouseMoveEvent()
-        {
-#if MIGRATION
-            return ShouldWireUpRoutedEvent(MouseMoveEvent, typeof(UIElement), nameof(OnMouseMove), new Type[1] { typeof(MouseEventArgs) });
-#else
-            return ShouldWireUpRoutedEvent(PointerMovedEvent, typeof(UIElement), nameof(OnPointerMoved), new Type[1] { typeof(PointerRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpMouseDownEvent()
-        {
-#if MIGRATION
-            Type[] types = new Type[1] { typeof(MouseButtonEventArgs) };
-
-            return ShouldWireUpRoutedEvent(MouseLeftButtonDownEvent, typeof(UIElement), nameof(OnMouseLeftButtonDown), types) ||
-                   ShouldWireUpRoutedEvent(MouseRightButtonDownEvent, typeof(UIElement), nameof(OnMouseRightButtonDown), types);
-#else
-            return ShouldWireUpRoutedEvent(PointerPressedEvent, typeof(UIElement), nameof(OnPointerPressed), new Type[1] { typeof(PointerRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpMouseUpEvent()
-        {
-#if MIGRATION
-            Type[] types = new Type[1] { typeof(MouseButtonEventArgs) };
-
-            return ShouldWireUpRoutedEvent(MouseLeftButtonUpEvent, typeof(UIElement), nameof(OnMouseLeftButtonUp), types) ||
-                   ShouldWireUpRoutedEvent(MouseRightButtonUpEvent, typeof(UIElement), nameof(OnMouseRightButtonUp), types) ||
-                   ShouldWireUpRoutedEvent(TappedEvent, typeof(UIElement), nameof(OnTapped), new Type[1] { typeof(TappedRoutedEventArgs) });
-#else
-            return ShouldWireUpRoutedEvent(PointerReleasedEvent, typeof(UIElement), nameof(OnPointerReleased), new Type[1] { typeof(PointerRoutedEventArgs) }) ||
-                   ShouldWireUpRoutedEvent(RightTappedEvent, typeof(UIElement), nameof(OnRightTapped), new Type[1] { typeof(RightTappedRoutedEventArgs) }) ||
-                   ShouldWireUpRoutedEvent(TappedEvent, typeof(UIElement), nameof(OnTapped), new Type[1] { typeof(TappedRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpWheelEvent()
-        {
-#if MIGRATION
-            return ShouldWireUpRoutedEvent(MouseWheelEvent, typeof(UIElement), nameof(OnMouseWheel), new Type[1] { typeof(MouseWheelEventArgs) });
-#else
-            return ShouldWireUpRoutedEvent(PointerWheelChangedEvent, typeof(UIElement), nameof(OnPointerWheelChanged), new Type[1] { typeof(PointerRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpMouseEnterEvent()
-        {
-#if MIGRATION
-            return ShouldWireUpRoutedEvent(MouseEnterEvent, typeof(UIElement), nameof(OnMouseEnter), new Type[1] { typeof(MouseEventArgs) });
-#else
-            return ShouldWireUpRoutedEvent(PointerEnteredEvent, typeof(UIElement), nameof(OnPointerEntered), new Type[1] { typeof(PointerRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpMouseLeaveEvent()
-        {
-#if MIGRATION
-            return ShouldWireUpRoutedEvent(MouseLeaveEvent, typeof(UIElement), nameof(OnMouseLeave), new Type[1] { typeof(MouseEventArgs) });
-#else
-            return ShouldWireUpRoutedEvent(PointerExitedEvent, typeof(UIElement), nameof(OnPointerExited), new Type[1] { typeof(PointerRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpInputEvent()
-        {
-            return ShouldWireUpRoutedEvent(TextInputEvent, typeof(UIElement), nameof(OnTextInput), new Type[1] { typeof(TextCompositionEventArgs) });
-        }
-
-        private bool ShouldHookUpKeyDownEvent()
-        {
-#if MIGRATION
-            return ShouldWireUpRoutedEvent(KeyDownEvent, typeof(UIElement), nameof(OnKeyDown), new Type[1] { typeof(KeyEventArgs) });
-#else
-            return ShouldWireUpRoutedEvent(KeyDownEvent, typeof(UIElement), nameof(OnKeyDown), new Type[1] { typeof(KeyRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpKeyUpEvent()
-        {
-#if MIGRATION
-            return ShouldWireUpRoutedEvent(KeyUpEvent, typeof(UIElement), nameof(OnKeyUp), new Type[1] { typeof(KeyEventArgs) });
-#else
-            return ShouldWireUpRoutedEvent(KeyUpEvent, typeof(UIElement), nameof(OnKeyUp), new Type[1] { typeof(KeyRoutedEventArgs) });
-#endif
-        }
-
-        private bool ShouldHookUpFocusInEvent()
-        {
-            return ShouldWireUpRoutedEvent(GotFocusEvent, typeof(UIElement), nameof(OnGotFocus), new Type[1] { typeof(RoutedEventArgs) });
-        }
-
-        private bool ShouldHookUpFocusOutEvent()
-        {
-            return ShouldWireUpRoutedEvent(LostFocusEvent, typeof(UIElement), nameof(OnLostFocus), new Type[1] { typeof(RoutedEventArgs) });
-        }
-
-        private void HookUpMouseMoveEvent()
-        {
-            HookUpDOMEvent(ID_MOUSEMOVE);
-        }
-
-        private void HookUpMouseDownEvent()
-        {
-            HookUpDOMEvent(ID_MOUSEDOWN);
-        }
-
-        private void HookUpMouseUpEvent()
-        {
-            HookUpDOMEvent(ID_MOUSEUP);
-        }
-
-        private void HookUpWheelEvent()
-        {
-            HookUpDOMEvent(ID_WHEEL);
-        }
-
-        private void HookUpMouseEnterEvent()
-        {
-            HookUpDOMEvent(ID_MOUSEENTER);
-        }
-
-        private void HookUpMouseLeaveEvent()
-        {
-            HookUpDOMEvent(ID_MOUSELEAVE);
-        }
-
-        private void HookUpInputEvent()
-        {
-            HookUpDOMEvent(ID_INPUT);
-        }
-
-        private void HookUpKeyDownEvent()
-        {
-            HookUpDOMEvent(ID_KEYDOWN);
-        }
-
-        private void HookUpKeyUpEvent()
-        {
-            HookUpDOMEvent(ID_KEYUP);
-        }
-
-        private void HookUpFocusInEvent()
-        {
-            HookUpDOMEvent(ID_FOCUSIN);
-        }
-
-        private void HookUpFocusOutEvent()
-        {
-            HookUpDOMEvent(ID_FOCUSOUT);
-        }
-
-        private void HookUpDOMEvent(int id)
-        {
-            GetOrCreateEventManager(id).AttachToDomEvents();
-        }
-
-        private bool ShouldWireUpRoutedEvent(RoutedEvent routedEvent, Type ownerType, string methodName, Type[] methodParameters)
-        {
-            if (_eventHandlersStore != null)
-            {
-                List<RoutedEventHandlerInfo> handlers = _eventHandlersStore[routedEvent];
-                if (handlers != null && handlers.Count > 0)
-                {
-                    return true;
-                }
-            }
-
-            return INTERNAL_EventsHelper.IsEventCallbackOverridden(this, ownerType, methodName, methodParameters);
-        }
-
-        private void WireUpRoutedEvent(RoutedEvent routedEvent)
-        {
-            int id = GetEventManagerID(routedEvent);
-
-            if (id != ID_UNSUPPORTED)
-            {
-                HookUpDOMEvent(id);
-
-                if (id == ID_MOUSEENTER)
-                {
-                    HookUpDOMEvent(ID_MOUSELEAVE);
-                }
-                else if (id == ID_MOUSELEAVE)
-                {
-                    HookUpDOMEvent(ID_MOUSEENTER);
-                }
-            }
-        }
-
-        private void UnHookDOMEvents()
-        {
-            if (_eventManagersStore == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < _eventManagersStore.Length; i++)
-            {
-                DOMEventManager manager = _eventManagersStore[i];
-                if (manager != null)
-                {
-                    manager.DetachFromDomEvents();
-                }
-            }
-        }
-
-        private void UnHookDOMEvent(int id)
-        {
-            if (_eventManagersStore == null)
-            {
-                return;
-            }
-
-            DOMEventManager manager = _eventManagersStore[id];
-            if (manager != null)
-            {
-                manager.DetachFromDomEvents();
-            }
         }
     }
 }
