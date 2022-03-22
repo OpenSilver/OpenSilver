@@ -303,7 +303,6 @@
       />
     <ItemGroup>
       <ResourcesProcessorProcessedFiles Include="@(EmbeddedResource->'$(IntermediateOutputPath)%(RelativeDir)%(Filename)%(Extension).g.js')" Condition="((('%(EmbeddedResource.Extension)'=='.config' Or '%(EmbeddedResource.Extension)'=='.ClientConfig') And '%(EmbeddedResource.FileName)'!='packages') Or '%(EmbeddedResource.Extension)'=='.txt' Or '%(EmbeddedResource.Extension)'=='.xml' Or '%(EmbeddedResource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
-      <EmbeddedResource Remove="@(EmbeddedResource)" Condition="((('%(EmbeddedResource.Extension)'=='.config' Or '%(EmbeddedResource.Extension)'=='.ClientConfig') And '%(EmbeddedResource.FileName)'!='packages') Or '%(EmbeddedResource.Extension)'=='.txt' Or '%(EmbeddedResource.Extension)'=='.xml' Or '%(EmbeddedResource.Extension)'=='.json') And '$(IsSecondPass)'=='True'" />
       <EmbeddedResource Include="@(ResourcesProcessorProcessedFiles)" />
       <FileWrites Include="@(ResourcesProcessorProcessedFiles)"/>
     </ItemGroup>
