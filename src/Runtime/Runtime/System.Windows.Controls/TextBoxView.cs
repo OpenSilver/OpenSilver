@@ -1008,7 +1008,7 @@ var range,selection;
         protected override Size MeasureOverride(Size availableSize)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.Text, Host.TextWrapping, Margin, availableSize.Width);
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.TextWrapping, Margin, availableSize.Width);
             return TextSize;
         }
     }
