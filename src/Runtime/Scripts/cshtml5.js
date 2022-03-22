@@ -530,7 +530,7 @@ document.setPosition = function(id, left, top, bSetAbsolutePosition, bSetZeroMar
     }
 }
 
-document.measureTextBlock = function(uid, text, textWrapping, padding, width, maxWidth) {
+document.measureTextBlock = function(uid, textWrapping, padding, width, maxWidth) {
     var element = document.measureTextBlockElement;
 	var elToMeasure = document.getElementById(uid);
     if (element && elToMeasure)
@@ -539,7 +539,11 @@ document.measureTextBlock = function(uid, text, textWrapping, padding, width, ma
 
         var runElement = element.firstElementChild;
         if (runElement != null) {
-            runElement.innerText = text;
+            var child = elToMeasure;
+            while (child.hasChildNodes()) {
+                child = child.firstChild;
+            }
+            runElement.innerHTML = child.parentElement.innerHTML.length == 0 ? 'A' : child.parentElement.innerHTML;
         }
 
         element.style.fontSize = computedStyle.fontSize;
