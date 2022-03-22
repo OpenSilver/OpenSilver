@@ -68,6 +68,7 @@
     <Compile Include="Core\Events\DOMEventManager.cs" />
     <Compile Include="Core\Main\DescendentsWalker.cs" />
     <Compile Include="Core\Main\DescendentsWalkerBase.cs" />
+    <Compile Include="Core\Main\EffectiveValueEntry.cs" />
     <Compile Include="Core\Main\EmptyEnumerator.cs" />
     <Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
     <Compile Include="Core\Main\INTERNAL_NamedObject.cs" />

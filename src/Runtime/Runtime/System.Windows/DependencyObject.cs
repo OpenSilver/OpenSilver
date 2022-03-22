@@ -258,7 +258,7 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStorage storage;
             if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
             {
-                return INTERNAL_PropertyStore.GetEffectiveValue(storage);
+                return INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
             }
             return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
         }
@@ -494,7 +494,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_PropertyStore.SetInheritedValue(storage, 
                                                          DependencyProperty.UnsetValue,
                                                          false); // recursively
-                if (storage.BaseValueSourceInternal == BaseValueSourceInternal.Default &&
+                if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default &&
                     (storage.PropertyListeners == null || storage.PropertyListeners.Count == 0)) //this second test is to make sure we keep any listener working (for example Bindings would stop working if we remove an element from the Visual tree then add it back))
                 {
                     // Remove storage if the effective value is the default value.
@@ -539,13 +539,13 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStorage[] copyOfCollection = this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value).ToArray();
             foreach (INTERNAL_PropertyStorage storage in copyOfCollection)
             {
-                if (storage.IsExpression)
+                if (storage.Entry.IsExpression)
                 {
                     (storage.LocalValue as BindingExpression)?.OnSourceAvailable();
                 }
-                else if (storage.IsExpressionFromStyle)
+                else if (storage.Entry.IsExpressionFromStyle)
                 {
-                    (storage.ModifiedValue.BaseValue as BindingExpression)?.OnSourceAvailable();
+                    (storage.Entry.ModifiedValue.BaseValue as BindingExpression)?.OnSourceAvailable();
                 }
             }
         }

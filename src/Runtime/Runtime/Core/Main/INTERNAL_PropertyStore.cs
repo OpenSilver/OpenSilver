@@ -133,7 +133,7 @@ namespace CSHTML5.Internal
             {
                 object newLocalValue = newValue;
 
-                if (storage.BaseValueSourceInternal == BaseValueSourceInternal.Local)
+                if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
                 {
                     var currentExpr = storage.LocalValue as Expression;
                     if (currentExpr != null)
@@ -175,7 +175,7 @@ namespace CSHTML5.Internal
         internal static void RefreshExpressionCommon(INTERNAL_PropertyStorage storage, Expression expression, bool isInStyle)
         {
             global::System.Diagnostics.Debug.Assert(expression != null, "Expression should not be null");
-            global::System.Diagnostics.Debug.Assert(storage.IsExpression || storage.IsExpressionFromStyle, "Property base value is not a BindingExpression !");
+            global::System.Diagnostics.Debug.Assert(storage.Entry.IsExpression || storage.Entry.IsExpressionFromStyle, "Property base value is not a BindingExpression !");
 
             UpdateEffectiveValue(storage,
                                  expression,
@@ -189,7 +189,7 @@ namespace CSHTML5.Internal
         internal static void ClearValueCommon(INTERNAL_PropertyStorage storage)
         {
             // Check for expression
-            var currentExpr = storage.IsExpression
+            var currentExpr = storage.Entry.IsExpression
                               ? storage.LocalValue as Expression
                               : null;
 
@@ -212,9 +212,9 @@ namespace CSHTML5.Internal
 
         internal static void CoerceValueCommon(INTERNAL_PropertyStorage storage)
         {
-            if (storage.IsCoercedWithCurrentValue)
+            if (storage.Entry.IsCoercedWithCurrentValue)
             {
-                SetValueCommon(storage, storage.ModifiedValue.CoercedValue, true);
+                SetValueCommon(storage, storage.Entry.ModifiedValue.CoercedValue, true);
                 return;
             }
 
@@ -227,26 +227,26 @@ namespace CSHTML5.Internal
                                  true); // propagateChanges
         }
 
-        internal static object GetEffectiveValue(INTERNAL_PropertyStorage storage)
+        internal static object GetEffectiveValue(EffectiveValueEntry entry)
         {
-            if (storage.HasModifiers)
+            if (entry.HasModifiers)
             {
-                return (storage.IsCoercedWithCurrentValue || storage.IsCoerced)
-                       ? storage.ModifiedValue.CoercedValue
-                       : storage.ModifiedValue.ExpressionValue;
+                return (entry.IsCoercedWithCurrentValue || entry.IsCoerced)
+                       ? entry.ModifiedValue.CoercedValue
+                       : entry.ModifiedValue.ExpressionValue;
             }
             else
             {
-                return storage.Value;
+                return entry.Value;
             }
         }
 
         internal static void SetAnimationValue(INTERNAL_PropertyStorage storage,
                                                object value)
         {
-            if (storage.IsExpression || storage.IsExpressionFromStyle)
+            if (storage.Entry.IsExpression || storage.Entry.IsExpressionFromStyle)
             {
-                var currentExpr = storage.ModifiedValue.BaseValue as Expression;
+                var currentExpr = storage.Entry.ModifiedValue.BaseValue as Expression;
                 if (currentExpr != null)
                 {
                     currentExpr.OnDetach(storage.Owner, storage.Property);
@@ -322,9 +322,10 @@ namespace CSHTML5.Internal
             global::System.Diagnostics.Debug.Assert((coerceWithCurrentValue == coerceValue && !coerceValue) || coerceValue != coerceWithCurrentValue);
 
             bool isCoerceOperation = coerceValue || coerceWithCurrentValue;
-            BaseValueSourceInternal oldBaseValueSource = storage.BaseValueSourceInternal;
+            EffectiveValueEntry newEntry;
+            EffectiveValueEntry oldEntry = storage.Entry;
+            BaseValueSourceInternal oldBaseValueSource = oldEntry.BaseValueSourceInternal;
 
-            object oldValue;
             Expression currentExpr = null;
 
             // Compute new value
@@ -336,8 +337,21 @@ namespace CSHTML5.Internal
                 effectiveValue = newValue;
                 effectiveValueKind = oldBaseValueSource;
 
-                // Get old value before it gets overriden
-                oldValue = GetEffectiveValue(storage);
+                newEntry = new EffectiveValueEntry(oldEntry.FullValueSource);
+                if (!oldEntry.HasModifiers)
+                {
+                    newEntry.Value = oldEntry.Value;
+                }
+                else
+                {
+                    ModifiedValue modifiedValue = oldEntry.ModifiedValue;
+                    newEntry.Value = new ModifiedValue
+                    {
+                        BaseValue = modifiedValue.BaseValue,
+                        ExpressionValue = modifiedValue.ExpressionValue,
+                        CoercedValue = modifiedValue.CoercedValue,
+                    };
+                }
             }
             else
             {
@@ -353,10 +367,7 @@ namespace CSHTML5.Internal
                     return false;
                 }
 
-                // Get old value before it gets overriden
-                oldValue = GetEffectiveValue(storage);
-
-                currentExpr = (storage.IsExpression || storage.IsExpressionFromStyle) ? storage.ModifiedValue.BaseValue as Expression : null;
+                currentExpr = (oldEntry.IsExpression || oldEntry.IsExpressionFromStyle) ? oldEntry.ModifiedValue.BaseValue as Expression : null;
 
 #if USEASSERT
                 // If the current base value is an Expression, it should have been detached by now
@@ -366,14 +377,11 @@ namespace CSHTML5.Internal
                                                         !currentExpr.IsAttached ||
                                                         object.ReferenceEquals(currentExpr, effectiveValue), "Binding expression should be detached.");
 #endif
-
-                storage.ResetValue();
-
-                // Update the base value source
-                storage.BaseValueSourceInternal = effectiveValueKind;
+                newEntry = new EffectiveValueEntry(effectiveValueKind);
             }
 
             object computedValue;
+            object oldValue = GetEffectiveValue(oldEntry);
 
             if (!isCoerceOperation)
             {
@@ -383,7 +391,7 @@ namespace CSHTML5.Internal
                     computedValue = storage.Property.PropertyType == typeof(string)
                                     ? effectiveValue?.ToString()
                                     : effectiveValue;
-                    storage.Value = computedValue;
+                    newEntry.Value = computedValue;
                 }
                 else
                 {
@@ -393,24 +401,26 @@ namespace CSHTML5.Internal
 
                     // If the new Expression is the same as the current one,
                     // the Expression is already attached
-                    bool isNewBinding = !object.ReferenceEquals(currentExpr, newExpr);
+                    bool isNewBinding = currentExpr != newExpr;
                     if (isNewBinding)
                     {
                         if (newExpr.IsAttached)
                         {
                             throw new InvalidOperationException(string.Format("Cannot attach an instance of '{0}' multiple times", newExpr.GetType()));
                         }
+
                         newExpr.OnAttach(storage.Owner, storage.Property);
-                        storage.Value = newExpr; // Set the new base value
                     }
+                    
+                    newEntry.Value = newExpr; // Set the new base value
 
                     if (effectiveValueKind == BaseValueSourceInternal.Local)
                     {
-                        storage.SetExpressionValue(storage.TypeMetadata.DefaultValue, newExpr);
+                        newEntry.SetExpressionValue(storage.TypeMetadata.DefaultValue, newExpr);
                     }
                     else
                     {
-                        storage.SetExpressionFromStyleValue(storage.TypeMetadata.DefaultValue, newExpr);
+                        newEntry.SetExpressionFromStyleValue(storage.TypeMetadata.DefaultValue, newExpr);
                     }
 
                     // 1- 'isNewBinding == true' means that we are attaching a new Expression.
@@ -424,23 +434,26 @@ namespace CSHTML5.Internal
                     computedValue = storage.Property.PropertyType == typeof(string)
                                     ? computedValue?.ToString()
                                     : computedValue;
-                    storage.ModifiedValue.ExpressionValue = computedValue;
+                    newEntry.ModifiedValue.ExpressionValue = computedValue;
                 }
             }
             else
             {
-                computedValue = coerceWithCurrentValue ? newValue : GetCoercionBaseValue(storage);
+                computedValue = coerceWithCurrentValue ? newValue : GetCoercionBaseValue(newEntry);
                 if (coerceValue)
                 {
-                    storage.ResetCoercedValue();
+                    newEntry.ResetCoercedValue();
                 }
             }
 
             // Coerce to current value
             if (coerceWithCurrentValue)
             {
-                object baseValue = GetCoercionBaseValue(storage);
-                ProcessCoerceValue(storage,
+                object baseValue = GetCoercionBaseValue(newEntry);
+                ProcessCoerceValue(storage.Owner,
+                                   storage.Property,
+                                   storage.TypeMetadata,
+                                   newEntry,
                                    ref computedValue,
                                    oldValue,
                                    baseValue,
@@ -449,10 +462,13 @@ namespace CSHTML5.Internal
 
             // Coerce Value
             // We don't want to coerce the value if it's being reset to the property's default value
-            if (storage.TypeMetadata.CoerceValueCallback != null && !(clearValue && storage.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default))
+            if (storage.TypeMetadata.CoerceValueCallback != null && !(clearValue && newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default))
             {
-                object baseValue = GetCoercionBaseValue(storage);
-                ProcessCoerceValue(storage,
+                object baseValue = GetCoercionBaseValue(newEntry);
+                ProcessCoerceValue(storage.Owner,
+                                   storage.Property,
+                                   storage.TypeMetadata,
+                                   newEntry,
                                    ref computedValue,
                                    oldValue,
                                    baseValue,
@@ -475,6 +491,8 @@ namespace CSHTML5.Internal
                 // Check above
                 storage.Owner.ProvideSelfAsInheritanceContext(computedValue, null/*storage.Property*/);
             }
+
+            storage.Entry = newEntry;
 
             bool valueChanged;
             if (valueChanged = (storage.INTERNAL_IsVisualValueDirty || !ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType)))
@@ -527,15 +545,18 @@ namespace CSHTML5.Internal
             storage.INTERNAL_IsVisualValueDirty = true;
         }
 
-        private static void ProcessCoerceValue(INTERNAL_PropertyStorage storage,
+        private static void ProcessCoerceValue(DependencyObject target,
+                                               DependencyProperty dp,
+                                               PropertyMetadata metadata,
+                                               EffectiveValueEntry entry,
                                                ref object newValue,
                                                object oldValue,
                                                object baseValue,
                                                bool coerceWithCurrentValue)
         {
-            newValue = coerceWithCurrentValue ? newValue : storage.TypeMetadata.CoerceValueCallback(storage.Owner, newValue);
+            newValue = coerceWithCurrentValue ? newValue : metadata.CoerceValueCallback(target, newValue);
 
-            if (!ArePropertiesEqual(newValue, baseValue, storage.Property.PropertyType))
+            if (!ArePropertiesEqual(newValue, baseValue, dp.PropertyType))
             {
                 // returning DependencyProperty.UnsetValue from a Coercion callback means "don't do the set" ...
                 // or "use previous value"
@@ -544,38 +565,38 @@ namespace CSHTML5.Internal
                     newValue = oldValue;
                 }
 
-                storage.SetCoercedValue(newValue, baseValue, coerceWithCurrentValue);
+                entry.SetCoercedValue(newValue, baseValue, coerceWithCurrentValue);
             }
         }
 
-        private static object GetCoercionBaseValue(INTERNAL_PropertyStorage storage)
+        private static object GetCoercionBaseValue(EffectiveValueEntry entry)
         {
             object baseValue;
-            if (!storage.HasModifiers)
+            if (!entry.HasModifiers)
             {
-                baseValue = storage.Value;
+                baseValue = entry.Value;
             }
-            else if (storage.IsCoerced)
+            else if (entry.IsCoerced)
             {
-                if (storage.IsCoercedWithCurrentValue)
+                if (entry.IsCoercedWithCurrentValue)
                 {
-                    baseValue = storage.ModifiedValue.CoercedValue;
+                    baseValue = entry.ModifiedValue.CoercedValue;
                 }
-                else if (storage.IsExpression/* || storage.IsExpressionFromStyle*/)
+                else if (entry.IsExpression/* || entry.IsExpressionFromStyle*/)
                 {
-                    baseValue = storage.ModifiedValue.ExpressionValue;
+                    baseValue = entry.ModifiedValue.ExpressionValue;
                 }
                 else
                 {
-                    //global::System.Diagnostics.Debug.Assert(!storage.IsExpressionFromStyle);
+                    //global::System.Diagnostics.Debug.Assert(!entry.IsExpressionFromStyle);
                     // Only modifier is Coerced
-                    baseValue = storage.ModifiedValue.BaseValue;
+                    baseValue = entry.ModifiedValue.BaseValue;
                 }
             }
             else
             {
-                global::System.Diagnostics.Debug.Assert(storage.IsExpression || storage.IsExpressionFromStyle);
-                baseValue = storage.ModifiedValue.ExpressionValue;
+                global::System.Diagnostics.Debug.Assert(entry.IsExpression || entry.IsExpressionFromStyle);
+                baseValue = entry.ModifiedValue.ExpressionValue;
             }
             return baseValue;
         }
@@ -682,9 +703,9 @@ namespace CSHTML5.Internal
 
         internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)
         {
-            if (storage.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle)
+            if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle)
             {
-                var oldExpr = storage.IsExpressionFromStyle ? storage.LocalStyleValue as Expression : null;
+                var oldExpr = storage.Entry.IsExpressionFromStyle ? storage.LocalStyleValue as Expression : null;
                 if (oldExpr != null)
                 {
                     oldExpr.OnDetach(storage.Owner, storage.Property);
@@ -717,9 +738,9 @@ namespace CSHTML5.Internal
 
         internal static void SetThemeStyleValue(INTERNAL_PropertyStorage storage, object newValue)
         {
-            if (storage.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle)
+            if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle)
             {
-                var oldExpr = storage.IsExpressionFromStyle ? storage.ThemeStyleValue as Expression : null;
+                var oldExpr = storage.Entry.IsExpressionFromStyle ? storage.ThemeStyleValue as Expression : null;
                 if (oldExpr != null)
                 {
                     oldExpr.OnDetach(storage.Owner, storage.Property);

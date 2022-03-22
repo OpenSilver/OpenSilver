@@ -799,7 +799,7 @@ if(nextSibling != undefined) {
             // it means they have been set at some point, and unset afterward,
             // so we should not call the PropertyChanged callback.
             var list = dependencyObject.INTERNAL_PropertyStorageDictionary
-                .Where(s => s.Value.BaseValueSourceInternal > BaseValueSourceInternal.Default)
+                .Where(s => s.Value.Entry.BaseValueSourceInternal > BaseValueSourceInternal.Default)
                 .ToList();
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Copy list of properties", t0);
@@ -830,7 +830,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
                             valueWasRetrieved = true;
                         }
 
@@ -844,7 +844,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
                             valueWasRetrieved = true;
                         }
 
@@ -861,7 +861,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
                             valueWasRetrieved = true;
                         }
 

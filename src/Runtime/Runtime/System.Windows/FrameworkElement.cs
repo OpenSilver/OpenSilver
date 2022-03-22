@@ -283,7 +283,7 @@ namespace Windows.UI.Xaml
                 foreach (var storage in storages)
                 {
                     uie.SetInheritedValue(storage.Property,
-                                          INTERNAL_PropertyStore.GetEffectiveValue(storage),
+                                          INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
                                           true);
                 }
             }
