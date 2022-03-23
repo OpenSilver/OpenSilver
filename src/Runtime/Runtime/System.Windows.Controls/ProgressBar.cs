@@ -135,6 +135,9 @@ namespace Windows.UI.Xaml.Controls
                 case Control control:
                     widthOffset += control.Padding.Left + control.Padding.Right;
                     break;
+                case Grid grid:
+                    widthOffset += 2;
+                    break;
             }
 
             _rectProgressIndicator.Width = (IsIndeterminate || maximum == minimum ? 1.0 : (Value - minimum) / (maximum - minimum)) * Math.Max(0.0, parent.ActualWidth - widthOffset);
