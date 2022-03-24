@@ -123,7 +123,7 @@ namespace Windows.UI.Xaml.Controls
             var parent = VisualTreeHelper.GetParent(_rectProgressIndicator) as FrameworkElement;
             if (parent == null) return;
 
-            double widthOffset = _rectProgressIndicator.Margin.Left + _rectProgressIndicator.Margin.Right;
+            double widthOffset = _rectProgressIndicator.Margin.Left + _rectProgressIndicator.Margin.Right + _rectProgressIndicator.StrokeThickness;
             double minimum = Minimum;
             double maximum = Maximum;
 
@@ -134,9 +134,6 @@ namespace Windows.UI.Xaml.Controls
                     break;
                 case Control control:
                     widthOffset += control.Padding.Left + control.Padding.Right;
-                    break;
-                case Grid grid:
-                    widthOffset += 2;
                     break;
             }
 
