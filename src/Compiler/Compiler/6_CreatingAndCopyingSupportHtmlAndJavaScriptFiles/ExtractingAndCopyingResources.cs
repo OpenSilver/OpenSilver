@@ -51,8 +51,7 @@ namespace DotNetForHtml5.Compiler
                     // Copy files:
                     foreach (KeyValuePair<string, byte[]> file in jsAndCssFiles)
                     {
-                        // remove path like 'obj\Debug\netstandard2.0\' from file.Key for .g.js files
-                        string fileName = Path.GetFileName(file.Key);
+                        string fileName = file.Key;
                         byte[] fileContent = file.Value;
 
                         // Combine the root output path and the relative "resources" folder path, while also ensuring that there is no forward slash, and that the path ends with a backslash:
