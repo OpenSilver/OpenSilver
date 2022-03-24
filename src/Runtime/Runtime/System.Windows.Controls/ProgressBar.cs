@@ -123,7 +123,7 @@ namespace Windows.UI.Xaml.Controls
             var parent = VisualTreeHelper.GetParent(_rectProgressIndicator) as FrameworkElement;
             if (parent == null) return;
 
-            double widthOffset = _rectProgressIndicator.Margin.Left + _rectProgressIndicator.Margin.Right;
+            double widthOffset = _rectProgressIndicator.Margin.Left + _rectProgressIndicator.Margin.Right + _rectProgressIndicator.StrokeThickness;
             double minimum = Minimum;
             double maximum = Maximum;
 
