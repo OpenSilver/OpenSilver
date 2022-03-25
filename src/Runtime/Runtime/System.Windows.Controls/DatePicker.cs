@@ -404,6 +404,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                     else
                     {
+                        _textBox.Text = string.Empty;
                         SetWaterMarkText();
                         return null;
                     }
