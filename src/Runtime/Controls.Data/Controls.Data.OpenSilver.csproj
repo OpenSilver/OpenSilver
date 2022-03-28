@@ -18,19 +18,13 @@
 
 
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION;WORKINPROGRESS</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION;WORKINPROGRESS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;OPENSILVER;MIGRATION</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;OPENSILVER;WORKINPROGRESS</DefineConstants>
-  </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="DataGrid\Automation\DataGridAutomationPeer.cs" />
@@ -144,9 +138,7 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' " />
-  <Import Project="..\..\packages\OpenSilver.WorkInProgress.$(OpenSilverVersion)\build\OpenSilver.WorkInProgress.targets" Condition=" '$(Configuration)|$(Platform)' == 'SL.WorkInProgress|AnyCPU' " />
   <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' " />
-  <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)|$(Platform)' == 'UWP.WorkInProgress|AnyCPU' " />
 
-  
+
 </Project>
