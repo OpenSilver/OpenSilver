@@ -1089,7 +1089,7 @@
 		<Compile Include="__SPECIFIC__\IJavaScriptExecutionHandler.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<Content Include="Themes\generic.xaml">
+		<Content Include="..\Themes\Runtime\OpenSilver\generic.xaml" Link="Themes\generic.xaml">
 			<SubType>Designer</SubType>
 			<Generator>MSBuild:Compile</Generator>
 		</Content>
