@@ -208,6 +208,7 @@
     <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
     <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
     <Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />
+    <Compile Include="System.Windows.Media.Animation\ColorAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
     <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
     <Compile Include="System.Windows.Media\TransformConverter.cs" />
@@ -871,7 +872,6 @@
     <Compile Include="System.Windows.Media.Animation\AnimationTimeline.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\BackEase.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ClockState.cs" />
-    <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
     <Compile Include="System.Windows.Media.Animation\DoubleAnimationUsingKeyFrames.cs" />

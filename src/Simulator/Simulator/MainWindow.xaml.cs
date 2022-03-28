@@ -47,6 +47,8 @@ using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System.Windows.Media.Imaging;
 #if OPENSILVER
 using OpenSilver.Simulator;
+#else
+using CSHTML5.Simulator;
 #endif
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
