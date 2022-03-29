@@ -151,8 +151,8 @@ namespace CSHTML5.Internal
 
                     child.INTERNAL_SpanParentCell = null;
 
-                    // Detach the element as well as all the children recursively:
-                    DetachVisualChidrenRecursively(child);
+                    //Detach Element  
+                    DetachVisualChidren(child);
 
 
                     INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
@@ -173,7 +173,24 @@ namespace CSHTML5.Internal
 #endif
         }
 
-        static void DetachVisualChidrenRecursively(UIElement element)
+        static void DetachVisualChidren(UIElement element)
+        {
+            Queue<UIElement> elementsQueue = new Queue<UIElement>();
+            elementsQueue.Enqueue(element);
+
+            while (elementsQueue.Count > 0)
+            {
+                var elementToDetach = elementsQueue.Dequeue();
+                if (elementToDetach.INTERNAL_VisualChildrenInformation != null)
+                {
+                    var elementTodetachChildren = elementToDetach.INTERNAL_VisualChildrenInformation.Select(kp => kp.Value);
+                    elementTodetachChildren.ForEach(q => elementsQueue.Enqueue(q.INTERNAL_UIElement));
+                }
+                DetachElement(elementToDetach);
+            }
+        }
+
+        static void DetachElement(UIElement element)
         {
             if (element.IsPointerOver)
             {
@@ -199,15 +216,6 @@ namespace CSHTML5.Internal
                 ((FrameworkElement)element).INTERNAL_RaiseUnloadedEvent();
             }
 
-            // Traverse all elements recursively:
-            if (element.INTERNAL_VisualChildrenInformation != null)
-            {
-                foreach (var childInfo in element.INTERNAL_VisualChildrenInformation.Select(kp => kp.Value))
-                {
-                    DetachVisualChidrenRecursively(childInfo.INTERNAL_UIElement);
-                }
-            }
-
             // Reset all visual-tree related information:
             element.IsConnectedToLiveTree = false;
             element.INTERNAL_OuterDomElement = null;
@@ -217,7 +225,6 @@ namespace CSHTML5.Internal
             element.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
         }
-
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
         {
             if (oldIndex < 0)
