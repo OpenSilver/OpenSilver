@@ -1071,7 +1071,7 @@
     <None Include="Runtime.licenseheader" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Themes\generic.xaml">
+    <Content Include="..\Themes\Runtime\CSHTML5\generic.xaml" Link="Themes\generic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
