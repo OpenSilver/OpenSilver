@@ -7,7 +7,7 @@
 
 <Style xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-       xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+       xmlns:vsm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
        TargetType="CheckBox">
     <!-- Cannot currently parse bool? type in XAML so it's being set in code -->
     <!-- <Setter Property="IsEnabled" Value="false" /> -->

@@ -3,6 +3,8 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -853,14 +855,13 @@ namespace Windows.UI.Xaml.Controls
 
         #region IEnumerable Members
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return _list.GetEnumerator();
         }
-
         #endregion
 
-#if DEBUG
+#if DEBUG && MIGRATION
 
         public void PrintIndexes()
         {
@@ -871,6 +872,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+
+
 #endif
+
     }
 }

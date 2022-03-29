@@ -6,6 +6,8 @@
 #if MIGRATION
 namespace System.Windows.Controls
 #else
+using System;
+
 namespace Windows.UI.Xaml.Controls
 #endif
 {
@@ -16,6 +18,7 @@ namespace Windows.UI.Xaml.Controls
     /// <QualityBand>Mature</QualityBand>
     public class DataGridRowDetailsEventArgs : EventArgs
     {
+ 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGridRowDetailsEventArgs" /> class. 
         /// </summary>

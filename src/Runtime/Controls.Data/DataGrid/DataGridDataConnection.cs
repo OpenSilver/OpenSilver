@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -314,21 +315,21 @@ namespace Windows.UI.Xaml.Controls
 
             return
                 type.IsEnum
-                || type == typeof(System.String)
-                || type == typeof(System.Char)
-                || type == typeof(System.DateTime)
-                || type == typeof(System.Boolean)
-                || type == typeof(System.Byte)
-                || type == typeof(System.SByte)
-                || type == typeof(System.Single)
-                || type == typeof(System.Double)
-                || type == typeof(System.Decimal)
-                || type == typeof(System.Int16)
-                || type == typeof(System.Int32)
-                || type == typeof(System.Int64)
-                || type == typeof(System.UInt16)
-                || type == typeof(System.UInt32)
-                || type == typeof(System.UInt64);
+                || type == typeof(String)
+                || type == typeof(Char)
+                || type == typeof(DateTime)
+                || type == typeof(Boolean)
+                || type == typeof(Byte)
+                || type == typeof(SByte)
+                || type == typeof(Single)
+                || type == typeof(Double)
+                || type == typeof(Decimal)
+                || type == typeof(Int16)
+                || type == typeof(Int32)
+                || type == typeof(Int64)
+                || type == typeof(UInt16)
+                || type == typeof(UInt32)
+                || type == typeof(UInt64);
         }
 
         /// <summary>

@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
@@ -21,6 +22,7 @@ namespace Windows.UI.Xaml.Controls
 {
     internal class DataGridValueConverter : IValueConverter
     {
+#if MIGRATION
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value;
@@ -41,5 +43,27 @@ namespace Windows.UI.Xaml.Controls
             }
             return value;
         }
+#else
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return value;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            if (targetType != null && targetType.IsNullableType())
+            {
+                String strValue = value as String;
+                if (strValue == String.Empty)
+                {
+                    return null;
+                }
+            }
+            return value;
+        }
+#endif
+
+
+
+       
     }
 }

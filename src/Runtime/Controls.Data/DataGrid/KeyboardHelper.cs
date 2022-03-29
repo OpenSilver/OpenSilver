@@ -7,6 +7,7 @@
 #if MIGRATION
 using System.Windows.Input;
 #else
+using System.Windows.Input;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -19,6 +20,7 @@ namespace Windows.UI.Xaml.Controls
 {
     internal static class KeyboardHelper
     {
+#if MIGRATION
         public static void GetMetaKeyState(out bool ctrl, out bool shift)
         {
             ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
@@ -35,6 +37,25 @@ namespace Windows.UI.Xaml.Controls
         {
             GetMetaKeyState(out ctrl, out shift);
             alt = (Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt;
-        }        
+        } 
+#else
+        public static void GetMetaKeyState(out bool ctrl, out bool shift)
+        {
+            ctrl = (Keyboard.Modifiers & System.VirtualKeyModifiers.Control) == System.VirtualKeyModifiers.Control;
+
+            // The Apple key on a Mac is supposed to behave like the CTRL key on a PC for
+            // things like multi-select, select-all, and grid navigation.  To allow for this,
+            // we set the CTRL to true if the Apple key is pressed.
+            ctrl |= (Keyboard.Modifiers & System.VirtualKeyModifiers.Apple) == System.VirtualKeyModifiers.Apple;
+
+            shift = (Keyboard.Modifiers & System.VirtualKeyModifiers.Shift) == System.VirtualKeyModifiers.Shift;
+        }
+
+        public static void GetMetaKeyState(out bool ctrl, out bool shift, out bool alt)
+        {
+            GetMetaKeyState(out ctrl, out shift);
+            alt = (Keyboard.Modifiers & System.VirtualKeyModifiers.Menu) == System.VirtualKeyModifiers.Menu;
+        }
+#endif
     }
 }

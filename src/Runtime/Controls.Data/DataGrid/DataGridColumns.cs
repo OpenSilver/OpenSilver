@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -1022,8 +1023,9 @@ namespace Windows.UI.Xaml.Controls
                 _autoGeneratingColumnOperationCount--;
             }
         }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+#if MIGRATION
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+#endif
         private bool ComputeDisplayedColumns()
         {
             bool invalidate = false;
@@ -1260,7 +1262,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
 
-#if DEBUG
+#if DEBUG && MIGRATION
                 Debug.Assert(this.ColumnsInternal.Debug_VerifyColumnDisplayIndexes());
 #endif
                 // Now raise all the OnColumnDisplayIndexChanged events
@@ -1306,7 +1308,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 this.ColumnsInternal.DisplayIndexMap.Insert(insertedColumn.DisplayIndexWithFiller, insertedColumn.Index);
 
-#if DEBUG
+#if DEBUG && MIGRATION
                 Debug.Assert(this.ColumnsInternal.Debug_VerifyColumnDisplayIndexes());
 #endif
                 // Now raise all the OnColumnDisplayIndexChanged events

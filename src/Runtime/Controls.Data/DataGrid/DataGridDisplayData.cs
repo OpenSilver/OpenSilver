@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -369,7 +370,7 @@ internal class DataGridDisplayData
 
         #endregion Methods
 
-#if DEBUG
+#if DEBUG && MIGRATION
         internal void PrintDisplay()
         {
             foreach (UIElement element in this.GetScrollingElements())

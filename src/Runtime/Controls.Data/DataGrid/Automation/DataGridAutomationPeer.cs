@@ -196,7 +196,9 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// child elements of the automation peer.
         /// </summary>
         /// <returns>The children elements.</returns>
+#if SILVERLIGHT
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Required method signature for automation peers")]
+#endif
         protected override List<AutomationPeer> GetChildrenCore()
         {
             List<AutomationPeer> children = base.GetChildrenCore();

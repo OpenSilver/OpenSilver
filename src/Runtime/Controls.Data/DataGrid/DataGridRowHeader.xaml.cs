@@ -15,6 +15,7 @@ using System.Windows.Media;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.Foundation;
 #endif
 
 #if MIGRATION
@@ -216,10 +217,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public DataGridRowHeader()
         {
             CustomLayout = true;
+#if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridRowHeader_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridRowHeader_MouseLeave);
-
+#else
+            this.AddHandler(FrameworkElement.PointerReleasedEvent, new PointerEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
+            this.PointerEntered += new PointerEventHandler(DataGridRowHeader_MouseEnter);
+            this.PointerReleased += new PointerEventHandler(DataGridRowHeader_MouseLeave);
+#endif
             DefaultStyleKey = typeof(DataGridRowHeader);
         }
 
@@ -343,16 +349,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-#endregion Private Properties
+        #endregion Private Properties
 
 
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Builds the visual tree for the row header when a new template is applied. 
         /// </summary>
+#if MIGRATION
+
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             base.OnApplyTemplate();
 
             this._rootElement = GetTemplateChild(DATAGRIDROWHEADER_elementRootName) as FrameworkElement;
@@ -507,6 +519,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
 #region Private Methods
 
+#if MIGRATION
         private void DataGridRowHeader_MouseEnter(object sender, MouseEventArgs e)
         {
             if (this.OwningRow != null)
@@ -541,7 +554,42 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 }
             }
         }
+#else
+        private void DataGridRowHeader_MouseEnter(object sender, PointerRoutedEventArgs e)
+        {
+            if (this.OwningRow != null)
+            {
+                this.OwningRow.IsMouseOver = true;
+            }
+        }
 
+        private void DataGridRowHeader_MouseLeave(object sender, PointerRoutedEventArgs e)
+        {
+            if (this.OwningRow != null)
+            {
+                this.OwningRow.IsMouseOver = false;
+            }
+        }
+
+        private void DataGridRowHeader_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
+        {
+            if (this.OwningGrid != null)
+            {
+                if (!e.Handled && this.OwningGrid.IsTabStop)
+                {
+                    bool success = this.OwningGrid.Focus();
+                    Debug.Assert(success);
+                }
+                if (this.OwningRow != null)
+                {
+                    Debug.Assert(sender is DataGridRowHeader);
+                    Debug.Assert(sender == this);
+                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, -1, this.Slot, false);
+                    this.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
+                }
+            }
+        }
+#endif
 #endregion Private Methods
     }
 }

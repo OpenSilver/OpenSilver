@@ -8,11 +8,11 @@
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:System.Windows.Controls;assembly=OpenSilver.Controls.Data"
-    xmlns:dataInput="clr-namespace:System.Windows.Controls;assembly=OpenSilver.Controls.Data.Input"
-    xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=System.Windows"
-    xmlns:localprimitives="clr-namespace:System.Windows.Controls.Primitives;assembly=OpenSilver.Controls.Data"
-    xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows">
+    xmlns:local="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:dataInput="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    xmlns:primitives="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    xmlns:localprimitives="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    xmlns:vsm="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 
     <Style TargetType="local:DataGrid">
         <Setter Property="RowBackground" Value="#AAEAEFF4" />

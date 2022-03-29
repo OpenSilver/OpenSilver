@@ -7,6 +7,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,7 +28,9 @@ using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Common;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.System;
 #endif
 
 #if MIGRATION
@@ -773,14 +776,19 @@ namespace Windows.UI.Xaml.Controls
         ////
         ////------------------------------------------------------ 
 
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Applies the control's template, retrieves the elements
         /// within it, and sets up events.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             base.OnApplyTemplate();
 
             // unsubscribe event handlers for previous template parts
@@ -806,7 +814,11 @@ namespace Windows.UI.Xaml.Controls
 
             if (this._currentPageTextBox != null)
             {
+#if MIGRATION
                 this._currentPageTextBox.KeyDown -= new System.Windows.Input.KeyEventHandler(this.OnCurrentPageTextBoxKeyDown);
+#else
+                this._currentPageTextBox.KeyDown -= new KeyEventHandler(this.OnCurrentPageTextBoxKeyDown);
+#endif
                 this._currentPageTextBox.LostFocus -= new RoutedEventHandler(this.OnCurrentPageTextBoxLostFocus);
             }
 
@@ -865,7 +877,11 @@ namespace Windows.UI.Xaml.Controls
 
             if (this._currentPageTextBox != null)
             {
+#if MIGRATION
                 this._currentPageTextBox.KeyDown += new System.Windows.Input.KeyEventHandler(this.OnCurrentPageTextBoxKeyDown);
+#else
+                this._currentPageTextBox.KeyDown += this.OnCurrentPageTextBoxKeyDown;
+#endif
                 this._currentPageTextBox.LostFocus += new RoutedEventHandler(this.OnCurrentPageTextBoxLostFocus);
                 AutomationProperties.SetAutomationId(this._currentPageTextBox, DATAPAGER_currentPageTextBoxAutomationId);
             }
@@ -1296,6 +1312,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The object firing this event.</param>
         /// <param name="e">The event args for this event.</param>
+#if MIGRATION
         private void OnCurrentPageTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Enter)
@@ -1303,6 +1320,15 @@ namespace Windows.UI.Xaml.Controls
                 this.MoveCurrentPageToTextboxValue();
             }
         }
+#else
+        private void OnCurrentPageTextBoxKeyDown(object sender,KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                this.MoveCurrentPageToTextboxValue();
+            }
+        }
+#endif
 
         /// <summary>
         /// Handles the loss of focus for the current page text box.

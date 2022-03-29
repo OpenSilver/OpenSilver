@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -630,7 +631,7 @@ namespace Windows.UI.Xaml.Controls
 
         #region Debugging Methods
 
-#if DEBUG
+#if DEBUG && MIGRATION
         internal bool Debug_VerifyColumnDisplayIndexes()
         {
             for (int columnDisplayIndex = 0; columnDisplayIndex < this.ItemsInternal.Count; columnDisplayIndex++)

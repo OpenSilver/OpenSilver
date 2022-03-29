@@ -5,11 +5,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Windows.Markup;
 
 
 #if MIGRATION
 using System.Windows.Controls;
-using System.Windows.Markup;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
@@ -73,10 +74,10 @@ namespace Windows.UI.Xaml.Controls
 
             if (!_cache.TryGetValue(resourceName, out template))
             {
-                System.IO.Stream s = type.Assembly.GetManifestResourceStream(resourceName + ".xaml");
+                 Stream s = type.Assembly.GetManifestResourceStream(resourceName + ".xaml");
                 if (s != null)
                 {
-                    template = new System.IO.StreamReader(s).ReadToEnd();
+                    template = new StreamReader(s).ReadToEnd();
                     _cache[resourceName] = template;
                 }
             }

@@ -9,6 +9,8 @@
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
 #else
+using System;
+using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Media;
 #endif

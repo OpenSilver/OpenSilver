@@ -178,7 +178,12 @@ namespace Windows.UI.Xaml.Controls
             }
 
             //key processing methods
+
+#if MIGRATION
             internal void ProcessDataGridKey(KeyEventArgs e)
+#else
+            internal void ProcessDataGridKey(KeyRoutedEventArgs e)
+#endif
             {
                 _grid.ProcessDataGridKey(e);
             }
@@ -232,9 +237,13 @@ namespace Windows.UI.Xaml.Controls
             {
                 return _grid.ProcessRightKey();
             }
-
+#if MIGRATION
             internal bool ProcessTabKey(KeyEventArgs e)
             {
+#else
+            internal bool ProcessTabKey(KeyRoutedEventArgs e)
+            {
+#endif
                 return _grid.ProcessTabKey(e);
             }
 
@@ -263,7 +272,7 @@ namespace Windows.UI.Xaml.Controls
                 _grid.ValidationSummary_FocusingInvalidControl(sender, e);
             }
 
-            #endregion
+#endregion
         }
 
 

@@ -6,7 +6,9 @@
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
 #else
-namespace Windows.UI.Xaml.Controls,Primitives
+using System;
+
+namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
     /// <summary>

@@ -4,6 +4,7 @@
 // All other rights reserved.
 
 using System.Diagnostics;
+using System;
 
 
 #if MIGRATION
@@ -12,6 +13,8 @@ using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Media;
+using Windows.Foundation;
+
 #endif
 
 #if MIGRATION
@@ -173,8 +176,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
 #endregion Methods
-
-#if DEBUG
+         
+#if DEBUG && MIGRATION
         internal void PrintChildren()
         {
             foreach (UIElement element in this.Children)

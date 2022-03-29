@@ -5,10 +5,12 @@
 
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System;
 #if MIGRATION
 using System.Windows.Input;
 #else
 using Windows.UI.Xaml.Input;
+using Windows.Foundation;
 #endif
 
 
@@ -174,12 +176,20 @@ namespace Windows.UI.Xaml.Controls
             if (editingCheckBox != null)
             {
                 bool? uneditedValue = editingCheckBox.IsChecked;
+#if MIGRATION
                 MouseButtonEventArgs mouseButtonEventArgs = editingEventArgs as MouseButtonEventArgs;
+#else
+                PointerRoutedEventArgs mouseButtonEventArgs = editingEventArgs as PointerRoutedEventArgs;
+#endif
                 bool editValue = false;
                 if (mouseButtonEventArgs != null)
                 {
+#if MIGRATION
                     // Editing was triggered by a mouse click
                     Point position = mouseButtonEventArgs.GetPosition(editingCheckBox);
+#else
+                    Point position = mouseButtonEventArgs.GetCurrentPoint(editingCheckBox).Position;
+#endif
                     Rect rect = new Rect(0, 0, editingCheckBox.ActualWidth, editingCheckBox.ActualHeight);
                     editValue = rect.Contains(position);
                 }
@@ -242,9 +252,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion Protected Methods
+#endregion Protected Methods
 
-        #region Private Methods
+#region Private Methods
 
         private void Columns_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -285,7 +295,7 @@ namespace Windows.UI.Xaml.Controls
             }
             return false;
         }
-
+ 
         private void OwningGrid_CurrentCellChanged(object sender, EventArgs e)
         {
             if (_currentCheckBox != null)
@@ -307,7 +317,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-
+#if MIGRATION
         private void OwningGrid_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space && this.OwningGrid != null &&
@@ -327,6 +337,27 @@ namespace Windows.UI.Xaml.Controls
             }
             _beganEditWithKeyboard = false;
         }
+#else
+        private void OwningGrid_KeyDown(object sender,KeyRoutedEventArgs e)
+        {
+            if (e.Key == System.VirtualKey.Space && this.OwningGrid != null &&
+                this.OwningGrid.CurrentColumn == this)
+            {
+                DataGridRow row = this.OwningGrid.DisplayData.GetDisplayedElement(this.OwningGrid.CurrentSlot) as DataGridRow;
+                if (row != null)
+                {
+                    CheckBox checkBox = this.GetCellContent(row) as CheckBox;
+                    if (checkBox == _currentCheckBox)
+                    {
+                        _beganEditWithKeyboard = true;
+                        this.OwningGrid.BeginEdit();
+                        return;
+                    }
+                }
+            }
+            _beganEditWithKeyboard = false;
+        }
+#endif
 
         private void OwningGrid_LoadingRow(object sender, DataGridRowEventArgs e)
         {
@@ -352,6 +383,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }

@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.ComponentModel;
 
 #if MIGRATION
@@ -11,8 +12,10 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+#if MIGRATION
     // These aren't flags
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags")]
+#endif
     public enum DataGridLengthUnitType
     {
         Auto = 0,
@@ -29,7 +32,7 @@ namespace Windows.UI.Xaml.Controls
     [TypeConverter(typeof(DataGridLengthConverter))]
     public struct DataGridLength : IEquatable<DataGridLength>
     {
-        #region Data
+#region Data
 
         private double _desiredValue;   //  desired value storage
         private double _displayValue;   //  display value storage
@@ -44,10 +47,10 @@ namespace Windows.UI.Xaml.Controls
         // WPF uses 1.0 as the default value as well
         internal const double DATAGRIDLENGTH_DefaultValue = 1.0;
 
-        #endregion Data
+#endregion Data
 
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Windows.Controls.DataGridLength" /> class. 
@@ -140,9 +143,9 @@ namespace Windows.UI.Xaml.Controls
             _unitType = type;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets a <see cref="T:System.Windows.Controls.DataGridLength" /> structure that represents the standard automatic sizing mode.
@@ -291,9 +294,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        #endregion Properties
+#endregion Properties
 
-        #region Methods
+#region Methods
 
         /// <summary>
         /// Overloaded operator, compares 2 DataGridLength's.
@@ -361,6 +364,6 @@ namespace Windows.UI.Xaml.Controls
             return ((int)_unitValue + (int)_unitType) + (int)_desiredValue + (int)_displayValue;
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

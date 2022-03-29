@@ -14,9 +14,12 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Text;
+
 #endif
 
 using System.ComponentModel;
+using System;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -120,7 +123,11 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
+#if MIGRATION
                 return this._fontStyle ?? FontStyles.Normal;
+#else
+                return this._fontStyle ?? FontStyle.Normal;
+#endif
             }
             set
             {
@@ -203,7 +210,8 @@ namespace Windows.UI.Xaml.Controls
         {
             TextBox textBox = new TextBox();
             textBox.VerticalAlignment = VerticalAlignment.Stretch;
-            textBox.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Transparent);
+
+            textBox.Background = new SolidColorBrush(Colors.Transparent);
 
             if (DependencyProperty.UnsetValue != ReadLocalValue(DataGridTextColumn.FontFamilyProperty))
             {
@@ -276,6 +284,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="editingElement">The element that the column displays for a cell in editing mode.</param>
         /// <param name="editingEventArgs">Information about the user gesture that is causing a cell to enter editing mode.</param>
         /// <returns>The unedited value. </returns>
+#if MIGRATION
         protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
         {
             TextBox textBox = editingElement as TextBox;
@@ -298,6 +307,30 @@ namespace Windows.UI.Xaml.Controls
             }
             return string.Empty;
         }
+#else
+        protected override object PrepareCellForEdit(FrameworkElement editingElement, RoutedEventArgs editingEventArgs)
+        {
+            TextBox textBox = editingElement as TextBox;
+            if (textBox != null)
+            {
+                string uneditedText = textBox.Text;
+                int len = uneditedText.Length;
+                KeyRoutedEventArgs keyEventArgs = editingEventArgs as KeyRoutedEventArgs;
+                if (keyEventArgs != null && keyEventArgs.Key == System.VirtualKey.F2)
+                {
+                    // Put caret at the end of the text
+                    textBox.Select(len, len);
+                }
+                else
+                {
+                    // Select all text
+                    textBox.Select(0, len);
+                }
+                return uneditedText;
+            }
+            return string.Empty;
+        }
+#endif
 
         /// <summary>
         /// Called by the DataGrid control when this column asks for its elements to be

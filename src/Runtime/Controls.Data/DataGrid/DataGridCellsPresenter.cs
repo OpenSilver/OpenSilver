@@ -4,11 +4,13 @@
 // All other rights reserved.
 
 using System.Diagnostics;
+using System;
 
 #if MIGRATION
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Media;
+using Windows.Foundation;
 #endif
 
 #if MIGRATION

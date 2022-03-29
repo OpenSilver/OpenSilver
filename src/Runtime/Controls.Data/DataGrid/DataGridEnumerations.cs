@@ -63,8 +63,10 @@ public enum DataGridClipboardCopyMode
     /// Determines whether the inner cells' vertical/horizontal gridlines are shown or not.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
+#if MIGRATION
     [Flags]
     [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
+#endif
     public enum DataGridGridLinesVisibility
     {
         None = 0,
@@ -84,7 +86,9 @@ public enum DataGridClipboardCopyMode
     /// Determines whether the row/column headers are shown or not.
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
+#if MIGRATION
     [Flags]
+#endif
     [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
     public enum DataGridHeadersVisibility
     {

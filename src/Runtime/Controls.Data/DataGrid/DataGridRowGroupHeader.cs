@@ -5,6 +5,7 @@
 
 using System.Diagnostics;
 using System.Globalization;
+using System;
 
 
 #if MIGRATION
@@ -19,6 +20,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.Foundation;
 #endif
 
 
@@ -62,13 +64,16 @@ namespace Windows.UI.Xaml.Controls
         {
             CustomLayout = true;
             DefaultStyleKey = typeof(DataGridRowGroupHeader);
-
+#if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
+#else
+            this.AddHandler(FrameworkElement.PointerReleasedEvent, new PointerEventHandler(DataGridRowGroupHeader_MouseLeftButtonDown), true);
+#endif
         }
 
-#region Dependency Properties
+        #region Dependency Properties
 
-#region HeaderStyle
+        #region HeaderStyle
         /// <summary>
         /// The style applied to the header cell of a <see cref="T:System.Windows.Controls.DataGridRowGroupHeader" />. 
         /// </summary>
@@ -96,9 +101,9 @@ namespace Windows.UI.Xaml.Controls
                 groupHeader._headerElement.EnsureStyle(e.OldValue as Style);
             }
         }
-#endregion HeaderStyle
+        #endregion HeaderStyle
 
-#region ItemCountVisibility
+        #region ItemCountVisibility
         /// <summary>
         /// Gets or sets a value that indicates whether the item count is visible.
         /// </summary>
@@ -117,9 +122,9 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Visibility),
                 typeof(DataGridRowGroupHeader),
                 null);
-#endregion ItemCountVisibility
+        #endregion ItemCountVisibility
 
-#region PropertyName
+        #region PropertyName
         /// <summary>
         /// Gets or sets the name of the property that this <see cref="T:System.Windows.Controls.DataGrid" /> row is bound to. 
         /// </summary>
@@ -138,9 +143,9 @@ namespace Windows.UI.Xaml.Controls
                 typeof(string),
                 typeof(DataGridRowGroupHeader),
                 null);
-#endregion PropertyName
+        #endregion PropertyName
 
-#region PropertyNameVisibility
+        #region PropertyNameVisibility
         /// <summary>
         /// Gets or sets a value that indicates whether the property name is visible.
         /// </summary>
@@ -159,9 +164,9 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Visibility),
                 typeof(DataGridRowGroupHeader),
                 null);
-#endregion PropertyNameVisibility
+        #endregion PropertyNameVisibility
 
-#region SublevelIndent
+        #region SublevelIndent
         /// <summary>
         /// Gets or sets a value that indicates the amount that the 
         /// children of the <see cref="T:System.Windows.Controls.RowGroupHeader" /> are indented. 
@@ -197,7 +202,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else if (newValue < 0)
             {
-                throw DataGridError.DataGrid.ValueMustBeGreaterThanOrEqualTo("value", "SublevelIndent", 0); 
+                throw DataGridError.DataGrid.ValueMustBeGreaterThanOrEqualTo("value", "SublevelIndent", 0);
             }
 
             if (groupHeader.OwningGrid != null)
@@ -205,11 +210,11 @@ namespace Windows.UI.Xaml.Controls
                 groupHeader.OwningGrid.OnSublevelIndentUpdated(groupHeader, newValue);
             }
         }
-#endregion SublevelIndent
+        #endregion SublevelIndent
 
-#endregion Dependency Properties
+        #endregion Dependency Properties
 
-#region Properties
+        #region Properties
 
         internal DataGridRowHeader HeaderCell
         {
@@ -270,9 +275,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Properties
+        #endregion Properties
 
-#region Methods
+        #region Methods
 
         internal void ApplyHeaderStatus(bool animate)
         {
@@ -309,7 +314,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 VisualStates.GoToState(this, useTransitions, VisualStates.StateEmpty);
             }
-            else 
+            else
             {
                 if (this.RowGroupInfo.Visibility == Visibility.Visible)
                 {
@@ -378,9 +383,13 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-
+#if MIGRATION
         private void DataGridRowGroupHeader_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+#else
+        private void DataGridRowGroupHeader_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
+        {
+#endif
             if (this.OwningGrid != null)
             {
                 if (this.OwningGrid.IsDoubleClickRecordsClickOnCall(this) && !e.Handled)
@@ -465,9 +474,13 @@ namespace Windows.UI.Xaml.Controls
             ApplyState(false /*useTransitions*/);
             ApplyHeaderStatus(false);
         }
-
+#if MIGRATION
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             _rootElement = GetTemplateChild(DataGridRow.DATAGRIDROW_elementRoot) as Panel;
 
             if (_expanderButton != null)
@@ -509,13 +522,15 @@ namespace Windows.UI.Xaml.Controls
             return new DataGridRowGroupHeaderAutomationPeer(this);
         }
 
+#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
         {
+
             if (!this.IsEnabled)
             {
                 return;
             }
-            
+
             this.IsMouseOver = true;
             ApplyState(true /*useTransitions*/);
         }
@@ -530,7 +545,7 @@ namespace Windows.UI.Xaml.Controls
             this.IsMouseOver = false;
             ApplyState(true /*useTransitions*/);
         }
-
+#endif
         private void SetIsCheckedNoCallBack(bool value)
         {
             if (_expanderButton != null && _expanderButton.IsChecked != value)

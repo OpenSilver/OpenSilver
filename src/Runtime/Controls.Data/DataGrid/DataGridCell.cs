@@ -12,7 +12,7 @@ using System.Windows.Shapes;
 #else
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Shapes;#endif
+using Windows.UI.Xaml.Shapes;
 #endif
 
 
@@ -57,10 +57,15 @@ namespace Windows.UI.Xaml.Controls
         public DataGridCell()
         {
             CustomLayout = true;
+#if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridCell_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridCell_MouseEnter);
             this.MouseLeave += new MouseEventHandler(DataGridCell_MouseLeave);
-
+#else
+            this.AddHandler(FrameworkElement.PointerReleasedEvent, new PointerEventHandler(DataGridCell_MouseLeftButtonDown), true);
+            this.PointerEntered += new PointerEventHandler(DataGridCell_MouseEnter);
+            this.PointerReleased += new PointerEventHandler(DataGridCell_MouseLeave);
+#endif
             DefaultStyleKey = typeof(DataGridCell);
         }
 
@@ -234,21 +239,26 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Private Properties
+        #endregion Private Properties
 
 
-#region Public Methods
+        #region Public Methods
 
-#endregion Public Methods
+        #endregion Public Methods
 
 
-#region Protected Methods
+        #region Protected Methods
 
         /// <summary>
         /// Builds the visual tree for the cell control when a new template is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             base.OnApplyTemplate();
 
             ApplyCellState(false /*animate*/);
@@ -404,7 +414,7 @@ namespace Windows.UI.Xaml.Controls
 
 
 #region Private Methods
-
+#if MIGRATION
         private void DataGridCell_MouseEnter(object sender, MouseEventArgs e)
         {
             if (this.OwningRow != null)
@@ -440,7 +450,43 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
+#else
+        private void DataGridCell_MouseEnter(object sender, PointerRoutedEventArgs e)
+        {
+            if (this.OwningRow != null)
+            {
+                this.IsMouseOver = true;
+            }
+        }
 
+        private void DataGridCell_MouseLeave(object sender, PointerRoutedEventArgs e)
+        {
+            if (this.OwningRow != null)
+            {
+                this.IsMouseOver = false;
+            }
+        }
+
+        private void DataGridCell_MouseLeftButtonDown(object sender, PointerRoutedEventArgs e)
+        {
+            // OwningGrid is null for TopLeftHeaderCell and TopRightHeaderCell because they have no OwningRow
+            if (this.OwningGrid != null)
+            {
+                if (!e.Handled && this.OwningGrid.IsTabStop)
+                {
+                    bool success = this.OwningGrid.Focus();
+                    Debug.Assert(success);
+                }
+                if (this.OwningRow != null)
+                {
+                    Debug.Assert(sender is DataGridCell);
+                    Debug.Assert(sender == this);
+                    e.Handled = this.OwningGrid.UpdateStateOnMouseLeftButtonDown(e, this.ColumnIndex, this.OwningRow.Slot, !e.Handled);
+                    this.OwningGrid.UpdatedStateOnMouseLeftButtonDown = true;
+                }
+            }
+        }
+#endif
 #endregion Private Methods
     }
 }

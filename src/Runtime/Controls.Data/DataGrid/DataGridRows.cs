@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-
+using System;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -19,6 +19,7 @@ using System.Windows.Media;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
+using Windows.Foundation;
 #endif
 
 
@@ -2429,7 +2430,9 @@ namespace Windows.UI.Xaml.Controls
         }
 
         // Updates display information and displayed rows after scrolling the given number of pixels
+#if SILVERLIGHT
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+#endif
         private void ScrollSlotsByHeight(double height)
         {
             Debug.Assert(this.DisplayData.FirstScrollingSlot >= 0);
@@ -2952,7 +2955,9 @@ namespace Windows.UI.Xaml.Controls
         // be applied this header
         // Returns the number of pixels that were expanded or (collapsed); however, if we're expanding displayed rows, we only expand up
         // to what we can display
+#if MIGRATION
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
+#endif
         private double UpdateRowGroupVisibility(DataGridRowGroupInfo targetRowGroupInfo, Visibility newVisibility, bool isDisplayed)
         {
             double heightChange = 0;
@@ -3127,7 +3132,7 @@ namespace Windows.UI.Xaml.Controls
 
 #endregion Private Methods
 
-#if DEBUG
+#if DEBUG && MIGRATION
         internal void PrintRowGroupInfo()
         {
             Debug.WriteLine("-----------------------------------------------RowGroupHeaders");

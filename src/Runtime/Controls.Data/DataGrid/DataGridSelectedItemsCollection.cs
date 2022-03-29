@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -219,7 +220,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        public void CopyTo(System.Array array, int index)
+        public void CopyTo(Array array, int index)
         {
             // 
             throw new NotImplementedException();

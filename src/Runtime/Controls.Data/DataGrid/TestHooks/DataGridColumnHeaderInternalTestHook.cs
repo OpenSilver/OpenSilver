@@ -7,6 +7,7 @@
 #if MIGRATION
 using System.Windows.Shapes;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Shapes;
 #endif
 

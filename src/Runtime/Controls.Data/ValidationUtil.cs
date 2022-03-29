@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
@@ -83,7 +84,9 @@ namespace Windows.UI.Xaml.Controls
 
             clone.BindsDirectlyToSource = source.BindsDirectlyToSource;
             clone.Converter = source.Converter;
+#if MIGRATION
             clone.ConverterCulture = source.ConverterCulture;
+#endif
             clone.ConverterParameter = source.ConverterParameter;
             clone.FallbackValue = source.FallbackValue;
             clone.Mode = source.Mode;
@@ -306,9 +309,9 @@ namespace Windows.UI.Xaml.Controls
                 (exception is ThreadAbortException);
         }
 
-        #endregion Public Methods
+#endregion Public Methods
 
-        #region Private Methods
+#region Private Methods
 
         /// <summary>
         /// Gets a list of active bindings on the specified FrameworkElement.  Bindings are gathered
@@ -360,7 +363,7 @@ namespace Windows.UI.Xaml.Controls
             return bindingData;
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 
     /// <summary>
