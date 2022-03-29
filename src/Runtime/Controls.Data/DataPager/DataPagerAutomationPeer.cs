@@ -9,6 +9,7 @@
 
 using System.Globalization;
 using System;
+using OpenSilver.Controls;
 
 #if MIGRATION
 using System.Windows.Automation.Provider;

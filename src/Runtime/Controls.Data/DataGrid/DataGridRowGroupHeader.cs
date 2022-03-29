@@ -6,6 +6,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System;
+using OpenSilver.Controls;
 
 
 #if MIGRATION

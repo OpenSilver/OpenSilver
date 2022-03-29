@@ -5,7 +5,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-
+using OpenSilver.Controls;
 
 #if MIGRATION
 using System.Windows.Automation.Provider;

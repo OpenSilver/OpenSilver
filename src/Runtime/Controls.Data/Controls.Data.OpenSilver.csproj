@@ -96,13 +96,21 @@
     <Compile Include="DataPager\DataPager.cs" />
     <Compile Include="DataPager\DataPagerAutomationPeer.cs" />
     <Compile Include="DataPager\PagerDisplayMode.cs" />
-    <Compile Include="DataPager\PagerResources.Designer.cs" />
+    <Compile Include="DataPager\PagerResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PagerResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="DoubleUtil.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="InvalidEnumArgumentException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resource.Designer.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
     <Compile Include="ValidationUtil.cs" />
     <Compile Include="VisualStates.cs" />
     <Compile Include="WeakEventListener.cs" />
@@ -113,8 +121,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="DataPager\PagerResources.resx" />
-    <EmbeddedResource Include="Resource.resx" />
+    <EmbeddedResource Include="DataPager\PagerResources.resx">
+      <LastGenOutput>PagerResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Controls</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resource.resx">
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>OpenSilver.Controls</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
 
 

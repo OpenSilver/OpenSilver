@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using OpenSilver.Controls;
 
 #if MIGRATION
 using System.Windows.Automation;

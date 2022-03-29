@@ -5,6 +5,7 @@
 
 using System;
 using System.Globalization;
+using OpenSilver.Controls;
 
 #if MIGRATION
 namespace System.Windows.Controls

@@ -5,6 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using OpenSilver.Controls;
 
 #if MIGRATION
 using System.Windows.Controls;
