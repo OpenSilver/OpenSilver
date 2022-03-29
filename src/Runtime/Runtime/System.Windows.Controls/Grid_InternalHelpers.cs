@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!_isGridSupported.HasValue)
             {
-                _isGridSupported = (bool)((CSHTML5.Types.INTERNAL_JSObjectReference)(CSHTML5.Interop.ExecuteJavaScript("document.isGridSupported"))).Value;
+                _isGridSupported = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.isGridSupported"));
             }
             return _isGridSupported.Value;
         }
@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!_isMSGrid.HasValue)
             {
-                _isMSGrid = (bool)((CSHTML5.Types.INTERNAL_JSObjectReference)(CSHTML5.Interop.ExecuteJavaScript("document.isMSGrid"))).Value;
+                _isMSGrid = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.isMSGrid"));
             }
             return _isMSGrid.Value;
         }

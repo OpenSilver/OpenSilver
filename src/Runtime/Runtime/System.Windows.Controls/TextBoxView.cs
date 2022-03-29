@@ -986,7 +986,7 @@ var range,selection;
 #endif
         private static int CastToInt(object value)
         {
-            return Convert.ToInt32(((CSHTML5.Types.INTERNAL_JSObjectReference)value).Value);
+            return Convert.ToInt32(value);
         }
 
 #if BRIDGE

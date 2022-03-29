@@ -1,15 +1,15 @@
 ﻿
 
 /*===================================================================================
-* 
+*
 *   Copyright (c) Userware/OpenSilver.net
-*      
+*
 *   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
 *   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
+*
 *   As stated in the MIT license, "the above copyright notice and this permission
 *   notice shall be included in all copies or substantial portions of the Software."
-*  
+*
 \*====================================================================================*/
 
 
@@ -22,6 +22,9 @@ using JSIL.Meta;
 
 using System;
 
+#if OPENSILVER
+using System.Text.Json;
+#endif
 
 namespace CSHTML5.Types
 {
@@ -32,9 +35,10 @@ namespace CSHTML5.Types
 #endif
     internal class INTERNAL_JSObjectReference : IConvertible
     {
-        public object Value { get; set; }
-        public string ReferenceId { get; set; }
-        public bool IsArray { get; set; }
+        private object Value { get; }
+
+        public string ReferenceId { get; }
+        public bool IsArray { get; }
 
         private int _arrayIndex;
         public int ArrayIndex // Note: this property applies only if "IsArray" is true.
@@ -53,6 +57,73 @@ namespace CSHTML5.Types
             }
         }
 
+        internal INTERNAL_JSObjectReference(object value)
+        {
+            Value = value;
+        }
+
+        public INTERNAL_JSObjectReference(object value, string referenceId)
+        {
+            Value = value;
+            ReferenceId = referenceId;
+        }
+
+        public INTERNAL_JSObjectReference(object value, string referenceId, int arrayIndex)
+        {
+            Value = value;
+            ReferenceId = referenceId;
+            IsArray = true;
+            ArrayIndex = arrayIndex;
+        }
+
+#if BRIDGE
+        [Bridge.Template("null")]
+#endif
+        internal static object CastFromJsValue(object obj)
+        {
+#if OPENSILVER
+            if (!Interop.IsRunningInTheSimulator_WorkAround)
+            {
+                if (obj != null && (obj is string || obj.GetType().IsPrimitive))
+                {
+                    return obj;
+                }
+
+                JsonElement jsonElement = (JsonElement)obj;
+                object res;
+                switch (jsonElement.ValueKind)
+                {
+                    case JsonValueKind.Object:
+                    case JsonValueKind.Array:
+                        res = obj;
+                        break;
+                    case JsonValueKind.String:
+                        res = jsonElement.GetString();
+                        break;
+                    case JsonValueKind.Number:
+                        res = jsonElement.GetSingle();
+                        break;
+                    case JsonValueKind.True:
+                    case JsonValueKind.False:
+                        res = jsonElement.GetBoolean();
+                        break;
+                    case JsonValueKind.Undefined:
+                    case JsonValueKind.Null:
+                        res = null;
+                        break;
+                    default:
+                        res = null;
+                        break;
+                }
+                return res;
+            }
+            else
+#endif
+            {
+                return DotNetForHtml5.Core.INTERNAL_Simulator.ConvertBrowserResult(obj);
+            }
+        }
+
 #if BRIDGE
         [External] //we exclude this method
 #else
@@ -62,7 +133,7 @@ namespace CSHTML5.Types
         {
 #if !BUILDINGDOCUMENTATION // We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
             object result;
-            
+
             if (IsArray)
             {
                 var fullName = Value.GetType().FullName;
@@ -106,7 +177,7 @@ namespace CSHTML5.Types
             }
             else
             {
-                return result;
+                return CastFromJsValue(result);
             }
 #endif
         }
