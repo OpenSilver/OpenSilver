@@ -99,19 +99,6 @@
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LinearClipper.cs" />
 		<Compile Include="System.Windows.Controls\CalendarDayButton.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\DataPager\Extensions.cs" />
-		<Compile Include="System.Windows.Controls\DataPager\PagerDisplayMode.cs" />
-		<Compile Include="System.Windows.Controls\DataPager\PagerResources.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>PagerResources.resx</DependentUpon>
-		</Compile>
-		<Compile Include="System.Windows.Controls\DataPager\Resource.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>Resource.resx</DependentUpon>
-		</Compile>
-		<Compile Include="System.Windows.Controls\DataPager\WeakEventListener.cs" />
 		<Compile Include="System.Windows.Controls\DateTimeHelper.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
@@ -1221,18 +1208,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="PagedCollectionView\PagedCollectionViewResources.resx" />
-		<EmbeddedResource Include="System.Windows.Controls\DataPager\PagerResources.resx">
-			<LastGenOutput>PagerResources.Designer.cs</LastGenOutput>
-			<CustomToolNamespace>OpenSilver.DataPager</CustomToolNamespace>
-			<Generator>ResXFileCodeGenerator</Generator>
-			<SubType>Designer</SubType>
-		</EmbeddedResource>
-		<EmbeddedResource Include="System.Windows.Controls\DataPager\Resource.resx">
-			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
-			<CustomToolNamespace>OpenSilver.DataPager</CustomToolNamespace>
-			<Generator>ResXFileCodeGenerator</Generator>
-			<SubType>Designer</SubType>
-		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />

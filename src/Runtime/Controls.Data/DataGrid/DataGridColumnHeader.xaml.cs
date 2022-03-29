@@ -12,7 +12,6 @@ using System.Windows.Input;
 #if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Automation.Peers;
