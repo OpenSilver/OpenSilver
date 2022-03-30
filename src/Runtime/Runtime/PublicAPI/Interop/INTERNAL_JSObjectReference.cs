@@ -379,6 +379,11 @@ namespace CSHTML5.Types
 
         public object ToType(Type conversionType, IFormatProvider provider)
         {
+            if (conversionType == typeof(Guid))
+            {
+                return Guid.Parse(GetActualValue().ToString());
+            }
+
             throw new NotImplementedException();
         }
 #endregion
