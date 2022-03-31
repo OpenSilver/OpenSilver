@@ -546,6 +546,7 @@ namespace Windows.UI.Xaml.Controls
 
                 TextBlock textBlock = new TextBlock();
                 textBlock.SetBinding(TextBlock.TextProperty, new Binding());
+                textBlock.TemplatedParent = container;
 
                 return textBlock;
             }

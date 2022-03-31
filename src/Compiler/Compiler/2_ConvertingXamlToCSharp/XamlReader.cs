@@ -47,7 +47,7 @@ namespace DotNetForHtml5.Compiler
 
         public XamlNodeType NodeType => _it?.Current.NodeType ?? XamlNodeType.None;
 
-        public ObjectNodeData ObjectData => NodeType == XamlNodeType.StartObject ? (ObjectNodeData)_it.Current.Value : null;
+        public ObjectNodeData ObjectData => (NodeType == XamlNodeType.StartObject || NodeType == XamlNodeType.EndObject) ? (ObjectNodeData)_it.Current.Value : null;
 
         public MemberNodeData MemberData => (NodeType == XamlNodeType.StartMember || NodeType == XamlNodeType.EndMember) ? (MemberNodeData)_it.Current.Value : null;
 

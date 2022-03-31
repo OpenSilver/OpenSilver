@@ -36,9 +36,17 @@ namespace DotNetForHtml5.Compiler
                 public readonly Dictionary<XElement, Dictionary<string, string>> NamescopeRootToNameToUniqueNameDictionary = new Dictionary<XElement, Dictionary<string, string>>();
                 public readonly HashSet<string> ListOfAllTheTypesUsedInThisXamlFile = new HashSet<string>();
                 public readonly StringBuilder StringBuilder = new StringBuilder();
-                public readonly Stack<string> FrameworkTemplateNames = new Stack<string>();
                 public readonly Dictionary<XElement, List<string>> NamescopeRootToMarkupExtensionsAdditionalCode = new Dictionary<XElement, List<string>>();
                 public readonly Dictionary<XElement, Dictionary<string, string>> NamescopeRootToElementsUniqueNameToInstantiatedObjects = new Dictionary<XElement, Dictionary<string, string>>();
+                
+                public readonly Stack<FrameworkTemplateData> FrameworkTemplateNames = new Stack<FrameworkTemplateData>();
+            }
+
+            private struct FrameworkTemplateData
+            {
+                public string Name;
+                public string OwnerName;
+                public string InstanceName;
             }
 
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
@@ -666,7 +674,15 @@ namespace DotNetForHtml5.Compiler
 
             private void OnWriteEndObject(GeneratorContext parameters)
             {
-                // Do nothing for now
+                if (parameters.FrameworkTemplateNames.Count > 0)
+                {
+                    XElement element = _reader.ObjectData.Element;
+
+                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
+                    {
+                        parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({GetUniqueName(element)}, {parameters.FrameworkTemplateNames.Peek().OwnerName});");
+                    }
+                }
             }
 
             private void OnWriteStartMember(GeneratorContext parameters)
@@ -681,15 +697,21 @@ namespace DotNetForHtml5.Compiler
                 if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
                     _reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkTemplate", member.Name.NamespaceName, typeName))
                 {
-                    string templateInstanceName = $"templateInstance_{GetUniqueName(element)}";
-                    string templateOwnerName = $"templateOwner_{GetUniqueName(element)}";
+                    string frameworkTemplateName = GetUniqueName(element);
+                    string templateInstanceName = $"templateInstance_{frameworkTemplateName}";
+                    string templateOwnerName = $"templateOwner_{frameworkTemplateName}";
 
-                    parameters.StringBuilder.AppendLine($"{GetUniqueName(element)}.SetMethodToInstantiateFrameworkTemplate({templateOwnerName} =>")
+                    parameters.StringBuilder.AppendLine($"{frameworkTemplateName}.SetMethodToInstantiateFrameworkTemplate({templateOwnerName} =>")
                                   .AppendLine("{")
                                   .AppendLine($"var {templateInstanceName} = new global::{_metadata.SystemWindowsNS}.TemplateInstance();")
                                   .AppendLine($"{templateInstanceName}.TemplateOwner = {templateOwnerName};");
 
-                    parameters.FrameworkTemplateNames.Push(templateInstanceName);
+                    parameters.FrameworkTemplateNames.Push(new FrameworkTemplateData
+                    {
+                        Name = frameworkTemplateName,
+                        OwnerName = templateOwnerName,
+                        InstanceName = templateInstanceName
+                    });
                 }
             }
 
@@ -986,8 +1008,11 @@ namespace DotNetForHtml5.Compiler
 
                                     if (BindingRelativeSourceIsTemplatedParent(child) && !IsStyleSetter(parent))
                                     {
-                                        string templateInstance = parameters.FrameworkTemplateNames.Count > 0 ? parameters.FrameworkTemplateNames.Peek() : TemplateOwnerValuePlaceHolder;
-                                        parameters.StringBuilder.AppendLine(string.Format("{0}.TemplateOwner = {1};", GetUniqueName(child), templateInstance));
+                                        string templateInstance = parameters.FrameworkTemplateNames.Count > 0 ? 
+                                            parameters.FrameworkTemplateNames.Peek().InstanceName : 
+                                            TemplateOwnerValuePlaceHolder;
+
+                                        parameters.StringBuilder.AppendLine($"{GetUniqueName(child)}.TemplateOwner = {templateInstance};");
                                     }
 
                                     // Check if the property is of type "Binding" (or "BindingBase"), in which 
@@ -1015,11 +1040,11 @@ namespace DotNetForHtml5.Compiler
                                             _assemblyNameWithoutExtension);
 
                                     parameters.StringBuilder.AppendLine(string.Format(
-                                        "{0}.SetValue({1}, {2}.ProvideValue(new global::System.ServiceProvider({3}.TemplateOwner, null)));",
+                                        "{0}.SetValue({1}, {2}.ProvideValue(new global::System.ServiceProvider({3}, null)));",
                                         parentElementUniqueNameOrThisKeyword,
                                         dependencyPropertyName,
                                         GetUniqueName(child),
-                                        parameters.FrameworkTemplateNames.Count > 0 ? parameters.FrameworkTemplateNames.Peek() : TemplateOwnerValuePlaceHolder));
+                                        parameters.FrameworkTemplateNames.Count > 0 ? parameters.FrameworkTemplateNames.Peek().OwnerName : TemplateOwnerValuePlaceHolder));
                                 }
                                 else if (child.Name == xNamespace + "NullExtension")
                                 {

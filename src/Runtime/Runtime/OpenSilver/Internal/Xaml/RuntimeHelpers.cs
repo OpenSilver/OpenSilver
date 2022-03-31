@@ -112,5 +112,11 @@ namespace OpenSilver.Internal.Xaml
                 nameScope.RegisterName(name, scopedElement);
             }
         }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
+        {
+            element.TemplatedParent = templatedParent;
+        }
     }
 }

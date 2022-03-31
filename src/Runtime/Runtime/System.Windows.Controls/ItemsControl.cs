@@ -144,11 +144,16 @@ namespace Windows.UI.Xaml.Controls
         {
             ItemsPanelTemplate template = new ItemsPanelTemplate();
             template.SetMethodToInstantiateFrameworkTemplate(owner =>
-                new TemplateInstance
+            {
+                var panel = new StackPanel();
+                panel.TemplatedParent = owner;
+
+                return new TemplateInstance
                 {
                     TemplateOwner = owner,
-                    TemplateContent = new StackPanel()
-                });
+                    TemplateContent = panel,
+                };
+            });
 
             template.Seal();
 
@@ -857,6 +862,7 @@ namespace Windows.UI.Xaml.Controls
 
                 TextBlock textBlock = new TextBlock();
                 textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
+                textBlock.TemplatedParent = control;
 
                 templateInstance.TemplateContent = textBlock;
 

@@ -311,6 +311,8 @@ namespace Windows.UI.Xaml
 
         #endregion Logical Parent
 
+        internal DependencyObject TemplatedParent { get; set; }
+
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
         // Note: TemplateChild is an UIElement in WPF.
