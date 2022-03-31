@@ -19,6 +19,8 @@ namespace Runtime.OpenSilver.Tests.CSHTML5.Types
 
         private static readonly JsonElement NullJsonElement = JsonDocument.Parse("null").RootElement;
 
+        private static readonly JsonElement GuidJsonElement = JsonDocument.Parse(@"""9e1948f9-4f7e-45a9-842e-1b89e3fb5c80""").RootElement;
+
         private static readonly JsonElement UndefinedJsonElement = default;
 
         private const double Delta = 0.0001;
@@ -86,6 +88,13 @@ namespace Runtime.OpenSilver.Tests.CSHTML5.Types
         {
             var objRef = new INTERNAL_JSObjectReference(NullJsonElement);
             Assert.IsTrue(objRef.IsNull());
+        }
+
+        [TestMethod]
+        public void ConvertToGuid()
+        {
+            var objRef = new INTERNAL_JSObjectReference(GuidJsonElement);
+            Assert.AreEqual(Guid.Parse(GuidJsonElement.ToString()), Convert.ChangeType(objRef, typeof(Guid)));
         }
     }
 }
