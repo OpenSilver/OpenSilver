@@ -309,6 +309,7 @@ namespace Windows.UI.Xaml.Data
         /// Do not use this property.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This is unused and will be removed in future releases.")]
         public TemplateInstance TemplateOwner { get; set; }
 
 #region Validation

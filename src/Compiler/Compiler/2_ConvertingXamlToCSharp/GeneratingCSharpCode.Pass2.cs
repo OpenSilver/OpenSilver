@@ -1006,15 +1006,6 @@ namespace DotNetForHtml5.Compiler
                                     }
                                     string propertyTypeFullName = (!string.IsNullOrEmpty(propertyTypeNamespace) ? propertyTypeNamespace + "." : "") + propertyTypeName;
 
-                                    if (BindingRelativeSourceIsTemplatedParent(child) && !IsStyleSetter(parent))
-                                    {
-                                        string templateInstance = parameters.FrameworkTemplateNames.Count > 0 ? 
-                                            parameters.FrameworkTemplateNames.Peek().InstanceName : 
-                                            TemplateOwnerValuePlaceHolder;
-
-                                        parameters.StringBuilder.AppendLine($"{GetUniqueName(child)}.TemplateOwner = {templateInstance};");
-                                    }
-
                                     // Check if the property is of type "Binding" (or "BindingBase"), in which 
                                     // case we should directly assign the value instead of calling "SetBinding"
                                     bool isPropertyOfTypeBinding = propertyTypeFullName == $"global::{_metadata.SystemWindowsDataNS}.Binding" ||
@@ -1806,37 +1797,6 @@ return {templateInstanceUniqueName};
                         );
                     }
                 }
-            }
-
-            private static bool BindingRelativeSourceIsTemplatedParent(XElement child)
-            {
-                foreach (XElement bindingProperty in child.Elements())
-                {
-                    if (bindingProperty.Name == DefaultXamlNamespace + "Binding.RelativeSource")
-                    {
-                        foreach (XElement relativeSource in bindingProperty.Elements())
-                        {
-                            if (relativeSource.Name == DefaultXamlNamespace + "RelativeSource")
-                            {
-                                foreach (XAttribute attribute in relativeSource.Attributes())
-                                {
-                                    if (attribute.Name.LocalName == "Mode" && attribute.Value == "TemplatedParent")
-                                    {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-
-            private bool IsStyleSetter(XElement element)
-            {
-                string setterFullName = $"global::{_metadata.SystemWindowsNS}.Setter";
-
-                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(element.Name.NamespaceName, element.Name.LocalName) == setterFullName;
             }
 
             private void ChangeRelativePathIntoAbsolutePathIfNecessary(ref string path,
