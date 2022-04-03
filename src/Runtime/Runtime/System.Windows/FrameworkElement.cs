@@ -1458,7 +1458,7 @@ namespace Windows.UI.Xaml
         private void InvalidateStyleProperty()
         {
             // Try to find an implicit style
-            object implicitStyle = FrameworkElement.FindImplicitStyleResource(this, GetType());
+            object implicitStyle = FindImplicitStyleResource(this, GetType());
 
             // Set the flag associated with the StyleProperty
             HasImplicitStyleFromResources = implicitStyle != DependencyProperty.UnsetValue;
@@ -1493,9 +1493,18 @@ namespace Windows.UI.Xaml
         {
             if (fe.ShouldLookupImplicitStyles)
             {
+                // For non-controls the implicit StyleResource lookup must stop at
+                // the templated parent.
+                DependencyObject boundaryElement = null;
+                if (!(fe is Control) || fe is TextBlock)
+                {
+                    boundaryElement = fe.TemplatedParent;
+                }
+
                 object implicitStyle;
                 // First, try to find an implicit style in parents' resources.
-                for (FrameworkElement f = fe; f != null; f = VisualTreeHelper.GetParent(f) as FrameworkElement)
+                FrameworkElement f = fe;
+                while (f != null)
                 {
                     if (f.HasResources && f.Resources.HasImplicitStyles)
                     {
@@ -1505,7 +1514,14 @@ namespace Windows.UI.Xaml
                             return implicitStyle;
                         }
                     }
+
+                    f = (f.Parent ?? VisualTreeHelper.GetParent(f)) as FrameworkElement;
+                    if (boundaryElement != null && f == boundaryElement)
+                    {
+                        return DependencyProperty.UnsetValue;
+                    }
                 }
+
                 // Then we try to find the resource in the App's Resources
                 // if we can't find it in the parents.
                 Application app = Application.Current;
@@ -1518,6 +1534,7 @@ namespace Windows.UI.Xaml
                     }
                 }
             }
+
             return DependencyProperty.UnsetValue;
         }
 
