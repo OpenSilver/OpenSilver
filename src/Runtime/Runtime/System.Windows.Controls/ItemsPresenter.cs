@@ -121,31 +121,8 @@ namespace Windows.UI.Xaml.Controls
 
         private void AttachToOwner()
         {
-            // Find the templated parent
-            // todo: change this once FrameworkElement.TemplatedParent is implemented.
-            ItemsControl owner = this._owner;
+            ItemsControl owner = this.TemplatedParent as ItemsControl;
             ItemContainerGenerator generator = null;
-            DependencyObject elt = this;
-            while (owner == null)
-            {
-                // First try to find the visual parent.
-                DependencyObject parent = VisualTreeHelper.GetParent(elt);
-
-                // If visual parent is null, it could be that the element is the content
-                // of popup (cf. ComboBox default style), so we handle this case here.
-                if (parent == null)
-                {
-                    parent = (elt as PopupRoot)?.INTERNAL_LinkedPopup;
-                    if (parent == null)
-                    {
-                        // no more visual parent, exit.
-                        break;
-                    }
-                }
-
-                owner = parent as ItemsControl;
-                elt = parent;
-            }
 
             if (owner != null)
             {
@@ -193,7 +170,7 @@ namespace Windows.UI.Xaml.Controls
             if (panel == null)
                 return null;
 
-            return VisualTreeHelper.GetParent(panel) as ItemsPresenter;
+            return panel.TemplatedParent as ItemsPresenter;
         }
 
         /// <summary>

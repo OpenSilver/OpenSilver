@@ -228,16 +228,7 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
-            ScrollViewer sv = null;
-            for (DependencyObject parent = VisualTreeHelper.GetParent(this); parent != null; parent = VisualTreeHelper.GetParent(parent))
-            {
-                sv = parent as ScrollViewer;
-                if (sv != null)
-                {
-                    break;
-                }
-            }
-
+            ScrollViewer sv = TemplatedParent as ScrollViewer;
             if (sv == null)
                 return;
 
