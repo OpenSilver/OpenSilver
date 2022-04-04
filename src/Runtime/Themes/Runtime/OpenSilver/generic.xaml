@@ -23,6 +23,9 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultThumbStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTileViewItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTileViewStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultListTimePickerPopupStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRangeTimePickerPopupStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTimeUpDownStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTimePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToolTipStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultViewboxStyle.xaml" />
