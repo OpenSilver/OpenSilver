@@ -122,6 +122,7 @@
 		<Compile Include="System.Windows.Automation.Peers\NumericUpDownAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\UpDownBaseAutomationPeer.cs" />
 		<Compile Include="System.Windows.Browser\EventSubscriber.cs" />
+		<Compile Include="System.Windows.Controls.Primitives\ItemSelectionHelper.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\Clipper.cs" />
@@ -131,6 +132,8 @@
 		<Compile Include="System.Windows.Controls\DateTimeHelper.cs" />
 		<Compile Include="System.Windows.Controls\DragDecorator.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
+		<Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
+		<Compile Include="System.Windows.Controls\LongTimeFormat.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
@@ -146,10 +149,11 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RangeTimePickerPopup.cs" />
+		<Compile Include="System.Windows.Controls\RangeTimePickerPopup.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RatingItem.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ShortTimeFormat.cs" />
+		<Compile Include="System.Windows.Controls\ShortTimeFormat.cs" />
+		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewExtensions.cs" />
 		<Compile Include="System.ComponentModel\ReflectedPropertyCollection.cs" />
@@ -316,14 +320,14 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\GridSplitter.cs" />
 		<Compile Include="System.Windows.Controls\HeaderedItemsControl.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ITimeFormat.cs" />
+		<Compile Include="System.Windows.Controls\ITimeFormat.cs" />
 		<Compile Include="System.Windows.Controls\IDefinitionBase.cs" />
 		<Compile Include="System.Windows.Controls\IUpdateVisualState.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ListTimePickerPopup.cs" />
+		<Compile Include="System.Windows.Controls\ListTimePickerPopup.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MediaElement.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleImage.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\MultiScaleSubImage.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Picker.cs" />
+		<Compile Include="System.Windows.Controls\Picker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlock.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlockOverflow.cs" />
@@ -332,12 +336,11 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextBlock.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextSearch.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimeGlobalizationInfo.cs" />
+		<Compile Include="System.Windows.Controls\TimeGlobalizationInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimeParser.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimeParserCollection.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimePicker.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimePickerPopup.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TimeUpDown.cs" />
+		<Compile Include="System.Windows.Controls\TimePickerPopup.cs" />
+		<Compile Include="System.Windows.Controls\TimeUpDown.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="System.Windows.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="System.Windows.Data\CollectionView.cs" />
@@ -1154,6 +1157,18 @@
 			<SubType>Designer</SubType>
 		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultThumbStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultListTimePickerPopupStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultRangeTimePickerPopupStyle.xaml">
+			<Generator>MSBuild:Compile</Generator>
+			<SubType>Designer</SubType>
+		</Content>
+		<Content Include="DefaultStyles\INTERNAL_DefaultTimeUpDownStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>

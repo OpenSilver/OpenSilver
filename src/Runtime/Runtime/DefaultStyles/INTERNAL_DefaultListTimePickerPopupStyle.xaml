@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="ListTimePickerPopup">
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="PopupMinutesInterval" Value="30"/>
+        <Setter Property="PopupSecondsInterval" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListTimePickerPopup">
+                    <Grid Background="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0"/>
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="Disabled"/>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused"/>
+                                <VisualState x:Name="Unfocused"/>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ContainedByPickerStates">
+                                <VisualState x:Name="Contained">
+                                    <Storyboard/>
+                                </VisualState>
+                                <VisualState x:Name="NotContained">
+                                    <Storyboard/>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="PopupModeStates">
+                                <VisualState x:Name="AllowSecondsAndDesignatorsSelection"/>
+                                <VisualState x:Name="AllowTimeDesignatorsSelection"/>
+                                <VisualState x:Name="AllowSecondsSelection"/>
+                                <VisualState x:Name="HoursAndMinutesOnly"/>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ListBox x:Name="ListBox" DisplayMemberPath="Key" DataContext="{TemplateBinding TimeItemsSelection}" IsTabStop="True" ItemsSource="{Binding Items}" ItemContainerStyle="{TemplateBinding ListBoxItemStyle}" MaxHeight="130" Style="{TemplateBinding ListBoxStyle}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" TabIndex="1"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
