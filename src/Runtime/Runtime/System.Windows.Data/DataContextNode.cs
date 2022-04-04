@@ -21,26 +21,23 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal sealed class DependencyPropertyNode : PropertyPathNode
+    internal sealed class DataContextNode : PropertyPathNode
     {
-        private readonly DependencyProperty _dp;
         private IPropertyChangedListener _dpListener;
 
-        internal DependencyPropertyNode(DependencyProperty dp)
+        internal DataContextNode(PropertyPathWalker listener)
+            : base(listener)
         {
-            Debug.Assert(dp != null, "dp can't be null !");
-
-            _dp = dp;
         }
 
-        internal override Type TypeImpl => _dp.PropertyType;
+        public override Type Type => typeof(object);
         
         internal override void SetValue(object value)
         {
             DependencyObject sourceDO = SourceDO;
             if (sourceDO != null)
             {
-                sourceDO.SetValue(_dp, value);
+                sourceDO.SetValue(FrameworkElement.DataContextProperty, value);
             }
         }
 
@@ -49,7 +46,7 @@ namespace Windows.UI.Xaml.Data
             DependencyObject sourceDO = SourceDO;
             if (sourceDO != null)
             {
-                object value = sourceDO.GetValue(_dp);
+                object value = sourceDO.GetValue(FrameworkElement.DataContextProperty);
                 UpdateValueAndIsBroken(value, value == null);
             }
         }
@@ -67,7 +64,7 @@ namespace Windows.UI.Xaml.Data
             if (sourceDO != null)
             {
                 _dpListener = INTERNAL_PropertyStore.ListenToChanged(
-                    sourceDO, _dp, OnPropertyChanged
+                    sourceDO, FrameworkElement.DataContextProperty, OnPropertyChanged
                 );
             }
         }

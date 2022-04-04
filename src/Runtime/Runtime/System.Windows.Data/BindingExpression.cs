@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Contains information about a single instance of a <see cref="Binding" />.
     /// </summary>
-    public partial class BindingExpression : BindingExpressionBase, IPropertyPathWalkerListener
+    public class BindingExpression : BindingExpressionBase
     {
         // we are not allowed to change the following in BindingExpression because it is used:
         //  - ParentBinding.Mode
@@ -66,14 +66,7 @@ namespace Windows.UI.Xaml.Data
             ParentBinding = binding;
             TargetProperty = property;
 
-            bool isDataContextBound = binding.ElementName == null && binding.Source == null && binding.RelativeSource == null;
-            string path = ParentBinding.XamlPath ?? ParentBinding.Path.Path ?? string.Empty;
-
-            var walker = _propertyPathWalker = new PropertyPathWalker(path, isDataContextBound);
-            if (binding.Mode != BindingMode.OneTime)
-            {
-                walker.Listen(this);
-            }
+            _propertyPathWalker = new PropertyPathWalker(this);
         }
 
         /// <summary>
@@ -137,7 +130,7 @@ namespace Windows.UI.Xaml.Data
                 // BROKEN PATH
                 //------------------------
 
-                if (_propertyPathWalker.IsDataContextBound && _propertyPathWalker.FinalNode is DependencyPropertyNode)
+                if (_propertyPathWalker.IsDataContextBound && _propertyPathWalker.FinalNode is DataContextNode)
                 {
                     value = UseTargetNullValue();
                 }
@@ -260,7 +253,7 @@ namespace Windows.UI.Xaml.Data
             Target = null;
         }
 
-        void IPropertyPathWalkerListener.ValueChanged() { Refresh(); }
+        internal void ValueChanged() { Refresh(); }
 
         /// <summary>
         /// The element that is the binding target object of this binding expression.
@@ -280,7 +273,7 @@ namespace Windows.UI.Xaml.Data
                     INTERNAL_ForceValidateOnNextSetValue = false;
                     try
                     {
-                        IPropertyPathNode node = _propertyPathWalker.FinalNode;
+                        PropertyPathNode node = _propertyPathWalker.FinalNode;
                         node.SetValue(node.Value); //we set the source property to its own value to check whether it causes an exception, in which case the value is not valid.
                     }
                     catch (Exception e) //todo: put the content of this catch in a method which will be called here and in UpdateSourceObject (OR put the whole try/catch in the method and put the Value to set as parameter).
@@ -373,7 +366,7 @@ namespace Windows.UI.Xaml.Data
             if (_propertyPathWalker.IsPathBroken)
                 return;
 
-            IPropertyPathNode node = _propertyPathWalker.FinalNode;
+            PropertyPathNode node = _propertyPathWalker.FinalNode;
             bool oldIsUpdating = IsUpdating;
 
             object convertedValue = value;

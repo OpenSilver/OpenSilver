@@ -133,7 +133,7 @@
 		<Compile Include="System.Windows.Controls\ValidSpinDirections.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowserBrush.cs" />
-		<Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
+		<Compile Include="System.Windows.Data\DataContextNode.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
 		<Compile Include="System.Windows.Ink\WORKINPROGRESS\Stroke.cs" />
 		<Compile Include="System.Windows.Ink\WORKINPROGRESS\StrokeCollection.cs" />
@@ -824,9 +824,6 @@
 		<Compile Include="System.Windows.Data\IndexedPropertyPathNode.cs" />
 		<Compile Include="System.Windows.Data\INTERNAL_DataOperations.cs" />
 		<Compile Include="System.Windows.Data\IPropertyChangedListener.cs" />
-		<Compile Include="System.Windows.Data\IPropertyPathNode.cs" />
-		<Compile Include="System.Windows.Data\IPropertyPathNodeListener.cs" />
-		<Compile Include="System.Windows.Data\IPropertyPathWalkerListener.cs" />
 		<Compile Include="System.Windows.Data\IValueConverter.cs" />
 		<Compile Include="System.Windows.Data\PropertyChangedListener.cs" />
 		<Compile Include="System.Windows.Data\PropertyPathNode.cs" />
