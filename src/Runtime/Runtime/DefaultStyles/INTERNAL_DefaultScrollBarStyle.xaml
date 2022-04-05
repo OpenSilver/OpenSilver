@@ -174,7 +174,7 @@
                                 <VisualState x:Name="Disabled" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Canvas x:Name="HorizontalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
+                        <Canvas x:Name="HorizontalRoot" Visibility="Collapsed" ClipToBounds="True"  Background="{TemplateBinding Background}">
                             <Button x:Name="HorizontalSmallDecrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowLeft" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 2,4.5 L 5.5,1 L 5.5,8"/>
                             </Button>
@@ -187,7 +187,7 @@
 
 
                         </Canvas>
-                        <Canvas x:Name="VerticalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
+                        <Canvas x:Name="VerticalRoot" Visibility="Collapsed" ClipToBounds="True" Background="{TemplateBinding Background}">
                             <Button x:Name="VerticalSmallDecrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowTop" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 4.5,2 L 1,5.5 L 8,5.5"/>
                             </Button>
