@@ -78,5 +78,25 @@ namespace TestApplication.Tests.Events
         {
             e.Handled = true;
         }
+
+        private void box8_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Left || e.Key == Key.Right)
+                blockMsg.Text = "KeyDown event should fire only if the cursor is in position 0 or at the end.";
+        }
+
+        private void box9_KeyDown(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (e.Key == Key.Up || e.Key == Key.Down)
+                blockMsg.Text = $"SelectionStart: {textBox.SelectionStart} Cursor remains in position where it was and SelectionStart is the current position.";
+        }
+
+        private void box10_KeyDown(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (e.Key == Key.Up || e.Key == Key.Down)
+                blockMsg.Text = $"SelectionStart: {textBox.SelectionStart}, SelectionLength: {textBox.SelectionLength} Selected removed, cursor moves to the beginning/end of the text. SelectionStart is the position, SelectionLength is 0.";
+        }
     }
 }
