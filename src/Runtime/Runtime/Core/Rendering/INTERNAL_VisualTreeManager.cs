@@ -23,8 +23,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Documents;
@@ -519,14 +521,18 @@ if(nextSibling != undefined) {
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(additionalOutsideDivForMargins);
                 style.boxSizing = "border-box";
                 if (child is FrameworkElement &&
-                    (((FrameworkElement)child).HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Width)))
+                    (((FrameworkElement)child).HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Width)
+                    && !(child is Image && ((Image)child).Stretch == Stretch.None)))
                 {
                     if (!containsNegativeMargins)
                         style.width = "100%";
                 }
                 if (child is FrameworkElement &&
-                    (((FrameworkElement)child).VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Height)))
+                    (((FrameworkElement)child).VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Height)
+                    && !(child is Image && ((Image)child).Stretch == Stretch.None)))
+                {
                     style.height = "100%";
+                } 
             }
 
 #if PERFSTAT

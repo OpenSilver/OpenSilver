@@ -415,9 +415,13 @@ namespace Windows.UI.Xaml
                         return;
                     }
 
-                    // If a size in pixels is specified AND the alignment is "Stretch", the behavior is similar to "Center":
-                    if (newHorizontalAlignment == HorizontalAlignment.Stretch && !double.IsNaN(fe.Width))
+                    // If the alignment is "Stretch" AND a size in pixels is specified, the behavior is similar to "Center".
+                    // Also, if the alignment is "Stretch" AND the element is an Image with Stretch = None this same case applies since it has a fixed size too:
+                    if (newHorizontalAlignment == HorizontalAlignment.Stretch
+                        && (!double.IsNaN(fe.Width) || (fe is Image && ((Image)fe).Stretch == Media.Stretch.None)))
+                    {
                         newHorizontalAlignment = HorizontalAlignment.Center;
+                    }
 
                     //If the element is an Image and it has Stretch = Uniform and no size, the behavior is similar to "Stretch":
                     if (fe is Image
@@ -809,9 +813,13 @@ namespace Windows.UI.Xaml
                     }
 
 
-                    // If a size in pixels is specified AND the alignment is "Stretch", the behavior is similar to "Center":
-                    if (newVerticalAlignment == VerticalAlignment.Stretch && !double.IsNaN(fe.Height))
+                    // If the alignment is "Stretch" AND a size in pixels is specified, the behavior is similar to "Center".
+                    // Also, if the alignment is "Stretch" AND the element is an Image with Stretch = None this same case applies since it has a fixed size too:
+                    if (newVerticalAlignment == VerticalAlignment.Stretch
+                        && (!double.IsNaN(fe.Height) || (fe is Image && ((Image)fe).Stretch == Media.Stretch.None)))
+                    {
                         newVerticalAlignment = VerticalAlignment.Center;
+                    }
 
                     //If the element is an Image and it has Stretch = Uniform and no size, the behavior is similar to "Stretch":
                     if (fe is Image
