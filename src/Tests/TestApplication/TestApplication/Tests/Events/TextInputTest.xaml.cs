@@ -89,14 +89,14 @@ namespace TestApplication.Tests.Events
         {
             var textBox = sender as TextBox;
             if (e.Key == Key.Up || e.Key == Key.Down)
-                blockMsg.Text = $"SelectionStart: {textBox.SelectionStart} Cursor remains in position where it was and SelectionStart is the current position.";
+                blockMsg.Text = string.Format("SelectionStart: {0} Cursor remains in position where it was and SelectionStart is the current position.", textBox.SelectionStart);
         }
 
         private void box10_KeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
             if (e.Key == Key.Up || e.Key == Key.Down)
-                blockMsg.Text = $"SelectionStart: {textBox.SelectionStart}, SelectionLength: {textBox.SelectionLength} Selected removed, cursor moves to the beginning/end of the text. SelectionStart is the position, SelectionLength is 0.";
+                blockMsg.Text = string.Format("SelectionStart: {0}, SelectionLength: {1} Selected removed, cursor moves to the beginning/end of the text. SelectionStart is the position, SelectionLength is 0.", textBox.SelectionStart, textBox.SelectionLength);
         }
     }
 }
