@@ -287,7 +287,8 @@ namespace DotNetForHtml5.Compiler
                         assemblyName = "OpenSilver.Expression.Effects";
                         return;
                     case "System.Windows.Controls.DomainServices":
-                        assemblyName = "System.Windows.Controls.DomainServices";
+                        assemblyName = "OpenRiaServices.Controls.DomainServices";
+                        namespaceName = "OpenRiaServices.Controls";
                         return;
                     default:
                         if (assemblyName == "System" || assemblyName.StartsWith("System."))
