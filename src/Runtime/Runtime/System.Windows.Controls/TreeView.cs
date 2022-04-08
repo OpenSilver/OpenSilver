@@ -285,7 +285,7 @@ namespace Windows.UI.Xaml.Controls
         /// The <see cref="Style" /> applied to the container
         /// element that contains each item.
         /// </value>
-        public Style ItemContainerStyle
+        public new Style ItemContainerStyle
         {
             get { return GetValue(ItemContainerStyleProperty) as Style; }
             set { SetValue(ItemContainerStyleProperty, value); }
@@ -301,7 +301,7 @@ namespace Windows.UI.Xaml.Controls
         /// <see cref="TreeView.ItemContainerStyle" />
         /// dependency property.
         /// </value>
-        public static readonly DependencyProperty ItemContainerStyleProperty =
+        public new static readonly DependencyProperty ItemContainerStyleProperty =
             DependencyProperty.Register(
                 "ItemContainerStyle",
                 typeof(Style),

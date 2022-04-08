@@ -149,7 +149,7 @@ namespace Windows.UI.Xaml.Controls
         /// The <see cref="Style" /> that is applied to the
         /// container element generated for each item. The default is null.
         /// </value>
-        public Style ItemContainerStyle
+        public new Style ItemContainerStyle
         {
             get { return GetValue(ItemContainerStyleProperty) as Style; }
             set { SetValue(ItemContainerStyleProperty, value); }
@@ -165,7 +165,7 @@ namespace Windows.UI.Xaml.Controls
         /// <see cref="HeaderedItemsControl.ItemContainerStyle" />
         /// dependency property.
         /// </value>
-        public static readonly DependencyProperty ItemContainerStyleProperty =
+        public new static readonly DependencyProperty ItemContainerStyleProperty =
             DependencyProperty.Register(
                 "ItemContainerStyle",
                 typeof(Style),
@@ -325,9 +325,13 @@ namespace Windows.UI.Xaml.Controls
                 {
                     control.SetValue(HeaderedItemsControl.HeaderTemplateProperty, parentItemTemplate);
                 }
-                if (parentItemContainerStyle != null && control.Style == null)
+                if (parentItemContainerStyle != null)
                 {
-                    control.SetValue(HeaderedItemsControl.StyleProperty, parentItemContainerStyle);
+                    object style = control.ReadLocalValue(HeaderedItemsControl.StyleProperty);
+                    if (style == null || style == DependencyProperty.UnsetValue)
+                    {
+                        control.SetValue(HeaderedItemsControl.StyleProperty, parentItemContainerStyle);
+                    }
                 }
 
                 // Note: this is where we would apply the HeaderTemplateSelector
