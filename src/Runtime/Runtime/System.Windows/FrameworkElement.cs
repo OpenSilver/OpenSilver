@@ -390,6 +390,43 @@ namespace Windows.UI.Xaml
             {
                 ShouldLookupImplicitStyles = true;
             }
+        }
+
+
+        private bool _syncActualWidthOnSizeChange = false;
+        internal bool SyncActualWidthOnSizeChange
+        {
+            get => _syncActualWidthOnSizeChange;
+            set
+            {
+                if (value != _syncActualWidthOnSizeChange)
+                {
+                    _syncActualWidthOnSizeChange = value;
+                    SetValue(ActualWidthProperty, this.INTERNAL_GetActualWidthAndHeight().Width);
+                    HookToSizeChange();
+                }
+            }
+        }
+        private bool _syncActualHeightOnSizeChange = false;
+        internal bool SyncActualHeightOnSizeChange
+        {
+            get => _syncActualHeightOnSizeChange;
+            set
+            {
+                if (value != _syncActualHeightOnSizeChange)
+                {
+                    _syncActualHeightOnSizeChange = value;
+                    SetValue(ActualHeightProperty, this.INTERNAL_GetActualWidthAndHeight().Height);
+                    HookToSizeChange();
+                }
+            }
+        }
+
+        private bool _hookedToSizeChange = false;
+        private void HookToSizeChange()
+        {
+            if (_hookedToSizeChange) return;
+            _hookedToSizeChange = true; 
 
             SizeChanged += (s, e) =>
             {
@@ -404,34 +441,6 @@ namespace Windows.UI.Xaml
                 }
             };
         }
-
-        private bool _syncActualWidthOnSizeChange = false;
-        internal bool SyncActualWidthOnSizeChange
-        {
-            get => _syncActualWidthOnSizeChange;
-            set
-            {
-                if (value != _syncActualWidthOnSizeChange)
-                {
-                    _syncActualWidthOnSizeChange = value;
-                    SetValue(ActualWidthProperty, this.INTERNAL_GetActualWidthAndHeight().Width);
-                }
-            }
-        }
-        private bool _syncActualHeightOnSizeChange = false;
-        internal bool SyncActualHeightOnSizeChange
-        {
-            get => _syncActualHeightOnSizeChange;
-            set
-            {
-                if (value != _syncActualHeightOnSizeChange)
-                {
-                    _syncActualHeightOnSizeChange = value;
-                    SetValue(ActualHeightProperty, this.INTERNAL_GetActualWidthAndHeight().Height);
-                }
-            }
-        }
-
 
         #region Resources
 
