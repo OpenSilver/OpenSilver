@@ -230,7 +230,8 @@ namespace Windows.UI.Xaml.Data
             {
                 CheckSealed();
                 _wasModeSetByUserRatherThanDefaultValue = true;
-                _mode = value;
+                // FIXME: workaround to fix a bug that OneTime mode is not working
+                _mode = value == BindingMode.OneTime ? BindingMode.OneWay : value;
             }
         }
 
@@ -257,7 +258,7 @@ namespace Windows.UI.Xaml.Data
             set 
             { 
                 CheckSealed(); 
-                _path = value ?? throw new ArgumentNullException(nameof(value)); 
+                _path = value ?? throw new ArgumentNullException(nameof(value));                 
             }
         }
 

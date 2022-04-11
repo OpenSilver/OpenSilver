@@ -582,7 +582,7 @@ namespace Windows.UI.Xaml.Data
             }
             else if (ParentBinding.ElementName != null)
             {
-                _bindingSource = (Target as FrameworkElement)?.FindName(ParentBinding.ElementName);
+                _bindingSource = (Target as FrameworkElement)?.FindName(ParentBinding.ElementName);                
             }
             else if (ParentBinding.RelativeSource != null)
             {
@@ -613,6 +613,19 @@ namespace Windows.UI.Xaml.Data
                 {
                     Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
                     _bindingSource = FrameworkElement.FindMentor(Target);
+                }
+            }
+
+            if (ParentBinding.Path.Path == "ActualWidth" || ParentBinding.Path.Path == "ActualHeight")
+            {
+                var fe = _bindingSource as FrameworkElement;
+                if (fe != null && ParentBinding.Path.Path == "ActualWidth")
+                {
+                    fe.SyncActualWidthOnSizeChange = true;
+                }
+                if (fe != null && ParentBinding.Path.Path == "ActualHeight")
+                {
+                    fe.SyncActualHeightOnSizeChange = true;
                 }
             }
         }

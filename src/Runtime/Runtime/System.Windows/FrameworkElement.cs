@@ -390,9 +390,50 @@ namespace Windows.UI.Xaml
             {
                 ShouldLookupImplicitStyles = true;
             }
+
+            SizeChanged += (s, e) =>
+            {
+                if (SyncActualWidthOnSizeChange && ((double)GetValue(ActualWidthProperty)) != e.NewSize.Width)
+                {
+                    SetValue(ActualWidthProperty, e.NewSize.Width);
+                }
+
+                if (SyncActualHeightOnSizeChange && ((double)GetValue(ActualHeightProperty)) != e.NewSize.Height)
+                {
+                    SetValue(ActualHeightProperty, e.NewSize.Height);
+                }
+            };
         }
 
-#region Resources
+        private bool _syncActualWidthOnSizeChange = false;
+        internal bool SyncActualWidthOnSizeChange
+        {
+            get => _syncActualWidthOnSizeChange;
+            set
+            {
+                if (value != _syncActualWidthOnSizeChange)
+                {
+                    _syncActualWidthOnSizeChange = value;
+                    SetValue(ActualWidthProperty, this.INTERNAL_GetActualWidthAndHeight().Width);
+                }
+            }
+        }
+        private bool _syncActualHeightOnSizeChange = false;
+        internal bool SyncActualHeightOnSizeChange
+        {
+            get => _syncActualHeightOnSizeChange;
+            set
+            {
+                if (value != _syncActualHeightOnSizeChange)
+                {
+                    _syncActualHeightOnSizeChange = value;
+                    SetValue(ActualHeightProperty, this.INTERNAL_GetActualWidthAndHeight().Height);
+                }
+            }
+        }
+
+
+        #region Resources
 
         /// <summary>
         ///     Check if resource is not empty.
