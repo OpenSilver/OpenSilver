@@ -1705,10 +1705,12 @@ namespace Windows.UI.Xaml
                 {
                     this._valueOfLastSizeChanged = currentSize;
 
+                    SizeChangedEventArgs e = new SizeChangedEventArgs(currentSize);
+
                     // Raise the "SizeChanged" event of all the listeners:
-                    foreach (var sizeChangedEventHandler in this._sizeChangedEventHandlers)
+                    for (int i = 0; i < this._sizeChangedEventHandlers.Count; i++)
                     {
-                        sizeChangedEventHandler(this, new SizeChangedEventArgs(currentSize));
+                        this._sizeChangedEventHandlers[i](this, e);
                     }
                 }
             }
