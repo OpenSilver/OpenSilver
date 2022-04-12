@@ -609,18 +609,18 @@ namespace Windows.UI.Xaml.Data
                 }
             }
 
-            if (ParentBinding.Path.Path == "ActualWidth" || ParentBinding.Path.Path == "ActualHeight")
-            {
-                var fe = _bindingSource as FrameworkElement;
-                if (fe != null && ParentBinding.Path.Path == "ActualWidth")
-                {
-                    fe.SyncActualWidthOnSizeChange = true;
-                }
-                if (fe != null && ParentBinding.Path.Path == "ActualHeight")
-                {
-                    fe.SyncActualHeightOnSizeChange = true;
-                }
-            }
+            //if (ParentBinding.Path.Path == "ActualWidth" || ParentBinding.Path.Path == "ActualHeight")
+            //{
+            //    var fe = _bindingSource as FrameworkElement;
+            //    if (fe != null && ParentBinding.Path.Path == "ActualWidth")
+            //    {
+            //        fe.SyncActualWidthOnSizeChange = true;
+            //    }
+            //    if (fe != null && ParentBinding.Path.Path == "ActualHeight")
+            //    {
+            //        fe.SyncActualHeightOnSizeChange = true;
+            //    }
+            //}
         }
         
         private static object FindRelativeSource(BindingExpression expr)

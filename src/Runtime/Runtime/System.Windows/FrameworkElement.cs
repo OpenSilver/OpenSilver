@@ -390,10 +390,12 @@ namespace Windows.UI.Xaml
             {
                 ShouldLookupImplicitStyles = true;
             }
+
+            HookToSizeChange();
         }
 
 
-        private bool _syncActualWidthOnSizeChange = false;
+        private bool _syncActualWidthOnSizeChange = true;
         internal bool SyncActualWidthOnSizeChange
         {
             get => _syncActualWidthOnSizeChange;
@@ -407,7 +409,7 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        private bool _syncActualHeightOnSizeChange = false;
+        private bool _syncActualHeightOnSizeChange = true;
         internal bool SyncActualHeightOnSizeChange
         {
             get => _syncActualHeightOnSizeChange;
