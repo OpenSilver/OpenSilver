@@ -631,7 +631,8 @@
 		<Compile Include="System.Windows.Markup\StaticResourceExtension.cs" />
 		<Compile Include="System.Windows.Markup\ThemeResourceExtension.cs" />
 		<Compile Include="System.Windows.Markup\XamlParseException.cs" />
-		<Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+		<Compile Include="System.Windows.Markup\XmlLanguage.cs" />
+		<Compile Include="System.Windows.Markup\XmlLanguageConverter.cs" />
 		<Compile Include="System.Windows.Media.Effects\DropShadowEffect.cs" />
 		<Compile Include="System.Windows.Media.Effects\Effect.cs" />
 		<Compile Include="System.Windows.Resources\StreamResourceInfo.cs" />
