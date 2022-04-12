@@ -35,7 +35,8 @@ namespace Windows.UI.Xaml.Data
         private PropertyInfo _prop;
         private FieldInfo _field;
 
-        internal StandardPropertyPathNode(string typeName, string propertyName)
+        internal StandardPropertyPathNode(PropertyPathWalker listener, string typeName, string propertyName)
+            : base(listener)
         {
             _resolvedType = typeName != null ? Type.GetType(typeName) : null;
             _propertyName = propertyName;
@@ -45,12 +46,13 @@ namespace Windows.UI.Xaml.Data
         /// This constructor is called only when there is no path, which means 
         /// that the binding's source is directly the value we are looking for.
         /// </summary>
-        internal StandardPropertyPathNode()
+        internal StandardPropertyPathNode(PropertyPathWalker listener)
+            : base(listener)
         {
             _bindsDirectlyToSource = true;
         }
 
-        internal override Type TypeImpl
+        public override Type Type
         {
             get
             {
@@ -214,11 +216,16 @@ namespace Windows.UI.Xaml.Data
 
         private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (!Listener.ListenForChanges)
+            {
+                return;
+            }
+
             if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop != null || _field != null))
             {
                 UpdateValue();
 
-                IPropertyPathNode next = Next;
+                PropertyPathNode next = Next;
                 if (next != null)
                 {
                     next.SetSource(Value);
@@ -228,6 +235,11 @@ namespace Windows.UI.Xaml.Data
 
         private void OnPropertyChanged(object sender, IDependencyPropertyChangedEventArgs args)
         {
+            if (!Listener.ListenForChanges)
+            {
+                return;
+            }
+
             try
             {
                 UpdateValue();

@@ -30,23 +30,13 @@ namespace Windows.UI.Xaml.Data
 
         private static readonly PropertyInfo _iListIndexer = GetIListIndexer();
 
-        internal IndexedPropertyPathNode(string index)
+        internal IndexedPropertyPathNode(PropertyPathWalker listener, string index)
+            : base(listener)
         {
             _index = index;
         }
 
-        internal override Type TypeImpl
-        {
-            get
-            {
-                if (_indexer != null)
-                {
-                    return _indexer.PropertyType;
-                }
-
-                return null;
-            }
-        }
+        public override Type Type => _indexer?.PropertyType;
 
         private object Index
         {

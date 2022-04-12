@@ -25,29 +25,32 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal class PropertyPathWalker : IPropertyPathNodeListener
+    internal class PropertyPathWalker
     {
         private readonly string _path;
-        private readonly bool _isDataContextBound;
-        private readonly IPropertyPathNode _firstNode;
-        private IPropertyPathWalkerListener _listener;
+        private readonly PropertyPathNode _firstNode;
+        private readonly BindingExpression _expr;
         private object _source;
 
-        internal PropertyPathWalker(string path, bool isDatacontextBound)
+        internal PropertyPathWalker(BindingExpression be)
         {
-            _path = path;
-            _isDataContextBound = isDatacontextBound;
+            Binding binding = be.ParentBinding;
 
-            if (_isDataContextBound)
+            _expr = be;
+            _path = binding.XamlPath ?? binding.Path.Path ?? string.Empty;
+            IsDataContextBound = binding.ElementName == null && binding.Source == null && binding.RelativeSource == null;
+            ListenForChanges = binding.Mode != BindingMode.OneTime;
+
+            if (IsDataContextBound)
             {
-                _firstNode = new DependencyPropertyNode(FrameworkElement.DataContextProperty);
+                _firstNode = new DataContextNode(this);
             }
 
-            ParsePath(_path, out IPropertyPathNode head, out IPropertyPathNode tail);
+            ParsePath(_path, out PropertyPathNode head, out PropertyPathNode tail);
 
             if (_firstNode == null)
             {
-                _firstNode = head ?? new StandardPropertyPathNode();
+                _firstNode = head ?? new StandardPropertyPathNode(this);
             }
             else
             {
@@ -55,13 +58,13 @@ namespace Windows.UI.Xaml.Data
             }
 
             FinalNode = tail ?? _firstNode;
-
-            FinalNode.Listen(this);
         }
 
-        internal bool IsDataContextBound => _isDataContextBound;
+        internal bool IsDataContextBound { get; }
 
-        internal IPropertyPathNode FinalNode { get; }
+        internal bool ListenForChanges { get; }
+
+        internal PropertyPathNode FinalNode { get; }
 
         internal object ValueInternal { get; private set; }
 
@@ -69,7 +72,7 @@ namespace Windows.UI.Xaml.Data
         {
             get
             {
-                IPropertyPathNode node = _firstNode;
+                PropertyPathNode node = _firstNode;
                 while (node != null)
                 {
                     if (node.IsBroken)
@@ -84,36 +87,19 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        internal void Listen(IPropertyPathWalkerListener listener)
-        {
-            _listener = listener;
-        }
-
-        internal void Unlisten(IPropertyPathWalkerListener listener)
-        {
-            if (_listener == listener)
-            {
-                _listener = null;
-            }
-        }
-
         internal void Update(object source)
         {
             _source = source;
             _firstNode.SetSource(source);
         }
 
-        void IPropertyPathNodeListener.ValueChanged(IPropertyPathNode node)
+        internal void ValueChanged(PropertyPathNode node)
         {
             ValueInternal = node.Value;
-            IPropertyPathWalkerListener listener = _listener;
-            if (listener != null)
-            {
-                listener.ValueChanged();
-            }
+            _expr.ValueChanged();
         }
 
-        private void ParsePath(string path, out IPropertyPathNode head, out IPropertyPathNode tail)
+        private void ParsePath(string path, out PropertyPathNode head, out PropertyPathNode tail)
         {
             head = null;
             tail = null;
@@ -123,15 +109,15 @@ namespace Windows.UI.Xaml.Data
 
             while ((type = parser.Step(out string typeName, out string propertyName, out string index)) != PropertyNodeType.None)
             {
-                IPropertyPathNode node;
+                PropertyPathNode node;
                 switch (type)
                 {
                     case PropertyNodeType.AttachedProperty:
                     case PropertyNodeType.Property:
-                        node = new StandardPropertyPathNode(typeName, propertyName);
+                        node = new StandardPropertyPathNode(this, typeName, propertyName);
                         break;
                     case PropertyNodeType.Indexed:
-                        node = new IndexedPropertyPathNode(index);
+                        node = new IndexedPropertyPathNode(this, index);
                         break;
                     default:
                         throw new InvalidOperationException();
