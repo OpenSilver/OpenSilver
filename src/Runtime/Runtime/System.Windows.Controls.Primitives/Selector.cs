@@ -355,13 +355,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
             Debug.Assert(IsSynchronizedWithCurrentItemPrivate);
             if (!SyncingSelectionAndCurrency)
             {
+                ICollectionView icv = ItemsSource as ICollectionView;
+                if (icv == null)
+                {
+                    return;
+                }
+
                 SyncingSelectionAndCurrency = true;
 
                 try
                 {
-                    ICollectionView icv = ItemsSource as ICollectionView;
-                    Debug.Assert(icv != null);
-
                     if (_selectedItems.Count == 0)
                     {
                         // this avoid treating null as an item
