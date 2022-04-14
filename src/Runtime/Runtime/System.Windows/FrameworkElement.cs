@@ -1136,15 +1136,26 @@ namespace Windows.UI.Xaml
             }
         }
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Identifies the <see cref="Language"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty LanguageProperty =
             DependencyProperty.Register(
                 nameof(Language),
                 typeof(XmlLanguage),
                 typeof(FrameworkElement),
-                null);
+                new PropertyMetadata(XmlLanguage.GetLanguage("en-US")));
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets or sets localization/globalization language information that applies to
+        /// a <see cref="FrameworkElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The language information for this object. The default is an <see cref="XmlLanguage"/>
+        /// object that has its <see cref="XmlLanguage.IetfLanguageTag"/> value set
+        /// to the string "en-US".
+        /// </returns>
+        [TypeConverter(typeof(XmlLanguageConverter))]
         public XmlLanguage Language
         {
             get { return (XmlLanguage)this.GetValue(LanguageProperty); }

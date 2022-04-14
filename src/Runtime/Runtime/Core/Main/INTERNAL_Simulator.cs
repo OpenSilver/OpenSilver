@@ -72,6 +72,11 @@ namespace DotNetForHtml5.Core
             internal get;
         }
 
+        /// <summary>
+        /// CheckAccess() of WebControl's Dispatcher.
+        /// </summary>
+        public static Func<bool> WebControlDispatcherCheckAccess { get; internal set; }
+
 #if CSHTML5NETSTANDARD
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler
         {
