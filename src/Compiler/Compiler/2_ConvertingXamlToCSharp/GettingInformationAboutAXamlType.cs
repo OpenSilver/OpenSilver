@@ -262,11 +262,33 @@ namespace DotNetForHtml5.Compiler
                     case "System.Windows.Controls.Data.Input":
                         assemblyName = "OpenSilver.Controls.Data.Input";
                         return;
+                    case "System.Windows.Controls.Data":
+                        assemblyName = "OpenSilver.Controls.Data";
+                        return;
                     case "System.Windows.Controls.Data.DataForm.Toolkit":
                         assemblyName = "OpenSilver.Controls.Data.DataForm.Toolkit";
                         return;
+                    case "System.Windows.Controls.DataVisualization.Toolkit":
+                        assemblyName = "OpenSilver.Controls.DataVisualization.Toolkit";
+                        return;
                     case "System.Windows.Controls.Navigation":
                         assemblyName = "OpenSilver.Controls.Navigation";
+                        return;
+                    case "System.Windows.Controls.Input":
+                        assemblyName = "OpenSilver.Controls.Input";
+                        return;
+                    case "System.Windows.Interactivity":
+                        assemblyName = "OpenSilver.Interactivity";
+                        return;
+                    case "Microsoft.Expression.Interactions":
+                        assemblyName = "OpenSilver.Expression.Interactions";
+                        return;
+                    case "Microsoft.Expression.Effects":
+                        assemblyName = "OpenSilver.Expression.Effects";
+                        return;
+                    case "System.Windows.Controls.DomainServices":
+                        assemblyName = "OpenRiaServices.Controls.DomainServices";
+                        namespaceName = "OpenRiaServices.Controls";
                         return;
                     default:
                         if (assemblyName == "System" || assemblyName.StartsWith("System."))
@@ -280,6 +302,9 @@ namespace DotNetForHtml5.Compiler
                 {
                     case "System.Windows.Controls.Data.Input":
                         assemblyName = "CSHTML5.Controls.Data.Input";
+                        return;
+                    case "System.Windows.Controls.Input":
+                        assemblyName = "CSHTML5.Controls.Input";
                         return;
                     default:
                         if (assemblyName == "System" || assemblyName.StartsWith("System."))

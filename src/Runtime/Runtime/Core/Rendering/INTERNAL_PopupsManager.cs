@@ -260,7 +260,7 @@ $1.removeChild(popupRoot);
             return new Point();
         }
 
-        public static void EnsurePopupStaysWithinScreenBounds(Popup popup)
+        public static void EnsurePopupStaysWithinScreenBounds(Popup popup, double forcedWidth = double.NaN, double forcedHeight = double.NaN)
         {
             if (popup.IsOpen
                 && popup.PopupRoot != null
@@ -268,8 +268,8 @@ $1.removeChild(popupRoot);
             {
                 // Determine the size of the popup:
                 FrameworkElement content = (FrameworkElement)popup.PopupRoot.Content;
-                double popupActualWidth = content.ActualWidth;
-                double popupActualHeight = content.ActualHeight;
+                double popupActualWidth = !double.IsNaN(forcedWidth) ? forcedWidth : content.ActualWidth;
+                double popupActualHeight = !double.IsNaN(forcedHeight) ? forcedHeight : content.ActualHeight;
                 if (!double.IsNaN(popupActualWidth)
                     && !double.IsNaN(popupActualHeight)
                     && popupActualWidth > 0

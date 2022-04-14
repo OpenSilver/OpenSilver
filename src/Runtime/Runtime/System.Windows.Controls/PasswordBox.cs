@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -37,16 +38,15 @@ namespace Windows.UI.Xaml.Controls
         private ITextBoxViewHost<PasswordBoxView> _textViewHost;
 
         private readonly string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
-        
-        internal sealed override bool INTERNAL_GetFocusInBrowser
-        {
-            get { return true; }
-        }
 
         public PasswordBox()
         {
             this.DefaultStyleKey = typeof(PasswordBox);
         }
+
+        internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+
+        internal sealed override bool INTERNAL_GetFocusInBrowser => true;
 
         /// <summary>
         /// The DependencyID for the PasswordChar property.
@@ -143,7 +143,10 @@ namespace Windows.UI.Xaml.Controls
                 pwb._textViewHost.View.OnPasswordChanged((string)e.NewValue);
             }
 
-            pwb.OnPasswordChanged(new RoutedEventArgs() { OriginalSource = pwb });
+            pwb.OnPasswordChanged(new RoutedEventArgs
+            {
+                OriginalSource = pwb
+            });
         }
 
         private static object CoercePassword(DependencyObject d, object baseValue)
@@ -217,6 +220,8 @@ namespace Windows.UI.Xaml.Controls
             if (_textViewHost != null)
             {
                 PasswordBoxView view = CreateView();
+                view.Loaded += new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.AttachView(view);
             }
         }
@@ -225,11 +230,18 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_textViewHost != null)
             {
+                _textViewHost.View.Loaded -= new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
         }
-        
+
+        private void OnViewLoaded(object sender, RoutedEventArgs e)
+        {
+            UpdateTabIndex(IsTabStop, TabIndex);
+        }
+
         /// <summary>
         /// Selects all the character in the PasswordBox.
         /// </summary>

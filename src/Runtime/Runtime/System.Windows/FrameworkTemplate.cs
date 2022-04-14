@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,19 +11,14 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows.Markup;
-using CSHTML5.Internal;
 
-#if !MIGRATION
-using Windows.UI.Xaml.Controls;
-#else
+#if MIGRATION
 using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION
@@ -39,11 +33,33 @@ namespace Windows.UI.Xaml
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
     public abstract partial class FrameworkTemplate : DependencyObject
     {
-        internal Func<FrameworkElement, TemplateInstance> _methodToInstantiateFrameworkTemplate;
+        private Func<FrameworkElement, TemplateInstance> _methodToInstantiateFrameworkTemplate;
 
         protected FrameworkTemplate()
         {
             this.CanBeInheritanceContext = false;
+        }
+
+        internal bool ApplyTemplateContent(FrameworkElement container)
+        {
+            Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
+
+            if (_methodToInstantiateFrameworkTemplate != null)
+            {
+                FrameworkElement visualTree = _methodToInstantiateFrameworkTemplate(container).TemplateContent;
+                container.TemplateChild = visualTree;
+                
+                return visualTree != null;
+            }
+            else
+            {
+                return BuildVisualTree(container);
+            }
+        }
+
+        internal virtual bool BuildVisualTree(FrameworkElement container)
+        {
+            return false;
         }
 
         /// <summary>
@@ -52,23 +68,9 @@ namespace Windows.UI.Xaml
         /// <returns>The instantiated template.</returns>
         internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate()
         {
-            return INTERNAL_InstantiateFrameworkTemplate(null);
-        }
-
-        /// <summary>
-        /// Creates an instance of the Template.
-        /// </summary>
-        /// <param name="templateOwner">
-        /// Owner of the template.
-        /// Should be null if the template has no owner (for example,
-        /// DataTemplate)
-        /// </param>
-        /// <returns></returns>
-        internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate(FrameworkElement templateOwner)
-        {
             if (_methodToInstantiateFrameworkTemplate != null)
             {
-                TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(templateOwner);
+                TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(null);
                 return templateInstance.TemplateContent;
             }
             else
@@ -85,7 +87,7 @@ namespace Windows.UI.Xaml
         {
             if (_isSealed)
             {
-                throw new InvalidOperationException("Cannot modify a sealed " + this.GetType().Name + ". Please create a new one instead.");
+                throw new InvalidOperationException($"Cannot modify a sealed '{GetType().Name}'. Please create a new one instead.");
             }
             _methodToInstantiateFrameworkTemplate = methodToInstantiateFrameworkTemplate;
         }

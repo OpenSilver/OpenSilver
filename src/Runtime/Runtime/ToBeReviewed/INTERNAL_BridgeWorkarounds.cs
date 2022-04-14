@@ -22,6 +22,7 @@ using CSHTML5;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -325,6 +326,40 @@ public static class INTERNAL_BridgeWorkarounds
         }
 
         return null;
+    }
+
+    public static Type EventHandlerType(this EventInfo eventInfo)
+    {
+        if (eventInfo == null)
+        {
+            throw new ArgumentNullException(nameof(eventInfo));
+        }
+
+        return eventInfo.AddMethod.GetParameters()[0].ParameterType;
+    }
+
+
+    public static IEnumerable<TResult> Cast<TResult>(this IEnumerable source)
+    {
+        if (source is IEnumerable<TResult> typedSource)
+        {
+            return typedSource;
+        }
+
+        if (source == null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        return CastIterator<TResult>(source);
+    }
+
+    private static IEnumerable<TResult> CastIterator<TResult>(IEnumerable source)
+    {
+        foreach (object obj in source)
+        {
+            yield return (TResult)obj;
+        }
     }
 }
 #endif

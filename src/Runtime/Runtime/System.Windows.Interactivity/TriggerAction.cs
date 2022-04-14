@@ -173,6 +173,7 @@ namespace System.Windows.Interactivity
         /// </summary>
         public void Detach() //should be an override but we changed the heritage
         {
+            this.OnDetaching();
             this._associatedObject = null;
         }
     }

@@ -30,12 +30,7 @@ namespace Windows.UI.Xaml
                      Thickness padding, 
                      double maxWidth);
         
-        Size MeasureTextBlock(string text, 
-                              double fontSize, 
-                              FontFamily fontFamily, 
-                              FontStyle style, 
-                              FontWeight weight, 
-                              /*FontStretch stretch,*/ 
+        Size MeasureTextBlock(string uid,
                               TextWrapping wrapping, 
                               Thickness padding, 
                               double maxWidth);
@@ -72,10 +67,6 @@ namespace Windows.UI.Xaml
         private string measureTextBoxElementID;
         private string measureTextBlockElementID;
 
-        private double savedTextBlockFontSize;
-        private string savedTextBlockFontFamily;
-        private FontStyle savedTextBlockFontStyle;
-        private FontWeight savedTextBlockFontWeight;
         private TextWrapping savedTextBlockTextWrapping;
         private Thickness savedTextBlockPadding;
 
@@ -84,14 +75,6 @@ namespace Windows.UI.Xaml
             measureTextBoxElementID = "";
             measureTextBlockElementID = "";
 
-            savedTextBlockFontSize = 0;
-            savedTextBlockFontFamily = "";
-#if MIGRATION
-            savedTextBlockFontStyle = FontStyles.Normal;
-#else
-            savedTextBlockFontStyle = FontStyle.Normal;
-#endif
-            savedTextBlockFontWeight.Weight = 0;
             savedTextBlockTextWrapping = TextWrapping.NoWrap;
             savedTextBlockPadding = new Thickness(double.NegativeInfinity);
         }
@@ -106,14 +89,28 @@ namespace Windows.UI.Xaml
 
             associatedTextBox = new TextBox();
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBox, parent);
+
+            bool hasMarginDiv = false;
+            if (associatedTextBox.INTERNAL_AdditionalOutsideDivForMargins != null)
+            {
+                hasMarginDiv = true;
+
+                var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(associatedTextBox.INTERNAL_AdditionalOutsideDivForMargins);
+                wrapperDivStyle.position = "absolute";
+                wrapperDivStyle.visibility = "hidden";
+                wrapperDivStyle.left = "-100000px";
+                wrapperDivStyle.top = "-100000px";
+            }
+
             textBoxReference = associatedTextBox.INTERNAL_OuterDomElement;
             textBoxDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBoxReference);
             textBoxDivStyle.position = "absolute";
             textBoxDivStyle.visibility = "hidden";
             textBoxDivStyle.height = "";
             textBoxDivStyle.width = "";
-            textBoxDivStyle.top = "0px";
             textBoxDivStyle.borderWidth = "1";
+            textBoxDivStyle.left = hasMarginDiv ? "0px" : "-100000px";
+            textBoxDivStyle.top = hasMarginDiv ? "0px" : "-100000px";
 
             measureTextBoxElementID = ((INTERNAL_HtmlDomElementReference)textBoxReference).UniqueIdentifier;
 
@@ -125,16 +122,32 @@ namespace Windows.UI.Xaml
 
             associatedTextBlock = new TextBlock();
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBlock, parent);
+
+            hasMarginDiv = false;
+            if (associatedTextBlock.INTERNAL_AdditionalOutsideDivForMargins != null)
+            {
+                hasMarginDiv = true;
+
+                var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(associatedTextBlock.INTERNAL_AdditionalOutsideDivForMargins);
+                wrapperDivStyle.position = "absolute";
+                wrapperDivStyle.visibility = "hidden";
+                wrapperDivStyle.left = "-100000px";
+                wrapperDivStyle.top = "-100000px";
+            }
+
             textBlockReference = associatedTextBlock.INTERNAL_OuterDomElement;
             textBlockDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBlockReference);
             textBlockDivStyle.position = "absolute";
             textBlockDivStyle.visibility = "hidden";
             textBlockDivStyle.height = "";
             textBlockDivStyle.width = "";
-            textBlockDivStyle.top = "100px";
             textBlockDivStyle.borderWidth = "1";
             textBlockDivStyle.whiteSpace = "pre";
+            textBlockDivStyle.left = hasMarginDiv ? "0px" : "-100000px";
+            textBlockDivStyle.top = hasMarginDiv ? "0px" : "-100000px";
+
             associatedTextBlock.Text = "A";
+
             measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.measureTextBlockElement=$0", textBlockReference);
         }
@@ -197,12 +210,7 @@ namespace Windows.UI.Xaml
             return new Size(associatedTextBox.ActualWidth + 2, associatedTextBox.ActualHeight);
         }
 
-        public Size MeasureTextBlock(string text, 
-                                     double fontSize, 
-                                     FontFamily fontFamily, 
-                                     FontStyle style, 
-                                     FontWeight weight, 
-                                     /*FontStretch stretch,*/ 
+        public Size MeasureTextBlock(string uid,
                                      TextWrapping wrapping, 
                                      Thickness padding, 
                                      double maxWidth)
@@ -211,15 +219,7 @@ namespace Windows.UI.Xaml
             {
                 return new Size();
             }
-#if OPENSILVER
-            string strText = String.IsNullOrEmpty(text) ? "A" : INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text);
-#elif BRIDGE
-            string strText = String.IsNullOrEmpty(text) ? "A" : text;
-#endif
-            string strFontSize = (Math.Floor(fontSize * 1000) / 1000).ToString(CultureInfo.InvariantCulture) + "px";
-            string strFontFamily = fontFamily != null ? INTERNAL_FontsHelper.LoadFont(fontFamily.Source, (UIElement)associatedTextBlock) : "-";
-            string strFontStyle = style.ToString().ToLower();
-            string strFontWeight = weight.Weight.ToInvariantString();
+
             string strTextWrapping = wrapping == TextWrapping.Wrap ? "pre-wrap" : "pre";
             string strPadding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
             string strWidth = "";
@@ -235,26 +235,6 @@ namespace Windows.UI.Xaml
                 strMaxWidth = maxWidth.ToInvariantString() + "px";
             }
 
-            if (savedTextBlockFontSize == fontSize)
-                strFontSize = "";
-            else
-                savedTextBlockFontSize = fontSize;
-
-            if (savedTextBlockFontFamily == strFontFamily)
-                strFontFamily = "";
-            else
-                savedTextBlockFontFamily = strFontFamily;
-
-            if (savedTextBlockFontStyle == style)
-                strFontStyle = "";
-            else
-                savedTextBlockFontStyle = style;
-
-            if (savedTextBlockFontWeight == weight)
-                strFontWeight = "";
-            else
-                savedTextBlockFontWeight = weight;
-
             if (savedTextBlockTextWrapping == wrapping)
                 strTextWrapping = "";
             else
@@ -265,7 +245,7 @@ namespace Windows.UI.Xaml
             else
                 savedTextBlockPadding = padding;
 
-            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{strText}"",""{strFontSize}"",""{strFontFamily}"",""{strFontStyle}"",""{strFontWeight}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
+            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
 #if OPENSILVER
             string strTextSize = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(javaScriptCodeToExecute));
 #elif BRIDGE

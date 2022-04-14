@@ -47,6 +47,8 @@ using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System.Windows.Media.Imaging;
 #if OPENSILVER
 using OpenSilver.Simulator;
+#else
+using CSHTML5.Simulator;
 #endif
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -68,6 +70,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         bool _htmlHasBeenLoaded = false;
         Assembly _entryPointAssembly;
         Type _applicationType;
+        SimulatorLaunchParameters _simulatorLaunchParameters;
         CompilationState _compilationState = CompilationState.Initializing;
         string _compilationLog;
         string _outputRootPath;
@@ -99,8 +102,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
-            
+
             InitializeComponent();
+            Instance = this;
 
 #if OPENSILVER
             Icon = new BitmapImage(new Uri("pack://application:,,,/OpenSilver.Simulator;component/OpenSilverIcon.ico"));
@@ -127,9 +131,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             LoggerProvider.Instance.ChromiumLogFile = @"C:\temp\chromium.log";
             BrowserPreferences.SetChromiumSwitches("--v=1");
 #endif
-            
+
 #if OPENSILVER
             _applicationType = userApplicationType ?? throw new ArgumentNullException(nameof(userApplicationType));
+            _simulatorLaunchParameters = simulatorLaunchParameters;
             ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out _coreAssembly);
             _entryPointAssembly = _applicationType.Assembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
@@ -315,9 +320,15 @@ ends with "".Browser"" in your solution.";
             {
                 //case Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR:
                 case Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR:
+                case "OpenSilver.Controls.Data":
                 case "OpenSilver.Controls.Data.Input":
                 case "OpenSilver.Controls.Data.DataForm.Toolkit":
+                case "OpenSilver.Controls.DataVisualization.Toolkit":
                 case "OpenSilver.Controls.Navigation":
+                case "OpenSilver.Controls.Input":
+                case "OpenSilver.Interactivity":
+                case "OpenSilver.Expression.Interactions":
+                case "OpenSilver.Expression.Effects":
                     // If specified DLL has absolute path, look in same folder:
                     string pathOfAssemblyThatContainsEntryPoint;
                     string candidatePath;
@@ -511,7 +522,7 @@ ends with "".Browser"" in your solution.";
 
         private void OnConsoleMessageEvent(object sender, ConsoleEventArgs args)
         {
-            switch(args.Level)
+            switch (args.Level)
             {
 #if DEBUG
                 case ConsoleEventArgs.MessageLevel.DEBUG:
@@ -635,6 +646,12 @@ ends with "".Browser"" in your solution.";
                 Dispatcher.BeginInvoke((Action)(() =>
                 {
                     bool success = StartApplication();
+
+                    if (success)
+                    {
+                        _simulatorLaunchParameters?.AppStartedCallback?.Invoke();
+                    }
+
                     HideLoadingMessage();
 
                     UpdateWebBrowserAndWebPageSizeBasedOnCurrentState();
@@ -658,7 +675,7 @@ ends with "".Browser"" in your solution.";
                     {
                         xamlRoot = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Debug.WriteLine($"Initialization: can not get the root. {ex.Message}");
                     }
@@ -858,9 +875,25 @@ ends with "".Browser"" in your solution.";
                 );
         }
 
-        string getHtmlSnapshot()
+        private string getHtmlSnapshot(bool osRootOnly = false, string htmlElementId = null, string xamlElementName = null)
         {
-            var html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document.documentElement.outerHTML").ToString();
+            string html;
+            if (htmlElementId != null)
+            {
+                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue($"document.getElementById('{htmlElementId}').outerHTML").ToString();
+            }
+            else if (xamlElementName != null)
+            {
+                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue($"document.querySelectorAll('[dataid=\"{xamlElementName}\"]')[0].outerHTML").ToString();
+            }
+            else if (osRootOnly)
+            {
+                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document.getElementById('opensilver-root').outerHTML").ToString();
+            }
+            else
+            {
+                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document.documentElement.outerHTML").ToString();
+            }
             return html ?? "";
         }
 
@@ -962,7 +995,7 @@ Click OK to continue.";
                 }
             }
         }
-        
+
 #if OPENSILVER
         bool InitializeApplication()
         {
@@ -979,13 +1012,14 @@ Click OK to continue.";
                 InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
                 InteropHelpers.InjectWebControlDispatcherBeginInvoke(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectWebControlDispatcherInvoke(MainWebBrowser, _coreAssembly);
+                InteropHelpers.InjectWebControlDispatcherCheckAccess(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectConvertBrowserResult(BrowserResultConverter.CastFromJsValue, _coreAssembly);
                 InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
                 InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
                 InteropHelpers.InjectWebClientFactory(_coreAssembly);
                 InteropHelpers.InjectClipboardHandler(_coreAssembly);
                 InteropHelpers.InjectSimulatorProxy(new SimulatorProxy(MainWebBrowser, Console), _coreAssembly);
-                
+
                 // In the OpenSilver Version, we use this work-around to know if we're in the simulator
                 InteropHelpers.InjectIsRunningInTheSimulator_WorkAround(_coreAssembly);
 
@@ -1082,7 +1116,7 @@ Click OK to continue.";
         }
 #endif
 
-        
+
 
         void ReloadAppAfterRedirect(string urlFragment)
         {
@@ -2057,7 +2091,7 @@ Click OK to continue.";
             }
         }
 
-#region Element Picker for XAML Inspection
+        #region Element Picker for XAML Inspection
 
         void StartElementPickerForInspection()
         {
@@ -2125,7 +2159,7 @@ Click OK to continue.";
                 StopElementPickerForInspection();
         }
 
-#endregion
+        #endregion
 
 
         private bool IsNetworkAvailable()
@@ -2133,14 +2167,14 @@ Click OK to continue.";
             return NetworkInterface.GetIsNetworkAvailable();
         }
 
-#region profil popup
+        #region profil popup
 
         private void ButtonLogout_Click(object sender, RoutedEventArgs e)
         {
             LicenseChecker.LogOut();
         }
 
-#endregion
+        #endregion
 
         private void LaunchOptimizerButton_Click(object sender, RoutedEventArgs e)
         {
@@ -2213,6 +2247,24 @@ Click OK to continue.";
         private void CheckBoxCORS_Unchecked(object sender, RoutedEventArgs e)
         {
             CrossDomainCallsHelper.IsBypassCORSErrors = false;
+        }
+
+        public static MainWindow Instance { get; set; }
+
+        public static void SaveHtmlSnapshot(string fileName = null, bool osRootOnly = true, string htmlElementId = null, string xamlElementName = null)
+        {
+            if (fileName == null)
+            {
+                var elementName = htmlElementId ?? xamlElementName ?? "";
+                fileName = $"HtmlSnapshot-{elementName}-" + DateTime.Now.ToString("yy.MM.dd.hh.mm.ss") + ".html";
+            }
+            string simulatorExePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string debuggingFolder = Path.Combine(simulatorExePath, "debugging");
+            if (!Directory.Exists(debuggingFolder))
+                Directory.CreateDirectory(debuggingFolder);
+
+            File.WriteAllText(Path.Combine(debuggingFolder, fileName), Instance.getHtmlSnapshot(osRootOnly, htmlElementId, xamlElementName));
         }
     }
 }

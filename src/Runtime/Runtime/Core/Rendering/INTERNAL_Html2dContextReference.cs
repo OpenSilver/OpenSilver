@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
@@ -80,14 +81,48 @@ namespace CSHTML5.Internal
 
         object InvokeMethod(string methodName, object[] args)
         {
-            string methodArgumentsFormattedForJavaScript = string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x)));
-            string javaScriptCodeToExecute =
-                $@"document.invoke2dContextMethod(""{_domElementUniqueIdentifier}"" , ""{methodName}"", ""{methodArgumentsFormattedForJavaScript}"")";
+            string argsString = string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x)));
+            return InvokeMethodImpl(methodName, argsString);
+        }
 
-            var result = CSHTML5.Interop.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
-            return result;
-            //INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode(javaScriptCodeToExecute);
-            //result = null;
+        object InvokeMethod(string methodName)
+        {
+            return InvokeMethodImpl(methodName, string.Empty);
+        }
+
+        object InvokeMethod(string methodName, double arg0)
+        {
+            string args = $"{arg0.ToInvariantString()}";
+            return InvokeMethodImpl(methodName, args);
+        }
+
+        object InvokeMethod(string methodName, double arg0, double arg1)
+        {
+            string args = $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}";
+            return InvokeMethodImpl(methodName, args);
+        }
+
+        object InvokeMethod(string methodName, double arg0, double arg1, double arg2, double arg3)
+        {
+            string args = $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}, {arg2.ToInvariantString()}, {arg3.ToInvariantString()}";
+            return InvokeMethodImpl(methodName, args);
+        }
+
+        object InvokeMethod(string methodName, double arg0, double arg1, double arg2, double arg3, double arg4, double arg5)
+        {
+            string args = $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}, {arg2.ToInvariantString()}, {arg3.ToInvariantString()}, {arg4.ToInvariantString()}, {arg5.ToInvariantString()}";
+            return InvokeMethodImpl(methodName, args);
+        }
+
+        object InvokeMethod(string methodName, double[] args)
+        {
+            string argsString = string.Join(", ", args.Select(x => x.ToInvariantString()));
+            return InvokeMethodImpl(methodName, argsString);
+        }
+
+        object InvokeMethodImpl(string methodName, string args)
+        {
+            return OpenSilver.Interop.ExecuteJavaScriptAsync($"document.invoke2dContextMethod(\"{_domElementUniqueIdentifier}\", \"{methodName}\", \"{args}\")");
         }
 
         public string fillStyle { set { SetPropertyValue("fillStyle", value); } }
@@ -96,29 +131,29 @@ namespace CSHTML5.Internal
         public string lineDashOffset { set { SetPropertyValue("lineDashOffset", value); } }
 
 
-        public void transform(params object[] args) { InvokeMethod("transform", args); }
-        public void translate(params object[] args) { InvokeMethod("translate", args); }
-        public void rotate(params object[] args) { InvokeMethod("rotate", args); }
-        public void scale(params object[] args) { InvokeMethod("scale", args); }
+        public void transform(double m11, double m12, double m21, double m22, double dx, double dy) { InvokeMethod("transform", m11, m12, m21, m22, dx, dy); }
+        public void translate(double x, double y) { InvokeMethod("translate", x, y); }
+        public void rotate(double angle) { InvokeMethod("rotate", angle); }
+        public void scale(double x, double y) { InvokeMethod("scale", x, y); }
 
-        public void save(params object[] args) { InvokeMethod("save", args); }
-        public void restore(params object[] args) { InvokeMethod("restore", args); }
+        public void save() { InvokeMethod("save"); }
+        public void restore() { InvokeMethod("restore"); }
 
         public void fill(params object[] args) { InvokeMethod("fill", args); }
         public void stroke(params object[] args) { InvokeMethod("stroke", args); }
-        public void setLineDash(params object[] args) { InvokeMethod("setLineDash", args); }
+        public void setLineDash(params double[] args) { InvokeMethod("setLineDash", args); }
 
-        public void beginPath(params object[] args) { InvokeMethod("beginPath", args); }
-        public void closePath(params object[] args) { InvokeMethod("closePath", args); }
-        public void createLinearGradient(params object[] args) { InvokeMethod("createLinearGradient", args); }
+        public void beginPath() { InvokeMethod("beginPath"); }
+        public void closePath() { InvokeMethod("closePath"); }
+        public void createLinearGradient(double x0, double y0, double x1, double y1) { InvokeMethod("createLinearGradient", x0, y0, x1, y1); }
 
         public void arc(params object[] args) { InvokeMethod("arc", args); }
         public void ellipse(params object[] args) { InvokeMethod("ellipse", args); }
-        public void rect(params object[] args) { InvokeMethod("rect", args); }
+        public void rect(double x, double y, double width, double height) { InvokeMethod("rect", x, y, width, height); }
 
-        public void moveTo(params object[] args) { InvokeMethod("moveTo", args); }
-        public void lineTo(params object[] args) { InvokeMethod("lineTo", args); }
-        public void bezierCurveTo(params object[] args) { InvokeMethod("bezierCurveTo", args); }
-        public void quadraticCurveTo(params object[] args) { InvokeMethod("quadraticCurveTo", args); }
+        public void moveTo(double x, double y) { InvokeMethod("moveTo", x, y); }
+        public void lineTo(double x, double y) { InvokeMethod("lineTo", x, y); }
+        public void bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y, double x, double y) { InvokeMethod("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y); }
+        public void quadraticCurveTo(double cpx, double cpy, double x, double y) { InvokeMethod("quadraticCurveTo", cpx, cpy, x, y); }
     }
 }

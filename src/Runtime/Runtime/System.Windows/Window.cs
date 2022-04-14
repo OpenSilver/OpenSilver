@@ -43,6 +43,29 @@ namespace Windows.UI.Xaml
     public partial class Window : FrameworkElement
 #endif
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Window"/> class.
+        /// </summary>
+        public Window() : this(false) { }
+
+        internal Window(bool hookUpEvents)
+        {
+            if (hookUpEvents)
+            {
+                new DOMEventManager(
+                    Application.Current.GetWindow, 
+                    "beforeunload", 
+                    ProcessOnClosing)
+                .AttachToDomEvents();
+
+                new DOMEventManager(
+                    () => INTERNAL_HtmlDomManager.GetHtmlWindow(), 
+                    "resize", 
+                    ProcessOnWindowSizeChanged)
+                .AttachToDomEvents();
+            }
+        }
+
         internal override int VisualChildrenCount
         {
             get
@@ -66,6 +89,28 @@ namespace Windows.UI.Xaml
         /// Gets the currently activated window for an application.
         /// </summary>
         public static Window Current { get; set; }
+
+        #region Out-of browser properties
+        /// <summary>
+        /// Gets or sets the position of the left edge of the application window; see Remarks
+        /// for restrictions on setting this property at run time.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double Left { get; set; }
+
+        /// <summary>
+        /// Gets or sets the position of the top edge of the application window; see Remarks
+        /// for restrictions on setting this property at run time.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double Top { get; set; }
+
+        /// <summary>
+        /// Gets or sets the window title bar text.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public string Title { get; set; }
+        #endregion
 
         internal PositionsWatcher INTERNAL_PositionsWatcher = new PositionsWatcher(); //Note: this is to handle the changes of position of elements (for example for when we want a popup to stick to a given UIElement - see Popup.PlacementTarget).
         internal object INTERNAL_RootDomElement;
@@ -133,24 +178,10 @@ namespace Windows.UI.Xaml
 
         #region Bounds and SizeChanged event
 
-        INTERNAL_EventManager<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs> _windowSizeChangedEventManager;
         /// <summary>
         /// Occurs when the window has rendered or changed its rendering size.
         /// </summary>
-        public new event WindowSizeChangedEventHandler SizeChanged
-        {
-            add
-            {
-                if (_windowSizeChangedEventManager == null)
-                    _windowSizeChangedEventManager = new INTERNAL_EventManager<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs>(() => INTERNAL_HtmlDomManager.GetHtmlWindow(), "resize", ProcessOnWindowSizeChanged);
-                _windowSizeChangedEventManager.Add(value);
-            }
-            remove
-            {
-                if (_windowSizeChangedEventManager != null)
-                    _windowSizeChangedEventManager.Remove(value);
-            }
-        }
+        public new event WindowSizeChangedEventHandler SizeChanged;
 
         void ProcessOnWindowSizeChanged(object jsEventArg)
         {
@@ -163,7 +194,7 @@ namespace Windows.UI.Xaml
 #endif
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement));
+                string concatenated = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.offsetWidth + '|' + $0.offsetHeight", this.INTERNAL_OuterDomElement));
                 int sepIndex = concatenated.IndexOf('|');
                 string widthAsString = concatenated.Substring(0, sepIndex);
                 string heightAsString = concatenated.Substring(sepIndex + 1);
@@ -172,8 +203,8 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                width = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetWidth", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientWidth;
-                height = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.offsetHeight", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientHeight;
+                width = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("$0.offsetWidth", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientWidth;
+                height = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("$0.offsetHeight", this.INTERNAL_OuterDomElement)); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientHeight;
             }
 
             var eventArgs = new WindowSizeChangedEventArgs()
@@ -185,10 +216,7 @@ namespace Windows.UI.Xaml
 
         void OnWindowSizeChanged(WindowSizeChangedEventArgs eventArgs)
         {
-            foreach (WindowSizeChangedEventHandler handler in _windowSizeChangedEventManager.Handlers.ToList<WindowSizeChangedEventHandler>())
-            {
-                handler(this, eventArgs);
-            }
+            SizeChanged?.Invoke(this, eventArgs);
         }
 
         /// <summary>
@@ -324,48 +352,16 @@ namespace Windows.UI.Xaml
 
         #region Closing event
 
-        INTERNAL_EventManager<EventHandler<ClosingEventArgs>, ClosingEventArgs> _closingEventManager;
-        INTERNAL_EventManager<EventHandler<ClosingEventArgs>, ClosingEventArgs> ClosingEventManager
-        {
-            get
-            {
-                if (_closingEventManager == null)
-                {
-                    _closingEventManager = new INTERNAL_EventManager<EventHandler<ClosingEventArgs>, ClosingEventArgs>(Application.Current.GetWindow, "beforeunload", ProcessOnClosing);
-                }
-                return _closingEventManager;
-            }
-        }
-
-        // Exceptions:
-        //   System.NotSupportedException:
-        //     When adding or removing an event handler, the application is not running
-        //     outside the browser.
         /// <summary>
         /// Occurs when the window is about to close.
         /// </summary>
-        public event EventHandler<ClosingEventArgs> Closing
-        {
-            add
-            {
-                //CSHTML5.Interop.ExecuteJavaScript(@"window.addEventListener(""beforeunload"", function (e) { e.returnValue=""test"";})");
-                //CSHTML5.Interop.ExecuteJavaScript(@"window.onbeforeunload = function (e) { return ""test"";}");
-                ClosingEventManager.Add(value);
-            }
-            remove
-            {
-                ClosingEventManager.Remove(value);
-            }
-        }
+        public event EventHandler<ClosingEventArgs> Closing;
 
         /// <summary>
         /// Raises the Closing event
         /// </summary>
         void ProcessOnClosing(object jsEventArg)
         {
-            //CSHTML5.Interop.ExecuteJavaScript(@"$0.returnValue = ""The modifications you made may not be saved.""", jsEventArg); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe edge).
-            //CSHTML5.Interop.ExecuteJavaScript(@"return ""The modifications you made may not be saved.""", jsEventArg); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe edge).
-
             var eventArgs = new ClosingEventArgs(true);
             eventArgs.INTERNAL_JSArgs = jsEventArg;
             OnClosing(eventArgs);
@@ -377,10 +373,7 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         protected void OnClosing(ClosingEventArgs eventArgs)
         {
-            foreach (EventHandler<ClosingEventArgs> handler in _closingEventManager.Handlers)//.ToList<EventHandler>())
-            {
-                handler(this, eventArgs);
-            }
+            Closing?.Invoke(this, eventArgs);
         }
 
         #endregion
@@ -401,6 +394,15 @@ namespace Windows.UI.Xaml
 
         [OpenSilver.NotImplemented]
         public WindowState WindowState { get; set; }
+
+        /// <summary>
+        ///     Show the window
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public void Show()
+        {
+        
+        }
 
         [OpenSilver.NotImplemented]
         public void Close()

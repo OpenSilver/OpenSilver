@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 if (isLastLoop)
                 {
-                    AnimationHelpers.ApplyValue(target, propertyPath, value, parameters.IsVisualStateChange);
+                    AnimationHelpers.ApplyValue(target, propertyPath, value);
                 }
 
                 OnIterationCompleted(parameters);

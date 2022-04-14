@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using System.Security;
 using System.Security.Permissions;
+using System.Xml;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -57,6 +58,16 @@ namespace DotNetForHtml5.Compiler
             LinePosition = linePosition;
         }
 
+        public XamlParseException(string message, IXmlLineInfo lineInfo)
+            : this(message)
+        {
+            if (lineInfo != null && lineInfo.HasLineInfo())
+            {
+                LineNumber = lineInfo.LineNumber;
+                LinePosition = lineInfo.LinePosition;
+            }
+        }
+        
         ///<summary>
         /// Constructor
         ///</summary>
@@ -77,6 +88,16 @@ namespace DotNetForHtml5.Compiler
         {
             LineNumber = lineNumber;
             LinePosition = linePosition;
+        }
+
+        public XamlParseException(string message, IXmlLineInfo lineInfo, Exception innerException)
+            : this(message, innerException)
+        {
+            if (lineInfo != null && lineInfo.HasLineInfo())
+            {
+                LineNumber = lineInfo.LineNumber;
+                LinePosition = lineInfo.LinePosition;
+            }
         }
 
         internal XamlParseException(string message, int lineNumber, int linePosition, Uri baseUri, Exception innerException)

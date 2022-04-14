@@ -283,7 +283,7 @@ namespace Windows.UI.Xaml
                 foreach (var storage in storages)
                 {
                     uie.SetInheritedValue(storage.Property,
-                                          INTERNAL_PropertyStore.GetEffectiveValue(storage),
+                                          INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
                                           true);
                 }
             }
@@ -310,6 +310,8 @@ namespace Windows.UI.Xaml
         }
 
         #endregion Logical Parent
+
+        internal DependencyObject TemplatedParent { get; set; }
 
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
@@ -492,13 +494,25 @@ namespace Windows.UI.Xaml
 
             object div1;
             var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            object div2;
-            var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
-            div2style.width = "100%";
-            div2style.height = "100%";
-            if (INTERNAL_ForceEnableAllPointerEvents)
-                div2style.pointerEvents = "all";
-            domElementWhereToPlaceChildren = div2;
+            if (!this.IsUnderCustomLayout || INTERNAL_ForceEnableAllPointerEvents)
+            {
+                object div2;
+                var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
+                div2style.width = "100%";
+                div2style.height = "100%";
+                if (INTERNAL_ForceEnableAllPointerEvents)
+                    div2style.pointerEvents = "all";
+                domElementWhereToPlaceChildren = div2;
+
+                if (this.IsCustomLayoutRoot)
+                {
+                    div1style.position = "relative";
+                }
+            }
+            else
+            {
+                domElementWhereToPlaceChildren = div1;
+            }
             return div1;
         }
 
@@ -554,8 +568,6 @@ namespace Windows.UI.Xaml
             this.OnPreApplyTemplate();
 
             bool visualsCreated = false;
-            FrameworkElement visualChild = null;
-
             if (this.TemplateInternal != null)
             {
                 FrameworkTemplate template = this.TemplateInternal;
@@ -564,18 +576,12 @@ namespace Windows.UI.Xaml
                 // rendered already for this control.
                 if (this.TemplateChild == null)
                 {
-                    visualChild = template.INTERNAL_InstantiateFrameworkTemplate(this);
-                    if (visualChild != null)
-                    {
-                        visualsCreated = true;
-                    }
+                    visualsCreated = template.ApplyTemplateContent(this);
                 }
             }
 
             if (visualsCreated)
             {
-                this.TemplateChild = visualChild;
-
                 // Call the OnApplyTemplate method
                 this.OnApplyTemplate();
             }
@@ -1002,7 +1008,42 @@ namespace Windows.UI.Xaml
         /// <summary>Occurs when the data context for this element changes. </summary>
         public event DependencyPropertyChangedEventHandler DataContextChanged;
 
-#endregion
+        #endregion
+
+        #region Triggers
+
+        /// <summary>
+        /// Gets the collection of triggers for animations that are defined for a <see cref="FrameworkElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The collection of triggers for animations that are defined for this object.
+        /// </returns>
+        public TriggerCollection Triggers
+        {
+            get
+            {
+                TriggerCollection triggers = (TriggerCollection)GetValue(TriggersProperty);
+                if (triggers == null)
+                {
+                    triggers = new TriggerCollection(this);
+                    SetValue(TriggersProperty, triggers);
+                }
+
+                return triggers;
+            }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Triggers"/> dependency property.
+        /// </summary>
+        internal static readonly DependencyProperty TriggersProperty =
+            DependencyProperty.Register(
+                nameof(Triggers),
+                typeof(TriggerCollection),
+                typeof(FrameworkElement),
+                null);
+
+        #endregion Triggers
 
         public event EventHandler LayoutUpdated;
 
@@ -1011,27 +1052,7 @@ namespace Windows.UI.Xaml
             LayoutUpdated?.Invoke(this, new EventArgs());
         }
 
-#region Work in progress
-#region Triggers
-
-        [OpenSilver.NotImplemented]
-        public TriggerCollection Triggers
-        {
-            get
-            {
-                return (TriggerCollection)this.GetValue(FrameworkElement.TriggersProperty);
-            }
-        }
-
-        [OpenSilver.NotImplemented]
-        public static DependencyProperty TriggersProperty =
-            DependencyProperty.Register(
-                nameof(Triggers),
-                typeof(TriggerCollection),
-                typeof(FrameworkElement),
-                new PropertyMetadata(new TriggerCollection()));
-
-#endregion
+        #region Work in progress
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty FlowDirectionProperty =
@@ -1063,15 +1084,26 @@ namespace Windows.UI.Xaml
             }
         }
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Identifies the <see cref="Language"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty LanguageProperty =
             DependencyProperty.Register(
                 nameof(Language),
                 typeof(XmlLanguage),
                 typeof(FrameworkElement),
-                null);
+                new PropertyMetadata(XmlLanguage.GetLanguage("en-US")));
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets or sets localization/globalization language information that applies to
+        /// a <see cref="FrameworkElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The language information for this object. The default is an <see cref="XmlLanguage"/>
+        /// object that has its <see cref="XmlLanguage.IetfLanguageTag"/> value set
+        /// to the string "en-US".
+        /// </returns>
+        [TypeConverter(typeof(XmlLanguageConverter))]
         public XmlLanguage Language
         {
             get { return (XmlLanguage)this.GetValue(LanguageProperty); }
@@ -1437,7 +1469,7 @@ namespace Windows.UI.Xaml
         private void InvalidateStyleProperty()
         {
             // Try to find an implicit style
-            object implicitStyle = FrameworkElement.FindImplicitStyleResource(this, GetType());
+            object implicitStyle = FindImplicitStyleResource(this, GetType());
 
             // Set the flag associated with the StyleProperty
             HasImplicitStyleFromResources = implicitStyle != DependencyProperty.UnsetValue;
@@ -1472,9 +1504,18 @@ namespace Windows.UI.Xaml
         {
             if (fe.ShouldLookupImplicitStyles)
             {
+                // For non-controls the implicit StyleResource lookup must stop at
+                // the templated parent.
+                DependencyObject boundaryElement = null;
+                if (!(fe is Control) || fe is TextBlock)
+                {
+                    boundaryElement = fe.TemplatedParent;
+                }
+
                 object implicitStyle;
                 // First, try to find an implicit style in parents' resources.
-                for (FrameworkElement f = fe; f != null; f = VisualTreeHelper.GetParent(f) as FrameworkElement)
+                FrameworkElement f = fe;
+                while (f != null)
                 {
                     if (f.HasResources && f.Resources.HasImplicitStyles)
                     {
@@ -1484,7 +1525,14 @@ namespace Windows.UI.Xaml
                             return implicitStyle;
                         }
                     }
+
+                    f = (f.Parent ?? VisualTreeHelper.GetParent(f)) as FrameworkElement;
+                    if (boundaryElement != null && f == boundaryElement)
+                    {
+                        return DependencyProperty.UnsetValue;
+                    }
                 }
+
                 // Then we try to find the resource in the App's Resources
                 // if we can't find it in the parents.
                 Application app = Application.Current;
@@ -1497,6 +1545,7 @@ namespace Windows.UI.Xaml
                     }
                 }
             }
+
             return DependencyProperty.UnsetValue;
         }
 
@@ -1715,11 +1764,18 @@ namespace Windows.UI.Xaml
             get { return _themeStyleCache; }
         }
 
-#endregion DefaultStyleKey
+        #endregion DefaultStyleKey
 
-#endregion Handling Styles
+        #endregion Handling Styles
 
-#region Loaded/Unloaded events
+        #region Loaded/Unloaded events
+
+        public static readonly RoutedEvent LoadedEvent = 
+            new RoutedEvent(
+                nameof(Loaded),
+                RoutingStrategy.Direct,
+                typeof(RoutedEventHandler), 
+                typeof(FrameworkElement));
 
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.

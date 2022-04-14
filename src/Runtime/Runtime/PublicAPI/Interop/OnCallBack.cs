@@ -205,10 +205,11 @@ namespace CSHTML5.Internal
                         }
                         catch (Exception ex)
                         {
-#if DEBUG
                             Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-#endif
-                            throw;
+//#if DEBUG
+//                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+//#endif
+//                            throw;
                         }
                     });
             };
@@ -274,13 +275,7 @@ namespace CSHTML5.Internal
 
             for (int i = 0; i < count; i++)
             {
-                var arg = new INTERNAL_JSObjectReference()
-                {
-                    ReferenceId = idWhereCallbackArgsAreStored,
-                    IsArray = true,
-                    ArrayIndex = i,
-                    Value = callbackArgs
-                };
+                var arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i);
                 if (callbackGenericArgs != null
                     && i < callbackGenericArgs.Length
                     && callbackGenericArgs[i] != typeof(object)
@@ -336,13 +331,7 @@ namespace CSHTML5.Internal
 
             for (int i = 0; i < count; i++)
             {
-                var arg = new INTERNAL_JSObjectReference()
-                {
-                    ReferenceId = idWhereCallbackArgsAreStored,
-                    IsArray = true,
-                    ArrayIndex = i,
-                    Value = callbackArgs
-                };
+                var arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i);
                 if (callbackGenericArgs != null
                     && i < callbackGenericArgs.Length
                     && callbackGenericArgs[i] != typeof(object)
@@ -441,13 +430,7 @@ namespace CSHTML5.Internal
 
             for (int i = 0; i < count; i++)
             {
-                var arg = new INTERNAL_JSObjectReference()
-                {
-                    ReferenceId = idWhereCallbackArgsAreStored,
-                    IsArray = true,
-                    ArrayIndex = i,
-                    Value = callbackArgs
-                };
+                var arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i);
                 if (callbackGenericArgs != null
                     && i < callbackGenericArgs.Length
                     && callbackGenericArgs[i] != typeof(object)

@@ -12,8 +12,10 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using CSHTML5.Internal.System.Windows.Data;
@@ -33,8 +35,7 @@ namespace Windows.UI.Xaml
     /// </summary>
     public sealed partial class PropertyPath : DependencyObject
     {
-        internal DependencyProperty INTERNAL_DependencyProperty; //this is only defined when the user uses the PropertyPath(DependencyProperty dependencyProperty) constructor.
-        internal bool INTERNAL_IsDirectlyDependencyPropertyPath = false;
+        private SourceValueInfo[] _arySVI;
 
         /// <summary>
         /// Initializes a new instance of the PropertyPath class based on a path string.
@@ -42,176 +43,40 @@ namespace Windows.UI.Xaml
         /// <param name="path">The path string to construct with.</param>
         public PropertyPath(string path)
         {
-            _path = path;
+            Path = path;
 
-            INTERNAL_AccessPropertyContainer = defaulAccessVisualStateProperty;
-            INTERNAL_PropertySetVisualState = defaultSetVisualStateProperty;
-            INTERNAL_PropertySetAnimationValue = defaultSetAnimationVisualStateProperty;
-            INTERNAL_PropertySetLocalValue = defaultSetLocalVisualStateProperty;
-            INTERNAL_PropertyGetVisualState = defaultGetVisualStateProperty;
+            INTERNAL_AccessPropertyContainer = accessVisualStateProperty;
+            INTERNAL_PropertySetAnimationValue = setVisualStateProperty;
         }
 
         public PropertyPath(DependencyProperty dependencyProperty)
         {
-            INTERNAL_IsDirectlyDependencyPropertyPath = true;
-            INTERNAL_DependencyProperty = dependencyProperty;
-            _path = dependencyProperty.Name;
-            INTERNAL_DependencyPropertyName = dependencyProperty.Name;
-            INTERNAL_AccessPropertyContainer = defaulAccessVisualStateProperty;
-            INTERNAL_PropertySetVisualState = defaultSetVisualStateProperty;
-            INTERNAL_PropertySetAnimationValue = defaultSetAnimationVisualStateProperty;
-            INTERNAL_PropertySetLocalValue = defaultSetLocalVisualStateProperty;
-            INTERNAL_PropertyGetVisualState = defaultGetVisualStateProperty;
+            Path = dependencyProperty.Name;
+            DependencyProperty = dependencyProperty;
+
+            INTERNAL_AccessPropertyContainer = (d) => Enumerable.Empty<Tuple<DependencyObject, DependencyProperty, int?>>();
+            INTERNAL_PropertySetAnimationValue = (target, value) => target.SetAnimationValue(DependencyProperty, value);
         }
 
-        #region methods to access property for the PropertyPath(DependencyProperty) constructor
-        private IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> defaulAccessVisualStateProperty(DependencyObject rootTargetObjectInstance)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyPath"/> class.
+        /// </summary>
+        /// <param name="path">
+        /// The path string for this <see cref="PropertyPath"/>.
+        /// </param>
+        /// <param name="pathParameters">
+        /// Do not use.
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Provided an array of length greater than zero for pathParameters.
+        /// </exception>
+        public PropertyPath(string path, params object[] pathParameters) : this(path)
         {
-            PropertyPathParser parser = new PropertyPathParser(Path);
-            string typeName, propertyName, index;
-            PropertyNodeType type;
-            var nodes = new List<Tuple<PropertyNodeType, Tuple<string/*type*/, string/*property*/, string/*index*/>>>();
-            while ((type = parser.Step(out typeName, out propertyName, out index)) != PropertyNodeType.None)
+            if (pathParameters != null && pathParameters.Length > 0)
             {
-                nodes.Add(
-                    new Tuple<PropertyNodeType, Tuple<string, string, string>>(
-                        type, new Tuple<string, string, string>(typeName, propertyName, index)));
-            }
-            int count = Math.Max(0, nodes.Count - 1);
-            List<Tuple<DependencyObject, DependencyProperty, int?>> list = new List<Tuple<DependencyObject, DependencyProperty, int?>>(count);
-            for (int j = 0; j < count; ++j)
-            {
-                type = nodes[j].Item1;
-                typeName = nodes[j].Item2.Item1;
-                propertyName = nodes[j].Item2.Item2;
-                index = nodes[j].Item2.Item3;
-
-                Tuple<DependencyObject, DependencyProperty, int?> tuple;
-                DependencyObject targetDO;
-                switch (type)
-                {
-                    case PropertyNodeType.AttachedProperty:
-                    case PropertyNodeType.Property:
-                        targetDO = list.Count == 0 ?
-                            rootTargetObjectInstance :
-                            list[list.Count - 1].Item1;
-                        Type targetType = targetDO.GetType();
-                        PropertyInfo prop = targetType.GetProperty(propertyName);
-                        DependencyObject value = (DependencyObject)prop.GetValue(targetDO);
-                        DependencyProperty dp = (DependencyProperty)prop.DeclaringType.GetField(propertyName + "Property").GetValue(null);
-                        tuple = new Tuple<DependencyObject, DependencyProperty, int?>(
-                            value,
-                            dp,
-                            null);
-                        list.Add(tuple);
-                        yield return tuple;
-                        break;
-                    case PropertyNodeType.Indexed:
-                        int i;
-                        int.TryParse(index, out i);
-                        targetDO = rootTargetObjectInstance;
-                        if (list.Count > 0)
-                        {
-#if OPENSILVER
-                            if (true)
-#elif BRIDGE
-                            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-                            {
-                                // Note: In OpenSilver, we want to enter this case both in the simulator and
-                                // the browser.
-                                targetDO = (DependencyObject)((dynamic)list[list.Count - 1].Item1)[i];
-                            }
-                            else
-                            {
-                                // Note: getItem() is the indexer's name in the Bridge implementation.
-                                // The use of 'dynamic' makes the above line return undefined when the application
-                                // is running in javascript with CSHTML5.
-                                targetDO = (DependencyObject)((dynamic)list[list.Count - 1].Item1).getItem(i);
-                            }
-                        }
-                        tuple = new Tuple<DependencyObject, DependencyProperty, int?>(
-                            targetDO,
-                            null,
-                            i);
-                        list.Add(tuple);
-                        yield return tuple;
-                        break;
-                }
-            }
-            if (!INTERNAL_IsDirectlyDependencyPropertyPath)
-            {
-                bool success = false;
-                DependencyProperty dp = null;
-                try
-                {
-                    string name = nodes[nodes.Count - 1].Item2.Item2;
-                    DependencyObject finalDO = count == 0 ? rootTargetObjectInstance : list[list.Count - 1].Item1;
-                    dp = (DependencyProperty)finalDO.GetType()
-                        .GetField(name + "Property", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public)
-                        .GetValue(null);
-                    success = dp != null;
-                }
-                finally
-                {
-                    if (success)
-                    {
-                        INTERNAL_IsDirectlyDependencyPropertyPath = true;
-                        INTERNAL_DependencyProperty = dp;
-                        INTERNAL_DependencyPropertyName = dp.Name;
-                    }
-                }
+                throw new ArgumentOutOfRangeException(nameof(pathParameters));
             }
         }
-
-        private void defaultSetVisualStateProperty(DependencyObject finalTargetInstance, object value)
-        {
-            if (INTERNAL_IsDirectlyDependencyPropertyPath)
-            {
-                (finalTargetInstance).SetVisualStateValue(INTERNAL_DependencyProperty, value);
-            }
-            else
-            {
-                throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
-            }
-        }
-
-        private void defaultSetAnimationVisualStateProperty(DependencyObject finalTargetInstance, object value)
-        {
-            if (INTERNAL_IsDirectlyDependencyPropertyPath)
-            {
-                (finalTargetInstance).SetAnimationValue(INTERNAL_DependencyProperty, value);
-            }
-            else
-            {
-                throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
-            }
-        }
-
-        private void defaultSetLocalVisualStateProperty(DependencyObject finalTargetInstance, object value)
-        {
-            if (INTERNAL_IsDirectlyDependencyPropertyPath)
-            {
-                (finalTargetInstance).SetCurrentValue(INTERNAL_DependencyProperty, value);
-            }
-            else
-            {
-                throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
-            }
-        }
-
-        private object defaultGetVisualStateProperty(DependencyObject finalTargetInstance)
-        {
-            if (INTERNAL_IsDirectlyDependencyPropertyPath)
-            {
-                return finalTargetInstance.GetVisualStateValue(INTERNAL_DependencyProperty);
-            }
-            else
-            {
-                throw new InvalidOperationException("The constructor: PropertyPath(string path) for storyboards is not supported yet. Please use PropertyPath(DependencyProperty dependencyProperty) or define your storyboard in the XAML.");
-            }
-        }
-#endregion
 
         /// <summary>
         /// Initializes a new Instance of the PropertyPath class based on methods to access the property from a DependencyObject.
@@ -224,68 +89,153 @@ namespace Windows.UI.Xaml
         /// <param name="propertySetLocalValue">The function that sets the Local value on the given element.</param>
         /// <param name="propertyGetVisualState">The function that gets the VisualState value on the given element.</param>
         /// <ignore/>
+        [Obsolete("Please use PropertyPath(string) instead. This constructor will be removed in a future release.")]
         public PropertyPath(string path, string dependencyPropertyName, Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> accessPropertyContainer,
-            Action<DependencyObject, Object> propertySetVisualState,
-            Action<DependencyObject, Object> propertySetAnimationValue,
-            Action<DependencyObject, Object> propertySetLocalValue,
-            Func<DependencyObject, Object> propertyGetVisualState)
+            Action<DependencyObject, object> propertySetVisualState,
+            Action<DependencyObject, object> propertySetAnimationValue,
+            Action<DependencyObject, object> propertySetLocalValue,
+            Func<DependencyObject, object> propertyGetVisualState)
         {
-            _path = path;
-            INTERNAL_DependencyPropertyName = dependencyPropertyName;
+            Path = path;
+
             INTERNAL_AccessPropertyContainer = accessPropertyContainer;
-            INTERNAL_PropertySetVisualState = propertySetVisualState;
             INTERNAL_PropertySetAnimationValue = propertySetAnimationValue;
-            INTERNAL_PropertySetLocalValue = propertySetLocalValue;
-            INTERNAL_PropertyGetVisualState = propertyGetVisualState;
         }
-
-
-        internal string INTERNAL_DependencyPropertyName;
-        /// <summary>
-        /// When set, defines a method designed to access the element that contains the property whose Value will be accessed.
-        /// </summary>
-        /// <ignore/>
-        internal Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> INTERNAL_AccessPropertyContainer;
-        /// <summary>
-        /// Sets the VisualState value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
-        /// </summary>
-        /// <ignore/>
-        internal Action<DependencyObject, Object> INTERNAL_PropertySetVisualState;
-        /// <summary>
-        /// Sets the Animation value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
-        /// </summary>
-        /// <ignore/>
-        internal Action<DependencyObject, Object> INTERNAL_PropertySetAnimationValue;
-        /// <summary>
-        /// Sets the Local value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
-        /// </summary>
-        /// <ignore/>
-        internal Action<DependencyObject, Object> INTERNAL_PropertySetLocalValue;
-        /// <summary>
-        /// Gets the VisualState value of the previously defined property on the DependencyObject set as parameter.
-        /// </summary>
-        /// <ignore/>
-        internal Func<DependencyObject, Object> INTERNAL_PropertyGetVisualState;
-
-        private string _path;
 
         /// <summary>
         /// Gets the path value held by this PropertyPath. Returns the path value held by this PropertyPath.
         /// </summary>
-        public string Path
+        public string Path { get; }
+
+        internal DependencyProperty DependencyProperty { get; }
+
+        /// <summary>
+        /// When set, defines a method designed to access the element that contains the property whose Value will be accessed.
+        /// </summary>
+        /// <ignore/>
+        internal Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> INTERNAL_AccessPropertyContainer { get; }
+
+        /// <summary>
+        /// Sets the Animation value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
+        /// </summary>
+        /// <ignore/>
+        internal Action<DependencyObject, object> INTERNAL_PropertySetAnimationValue { get; }
+
+        internal SourceValueInfo[] SVI
         {
             get
             {
-                return _path;
+                if (_arySVI == null)
+                {
+                    _arySVI = ParsePath(Path);
+                }
+
+                return _arySVI;
             }
         }
 
-        public PropertyPath(string path, params object[] pathParameters) : this(path)
+        private static SourceValueInfo[] ParsePath(string path)
         {
-            if (pathParameters != null && pathParameters.Length > 0)
+            List<SourceValueInfo> steps = new List<SourceValueInfo>();
+            var parser = new PropertyPathParser(path);
+            while (true)
             {
-                throw new ArgumentOutOfRangeException("pathParameters");
+                switch (parser.Step(out _, out string property, out string index))
+                {
+                    case PropertyNodeType.Property:
+                    case PropertyNodeType.AttachedProperty:
+                        steps.Add(new SourceValueInfo
+                        {
+                            type = PropertyNodeType.Property,
+                            propertyName = property,
+                        });
+                        break;
+
+                    case PropertyNodeType.Indexed:
+                        steps.Add(new SourceValueInfo
+                        {
+                            type = PropertyNodeType.Indexed,
+                            propertyName = "Item[]",
+                            param = index,
+                        });
+                        break;
+
+                    case PropertyNodeType.None:
+                        goto exit;
+                }
+            }
+
+        exit:
+            SourceValueInfo[] res = new SourceValueInfo[steps.Count];
+            steps.CopyTo(res);
+            return res;
+        }
+
+        private IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> accessVisualStateProperty(DependencyObject rootTargetObjectInstance)
+        {
+            DependencyObject currentTarget = rootTargetObjectInstance;
+            for (int i = 0; i < SVI.Length - 1; i++)
+            {
+                SourceValueInfo svi = _arySVI[i];
+                switch (svi.type)
+                {
+                    case PropertyNodeType.Property:
+                        DependencyProperty dp = DependencyPropertyFromName(svi.propertyName, currentTarget.GetType());
+                        currentTarget = AsDependencyObject(currentTarget.GetValue(dp));
+                        yield return new Tuple<DependencyObject, DependencyProperty, int?>(currentTarget, dp, null);
+                        break;
+
+                    case PropertyNodeType.Indexed:
+                        if (!(currentTarget is IList list))
+                        {
+                            throw new InvalidOperationException($"'{currentTarget}' must implement IList.");
+                        }
+
+                        if (!int.TryParse(svi.param, out int index))
+                        {
+                            throw new InvalidOperationException($"'{svi.param}' can't be converted to an integer value.");
+                        }
+
+                        currentTarget = AsDependencyObject(list[index]);
+                        yield return new Tuple<DependencyObject, DependencyProperty, int?>(currentTarget, null, index);
+                        break;
+
+                    default:
+                        throw new InvalidOperationException();
+                }
             }
         }
+
+        private void setVisualStateProperty(DependencyObject finalTargetInstance, object value)
+        {
+            if (SVI.Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
+
+            SourceValueInfo svi = _arySVI[_arySVI.Length - 1];
+            DependencyProperty dp = DependencyPropertyFromName(svi.propertyName, finalTargetInstance.GetType());
+
+            finalTargetInstance.SetAnimationValue(dp, value);
+        }
+
+        private static DependencyObject AsDependencyObject(object o)
+        {
+            return o as DependencyObject ?? throw new InvalidOperationException($"'{o}' must be a DependencyObject.");
+        }
+
+        private static DependencyProperty DependencyPropertyFromName(string name, Type ownerType)
+        {
+            DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(ownerType, name);
+
+            return dp ?? throw new InvalidOperationException($"No DependencyProperty named '{name}' could be found in '{ownerType}'.");
+        }
+    }
+
+    internal struct SourceValueInfo
+    {
+        public PropertyNodeType type;
+        public string propertyName;
+        public string param; // parameter for indexer
     }
 }

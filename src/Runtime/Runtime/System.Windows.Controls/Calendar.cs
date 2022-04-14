@@ -44,6 +44,44 @@ namespace Windows.UI.Xaml.Controls
             this.Loaded += DatePicker_Loaded;
         }
 
+        /// <summary>
+        /// Identifies the <see cref="P:System.Windows.Controls.Calendar.SelectedDate" /> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="P:System.Windows.Controls.Calendar.SelectedDate" /> dependency property.
+        /// </returns>
+        public static readonly DependencyProperty SelectedDateProperty = DependencyProperty.Register(nameof(SelectedDate), typeof(DateTime?), typeof(Calendar), new PropertyMetadata(OnSelectedDateChanged));
+
+        /// <summary>
+        /// Gets or sets the currently selected date.
+        /// </summary>
+        /// <returns>
+        /// The date currently selected. The default is null.
+        /// </returns>
+        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        /// The given date is outside the range specified by <see cref="P:System.Windows.Controls.Calendar.DisplayDateStart" /> and <see cref="P:System.Windows.Controls.Calendar.DisplayDateEnd" />
+        /// -or-The given date is in the <see cref="P:System.Windows.Controls.Calendar.BlackoutDates" /> collection.
+        /// </exception>
+        /// <exception cref="T:System.InvalidOperationException">
+        /// If set to anything other than null when <see cref="P:System.Windows.Controls.Calendar.SelectionMode" /> is set to <see cref="F:System.Windows.Controls.CalendarSelectionMode.None" />.
+        /// </exception>
+        public DateTime? SelectedDate
+        {
+            get => (DateTime?)GetValue(SelectedDateProperty);
+            set => SetValue(SelectedDateProperty, value);
+        }
+
+        private static void OnSelectedDateChanged(
+          DependencyObject d,
+          DependencyPropertyChangedEventArgs e)
+        {
+            Calendar c = d as Calendar;
+            if (c.SelectedValue != c.SelectedDate)
+            {
+                c.SelectedValue = c.SelectedDate;
+            }
+        }
+
         private void DatePicker_Loaded(object sender, RoutedEventArgs e)
         {
             DateTime defaultDate = SelectedValue == null ? DateTime.Today : SelectedValue.Value;
@@ -133,6 +171,7 @@ namespace Windows.UI.Xaml.Controls
             var dateTime = new DateTime(intYear, intMonth, intDay);
 
             this.SelectedValue = (DateTime?)dateTime;
+            this.SelectedDate = this.SelectedValue;
             RefreshTodayHighlight(IsTodayHighlighted);
         }
 

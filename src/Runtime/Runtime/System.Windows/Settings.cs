@@ -15,6 +15,7 @@
 
 using CSHTML5.Internal;
 using System;
+using System.ComponentModel;
 using System.Net;
 
 #if MIGRATION
@@ -121,7 +122,14 @@ namespace System
 
         [OpenSilver.NotImplemented]
         public bool EnableAutoZoom { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Windowless { get; private set; }
+
+        public bool Windowless { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the application was launched from the out-of-browser state.
+        /// Specified value can be received from <see cref="Application.IsRunningOutOfBrowser"/> property.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool IsRunningOutOfBrowser { get; set; }
     }
 }

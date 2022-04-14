@@ -142,9 +142,13 @@ namespace Windows.UI.Xaml.Controls
         {
             // Apply the ItemContainerStyle to the item
             Control control = element as Control;
-            if (parentItemContainerStyle != null && control != null && control.Style == null)
+            if (parentItemContainerStyle != null && control != null)
             {
-                control.SetValue(Control.StyleProperty, parentItemContainerStyle);
+                object style = control.ReadLocalValue(Control.StyleProperty);
+                if (style == null || style == DependencyProperty.UnsetValue)
+                {
+                    control.SetValue(Control.StyleProperty, parentItemContainerStyle);
+                }
             }
 
             // Note: WPF also does preparation for ContentPresenter,
@@ -180,7 +184,8 @@ namespace Windows.UI.Xaml.Controls
             foreach (UIElement element in itemsHost.Children)
             {
                 FrameworkElement obj = element as FrameworkElement;
-                if (obj.Style == null)
+                object style = obj.ReadLocalValue(FrameworkElement.StyleProperty);
+                if (style == null || style == DependencyProperty.UnsetValue)
                 {
                     obj.Style = itemContainerStyle;
                 }

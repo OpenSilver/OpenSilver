@@ -32,91 +32,105 @@ namespace Windows.Foundation
         internal double _height;
 
         /// <summary>
-        /// Initializes a Windows.Foundation.Rect structure that
-        /// is exactly large enough to contain the two specified points.
+        /// Initializes a <see cref="Rect"/> structure that is exactly large enough to contain
+        /// the two specified points.
         /// </summary>
-        /// <param name="point1">The first point that the new rectangle must contain.</param>
-        /// <param name="point2">The second point that the new rectangle must contain.</param>
+        /// <param name="point1">
+        /// The first point that the new rectangle must contain.
+        /// </param>
+        /// <param name="point2">
+        /// The second point that the new rectangle must contain.
+        /// </param>
         public Rect(Point point1, Point point2)
         {
-            //setting the elements of the struct to their default value (we don't set it to the given value because it could be an anothorized value)
-            _x = 0;
-            _y = 0;
-            _width = 0;
-            _height = 0;
+            _x = Math.Min(point1._x, point2._x);
+            _y = Math.Min(point1._y, point2._y);
 
-
-            double x1 = (point1.X < point2.X) ? point1.X : point2.X;
-            double x2 = (point1.X >= point2.X) ? point1.X : point2.X;
-
-            X = point1.X;
-            Width = point2.X - point1.X;
-
-
-            double y1 = (point1.Y < point2.Y) ? point1.Y : point2.Y;
-            double y2 = (point1.Y >= point2.Y) ? point1.Y : point2.Y;
-
-            Y = point1.Y;
-            Height = point2.Y - point1.Y;
+            //  Max with 0 to prevent double weirdness from causing us to be (-epsilon..0)
+            _width = Math.Max(Math.Max(point1._x, point2._x) - _x, 0);
+            _height = Math.Max(Math.Max(point1._y, point2._y) - _y, 0);
         }
 
         /// <summary>
-        /// Initializes a Windows.Foundation.Rect structure based
-        /// on an origin and size.
+        /// Initializes a <see cref="Rect"/> structure based on an origin and size.
         /// </summary>
-        /// <param name="location">The origin of the new Windows.Foundation.Rect.</param>
-        /// <param name="size">The size of the new Windows.Foundation.Rect.</param>
+        /// <param name="location">
+        /// The origin of the new <see cref="Rect"/>.
+        /// </param>
+        /// <param name="size">
+        /// The size of the new <see cref="Rect"/>.
+        /// </param>
         public Rect(Point location, Size size)
         {
-            //setting the elements of the struct to their default value (we don't set it to the given value because it could be an anothorized value)
-            _x = 0;
-            _y = 0;
-            _width = 0;
-            _height = 0;
-
-            X = location.X;
-            Y = location.Y;
-            Width = size.Width;
-            Height = size.Height;
+            if (size.IsEmpty)
+            {
+                this = Empty;
+            }
+            else
+            {
+                _x = location.X;
+                _y = location.Y;
+                _width = size.Width;
+                _height = size.Height;
+            }
         }
 
         /// <summary>
-        /// Initializes a Windows.Foundation.Rect structure that
-        /// has the specified x-coordinate, y-coordinate, width, and height.
+        /// Initializes a <see cref="Rect"/> structure that has the specified x-coordinate,
+        /// y-coordinate, width, and height.
         /// </summary>
-        /// <param name="x">The x-coordinate of the top-left corner of the rectangle.</param>
-        /// <param name="y">The y-coordinate of the top-left corner of the rectangle.</param>
-        /// <param name="width">The width of the rectangle.</param>
-        /// <param name="height">The height of the rectangle.</param>
+        /// <param name="x">
+        /// The x-coordinate of the top-left corner of the rectangle.
+        /// </param>
+        /// <param name="y">
+        /// The y-coordinate of the top-left corner of the rectangle.
+        /// </param>
+        /// <param name="width">
+        /// The width of the rectangle.
+        /// </param>
+        /// <param name="height">
+        /// The height of the rectangle.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// width or height are less than 0.
+        /// </exception>
         public Rect(double x, double y, double width, double height)
         {
-            //setting the elements of the struct to their default value (we don't set it to the given value because it could be an anothorized value)
-            _x = 0;
-            _y = 0;
-            _width = 0;
-            _height = 0;
+            if (width < 0)
+            {
+                throw new ArgumentException("Width must be non-negative.", nameof(width));
+            }
 
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
+            if (height < 0)
+            {
+                throw new ArgumentException("Height must be non-negative.", nameof(height));
+            }
+
+            _x = x;
+            _y = y;
+            _width = width;
+            _height = height;
         }
 
         /// <summary>
-        /// Initializes a new instance of the System.Windows.Rect structure that is of the
+        /// Initializes a new instance of the <see cref="Rect"/> structure that is of the
         /// specified size and is located at (0,0).
         /// </summary>
-        /// <param name="size">The size of the new Windows.Foundation.Rect.</param>
+        /// <param name="size">
+        /// The size of the new <see cref="Rect"/>.
+        /// </param>
         public Rect(Size size)
         {
-            //setting the elements of the struct to their default value (we don't set it to the given value because it could be an anothorized value)
-            _x = 0;
-            _y = 0;
-            _width = 0;
-            _height = 0;
-
-            Width = size.Width;
-            Height = size.Height;
+            if (size.IsEmpty)
+            {
+                this = Empty;
+            }
+            else
+            {
+                _x = _y = 0;
+                _width = size.Width;
+                _height = size.Height;
+            }
         }
 
         /// <summary>

@@ -38,68 +38,17 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public abstract partial class Timeline : DependencyObject
     {
-#if MIGRATION
-        internal static readonly string[] defaultTypesPaths = {
-                                                                 "", //keep an empty one to test the type directly.
-                                                                 "System.Windows.Xaml.",
-                                                                 "System.Windows.Controls.",
-                                                                 "System.Windows.Controls.Primitives.",
-                                                                 "System.Windows.Media.",
-                                                                 "System.Windows.Media.Animation.",
-                                                                 "System.Windows.Media.Imaging.",
-                                                                 "System.Windows.Shapes.",
-                                                              };
-#else
-        internal static readonly string[] defaultTypesPaths = {
-                                                                 "", //keep an empty one to test the type directly.
-                                                                 "Windows.UI.Xaml.",
-                                                                 "Windows.UI.Xaml.Controls.",
-                                                                 "Windows.UI.Xaml.Controls.Primitives.",
-                                                                 "Windows.UI.Xaml.Media.",
-                                                                 "Windows.UI.Xaml.Media.Animation.",
-                                                                 "Windows.UI.Xaml.Media.Imaging.",
-                                                                 "Windows.UI.Xaml.Shapes.",
-                                                             };
-#endif
-
         internal DependencyProperty GetProperty(DependencyObject target, PropertyPath propertyPath)
         {
-            if (propertyPath.INTERNAL_IsDirectlyDependencyPropertyPath)
+            if (propertyPath.DependencyProperty != null)
             {
-                return propertyPath.INTERNAL_DependencyProperty;
+                return propertyPath.DependencyProperty;
             }
-            Type lastElementType = target.GetType();
-            Type dependencyPropertyContainerType = null;
-            PropertyInfo propertyInfo = lastElementType.GetProperty(propertyPath.INTERNAL_DependencyPropertyName);
-            if (propertyInfo != null)
-            {
-                dependencyPropertyContainerType = propertyInfo.DeclaringType;
-            }
-            else
-            {
-                string[] splittedPath = propertyPath.Path.Split('('); //example: "(Canvas.Left)" --> ["", "Canvas.Left)"]
-                string end = splittedPath[splittedPath.Length - 1];
-                string[] splittedEnd = end.Split('.'); //with the example above: --> ["Canvas", "Left)"]
-                string parentTypeString = end.Substring(0, end.Length - splittedEnd[splittedEnd.Length - 1].Length - 1); // -1 to remove the dot that wasn't counted due to the split.
-                parentTypeString = parentTypeString.StartsWith("global::") ? parentTypeString.Substring(8) : parentTypeString;
-                int i = 0;
-                //todo: find a way to handle user defined types
-                //todo: find a better way to do the following
-                while (i < defaultTypesPaths.Length && dependencyPropertyContainerType == null)
-                {
-                    dependencyPropertyContainerType = Type.GetType(defaultTypesPaths[i] + parentTypeString);
-                    ++i;
-                }
-                if (dependencyPropertyContainerType == null)
-                {
-                    throw new InvalidOperationException("Type \"" + parentTypeString + "\"could not be found.");
-                }
-            }
-            FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
 
-            // - Get the DependencyProperty (since Bridge, the GetValue parameter must be null because DependencyProperties are always static)
-            DependencyProperty dp = (DependencyProperty)dependencyPropertyField.GetValue(null);
-            return dp;
+            return INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
+                target.GetType(),
+                propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName
+            );
         }
 
         ///// <summary>
@@ -298,7 +247,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 PropertyPath propertyPath;
                 GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
                 //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
-                propertyPath.INTERNAL_PropertySetVisualState(target, DependencyProperty.UnsetValue);
+                propertyPath.INTERNAL_PropertySetAnimationValue(target, DependencyProperty.UnsetValue);
             }
         }
 
@@ -396,16 +345,12 @@ namespace Windows.UI.Xaml.Media.Animation
             if (frameworkElementAsControl != null) //if frameworkElement is not a control, there can't be a Storyboard?
             {
                 GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
-                //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
-                Type lastElementType = target.GetType();
-                PropertyInfo propertyInfo = lastElementType.GetProperty(propertyPath.INTERNAL_DependencyPropertyName);
+                
+                DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
+                    target.GetType(),
+                    propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName
+                );
 
-
-
-                Type dependencyPropertyContainerType = propertyInfo.DeclaringType;
-                FieldInfo dependencyPropertyField = dependencyPropertyContainerType.GetField(propertyPath.INTERNAL_DependencyPropertyName + "Property");
-                // - Get the DependencyProperty
-                DependencyProperty dp = (DependencyProperty)dependencyPropertyField.GetValue(null);
                 // - Get the propertyMetadata from the property
                 PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
                 // - Get the cssPropertyName from the PropertyMetadata

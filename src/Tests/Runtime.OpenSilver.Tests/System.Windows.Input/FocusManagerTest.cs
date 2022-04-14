@@ -91,7 +91,8 @@ namespace Windows.UI.Xaml.Input.Tests
             var window = new Window();
             Window.Current = window;
 
-            var element = new Control();
+            var element = CreateNewFocusableControl();
+
             element.INTERNAL_ParentWindow = window;
 
             element.Focus();
@@ -106,10 +107,10 @@ namespace Windows.UI.Xaml.Input.Tests
             var window = new Window();
             Window.Current = window;
 
-            var firstElement = new Control();
+            var firstElement = CreateNewFocusableControl();
             firstElement.INTERNAL_ParentWindow = window;
 
-            var secondElement = new Control();
+            var secondElement = CreateNewFocusableControl();
             secondElement.INTERNAL_ParentWindow = window;
 
             firstElement.Focus();
@@ -121,6 +122,16 @@ namespace Windows.UI.Xaml.Input.Tests
             focusedElement = FocusManager.GetFocusedElement();
             focusedElement.Should().NotBe(firstElement);
             focusedElement.Should().Be(secondElement);
+        }
+
+        private Control CreateNewFocusableControl()
+        {
+            return new Control
+            {
+                Visibility = Visibility.Visible,
+                IsEnabled = true,
+                IsConnectedToLiveTree = true
+            };
         }
     }
 }

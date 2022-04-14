@@ -171,7 +171,23 @@
                             </VisualStateGroup>
 
                             <VisualStateGroup x:Name="SelectionStates">
-                                <VisualState x:Name="Unselected" />
+                                <VisualState x:Name="Unselected" >
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="FocusVisualElement"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <DoubleAnimation Storyboard.TargetName="MouseOverVisualElement"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         Duration="0"
+                                                         To="0" />
+                                    </Storyboard>
+                                </VisualState>
                                 <VisualState x:Name="Selected">
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="SelectedVisualElement"
@@ -187,7 +203,6 @@
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
-
                             <VisualStateGroup x:Name="FocusStates">
                                 <VisualState x:Name="Focused">
                                     <Storyboard>
@@ -202,7 +217,6 @@
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
-
                                 <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
@@ -233,5 +247,5 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
 </ResourceDictionary>

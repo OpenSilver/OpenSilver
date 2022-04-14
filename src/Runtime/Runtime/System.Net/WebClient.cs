@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
 using System.Reflection;
+using System.ComponentModel;
 
 #if OPENSILVER
 using System.Net;
@@ -807,11 +808,17 @@ namespace System.Net
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether to buffer the data read from the
+        /// Internet resource for a <see cref="WebClient"/> instance.
+        /// </summary>
+        /// <returns>
+        /// true to enable buffering of the data received from the Internet resource; false
+        /// to disable buffering. The default is true.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool AllowReadStreamBuffering { get; set; }
 
-
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //[Obsolete("This API supports the .NET Framework infrastructure and is not intended to be used directly from your code.", true)]
-        //public bool AllowReadStreamBuffering { get; set; }
         //[EditorBrowsable(EditorBrowsableState.Never)]
         //[Obsolete("This API supports the .NET Framework infrastructure and is not intended to be used directly from your code.", true)]
         //public bool AllowWriteStreamBuffering { get; set; }
@@ -854,14 +861,14 @@ namespace System.Net
         ////     the request. The default is null.
         //public ICredentials Credentials { get; set; }
 
-        ////
         //// Summary:
         ////     Gets whether a Web request is in progress.
         ////
         //// Returns:
         ////     true if the Web request is still in progress; otherwise false.
-        //public bool IsBusy { get; }
-        ////
+        [OpenSilver.NotImplemented]
+        public bool IsBusy { get; }
+
         //// Summary:
         ////     Gets or sets the proxy used by this System.Net.WebClient object.
         ////
@@ -949,8 +956,9 @@ namespace System.Net
 
         //// Summary:
         ////     Cancels a pending asynchronous operation.
-        //public void CancelAsync();
-        ////
+        [OpenSilver.NotImplemented]
+        public void CancelAsync() { }
+        
         //// Summary:
         ////     Downloads the resource with the specified URI as a System.Byte array.
         ////
@@ -1324,6 +1332,7 @@ namespace System.Net
         ////     invalid.-or- An error occurred while downloading data.
         //public Stream OpenRead(Uri address);
         ////
+        
         //// Summary:
         ////     Opens a readable stream containing the specified resource. This method does
         ////     not block the calling thread.
@@ -1340,8 +1349,9 @@ namespace System.Net
         ////     The URI formed by combining System.Net.WebClient.BaseAddress and address
         ////     is invalid.-or- An error occurred while downloading the resource. -or- An
         ////     error occurred while opening the stream.
-        //public void OpenReadAsync(Uri address);
-        ////
+        [OpenSilver.NotImplemented]
+        public void OpenReadAsync(Uri address) { }
+
         // Summary:
         //     Opens a readable stream containing the specified resource. This method does
         //     not block the calling thread.

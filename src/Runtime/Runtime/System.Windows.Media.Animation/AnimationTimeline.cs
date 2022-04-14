@@ -57,17 +57,17 @@ namespace Windows.UI.Xaml.Media.Animation
                 RestoreDefault();
             }
             // This is a workaround to tell the property the effective value should be the animated value.
-            SetInitialAnimationValue(parameters.IsVisualStateChange);
+            SetInitialAnimationValue();
             base.IterateOnce(parameters, isLastLoop);
 
             Apply(parameters, isLastLoop);
         }
 
         // todo: find a way to not have to do this.
-        private void SetInitialAnimationValue(bool isVisualStateChange)
+        private void SetInitialAnimationValue()
         {
             object initialAnimationValue = _propertyContainer.GetValue(_propDp);
-            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, initialAnimationValue, isVisualStateChange);
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, initialAnimationValue);
         }
 
         //Note: stateContainerGroupName is useful for allowing us to stop the animations made using velocity: 
@@ -115,7 +115,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 StopAnimation(groupName);
                 if (revertToFormerValue)
                 {
-                    UnApply(_parameters.IsVisualStateChange);
+                    UnApply();
                 }
             }
         }
@@ -125,9 +125,9 @@ namespace Windows.UI.Xaml.Media.Animation
             
         }
 
-        private void UnApply(bool isVisualStateChange)
+        private void UnApply()
         {
-            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, DependencyProperty.UnsetValue, isVisualStateChange);
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, DependencyProperty.UnsetValue);
             //_targetProperty.INTERNAL_PropertySetAnimationValue(_propertyContainer, INTERNAL_NoValue.NoValue);
         }
     }

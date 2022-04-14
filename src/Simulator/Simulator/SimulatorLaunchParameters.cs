@@ -17,9 +17,14 @@ namespace CSHTML5.Simulator
         public Action<WPFBrowserView> BrowserCreatedCallback { get; set; }
 
         /// <summary>
+        /// Action to call when the provided app class is created successfully.
+        /// </summary>
+        public Action AppStartedCallback { get; set; }
+
+        /// <summary>
         /// Sets or gets custom cookies to the simulator
         /// </summary>
         public  IList<CookieData> CookiesData { get; set; }
-
+    
     }
 }

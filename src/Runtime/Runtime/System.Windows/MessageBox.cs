@@ -150,5 +150,24 @@ namespace Windows.UI.Xaml
                 return (isOK ? MessageBoxResult.OK : MessageBoxResult.Cancel);
             }
         }
+
+        /// <summary>
+        /// Displays a message box that contains the specified text and an OK button that is modal to the window 
+        /// specified by the owner parameter.
+        /// </summary>
+        /// <param name="owner">
+        ///  A window reference that represents the top-level window that will own the modal dialog box.
+        /// </param>
+        /// <param name="msg">
+        ///  The message to display.
+        /// </param>
+        /// <returns>
+        ///  <see cref="MessageBoxResult.OK"/> in all cases.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public static MessageBoxResult Show(Window owner, string msg)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -12,6 +12,9 @@
 \*====================================================================================*/
 
 using System;
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Browser
 {
@@ -92,7 +95,11 @@ namespace System.Windows.Browser
 #endif
         public void Alert(string alertText)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                MessageBox.Show(alertText);
+            }
+            else
             {
                 OpenSilver.Interop.ExecuteJavaScript("alert($0)", alertText);
             }
@@ -113,12 +120,14 @@ namespace System.Windows.Browser
 #endif
         public bool Confirm(string confirmText)
         {
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                return MessageBox.Show(confirmText, MessageBoxButton.OKCancel) == MessageBoxResult.OK;
+            }
+            else
             {
                 return Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("confirm($0)", confirmText));
             }
-
-            return false;
         }
 
         /// <summary>
@@ -136,6 +145,9 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentException">
         /// <paramref name="name"/> is an empty string or contains an embedded null character (\0).
         /// </exception>
+#if BRIDGE
+        [Bridge.Template("{name}")]
+#endif
         public override object GetProperty(string name)
         {
             var result = default(object);

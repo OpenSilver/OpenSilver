@@ -106,12 +106,10 @@ namespace System.Windows
         }
 #endif
 
-#if unsupported
         /// <summary>
         /// Gets a member of the System.Windows.DragDropEffects enumeration that specifies
         /// which operations are allowed by the originator of the drag event.
         /// </summary>
         public DragDropEffects AllowedEffects { get; internal set; }
-#endif
     }
 }

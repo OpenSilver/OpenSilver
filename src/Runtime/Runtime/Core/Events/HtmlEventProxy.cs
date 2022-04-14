@@ -12,19 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if !BUILDINGDOCUMENTATION && !CSHTML5NETSTANDARD && !BRIDGE
-using DotNetBrowser;
-using DotNetBrowser.DOM.Events;
-#endif
-
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
 using System;
 using System.Globalization;
 using System.Reflection;
@@ -60,36 +47,48 @@ namespace CSHTML5.Internal
         private object _sender;
         private object _domElementRef;
         private string _eventName = null;
+        private Delegate _handler;
 
         // Constructor
-        internal HtmlEventProxy(string eventName, object domElementRef, Action<object> originalEventHandler)
+        internal HtmlEventProxy(string eventName, object domElementRef, Action<object> originalEventHandler, bool sync)
         {
             this._eventName = eventName;
             this._domElementRef = domElementRef;
             this._sender = this;
             this._eventHandler = (EventHandler<HtmlEventProxy.EventArgsWithJSEventObject>)((s, e) => { originalEventHandler(e.JSEventObject); });
             this._originalEventHandler = originalEventHandler;
+            this._handler = CreateHandler(sync);
         }
-#if !BUILDINGDOCUMENTATION
-#if !BRIDGE
-        [JSIgnore]
-#else
-        [External]
+
+        public Delegate Handler
+        {
+            get { return _handler; }
+        }
+
+#if BRIDGE
+        [Bridge.External]
 #endif
-        public void OnEvent(object jsEventArg)
+        private void OnEventImpl(object jsEventArg)
         {
             if (this._eventHandler != null)
             {
-                //this._eventHandler(this._sender, new EventArgsWithJSEventObject(new INTERNAL_SimulatorJSEventObject(jsEventArg)));
                 this._eventHandler(this._sender, new EventArgsWithJSEventObject(jsEventArg));
             }
-
-            //dynamic mouseEvent = (JSObject)arguments[0];
-            //String message = String.Format("Mouse over at: {0}x{1}", mouseEvent.clientX, mouseEvent.clientY);
         }
-#else
-        public void OnEvent(object arguments) { }
-#endif
+
+        private Delegate CreateHandler(bool sync)
+        {
+            if (sync)
+            {
+                return new Func<object, string>(jsEventArg =>
+                {
+                    OnEventImpl(jsEventArg);
+                    return "";
+                });
+            }
+
+            return new Action<object>(jsEventArg => OnEventImpl(jsEventArg));
+        }
 
         public void Dispose()
         {
@@ -102,6 +101,7 @@ namespace CSHTML5.Internal
                 _sender = null;
                 _eventHandler = null;
                 _originalEventHandler = null;
+                _handler = null;
             }
         }
 

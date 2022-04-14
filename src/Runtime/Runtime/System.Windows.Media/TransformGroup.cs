@@ -80,6 +80,15 @@ namespace Windows.UI.Xaml.Media
             newValue?.SetParentTransform(transformGroup);
         }
 
+        /// <summary>
+        /// Gets the <see cref="Matrix"/> structure that describes the transformation
+        /// represented by this <see cref="TransformGroup"/>.
+        /// </summary>
+        /// <returns>
+        /// A composite of the <see cref="Transform"/> objects in this <see cref="TransformGroup"/>.
+        /// </returns>
+        public Matrix Value => ValueInternal;
+
         internal override Matrix ValueInternal
         {
             get

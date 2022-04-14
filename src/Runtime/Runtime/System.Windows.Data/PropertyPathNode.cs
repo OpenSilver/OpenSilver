@@ -19,46 +19,26 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal abstract class PropertyPathNode : IPropertyPathNode
+    internal abstract class PropertyPathNode
     {
-        private IPropertyPathNodeListener _nodeListener;
-        
-        protected PropertyPathNode()
+        protected PropertyPathNode(PropertyPathWalker listener)
         {
-            Value = DependencyProperty.UnsetValue;
+            Listener = listener;
         }
+
+        public PropertyPathWalker Listener { get; }
 
         public object Source { get; private set; }
 
-        public object Value { get; private set; }
+        public object Value { get; private set; } = DependencyProperty.UnsetValue;
 
         public bool IsBroken { get; private set; }
 
-        public IPropertyPathNode Next { get; set; }
+        public PropertyPathNode Next { get; set; }
 
-        internal abstract Type TypeImpl { get; }
+        public abstract Type Type { get; }
 
-        internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
-        {
-            IsBroken = isBroken;
-            Value = newValue;
-
-            IPropertyPathNodeListener listener = _nodeListener;
-            if (listener != null)
-            {
-                listener.ValueChanged(this);
-            }
-        }
-
-        internal abstract void OnSourceChanged(object oldSource, object newSource);
-        
-        internal abstract void UpdateValue();
-
-        internal abstract void SetValue(object value);
-
-        Type IPropertyPathNode.Type => TypeImpl;
-
-        void IPropertyPathNode.SetSource(object source)
+        internal void SetSource(object source)
         {
             object oldSource = Source;
             Source = source;
@@ -76,22 +56,21 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        void IPropertyPathNode.SetValue(object value)
+        internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
         {
-            SetValue(value);
-        }
+            IsBroken = isBroken;
+            Value = newValue;
 
-        void IPropertyPathNode.Listen(IPropertyPathNodeListener listener)
-        {
-            _nodeListener = listener;
-        }
-
-        void IPropertyPathNode.Unlisten(IPropertyPathNodeListener listener)
-        {
-            if (_nodeListener == listener)
+            if (Next == null)
             {
-                _nodeListener = null;
+                Listener.ValueChanged(this);
             }
         }
+
+        internal abstract void OnSourceChanged(object oldSource, object newSource);
+        
+        internal abstract void UpdateValue();
+
+        internal abstract void SetValue(object value);
     }
 }

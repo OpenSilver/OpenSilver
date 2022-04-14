@@ -72,13 +72,13 @@ namespace Windows.UI.Xaml
             } 
         } 
 
-        private IList<VisualTransition> _transitions;
+        private IList _transitions;
 
         /// <summary>
         /// Gets the collection of VisualTransition objects.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public IList<VisualTransition> Transitions
+        public IList Transitions
         {
             get
             {
@@ -86,9 +86,11 @@ namespace Windows.UI.Xaml
                 {
                     this._transitions = new List<VisualTransition>();
                 }
+
                 return this._transitions;
             }
         }
+
         internal VisualState GetState(string stateName)
         {
             for (int stateIndex = 0; stateIndex < States.Count; ++stateIndex)

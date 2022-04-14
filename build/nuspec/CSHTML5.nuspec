@@ -22,7 +22,8 @@
     <file src="../../src/Runtime/Runtime/bin/CSHTML5/$Configuration$/$AssembliesPrefix$.pdb" target="lib/net40/$AssembliesPrefix$.pdb" />
     <file src="../../src/Runtime/Bridge.TypesThatWillBeForwarded/bin/CSHTML5/$Configuration$/CSHTML5.Stubs.dll" target="lib/net40/CSHTML5.Stubs.dll" />
 	<file src="../../src/Runtime/Controls.Data.Input/bin/CSHTML5/$Configuration$/CSHTML5.Controls.Data.Input.dll" target="lib/net40/CSHTML5.Controls.Data.Input.dll" />
-
+	<file src="../../src/Runtime/Controls.Input/.CSHTML5/bin/CSHTML5/$Configuration$/CSHTML5.Controls.Input.dll" target="lib/net40/CSHTML5.Controls.Input.dll" />
+	
     <!-- CSHTML5 targets -->
     <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" /> <!-- Note: the main targets file must have the same name as the package in order to be automatically imported into the end-user project. -->
     <file src="../../src/Targets/CSHTML5.Common.targets" target="build/CSHTML5.Common.targets" />

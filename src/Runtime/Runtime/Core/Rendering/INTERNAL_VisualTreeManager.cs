@@ -23,8 +23,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Documents;
@@ -173,22 +175,9 @@ namespace CSHTML5.Internal
 
         static void DetachVisualChidrenRecursively(UIElement element)
         {
-            if (element._pointerExitedEventManager != null)
+            if (element.IsPointerOver)
             {
-                if (element.INTERNAL_isPointerInside)
-                {
-#if MIGRATION
-                    MouseEventArgs eventArgs = new MouseEventArgs();
-                    element.OnMouseLeave(eventArgs);
-                    element.OnMouseLeave_ForHandledEventsToo(eventArgs);
-#else
-                    PointerRoutedEventArgs eventArgs = new PointerRoutedEventArgs();
-                    element.OnPointerExited(eventArgs);//CSHTML5.Interop.ExecuteJavaScript("window.lastPointerPosition.event"));
-                    element.OnPointerExited_ForHandledEventsToo(eventArgs);
-#endif
-                }
-                element.isAlreadySubscribedToMouseEnterAndLeave = false;
-                element.INTERNAL_isPointerInside = false;
+                element.RaiseMouseLeave();
             }
 
             // Call the "OnDetached" of the element. This is particularly useful for elements to clear any references they have to DOM elements. For example, the Grid will use it to set its _tableDiv to null.
@@ -532,14 +521,18 @@ if(nextSibling != undefined) {
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(additionalOutsideDivForMargins);
                 style.boxSizing = "border-box";
                 if (child is FrameworkElement &&
-                    (((FrameworkElement)child).HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Width)))
+                    (((FrameworkElement)child).HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Width)
+                    && !(child is Image && ((Image)child).Stretch == Stretch.None)))
                 {
                     if (!containsNegativeMargins)
                         style.width = "100%";
                 }
                 if (child is FrameworkElement &&
-                    (((FrameworkElement)child).VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Height)))
+                    (((FrameworkElement)child).VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Height)
+                    && !(child is Image && ((Image)child).Stretch == Stretch.None)))
+                {
                     style.height = "100%";
+                } 
             }
 
 #if PERFSTAT
@@ -647,7 +640,7 @@ if(nextSibling != undefined) {
             // If we are inside a canvas, we set the position to "absolute":
             if (parent is Canvas)
             {
-                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = "absolute"; //todo: test if this works properly
+                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).position = child is StackPanel ? "relative" : "absolute"; //todo: test if this works properly
             }
 
             UIElement.SetPointerEvents(child);
@@ -725,12 +718,11 @@ if(nextSibling != undefined) {
             // HANDLE TABINDEX:
             //--------------------------------------------------------
 
-            // For GotFocus and LostFocus to work, the DIV specified by "INTERNAL_OptionalSpecifyDomElementConcernedByFocus"
-            // (or the OuterDomElement otherwise) needs to have the "tabIndex" attribute set. Therefore we need to always set
-            // it (unless IsTabStop is False) to its current value (default is Int32.MaxValue). At the time when this code was
-            // written, there was no way to automatically call the "OnChanged" on a dependency property if no value was set.
+            // For GotFocus and LostFocus to work, the DIV specified by UIElement.GetFocusTarget() needs to have the "tabIndex"
+            // attribute set. Therefore we need to always set it (unless IsTabStop is False) to its current value (default is
+            // Int32.MaxValue). At the time when this code was written, there was no way to automatically call the "OnChanged"
+            // on a dependency property if no value was set.
 
-            // IMPORTANT: This needs to be done AFTER the "OnApplyTemplate" (for example, the TextBox sets the "INTERNAL_OptionalSpecifyDomElementConcernedByFocus" in the "OnApplyTemplate").
             if (isChildAControl)
             {
                 if (!(child is TextBlock)) // TextBlock should not count in tabbing (TextBlock is not supposed to be a Control).
@@ -778,8 +770,6 @@ if(nextSibling != undefined) {
                 ((FrameworkElement)child).INTERNAL_RaiseLoadedEvent();
             }
 
-            child.StartManagingPointerPositionForPointerExitedEventIfNeeded();
-
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Raise Loaded event", t11);
 #endif
@@ -815,7 +805,7 @@ if(nextSibling != undefined) {
             // it means they have been set at some point, and unset afterward,
             // so we should not call the PropertyChanged callback.
             var list = dependencyObject.INTERNAL_PropertyStorageDictionary
-                .Where(s => s.Value.BaseValueSourceInternal > BaseValueSourceInternal.Default)
+                .Where(s => s.Value.Entry.BaseValueSourceInternal > BaseValueSourceInternal.Default)
                 .ToList();
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Copy list of properties", t0);
@@ -846,7 +836,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
                             valueWasRetrieved = true;
                         }
 
@@ -860,7 +850,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
                             valueWasRetrieved = true;
                         }
 
@@ -877,7 +867,7 @@ if(nextSibling != undefined) {
                     {
                         if (!valueWasRetrieved)
                         {
-                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage);
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
                             valueWasRetrieved = true;
                         }
 

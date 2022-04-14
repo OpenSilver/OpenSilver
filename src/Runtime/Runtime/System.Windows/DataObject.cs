@@ -62,6 +62,12 @@ namespace System.Windows
                 return null;
         }
 
+        [OpenSilver.NotImplemented]
+        public object GetData(Type format)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Checks to see whether the data is available in, or can be converted to, a
         /// specified format; the data format is specified by a string.

@@ -176,7 +176,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         {
             if (ImageOpened != null)
             {
-                ImageOpened(this, new RoutedEventArgs()
+                ImageOpened(this, new RoutedEventArgs
                 {
                     OriginalSource = this
                 });

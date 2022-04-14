@@ -34,6 +34,8 @@ namespace TestApplication
             events.Add(new Test("Attach/Detach", "Events/AttachDetach"));
             events.Add(new Test("TextChanged", "Events/TextChanged"));
             events.Add(new Test("Focus", "Events/Focus"));
+            events.Add(new Test("KeyDown", "Events/KeyDown"));
+            events.Add(new Test("TextInput", "Events/TextInput"));
             Tests.Add(events);
 
             Tests.Add(new Test("Templated TextBox", "TemplatedTextBox"));
@@ -113,6 +115,7 @@ namespace TestApplication
             Tests.Add(new Test("Composite Controls", "CompositeControls"));
             Tests.Add(new Test("Nested Elements", "NestedElements"));
             Tests.Add(new Test("Printing", "Printing"));
+            Tests.Add(new Test("PrintDocument", "PrintDocument"));
             Tests.Add(new Test("Text Properties", "TextProperties"));
             Tests.Add(new Test("Font Precedence", "FontPrecedence"));
             Tests.Add(new Test("Async/Await", "AsyncAwait"));

@@ -50,7 +50,7 @@ namespace CSHTML5
 #if BRIDGE
         [Bridge.Template("null")]
 #endif
-        internal static object ExecuteJavaScript_SimulatorImplementation(string javascript, bool runAsynchronously, bool noImpactOnPendingJSCode = false, params object[] variables)
+        internal static INTERNAL_JSObjectReference ExecuteJavaScript_SimulatorImplementation(string javascript, bool runAsynchronously, bool noImpactOnPendingJSCode = false, params object[] variables)
         {
             //---------------
             // Due to the fact that it is not possible to pass JavaScript objects between the simulator JavaScript context
@@ -210,20 +210,14 @@ namespace CSHTML5
             object value = null;
             if (!runAsynchronously)
             {
-                value = CastFromJsValue(INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript, noImpactOnPendingJSCode: noImpactOnPendingJSCode));
+                value = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript, noImpactOnPendingJSCode: noImpactOnPendingJSCode);
             }
             else
             {
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
             }
 
-            var objectReference = new INTERNAL_JSObjectReference()
-            {
-                Value = value,
-                ReferenceId = referenceId.ToString()
-            };
-
-            return objectReference;
+            return new INTERNAL_JSObjectReference(value, referenceId.ToString());
         }
 
         internal static void ResetLoadedFilesDictionaries()
@@ -255,54 +249,6 @@ namespace CSHTML5
 {1}
 ", str, errorMessage);
                 Console.WriteLine(message);
-            }
-        }
-
-#if BRIDGE
-        [Bridge.Template("null")]
-#endif
-        internal static object CastFromJsValue(object obj)
-        {
-#if OPENSILVER
-            if (!Interop.IsRunningInTheSimulator_WorkAround)
-            {
-                if (obj != null && (obj is string || obj.GetType().IsPrimitive))
-                {
-                    return obj;
-                }
-
-                JsonElement jsonElement = (JsonElement)obj;
-                object res;
-                switch (jsonElement.ValueKind)
-                {
-                    case JsonValueKind.Object:
-                    case JsonValueKind.Array:
-                        res = obj;
-                        break;
-                    case JsonValueKind.String:
-                        res = jsonElement.GetString();
-                        break;
-                    case JsonValueKind.Number:
-                        res = jsonElement.GetSingle();
-                        break;
-                    case JsonValueKind.True:
-                    case JsonValueKind.False:
-                        res = jsonElement.GetBoolean();
-                        break;
-                    case JsonValueKind.Undefined:
-                    case JsonValueKind.Null:
-                        res = null;
-                        break;
-                    default:
-                        res = null;
-                        break;
-                }
-                return res;
-            }
-            else
-#endif
-            {
-                return DotNetForHtml5.Core.INTERNAL_Simulator.ConvertBrowserResult(obj);
             }
         }
 

@@ -105,6 +105,13 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public event RoutedEventHandler CalendarOpened;
 
+        /// <summary>
+        /// Occurs when <see cref="P:System.Windows.Controls.DatePicker.Text" /> is assigned
+        /// a value that cannot be interpreted as a date.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event EventHandler<DatePickerDateValidationErrorEventArgs> DateValidationError;
+
         #region DisplayDate
         /// <summary>
         /// Gets or sets the date to display.

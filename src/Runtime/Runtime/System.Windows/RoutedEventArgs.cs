@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -35,58 +28,79 @@ namespace Windows.UI.Xaml
         : EventArgs
 #endif
     {
+        private object _originalSource;
+
         /// <summary>
-        /// Initializes a new instance of the RoutedEventArgs class.
+        /// Initializes a new instance of the <see cref="RoutedEventArgs"/> class.
         /// </summary>
         public RoutedEventArgs() { }
 
-
-        private DependencyObject _originalSource;
         /// <summary>
         /// Gets a reference to the object that raised the event.
         /// </summary>
         public object OriginalSource
         {
-            get
-            {
-                if (_originalSource != null)
-                {
-                    return _originalSource;
-                }
-                else if (_originalJSEventArg != null)
-                {
-                    object jsTarget = CSHTML5.Interop.ExecuteJavaScript(@"$0.target || $0.srcElement", _originalJSEventArg);
-                    UIElement correspondingUiElementIfFound = INTERNAL_HtmlDomManager.GetUIElementFromDomElement(jsTarget); //Note: already handles the possibility that "jsTarget" is null or undefined.
-                    return correspondingUiElementIfFound;
-                }
-                else
-                    return null;
-            }
-            set
+            get { return _originalSource; }
+            internal set
             {
                 if (value == null || !(value is DependencyObject))
                 {
                     throw new ArgumentException();
                 }
-                _originalSource = (DependencyObject)value;
+
+                _originalSource = value;
             }
         }
 
-        object _originalJSEventArg;
+        /// <summary>
+        /// Returns the <see cref="RoutedEvent"/> associated
+        /// with this <see cref="RoutedEventArgs"/>
+        /// </summary>
+        internal RoutedEvent RoutedEvent { get; set; }
+
+        internal bool HandledImpl { get; set; }
+
+        // Calls the InvokeEventHandler protected
+        // virtual method
+        //
+        // This method is needed because
+        // delegates are invoked from
+        // RoutedEventHandler which is not a
+        // sub-class of RoutedEventArgs
+        // and hence cannot invoke protected
+        // method RoutedEventArgs.FireEventHandler
+        internal virtual void InvokeHandler(Delegate handler, object target)
+        {
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            if (handler is RoutedEventHandler)
+            {
+                ((RoutedEventHandler)handler)(target, this);
+            }
+            else
+            {
+#if BRIDGE
+                handler.Apply(new object[] { target, this });
+#else
+                // Restricted Action - reflection permission required
+                handler.DynamicInvoke(new object[] { target, this });
+#endif
+            }
+        }
+
         /// <summary>
         /// (Optional) Gets the original javascript event arg.
         /// </summary>
-        public object INTERNAL_OriginalJSEventArg
-        {
-            get
-            {
-                return _originalJSEventArg;
-            }
-            set
-            {
-                _originalJSEventArg = value;
-            }
-        }
-
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object INTERNAL_OriginalJSEventArg { get; set; }
     }
 }

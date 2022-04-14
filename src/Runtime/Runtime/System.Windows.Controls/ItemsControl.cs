@@ -142,17 +142,19 @@ namespace Windows.UI.Xaml.Controls
 
         private static ItemsPanelTemplate GetDefaultItemsPanel()
         {
-            ItemsPanelTemplate template = new ItemsPanelTemplate()
+            ItemsPanelTemplate template = new ItemsPanelTemplate();
+            template.SetMethodToInstantiateFrameworkTemplate(owner =>
             {
-                _methodToInstantiateFrameworkTemplate = (FrameworkElement templateOwner) =>
+                var panel = new StackPanel();
+                panel.TemplatedParent = owner;
+
+                return new TemplateInstance
                 {
-                    return new TemplateInstance()
-                    {
-                        TemplateOwner = templateOwner,
-                        TemplateContent = new StackPanel()
-                    };
-                }
-            };
+                    TemplateOwner = owner,
+                    TemplateContent = panel,
+                };
+            });
+
             template.Seal();
 
             // Note: We seal the template in order to avoid letting the user modify the 
@@ -819,15 +821,7 @@ namespace Windows.UI.Xaml.Controls
                 throw new InvalidOperationException("Cannot set both DisplayMemberPath and ItemTemplate.");
             }
 
-            DataTemplate template = null;
-            if (!(item is UIElement))
-            {
-                template = this.ItemTemplate;
-                if (template == null)
-                {
-                    template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
-                }
-            }
+            DataTemplate template = this.SelectTemplate(element, item);
 
             if ((cc = element as ContentControl) != null)
             {
@@ -839,21 +833,41 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private DataTemplate SelectTemplate(DependencyObject element, object item)
+        {
+            DataTemplate template = null;
+            if (!(item is UIElement))
+            {
+                template = this.ItemTemplate;
+                if (template == null)
+                {
+                    template = (DataTemplate)ContentPresenter.FindTemplateResourceInternal(element, item);
+                    if (template == null)
+                    {
+                        template = GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
+                    }
+                }
+            }
+
+            return template;
+        }
+
         internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
         {
             DataTemplate template = new DataTemplate();
 
-            template._methodToInstantiateFrameworkTemplate = control =>
+            template.SetMethodToInstantiateFrameworkTemplate(control =>
             {
                 TemplateInstance templateInstance = new TemplateInstance();
 
                 TextBlock textBlock = new TextBlock();
                 textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
+                textBlock.TemplatedParent = control;
 
                 templateInstance.TemplateContent = textBlock;
 
                 return templateInstance;
-            };
+            });
 
             return template;
         }

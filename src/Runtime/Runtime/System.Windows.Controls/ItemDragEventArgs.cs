@@ -71,7 +71,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public bool Cancel { get; set; }
 
-#if unsupported
         /// <summary>
         /// Gets a value indicating whether removing data
         /// from the source is handled by the target.
@@ -147,6 +146,5 @@ namespace Windows.UI.Xaml.Controls
             this.RemoveDataFromDragSourceAction = args.RemoveDataFromDragSourceAction;
             this.DataRemovedFromDragSource = args.DataRemovedFromDragSource;
         }
-#endif
     }
 }

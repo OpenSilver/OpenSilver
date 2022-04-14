@@ -19,10 +19,12 @@ using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Input;
 #else
 using Windows.Foundation;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -59,10 +61,9 @@ namespace Windows.UI.Xaml.Controls
             this.DefaultStyleKey = typeof(TextBox);
         }
 
-        internal sealed override bool INTERNAL_GetFocusInBrowser
-        {
-            get { return true; }
-        }
+        internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+
+        internal sealed override bool INTERNAL_GetFocusInBrowser => true;
 
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
@@ -546,6 +547,49 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+
+            if (e.Handled)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            Focus();
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+
+            e.Handled = true;
+        }
+
+        protected override void OnTextInput(TextCompositionEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            e.Handled = true;
+        }
+
         /// <summary>
         /// Selects all text in the text box.
         /// </summary>
@@ -568,13 +612,9 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
-            Size TextSize = Application.Current.TextMeasurementService.Measure(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
-            TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
-            TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
-            return TextSize;
+            return base.MeasureOverride(availableSize);
         }
-
+    
         internal override void UpdateVisualStates()
         {
             if (!IsEnabled)
@@ -603,24 +643,9 @@ namespace Windows.UI.Xaml.Controls
             if (_textViewHost != null)
             {
                 TextBoxView view = CreateView();
+                view.Loaded += new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.AttachView(view);
-            }
-        }
-
-        internal void UpdateFocusContentEditable(object contentEditableDiv)
-        {
-            INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
-            UpdateTabIndex(IsTabStop, TabIndex);
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-
-            var view = _textViewHost?.View;
-            if (view != null)
-            {
-                INTERNAL_HtmlDomManager.SetFocus(view);
             }
         }
 
@@ -628,9 +653,16 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_textViewHost != null)
             {
+                _textViewHost.View.Loaded -= new RoutedEventHandler(OnViewLoaded);
+
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
+        }
+
+        private void OnViewLoaded(object sender, RoutedEventArgs e) 
+        { 
+            UpdateTabIndex(IsTabStop, TabIndex);
         }
 
         internal static ITextBoxViewHost<T> GetContentHost<T>(FrameworkElement contentElement) where T : FrameworkElement, ITextBoxView

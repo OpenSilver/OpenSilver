@@ -28,6 +28,10 @@ namespace System.Windows.Input
     /// </summary>
     public partial class MouseButtonEventArgs : MouseEventArgs
     {
+        internal override void InvokeHandler(Delegate handler, object target)
+        {
+            ((MouseButtonEventHandler)handler)(target, this);
+        }
     }
 }
 #endif

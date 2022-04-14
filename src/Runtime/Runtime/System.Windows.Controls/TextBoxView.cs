@@ -44,6 +44,8 @@ namespace Windows.UI.Xaml.Controls
 
         internal TextBox Host { get; }
 
+        internal object InputDiv => _contentEditableDiv;
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var div = AddContentEditableDomElement(parentRef, out domElementWhereToPlaceChildren);
@@ -282,13 +284,13 @@ element.setAttribute(""data-maxlength"", ""{maxLength}"");");
         internal void OnTextDecorationsChanged(TextDecorationCollection tdc)
         {
             string cssValue = tdc?.ToHtmlString() ?? string.Empty;
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).textDecoration = cssValue;
         }
 #else
         internal void OnTextDecorationsChanged(TextDecorations? tdc)
         {
             string cssValue = TextDecorationsToHtmlString(tdc);
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OptionalSpecifyDomElementConcernedByFocus).textDecoration = cssValue;
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).textDecoration = cssValue;
         }
 
         private static string TextDecorationsToHtmlString(TextDecorations? tdc)
@@ -406,7 +408,6 @@ sel.addRange(range);
             object contentEditableDiv;
             var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", middleDiv, this, out contentEditableDiv);
             _contentEditableDiv = contentEditableDiv;
-            Host.UpdateFocusContentEditable(_contentEditableDiv);
             if (INTERNAL_HtmlDomManager.IsInternetExplorer())
             {
                 //set the class to remove margins on <p> inside the contentEditableDiv
@@ -434,7 +435,6 @@ sel.addRange(range);
 
             string isContentEditable = (!isReadOnly).ToString().ToLower();
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "contentEditable", isContentEditable);
-            this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
 
             this.Host.INTERNAL_OptionalSpecifyDomElementConcernedByFocus = contentEditableDiv;
@@ -451,9 +451,6 @@ sel.addRange(range);
             }
 
             domElementWhereToPlaceChildren = contentEditableDiv;
-
-            // Set the mark saying that the pointer events must be "absorbed" by the TextBox:
-            INTERNAL_HtmlDomManager.SetDomElementProperty(outerDiv, "data-absorb-events", true);
 
             //-----------------------
             // Prepare to raise the "TextChanged" event and to update the value of the "Text" property when the DOM text changes:
@@ -949,7 +946,7 @@ var range,selection;
         private void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
         {
 #if BRIDGE
-            previousInnerText = CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
+            previousInnerText = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv));
 #endif
         }
 
@@ -961,7 +958,7 @@ var range,selection;
         private void InternetExplorer_RaiseTextChangedIfNecessary()
         {
 #if BRIDGE
-            string newInnerText = OpenSilver.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", this.INTERNAL_OptionalSpecifyDomElementConcernedByFocus);
+            string newInnerText = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv));
             if (newInnerText != previousInnerText)
             {
                 TextAreaValueChanged();
@@ -992,7 +989,7 @@ var range,selection;
 #endif
         private static int CastToInt(object value)
         {
-            return Convert.ToInt32(((CSHTML5.Types.INTERNAL_JSObjectReference)value).Value);
+            return Convert.ToInt32(value);
         }
 
 #if BRIDGE
@@ -1009,6 +1006,13 @@ var range,selection;
         private static bool IsRunningInJavaScript()
         {
             return false;
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.TextWrapping, Margin, availableSize.Width);
+            return TextSize;
         }
     }
 }

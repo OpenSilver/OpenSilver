@@ -234,8 +234,33 @@ namespace Windows.UI.Xaml.Controls
                 var newDate = e.NewValue as DateTime?;
                 datePicker.INTERNAL_SelectedDate = newDate;
 
-                if (newDate == null)
+                if (!newDate.HasValue)
+                {
+                    // Clean DataPickerTextBox before setting watermark text
+                    if (datePicker._textBox != null)
+                        datePicker._textBox.Text = string.Empty;
+
                     datePicker.SetWaterMarkText();
+                }
+                else
+                {
+                    datePicker.Text = datePicker.DateTimeToString(newDate.Value);
+                }
+            }
+        }
+
+
+        private string DateTimeToString(DateTime d)
+        {
+            DateTimeFormatInfo currentDateFormat = GetCurrentDateFormat();
+            switch (SelectedDateFormat)
+            {
+                case DatePickerFormat.Short:
+                    return string.Format(CultureInfo.CurrentCulture, d.ToString(currentDateFormat.ShortDatePattern, currentDateFormat));
+                case DatePickerFormat.Long:
+                    return string.Format(CultureInfo.CurrentCulture, d.ToString(currentDateFormat.LongDatePattern, currentDateFormat));
+                default:
+                    return null;
             }
         }
 
@@ -277,29 +302,8 @@ namespace Windows.UI.Xaml.Controls
 
         private DateTimeFormatInfo GetCurrentDateFormat()
         {
-#if NETSTANDARD
-            if (CultureInfo.CurrentCulture.Calendar is GregorianCalendar)
-            {
-                return CultureInfo.CurrentCulture.DateTimeFormat;
-            }
-            else
-            {
-                foreach (global::System.Globalization.Calendar cal in CultureInfo.CurrentCulture.OptionalCalendars)
-                {
-                    if (cal is GregorianCalendar)
-                    {
-                        //if the default calendar is not Gregorian, return the first supported GregorianCalendar dtfi
-                        DateTimeFormatInfo dtfi = new CultureInfo(CultureInfo.CurrentCulture.Name).DateTimeFormat;
-                        dtfi.Calendar = cal;
-                        return dtfi;
-                    }
-                }
-
-                //if there are no GregorianCalendars in the OptionalCalendars list, use the invariant dtfi
-                DateTimeFormatInfo dt = new CultureInfo(CultureInfo.InvariantCulture.Name).DateTimeFormat;
-                dt.Calendar = new GregorianCalendar();
-                return dt;
-            }
+#if OPENSILVER
+            return DateTimeHelper.GetCurrentDateFormat();
 #elif BRIDGE
             return CultureInfo.CurrentCulture.DateTimeFormat;
 #endif
@@ -387,7 +391,7 @@ namespace Windows.UI.Xaml.Controls
                 DateTime? date = ParseText(text);
                 if (date != null)
                 {
-                    SetValue(TextProperty, text);
+                    SetValue(TextProperty, DateTimeToString(date.Value));
                     return date;
                 }
                 else
@@ -400,6 +404,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                     else
                     {
+                        _textBox.Text = string.Empty;
                         SetWaterMarkText();
                         return null;
                     }

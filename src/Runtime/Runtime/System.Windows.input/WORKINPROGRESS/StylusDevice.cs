@@ -30,5 +30,17 @@ namespace Windows.UI.Xaml.Input
     {
         [OpenSilver.NotImplemented]
         public TabletDeviceType DeviceType { get; private set; }
+
+        /// <summary>
+        /// Returns the stylus points collected since the last mouse event.
+        /// </summary>
+        /// <param name="relativeTo">Specifies the offset for the object (typically an System.Windows.Controls.InkPresenter)
+        /// that should be applied to captured points.</param>
+        /// <returns>A collection of the stylus points collected since the last mouse event.</returns>
+        [OpenSilver.NotImplemented]
+        public StylusPointCollection GetStylusPoints(UIElement relativeTo)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

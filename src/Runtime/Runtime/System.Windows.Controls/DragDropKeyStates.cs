@@ -13,7 +13,6 @@
 \*====================================================================================*/
 
 
-#if unsupported
 using System;
 
 #if MIGRATION
@@ -65,4 +64,3 @@ namespace System.Windows
         AltKey = 32,
     }
 }
-#endif

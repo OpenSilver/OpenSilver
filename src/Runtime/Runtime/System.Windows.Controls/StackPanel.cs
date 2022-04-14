@@ -129,6 +129,17 @@ namespace Windows.UI.Xaml.Controls
                 object outerDiv;
                 var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
 
+                if (this.IsUnderCustomLayout)
+                {
+                    domElementWhereToPlaceChildren = outerDiv;
+
+                    return outerDiv;
+                }
+                else if (this.IsCustomLayoutRoot)
+                {
+                    outerDivStyle.position = "relative";
+                }
+
                 if (INTERNAL_HtmlDomManager.IsInternetExplorer() && !INTERNAL_HtmlDomManager.IsEdge()) //When in Internet Explorer, we need to use display:grid instead of table so that VerticalAlignment.Stretch works (cf StratX.Star in the products page) but we definitely do not want this to be used in Edge as it crashes and causes the whole app to restart (cf ShowcaseApp with CSHTML5 from v1.0 beta 13.2 to RC1 included)
                 {
                     outerDivStyle.display = !Grid_InternalHelpers.isMSGrid() ? outerDivStyle.display = "grid" : Grid_InternalHelpers.INTERNAL_CSSGRID_MS_PREFIX + "grid";
@@ -161,6 +172,12 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
         {
+            if (this.IsUnderCustomLayout || this.IsCustomLayoutRoot)
+            {
+                domElementWhereToPlaceChild = null;
+                return null;
+            }
+
             if (Orientation == Orientation.Horizontal)
             {
                 //------v1------//

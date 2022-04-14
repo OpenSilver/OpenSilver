@@ -200,9 +200,9 @@ namespace DotNetForHtml5.Compiler
             _marshalledObject.GetMethodReturnValueTypeInfo(methodName, namespaceName, localTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out returnValueAssemblyName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
-        public void GetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+        public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
         {
-            _marshalledObject.GetMethodInfo(methodName, namespaceName, localTypeName, out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
+            _marshalledObject.GetAttachedPropertyGetMethodInfo(methodName, namespaceName, localTypeName, out declaringTypeName, out returnValueNamespaceName, out returnValueLocalTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny);
         }
 
         public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
@@ -872,8 +872,13 @@ namespace DotNetForHtml5.Compiler
 #endif
                 var contentProperty = Attribute.GetCustomAttribute(type, contentPropertyAttributeType, true);
 
-                if (contentProperty == null && !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny)) //if the element is a collection, it is possible to add the children directly to this element.
+                if (contentProperty == null &&
+                    !IsElementACollection(namespaceName, localTypeName, assemblyNameIfAny) &&
+                    !IsElementADictionary(namespaceName, localTypeName, assemblyNameIfAny))
+                {
+                    //if the element is a collection, it is possible to add the children directly to this element.
                     throw new XamlParseException("No default content property exists for element: " + localTypeName.ToString());
+                }
 
                 if (contentProperty == null)
                     return null;
@@ -1108,50 +1113,51 @@ namespace DotNetForHtml5.Compiler
             public bool IsPropertyOrFieldACollection(string propertyOrFieldName, string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
             {
                 Type propertyOrFieldType = GetPropertyOrFieldType(propertyOrFieldName, parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
-                bool typeIsACollection = (typeof(IEnumerable).IsAssignableFrom(propertyOrFieldType) && propertyOrFieldType != typeof(string));
+                bool typeIsACollection = typeof(IList).IsAssignableFrom(propertyOrFieldType)
+                    || typeof(IDictionary).IsAssignableFrom(propertyOrFieldType);
+                
                 return typeIsACollection;
             }
 
             public bool IsPropertyOrFieldADictionary(string propertyName, string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)
             {
                 Type propertyOrFieldType = GetPropertyOrFieldType(propertyName, parentNamespaceName, parentLocalTypeName, parentAssemblyNameIfAny);
-                bool isTypeTheIDictionayType = propertyOrFieldType.IsGenericType && propertyOrFieldType.GetGenericTypeDefinition() == typeof(IDictionary<,>);
-                bool typeIsADictionary = isTypeTheIDictionayType
-                    || (propertyOrFieldType.GetInterface("IDictionary`2") != null && propertyOrFieldType != typeof(string));
-                //bool typeIsADictionary = (typeof(IDictionary).IsAssignableFrom(propertyOrFieldType) && propertyOrFieldType != typeof(string));
+                bool typeIsADictionary = typeof(IDictionary).IsAssignableFrom(propertyOrFieldType);
+                
                 return typeIsADictionary;
             }
 
             public bool DoesMethodReturnACollection(string methodName, string typeNamespaceName, string localTypeName, string typeAssemblyNameIfAny = null)
             {
                 Type propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
-                bool typeIsACollection = (typeof(IEnumerable).IsAssignableFrom(propertyType) && propertyType != typeof(string));
+                bool typeIsACollection = typeof(IList).IsAssignableFrom(propertyType) ||
+                    typeof(IDictionary).IsAssignableFrom(propertyType);
+                
                 return typeIsACollection;
             }
 
             public bool DoesMethodReturnADictionary(string methodName, string typeNamespaceName, string localTypeName, string typeAssemblyNameIfAny = null)
             {
                 Type propertyType = GetMethodReturnValueType(methodName, typeNamespaceName, localTypeName, typeAssemblyNameIfAny);
-                bool typeIsADictionary = (propertyType.GetInterface("IDictionary`2") != null && propertyType != typeof(string));
-                //bool typeIsADictionary = (typeof(IDictionary).IsAssignableFrom(propertyOrFieldType) && propertyOrFieldType != typeof(string));
+                bool typeIsADictionary = typeof(IDictionary).IsAssignableFrom(propertyType);
+                
                 return typeIsADictionary;
             }
 
             public bool IsElementACollection(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
             {
                 var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
-
-                bool typeIsACollection = (typeof(IEnumerable).IsAssignableFrom(elementType) && elementType != typeof(string));
+                bool typeIsACollection = typeof(IList).IsAssignableFrom(elementType);
+                
                 return typeIsACollection;
             }
 
             public bool IsElementADictionary(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
             {
                 var elementType = FindType(elementNameSpace, elementLocalName, assemblyNameIfAny);
-
-                bool typeIsADictionary = (elementType.GetInterface("IDictionary`2") != null && elementType != typeof(string));
+                bool typeIsADictionary = typeof(IDictionary).IsAssignableFrom(elementType);
+                
                 return typeIsADictionary;
-
             }
 
             public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName, string assemblyNameIfAny)
@@ -1203,14 +1209,59 @@ namespace DotNetForHtml5.Compiler
                 isTypeEnum = (type.IsEnum);
             }
 
-            public void GetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+            private Type GetDependencyObjectType()
             {
-                var elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
-                MethodInfo methodInfo = elementType.GetMethod(methodName);
+#if CSHTML5BLAZOR
+#if MIGRATION
+                return FindType("System.Windows", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR);
+#else
+                return FindType("Windows.UI.Xaml", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR);
+#endif
+#elif BRIDGE
+#if MIGRATION
+                return FindType("System.Windows", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE);
+#else
+                return FindType("Windows.UI.Xaml", "DependencyObject", Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE);
+#endif
+#endif
+            }
+
+            public void GetAttachedPropertyGetMethodInfo(string methodName, string namespaceName, string localTypeName, out string declaringTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
+            {
+                Type dependencyObjectType = GetDependencyObjectType();
+
+                Type elementType = FindType(namespaceName, localTypeName, assemblyNameIfAny);
+                MethodInfo methodInfo = null;
+                for (Type t = elementType; t != null; t = t.BaseType)
+                {
+                    methodInfo = t.GetMethods(BindingFlags.Static | BindingFlags.Public)
+                        .FirstOrDefault(m =>
+                        {
+                            if (m.Name != methodName)
+                            {
+                                return false;
+                            }
+
+                            ParameterInfo[] parameterInfos = m.GetParameters();
+                            if (parameterInfos.Length != 1)
+                            {
+                                return false;
+                            }
+
+                            return dependencyObjectType.IsAssignableFrom(parameterInfos[0].ParameterType);
+                        });
+
+                    if (methodInfo != null)
+                    {
+                        break;
+                    }
+                }
+
                 if (methodInfo == null)
                 {
                     throw new XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType.ToString() + "\".");
                 }
+
                 declaringTypeName = "global::" + (!string.IsNullOrEmpty(methodInfo.DeclaringType.Namespace) ? methodInfo.DeclaringType.Namespace + "." : "") + GetTypeNameIncludingGenericArguments(methodInfo.DeclaringType);
                 returnValueNamespaceName = this.BuildPropertyPathRecursively(methodInfo.ReturnType);
                 returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(methodInfo.ReturnType);
@@ -1802,7 +1853,7 @@ namespace DotNetForHtml5.Compiler
                     field = type.GetField(fieldNameIgnoreCase, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
                 }
 
-                return field.Name ?? throw new XamlParseException($"Field '{fieldNameIgnoreCase}' not found in type: '{type.FullName}'.");
+                return field?.Name ?? throw new XamlParseException($"Field '{fieldNameIgnoreCase}' not found in type: '{type.FullName}'.");
             }
 
             // note: this method has been abandonned because fieldInfo.GetValue(null) can 

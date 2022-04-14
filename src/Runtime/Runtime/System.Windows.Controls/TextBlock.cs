@@ -356,9 +356,11 @@ namespace Windows.UI.Xaml.Controls
             //return actualSize;
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
 
+            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
+
             if (noWrapSize == Size.Empty)
             {
-                noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
+                noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, TextWrapping.NoWrap, Padding, Double.PositiveInfinity);
                 noWrapSize = noWrapSize.Add(BorderThicknessSize);
             }
 
@@ -367,7 +369,7 @@ namespace Windows.UI.Xaml.Controls
                 return noWrapSize;
             }
 
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(Text ?? String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
             TextSize = TextSize.Add(BorderThicknessSize);
 
             return TextSize;

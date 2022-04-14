@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
@@ -17,11 +17,15 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG;MIGRATION</DefineConstants>
+    <DefineConstants>TRACE;MIGRATION</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UWP|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Optimize) != true">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\Compiler\Shared\XamlResourcesHelper.cs">
+      <Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
+    </Compile>
     <Compile Include="System\Windows\Controls\Common\DependencyObjectExtensions.cs" />
     <Compile Include="System\Windows\Navigation\INavigationContentLoader.cs" />
     <Compile Include="System\Windows\Navigation\LoadResult.cs" />

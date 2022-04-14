@@ -39,63 +39,103 @@ namespace DotNetForHtml5.Compiler
 
         // this struct is used to find a given substring in a text when reading it character by character 
         // (in this class, we use it to find the substring "base.Channel" efficiently and the interface type in System.ServiceModel.ClientBase<...>).
-        internal class SubStringFinderCharByChar
+        internal interface ISubstringFinderCharByChar
         {
-            private string SubString { get; set; }
+            bool IsMatch { get; }
 
-            private int CurrentIndex { get; set; }
+            void Reset();
 
-            internal bool IsMatch { get; private set; }
+            void MoveNext(char c);
 
-            private int _matchStartIndex;
-            internal int MatchStartIndex
+            string Match { get; }
+        }
+
+        internal class SubstringFinderCharByChar : ISubstringFinderCharByChar
+        {
+            private readonly string _subString;
+            private int _position;
+            private bool _isMatch;
+
+            public SubstringFinderCharByChar(string subString)
             {
-                get
+                _subString = subString;
+                _position = 0;
+                _isMatch = false;
+            }
+
+            public bool IsMatch => _isMatch;
+
+            public string Match => _isMatch ? _subString : throw new InvalidOperationException();
+
+            public void Reset()
+            {
+                _position = 0;
+                _isMatch = false;
+            }
+
+            public void MoveNext(char c)
+            {
+                if (_isMatch)
                 {
-                    if (!IsMatch)
+                    return;
+                }
+
+                if (_subString[_position] == c)
+                {
+                    if (++_position == _subString.Length)
                     {
-                        return -1;
+                        _isMatch = true;
                     }
-                    else
-                    {
-                        return _matchStartIndex;
-                    }
+                }
+                else
+                {
+                    Reset();
+                }
+            }
+        }
+
+        internal class ArrayOfSubstringFinderCharByChar : ISubstringFinderCharByChar
+        {
+            private readonly ISubstringFinderCharByChar[] _subStringFinders;
+            private int _matchIndex = -1;
+            public ArrayOfSubstringFinderCharByChar(IList<string> subStrings)
+            {
+                _subStringFinders = new ISubstringFinderCharByChar[subStrings.Count];
+                for (int i = 0; i < subStrings.Count; i++)
+                {
+                    _subStringFinders[i] = new SubstringFinderCharByChar(subStrings[i]);
                 }
             }
 
-            internal SubStringFinderCharByChar(string subString)
-            {
-                _matchStartIndex = -1;
-                SubString = subString;
-                CurrentIndex = 0;
-                IsMatch = false;
-            }
+            public bool IsMatch => _matchIndex > -1;
 
-            internal void Reset()
-            {
-                CurrentIndex = 0;
-                IsMatch = false;
-                _matchStartIndex = -1;
-            }
+            public string Match => IsMatch ? _subStringFinders[_matchIndex].Match : throw new InvalidOperationException();
 
-            internal void CheckNextChar(char currentChar, int charIndexInBaseString)
+            public void Reset()
             {
-                if (!IsMatch)
+                for (int i = 0; i < _subStringFinders.Length; i++)
                 {
-                    if (SubString[CurrentIndex] == currentChar)
+                    _subStringFinders[i].Reset();
+                }
+
+                _matchIndex = -1;
+            }
+
+            public void MoveNext(char c)
+            {
+                if (IsMatch)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < _subStringFinders.Length; i++)
+                {
+                    ISubstringFinderCharByChar finder = _subStringFinders[i];
+                    finder.MoveNext(c);
+                    if (finder.IsMatch)
                     {
-                        if (CurrentIndex == 0)
-                        {
-                            _matchStartIndex = charIndexInBaseString;
-                        }
-                        if (++CurrentIndex == SubString.Length)
-                        {
-                            IsMatch = true;
-                        }
-                    }
-                    else
-                    {
-                        Reset();
+                        _matchIndex = i;
+                        break;
                     }
                 }
             }
@@ -121,6 +161,13 @@ namespace DotNetForHtml5.Compiler
             }
         }
 
+        private static readonly Dictionary<string, string> SupportedClientBaseTypes = 
+            new Dictionary<string, string>()
+            {
+                ["System.ServiceModel.ClientBase"] = "System.ServiceModel.CSHTML5_ClientBase",
+                ["System.ServiceModel.DuplexClientBase"] = "System.ServiceModel.CSHTML5_DuplexClientBase",
+            };
+        
         internal static string Fix(string inputText, string clientBaseForcedToken, string clientBaseForcedInterfaceName, string endpointCode, string soapVersion, out bool wasAnythingFixed)
         {
             soapVersion = string.IsNullOrEmpty(soapVersion) ? "1.1" : soapVersion;
@@ -139,8 +186,12 @@ namespace DotNetForHtml5.Compiler
             int numberOfOpenedSquaredBrackets = 0;
             int previousNumberOfOpenedSquaredBrackets = 0;
 
-            // used to find the interface in "System.ServiceModel.ClientBase<...>", so we don't need to it every time we call FixBlock().
-            SubStringFinderCharByChar clientBaseInterfaceFinder = new SubStringFinderCharByChar("System.ServiceModel.ClientBase<");
+            // used to find the interface in "System.ServiceModel.ClientBase<...>" or
+            // "System.ServiceModel.DuplexClientBase<...>" so we don't need to it every
+            // time we call FixBlock().
+            ISubstringFinderCharByChar clientBaseInterfaceFinder = new ArrayOfSubstringFinderCharByChar(
+                SupportedClientBaseTypes.Keys.Select(s => $"{s}<").ToArray());
+
             bool isClientBaseInterfaceFound = false;
             string clientBaseInterfaceName = "";
 
@@ -214,7 +265,7 @@ namespace DotNetForHtml5.Compiler
                             }
                             else
                             {
-                                clientBaseInterfaceFinder.CheckNextChar(c, charIndex);
+                                clientBaseInterfaceFinder.MoveNext(c);
                             }
                         }
                         // this means we just entered in a type
@@ -297,8 +348,12 @@ namespace DotNetForHtml5.Compiler
             //extract the ServiceKnownTypesAttribute that are assigned to the Methods of the interfaces, to assign them to the interface itself (our version of JSIL is unable to get the custom Attributes from interfaces' methods, but not from the interface's type itself.
             ExtractServiceKnownTypeAttributesToInterfaceItself(ref finalText);
 
-            //Replace the inheritance to ClientBase with an inheritance to CSHTML5_ClientBase
-            finalText = finalText.Replace("System.ServiceModel.ClientBase<", "System.ServiceModel.CSHTML5_ClientBase<");
+            // Replace the inheritance to ClientBase with an inheritance to CSHTML5_ClientBase 
+            // and DuplexClientBase with an inheritance to CSHTML5_DuplexClientBase
+            foreach (var pair in SupportedClientBaseTypes)
+            {
+                finalText = finalText.Replace($"{pair.Key}<", $"{pair.Value}<");
+            }
 
             finalText = FixBasicHttpBinding(finalText);
 
@@ -397,12 +452,20 @@ namespace DotNetForHtml5.Compiler
                 //Make a dictionary to know the parameters from the name:
                 //todo-perf: this and the "check the amount of parameters and adapt the body replacement:" part may be a bit redundant since they're both about the parameters of the method so we might be able to make the compilation slightly faster by changing this (probably unnoticeable).
                 Dictionary<string, string> parameterNamesToTheirDefinitions = new Dictionary<string, string>();
+                Dictionary<string, string> outParamDefinitions = new Dictionary<string, string>();
                 if (!string.IsNullOrWhiteSpace(methodParametersDefinitions))
                 {
                     string[] splittedMethodParametersDefinition = SplitStringTakingAccountOfBrackets(methodParametersDefinitions, ',');
                     foreach (string parameterDefinition in splittedMethodParametersDefinition)
                     {
                         string paramDefinition = parameterDefinition.Trim();
+                        bool isOutParam = false;
+                        if (paramDefinition.StartsWith("out "))
+                        {
+                            paramDefinition = paramDefinition.Remove(0, 4).Trim();
+                            isOutParam = true;
+                        }
+
                         string[] splittedParamDefinition = SplitStringTakingAccountOfBrackets(paramDefinition, ' ');
                         //Note on the line above: very improbable scenario that would lead to problems: if the guy writes Paramtype1\r\nParamName (see it as a new line, not the actual characters)
                         bool isParameterTypeGotten = false;
@@ -424,7 +487,14 @@ namespace DotNetForHtml5.Compiler
                             }
                         }
 
-                        parameterNamesToTheirDefinitions.Add(parameterName, string.Format(@"{0}", parameterName));
+                        if (isOutParam)
+                        {
+                            outParamDefinitions.Add(parameterName, parameterTypeAsString);
+                        }
+                        else
+                        {
+                            parameterNamesToTheirDefinitions.Add(parameterName, string.Format(@"{0}", parameterName));
+                        }
                     }
                 }
                 //check the amount of parameters and adapt the body replacement:
@@ -433,17 +503,17 @@ namespace DotNetForHtml5.Compiler
                 if (thereAreParameters)
                 {
                     string parametersDictionaryDefinition = "new global::System.Collections.Generic.Dictionary<string, object>() {";
-                    bool isFirst = true;
                     foreach (string paramName in splittedParameters)
                     {
                         string trimmedParamName = paramName.Trim();
+                        bool isOutParam = false;
+                        if (paramName.StartsWith("out "))
+                        {
+                            isOutParam = true;
+                            trimmedParamName = trimmedParamName.Remove(0, 4).Trim();
+                        }
 
                         if (trimmedParamName == "null") continue;
-
-                        if (!isFirst)
-                        {
-                            parametersDictionaryDefinition += ", ";
-                        }
 
                         string parameterDefinition = parameterNamesToTheirDefinitions.ContainsKey(trimmedParamName) ?
                                                      parameterNamesToTheirDefinitions[trimmedParamName] :
@@ -451,17 +521,17 @@ namespace DotNetForHtml5.Compiler
 
                         // Note: Can the params names be different from trimmedParam and the one 
                         // in parameterNamesToTheirDefinitions? (probably not if properly trimmed and all)
-                        parametersDictionaryDefinition +=
-                            string.Format("{{ \"{0}\", {1} }}",
-                                          trimmedParamName,
-                                          parameterDefinition);
-                        isFirst = false;
+                        if (!isOutParam)
+                        {
+                            parametersDictionaryDefinition += $"{{ \"{trimmedParamName}\", {parameterDefinition} }},";
+                        }
                     }
                     parametersDictionaryDefinition += "}";
 
                     newBody = string.Format(
 
     @"
+            {11}
             {6}System.ServiceModel.INTERNAL_WebMethodsCaller.{8}CallWebMethod{0}{7}
                 <{1}{2}>({9}, ""{3}"", {4}, ""{10}"");
 ",
@@ -475,7 +545,8 @@ namespace DotNetForHtml5.Compiler
      ((methodType == MethodType.AsyncWithoutReturnType || methodType == MethodType.NotAsyncWithoutReturnType || methodType == MethodType.AsyncEndWithoutReturnType) ? "_WithoutReturnValue" : ""),
      ((methodType == MethodType.AsyncBegin ? "Begin" : "") + (methodType == MethodType.AsyncEndWithoutReturnType || methodType == MethodType.AsyncEndWithReturnType ? "End" : "")),
      endpointCode,
-     soapVersion
+     soapVersion,
+     string.Join(" ", outParamDefinitions.Select(def => $"{def.Key} = default({def.Value});"))
      );
                 }
                 else //case where there are no parameters

@@ -62,7 +62,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_PropertyStorage storage;
                 if (INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d, dp, false, out storage))
                 {
-                    oldValueSource = storage.BaseValueSourceInternal;
+                    oldValueSource = storage.Entry.BaseValueSourceInternal;
                 }
 
                 // If the oldValueSource is of lower precedence than Inheritance

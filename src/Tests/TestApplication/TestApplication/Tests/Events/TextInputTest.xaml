@@ -1,0 +1,50 @@
+﻿<sdk:Page
+    x:Class="TestApplication.Tests.Events.TextInputTest"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:TestApplication.Tests.Events"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Press any key: Nothing should happen, event doesn't fire without handledeventstoo" Margin="0,10,0,0" />
+        <TextBox x:Name="box1" Text="box1" Width="100" Height="30"/>
+        
+        <TextBlock Text="Press any key: event fires " Margin="0,10,0,0" />
+        <TextBox x:Name="box2" Text="box2" Width="100" Height="30"/>
+        
+        <TextBlock Text="Press any key, Nothing should happen, event doesn't fire with Keydow e.Handled=true" Margin="0,10,0,0" />
+        <TextBox x:Name="box3" Text="box3" Width="100" Height="30"/>
+        
+        <TextBlock Text="Press Esc or Enter: event fires without handledeventstoo" Margin="0,10,0,0" />
+        <TextBox x:Name="box4" Text="box4" Width="100" Height="30"/>
+        
+        <TextBlock Text="Press any key:key should be added to textbox, event fires but e.Handled=true has no effect" Margin="0,10,0,0" />
+        <TextBox x:Name="box5" Text="box5" Width="100" Height="30"/>
+        
+        <TextBlock Text="Press any key:key should Not be added to textbox, event fires with OnTextInput and e.Handled=true before calling base" Margin="0,10,0,0" />
+        <local:XTextBox x:Name="box6" Text="box6" Width="100" Height="30"/>
+        
+        <TextBlock Text="Press any key:key should Not be added to textbox, event fires with OnTextInput and Not calling base" Margin="0,10,0,0" />
+        <local:XTextBox x:Name="box7" Text="box7" Width="100" Height="30"/>
+
+        <TextBlock Text="Press left/right arrow keys: KeyDown event should fire only if the cursor is in position 0 or at the end." Margin="0,10,0,0" />
+        <TextBox x:Name="box8" Text="box8" Width="100" Height="30" KeyDown="box8_KeyDown"/>
+
+        <TextBlock Text="Press up/down arrow key, text is not selected: Cursor remains in position where it was and SelectionStart is the current position." Margin="0,10,0,0" />
+        <TextBox x:Name="box9" Text="box9" Width="100" Height="30" KeyDown="box9_KeyDown"/>
+
+        <TextBlock Text="Press up/down arrow key, text is selected: Selected removed, cursor moves to the beginning/end of the text. SelectionStart is the position, SelectionLength is 0" Margin="0,10,0,0" />
+        <TextBox x:Name="box10" Text="box10" Width="100" Height="30" KeyDown="box10_KeyDown"/>
+
+        <TextBlock Text="Press any key when focus on button: event should fire for non editable elements" Margin="0,10,0,0" />
+        <Button x:Name="button2" Content="type when I'm focused" Width="150" Height="30"/>
+
+        <TextBlock Text="Press any key when focus on button: event other handlers should still fire after OnTextInput and even with e.Handled=true before calling base" Margin="0,10,0,0" />
+        <local:XButton x:Name="button3" Content="type when I'm focused" Width="150" Height="30"/>
+        
+        <Button x:Name="button1" Content="Clear" Width="100" Height="30" Margin="0,20,0,0"/>
+
+        <TextBlock Name="blockMsg" Margin="0,100,0,0" Foreground="Orange" FontWeight="Bold"/>
+    </StackPanel>
+
+</sdk:Page>

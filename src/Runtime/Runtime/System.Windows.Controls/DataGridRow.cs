@@ -49,7 +49,14 @@ namespace Windows.UI.Xaml.Controls
         internal int _rowIndex; //todo: replace this with the method GetIndex? (see wpf)
         private DataGridSelectionMode _currentSelectionMode;
 
-        internal static DataTemplate DefaultTemplateForExtendedSelectionMode = new DataTemplate() { _methodToInstantiateFrameworkTemplate = GenerateDefaultHeaderTemplateForExtendedSelectionMode };
+        internal static DataTemplate DefaultTemplateForExtendedSelectionMode = CreateDefaultTemplateForExtendedSelectionMode();
+
+        private static DataTemplate CreateDefaultTemplateForExtendedSelectionMode()
+        {
+            DataTemplate template = new DataTemplate();
+            template.SetMethodToInstantiateFrameworkTemplate(GenerateDefaultHeaderTemplateForExtendedSelectionMode);
+            return template;
+        }
 
 #if MIGRATION
         public event MouseButtonEventHandler MouseLeftButtonUp;
@@ -66,12 +73,14 @@ namespace Windows.UI.Xaml.Controls
             border.HorizontalAlignment = HorizontalAlignment.Stretch;
             border.VerticalAlignment = VerticalAlignment.Stretch;
             border.Background = new SolidColorBrush(Colors.Gray);
+            border.TemplatedParent = templateOwner;
             CheckBox checkbox = new CheckBox();
             checkbox.HorizontalAlignment = HorizontalAlignment.Center;
             checkbox.VerticalAlignment = VerticalAlignment.Center;
             Binding b = new Binding("IsSelected");
             b.Mode = BindingMode.TwoWay;
             checkbox.SetBinding(CheckBox.IsCheckedProperty, b);
+            checkbox.TemplatedParent = templateOwner;
             border.Child = checkbox;
             templateInstance.TemplateContent = border;
             return templateInstance;

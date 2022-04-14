@@ -59,5 +59,45 @@ namespace Windows.UI.Xaml.Controls
         {
             return "";
         }
+
+        /// <summary>
+        /// Executes a script function that is implemented by the currently loaded document.
+        /// </summary>
+        /// <param name="scriptName">
+        /// The name of the script function to execute.
+        /// </param>
+        /// <returns>
+        /// The object returned by the Active Scripting call.
+        /// </returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [OpenSilver.NotImplemented]
+        public object InvokeScript(string scriptName)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Executes a script function that is defined in the currently loaded document.
+        /// </summary>
+        /// <param name="scriptName">
+        /// The name of the script function to execute.
+        /// </param>
+        /// <param name="args">
+        /// The parameters to pass to the script function.
+        /// </param>
+        /// <returns>
+        /// The object returned by the Active Scripting call.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public object InvokeScript(string scriptName, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Occurs when the content contained in the WebBrowser control passes a string to the Silverlight plug-in by using JavaScript.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public event EventHandler<NotifyEventArgs> ScriptNotify;
     }
 }

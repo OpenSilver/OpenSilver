@@ -23,6 +23,7 @@ using CSHTML5;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using OpenSilver.Internal;
+using System.Linq;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
@@ -69,9 +70,11 @@ namespace Windows.UI.Xaml
         {
             // Keep a reference to the app:
             Application.Current = this;
-            
+
             // Initialize Deployment
             _ = Deployment.Current;
+
+            new DOMEventManager(GetWindow, "unload", ProcessOnExit).AttachToDomEvents();
 
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
             INTERNAL_InteropImplementation.ResetLoadedFilesDictionaries();
@@ -120,7 +123,7 @@ namespace Windows.UI.Xaml
             // Initialize the window:
             if (_mainWindow == null) // Note: it could be != null if the user clicks "Restart" from the Simulator advanced options.
             {
-                _mainWindow = new Window();
+                _mainWindow = new Window(true);
                 Window.Current = _mainWindow;
                 object applicationRootDomElement = INTERNAL_HtmlDomManager.GetApplicationRootDomElement();
                 _mainWindow.AttachToDomElement(applicationRootDomElement);
@@ -154,11 +157,15 @@ namespace Windows.UI.Xaml
                 StartAppServices();
 
                 // Raise the "Startup" event:
+                var startupEventArgs = new StartupEventArgs();
+                ApplyBuiltInInitParams(startupEventArgs);
+
                 if (this.Startup != null)
-                    Startup(this, new StartupEventArgs());
+                    Startup(this, startupEventArgs);
 
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());
+
             }));
 
         }
@@ -194,7 +201,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
+        #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
 
 #if !CSHTML5NETSTANDARD
         DispatcherTimer _timerForWorkaroundFireFoxIssue = new DispatcherTimer();
@@ -362,7 +369,7 @@ namespace Windows.UI.Xaml
         //returns the html window element
         internal object GetWindow()
         {
-            return CSHTML5.Interop.ExecuteJavaScript(@"window");
+            return OpenSilver.Interop.ExecuteJavaScript(@"window");
         }
 
         /// <summary>
@@ -568,42 +575,17 @@ namespace Windows.UI.Xaml
 
         #region Exit event
 
-        INTERNAL_EventManager<EventHandler, EventArgs> _ExitEventManager;
-        INTERNAL_EventManager<EventHandler, EventArgs> ExitEventManager
-        {
-            get
-            {
-                if (_ExitEventManager == null)
-                {
-                    _ExitEventManager = new INTERNAL_EventManager<EventHandler, EventArgs>(GetWindow, "unload", ProcessOnExit);
-                }
-                return _ExitEventManager;
-            }
-        }
-
         /// <summary>
-        /// Occurs when an otherwise unhandled Tap interaction occurs over the hit test
-        /// area of this element.
+        /// Occurs just before an application shuts down and cannot be canceled.
         /// </summary>
-        public event EventHandler Exit
-        {
-            add
-            {
-                ExitEventManager.Add(value);
-            }
-            remove
-            {
-                ExitEventManager.Remove(value);
-            }
-        }
+        public event EventHandler Exit;
 
         /// <summary>
         /// Raises the Exit event
         /// </summary>
         void ProcessOnExit(object jsEventArg)
         {
-            var eventArgs = new EventArgs();
-            OnExit(eventArgs);
+            OnExit(EventArgs.Empty);
         }
 
         /// <summary>
@@ -612,10 +594,7 @@ namespace Windows.UI.Xaml
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnExit(EventArgs eventArgs)
         {
-            foreach (EventHandler handler in _ExitEventManager.Handlers)//.ToList<EventHandler>())
-            {
-                handler(this, eventArgs);
-            }
+            Exit?.Invoke(this, eventArgs);
         }
 
         #endregion
@@ -650,5 +629,22 @@ namespace Windows.UI.Xaml
                 );
         }
 #endif
+
+        private void ApplyBuiltInInitParams(StartupEventArgs startupEventArgs)
+        {
+            var builtInParams = new List<string>() { "windowless" };
+
+            var builtInParamsFromArgs = startupEventArgs.InitParams.Where(kv => builtInParams.Contains(kv.Key));
+
+            foreach (var param in builtInParamsFromArgs)
+            {
+                switch (param.Key)
+                {
+                    case "windowless":
+                        Current.Host.Settings.Windowless = Convert.ToBoolean(param.Value);
+                        break;
+                }
+            }
+        }
     }
 }
