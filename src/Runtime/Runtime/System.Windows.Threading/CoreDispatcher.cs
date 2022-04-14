@@ -265,10 +265,9 @@ namespace Windows.UI.Core
             return null;
         }
 
-		[OpenSilver.NotImplemented]
         public bool CheckAccess()
         {
-            return true;
+            return INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround ? INTERNAL_Simulator.WebControlDispatcherCheckAccess() : true;
         }
     }
 }

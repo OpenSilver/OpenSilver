@@ -1012,6 +1012,7 @@ Click OK to continue.";
                 InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
                 InteropHelpers.InjectWebControlDispatcherBeginInvoke(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectWebControlDispatcherInvoke(MainWebBrowser, _coreAssembly);
+                InteropHelpers.InjectWebControlDispatcherCheckAccess(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectConvertBrowserResult(BrowserResultConverter.CastFromJsValue, _coreAssembly);
                 InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
                 InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
