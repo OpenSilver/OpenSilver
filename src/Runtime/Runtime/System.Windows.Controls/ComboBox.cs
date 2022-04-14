@@ -137,6 +137,7 @@ namespace Windows.UI.Xaml.Controls
             this.SelectionBoxItemTemplate = template;
         }
 
+        private ScrollViewer _scroller;
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -173,6 +174,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 UpdateContentPresenter();
             }
+
+            _scroller = FindChildElementOfType<ScrollViewer>(_popup.Child as FrameworkElement);
         }
 
         /// <inheritdoc />
@@ -307,6 +310,7 @@ namespace Windows.UI.Xaml.Controls
                         // add removed 
 
                         comboBox._popup.IsOpen = true;
+                        comboBox.UpdatePopupHeight();
 
                         // Make sure the Width of the popup is at least the same as the popup
                         if (comboBox._popup.Child is FrameworkElement child)
@@ -378,7 +382,89 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the MaxDropDownHeight dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxDropDownHeightProperty =
-            DependencyProperty.Register("MaxDropDownHeight", typeof(double), typeof(ComboBox), new PropertyMetadata(200d));
+            DependencyProperty.Register("MaxDropDownHeight", typeof(double), typeof(ComboBox), new PropertyMetadata(double.PositiveInfinity, OnMaxDropDownHeightChanged));
+
+        private static void OnMaxDropDownHeightChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ComboBox)d).UpdatePopupHeight();
+        }
+
+        public static T FindChildElementOfType<T>(FrameworkElement element) where T : FrameworkElement
+        {
+            T correctlyTyped = element as T;
+
+            if (correctlyTyped != null)
+            {
+                return correctlyTyped;
+            }
+
+            if (element != null)
+            {
+
+                int numChildren = System.Windows.Media.VisualTreeHelper.GetChildrenCount(element);
+
+                for (int i = 0; i < numChildren; i++)
+                {
+                    T child = System.Windows.Media.VisualTreeHelper.GetChild(element, i) as T;
+                    if (child != null)
+                    {
+                        return child;
+                    }
+                }
+
+                Popup popup = element as Popup;
+
+                if (popup != null)
+                {
+                    return popup.Child as T;
+                }
+            }
+
+            return null;
+        }
+
+        private void UpdatePopupHeight()
+        {
+            if (_popup == null || _scroller == null) return;
+            if (!_popup.IsOpen || _popup.PopupRoot == null || !(_popup.PopupRoot.Content is FrameworkElement)) return;
+
+            // Determine the size of the popup:
+            FrameworkElement content = (FrameworkElement)_popup.PopupRoot.Content;
+            double popupActualWidth = content.ActualWidth;
+            double popupActualHeight = content.ActualHeight;
+            if (double.IsNaN(popupActualWidth) || double.IsNaN(popupActualHeight) || popupActualWidth <= 0 || popupActualHeight <= 0) return;
+
+
+            Point popupPosition = new Point(0, 0);
+            if (_popup.IsConnectedToLiveTree)
+            {
+                popupPosition = _popup.TransformToVisual(Application.Current.RootVisual).Transform(popupPosition);
+            }
+
+            //Rect windowBounds = Window.Current.Bounds;
+            //double popupX = popup.HorizontalOffset + popupPosition.X;
+            double popupY = _popup.VerticalOffset + popupPosition.Y;
+
+            var newValue = MaxDropDownHeight;
+            if (double.IsNaN(newValue)) newValue = double.PositiveInfinity;
+            var parentWindowHeight = this.INTERNAL_ParentWindow != null ? this.INTERNAL_ParentWindow.INTERNAL_GetActualWidthAndHeight().Height : double.PositiveInfinity;
+            if (!double.IsInfinity(parentWindowHeight))
+            {
+                parentWindowHeight -= popupY;
+                var comboHeight = this.INTERNAL_GetActualWidthAndHeight().Height;
+                if (!double.IsInfinity(comboHeight) && !double.IsNaN(comboHeight))
+                {
+                    parentWindowHeight -= comboHeight;
+                }
+            }
+
+            var minHeight = Math.Min(newValue, parentWindowHeight);
+
+            if (!double.IsInfinity(minHeight) && !double.IsNaN(minHeight))
+            {
+                _scroller.MaxHeight = minHeight;
+            }
+        }
 
         void Popup_ClosedDueToOutsideClick(object sender, EventArgs e)
         {
