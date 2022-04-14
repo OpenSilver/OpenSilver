@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Data
@@ -42,6 +43,12 @@ namespace Windows.UI.Xaml.Data
         {
             object oldSource = Source;
             Source = source;
+
+            //We need to handle when the source is a paged collection and use the current page/current item as the source instead of the PagedCollection itself
+            if (Source is IPagedCollectionView && Source is ICollectionView)
+            {
+                Source = (Source as ICollectionView).CurrentItem;
+            }
 
             if (oldSource != Source)
             {
