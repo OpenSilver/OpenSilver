@@ -252,10 +252,27 @@ namespace Windows.UI.Xaml.Controls
                         var panel = (Panel)d;
                         if (e is ImageBrush ib && ib != null)
                         {
-                            if (ib.Stretch == Stretch.Fill)
+                            string sizeValue = string.Empty;
+                            switch (ib.Stretch)
                             {
-                                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundSize" }, "100% 100%");
+                                case Stretch.None: sizeValue = "auto"; break;
+                                case Stretch.Fill: sizeValue = "100% 100%"; break;
+                                case Stretch.Uniform: sizeValue = "contain"; break;
+                                case Stretch.UniformToFill: sizeValue = "cover"; break;
                             }
+
+                            string javaScriptCodeToExecute = string.Empty;
+                            string settingProperties = string.Empty;
+                            settingProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(sizeValue)};";
+                            settingProperties += $"element.style.backgroundRepeat = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("no-repeat")};";
+                            settingProperties += $"element.style.backgroundPosition = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("center center")};";
+                            string uid = ((INTERNAL_HtmlDomElementReference)panel.INTERNAL_OuterDomElement).UniqueIdentifier;
+                            javaScriptCodeToExecute = $@"var element = document.getElementById(""{uid}"");if (element) {{ {settingProperties} }};";
+                            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+
+                            //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundSize" }, sizeValue);
+                            //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundRepeat" }, "no-repeat");
+                            //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundPosition" }, "center center");
                         }
                         UIElement.SetPointerEvents(panel);
                     },
@@ -313,7 +330,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if ((_uiElementCollection == null) || (_uiElementCollection.LogicalParent != logicalParent))
             {
-                if (_uiElementCollection != null)
+                if (_uiElementCollection != null)   
                 {
                     _uiElementCollection.CollectionChanged -= new NotifyCollectionChangedEventHandler(OnChildrenCollectionChanged);
                 }
