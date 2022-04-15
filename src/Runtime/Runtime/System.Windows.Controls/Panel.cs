@@ -249,7 +249,27 @@ namespace Windows.UI.Xaml.Controls
                     },
                     MethodToUpdateDom = (d, e) =>
                     {
-                        UIElement.SetPointerEvents((Panel)d);
+                        var panel = (Panel)d;
+                        if (e is ImageBrush ib && ib != null)
+                        {
+                            string cssSize = "auto";
+                            switch (ib.Stretch)
+                            {
+                                case Stretch.Fill: cssSize = "100% 100%"; break;
+                                case Stretch.Uniform: cssSize = "contain"; break;
+                                case Stretch.UniformToFill: cssSize = "cover"; break;
+                            }
+
+                            string javaScriptCodeToExecute = string.Empty;
+                            string settingProperties = string.Empty;
+                            settingProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(cssSize)};";
+                            settingProperties += $"element.style.backgroundRepeat = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("no-repeat")};";
+                            settingProperties += $"element.style.backgroundPosition = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("center center")};";
+                            string uid = ((INTERNAL_HtmlDomElementReference)panel.INTERNAL_OuterDomElement).UniqueIdentifier;
+                            javaScriptCodeToExecute = $@"var element = document.getElementById(""{uid}"");if (element) {{ {settingProperties} }};";
+                            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                        }
+                        UIElement.SetPointerEvents(panel);
                     },
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
