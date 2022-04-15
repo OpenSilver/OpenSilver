@@ -252,27 +252,22 @@ namespace Windows.UI.Xaml.Controls
                         var panel = (Panel)d;
                         if (e is ImageBrush ib && ib != null)
                         {
-                            string sizeValue = string.Empty;
+                            string cssSize = "auto";
                             switch (ib.Stretch)
                             {
-                                case Stretch.None: sizeValue = "auto"; break;
-                                case Stretch.Fill: sizeValue = "100% 100%"; break;
-                                case Stretch.Uniform: sizeValue = "contain"; break;
-                                case Stretch.UniformToFill: sizeValue = "cover"; break;
+                                case Stretch.Fill: cssSize = "100% 100%"; break;
+                                case Stretch.Uniform: cssSize = "contain"; break;
+                                case Stretch.UniformToFill: cssSize = "cover"; break;
                             }
 
                             string javaScriptCodeToExecute = string.Empty;
                             string settingProperties = string.Empty;
-                            settingProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(sizeValue)};";
+                            settingProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(cssSize)};";
                             settingProperties += $"element.style.backgroundRepeat = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("no-repeat")};";
                             settingProperties += $"element.style.backgroundPosition = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("center center")};";
                             string uid = ((INTERNAL_HtmlDomElementReference)panel.INTERNAL_OuterDomElement).UniqueIdentifier;
                             javaScriptCodeToExecute = $@"var element = document.getElementById(""{uid}"");if (element) {{ {settingProperties} }};";
                             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
-
-                            //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundSize" }, sizeValue);
-                            //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundRepeat" }, "no-repeat");
-                            //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundPosition" }, "center center");
                         }
                         UIElement.SetPointerEvents(panel);
                     },
@@ -330,7 +325,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if ((_uiElementCollection == null) || (_uiElementCollection.LogicalParent != logicalParent))
             {
-                if (_uiElementCollection != null)   
+                if (_uiElementCollection != null)
                 {
                     _uiElementCollection.CollectionChanged -= new NotifyCollectionChangedEventHandler(OnChildrenCollectionChanged);
                 }
