@@ -249,7 +249,15 @@ namespace Windows.UI.Xaml.Controls
                     },
                     MethodToUpdateDom = (d, e) =>
                     {
-                        UIElement.SetPointerEvents((Panel)d);
+                        var panel = (Panel)d;
+                        if (e is ImageBrush ib && ib != null)
+                        {
+                            if (ib.Stretch == Stretch.Fill)
+                            {
+                                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(panel.INTERNAL_OuterDomElement, new List<string> { "backgroundSize" }, "100% 100%");
+                            }
+                        }
+                        UIElement.SetPointerEvents(panel);
                     },
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
