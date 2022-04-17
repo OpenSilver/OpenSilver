@@ -43,15 +43,21 @@ namespace Windows.UI.Xaml.Data
         {
             object oldSource = Source;
             Source = source;
-
-            //We need to handle when the source is a paged collection and use the current item as the source instead of the PagedCollection itself
-            if (Source is IPagedCollectionView && Source is ICollectionView)
-            {
-                Source = (Source as ICollectionView).CurrentItem;
-            }
-
             if (oldSource != Source)
             {
+                //We need to handle when the source is a paged collection and use the current item as the source instead of the PagedCollection itself
+                if (source is IPagedCollectionView && source is ICollectionView)
+                {
+                    if (!(Listener._expr.ParentBinding.Path == null || string.IsNullOrEmpty(Listener._expr.ParentBinding.Path.Path)))  //we only handle this way when a binding path has been set
+                    {
+                        (source as PagedCollectionView).CollectionChanged += (sender, e) =>
+                        {
+                            SetSource((source as ICollectionView).CurrentItem);
+                        };
+                        Source = (source as ICollectionView).CurrentItem;
+                    }
+                }
+
                 OnSourceChanged(oldSource, Source);
             }
 
@@ -75,7 +81,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         internal abstract void OnSourceChanged(object oldSource, object newSource);
-        
+
         internal abstract void UpdateValue();
 
         internal abstract void SetValue(object value);
