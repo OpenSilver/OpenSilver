@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 #if MIGRATION
@@ -46,11 +47,11 @@ namespace Windows.UI.Xaml.Data
             if (oldSource != Source)
             {
                 //We need to handle when the source is a paged collection and use the current item as the source instead of the PagedCollection itself
-                if (source is IPagedCollectionView && source is ICollectionView)
+                if (source is IPagedCollectionView && source is ICollectionView && source is INotifyCollectionChanged)
                 {
                     if (!(Listener._expr.ParentBinding.Path == null || string.IsNullOrEmpty(Listener._expr.ParentBinding.Path.Path)))  //we only handle this way when a binding path has been set
                     {
-                        (source as PagedCollectionView).CollectionChanged += (sender, e) =>
+                        (source as INotifyCollectionChanged).CollectionChanged += (sender, e) =>
                         {
                             SetSource((source as ICollectionView).CurrentItem);
                         };
