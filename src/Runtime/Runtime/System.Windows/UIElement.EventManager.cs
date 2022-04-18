@@ -83,7 +83,7 @@ namespace Windows.UI.Xaml
                     keyboardTarget.ProcessOnFocusOut(jsEventArg);
                     break;
 
-                case "input":
+                case "keypress":
                     keyboardTarget.ProcessOnInput(jsEventArg);
                     break;
             }
@@ -414,11 +414,13 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnInput(object jsEventArg)
         {
-            string inputText = OpenSilver.Interop.ExecuteJavaScript("$0.data", jsEventArg).ToString();
-            if (inputText == null)
+            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
             {
                 return;
             }
+
+            string inputText = string.Empty;
+            inputText += (char)keyCode;
 
             TextCompositionEventArgs e = new TextCompositionEventArgs
             {
@@ -430,6 +432,11 @@ namespace Windows.UI.Xaml
             };
 
             RaiseEvent(e);
+
+            if (this is Controls.TextBoxView)
+            {
+                OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+            }
         }
 
         private void ProcessOnKeyDown(object jsEventArg)

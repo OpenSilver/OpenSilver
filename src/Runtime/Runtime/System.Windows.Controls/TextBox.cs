@@ -500,7 +500,24 @@ namespace Windows.UI.Xaml.Controls
                     _textViewHost.View.NEW_SET_SELECTION(SelectionStart, SelectionStart + value);
                 }
             }
-        }        
+        }
+
+        // It needs to get caret position for selection with Shift key
+        public int CaretPosition
+        {
+            get
+            {
+                int caret;
+                if (_textViewHost != null)
+                {
+                    _textViewHost.View.GetCaretPosition(out caret);
+                    return caret;
+                }
+
+                return 0;
+            }
+            set {  }
+        }
 
         /// <summary>
         /// Occurs when the text is changed.
@@ -589,24 +606,122 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Handled)
+                return;
+
+            base.OnKeyDown(e);
+
+            if (e.Key == Key.Left || e.Key == Key.Right)
+            {
+                if (e.KeyModifiers == ModifierKeys.None)
+                {
+                    if (SelectionLength > 0)
+                    {
+                        if (e.Key == Key.Left)
+                            Select(SelectionStart, 0);
+                        else
+                            Select(SelectionStart + SelectionLength, 0);
+
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        if (e.Key == Key.Left && SelectionStart > 0)
+                        {
+                            Select(SelectionStart - 1, 0);
+                            e.Handled = true;
+                        }
+                        else if (e.Key == Key.Right && SelectionStart < Text.Length)
+                        {
+                            Select(SelectionStart + 1, 0);
+                            e.Handled = true;
+                        }
+                    }
+                }
+                else if (e.KeyModifiers == ModifierKeys.Control)
+                {
+                    Console.WriteLine("Control");
+
+                }
+                else if (e.KeyModifiers == ModifierKeys.Shift)
+                {
+                    int caret = CaretPosition;
+                    int selectionStartWithDirection = SelectionStart;
+                    int selectionEndWithDirection = SelectionStart + SelectionLength;
+
+                    if (caret != selectionEndWithDirection)
+                    {
+                        // Selection direction is backward
+                        int tmp = selectionEndWithDirection;
+                        selectionEndWithDirection = selectionStartWithDirection;
+                        selectionStartWithDirection = tmp;
+                    }
+
+                    if (e.Key == Key.Left && selectionEndWithDirection > 0)
+                    {
+                        selectionEndWithDirection--;
+                        
+                        Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
+                        
+                        e.Handled = true;
+                    }
+                    else if (e.Key == Key.Right && selectionEndWithDirection < Text.Length)
+                    {
+                        selectionEndWithDirection++;
+                        Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
+                        
+                        e.Handled = true;
+                    }
+
+                    // Console.WriteLine($"Shift Handled {e.Handled} caret {caret}->{CaretPosition}, ({SelectionStart}, {SelectionLength})");
+                }
+                else if (e.KeyModifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                {
+                    Console.WriteLine("Control + Shift");
+                }
+            }
+
+            if (e.Key == Key.Up || e.Key == Key.Down)
+            {
+                // Todo
+            }
+        }
+
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
+            if (e.Handled)
+                return;
+
             base.OnTextInput(e);
-            
-            e.Handled = true;
+
+            if (this.IsReadOnly)
+                return;
+
+            if (this.MaxLength != 0 && Text.Length - SelectionLength >= this.MaxLength)
+                return;
+
+            if (e.Text == "\r")
+            {
+                if (this.AcceptsReturn == false)
+                    return;
+            }
 
             if (_textViewHost != null)
             {
                 _isProcessingInput = true;
                 try
                 {
-                    SetCurrentValue(TextProperty, _textViewHost.View.GetText());
+                    this.SelectedText = e.Text;
                 }
                 finally
                 {
                     _isProcessingInput = false;
                 }
             }
+
+            e.Handled = true;
         }
 
         /// <summary>
@@ -614,19 +729,12 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void SelectAll()
         {
-            this.SelectionStart = 0;
-            this.SelectionLength = this.Text.Length;
+            Select(0, this.Text.Length);
         }
 
         public void Select(int start, int length)
         {
-            if (start < 0)
-                throw new ArgumentOutOfRangeException(nameof(start));
-            if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-
-            SelectionStart = start;
-            SelectionLength = length;
+            _textViewHost.View.NEW_SET_SELECTION(start, start + length);
         }
 
         protected override Size MeasureOverride(Size availableSize)

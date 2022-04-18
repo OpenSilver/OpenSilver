@@ -383,15 +383,25 @@ return globalIndexes;
                 return;
 
             OpenSilver.Interop.ExecuteJavaScriptAsync(@"
-var range = document.createRange();
-var sel = window.getSelection();
+var sel = window.getSelection()
 var nodesAndOffsets = {}; //this will hold the nodes and offsets useful to set the range's start and end.
 document.getRangeStartAndEnd($0, true, 0, $1, $2, nodesAndOffsets, false, false)
-range.setStart(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset']);
-range.setEnd(nodesAndOffsets['endParent'], nodesAndOffsets['endOffset']);
-sel.removeAllRanges();
-sel.addRange(range);
+sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset'], nodesAndOffsets['endParent'], nodesAndOffsets['endOffset'])
 ", _contentEditableDiv, startIndex, endIndex);
+        }
+
+        internal void GetCaretPosition(out int caretPosition)
+        {
+
+            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                caretPosition = 0;
+                return;
+            }
+
+            var result = OpenSilver.Interop.ExecuteJavaScript(@"document.getCaretPosition($0)", _contentEditableDiv);
+
+            caretPosition = CastToInt(result);
         }
 
         private object AddContentEditableDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -649,7 +659,8 @@ element.setAttribute(""data-acceptsreturn"", ""{this.Host.AcceptsReturn.ToString
 element.setAttribute(""data-maxlength"", ""{this.Host.MaxLength}"");
 element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
 element.setAttribute(""data-acceptstab"", ""{this.Host.AcceptsTab.ToString().ToLower()}"");");
-
+                
+                /*
                 // Register the "keydown" javascript event:
                 INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
 var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
@@ -721,6 +732,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             return false;
     }}
 }}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
+                */
             }
 #endif
 
