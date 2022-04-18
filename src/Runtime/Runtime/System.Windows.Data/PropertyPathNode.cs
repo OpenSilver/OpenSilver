@@ -23,6 +23,7 @@ namespace Windows.UI.Xaml.Data
 {
     internal abstract class PropertyPathNode
     {
+        private INotifyCollectionChanged _originalSourcePagedCollection;
         protected PropertyPathNode(PropertyPathWalker listener)
         {
             Listener = listener;
@@ -40,10 +41,18 @@ namespace Windows.UI.Xaml.Data
 
         public abstract Type Type { get; }
 
+
+
         internal void SetSource(object source)
         {
+            if (_originalSourcePagedCollection != null && source == null)    //when detaching a previous binding we unsubscribe
+            {
+                _originalSourcePagedCollection.CollectionChanged -= _originalSourcePagedCollection_CollectionChanged;
+            }
+
             object oldSource = Source;
             Source = source;
+
             if (oldSource != Source)
             {
                 //We need to handle when the source is a paged collection and use the current item as the source instead of the PagedCollection itself
@@ -51,10 +60,8 @@ namespace Windows.UI.Xaml.Data
                 {
                     if (!(Listener._expr.ParentBinding.Path == null || string.IsNullOrEmpty(Listener._expr.ParentBinding.Path.Path)))  //we only handle this way when a binding path has been set
                     {
-                        (source as INotifyCollectionChanged).CollectionChanged += (sender, e) =>
-                        {
-                            SetSource((source as ICollectionView).CurrentItem);
-                        };
+                        _originalSourcePagedCollection = source as INotifyCollectionChanged;
+                        _originalSourcePagedCollection.CollectionChanged += _originalSourcePagedCollection_CollectionChanged;
                         Source = (source as ICollectionView).CurrentItem;
                     }
                 }
@@ -68,6 +75,11 @@ namespace Windows.UI.Xaml.Data
             {
                 Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value);
             }
+        }
+
+        private void _originalSourcePagedCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SetSource((_originalSourcePagedCollection as ICollectionView).CurrentItem);
         }
 
         internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
