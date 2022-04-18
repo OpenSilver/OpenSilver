@@ -138,6 +138,10 @@ namespace CSHTML5.Internal
 
         public string background { set { SetStylePropertyValue("background", value); } }
         public string backgroundColor { set { SetStylePropertyValue("backgroundColor", value); } }
+        public string backgroundSize { set { SetStylePropertyValue("backgroundSize", value); } }
+        public string backgroundRepeat { set { SetStylePropertyValue("backgroundRepeat", value); } }
+        public string backgroundPosition { set { SetStylePropertyValue("backgroundPosition", value); } }
+
         public string border { set { SetStylePropertyValue("border", value); } }
         public string borderRight { set { SetStylePropertyValue("borderRight", value); } }
         public string borderLeft { set { SetStylePropertyValue("borderLeft", value); } }
