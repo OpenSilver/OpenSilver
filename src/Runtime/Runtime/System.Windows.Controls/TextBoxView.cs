@@ -30,7 +30,6 @@ namespace Windows.UI.Xaml.Controls
     internal class TextBoxView : FrameworkElement, ITextBoxView
     {
         private object _contentEditableDiv;
-        private bool _isUpdatingDOM;
 
         internal TextBoxView(TextBox host)
         {
@@ -485,16 +484,6 @@ sel.addRange(range);
                     InternetExplorer_RaiseTextChangedIfNecessary();
                 }));
             }
-            else
-            {
-                //-----------------------
-                // Modern browsers
-                //-----------------------
-                INTERNAL_EventsHelper.AttachToDomEvents("input", contentEditableDiv, (Action<object>)(e =>
-                {
-                    TextAreaValueChanged();
-                }));
-            }
 
             //-----------------------
             // Prevent pressing Enter for line break when "AcceptsReturn" is false and prevent pressing any other key than backspace when "MaxLength" is reached:
@@ -850,27 +839,17 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
             return outerDiv;
         }
 
-        private void TextAreaValueChanged()
+        internal string GetText()
         {
-            //we get the value:
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            string text = INTERNAL_HtmlDomManager.GetTextBoxText(INTERNAL_InnerDomElement) ?? string.Empty;
+            if (!Host.AcceptsReturn)
             {
-                var text = INTERNAL_HtmlDomManager.GetTextBoxText(this.INTERNAL_InnerDomElement) ?? string.Empty;
-
-                if (!this.Host.AcceptsReturn) // This is just in case the user managed to enter multi-line text in a single-line textbox. It can happen (due to a bug) when pasting multi-line text under Interned Explorer 10.
-                    text = text.Replace("\n", "").Replace("\r", "");
-
-                _isUpdatingDOM = true;
-
-                try
-                {
-                    Host.SetCurrentValue(TextBox.TextProperty, text); //we call SetCurrentValue directly to avoid replacing the BindingExpression
-                }
-                finally
-                {
-                    _isUpdatingDOM = false;
-                }
+                // This is just in case the user managed to enter multi-line text in a single-line textbox.
+                // It can happen (due to a bug) when pasting multi-line text under Interned Explorer 10.
+                text = text.Replace('\n', '\0').Replace('\r', '\0');
             }
+
+            return text;
         }
 
         private void UpdateDomText(string text)
@@ -878,14 +857,14 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
             if (INTERNAL_OuterDomElement != null &&
                 Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier))
             {
-                if (_isUpdatingDOM || _contentEditableDiv == null)
+                if (_contentEditableDiv == null)
                     return;
 
                 INTERNAL_HtmlDomManager.SetContentString(this, text);
                 return;
             }
 
-            if (_isUpdatingDOM || _contentEditableDiv == null)
+            if (_contentEditableDiv == null)
                 return;
 
             INTERNAL_HtmlDomManager.SetContentString(this, Host.Text);
