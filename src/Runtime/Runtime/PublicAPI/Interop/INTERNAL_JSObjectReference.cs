@@ -17,6 +17,7 @@
 using Bridge;
 using DotNetBrowser;
 #else
+using CSHTML5.Internal;
 using JSIL.Meta;
 #endif
 
@@ -290,6 +291,12 @@ namespace CSHTML5.Types
         {
             object actualValue = this.GetActualValue();
             return (actualValue != null ? actualValue.ToString() : null);
+        }
+
+        ~INTERNAL_JSObjectReference()
+        {
+            // Removing itself from JS dict used for C# to JS Interops, otherwise dict keeps growing. Needs more testing
+            INTERNAL_HtmlDomManager.ExecuteJavaScript($@"if (""{ReferenceId}"" in document.jsObjRef) delete document.jsObjRef[""{ReferenceId}""]");
         }
 
 #region IConvertible implementation
