@@ -183,8 +183,10 @@ namespace CSHTML5.Internal
                 var elementToDetach = elementsQueue.Dequeue();
                 if (elementToDetach.INTERNAL_VisualChildrenInformation != null)
                 {
-                    var elementTodetachChildren = elementToDetach.INTERNAL_VisualChildrenInformation.Select(kp => kp.Value);
-                    elementTodetachChildren.ForEach(q => elementsQueue.Enqueue(q.INTERNAL_UIElement));
+                    foreach (var pair in elementToDetach.INTERNAL_VisualChildrenInformation)
+                    {
+                        elementsQueue.Enqueue(pair.Value.INTERNAL_UIElement);
+                    }
                 }
                 DetachElement(elementToDetach);
             }
