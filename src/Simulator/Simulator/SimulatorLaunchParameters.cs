@@ -22,9 +22,13 @@ namespace CSHTML5.Simulator
         public Action AppStartedCallback { get; set; }
 
         /// <summary>
-        /// Sets or gets custom cookies to the simulator
+        /// Gets or sets custom cookies to the simulator
         /// </summary>
-        public  IList<CookieData> CookiesData { get; set; }
-    
+        public IList<CookieData> CookiesData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the argument parameters for the App constructor
+        /// </summary>
+        public object[] ConstructorArguments { get; set; }
     }
 }

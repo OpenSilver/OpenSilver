@@ -1148,7 +1148,15 @@ Click OK to continue.";
             // Create a new instance of the application:
             try
             {
-                Activator.CreateInstance(_applicationType);
+                if (_simulatorLaunchParameters?.ConstructorArguments?.Length > 0)
+                {
+                    Activator.CreateInstance(_applicationType, _simulatorLaunchParameters.ConstructorArguments);
+                }
+                else
+                {
+                    Activator.CreateInstance(_applicationType);
+                }
+
                 return true;
             }
             catch (Exception ex)
