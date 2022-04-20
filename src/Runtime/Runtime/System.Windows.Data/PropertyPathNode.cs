@@ -41,8 +41,6 @@ namespace Windows.UI.Xaml.Data
 
         public abstract Type Type { get; }
 
-
-
         internal void SetSource(object source)
         {
             if (_originalSourceCollection != null && source == null)    //when detaching a previous binding we unsubscribe
