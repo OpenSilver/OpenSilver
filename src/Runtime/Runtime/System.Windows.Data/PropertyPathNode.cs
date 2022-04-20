@@ -23,7 +23,7 @@ namespace Windows.UI.Xaml.Data
 {
     internal abstract class PropertyPathNode
     {
-        private INotifyCollectionChanged _originalSourcePagedCollection;
+        private ICollectionView _originalSourceCollection;
         protected PropertyPathNode(PropertyPathWalker listener)
         {
             Listener = listener;
@@ -45,9 +45,9 @@ namespace Windows.UI.Xaml.Data
 
         internal void SetSource(object source)
         {
-            if (_originalSourcePagedCollection != null && source == null)    //when detaching a previous binding we unsubscribe
+            if (_originalSourceCollection != null && source == null)    //when detaching a previous binding we unsubscribe
             {
-                _originalSourcePagedCollection.CollectionChanged -= _originalSourcePagedCollection_CollectionChanged;
+                _originalSourceCollection.CurrentChanged -= _originalSourceCollection_CurrentChanged;
             }
 
             object oldSource = Source;
@@ -55,14 +55,17 @@ namespace Windows.UI.Xaml.Data
 
             if (oldSource != Source)
             {
-                //We need to handle when the source is a paged collection and use the current item as the source instead of the PagedCollection itself
-                if (source is IPagedCollectionView && source is ICollectionView && source is INotifyCollectionChanged)
+                //We need to handle when the source is an ICollectionView and use the current item as the source instead of the collection itself
+                if (source is ICollectionView)
                 {
                     if (!(Listener._expr.ParentBinding.Path == null || string.IsNullOrEmpty(Listener._expr.ParentBinding.Path.Path)))  //we only handle this way when a binding path has been set
                     {
-                        _originalSourcePagedCollection = source as INotifyCollectionChanged;
-                        _originalSourcePagedCollection.CollectionChanged += _originalSourcePagedCollection_CollectionChanged;
-                        Source = (source as ICollectionView).CurrentItem;
+                        if (!FindBindingPathOnSource(source))
+                        {
+                            _originalSourceCollection = source as ICollectionView;
+                            _originalSourceCollection.CurrentChanged += _originalSourceCollection_CurrentChanged;
+                            Source = _originalSourceCollection.CurrentItem;
+                        }
                     }
                 }
 
@@ -77,10 +80,12 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        private void _originalSourcePagedCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void _originalSourceCollection_CurrentChanged(object sender, EventArgs e)
         {
-            SetSource((_originalSourcePagedCollection as ICollectionView).CurrentItem);
+            SetSource(_originalSourceCollection.CurrentItem);
         }
+
+        protected virtual bool FindBindingPathOnSource(object source) { return false; }
 
         internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
         {

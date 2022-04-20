@@ -177,7 +177,12 @@ namespace Windows.UI.Xaml.Data
                 inpc.PropertyChanged += new PropertyChangedEventHandler(OnSourcePropertyChanged);
             }
 
-            if (newValue is DependencyObject sourceDO)
+            FindBindingPathOnSource(newValue);
+        }
+
+        protected override bool FindBindingPathOnSource(object source)
+        {
+            if (source is DependencyObject sourceDO)
             {
                 Type type = _resolvedType ?? Source.GetType();
 
@@ -186,7 +191,7 @@ namespace Windows.UI.Xaml.Data
                 if (dependencyProperty != null)
                 {
                     _dp = dependencyProperty;
-                    _dpListener = listener = INTERNAL_PropertyStore.ListenToChanged(sourceDO, dependencyProperty, OnPropertyChanged);
+                    _dpListener = INTERNAL_PropertyStore.ListenToChanged(sourceDO, dependencyProperty, OnPropertyChanged);
                 }
             }
 
@@ -212,6 +217,8 @@ namespace Windows.UI.Xaml.Data
                     _field = sourceType.GetField(_propertyName);
                 }
             }
+
+            return _dp != null || _prop != null;
         }
 
         private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
