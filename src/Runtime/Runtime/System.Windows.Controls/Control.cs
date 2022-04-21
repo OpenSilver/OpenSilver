@@ -105,6 +105,11 @@ namespace Windows.UI.Xaml.Controls
             UpdateVisualStates();
         }
 
+        internal override NativeEventsManager CreateEventsManager()
+        {
+            return new NativeEventsManager(this, this, this, true);
+        }
+
         //-----------------------
         // BACKGROUND
         //-----------------------

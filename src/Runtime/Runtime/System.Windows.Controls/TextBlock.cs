@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Documents;
@@ -79,6 +80,11 @@ namespace Windows.UI.Xaml.Controls
             divStyle.boxSizing = "border-box";
             domElementWhereToPlaceChildren = div;
             return div;
+        }
+
+        internal sealed override NativeEventsManager CreateEventsManager()
+        {
+            return new NativeEventsManager(this, this, this, false);
         }
 
         internal override bool EnablePointerEventsCore

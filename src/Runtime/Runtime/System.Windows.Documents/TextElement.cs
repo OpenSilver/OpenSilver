@@ -12,6 +12,7 @@
 *  
 \*====================================================================================*/
 
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -32,6 +33,11 @@ namespace Windows.UI.Xaml.Documents
     /// </summary>
     public abstract partial class TextElement : Control
     {
+        internal override NativeEventsManager CreateEventsManager()
+        {
+            return null;
+        }
+
         internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
         {
             // we don't do anything since TextElement is not supposed to be a Control in the first place

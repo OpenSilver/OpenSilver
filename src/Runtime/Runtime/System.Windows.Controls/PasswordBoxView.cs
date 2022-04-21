@@ -13,6 +13,7 @@
 
 using System;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -78,6 +79,11 @@ namespace Windows.UI.Xaml.Controls
             OpenSilver.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)PasswordBox_GotFocus);
 
             UpdateDOMPassword(Host.Password);
+        }
+
+        internal sealed override NativeEventsManager CreateEventsManager()
+        {
+            return new NativeEventsManager(this, this, Host, true);
         }
 
         internal override bool EnablePointerEventsCore => true;

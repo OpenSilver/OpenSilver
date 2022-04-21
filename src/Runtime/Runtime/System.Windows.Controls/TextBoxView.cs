@@ -150,6 +150,11 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        internal sealed override NativeEventsManager CreateEventsManager()
+        {
+            return new NativeEventsManager(this, this, Host, true);
+        }
+
         internal override object GetDomElementToSetContentString()
         {
             if (_contentEditableDiv != null)

@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -1009,10 +1010,15 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        internal virtual NativeEventsManager CreateEventsManager()
+        {
+            return new NativeEventsManager(this, this, this, false);
+        }
+
         public virtual void INTERNAL_AttachToDomEvents()
         {
-            _eventsManager = new NativeEventsManager(this);
-            _eventsManager.AttachEvents();
+            _eventsManager = CreateEventsManager();
+            _eventsManager?.AttachEvents();
         }
 
         public virtual void INTERNAL_DetachFromDomEvents()
