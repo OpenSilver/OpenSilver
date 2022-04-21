@@ -29,7 +29,7 @@ namespace Windows.UI.Xaml.Data
     {
         private readonly string _path;
         private readonly PropertyPathNode _firstNode;
-        internal readonly BindingExpression _expr;
+        private readonly BindingExpression _expr;
         private object _source;
 
         internal PropertyPathWalker(BindingExpression be)

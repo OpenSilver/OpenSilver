@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
 
 #if MIGRATION
@@ -23,7 +22,8 @@ namespace Windows.UI.Xaml.Data
 {
     internal abstract class PropertyPathNode
     {
-        private ICollectionView _originalSourceCollection;
+        private ICollectionView _icv;
+
         protected PropertyPathNode(PropertyPathWalker listener)
         {
             Listener = listener;
@@ -41,49 +41,60 @@ namespace Windows.UI.Xaml.Data
 
         public abstract Type Type { get; }
 
-        internal void SetSource(object source)
+        public abstract bool IsBound { get; }
+
+        internal void SetSource(object source) => SetSource(source, false);
+
+        private void SetSource(object source, bool sourceIsCurrentItem)
         {
-            if (_originalSourceCollection != null && source == null)    //when detaching a previous binding we unsubscribe
-            {
-                _originalSourceCollection.CurrentChanged -= _originalSourceCollection_CurrentChanged;
-            }
-
-            object oldSource = Source;
-            Source = source;
-
-            if (oldSource != Source)
-            {
-                //We need to handle when the source is an ICollectionView and use the current item as the source instead of the collection itself
-                if (source is ICollectionView)
-                {
-                    if (!(Listener._expr.ParentBinding.Path == null || string.IsNullOrEmpty(Listener._expr.ParentBinding.Path.Path)))  //we only handle this way when a binding path has been set
-                    {
-                        if (!FindBindingPathOnSource(source))
-                        {
-                            _originalSourceCollection = source as ICollectionView;
-                            _originalSourceCollection.CurrentChanged += _originalSourceCollection_CurrentChanged;
-                            Source = _originalSourceCollection.CurrentItem;
-                        }
-                    }
-                }
-
-                OnSourceChanged(oldSource, Source);
-            }
+            UpdateSource(source, sourceIsCurrentItem);
 
             UpdateValue();
 
             if (Next != null)
             {
-                Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value);
+                Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value, false);
             }
         }
 
-        private void _originalSourceCollection_CurrentChanged(object sender, EventArgs e)
+        private void UpdateSource(object source, bool sourceIsCurrentItem)
         {
-            SetSource(_originalSourceCollection.CurrentItem);
+            object oldSource = Source;
+            Source = source;
+
+            if (oldSource != Source)
+            {
+                OnSourceChanged(oldSource, source, sourceIsCurrentItem);
+            }
         }
 
-        protected virtual bool FindBindingPathOnSource(object source) { return false; }
+        private void OnSourceChanged(object oldSource, object newSource, bool sourceIsCurrentItem)
+        {
+            if (!sourceIsCurrentItem && _icv != null)
+            {
+                _icv.CurrentChanged -= new EventHandler(OnCurrentChanged);
+                _icv = null;
+            }
+
+            OnSourceChanged(oldSource, Source);
+
+            if (!sourceIsCurrentItem && !IsBound && newSource is ICollectionView icv)
+            {
+                _icv = icv;
+                icv.CurrentChanged += new EventHandler(OnCurrentChanged);
+                UpdateSource(icv.CurrentItem, true);
+            }
+        }
+
+        private void OnCurrentChanged(object sender, EventArgs e)
+        {
+            if (_icv == null || !Listener.ListenForChanges)
+            {
+                return;
+            }
+
+            SetSource(_icv.CurrentItem, true);
+        }
 
         internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
         {
