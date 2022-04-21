@@ -249,10 +249,41 @@ namespace Windows.UI.Xaml.Controls
                     },
                     MethodToUpdateDom = (d, e) =>
                     {
-                        UIElement.SetPointerEvents((Panel)d);
+                        var panel = (Panel)d;
+                        if (e is ImageBrush imageBrush)
+                        {
+                            SetImageBrushRelatedBackgroundProperties(panel, imageBrush);
+                        }
+                        UIElement.SetPointerEvents(panel);
                     },
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
+
+        /// <summary>
+        /// If the Background property of some controls (Panel, Border) is ImageBrush, 
+        /// to visualize similar as SilverLight for varisous Stretch values we need to set
+        /// HTML tag's background-size, background-repeat and background-position values.
+        /// </summary>
+        /// <param name="element">The UIElement to which we are setting background image</param>
+        /// <param name="imageBrush">The ImageBrush</param>
+        internal static void SetImageBrushRelatedBackgroundProperties(UIElement element, ImageBrush imageBrush)
+        {
+            string cssSize = "auto";
+            switch (imageBrush.Stretch)
+            {
+                case Stretch.Fill: cssSize = "100% 100%"; break;
+                case Stretch.Uniform: cssSize = "contain"; break;
+                case Stretch.UniformToFill: cssSize = "cover"; break;
+            }
+
+            string domUid = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
+            string backProperties = $"e.style.backgroundSize = \"{cssSize}\";" +
+                "e.style.backgroundRepeat = \"no-repeat\";" +
+                "e.style.backgroundPosition = \"center center\";";
+
+            string javaScriptCodeToExecute = $"var e = document.getElementById(\"{domUid}\");if (e) {{ {backProperties} }};";
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
 
         /// <summary>
         /// Gets the collection of child elements of the panel.
