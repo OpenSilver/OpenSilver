@@ -43,8 +43,6 @@ namespace Windows.UI.Xaml
     public partial class Window : FrameworkElement
 #endif
     {
-        private readonly UIElement _textMeasurementElement = new Control();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Window"/> class.
         /// </summary>
@@ -284,8 +282,7 @@ namespace Windows.UI.Xaml
                     }
                 }
 
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_textMeasurementElement, this);
-                Application.Current.TextMeasurementService.CreateMeasurementText(_textMeasurementElement);
+                Application.Current.TextMeasurementService.CreateMeasurementText(this);
 
                 /*
                 // Invalidate when content changed
