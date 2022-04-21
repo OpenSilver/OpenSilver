@@ -202,10 +202,9 @@ namespace Windows.UI.Xaml.Controls
                     MethodToUpdateDom = (d, e) =>
                     {
                         var border = (Border)d;
-                        if (e is ImageBrush imageBrush && imageBrush != null)
+                        if (e is ImageBrush imageBrush)
                         {
-                            Panel.SetImageBrushRelatedBackgroundProperties(imageBrush.Stretch,
-                                ((INTERNAL_HtmlDomElementReference)border.INTERNAL_OuterDomElement).UniqueIdentifier);
+                            Panel.SetImageBrushRelatedBackgroundProperties(border, imageBrush);
                         }
                         UIElement.SetPointerEvents(border);
                     },

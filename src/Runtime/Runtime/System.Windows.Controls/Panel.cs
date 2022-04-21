@@ -250,10 +250,9 @@ namespace Windows.UI.Xaml.Controls
                     MethodToUpdateDom = (d, e) =>
                     {
                         var panel = (Panel)d;
-                        if (e is ImageBrush imageBrush && imageBrush != null)
+                        if (e is ImageBrush imageBrush)
                         {
-                            SetImageBrushRelatedBackgroundProperties(imageBrush.Stretch, 
-                                ((INTERNAL_HtmlDomElementReference)panel.INTERNAL_OuterDomElement).UniqueIdentifier);
+                            SetImageBrushRelatedBackgroundProperties(panel, imageBrush);
                         }
                         UIElement.SetPointerEvents(panel);
                     },
@@ -265,23 +264,24 @@ namespace Windows.UI.Xaml.Controls
         /// to visualize similar as SilverLight for varisous Stretch values we need to set
         /// HTML tag's background-size, background-repeat and background-position values.
         /// </summary>
-        /// <param name="strech">The Stretch value of the brush</param>
-        /// <param name="domUid">The DOM id to which we are setting background image</param>
-        internal static void SetImageBrushRelatedBackgroundProperties(Stretch strech, string domUid)
+        /// <param name="element">The UIElement to which we are setting background image</param>
+        /// <param name="imageBrush">The ImageBrush</param>
+        internal static void SetImageBrushRelatedBackgroundProperties(UIElement element, ImageBrush imageBrush)
         {
             string cssSize = "auto";
-            switch (strech)
+            switch (imageBrush.Stretch)
             {
                 case Stretch.Fill: cssSize = "100% 100%"; break;
                 case Stretch.Uniform: cssSize = "contain"; break;
                 case Stretch.UniformToFill: cssSize = "cover"; break;
             }
 
-            string backProperties = string.Empty;
-            backProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(cssSize)};";
-            backProperties += $"element.style.backgroundRepeat = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("no-repeat")};";
-            backProperties += $"element.style.backgroundPosition = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("center center")};";
-            var javaScriptCodeToExecute = $@"var element = document.getElementById(""{domUid}"");if (element) {{ {backProperties} }};";
+            string domUid = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
+            string backProperties = $"e.style.backgroundSize = \"{cssSize}\";" +
+                "e.style.backgroundRepeat = \"no-repeat\";" +
+                "e.style.backgroundPosition = \"center center\";";
+
+            string javaScriptCodeToExecute = $"var e = document.getElementById(\"{domUid}\");if (e) {{ {backProperties} }};";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
