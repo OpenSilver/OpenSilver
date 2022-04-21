@@ -87,7 +87,11 @@ namespace Windows.UI.Xaml
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(associatedTextBox, parent);
             }
 
-            associatedTextBox = new TextBox();
+            associatedTextBox = new TextBox
+            {
+                // Prevent the TextBox from using an implicit style that could mess up the layout
+                Style = null
+            };
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBox, parent);
 
             bool hasMarginDiv = false;
@@ -120,7 +124,11 @@ namespace Windows.UI.Xaml
                 INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(associatedTextBlock, parent);
             }
 
-            associatedTextBlock = new TextBlock();
+            associatedTextBlock = new TextBlock
+            {
+                // Prevent the TextBlock from using an implicit style that could mess up the layout
+                Style = null
+            };
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(associatedTextBlock, parent);
 
             hasMarginDiv = false;
