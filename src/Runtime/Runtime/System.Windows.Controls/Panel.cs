@@ -250,29 +250,40 @@ namespace Windows.UI.Xaml.Controls
                     MethodToUpdateDom = (d, e) =>
                     {
                         var panel = (Panel)d;
-                        if (e is ImageBrush ib && ib != null)
+                        if (e is ImageBrush imageBrush && imageBrush != null)
                         {
-                            string cssSize = "auto";
-                            switch (ib.Stretch)
-                            {
-                                case Stretch.Fill: cssSize = "100% 100%"; break;
-                                case Stretch.Uniform: cssSize = "contain"; break;
-                                case Stretch.UniformToFill: cssSize = "cover"; break;
-                            }
-
-                            string javaScriptCodeToExecute = string.Empty;
-                            string settingProperties = string.Empty;
-                            settingProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(cssSize)};";
-                            settingProperties += $"element.style.backgroundRepeat = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("no-repeat")};";
-                            settingProperties += $"element.style.backgroundPosition = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("center center")};";
-                            string uid = ((INTERNAL_HtmlDomElementReference)panel.INTERNAL_OuterDomElement).UniqueIdentifier;
-                            javaScriptCodeToExecute = $@"var element = document.getElementById(""{uid}"");if (element) {{ {settingProperties} }};";
-                            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                            SetImageBrushRelatedBackgroundProperties(imageBrush.Stretch, 
+                                ((INTERNAL_HtmlDomElementReference)panel.INTERNAL_OuterDomElement).UniqueIdentifier);
                         }
                         UIElement.SetPointerEvents(panel);
                     },
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
+
+        /// <summary>
+        /// If the Background property of some controls (Panel, Border) is ImageBrush, 
+        /// to visualize similar as SilverLight for varisous Stretch values we need to set
+        /// HTML tag's background-size, background-repeat and background-position values.
+        /// </summary>
+        /// <param name="strech">The Stretch value of the brush</param>
+        /// <param name="domUid">The DOM id to which we are setting background image</param>
+        internal static void SetImageBrushRelatedBackgroundProperties(Stretch strech, string domUid)
+        {
+            string cssSize = "auto";
+            switch (strech)
+            {
+                case Stretch.Fill: cssSize = "100% 100%"; break;
+                case Stretch.Uniform: cssSize = "contain"; break;
+                case Stretch.UniformToFill: cssSize = "cover"; break;
+            }
+
+            string backProperties = string.Empty;
+            backProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(cssSize)};";
+            backProperties += $"element.style.backgroundRepeat = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("no-repeat")};";
+            backProperties += $"element.style.backgroundPosition = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("center center")};";
+            var javaScriptCodeToExecute = $@"var element = document.getElementById(""{domUid}"");if (element) {{ {backProperties} }};";
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
 
         /// <summary>
         /// Gets the collection of child elements of the panel.
