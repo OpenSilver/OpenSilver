@@ -75,6 +75,8 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
+        public override bool IsBound => _dp != null || _prop != null;
+
         internal override void SetValue(object value)
         {
             if (_dp != null)
