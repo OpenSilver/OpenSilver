@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
 namespace System.Windows.Data
 #else
@@ -20,29 +18,25 @@ namespace Windows.UI.Xaml.Data
 #endif
 {
     /// <summary>
-    /// This enum describes when updates (target-to-source data flow)
-    /// happen in a given Binding.
+    /// Defines constants that indicate when a binding source is updated by its binding
+    /// target in two-way binding.
     /// </summary>
     public enum UpdateSourceTrigger
     {
         /// <summary>
-        /// Obtain trigger from target property default
+        /// The binding source is updated automatically when the binding target value changes.
         /// </summary>
-        Default,
-
+        Default = 0,
         /// <summary>
-        /// Update whenever the target property changes
+        /// The binding source is updated whenever the binding target value changes. If the
+        /// binding target is a <see cref="Controls.TextBox"/>, it does not have to lose
+        /// focus for the changes to be detected.
         /// </summary>
-        PropertyChanged,
-
-        //// <summary>
-        //// Update only when target element loses focus, or when Binding deactivates
-        //// </summary>
-        //LostFocus,
-
+        PropertyChanged = 1,
         /// <summary>
-        /// Update only by explicit call to BindingExpression.UpdateSource()
+        /// The binding source is updated only when you call the <see cref="BindingExpression.UpdateSource"/>
+        /// method.
         /// </summary>
-        Explicit
+        Explicit = 3
     }
 }
