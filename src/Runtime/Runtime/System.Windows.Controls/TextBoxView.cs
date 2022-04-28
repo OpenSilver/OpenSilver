@@ -1001,6 +1001,19 @@ var range,selection;
             return false;
         }
 
+        internal void INTERNAL_CheckTextInputHandled(String inputText, bool handled, object jsEventArg)
+        {
+            bool multiLines = this.Host.Text.Contains("\r") || this.Host.Text.Contains("\n");
+            bool requireNewLine = inputText == "\r" && this.Host.AcceptsReturn;
+            if (handled == false && (requireNewLine || multiLines))
+            {
+                // Not implemented for multiple text lines
+                return;
+            }
+
+            OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;

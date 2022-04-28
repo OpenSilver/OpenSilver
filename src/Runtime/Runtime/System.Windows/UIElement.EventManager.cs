@@ -435,7 +435,7 @@ namespace Windows.UI.Xaml
 
             if (this is Controls.TextBoxView)
             {
-                OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+                (this as Controls.TextBoxView).INTERNAL_CheckTextInputHandled(e.Text, e.Handled, jsEventArg);
             }
         }
 

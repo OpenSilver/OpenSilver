@@ -613,6 +613,12 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnKeyDown(e);
 
+            if (this.Text.Contains("\r") || this.Text.Contains("\n"))
+            {
+                // Not implemented for multiple text lines
+                return;
+            }
+
             if (e.Key == Key.Left || e.Key == Key.Right)
             {
                 if (e.KeyModifiers == ModifierKeys.None)
@@ -639,11 +645,6 @@ namespace Windows.UI.Xaml.Controls
                             e.Handled = true;
                         }
                     }
-                }
-                else if (e.KeyModifiers == ModifierKeys.Control)
-                {
-                    Console.WriteLine("Control");
-
                 }
                 else if (e.KeyModifiers == ModifierKeys.Shift)
                 {
@@ -674,18 +675,20 @@ namespace Windows.UI.Xaml.Controls
                         
                         e.Handled = true;
                     }
-
-                    // Console.WriteLine($"Shift Handled {e.Handled} caret {caret}->{CaretPosition}, ({SelectionStart}, {SelectionLength})");
+                }
+                else if (e.KeyModifiers == ModifierKeys.Control)
+                {
+                    // Not implemented
                 }
                 else if (e.KeyModifiers == (ModifierKeys.Control | ModifierKeys.Shift))
                 {
-                    Console.WriteLine("Control + Shift");
+                    // Not implemented
                 }
             }
 
             if (e.Key == Key.Up || e.Key == Key.Down)
             {
-                // Todo
+                // Not implemented
             }
         }
 
@@ -697,15 +700,33 @@ namespace Windows.UI.Xaml.Controls
             base.OnTextInput(e);
 
             if (this.IsReadOnly)
+            {
+                e.Handled = true;
                 return;
+            }
 
             if (this.MaxLength != 0 && Text.Length - SelectionLength >= this.MaxLength)
+            {
+                e.Handled = true;
                 return;
+            }
 
             if (e.Text == "\r")
             {
                 if (this.AcceptsReturn == false)
+                {
+                    e.Handled = true;
                     return;
+                }
+
+                // Not implemented for multiple text lines
+                return;
+            }
+
+            if (this.Text.Contains("\r") || this.Text.Contains("\n"))
+            {
+                // Not implemented for multiple text lines
+                return;
             }
 
             if (_textViewHost != null)
