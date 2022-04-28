@@ -39,7 +39,7 @@ namespace DotNetForHtml5.Compiler
 
         static void TraverseNextElement(XElement currentElement, bool isInsideControlTemplate, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
-            if (currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ControlTemplate")
+            if (GeneratingCSharpCode.IsControlTemplate(currentElement))
             {
                 isInsideControlTemplate = true;
             }
@@ -47,7 +47,7 @@ namespace DotNetForHtml5.Compiler
             if (isInsideControlTemplate && !currentElement.Name.LocalName.Contains("."))
             {
                 bool isContentPresenter = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                    GeneratingCSharpCode.DefaultXamlNamespace.NamespaceName,
+                    GeneratingCSharpCode.DefaultXamlNamespace,
                     "ContentPresenter",
                     currentElement.Name.NamespaceName,
                     currentElement.Name.LocalName);
@@ -89,7 +89,7 @@ namespace DotNetForHtml5.Compiler
                         {
                             // Then make sure this is not an attached property.
                             bool isProperty = reflectionOnSeparateAppDomain.IsAssignableFrom(
-                                GeneratingCSharpCode.DefaultXamlNamespace.NamespaceName,
+                                GeneratingCSharpCode.DefaultXamlNamespace,
                                 "ContentPresenter",
                                 namespaceName,
                                 typeAndProperty[0]);

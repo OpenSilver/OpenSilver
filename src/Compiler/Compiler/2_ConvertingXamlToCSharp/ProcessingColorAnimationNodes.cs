@@ -41,7 +41,7 @@ namespace DotNetForHtml5.Compiler
         static void TraverseNextElement(XElement currentElement, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
         {
            
-            if (currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "ColorAnimation")
+            if (GeneratingCSharpCode.IsColorAnimation(currentElement))
             {
                 //Storyboard.TargetProperty="Background.Color"
                 XAttribute targetPropertyAttr = currentElement.Attribute("Storyboard.TargetProperty");

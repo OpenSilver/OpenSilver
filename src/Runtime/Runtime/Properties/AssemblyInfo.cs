@@ -73,6 +73,21 @@ using System.Runtime.InteropServices;
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Shapes")]
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Automation")]
 
+// http://schemas.microsoft.com/client/2007 is the default XAML namespace of Silverlight 1.0
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Controls")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Controls.Primitives")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Data")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Documents")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Input")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Markup")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Media")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Media.Animation")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Media.Effects")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Media.Imaging")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Shapes")]
+[assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/client/2007", "System.Windows.Automation")]
+
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Controls")]
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows.Controls.Primitives")]
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk", "System.Windows")]

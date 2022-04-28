@@ -86,10 +86,9 @@ namespace DotNetForHtml5.Compiler
 
             private string GenerateImpl(GeneratorContext parameters)
             {
-                PopulateDictionaryThatAssociatesNamesToUniqueNames(_reader.Document,
+                PopulateDictionaryThatAssociatesNamesToUniqueNames(
                     parameters.NamescopeRootToNameToUniqueNameDictionary,
-                    parameters.NamescopeRootToElementsUniqueNameToInstantiatedObjects,
-                    _reflectionOnSeparateAppDomain);
+                    parameters.NamescopeRootToElementsUniqueNameToInstantiatedObjects);
 
                 // Traverse the tree in "post order" (ie. start with child elements then traverse parent elements):
                 while (_reader.Read())
@@ -236,7 +235,7 @@ namespace DotNetForHtml5.Compiler
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
 
                 // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element, _reflectionOnSeparateAppDomain);
+                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
                 bool isElementInRootNamescope = (elementThatIsRootOfTheCurrentNamescope.Parent == null);
 
                 // Check if the element is the root element:
@@ -251,7 +250,7 @@ namespace DotNetForHtml5.Compiler
                 );
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
-                bool isResourceDictionary = element.Name == DefaultXamlNamespace + "ResourceDictionary";
+                bool isResourceDictionary = IsResourceDictionary(element);
                 bool isResourceDictionaryReferencedBySourceURI =
                     isResourceDictionary && element.Attribute("Source") != null;
 
@@ -724,7 +723,7 @@ namespace DotNetForHtml5.Compiler
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
 
                 // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element, _reflectionOnSeparateAppDomain);
+                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
 
                 // Get information about the parent element (to which the property applies) and the element itself:
                 var parentElement = element.Parent;
@@ -764,7 +763,7 @@ namespace DotNetForHtml5.Compiler
                     if (GettingInformationAboutXamlTypes.IsPropertyOrFieldACollection(element, _reflectionOnSeparateAppDomain, isAttachedProperty)
                         && (element.Elements().Count() != 1
                         || (!GettingInformationAboutXamlTypes.IsTypeAssignableFrom(element.Elements().First().Name, element.Name, _reflectionOnSeparateAppDomain, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
-                        && element.Elements().First().Name != DefaultXamlNamespace + "Binding"
+                        && !IsBinding(element.Elements().First())
                         && element.Elements().First().Name.LocalName != "StaticResourceExtension"
                         && element.Elements().First().Name.LocalName != "StaticResource"
                         && element.Elements().First().Name.LocalName != "TemplateBinding"
@@ -1258,15 +1257,14 @@ else
                 }
             }
 
-            private static void PopulateDictionaryThatAssociatesNamesToUniqueNames(XDocument doc,
+            private void PopulateDictionaryThatAssociatesNamesToUniqueNames(
                 Dictionary<XElement, Dictionary<string, string>> namescopeRootToNameToUniqueNameDictionary,
-                Dictionary<XElement, Dictionary<string, string>> namescopeRootToElementsUniqueNameToInstantiatedObjects,
-                ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+                Dictionary<XElement, Dictionary<string, string>> namescopeRootToElementsUniqueNameToInstantiatedObjects)
             {
-                foreach (var element in PostOrderTreeTraversal.TraverseTreeInPostOrder(doc.Root)) // Note: any order is fine here.
+                foreach (var element in PostOrderTreeTraversal.TraverseTreeInPostOrder(_reader.Document.Root)) // Note: any order is fine here.
                 {
                     // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                    XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element, reflectionOnSeparateAppDomain);
+                    XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
 
                     foreach (XAttribute attribute in element.Attributes())
                     {
@@ -1283,14 +1281,14 @@ else
                             if (element != elementThatIsRootOfTheCurrentNamescope)
                             {
                                 Dictionary<string, string> uniqueNameToInstantiatedObjectDictionary = GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToElementsUniqueNameToInstantiatedObjects);
-                                uniqueNameToInstantiatedObjectDictionary.Add(elementUniqueNameOrThisKeyword, GenerateCodeToInstantiateXElement(element, reflectionOnSeparateAppDomain));
+                                uniqueNameToInstantiatedObjectDictionary.Add(elementUniqueNameOrThisKeyword, GenerateCodeToInstantiateXElement(element, _reflectionOnSeparateAppDomain));
                             }
                         }
                     }
                 }
             }
 
-            private static XElement GetRootOfCurrentNamescopeForRuntime(XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+            private XElement GetRootOfCurrentNamescopeForRuntime(XElement element)
             {
                 XElement currentElement = element;
                 while (currentElement.Parent != null)
@@ -1303,7 +1301,7 @@ else
                         string propertyName = currentElement.Parent.Name.LocalName.Substring(index + 1);
 
                         if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                            reflectionOnSeparateAppDomain.IsAssignableFrom(DefaultXamlNamespace.NamespaceName, "FrameworkTemplate",
+                            _reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkTemplate",
                             namespaceName, typeName))
                         {
                             return currentElement;
@@ -1622,13 +1620,12 @@ return {templateInstanceUniqueName};
                 {
                     return element.Attribute(xNamespace + "Name").Value;
                 }
-                else if (element.Name == DefaultXamlNamespace + "Style")
+                else if (IsStyle(element))
                 {
                     isImplicitStyle = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element);
                 }
-                else if (element.Name == DefaultXamlNamespace + "DataTemplate"
-                    && element.Attribute("DataType") != null)
+                else if (IsDataTemplate(element) && element.Attribute("DataType") != null)
                 {
                     isImplicitDataTemplate = true;
                     return GetCSharpFullTypeNameFromTargetTypeString(element, isDataType: true);
@@ -2031,7 +2028,7 @@ return {templateInstanceUniqueName};
 #endif
                 }
 
-                return xName.Namespace == DefaultXamlNamespace;
+                return DefaultXamlNamespaces.Contains(xName.Namespace);
             }
 
             private static string GetCurrentCoreAssemblyName()

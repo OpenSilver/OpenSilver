@@ -176,18 +176,13 @@ namespace DotNetForHtml5.Compiler
             {
                 while (element.Parent != null)
                 {
-                    if (element.Name.Namespace == DefaultXamlNamespace && DoesClassInheritFromFrameworkTemplate(element.Name.LocalName))
+                    if (IsDataTemplate(element) || IsItemsPanelTemplate(element) || IsControlTemplate(element))
                     {
                         return element;
                     }
                     element = element.Parent;
                 }
                 return element;
-            }
-
-            private static bool DoesClassInheritFromFrameworkTemplate(string classLocalName) //todo: add support for namespace for more precision
-            {
-                return classLocalName == "DataTemplate" || classLocalName == "ItemsPanelTemplate" || classLocalName == "ControlTemplate";
             }
         }
     }

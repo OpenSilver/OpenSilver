@@ -46,16 +46,16 @@ namespace DotNetForHtml5.Compiler
         {
             if (currentNode is XText)
             {
-                if ((parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "TextBlock" && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
-                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Span"
-                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Italic"
-                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Underline"
-                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Bold"
-                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Hyperlink"
-                    || parentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Paragraph")
+                if ((GeneratingCSharpCode.IsTextBlock(parentElement) && siblingNodesCount > 1) // Note: if there is only one XNode inside a TextBlock, we do not surround with a <Run> for runtime performance optimization.
+                    || GeneratingCSharpCode.IsSpan(parentElement)
+                    || GeneratingCSharpCode.IsItalic(parentElement)
+                    || GeneratingCSharpCode.IsUnderline(parentElement)
+                    || GeneratingCSharpCode.IsBold(parentElement)
+                    || GeneratingCSharpCode.IsHyperlink(parentElement)
+                    || GeneratingCSharpCode.IsParagraph(parentElement))
                 {
                     // Surround with a <Run>:
-                    XElement contentWrapper = new XElement(GeneratingCSharpCode.DefaultXamlNamespace + "Run"); //todo: read the "ContentWrapperAttribute" of the collection (cf. InlineCollection.cs) instead of hard-coding this.
+                    XElement contentWrapper = new XElement(XName.Get("Run", GeneratingCSharpCode.DefaultXamlNamespace)); //todo: read the "ContentWrapperAttribute" of the collection (cf. InlineCollection.cs) instead of hard-coding this.
                     XNode content = currentNode;
                     currentNode.ReplaceWith(contentWrapper);
                     contentWrapper.Add(content);

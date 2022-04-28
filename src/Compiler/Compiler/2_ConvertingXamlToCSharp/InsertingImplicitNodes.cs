@@ -195,8 +195,7 @@ namespace DotNetForHtml5.Compiler
 
                                 // SPECIAL CASE: If we are in a TextBlock, we want to set the
                                 // property "TextBlock.Text" instead of "TextBlock.Inlines"
-                                if ((currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "TextBlock") ||
-                                     (currentElement.Name == GeneratingCSharpCode.DefaultXamlNamespace + "Run"))
+                                if (GeneratingCSharpCode.IsTextBlock(currentElement) || GeneratingCSharpCode.IsRun(currentElement))
                                 {
                                     contentPropertyName = "Text";
                                 }
