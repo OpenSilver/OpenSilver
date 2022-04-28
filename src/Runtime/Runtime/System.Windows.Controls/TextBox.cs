@@ -729,20 +729,36 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
+            this.SelectedText = e.Text;
+            e.Handled = true;
+        }
+        internal void INTERNAL_CheckTextInputHandled(TextCompositionEventArgs e, object jsEventArg)
+        {
+            bool multiLines = this.Text.Contains("\r") || this.Text.Contains("\n");
+            bool requireNewLine = e.Text == "\r" && this.AcceptsReturn;
+            if (e.Handled == false && (requireNewLine || multiLines))
+            {
+                // Not implemented for multiple text lines
+                return;
+            }
+
+            OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+        }
+
+        internal void INTERNAL_TextUpdated()
+        {
             if (_textViewHost != null)
             {
                 _isProcessingInput = true;
                 try
                 {
-                    this.SelectedText = e.Text;
+                    SetCurrentValue(TextProperty, _textViewHost.View.GetText());
                 }
                 finally
                 {
                     _isProcessingInput = false;
                 }
             }
-
-            e.Handled = true;
         }
 
         /// <summary>

@@ -86,6 +86,10 @@ namespace Windows.UI.Xaml
                 case "keypress":
                     keyboardTarget.ProcessOnInput(jsEventArg);
                     break;
+
+                case "input":
+                    keyboardTarget.ProcessOnTextUpdated(jsEventArg);
+                    break;
             }
         }
 
@@ -433,9 +437,18 @@ namespace Windows.UI.Xaml
 
             RaiseEvent(e);
 
-            if (this is Controls.TextBoxView)
+            if (this is Controls.TextBox)
             {
-                (this as Controls.TextBoxView).INTERNAL_CheckTextInputHandled(e.Text, e.Handled, jsEventArg);
+                (this as Controls.TextBox).INTERNAL_CheckTextInputHandled(e, jsEventArg);
+            }
+        }
+
+        // This callback will be triggered textinput is not handled
+        private void ProcessOnTextUpdated(object jsEventArg)
+        {
+            if (this is Controls.TextBox)
+            {
+                (this as Controls.TextBox).INTERNAL_TextUpdated();
             }
         }
 

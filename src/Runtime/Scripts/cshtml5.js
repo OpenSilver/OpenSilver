@@ -354,6 +354,7 @@ document._attachEventListeners = function (element, handler, isFocusable) {
     view.addEventListener('mouseleave', store['mouseleave'] = handler);
     if (isFocusable) {
         view.addEventListener('keypress', store['keypress'] = bubblingEventHandler);
+        view.addEventListener('input', store['input'] = bubblingEventHandler);
         view.addEventListener('keydown', store['keydown'] = bubblingEventHandler);
         view.addEventListener('keyup', store['keyup'] = bubblingEventHandler);
         view.addEventListener('focusin', store['focusin'] = bubblingEventHandler);
@@ -377,6 +378,7 @@ document._removeEventListeners = function (element) {
     view.removeEventListener('mouseleave', store['mouseleave']);
     if (store.isFocusable) {
         view.removeEventListener('keypress', store['keypress']);
+        view.removeEventListener('input', store['input']);
         view.removeEventListener('keydown', store['keydown']);
         view.removeEventListener('keyup', store['keyup']);
         view.removeEventListener('focusin', store['focusin']);
