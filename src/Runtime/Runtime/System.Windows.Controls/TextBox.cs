@@ -700,24 +700,15 @@ namespace Windows.UI.Xaml.Controls
             base.OnTextInput(e);
 
             if (this.IsReadOnly)
-            {
-                e.Handled = true;
                 return;
-            }
 
             if (this.MaxLength != 0 && Text.Length - SelectionLength >= this.MaxLength)
-            {
-                e.Handled = true;
                 return;
-            }
 
             if (e.Text == "\r")
             {
                 if (this.AcceptsReturn == false)
-                {
-                    e.Handled = true;
                     return;
-                }
 
                 // Not implemented for multiple text lines
                 return;
