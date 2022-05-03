@@ -159,9 +159,6 @@ namespace DotNetForHtml5.Compiler
             string className,
             string namespaceStringIfAny,
             string baseType,
-            string fileNameWithPathRelativeToProjectRoot,
-            string assemblyNameWithoutExtension,
-            bool hasCodeBehind,
             bool addApplicationEntryPoint)
         {
             string applicationEntryPointIfAny = string.Empty;
@@ -174,18 +171,9 @@ public static void Main()
 }}";
             }
 
-            string absoluteSourceUri = 
-                fileNameWithPathRelativeToProjectRoot.Contains(';') ? 
-                fileNameWithPathRelativeToProjectRoot : 
-                "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot;
-            
-            string classToInstantiateName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
-
             string methodsMergedCode = string.Join(Environment.NewLine + Environment.NewLine, methods);
             
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
-
-            string classAccessModifier = hasCodeBehind ? "" : "public ";
 
             string classCodeFilled = $@"
 public partial class {className} : {baseType}

@@ -174,9 +174,6 @@ namespace DotNetForHtml5.Compiler
                                                                className,
                                                                namespaceStringIfAny,
                                                                baseType,
-                                                               _fileNameWithPathRelativeToProjectRoot,
-                                                               _assemblyNameWithoutExtension,
-                                                               hasCodeBehind,
 #if BRIDGE
                                                            addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
 #else
