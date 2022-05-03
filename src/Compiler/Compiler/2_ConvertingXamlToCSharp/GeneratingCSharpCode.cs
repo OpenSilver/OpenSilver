@@ -161,7 +161,6 @@ namespace DotNetForHtml5.Compiler
             string baseType,
             string fileNameWithPathRelativeToProjectRoot,
             string assemblyNameWithoutExtension,
-            HashSet<string> listOfAllTheTypesUsedInThisXamlFile,
             bool hasCodeBehind,
             bool addApplicationEntryPoint)
         {
@@ -186,18 +185,6 @@ public static void Main()
             
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
-            // Note: This is useful because we need to generate some c# code for every type used in the XAML
-            // file because otherwise the types risk not being found at "Pass2" of the compilation. In fact,
-            // Visual Studio automatically removes project references that are not referenced from C#, so if
-            // a type is present only in XAML and not in C#, its DLL risks not being referenced.
-            string fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced = 
-                string.Join(
-                    Environment.NewLine, 
-                    listOfAllTheTypesUsedInThisXamlFile.Select(
-                        x => $"private {x} {GeneratingUniqueNames.GenerateUniqueNameFromString("Unused")};"
-                    )
-                );
-
             string classAccessModifier = hasCodeBehind ? "" : "public ";
 
             string classCodeFilled = $@"
@@ -206,8 +193,6 @@ public partial class {className} : {baseType}
 
 #pragma warning disable 169, 649, 0628 // Prevents warning CS0169 ('field ... is never used'), CS0649 ('field ... is never assigned to, and will always have its default value null'), and CS0628 ('member : new protected member declared in sealed class')
 {fieldsForNamedElementsMergedCode}
-
-{fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced}
 #pragma warning restore 169, 649, 0628
 
 {methodsMergedCode}

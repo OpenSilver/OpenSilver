@@ -52,7 +52,6 @@ namespace DotNetForHtml5.Compiler
                 GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
                     out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
 
-                HashSet<string> listOfAllTheTypesUsedInThisXamlFile = new HashSet<string>();
                 List<string> resultingFieldsForNamedElements = new List<string>();
                 List<string> resultingMethods = new List<string>();
 
@@ -68,17 +67,6 @@ namespace DotNetForHtml5.Compiler
                     GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
                     string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
                         namespaceName, localTypeName, assemblyNameIfAny, true);
-
-                    if (hasCodeBehind ||
-                        elementTypeInCSharp.StartsWith("global::"))
-                    {
-                        // if hasCodeBehing is true, we have a namespace so we can assume that 
-                        // the type is either fully specified or that it is in the current
-                        // namespace.
-                        // Otherwise, we only take fully specified types (because we are in the
-                        // global namespace).
-                        listOfAllTheTypesUsedInThisXamlFile.Add(elementTypeInCSharp);
-                    }
 
                     if (!hasCodeBehind)
                     {
@@ -123,7 +111,6 @@ namespace DotNetForHtml5.Compiler
                                                                baseType,
                                                                _fileNameWithPathRelativeToProjectRoot,
                                                                _assemblyNameWithoutExtension,
-                                                               listOfAllTheTypesUsedInThisXamlFile,
                                                                hasCodeBehind,
 #if BRIDGE
                                                            addApplicationEntryPoint: IsClassTheApplicationClass(baseType)

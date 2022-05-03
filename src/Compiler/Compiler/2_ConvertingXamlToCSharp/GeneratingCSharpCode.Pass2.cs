@@ -34,7 +34,6 @@ namespace DotNetForHtml5.Compiler
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
                 public readonly Dictionary<XElement, Dictionary<string, string>> NamescopeRootToNameToUniqueNameDictionary = new Dictionary<XElement, Dictionary<string, string>>();
-                public readonly HashSet<string> ListOfAllTheTypesUsedInThisXamlFile = new HashSet<string>();
                 public readonly StringBuilder StringBuilder = new StringBuilder();
                 public readonly Dictionary<XElement, List<string>> NamescopeRootToMarkupExtensionsAdditionalCode = new Dictionary<XElement, List<string>>();
                 public readonly Dictionary<XElement, Dictionary<string, string>> NamescopeRootToElementsUniqueNameToInstantiatedObjects = new Dictionary<XElement, Dictionary<string, string>>();
@@ -177,7 +176,6 @@ namespace DotNetForHtml5.Compiler
                                                                baseType,
                                                                _fileNameWithPathRelativeToProjectRoot,
                                                                _assemblyNameWithoutExtension,
-                                                               parameters.ListOfAllTheTypesUsedInThisXamlFile,
                                                                hasCodeBehind,
 #if BRIDGE
                                                            addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
