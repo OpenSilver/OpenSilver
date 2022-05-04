@@ -487,11 +487,6 @@ namespace Windows.UI.Xaml.Controls
                         // items have been added earlier in the list than what is viewable
                         offset += args.ItemCount;
                     }
-
-                    if (Orientation == Orientation.Horizontal)
-                        SetHorizontalOffset(offset);
-                    else
-                        SetVerticalOffset(offset);
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     // The following logic is meant to keep the current viewable items in view
