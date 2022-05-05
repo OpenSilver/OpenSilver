@@ -379,6 +379,9 @@ return globalIndexes;
 
         internal void NEW_SET_SELECTION(int startIndex, int endIndex)
         {
+            if (Input.FocusManager.GetFocusedElement() != this.Host)
+                return;
+
             if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 return;
 
