@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -280,7 +281,7 @@ namespace Windows.UI.Xaml.Controls
             string backProperties = $"e.style.backgroundSize = \"{cssSize}\";" +
                 "e.style.backgroundRepeat = \"no-repeat\";" +
                 "e.style.backgroundPosition = \"center center\";" +
-                $"e.style.opacity = {imageBrush.Opacity};";
+                $"e.style.opacity = {imageBrush.Opacity.ToInvariantString()};";
 
             string javaScriptCodeToExecute = $"var e = document.getElementById(\"{domUid}\");if (e) {{ {backProperties} }};";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
