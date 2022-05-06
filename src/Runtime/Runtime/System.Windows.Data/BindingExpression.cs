@@ -654,7 +654,7 @@ namespace Windows.UI.Xaml.Data
                     return expr.Target;
 
                 case RelativeSourceMode.TemplatedParent:
-                    return (expr.Target as FrameworkElement)?.TemplatedParent;
+                    return FrameworkElement.FindMentor(expr.Target)?.TemplatedParent;
 
                 case RelativeSourceMode.FindAncestor:
                     return FindAncestor(expr.Target, relativeSource);
