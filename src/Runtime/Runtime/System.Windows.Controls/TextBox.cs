@@ -606,6 +606,7 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
         }
 
+#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Handled)
@@ -701,7 +702,7 @@ namespace Windows.UI.Xaml.Controls
                 // Not implemented
             }
         }
-
+#endif
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
             if (e.Handled)
