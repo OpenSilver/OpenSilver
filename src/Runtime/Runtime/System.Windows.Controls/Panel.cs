@@ -185,7 +185,7 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            if (this._enableProgressiveRendering || this.INTERNAL_EnableProgressiveLoading)
+            if (this.EnableProgressiveRendering || this.INTERNAL_EnableProgressiveLoading)
             {
                 this.ProgressivelyAttachChildren(this.Children);
             }
