@@ -613,6 +613,16 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnKeyDown(e);
 
+#if CSHTML5BLAZOR
+            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (!IsRunningInJavaScript())
+#endif
+            {
+                // Not implemented for the simulator
+                return;
+            }
+
             if (this.Text.Contains("\r") || this.Text.Contains("\n"))
             {
                 // Not implemented for multiple text lines
@@ -699,6 +709,16 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnTextInput(e);
 
+#if CSHTML5BLAZOR
+            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (!IsRunningInJavaScript())
+#endif
+            {
+                // Not implemented for the simulator
+                return;
+            }
+
             if (this.IsReadOnly)
                 return;
 
@@ -725,6 +745,16 @@ namespace Windows.UI.Xaml.Controls
         }
         internal void INTERNAL_CheckTextInputHandled(TextCompositionEventArgs e, object jsEventArg)
         {
+#if CSHTML5BLAZOR
+            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (!IsRunningInJavaScript())
+#endif
+            {
+                // Not implemented for the simulator
+                return;
+            }
+
             bool multiLines = this.Text.Contains("\r") || this.Text.Contains("\n");
             bool requireNewLine = e.Text == "\r" && this.AcceptsReturn;
             if (e.Handled == false && (requireNewLine || multiLines))

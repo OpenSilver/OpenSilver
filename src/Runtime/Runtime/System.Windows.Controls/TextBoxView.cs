@@ -662,10 +662,15 @@ element.setAttribute(""data-acceptsreturn"", ""{this.Host.AcceptsReturn.ToString
 element.setAttribute(""data-maxlength"", ""{this.Host.MaxLength}"");
 element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
 element.setAttribute(""data-acceptstab"", ""{this.Host.AcceptsTab.ToString().ToLower()}"");");
-                
-                /*
-                // Register the "keydown" javascript event:
-                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+
+#if CSHTML5BLAZOR
+                if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+                if (!IsRunningInJavaScript())
+#endif
+                {
+                    // Register the "keydown" javascript event:
+                    INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
 var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
 element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
@@ -735,7 +740,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             return false;
     }}
 }}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
-                */
+                }
             }
 #endif
 
