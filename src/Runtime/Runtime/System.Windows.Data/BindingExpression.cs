@@ -225,6 +225,14 @@ namespace Windows.UI.Xaml.Data
 
             FindSource();
 
+            if (_bindingSource is FrameworkElement fe)
+            {
+                if (ParentBinding.XamlPath == "ActualWidth" || ParentBinding.XamlPath == "ActualHeight")
+                {
+                    fe.SubsribeToSizeChanged();
+                }
+            }
+
             // FindSource should find the source now. Otherwise, the PropertyPathNodes
             // shoud do the work (their properties will change when the source will
             // become available)
