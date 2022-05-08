@@ -239,7 +239,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(TextWrapping),
                 typeof(TextWrapping),
                 typeof(TextBox),
-                new FrameworkPropertyMetadata(TextWrapping.Wrap, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextWrappingChanged));
+                new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextWrappingChanged));
 
         private static void OnTextWrappingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
