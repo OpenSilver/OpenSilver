@@ -36,6 +36,11 @@
                             <VisualStateGroup Name="CommonStates">
                                 <VisualState Name="Disabled">
                                     <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                                       Storyboard.TargetName="OuterBorder">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="0.4" />
+                                        </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush"
                                                                        Storyboard.TargetName="OuterBorder">
                                             <DiscreteObjectKeyFrame KeyTime="0"
