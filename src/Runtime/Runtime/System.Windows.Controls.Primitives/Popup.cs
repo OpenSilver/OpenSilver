@@ -175,6 +175,28 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+        private class PopupModelTreeEnumerator : ModelTreeEnumerator
+        {
+            internal PopupModelTreeEnumerator(Popup popup, object child)
+                : base(child)
+            {
+                Debug.Assert(popup != null, "popup should be non-null.");
+                Debug.Assert(child != null, "child should be non-null.");
+
+                _popup = popup;
+            }
+
+            protected override bool IsUnchanged
+            {
+                get
+                {
+                    return Object.ReferenceEquals(Content, _popup.Child);
+                }
+            }
+
+            private Popup _popup;
+        }
+
         #region Dependency Properties
 
         //-----------------------
