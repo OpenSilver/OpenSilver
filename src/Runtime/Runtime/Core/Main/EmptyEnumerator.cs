@@ -4,10 +4,8 @@ using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
 namespace OpenSilver.Internal.Controls
