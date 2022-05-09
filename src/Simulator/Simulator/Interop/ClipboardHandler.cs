@@ -25,5 +25,15 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         {
             Clipboard.SetText(text);
         }
+
+        public string GetText()
+        {
+            return Clipboard.GetText();
+        }
+
+        public bool ContainsText()
+        {
+            return Clipboard.ContainsText();
+        }
     }
 }
