@@ -18,6 +18,9 @@ using System.ComponentModel;
 using System.Windows.Markup;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
+using OpenSilver.Internal.Controls;
+using System.Collections;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -154,7 +157,25 @@ namespace Windows.UI.Xaml.Controls.Primitives
             this.HidePopupRootIfVisible();
         }
 
-#region Dependency Properties
+        /// <summary>
+        /// Returns enumerator to logical children.
+        /// </summary>
+        internal override IEnumerator LogicalChildren
+        {
+            get
+            {
+                object content = Child;
+
+                if (content == null)
+                {
+                    return EmptyEnumerator.Instance;
+                }
+
+                return new PopupModelTreeEnumerator(this, content);
+            }
+        }
+
+        #region Dependency Properties
 
         //-----------------------
         // CHILD
