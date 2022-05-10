@@ -47,6 +47,7 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class TextBox : Control
     {
+        private bool _isProcessingInput;
         private FrameworkElement _contentElement;
         private ITextBoxViewHost<TextBoxView> _textViewHost;
 
@@ -155,7 +156,12 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = (TextBox)d;
-            if (tb._textViewHost != null)
+            if (tb._isProcessingInput)
+            {
+                // Clear the flag to allow changing the Text during TextChanged
+                tb._isProcessingInput = false;
+            }
+            else if (tb._textViewHost != null)
             {
                 tb._textViewHost.View.OnTextChanged((string)e.NewValue);
             }
@@ -233,7 +239,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(TextWrapping),
                 typeof(TextWrapping),
                 typeof(TextBox),
-                new FrameworkPropertyMetadata(TextWrapping.Wrap, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextWrappingChanged));
+                new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextWrappingChanged));
 
         private static void OnTextWrappingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -586,8 +592,21 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
             base.OnTextInput(e);
-
+            
             e.Handled = true;
+
+            if (_textViewHost != null)
+            {
+                _isProcessingInput = true;
+                try
+                {
+                    SetCurrentValue(TextProperty, _textViewHost.View.GetText());
+                }
+                finally
+                {
+                    _isProcessingInput = false;
+                }
+            }
         }
 
         /// <summary>

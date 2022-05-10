@@ -69,7 +69,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         JavaScriptExecutionHandler _javaScriptExecutionHandler;
         bool _htmlHasBeenLoaded = false;
         Assembly _entryPointAssembly;
-        Type _applicationType;
+        Action _appCreationDelegate;
         SimulatorLaunchParameters _simulatorLaunchParameters;
         CompilationState _compilationState = CompilationState.Initializing;
         string _compilationLog;
@@ -93,7 +93,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         LicenseChecker LicenseChecker = null;
 
 #if OPENSILVER
-        public MainWindow(Type userApplicationType, SimulatorLaunchParameters simulatorLaunchParameters)
+        public MainWindow(Action appCreationDelegate, Assembly appAssembly, SimulatorLaunchParameters simulatorLaunchParameters)
 #elif BRIDGE
         public MainWindow()
 #endif
@@ -133,10 +133,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 #endif
 
 #if OPENSILVER
-            _applicationType = userApplicationType ?? throw new ArgumentNullException(nameof(userApplicationType));
+            _appCreationDelegate = appCreationDelegate ?? throw new ArgumentNullException(nameof(appCreationDelegate));
             _simulatorLaunchParameters = simulatorLaunchParameters;
             ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out _coreAssembly);
-            _entryPointAssembly = _applicationType.Assembly;
+            _entryPointAssembly = appAssembly;
             _pathOfAssemblyThatContainsEntryPoint = _entryPointAssembly.Location;
 #endif
 
@@ -1062,8 +1062,10 @@ Click OK to continue.";
                 try
                 {
                     // Determine Entry point:
-                    if (ReflectionInUserAssembliesHelper.TryDetermineTypeThatInheritsFromApplication(_entryPointAssembly, out _applicationType, out _coreAssembly))
+                    Type applicationType;
+                    if (ReflectionInUserAssembliesHelper.TryDetermineTypeThatInheritsFromApplication(_entryPointAssembly, out applicationType, out _coreAssembly))
                     {
+                        _appCreationDelegate = () => Activator.CreateInstance(applicationType);
                         // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
                         _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
 
@@ -1148,7 +1150,7 @@ Click OK to continue.";
             // Create a new instance of the application:
             try
             {
-                Activator.CreateInstance(_applicationType);
+                _appCreationDelegate();
                 return true;
             }
             catch (Exception ex)

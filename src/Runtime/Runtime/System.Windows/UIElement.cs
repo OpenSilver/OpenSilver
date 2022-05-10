@@ -804,14 +804,15 @@ namespace Windows.UI.Xaml
         private static void OnIsVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var uiElement = (UIElement)d;
-            bool newValue = (bool)e.NewValue;
 
-            if (uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible != null
-                && newValue == true)
+            if ((bool)e.NewValue)
             {
                 Action deferredLoadingWhenControlBecomesVisible = uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible;
-                uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
-                deferredLoadingWhenControlBecomesVisible();
+                if (deferredLoadingWhenControlBecomesVisible != null)
+                {
+                    uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
+                    deferredLoadingWhenControlBecomesVisible();
+                }
             }
 
             // Invalidate the children so that they will inherit the new value.

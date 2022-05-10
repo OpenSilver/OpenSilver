@@ -18,9 +18,11 @@ using OpenSilver.Internal.Data;
 
 #if MIGRATION
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -52,6 +54,8 @@ namespace Windows.UI.Xaml.Data
         private IPropertyChangedListener _propertyListener;
         private DynamicValueConverter _dynamicConverter;
         private object _bindingSource;
+        private bool _isUpdateOnLostFocus; // True if this binding expression updates on LostFocus
+        private bool _needsUpdate; // True if this binding expression has a pending source update 
 
         private readonly PropertyPathWalker _propertyPathWalker;
 
@@ -211,6 +215,14 @@ namespace Windows.UI.Xaml.Data
 
             Target = d;
 
+            _isUpdateOnLostFocus = ParentBinding.UpdateSourceTrigger == UpdateSourceTrigger.Default &&
+                (d is TextBox && dp == TextBox.TextProperty || 
+                 d is PasswordBox && dp == PasswordBox.PasswordProperty);
+            if (_isUpdateOnLostFocus)
+            {
+                ((FrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
+            }
+
             FindSource();
 
             // FindSource should find the source now. Otherwise, the PropertyPathNodes
@@ -248,6 +260,12 @@ namespace Windows.UI.Xaml.Data
             }
 
             _propertyPathWalker.Update(null);
+
+            if (_isUpdateOnLostFocus)
+            {
+                _isUpdateOnLostFocus = false;
+                ((FrameworkElement)Target).LostFocus -= new RoutedEventHandler(OnTargetLostFocus);
+            }
 
             Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
             Target = null;
@@ -345,10 +363,18 @@ namespace Windows.UI.Xaml.Data
 
         internal void TryUpdateSourceObject(object value)
         {
-            if (!IsUpdating && ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.Explicit)
+            if (IsUpdating || ParentBinding.UpdateSourceTrigger == UpdateSourceTrigger.Explicit)
             {
-                UpdateSourceObject(value);
+                return;
             }
+
+            if (_isUpdateOnLostFocus && ReferenceEquals(FocusManager.GetFocusedElement(), Target))
+            {
+                _needsUpdate = true;
+                return;
+            }
+
+            UpdateSourceObject(value);
         }
 
         private static bool IsValueValidForSourceUpdate(object value, Type type)
@@ -422,6 +448,15 @@ namespace Windows.UI.Xaml.Data
             finally
             {
                 IsUpdating = oldIsUpdating;
+            }
+        }
+
+        private void OnTargetLostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_needsUpdate)
+            {
+                _needsUpdate = false;
+                UpdateSourceObject(Target.GetValue(TargetProperty));
             }
         }
 
@@ -632,7 +667,7 @@ namespace Windows.UI.Xaml.Data
                     return expr.Target;
 
                 case RelativeSourceMode.TemplatedParent:
-                    return (expr.Target as FrameworkElement)?.TemplatedParent;
+                    return FrameworkElement.FindMentor(expr.Target)?.TemplatedParent;
 
                 case RelativeSourceMode.FindAncestor:
                     return FindAncestor(expr.Target, relativeSource);
@@ -682,8 +717,7 @@ namespace Windows.UI.Xaml.Data
         {
             try
             {
-                if (!IsUpdating && ParentBinding.UpdateSourceTrigger != UpdateSourceTrigger.Explicit)
-                    UpdateSourceObject(Target.GetValue(TargetProperty));
+                TryUpdateSourceObject(Target.GetValue(TargetProperty));
             }
             catch (Exception err)
             {

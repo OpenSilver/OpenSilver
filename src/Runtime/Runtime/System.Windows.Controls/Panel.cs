@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -184,7 +185,7 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            if (this._enableProgressiveRendering || this.INTERNAL_EnableProgressiveLoading)
+            if (this.EnableProgressiveRendering || this.INTERNAL_EnableProgressiveLoading)
             {
                 this.ProgressivelyAttachChildren(this.Children);
             }
@@ -250,29 +251,41 @@ namespace Windows.UI.Xaml.Controls
                     MethodToUpdateDom = (d, e) =>
                     {
                         var panel = (Panel)d;
-                        if (e is ImageBrush ib && ib != null)
+                        if (e is ImageBrush imageBrush)
                         {
-                            string cssSize = "auto";
-                            switch (ib.Stretch)
-                            {
-                                case Stretch.Fill: cssSize = "100% 100%"; break;
-                                case Stretch.Uniform: cssSize = "contain"; break;
-                                case Stretch.UniformToFill: cssSize = "cover"; break;
-                            }
-
-                            string javaScriptCodeToExecute = string.Empty;
-                            string settingProperties = string.Empty;
-                            settingProperties += $"element.style.backgroundSize = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(cssSize)};";
-                            settingProperties += $"element.style.backgroundRepeat = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("no-repeat")};";
-                            settingProperties += $"element.style.backgroundPosition = {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode("center center")};";
-                            string uid = ((INTERNAL_HtmlDomElementReference)panel.INTERNAL_OuterDomElement).UniqueIdentifier;
-                            javaScriptCodeToExecute = $@"var element = document.getElementById(""{uid}"");if (element) {{ {settingProperties} }};";
-                            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                            SetImageBrushRelatedBackgroundProperties(panel, imageBrush);
                         }
                         UIElement.SetPointerEvents(panel);
                     },
                     CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
+
+        /// <summary>
+        /// If the Background property of some controls (Panel, Border) is ImageBrush, 
+        /// to visualize similar as SilverLight for varisous Stretch values we need to set
+        /// HTML tag's background-size, background-repeat and background-position values.
+        /// </summary>
+        /// <param name="element">The UIElement to which we are setting background image</param>
+        /// <param name="imageBrush">The ImageBrush</param>
+        internal static void SetImageBrushRelatedBackgroundProperties(UIElement element, ImageBrush imageBrush)
+        {
+            string cssSize = "auto";
+            switch (imageBrush.Stretch)
+            {
+                case Stretch.Fill: cssSize = "100% 100%"; break;
+                case Stretch.Uniform: cssSize = "contain"; break;
+                case Stretch.UniformToFill: cssSize = "cover"; break;
+            }
+
+            string domUid = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
+            string backProperties = $"e.style.backgroundSize = \"{cssSize}\";" +
+                "e.style.backgroundRepeat = \"no-repeat\";" +
+                "e.style.backgroundPosition = \"center center\";" +
+                $"e.style.opacity = {imageBrush.Opacity.ToInvariantString()};";
+
+            string javaScriptCodeToExecute = $"var e = document.getElementById(\"{domUid}\");if (e) {{ {backProperties} }};";
+            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+        }
 
         /// <summary>
         /// Gets the collection of child elements of the panel.

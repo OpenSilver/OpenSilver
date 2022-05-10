@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Data
@@ -21,6 +22,8 @@ namespace Windows.UI.Xaml.Data
 {
     internal abstract class PropertyPathNode
     {
+        private ICollectionView _icv;
+
         protected PropertyPathNode(PropertyPathWalker listener)
         {
             Listener = listener;
@@ -38,22 +41,59 @@ namespace Windows.UI.Xaml.Data
 
         public abstract Type Type { get; }
 
-        internal void SetSource(object source)
+        public abstract bool IsBound { get; }
+
+        internal void SetSource(object source) => SetSource(source, false);
+
+        private void SetSource(object source, bool sourceIsCurrentItem)
+        {
+            UpdateSource(source, sourceIsCurrentItem);
+
+            UpdateValue();
+
+            if (Next != null)
+            {
+                Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value, false);
+            }
+        }
+
+        private void UpdateSource(object source, bool sourceIsCurrentItem)
         {
             object oldSource = Source;
             Source = source;
 
             if (oldSource != Source)
             {
-                OnSourceChanged(oldSource, Source);
+                OnSourceChanged(oldSource, source, sourceIsCurrentItem);
             }
+        }
 
-            UpdateValue();
-
-            if (Next != null)
+        private void OnSourceChanged(object oldSource, object newSource, bool sourceIsCurrentItem)
+        {
+            if (!sourceIsCurrentItem && _icv != null)
             {
-                Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value);
+                _icv.CurrentChanged -= new EventHandler(OnCurrentChanged);
+                _icv = null;
             }
+
+            OnSourceChanged(oldSource, Source);
+
+            if (!sourceIsCurrentItem && !IsBound && newSource is ICollectionView icv)
+            {
+                _icv = icv;
+                icv.CurrentChanged += new EventHandler(OnCurrentChanged);
+                UpdateSource(icv.CurrentItem, true);
+            }
+        }
+
+        private void OnCurrentChanged(object sender, EventArgs e)
+        {
+            if (_icv == null || !Listener.ListenForChanges)
+            {
+                return;
+            }
+
+            SetSource(_icv.CurrentItem, true);
         }
 
         internal void UpdateValueAndIsBroken(object newValue, bool isBroken)
@@ -68,7 +108,7 @@ namespace Windows.UI.Xaml.Data
         }
 
         internal abstract void OnSourceChanged(object oldSource, object newSource);
-        
+
         internal abstract void UpdateValue();
 
         internal abstract void SetValue(object value);

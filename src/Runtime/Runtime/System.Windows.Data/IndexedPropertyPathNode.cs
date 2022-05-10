@@ -38,6 +38,8 @@ namespace Windows.UI.Xaml.Data
 
         public override Type Type => _indexer?.PropertyType;
 
+        public override bool IsBound => _indexer != null;
+
         private object Index
         {
             get
@@ -152,11 +154,6 @@ namespace Windows.UI.Xaml.Data
                     _indexer = _iListIndexer;
                     _intIndex = int.Parse(_index, NumberStyles.Integer, CultureInfo.InvariantCulture);
                 }
-            }
-           
-            if (_indexer == null)
-            {
-                throw new NotSupportedException("Only String and Int32 indexers with one parameters are supported.");
             }
         }
 

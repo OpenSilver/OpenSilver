@@ -31,7 +31,9 @@ namespace Windows.UI.Xaml.Data
         }
 
         public override Type Type => typeof(object);
-        
+
+        public override bool IsBound => true;
+
         internal override void SetValue(object value)
         {
             DependencyObject sourceDO = SourceDO;

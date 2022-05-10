@@ -53,6 +53,7 @@
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
+		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
@@ -374,7 +375,6 @@
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\CommunicationObject.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\MessageState.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\RequestContext.cs" />
-		<Compile Include="System.ServiceModel.Security\WORKINPROGRESS\UserNamePasswordClientCredential.cs" />
 		<Compile Include="System.Windows\ApplicationServiceContext.cs" />
 		<Compile Include="System.Windows\DataFormats.cs" />
 		<Compile Include="System.Windows\DependencyObjectCollection_1.cs" />

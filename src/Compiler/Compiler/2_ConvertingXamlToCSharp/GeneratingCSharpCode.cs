@@ -33,7 +33,10 @@ namespace DotNetForHtml5.Compiler
 
     internal static partial class GeneratingCSharpCode
     {
-        internal static readonly XNamespace DefaultXamlNamespace = @"http://schemas.microsoft.com/winfx/2006/xaml/presentation";
+        internal const string DefaultXamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
+        private const string LegacyXamlNamespace = "http://schemas.microsoft.com/client/2007"; // XAML namespace used for Silverlight 1.0 application
+        
+        private static readonly XNamespace[] DefaultXamlNamespaces = new XNamespace[2] { DefaultXamlNamespace, LegacyXamlNamespace };
         internal static readonly XNamespace xNamespace = @"http://schemas.microsoft.com/winfx/2006/xaml"; // Used for example for "x:Name" attributes and {x:Null} markup extensions.
 
         public static string GenerateCSharpCode(XDocument doc,
@@ -156,10 +159,6 @@ namespace DotNetForHtml5.Compiler
             string className,
             string namespaceStringIfAny,
             string baseType,
-            string fileNameWithPathRelativeToProjectRoot,
-            string assemblyNameWithoutExtension,
-            HashSet<string> listOfAllTheTypesUsedInThisXamlFile,
-            bool hasCodeBehind,
             bool addApplicationEntryPoint)
         {
             string applicationEntryPointIfAny = string.Empty;
@@ -172,30 +171,9 @@ public static void Main()
 }}";
             }
 
-            string absoluteSourceUri = 
-                fileNameWithPathRelativeToProjectRoot.Contains(';') ? 
-                fileNameWithPathRelativeToProjectRoot : 
-                "/" + assemblyNameWithoutExtension + ";component/" + fileNameWithPathRelativeToProjectRoot;
-            
-            string classToInstantiateName = XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri);
-
             string methodsMergedCode = string.Join(Environment.NewLine + Environment.NewLine, methods);
             
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
-
-            // Note: This is useful because we need to generate some c# code for every type used in the XAML
-            // file because otherwise the types risk not being found at "Pass2" of the compilation. In fact,
-            // Visual Studio automatically removes project references that are not referenced from C#, so if
-            // a type is present only in XAML and not in C#, its DLL risks not being referenced.
-            string fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced = 
-                string.Join(
-                    Environment.NewLine, 
-                    listOfAllTheTypesUsedInThisXamlFile.Select(
-                        x => $"private {x} {GeneratingUniqueNames.GenerateUniqueNameFromString("Unused")};"
-                    )
-                );
-
-            string classAccessModifier = hasCodeBehind ? "" : "public ";
 
             string classCodeFilled = $@"
 public partial class {className} : {baseType}
@@ -203,8 +181,6 @@ public partial class {className} : {baseType}
 
 #pragma warning disable 169, 649, 0628 // Prevents warning CS0169 ('field ... is never used'), CS0649 ('field ... is never assigned to, and will always have its default value null'), and CS0628 ('member : new protected member declared in sealed class')
 {fieldsForNamedElementsMergedCode}
-
-{fieldsToEnsureThatAllTypesReferencedInTheXamlFileAreReferenced}
 #pragma warning restore 169, 649, 0628
 
 {methodsMergedCode}
@@ -405,5 +381,52 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
 
         private const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
         private const string IXamlComponentFactoryClass = "global::OpenSilver.Internal.Xaml.IXamlComponentFactory";
+
+        public static bool IsDataTemplate(XElement element) => IsXElementOfType(element, "DataTemplate");
+
+        public static bool IsItemsPanelTemplate(XElement element) => IsXElementOfType(element, "ItemsPanelTemplate");
+
+        public static bool IsControlTemplate(XElement element) => IsXElementOfType(element, "ControlTemplate");
+
+        public static bool IsResourceDictionary(XElement element) => IsXElementOfType(element, "ResourceDictionary");
+
+        public static bool IsBinding(XElement element) => IsXElementOfType(element, "Binding");
+
+        public static bool IsStyle(XElement element) => IsXElementOfType(element, "Style");
+
+        public static bool IsTextBlock(XElement element) => IsXElementOfType(element, "TextBlock");
+
+        public static bool IsRun(XElement element) => IsXElementOfType(element, "Run");
+
+        public static bool IsSpan(XElement element) => IsXElementOfType(element, "Span");
+
+        public static bool IsItalic(XElement element) => IsXElementOfType(element, "Italic");
+        
+        public static bool IsUnderline(XElement element) => IsXElementOfType(element, "Underline");
+
+        public static bool IsBold(XElement element) => IsXElementOfType(element, "Bold");
+
+        public static bool IsHyperlink(XElement element) => IsXElementOfType(element, "Hyperlink");
+
+        public static bool IsParagraph(XElement element) => IsXElementOfType(element, "Paragraph");
+
+        public static bool IsColorAnimation(XElement element) => IsXElementOfType(element, "ColorAnimation");
+
+        private static bool IsXElementOfType(XElement element, string typeName)
+        {
+            XName name = element.Name;
+            if (name.LocalName == typeName)
+            {
+                for (int i = 0; i < DefaultXamlNamespaces.Length; i++)
+                {
+                    if (name.Namespace == DefaultXamlNamespaces[i])
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

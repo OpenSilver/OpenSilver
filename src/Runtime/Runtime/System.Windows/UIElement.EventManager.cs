@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Input;
@@ -34,91 +35,57 @@ namespace Windows.UI.Xaml
     {
         private NativeEventsManager _eventsManager;
 
-        private class NativeEventsManager
+        internal static void NativeEventCallback(UIElement mouseTarget, UIElement keyboardTarget, object jsEventArg)
         {
-            private readonly Delegate _handler;
-            private readonly UIElement _owner;
-
-            public NativeEventsManager(UIElement uie)
+            string type = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+            switch (type)
             {
-                _owner = uie;
+                case "mousemove":
+                case "touchmove":
+                    mouseTarget.ProcessOnMouseMove(jsEventArg);
+                    break;
 
-                if (OpenSilver.Interop.IsRunningInTheSimulator)
-                {
-                    _handler = new Action<object>(NativeEventCallback);
-                }
-                else
-                {
-                    _handler = new Func<object, string>(jsEventArg =>
-                    {
-                        NativeEventCallback(jsEventArg);
-                        return string.Empty;
-                    });
-                }
-            }
+                case "mousedown":
+                case "touchstart":
+                    mouseTarget.ProcessOnMouseDown(jsEventArg);
+                    break;
 
-            public void AttachEvents()
-            {
-                OpenSilver.Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1)", _owner.INTERNAL_OuterDomElement, _handler);
-            }
+                case "mouseup":
+                case "touchend":
+                    mouseTarget.ProcessOnMouseUp(jsEventArg);
+                    break;
 
-            public void DetachEvents()
-            {
-                OpenSilver.Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", _owner.INTERNAL_OuterDomElement);
-            }
+                case "wheel":
+                    mouseTarget.ProcessOnWheel(jsEventArg);
+                    break;
 
-            private void NativeEventCallback(object jsEventArg)
-            {
-                string type = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
-                switch (type)
-                {
-                    case "mousemove":
-                    case "touchmove":
-                        _owner.ProcessOnMouseMove(jsEventArg);
-                        break;
+                case "mouseenter":
+                    mouseTarget.ProcessOnMouseEnter(jsEventArg);
+                    break;
 
-                    case "mousedown":
-                    case "touchstart":
-                        _owner.ProcessOnMouseDown(jsEventArg);
-                        break;
+                case "mouseleave":
+                    mouseTarget.ProcessOnMouseLeave(jsEventArg);
+                    break;
 
-                    case "mouseup":
-                    case "touchend":
-                        _owner.ProcessOnMouseUp(jsEventArg);
-                        break;
+                case "keydown":
+                    keyboardTarget.ProcessOnKeyDown(jsEventArg);
+                    break;
 
-                    case "wheel":
-                        _owner.ProcessOnWheel(jsEventArg);
-                        break;
+                case "keyup":
+                    keyboardTarget.ProcessOnKeyUp(jsEventArg);
+                    break;
 
-                    case "mouseenter":
-                        _owner.ProcessOnMouseEnter(jsEventArg);
-                        break;
+                case "focusin":
+                    keyboardTarget.ProcessOnFocusIn(jsEventArg);
+                    break;
 
-                    case "mouseleave":
-                        _owner.ProcessOnMouseLeave(jsEventArg);
-                        break;
+                case "focusout":
+                    keyboardTarget.ProcessOnFocusOut(jsEventArg);
+                    break;
 
-                    case "keydown":
-                        _owner.ProcessOnKeyDown(jsEventArg);
-                        break;
-
-                    case "keyup":
-                        _owner.ProcessOnKeyUp(jsEventArg);
-                        break;
-
-                    case "focusin":
-                        _owner.ProcessOnFocusIn(jsEventArg);
-                        break;
-
-                    case "focusout":
-                        _owner.ProcessOnFocusOut(jsEventArg);
-                        break;
-
-                    case "input":
-                        _owner.ProcessOnInput(jsEventArg);
-                        break;
-                }
+                case "input":
+                    keyboardTarget.ProcessOnInput(jsEventArg);
+                    break;
             }
         }
 
