@@ -17,6 +17,9 @@ using System;
 
 #if !BRIDGE
 using JSIL.Meta;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
 #else
 using Bridge;
 #endif
@@ -35,6 +38,15 @@ namespace CSHTML5
     /// </summary>
     public static class Profiler
     {
+#if OPENSILVER
+        static Dictionary<string, PerformanceCounter> PerformanceCounters = new Dictionary<string, PerformanceCounter>();
+
+        static Profiler()
+        {
+            OpenSilver.Interop.ExecuteJavaScript("window.ViewProfilerResults = $0", (Action)ViewProfilerResults);
+        }
+#endif
+
         /// <summary>
         /// Allows measuring the cumulative time between the start and the end of the measure. It returns a number that you need to pass to the "StopMeasuringTime()" method.
         /// </summary>
@@ -44,9 +56,15 @@ namespace CSHTML5
 #else
         [Template("performance.now()")]
 #endif
+#if OPENSILVER
+        public static long StartMeasuringTime()
+        {
+            return System.Diagnostics.Stopwatch.GetTimestamp();
+#else
         public static double StartMeasuringTime()
         {
-            return Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("performance.now()"));
+            return Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("performance.now()")); 
+#endif
         }
 
         /// <summary>
@@ -60,10 +78,75 @@ namespace CSHTML5
 #else
         [Template(@"document.addToPerformanceCounters({measureDescription}, {numberReturnedByTheStartMeasuringTimeMethod})")]
 #endif
+#if OPENSILVER
+        public static void StopMeasuringTime(string measureDescription, long numberReturnedByTheStartMeasuringTimeMethod)
+        {
+            AddToPerformanceCounters(measureDescription, numberReturnedByTheStartMeasuringTimeMethod);
+#else
         public static void StopMeasuringTime(string measureDescription, double numberReturnedByTheStartMeasuringTimeMethod)
         {
-            OpenSilver.Interop.ExecuteJavaScript("document.addToPerformanceCounters($0, $1)", measureDescription, numberReturnedByTheStartMeasuringTimeMethod);
+            OpenSilver.Interop.ExecuteJavaScript("document.addToPerformanceCounters($0, $1)", measureDescription, numberReturnedByTheStartMeasuringTimeMethod); 
+#endif
         }
+
+#if OPENSILVER
+        private static void AddToPerformanceCounters(string measureDescription, long initialTime)
+        {
+            long elapsedTime = (long)(System.Diagnostics.Stopwatch.GetTimestamp() - initialTime); 
+            PerformanceCounter counter;
+            PerformanceCounters.TryGetValue(measureDescription, out counter);
+            if(counter == null)
+            {
+                counter = new PerformanceCounter();
+                PerformanceCounters[measureDescription] = counter;
+            }
+            ++counter.Count;
+            counter.Time += elapsedTime;
+        }
+
+        public static void ViewProfilerResults()
+        { 
+            if(PerformanceCounters.Count > 0)
+            {
+                var sortedCounters = PerformanceCounters.OrderBy(x => x.Key);
+                string csvFormat = "Description,Total time in ms, Number of calls (OS)" + Environment.NewLine;
+                long ticksPerMs = Stopwatch.Frequency / 1000; //Note: Stopwatch.Frequency is the amount of ticks per second in the values returned, it is not representative of the accuracy. For example, a test today gave an Frequency 100 times bigger in the browser than in the Simulator despite the fact that the values returned in the Simulator are A LOT more precise than in the browser which only has an accuracy of .1ms.
+                foreach (var counterKVP in sortedCounters) //KVP for KeyValuePair
+                {
+                    var name = counterKVP.Key;
+                    var counter = counterKVP.Value;
+
+                    double time = ((double)(counter.Time)) / ticksPerMs;
+                    //Write the information on the current call:
+                    WriteLine("=== " + name + " ===");
+                    
+                    WriteLine("Total time: " + time + "ms");
+                    WriteLine("Number of calls: " + counter.Count);
+                    if (counter.Count > 0)
+                        WriteLine("Average time per call: " + (time / counter.Count) + "ms");
+                    WriteLine("");
+
+                    //prepare the csv format string:
+                    csvFormat += name + ',' + time + ',' + counter.Count + '\n';
+                }
+
+                WriteLine("### RESULTS IN CSV FORMAT: ###");
+                WriteLine(csvFormat);
+            }
+        }
+
+        static void WriteLine(string text)
+        {
+            if(OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                System.Diagnostics.Debug.WriteLine(text);
+            }
+            else
+            {
+                Console.WriteLine(text);
+            }
+        }
+#endif
 
 #if !BRIDGE
         [JSReplacement("console.time($label)")]
@@ -95,4 +178,12 @@ namespace CSHTML5
             OpenSilver.Interop.ExecuteJavaScript("console.timeLog($0)", label);
         }
     }
+
+#if OPENSILVER
+    class PerformanceCounter
+    {
+        public int Count { get; set; }
+        public long Time { get; set; }
+    } 
+#endif
 }
