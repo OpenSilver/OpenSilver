@@ -390,58 +390,6 @@ namespace Windows.UI.Xaml
             {
                 ShouldLookupImplicitStyles = true;
             }
-
-            HookToSizeChange();
-        }
-
-
-        private bool _syncActualWidthOnSizeChange = true;
-        internal bool SyncActualWidthOnSizeChange
-        {
-            get => _syncActualWidthOnSizeChange;
-            set
-            {
-                if (value != _syncActualWidthOnSizeChange)
-                {
-                    _syncActualWidthOnSizeChange = value;
-                    SetValue(ActualWidthProperty, this.INTERNAL_GetActualWidthAndHeight().Width);
-                    HookToSizeChange();
-                }
-            }
-        }
-        private bool _syncActualHeightOnSizeChange = true;
-        internal bool SyncActualHeightOnSizeChange
-        {
-            get => _syncActualHeightOnSizeChange;
-            set
-            {
-                if (value != _syncActualHeightOnSizeChange)
-                {
-                    _syncActualHeightOnSizeChange = value;
-                    SetValue(ActualHeightProperty, this.INTERNAL_GetActualWidthAndHeight().Height);
-                    HookToSizeChange();
-                }
-            }
-        }
-
-        private bool _hookedToSizeChange = false;
-        private void HookToSizeChange()
-        {
-            if (_hookedToSizeChange) return;
-            _hookedToSizeChange = true; 
-
-            SizeChanged += (s, e) =>
-            {
-                if (SyncActualWidthOnSizeChange && ((double)GetValue(ActualWidthProperty)) != e.NewSize.Width)
-                {
-                    SetValue(ActualWidthProperty, e.NewSize.Width);
-                }
-
-                if (SyncActualHeightOnSizeChange && ((double)GetValue(ActualHeightProperty)) != e.NewSize.Height)
-                {
-                    SetValue(ActualHeightProperty, e.NewSize.Height);
-                }
-            };
         }
 
         #region Resources
