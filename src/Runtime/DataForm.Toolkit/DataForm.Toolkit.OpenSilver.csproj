@@ -47,6 +47,7 @@
     <Compile Include="DataForm\DataFormEnums\DataFormCommandButtonsVisibility.cs" />
     <Compile Include="DataForm\DataFormEnums\DataFormEditAction.cs" />
     <Compile Include="DataForm\DataFormEnums\DataFormMode.cs" />
+    <Compile Include="DataForm\DataFormEnums\DataFormValidationSummaryPosition.cs" />
     <Compile Include="DataForm\DataFormEventArgs\DataFormAddingNewItemEventArgs.cs" />
     <Compile Include="DataForm\DataFormEventArgs\DataFormAutoGeneratingFieldEventArgs.cs" />
     <Compile Include="DataForm\DataFormEventArgs\DataFormContentLoadEventArgs.cs" />

@@ -319,6 +319,7 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
@@ -671,7 +672,7 @@
                                     </StackPanel>
                                 </Grid>
                                 <ScrollViewer Background="{x:Null}"
-                                              Grid.Row="1"
+                                              Grid.Row="2"
                                               IsTabStop="False"
                                               Padding="{TemplateBinding Padding}"
                                               Style="{StaticResource CustomScrollViewerStyle}"
@@ -680,10 +681,10 @@
                                                       Margin="12,12,6,12" />
                                 </ScrollViewer>
                                 <sdk:ValidationSummary x:Name="ValidationSummary"
-                                                   Grid.Row="2"
+                                                   Grid.Row="3"
                                                    MaxHeight="100"
                                                    BorderThickness="0" />
-                                <StackPanel Grid.Row="3"
+                                <StackPanel Grid.Row="4"
                                             Orientation="Horizontal"
                                             HorizontalAlignment="Right">
                                     <Button x:Name="CommitButton"

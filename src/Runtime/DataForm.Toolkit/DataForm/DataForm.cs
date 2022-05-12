@@ -496,6 +496,31 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Identifies the ValidationSummaryPosition dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ValidationSummaryPositionProperty =
+            DependencyProperty.Register(
+                "ValidationSummaryPosition",
+                typeof(DataFormValidationSummaryPosition),
+                typeof(DataForm),
+                new PropertyMetadata(OnValidationSummaryPositionPropertyChanged));
+
+        /// <summary>
+        /// ValidationSummaryPosition property changed handler.
+        /// </summary>
+        /// <param name="d">DataForm that changed its ValidationSummaryPosition value.</param>
+        /// <param name="e">The DependencyPropertyChangedEventArgs for this event.</param>
+        private static void OnValidationSummaryPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            DataForm dataForm = d as DataForm;
+
+            if (dataForm._validationSummary != null)
+            {
+                dataForm._validationSummary.SetValue(Grid.RowProperty, (DataFormValidationSummaryPosition)e.NewValue == DataFormValidationSummaryPosition.Top ? 1 : 3);
+            }
+        }
+
+        /// <summary>
         /// Identifies the Header dependency property.
         /// </summary>
         public static readonly DependencyProperty HeaderProperty =
@@ -1428,6 +1453,22 @@ namespace Windows.UI.Xaml.Controls
             set
             {
                 this.SetValue(ValidationSummaryStyleProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the developer-specified style for the ValidationSummary.
+        /// </summary>
+        public DataFormValidationSummaryPosition ValidationSummaryPosition
+        {
+            get
+            {
+                return (DataFormValidationSummaryPosition)this.GetValue(ValidationSummaryPositionProperty);
+            }
+
+            set
+            {
+                this.SetValue(ValidationSummaryPositionProperty, value);
             }
         }
 
@@ -2395,6 +2436,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 this._validationSummary.Errors.CollectionChanged += new NotifyCollectionChangedEventHandler(this.OnValidationSummaryErrorsCollectionChanged);
                 this._validationSummary.SetStyleWithType(this.ValidationSummaryStyle);
+                this._validationSummary.SetValue(Grid.RowProperty, ValidationSummaryPosition == DataFormValidationSummaryPosition.Top ? 1 : 3);
                 if (DesignerProperties.IsInDesignTool)
                 {
                     Debug.Assert(this._validationSummary.Errors != null, "The Errors collection in the ValidationSummary should never be null.");
