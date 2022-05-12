@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml
 
         internal static void NativeEventCallback(UIElement mouseTarget, UIElement keyboardTarget, object jsEventArg)
         {
-            string type = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+            string type = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".type"));
             switch (type)
             {
                 case "mousemove":
@@ -91,7 +91,7 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnMouseMove(object jsEventArg)
         {
-            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".type"));
             if (!(ignoreMouseEvents && eventType == "mousemove"))
             {
 #if MIGRATION
@@ -123,7 +123,7 @@ namespace Windows.UI.Xaml
             // 4: Fifth button, typically the Browser Forward button
 
             int button;
-            int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.button", jsEventArg).ToString(), out button);
+            int.TryParse(OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".button").ToString(), out button);
 
             switch (button)
             {
@@ -164,7 +164,7 @@ namespace Windows.UI.Xaml
             // 4: Fifth button, typically the Browser Forward button
 
             int button;
-            int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.button", jsEventArg).ToString(), out button);
+            int.TryParse(OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".button").ToString(), out button);
 
             switch (button)
             {
@@ -193,7 +193,7 @@ namespace Windows.UI.Xaml
             bool preventTextSelectionWhenPointerIsCaptured = false,
             bool refreshClickCount = false)
         {
-            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".type"));
             if (!(ignoreMouseEvents && eventType.StartsWith("mouse"))) //Ignore mousedown and mouseup if the touch equivalents have been handled.
             {
 #if MIGRATION
@@ -414,7 +414,7 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnInput(object jsEventArg)
         {
-            string inputText = OpenSilver.Interop.ExecuteJavaScript("$0.data", jsEventArg).ToString();
+            string inputText = OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".data").ToString();
             if (inputText == null)
             {
                 return;
@@ -434,7 +434,7 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnKeyDown(object jsEventArg)
         {
-            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
+            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".keyCode").ToString(), out int keyCode))
             {
                 return;
             }
@@ -460,13 +460,13 @@ namespace Windows.UI.Xaml
 
             if (e.Handled)
             {
-                OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+                OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".preventDefault()");
             }
         }
 
         private void ProcessOnKeyUp(object jsEventArg)
         {
-            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript("$0.keyCode", jsEventArg).ToString(), out int keyCode))
+            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript(CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg) + ".keyCode").ToString(), out int keyCode))
             {
                 return;
             }
