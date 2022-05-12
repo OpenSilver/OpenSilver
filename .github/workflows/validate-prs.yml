@@ -10,10 +10,10 @@ jobs:
   OpenSilver-Build:
     runs-on: windows-2019
     steps:
-      - uses: microsoft/setup-msbuild@v1.0.3
+      - uses: microsoft/setup-msbuild@v1.1
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '6.0.202'
       - name: Clone OpenSilver repo
         uses: actions/checkout@v2
         with:
