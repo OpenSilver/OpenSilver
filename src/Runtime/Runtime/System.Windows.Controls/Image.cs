@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using OpenSilver.Internal;
 #else
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -152,6 +153,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void RefreshSource()
         {
+            string sImageDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imageDiv);
             if (Source != null)
             {
                 Loaded += Image_Loaded;
@@ -178,7 +180,7 @@ namespace Windows.UI.Xaml.Controls
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", dataUrl);
                     }
                     //set the width and height to "inherit" so the image takes up the size defined for it (and applied to _imageDiv's parent):
-                    CSHTML5.Interop.ExecuteJavaScript("$0.style.width = 'inherit'; $0.style.height = 'inherit'", _imageDiv);
+                    CSHTML5.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = 'inherit'; {sImageDiv}.style.height = 'inherit'");
                 }
             }
             else
@@ -187,7 +189,7 @@ namespace Windows.UI.Xaml.Controls
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", TransparentGifOnePixel);
 
                 //Set css width and height values to 0 so we don't use space for an image that should not take any. Note: if the size is specifically set in the Xaml, it will still apply on a parent dom element so it won't change the appearance.
-                CSHTML5.Interop.ExecuteJavaScript("$0.style.width = ''; $0.style.height = ''", _imageDiv);
+                CSHTML5.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = ''; {sImageDiv}.style.height = ''");
             }
             INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "alt", " "); //the text displayed when the image cannot be found. We set it as an empty string since there is nothing in Xaml
         }
@@ -206,6 +208,7 @@ namespace Windows.UI.Xaml.Controls
             double parentWidth = parent.ActualWidth;
             double parentHeight = parent.ActualHeight;
 
+            string sImageDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imageDiv);
 #if OPENSILVER
             if (true)
 #elif BRIDGE
@@ -213,7 +216,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth + '|' + $0.naturalHeight", _imageDiv));
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript($"{sImageDiv}.naturalWidth + '|' + {sImageDiv}.naturalHeight"));
                 int sepIndex = concatenated.IndexOf('|');
                 string imgWidthAsString = concatenated.Substring(0, sepIndex);
                 string imgHeightAsString = concatenated.Substring(sepIndex + 1);
@@ -227,8 +230,8 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                imgHeight = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.naturalHeight", _imageDiv));
-                imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.naturalWidth", _imageDiv));
+                imgHeight = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript($"{sImageDiv}.naturalHeight"));
+                imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript($"{sImageDiv}.naturalWidth"));
             }
 
             double currentWidth = ActualWidth;
@@ -249,7 +252,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (double.IsNaN(Width) && currentWidth != parentWidth)
                 {
-                    imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.style.width = $1", _imageDiv, parentWidth));
+                    imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = {parentWidth.ToInvariantString()}"));
                     //_imageDiv.style.width = parentWidth;
                 }
             }
@@ -261,7 +264,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (double.IsNaN(Height) && currentHeight != parentHeight)
                 {
-                    imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript("$0.style.height = $1", _imageDiv, parentHeight));
+                    imgWidth = Convert.ToDouble(CSHTML5.Interop.ExecuteJavaScript($"{sImageDiv}.style.height = {parentHeight.ToInvariantString()}"));
                     //_imageDiv.style.height = parentHeight;
                 }
             }
@@ -338,8 +341,9 @@ namespace Windows.UI.Xaml.Controls
                     default:
                         break;
                 }
-                CSHTML5.Interop.ExecuteJavaScript(@"$0.style.objectFit = $1;
-$0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
+                string sImageDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(image._imageDiv);
+                CSHTML5.Interop.ExecuteJavaScript($@"{sImageDiv}.style.objectFit = ""{objectFitvalue}"";
+{sImageDiv}.style.objectPosition = ""{objectPosition}""");
 
             }
         }
@@ -522,16 +526,16 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             style.height = "0"; // Same as above.
             style.objectPosition = "center top";
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.addEventListener('mousedown', function(e) {
+            string sImg = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(img);
+            CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
+{sImg}.addEventListener('mousedown', function(e) {{
     e.preventDefault();
-}, false);
-$0.addEventListener('error', function(e) {
+}}, false);
+{sImg}.addEventListener('error', function(e) {{
     this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     this.style.width = 0;
     this.style.height = 0;
-});
-", img);
+}});");
 
             _imageDiv = img;
             domElementWhereToPlaceChildren = null;

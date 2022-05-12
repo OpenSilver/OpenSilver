@@ -467,7 +467,7 @@ namespace Windows.UI.Xaml
                                                 styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
+                                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"document.setDisplayTableCell(""{childOfOuterDomElement.UniqueIdentifier}"")");
                                             }
                                         }
                                     }
@@ -493,7 +493,7 @@ namespace Windows.UI.Xaml
                                                 styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
+                                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"document.setDisplayTableCell(""{childOfOuterDomElement.UniqueIdentifier}"")");
                                             }
                                         }
                                     }
@@ -519,7 +519,7 @@ namespace Windows.UI.Xaml
                                                 styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
                                             {
                                                 // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setDisplayTableCell($0)", childOfOuterDomElement.UniqueIdentifier);
+                                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"document.setDisplayTableCell(""{childOfOuterDomElement.UniqueIdentifier}"")");
                                             }
                                         }
                                     }
@@ -1618,7 +1618,7 @@ namespace Windows.UI.Xaml
                     try
                     {
                         // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("document.getActualWidthAndHeight($0)", this.INTERNAL_OuterDomElement).ToString();
+                        string concatenated = CSHTML5.Interop.ExecuteJavaScript($"document.getActualWidthAndHeight({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement)})").ToString();
                         int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
                         if (sepIndex > -1)
                         {
@@ -1667,7 +1667,8 @@ namespace Windows.UI.Xaml
                     try
                     {
                         // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("(function() { var v = $0.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) })()", this.INTERNAL_OuterDomElement).ToString();
+                        string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement);
+                        string concatenated = CSHTML5.Interop.ExecuteJavaScript($@"(function() {{ var v = {sElement}.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) }})()").ToString();
                         int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
                         if (sepIndex > -1)
                         {

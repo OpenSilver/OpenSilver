@@ -164,15 +164,15 @@ namespace Windows.UI.Xaml.Controls
                     //---------------------------------------------------------------
                     if (Grid_InternalHelpers.IsAllCollapsedColumns(this, elementColumn, elementLastColumn))
                     {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.style.overflow = 'hidden'", uiElement.INTERNAL_OuterDomElement);
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.setAttribute('data-isCollapsedDueToHiddenColumn', true)", uiElement.INTERNAL_OuterDomElement);
+                        string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(uiElement.INTERNAL_OuterDomElement);
+                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sElement}.style.overflow = 'hidden'");
+                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sElement}.setAttribute('data-isCollapsedDueToHiddenColumn', true)");
                     }
                     else
                     {
                         // Note: we set to Visible only if it was previously Hidden due to the fact that a Grid column is hidden, to avoid conflicts such as replacing the "overflow" property set by the ScrollViewer or by the "ClipToBounds" property.
                         //setAttribute('data-isCollapsedDueToHiddenColumn', false)
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.setGridCollapsedDuetoHiddenColumn($0)", 
-                            ((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_OuterDomElement).UniqueIdentifier);
+                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"document.setGridCollapsedDuetoHiddenColumn(""{((INTERNAL_HtmlDomElementReference)uiElement.INTERNAL_OuterDomElement).UniqueIdentifier}"")");
                     }
                 }
             }
