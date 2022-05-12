@@ -1571,20 +1571,25 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 null);
 
+        bool _isSubsribedToSizeChanged = false;
         internal void SubsribeToSizeChanged()
         {
-            SizeChanged += (s, e) =>
+            if (!_isSubsribedToSizeChanged)
             {
-                if (((double)GetValue(ActualWidthProperty)) != e.NewSize.Width)
+                SizeChanged += (s, e) =>
                 {
-                    SetValue(ActualWidthProperty, e.NewSize.Width);
-                }
+                    if (((double)GetValue(ActualWidthProperty)) != e.NewSize.Width)
+                    {
+                        SetValue(ActualWidthProperty, e.NewSize.Width);
+                    }
 
-                if (((double)GetValue(ActualHeightProperty)) != e.NewSize.Height)
-                {
-                    SetValue(ActualHeightProperty, e.NewSize.Height);
-                }
-            };
+                    if (((double)GetValue(ActualHeightProperty)) != e.NewSize.Height)
+                    {
+                        SetValue(ActualHeightProperty, e.NewSize.Height);
+                    }
+                };
+                _isSubsribedToSizeChanged = true;
+            }
         }
 
         /// <summary>
