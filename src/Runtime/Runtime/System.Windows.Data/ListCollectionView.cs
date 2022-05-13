@@ -425,7 +425,7 @@ namespace Windows.UI.Xaml.Data
         /// an explicit <seealso cref="CollectionView.Refresh"/> call by the app is required.
         /// Note: Setting the custom comparer object will clear previously set <seealso cref="CollectionView.SortDescriptions"/>.
         /// </remarks>
-        public IComparer CustomSort
+        public override IComparer CustomSort
         {
             get { return _customSort; }
             set
@@ -434,7 +434,7 @@ namespace Windows.UI.Xaml.Data
                     throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "CustomSort"));
                 _customSort = value;
 
-                SetSortDescriptions(null);
+                //SetSortDescriptions(null);
 
                 RefreshOrDefer();
             }
@@ -2954,10 +2954,10 @@ namespace Windows.UI.Xaml.Data
                 throw new InvalidOperationException(string.Format("'{0}' is not allowed during an AddNew or EditItem transaction.", "Sorting"));
 
             // adding to SortDescriptions overrides custom sort
-            if (_sort.Count > 0)
-            {
-                _customSort = null;
-            }
+            //if (_sort.Count > 0)
+            //{
+            //    _customSort = null;
+            //}
 
             RefreshOrDefer();
         }
