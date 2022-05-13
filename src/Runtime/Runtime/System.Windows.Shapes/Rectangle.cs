@@ -67,11 +67,7 @@ namespace Windows.UI.Xaml.Shapes
             outerStyle.boxSizing = "border-box";
             outerStyle.borderCollapse = "separate";
 
-            var innerStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out _innerDiv);
-            innerStyle.width = "100%";
-            innerStyle.height = "100%";
-            innerStyle.borderStyle = "solid";
-            innerStyle.borderWidth = "0px";
+            _innerDiv = div1;
 
             domElementWhereToPlaceChildren = null;
             return div1;
