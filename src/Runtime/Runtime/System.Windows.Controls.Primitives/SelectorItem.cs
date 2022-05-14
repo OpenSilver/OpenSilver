@@ -56,6 +56,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (container.ParentSelector != null)
             {
                 container.ParentSelector.NotifyIsSelectedChanged(container, (bool)e.NewValue);
+                if (container.ParentSelector is ListBox && (bool)e.NewValue == true)
+                {
+                    ((ListBox)container.ParentSelector).ScrollIntoViewInternal(container as ListBoxItem);
+                }
             }
 
             container.UpdateVisualStates();

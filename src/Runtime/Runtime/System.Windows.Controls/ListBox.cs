@@ -132,6 +132,14 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        internal void ScrollIntoViewInternal(ListBoxItem container)
+        {
+            if (container != null && container.INTERNAL_OuterDomElement != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScript("$0.scrollIntoView({ block: 'nearest'})", container.INTERNAL_OuterDomElement);
+            }
+        }
+
         /// <summary>
         /// Selects all the items in the <see cref="ListBox"/>.
         /// </summary>
