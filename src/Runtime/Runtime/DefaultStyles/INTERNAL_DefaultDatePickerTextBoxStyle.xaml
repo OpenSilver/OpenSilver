@@ -16,6 +16,14 @@
                         </Grid.Resources>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
+                                <VisualState Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Border"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.4"
+                                                         Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
                                 <!-- #if WORKINPROGRESS -->
                                 <!--
                                 <VisualStateGroup.Transitions>
