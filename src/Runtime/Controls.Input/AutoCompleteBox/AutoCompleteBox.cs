@@ -1517,19 +1517,25 @@ namespace Windows.UI.Xaml.Controls
 
             if (hasFocus)
             {
-                if (TextBox != null && TextBox.SelectionLength == 0)
-                {
-                    TextBox.SelectAll();
-                }
+                // Disabling selecting text because the ACB TextBox has focus
+                // in OpenSilver even at the time when OnLostFocus is called.
+                // To reproduce this, put focus on ACB and try to place cursor in another TextBox.
+                //if (TextBox != null && TextBox.SelectionLength == 0)
+                //{
+                //    TextBox.SelectAll();
+                //}
             }
             else
             {
                 IsDropDownOpen = false;
                 _userCalledPopulate = false;
-                if (TextBox != null)
-                {
-                    TextBox.Select(TextBox.Text.Length, 0);
-                }
+
+                // Disable selecting text because when going from an ACB to another,
+                // the cursor will go to the start of the text, differently from in Silverlight.
+                //if (TextBox != null)
+                //{
+                //    TextBox.Select(TextBox.Text.Length, 0);
+                //}
             }
         }
 
