@@ -53,10 +53,16 @@ namespace Windows.UI.Xaml.Shapes
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            ManageStrokeChanged();
+            if (Stroke != null)
+                ManageStrokeChanged();
             ManageStrokeThicknessChanged();
-            OnFillChanged();
-            OnRadiusChanged(); 
+
+            
+            if (Fill != null)
+                OnFillChanged();
+
+            if (RadiusX > 0d || RadiusY > 0d)
+                OnRadiusChanged();
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -65,7 +71,18 @@ namespace Windows.UI.Xaml.Shapes
 
             var outerStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
             outerStyle.boxSizing = "border-box";
-            outerStyle.borderCollapse = "separate";
+
+            if (!this.IsUnderCustomLayout)
+            {
+                outerStyle.borderCollapse = "separate";
+                outerStyle.width = "100%";
+                outerStyle.height = "100%";
+            }
+            
+            outerStyle.borderStyle = "solid";
+
+            if (this.Stroke == null || this.StrokeThickness < 1)
+                outerStyle.borderWidth = "0";
 
             _innerDiv = div1;
 
@@ -82,15 +99,21 @@ namespace Windows.UI.Xaml.Shapes
                 if (Stroke is SolidColorBrush)
                 {
                     INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv).borderColor = ((SolidColorBrush)Stroke).INTERNAL_ToHtmlString();
-                    var strokeThickness = this.StrokeThickness;
-                    outerStyle.paddingBottom = strokeThickness * 2 + "px";
-                    outerStyle.paddingRight = strokeThickness * 2 + "px";
+                    if (!this.IsUnderCustomLayout)
+                    {
+                        var strokeThickness = this.StrokeThickness;
+                        outerStyle.paddingBottom = strokeThickness * 2 + "px";
+                        outerStyle.paddingRight = strokeThickness * 2 + "px";
+                    }
                 }
                 else if (Stroke == null)
                 {
                     INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv).borderColor = "";
-                    outerStyle.paddingBottom = "0px";
-                    outerStyle.paddingRight = "0px";
+                    if (!this.IsUnderCustomLayout)
+                    {
+                        outerStyle.paddingBottom = "0px";
+                        outerStyle.paddingRight = "0px";
+                    }
                 }
                 else
                 {
@@ -108,18 +131,20 @@ namespace Windows.UI.Xaml.Shapes
             {
                 domStyle.backgroundColor = ((SolidColorBrush)Fill).INTERNAL_ToHtmlString();
             }
-
-            string cssSize = "auto";
-            switch (Stretch)
+            else
             {
-                case Stretch.Fill: cssSize = "100% 100%"; break;
-                case Stretch.Uniform: cssSize = "contain"; break;
-                case Stretch.UniformToFill: cssSize = "cover"; break;
-            }
+                string cssSize = "auto";
+                switch (Stretch)
+                {
+                    case Stretch.Fill: cssSize = "100% 100%"; break;
+                    case Stretch.Uniform: cssSize = "contain"; break;
+                    case Stretch.UniformToFill: cssSize = "cover"; break;
+                }
 
-            domStyle.backgroundSize = cssSize;
-            domStyle.backgroundRepeat = "no-repeat";
-            domStyle.backgroundPosition = "center center";
+                domStyle.backgroundSize = cssSize;
+                domStyle.backgroundRepeat = "no-repeat";
+                domStyle.backgroundPosition = "center center";
+            }
         }
 
         protected internal override void ManageStrokeThicknessChanged()
@@ -127,9 +152,13 @@ namespace Windows.UI.Xaml.Shapes
             if (Stroke == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this)) return ;
             var innerStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv);
             innerStyle.borderWidth = StrokeThickness + "px";
-            var outerStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
-            outerStyle.paddingBottom = StrokeThickness * 2 + "px";
-            outerStyle.paddingRight = StrokeThickness * 2 + "px";
+            
+            if (!IsUnderCustomLayout)
+            {
+                var outerStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
+                outerStyle.paddingBottom = StrokeThickness * 2 + "px";
+                outerStyle.paddingRight = StrokeThickness * 2 + "px";
+            }
         }
 
         

@@ -993,12 +993,21 @@ namespace Windows.UI.Xaml
 
 #endregion pointer-events
 
+        // Check a duplicated javascript call on the pointerEvents.
+        internal string PointerEventsPropertyValue = "";
+
         internal static void SetPointerEvents(UIElement element)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
-                style.pointerEvents = element.EnablePointerEvents ? "auto" : "none";
+                // PointerEventsPropertyValue
+                string pointerEvents= element.EnablePointerEvents ? "auto" : "none";
+                if (element.PointerEventsPropertyValue != pointerEvents)
+                {
+                    var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
+                    style.pointerEvents = pointerEvents;
+                    element.PointerEventsPropertyValue = pointerEvents;
+                }
             }
         }
 
