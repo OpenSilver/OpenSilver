@@ -31,13 +31,18 @@ using System.Windows;
 
 #endif
 
-namespace CSHTML5
+#if OPENSILVER
+namespace OpenSilver
+#else
+namespace CSHTML5 
+#endif
 {
     /// <summary>
     /// Provides static methods for profiling performance in the browser.
     /// </summary>
     public static class Profiler
     {
+        // Idea for improvement: Add "results management" methods such as Clear or stuff like that.
 #if OPENSILVER
         static Dictionary<string, PerformanceCounter> PerformanceCounters = new Dictionary<string, PerformanceCounter>();
 
@@ -104,8 +109,12 @@ namespace CSHTML5
             counter.Time += elapsedTime;
         }
 
+        /// <summary>
+        /// Shows the measures obtained so far in the Output window of Visual Studio if in the Simulator, in the browser's developer tools' console if in the Browser.
+        /// </summary>
         public static void ViewProfilerResults()
-        { 
+        {
+            //Ideas for improvements: Add parameter(s) to decide the output type (messageBox, file, Output, ...?)
             if(PerformanceCounters.Count > 0)
             {
                 var sortedCounters = PerformanceCounters.OrderBy(x => x.Key);
