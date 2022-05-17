@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Windows.Data;
 
 namespace System.ComponentModel
 {
@@ -47,6 +48,16 @@ namespace System.ComponentModel
         /// this ICollectionView is a view.
         /// </summary>
         IEnumerable SourceCollection { get; }
+
+        /// <summary>
+        /// Set a custom comparer to sort items using an object that implements IComparer.
+        /// </summary>
+        /// <remarks>
+        /// Setting the Sort criteria has no immediate effect,
+        /// an explicit <seealso cref="CollectionView.Refresh"/> call by the app is required.
+        /// Note: Setting the custom comparer object will clear previously set <seealso cref="CollectionView.SortDescriptions"/>.
+        /// </remarks>
+        IComparer CustomSort { get; set; }
 
         /// <summary>
         /// Filter is a callback set by the consumer of the ICollectionView

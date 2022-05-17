@@ -16,6 +16,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+#if OPENSILVER
+using OpenSilver; 
+#endif
 
 #if MIGRATION
 using System.Windows;

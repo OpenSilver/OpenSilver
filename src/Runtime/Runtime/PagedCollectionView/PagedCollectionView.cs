@@ -988,6 +988,9 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
+        public IComparer CustomSort { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+
         /// <summary>
         /// Gets the source of the IEnumerable collection we are using for our view.
         /// </summary>
