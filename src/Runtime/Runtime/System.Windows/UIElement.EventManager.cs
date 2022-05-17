@@ -423,8 +423,7 @@ namespace Windows.UI.Xaml
                 return;
             }
 
-            string inputText = string.Empty;
-            inputText += (char)keyCode;
+            string inputText = ((char)keyCode).ToString();
 
             TextCompositionEventArgs e = new TextCompositionEventArgs
             {

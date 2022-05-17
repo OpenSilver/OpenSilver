@@ -393,18 +393,17 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
 ", _contentEditableDiv, startIndex, endIndex);
         }
 
-        internal void GetCaretPosition(out int caretPosition)
+        internal int GetCaretPosition()
         {
 
             if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                caretPosition = 0;
-                return;
+                return 0;
             }
 
             var result = OpenSilver.Interop.ExecuteJavaScript(@"document.getCaretPosition($0)", _contentEditableDiv);
 
-            caretPosition = CastToInt(result);
+            return CastToInt(result);
         }
 
         private object AddContentEditableDomElement(object parentRef, out object domElementWhereToPlaceChildren)

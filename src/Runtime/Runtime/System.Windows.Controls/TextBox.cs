@@ -503,20 +503,15 @@ namespace Windows.UI.Xaml.Controls
         }
 
         // It needs to get caret position for selection with Shift key
-        public int CaretPosition
+        internal int CaretPosition
         {
             get
             {
-                int caret;
                 if (_textViewHost != null)
-                {
-                    _textViewHost.View.GetCaretPosition(out caret);
-                    return caret;
-                }
+                    return _textViewHost.View.GetCaretPosition();
 
                 return 0;
             }
-            set {  }
         }
 
         /// <summary>
@@ -793,6 +788,10 @@ namespace Windows.UI.Xaml.Controls
 
         public void Select(int start, int length)
         {
+            if (start < 0)
+                throw new ArgumentOutOfRangeException(nameof(start));
+            if (start + length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
             _textViewHost.View.NEW_SET_SELECTION(start, start + length);
         }
 
