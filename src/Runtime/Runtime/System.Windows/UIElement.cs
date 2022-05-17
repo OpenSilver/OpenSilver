@@ -748,7 +748,7 @@ namespace Windows.UI.Xaml
                     parent.INTERNAL_VisualChildrenInformation != null &&
                     parent.INTERNAL_VisualChildrenInformation.ContainsKey(uiElement))
                 {
-                    mostOuterDomElement = parent.INTERNAL_VisualChildrenInformation[uiElement];
+                    mostOuterDomElement = parent.INTERNAL_VisualChildrenInformation[uiElement].INTERNAL_OptionalChildWrapper_OuterDomElement;
                 }
                 if (mostOuterDomElement == null)
                 {
