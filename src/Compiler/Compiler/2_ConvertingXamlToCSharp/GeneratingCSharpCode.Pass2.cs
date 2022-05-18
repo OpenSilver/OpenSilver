@@ -39,13 +39,16 @@ namespace DotNetForHtml5.Compiler
                 public readonly Dictionary<XElement, Dictionary<string, string>> NamescopeRootToElementsUniqueNameToInstantiatedObjects = new Dictionary<XElement, Dictionary<string, string>>();
                 
                 public readonly Stack<FrameworkTemplateData> FrameworkTemplateNames = new Stack<FrameworkTemplateData>();
+                public readonly string RootXamlContext = GeneratingUniqueNames.GenerateUniqueNameFromString("xamlContext");
+
+                public string CurrentXamlContext => FrameworkTemplateNames.Count > 0 ? FrameworkTemplateNames.Peek().ParamXamlContext : RootXamlContext;
             }
 
             private struct FrameworkTemplateData
             {
                 public string Name;
-                public string OwnerName;
-                public string InstanceName;
+                public string ParamOwner;
+                public string ParamXamlContext;
             }
 
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
@@ -88,6 +91,8 @@ namespace DotNetForHtml5.Compiler
                 PopulateDictionaryThatAssociatesNamesToUniqueNames(
                     parameters.NamescopeRootToNameToUniqueNameDictionary,
                     parameters.NamescopeRootToElementsUniqueNameToInstantiatedObjects);
+
+                parameters.StringBuilder.AppendLine($"var {parameters.RootXamlContext} = {RuntimeHelperClass}.Create_XamlContext();");
 
                 // Traverse the tree in "post order" (ie. start with child elements then traverse parent elements):
                 while (_reader.Read())
@@ -268,6 +273,7 @@ namespace DotNetForHtml5.Compiler
                     );
                 }
 
+                bool flag = false;
                 if (!isRootElement)
                 {
                     // Instantiate the object if it has not been done yet in the 'PopulateDictionaryThatAssociatesNamesToUniqueNames()' method.
@@ -275,6 +281,7 @@ namespace DotNetForHtml5.Compiler
                     if (!parameters.NamescopeRootToElementsUniqueNameToInstantiatedObjects.TryGetValue(elementThatIsRootOfTheCurrentNamescope, out uniqueNameToObjectsMap) ||
                         !uniqueNameToObjectsMap.ContainsKey(elementUniqueNameOrThisKeyword))
                     {
+                        flag = true;
                         if (isKnownSystemType)
                         {
                             //------------------------------------------------
@@ -296,10 +303,12 @@ namespace DotNetForHtml5.Compiler
 
                             parameters.StringBuilder.AppendLine(
                                 string.Format(
-                                    "{1} {0} = {2};",
+                                    "{1} {0} = {3}.XamlContext_PushScope({4}, {2});",
                                     elementUniqueNameOrThisKeyword,
                                     elementTypeInCSharp,
-                                    SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length))
+                                    SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
+                                    RuntimeHelperClass,
+                                    parameters.CurrentXamlContext
                                 )
                             );
                         }
@@ -320,7 +329,12 @@ namespace DotNetForHtml5.Compiler
                             );
 
                             parameters.StringBuilder.AppendLine(
-                                string.Format("var {0} = {1};", elementUniqueNameOrThisKeyword, preparedValue)
+                                string.Format("var {0} = {2}.XamlContext_PushScope({3}, {1});", 
+                                    elementUniqueNameOrThisKeyword, 
+                                    preparedValue,
+                                    RuntimeHelperClass,
+                                    parameters.CurrentXamlContext
+                                )
                             );
 
                         }
@@ -337,10 +351,12 @@ namespace DotNetForHtml5.Compiler
 
                             parameters.StringBuilder.AppendLine(
                                 string.Format(
-                                    "var {0} = (({1})new {2}()).CreateComponent();",
+                                    "var {0} = {3}.XamlContext_PushScope({4}, (({1})new {2}()).CreateComponent());",
                                     elementUniqueNameOrThisKeyword,
                                     $"{IXamlComponentFactoryClass}<global::{_metadata.SystemWindowsNS}.ResourceDictionary>",
-                                    XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri)
+                                    XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
+                                    RuntimeHelperClass,
+                                    parameters.CurrentXamlContext
                                 )
                             );
                         }
@@ -349,26 +365,26 @@ namespace DotNetForHtml5.Compiler
                             //------------------------------------------------
                             // Add the type constructor:
                             //------------------------------------------------
-                            parameters.StringBuilder.AppendLine(string.Format("var {0} = new {1}();", elementUniqueNameOrThisKeyword, elementTypeInCSharp));
+                            parameters.StringBuilder.AppendLine(string.Format("var {0} = {2}.XamlContext_PushScope({3}, new {1}());", 
+                                elementUniqueNameOrThisKeyword, 
+                                elementTypeInCSharp,
+                                RuntimeHelperClass,
+                                parameters.CurrentXamlContext));
                         }
                     }
+                }
 
-                    //special case: it is a ResourceDictionary in a <XXX.Resources> tag: we want to create the dictionary and immediately set the parent's Resources to the Dictionary.
-                    //              this is to let the MergedDictionaries' resources be added to the Application.Resources as they are added, so that they can use each other's resources without needing to add a MergedDictionary in them.
-                    //              at this point, we have already added the line to create the ResourceDictionary, so we only need to set the paren't Resources property to this Dictionary.
-                    if (isResourceDictionary)
+                
+                if (!flag)
+                {
+                    parameters.StringBuilder.AppendLine($"_ = {RuntimeHelperClass}.XamlContext_PushScope({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword});");
+                }
+
+                if (parameters.FrameworkTemplateNames.Count > 0)
+                {
+                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                     {
-                        //we check whether it is in the parent's Resources' property:
-                        XElement parent = element.Parent;
-                        string parentLocalName = parent.Name.LocalName;
-                        string[] splittedParentName = parentLocalName.Split('.');
-                        if (splittedParentName.Length == 2 && splittedParentName[1] == "Resources")
-                        {
-                            //add the element.Resources = this ResourceDictionary:
-                            parameters.StringBuilder.AppendLine(string.Format("{0}.Resources = {1};", GetUniqueName(parent.Parent), elementUniqueNameOrThisKeyword));
-
-                        }
-                        //todo: add a check in the case "the element is a Property" whether the property's name is "Resources", in which case we do not set it because it shoul dbe done here.
+                        parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {parameters.FrameworkTemplateNames.Peek().ParamOwner});");
                     }
                 }
 
@@ -668,15 +684,7 @@ namespace DotNetForHtml5.Compiler
 
             private void OnWriteEndObject(GeneratorContext parameters)
             {
-                if (parameters.FrameworkTemplateNames.Count > 0)
-                {
-                    XElement element = _reader.ObjectData.Element;
-
-                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
-                    {
-                        parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({GetUniqueName(element)}, {parameters.FrameworkTemplateNames.Peek().OwnerName});");
-                    }
-                }
+                parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_PopScope({parameters.CurrentXamlContext});");
             }
 
             private void OnWriteStartMember(GeneratorContext parameters)
@@ -691,20 +699,23 @@ namespace DotNetForHtml5.Compiler
                 if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
                     _reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkTemplate", member.Name.NamespaceName, typeName))
                 {
-                    string frameworkTemplateName = GetUniqueName(element);
-                    string templateInstanceName = $"templateInstance_{frameworkTemplateName}";
-                    string templateOwnerName = $"templateOwner_{frameworkTemplateName}";
+                    if (member.Elements().Count() > 1)
+                    {
+                        throw new XamlParseException("A FrameworkTemplate cannot have more than one child.", element);
+                    }
 
-                    parameters.StringBuilder.AppendLine($"{frameworkTemplateName}.SetMethodToInstantiateFrameworkTemplate({templateOwnerName} =>")
-                                  .AppendLine("{")
-                                  .AppendLine($"var {templateInstanceName} = new global::{_metadata.SystemWindowsNS}.TemplateInstance();")
-                                  .AppendLine($"{templateInstanceName}.TemplateOwner = {templateOwnerName};");
+                    string frameworkTemplateName = GetUniqueName(element);
+                    string templateOwnerName = $"templateOwner_{frameworkTemplateName}";
+                    string xamlContextName = $"xamlContext_{frameworkTemplateName}";
+
+                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, ({templateOwnerName}, {xamlContextName}) => ")
+                        .AppendLine("{");
 
                     parameters.FrameworkTemplateNames.Push(new FrameworkTemplateData
                     {
                         Name = frameworkTemplateName,
-                        OwnerName = templateOwnerName,
-                        InstanceName = templateInstanceName
+                        ParamOwner = templateOwnerName,
+                        ParamXamlContext = xamlContextName,
                     });
                 }
             }
@@ -742,10 +753,10 @@ namespace DotNetForHtml5.Compiler
                     string namescope = CreateNameScope(childUniqueName, 
                         GetNameToUniqueNameDictionary(frameworkTemplateRoot, parameters.NamescopeRootToNameToUniqueNameDictionary));
 
-                    parameters.StringBuilder.AppendLine($"templateInstance_{GetUniqueName(element.Parent)}.TemplateContent = {childUniqueName};")
+                    parameters.StringBuilder
                         .AppendLine(markupExtensionsAdditionalCode)
                         .AppendLine(namescope)
-                        .AppendLine($"return templateInstance_{GetUniqueName(element.Parent)};")
+                        .AppendLine($"return {childUniqueName};")
                         .AppendLine("});");
 
                     parameters.FrameworkTemplateNames.Pop();
@@ -848,26 +859,6 @@ namespace DotNetForHtml5.Compiler
                                 // {StaticResource ...}
                                 //------------------------------
 
-                                //we generate a list of the parents of the element so that we can search their resources if needed
-                                XElement elementForSearch = element.Parent;
-                                string nameForParentsCollection = GeneratingUniqueNames.GenerateUniqueNameFromString("parents"); // Example: parents_4541C363579C48A981219C392BF8ACD5
-                                parameters.StringBuilder.AppendLine(string.Format("var {0} = new global::System.Collections.Generic.List<global::System.Object>();",
-                                    nameForParentsCollection));
-
-                                while (elementForSearch != null)
-                                {
-                                    if (!elementForSearch.Name.LocalName.Contains('.'))
-                                    {
-                                        if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(elementForSearch, _reflectionOnSeparateAppDomain)) //we don't want to add the MarkupExtensions in the list of the parents (A MarkupExtension is not a DependencyObject)
-                                        {
-                                            parameters.StringBuilder.AppendLine(string.Format("{0}.Add({1});",
-                                                nameForParentsCollection, GetUniqueName(elementForSearch)));
-                                        }
-                                    }
-
-                                    elementForSearch = elementForSearch.Parent;
-                                }
-
                                 string[] splittedLocalName = element.Name.LocalName.Split('.');
                                 string propertyKey = GettingInformationAboutXamlTypes.GetKeyNameOfProperty(
                                     parent, splittedLocalName[1], _reflectionOnSeparateAppDomain
@@ -899,14 +890,14 @@ namespace DotNetForHtml5.Compiler
 
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
-                                            "{0}.Set{1}({2},({3})({4}.ProvideValue(new global::System.ServiceProvider({2}, {5}, {6}))));",
+                                            "{0}.Set{1}({2}, ({3})({4}.CallProvideValue({5}, {6})));",
                                             elementTypeInCSharp,
                                             propertyName,
                                             GetUniqueName(parent),
                                             "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                            childUniqueName,
-                                            propertyKeyString,
-                                            nameForParentsCollection
+                                            RuntimeHelperClass,
+                                            parameters.CurrentXamlContext,
+                                            childUniqueName
                                         )
                                     );
                                 }
@@ -931,13 +922,13 @@ namespace DotNetForHtml5.Compiler
 
                                     parameters.StringBuilder.AppendLine(
                                         string.Format(
-                                            "{0}.{1} = ({2})({3}.ProvideValue(new global::System.ServiceProvider({0}, {4}, {5})));",
+                                            "{0}.{1} = ({2}){3}.CallProvideValue({4}, {5});",
                                             GetUniqueName(parent),
                                             propertyName,
                                             "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
-                                            childUniqueName,
-                                            propertyKeyString,
-                                            nameForParentsCollection
+                                            RuntimeHelperClass,
+                                            parameters.CurrentXamlContext,
+                                            childUniqueName
                                         )
                                     );
                                 }
@@ -1020,7 +1011,7 @@ namespace DotNetForHtml5.Compiler
                                     parentElementUniqueNameOrThisKeyword,
                                     dependencyPropertyName,
                                     GetUniqueName(child),
-                                    parameters.FrameworkTemplateNames.Count > 0 ? parameters.FrameworkTemplateNames.Peek().OwnerName : TemplateOwnerValuePlaceHolder));
+                                    parameters.FrameworkTemplateNames.Count > 0 ? parameters.FrameworkTemplateNames.Peek().ParamOwner : TemplateOwnerValuePlaceHolder));
                             }
                             else if (child.Name == xNamespace + "NullExtension")
                             {

@@ -310,6 +310,16 @@ namespace Windows.UI.Xaml
             }
         }
 
+        internal bool HasResources
+        {
+            get
+            {
+                ResourceDictionary resources = _resources;
+                return (resources != null &&
+                        ((resources.Count > 0) || (resources.MergedDictionaries.Count > 0)));
+            }
+        }
+
         //
         // Internal routine only look up in application resources
         //

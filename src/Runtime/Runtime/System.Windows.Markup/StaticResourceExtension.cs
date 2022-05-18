@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenSilver.Internal.Xaml;
+
 #if !MIGRATION
 using Windows.UI.Xaml;
 #endif
@@ -29,7 +24,7 @@ namespace System.Windows.Markup
     /// <summary>
     /// Class used to access elements inside the XAML code
     /// </summary>
-    [System.Windows.Markup.ContentProperty("ResourceKey")]
+    [ContentProperty("ResourceKey")]
     public partial class StaticResourceExtension : MarkupExtension
     {
         /// <summary>
@@ -62,75 +57,63 @@ namespace System.Windows.Markup
         public override object ProvideValue(IServiceProvider serviceProvider)
 #endif
         {
-            ServiceProvider serviceProviderAsServiceProvider = (ServiceProvider)serviceProvider;
-            Type targetType;
-            if (serviceProviderAsServiceProvider.TargetProperty as DependencyProperty != null)
+            ResourceDictionary dictionaryWithKey = FindTheResourceDictionary(serviceProvider);
+            if (dictionaryWithKey != null)
             {
-                targetType = ((DependencyProperty)serviceProviderAsServiceProvider.TargetProperty).PropertyType;
+                return dictionaryWithKey[ResourceKey];
             }
-            else
+
+            object value = FindResourceInAppOrSystem();
+            if (value == null)
             {
-                targetType = null;
+                throw new XamlParseException($"StaticResource resolve failed: cannot find resource named '{ResourceKey}' (Note: resource names are case sensitive)");
             }
-            object elementItself = null;
-            foreach (object parentElement in serviceProviderAsServiceProvider.Parents)
-            {
-                ResourceDictionary resourceDictionary = null;
-                if ((resourceDictionary = parentElement as ResourceDictionary) == null)
-                {
-                    if (parentElement is FrameworkElement parentFE)
-                    {
-                        resourceDictionary = parentFE.HasResources ? parentFE.Resources
-                                                                   : null;
-                    }
-                }
-                if (resourceDictionary != null && resourceDictionary.Contains(ResourceKey))
-                {
-                    object returnElement = resourceDictionary[ResourceKey];
-                    if (!object.Equals(returnElement, elementItself))
-                    {
-                        return this.EnsurePropertyType(returnElement, targetType);
-                    }
-                }
-            }
-            if (Application.Current.Resources.Contains(ResourceKey))
-            {
-                return this.EnsurePropertyType(Application.Current.Resources[ResourceKey], targetType);
-            }
-            else
-            {
-                // Look in the built-in resources (eg. "SystemAccentColor"):
-                object result = Application.Current.TryFindResource(ResourceKey);
-                if (result == null)
-                {
-                    throw new XamlParseException(string.Format("StaticResource resolve failed: cannot find resource named '{0}' (Note: resource names are case sensitive)", ResourceKey));
-                }
-                return this.EnsurePropertyType(result, targetType);
-            }
-            throw new XamlParseException(string.Format("StaticResource resolve failed: cannot find resource named '{0}' (Note: resource names are case sensitive)", ResourceKey));
+            return value;
         }
 
-        private object EnsurePropertyType(object item, Type targetType)
+        private ResourceDictionary FindTheResourceDictionary(IServiceProvider serviceProvider)
         {
-            if (targetType == null || item == null)
+            IAmbientResourcesProvider ambientProvider = serviceProvider.GetService(typeof(IAmbientResourcesProvider)) as IAmbientResourcesProvider;
+            if (ambientProvider == null)
             {
-                return item;
+                throw new InvalidOperationException(
+                    string.Format("Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.",
+                        GetType().Name,
+                        nameof(IAmbientResourcesProvider)));
             }
 
-            Type itemType = item.GetType();
-            if (targetType.IsAssignableFrom(itemType))
+            IEnumerable<object> ambientValues = ambientProvider.GetAllAmbientValues();
+            foreach (object ambientValue in ambientValues)
             {
-                return item;
+                if (ambientValue is ResourceDictionary rd)
+                {
+                    if (rd.Contains(ResourceKey))
+                    {
+                        return rd;
+                    }
+                }
             }
-            else if (itemType == typeof(string) && TypeFromStringConverters.CanTypeBeConverted(targetType))
+
+            return null;
+        }
+
+        private object FindResourceInAppOrSystem()
+        {
+            Application app = Application.Current;
+            if (app != null)
             {
-                return TypeFromStringConverters.ConvertFromInvariantString(targetType, (string)item);
+                if (app.HasResources && app.Resources.Contains(ResourceKey))
+                {
+                    return app.Resources[ResourceKey];
+                }
+                else
+                {
+                    // Look in the built-in resources (eg. "SystemAccentColor")
+                    return app.TryFindResource(ResourceKey);
+                }
             }
-            else
-            {
-                //note: can crash
-                return Convert.ChangeType(item, targetType);
-            }
+
+            return null;
         }
     }
 }

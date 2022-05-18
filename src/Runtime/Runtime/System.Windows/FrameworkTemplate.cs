@@ -12,14 +12,10 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
-
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
+using OpenSilver.Internal.Xaml.Context;
 
 #if MIGRATION
 namespace System.Windows
@@ -33,20 +29,27 @@ namespace Windows.UI.Xaml
     [ContentProperty("ContentPropertyUsefulOnlyDuringTheCompilation")]
     public abstract partial class FrameworkTemplate : DependencyObject
     {
-        private Func<FrameworkElement, TemplateInstance> _methodToInstantiateFrameworkTemplate;
+        private TemplateContent _template;
+        private bool _isSealed;
 
         protected FrameworkTemplate()
         {
-            this.CanBeInheritanceContext = false;
+            CanBeInheritanceContext = false;
+        }
+
+        internal TemplateContent Template
+        {
+            get { return _template; }
+            set { CheckSealed(); _template = value; }
         }
 
         internal bool ApplyTemplateContent(FrameworkElement container)
         {
             Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
 
-            if (_methodToInstantiateFrameworkTemplate != null)
+            if (Template != null)
             {
-                FrameworkElement visualTree = _methodToInstantiateFrameworkTemplate(container).TemplateContent;
+                FrameworkElement visualTree = Template.LoadContent(container);
                 container.TemplateChild = visualTree;
                 
                 return visualTree != null;
@@ -68,10 +71,9 @@ namespace Windows.UI.Xaml
         /// <returns>The instantiated template.</returns>
         internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate()
         {
-            if (_methodToInstantiateFrameworkTemplate != null)
+            if (Template != null)
             {
-                TemplateInstance templateInstance = _methodToInstantiateFrameworkTemplate(null);
-                return templateInstance.TemplateContent;
+                return Template.LoadContent(null);
             }
             else
             {
@@ -79,31 +81,29 @@ namespace Windows.UI.Xaml
             }
         }
 
-        /// <summary>
-        /// Sets the method that will create the tree of elements.
-        /// </summary>
-        /// <param name="methodToInstantiateFrameworkTemplate">The method that will create the tree of elements.</param>
+        [Obsolete("Deprecated. Please use the Template property instead.", true)]
         public void SetMethodToInstantiateFrameworkTemplate(Func<FrameworkElement, TemplateInstance> methodToInstantiateFrameworkTemplate)
         {
-            if (_isSealed)
-            {
-                throw new InvalidOperationException($"Cannot modify a sealed '{GetType().Name}'. Please create a new one instead.");
-            }
-            _methodToInstantiateFrameworkTemplate = methodToInstantiateFrameworkTemplate;
+            throw new NotSupportedException("Deprecated. Please use the Template property instead.");
         }
 
-        // The following property is used during the "InsertImplicitNodes" step of the compilation, in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
-        /// <exclude/>
+        // The following property is used during the "InsertImplicitNodes" step of the compilation,
+        // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public UIElement ContentPropertyUsefulOnlyDuringTheCompilation
         {
             get { return (UIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
             set { SetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
         }
-        /// <exclude/>
-        public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
-            DependencyProperty.Register("ContentPropertyUsefulOnlyDuringTheCompilation", typeof(UIElement), typeof(FrameworkTemplate), new PropertyMetadata(null));
 
-        bool _isSealed = false;
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
+            DependencyProperty.Register(
+                nameof(ContentPropertyUsefulOnlyDuringTheCompilation), 
+                typeof(UIElement), 
+                typeof(FrameworkTemplate), 
+                null);
+        
         /// <summary>
         /// Locks the template so it cannot be changed.
         /// </summary>
@@ -122,5 +122,34 @@ namespace Windows.UI.Xaml
             return _isSealed;
         }
 
+        private void CheckSealed()
+        {
+            if (IsSealed())
+            {
+                throw new InvalidOperationException($"Cannot modify a sealed '{GetType().Name}'. Please create a new one instead.");
+            }
+        }
+    }
+
+    internal class TemplateContent
+    {
+        private readonly XamlContext _xamlContext;
+        private readonly Func<FrameworkElement, XamlContext, FrameworkElement> _factory;
+
+        internal TemplateContent(XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
+        {
+            if (xamlContext == null)
+            {
+                throw new ArgumentNullException(nameof(xamlContext));
+            }
+
+            _xamlContext = new XamlContext(xamlContext);
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        }
+
+        internal FrameworkElement LoadContent(FrameworkElement owner)
+        {
+            return _factory(owner, new XamlContext(_xamlContext));
+        }
     }
 }
