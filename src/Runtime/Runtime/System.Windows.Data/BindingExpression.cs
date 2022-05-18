@@ -223,7 +223,7 @@ namespace Windows.UI.Xaml.Data
                 ((FrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
             }
 
-            FindSource();
+            AttachToContext(false);
 
             if (_bindingSource is FrameworkElement fe)
             {
@@ -324,7 +324,7 @@ namespace Windows.UI.Xaml.Data
 
         internal void OnSourceAvailable()
         {
-            FindSource();
+            AttachToContext(true);
             if (_bindingSource != null)
             {
                 _propertyPathWalker.Update(_bindingSource);
@@ -610,23 +610,70 @@ namespace Windows.UI.Xaml.Data
             OnSourceAvailable();
         }
 
-        private void FindSource()
+        private void OnMentorLoaded(object sender, RoutedEventArgs e)
         {
+            ((FrameworkElement)sender).Loaded -= new RoutedEventHandler(OnMentorLoaded);
+            OnSourceAvailable();
+        }
+
+        private void AttachToContext(bool lastAttempt)
+        {
+            object source = null;
+            FrameworkElement mentor = null;
+            bool useMentor = false;
+
             if (ParentBinding.Source != null)
             {
-                _bindingSource = ParentBinding.Source;
+                source = ParentBinding.Source;
             }
             else if (ParentBinding.ElementName != null)
             {
-                _bindingSource = (Target as FrameworkElement)?.FindName(ParentBinding.ElementName);
+                useMentor = true;
+                mentor = FrameworkElement.FindMentor(Target);
+                if (mentor != null)
+                {
+                    source = FindName(mentor, ParentBinding.ElementName);
+                    if (source == null && !lastAttempt)
+                    {
+                        mentor.Loaded += new RoutedEventHandler(OnMentorLoaded);
+                    }
+                }
             }
             else if (ParentBinding.RelativeSource != null)
             {
-                _bindingSource = FindRelativeSource(this);
+                switch (ParentBinding.RelativeSource.Mode)
+                {
+                    case RelativeSourceMode.Self:
+                        source = Target;
+                        break;
+
+                    case RelativeSourceMode.TemplatedParent:
+                        useMentor = true;
+                        mentor = FrameworkElement.FindMentor(Target);
+                        source = mentor?.TemplatedParent;
+                        break;
+
+                    case RelativeSourceMode.FindAncestor:
+                        useMentor = true;
+                        mentor = FrameworkElement.FindMentor(Target);
+                        if (mentor != null)
+                        {
+                            source = FindAncestor(mentor, ParentBinding.RelativeSource);
+                            if (source == null && !lastAttempt)
+                            {
+                                mentor.Loaded += new RoutedEventHandler(OnMentorLoaded);
+                            }
+                        }
+                        break;
+
+                    case RelativeSourceMode.None:
+                    default:
+                        source = null;
+                        break;
+                }
             }
             else
             {
-                // DataContext
                 if (Target is FrameworkElement targetFE)
                 {
                     DependencyObject contextElement = targetFE;
@@ -637,43 +684,70 @@ namespace Windows.UI.Xaml.Data
                     // 2. if the target is ContentPresenter and the target property
                     //      is Content, use the parent.  This enables
                     //          <ContentPresenter Content="{Binding...}"/>
-                    if (TargetProperty == FrameworkElement.DataContextProperty || 
+                    if (TargetProperty == FrameworkElement.DataContextProperty ||
                         TargetProperty == ContentPresenter.ContentProperty)
                     {
                         contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
                     }
 
-                    _bindingSource = contextElement;
+                    source = contextElement;
                 }
                 else
                 {
-                    Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
-                    _bindingSource = FrameworkElement.FindMentor(Target);
+                    useMentor = true;
+                    source = mentor = FrameworkElement.FindMentor(Target);
                 }
             }
-        }
-        
-        private static object FindRelativeSource(BindingExpression expr)
-        {
-            RelativeSource relativeSource = expr.ParentBinding.RelativeSource;
-            switch (relativeSource.Mode)
+
+            _bindingSource = source;
+
+            if (source == null && useMentor && mentor == null)
             {
-                case RelativeSourceMode.Self:
-                    return expr.Target;
-
-                case RelativeSourceMode.TemplatedParent:
-                    return FrameworkElement.FindMentor(expr.Target)?.TemplatedParent;
-
-                case RelativeSourceMode.FindAncestor:
-                    return FindAncestor(expr.Target, relativeSource);
-
-                case RelativeSourceMode.None:
-                default:
-                    return null;
+                Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
             }
         }
 
-        private static object FindAncestor(DependencyObject target, RelativeSource relativeSource)
+        private static object FindName(FrameworkElement mentor, string name)
+        {
+            object o = null;
+            FrameworkElement fe = mentor;
+
+            while (o == null && fe != null)
+            {
+                o = fe.FindName(name);
+
+                if (o == null)
+                {
+                    // move to the next outer namescope.
+                    // First try TemplatedParent of the scope owner.
+                    DependencyObject dd = fe.TemplatedParent;
+
+                    // if that doesn't work, we could be at the top of
+                    // generated content for an ItemsControl.  If so, use
+                    // the (visual) parent - a panel.
+                    if (dd == null)
+                    {
+                        Panel panel = fe as Panel;
+                        if (panel != null && panel.IsItemsHost)
+                        {
+                            dd = panel;
+                        }
+                    }
+
+                    // Last, try inherited context
+                    if (dd == null)
+                    {
+                        dd = fe.InheritanceContext;
+                    }
+
+                    fe = FrameworkElement.FindMentor(dd);
+                }
+            }
+
+            return o;
+        }
+
+        private static object FindAncestor(FrameworkElement mentor, RelativeSource relativeSource)
         {
             // todo: support bindings in style setters and then remove the following test.
             // To reproduce the issue:
@@ -682,11 +756,11 @@ namespace Windows.UI.Xaml.Data
             //   <Setter Property="DefaultMarkerGeometry"
             //           Value="{Binding DefaultMarkerGeometry, RelativeSource={RelativeSource AncestorType=telerik:RadLegend}}"/>
             // </Style>
-            if (!(target is UIElement uiE))
+            if (mentor == null)
                 return null;
 
             // make sure the target is in the visual tree:
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(uiE))
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(mentor))
                 return null;
 
             // get the AncestorLevel and AncestorType:
@@ -696,10 +770,13 @@ namespace Windows.UI.Xaml.Data
                 return null;
 
             // look for the target's ancestor:
-            UIElement currentParent = (UIElement)uiE.INTERNAL_VisualParent;
+            UIElement currentParent = (UIElement)VisualTreeHelper.GetParent(mentor);
+            if (currentParent == null)
+                return null;
+
             while (!ancestorType.IsAssignableFrom(currentParent.GetType()) || --ancestorLevel > 0)
             {
-                currentParent = (UIElement)currentParent.INTERNAL_VisualParent;
+                currentParent = (UIElement)VisualTreeHelper.GetParent(currentParent);
                 if (currentParent == null)
                     return null;
             }

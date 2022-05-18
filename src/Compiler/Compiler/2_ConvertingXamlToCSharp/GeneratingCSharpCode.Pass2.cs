@@ -527,28 +527,6 @@ namespace DotNetForHtml5.Compiler
                                                     throw new XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
                                             }
                                             else if (elementTypeInCSharp == $"global::{_metadata.SystemWindowsDataNS}.Binding"
-                                                && memberName == "ElementName")
-                                            {
-                                                // Verify that the user has not already set a "Source" for the binding, otherwise his source prevails over the "ElementName" property (ie. if the suer sets both Source and ElementName, we should only use Source):
-                                                if (element.Element("Binding.Source") == null && element.Attribute("Source") == null) //todo: test this...
-                                                {
-                                                    // Replace "ElementName" with a direct reference to the instance:
-                                                    // Note: We need to put the code at the end of the method because "FindName" only works after all the names in the current namescope have been registered.
-                                                    List<string> markupExtensionsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(elementThatIsRootOfTheCurrentNamescope, parameters.NamescopeRootToMarkupExtensionsAdditionalCode);
-                                                    string uniqueNameOfSource = GetUniqueNameFromElementName(attributeValue, elementThatIsRootOfTheCurrentNamescope, parameters.NamescopeRootToNameToUniqueNameDictionary);
-                                                    if (uniqueNameOfSource != null)
-                                                    {
-                                                        markupExtensionsAdditionalCode.Add(string.Format("{0}.Source = {1};", elementUniqueNameOrThisKeyword, uniqueNameOfSource));
-                                                    }
-                                                    else
-                                                    {
-                                                        //TODO: check wether WPF & UWP also allow that silently
-                                                        _logger.WriteWarning($"The \"ElementName\" specified in the Binding was not found: {attributeValue}", _sourceFile, GetLineNumber(element));
-                                                    }
-                                                }
-                                                codeForInstantiatingTheAttributeValue = null; // null means that we skip this attribute here.
-                                            }
-                                            else if (elementTypeInCSharp == $"global::{_metadata.SystemWindowsDataNS}.Binding"
                                                 && memberName == "Path")
                                             {
                                                 if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
