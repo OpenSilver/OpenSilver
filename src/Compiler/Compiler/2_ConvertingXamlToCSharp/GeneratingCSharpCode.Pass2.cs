@@ -28,27 +28,131 @@ namespace DotNetForHtml5.Compiler
     {
         private class GeneratorPass2 : ICodeGenerator
         {
+            private abstract class GeneratorScope
+            {
+                private readonly Dictionary<string, string> _namescope;
+
+                protected GeneratorScope(string rootElement, bool createNameScope)
+                {
+                    Root = rootElement;
+                    XamlContext = GeneratingUniqueNames.GenerateUniqueNameFromString("xamlContext");
+                    
+                    if (createNameScope)
+                    {
+                        _namescope = new Dictionary<string, string>();
+                    }
+                }
+
+                public string Root { get; }
+
+                public string XamlContext { get; }
+
+                public StringBuilder StringBuilder { get; } = new StringBuilder();
+
+                protected abstract string ToStringCore();
+
+                public void RegisterName(string name, string scopedElement)
+                {
+                    if (_namescope == null) return;
+                    
+                    _namescope.Add(name, scopedElement);
+                }
+
+                public sealed override string ToString() => ToStringCore();
+
+                private protected void AppendNamescope(StringBuilder builder)
+                {
+                    if (_namescope == null) return;
+
+                    builder.AppendLine($"{RuntimeHelperClass}.InitializeNameScope({Root});");
+
+                    foreach (var kp in _namescope)
+                    {
+                        builder.AppendLine($"{RuntimeHelperClass}.RegisterName({Root}, {EscapeString(kp.Key)}, {kp.Value});");
+                    }
+                }
+            }
+
+            private class RootScope : GeneratorScope
+            {
+                public RootScope(string rootElementName, bool createNameScope) 
+                    : base(rootElementName, createNameScope) 
+                {
+                    StringBuilder.AppendLine($"var {XamlContext} = {RuntimeHelperClass}.Create_XamlContext();");
+                }
+
+                protected override string ToStringCore()
+                {
+                    StringBuilder builder = new StringBuilder();
+
+                    builder.Append(StringBuilder.ToString());
+                    AppendNamescope(builder);
+
+                    return builder.ToString();
+                }
+            }
+
+            private class FrameworkTemplateScope : GeneratorScope
+            {
+                private readonly IMetadata _metadata;
+
+                public FrameworkTemplateScope(string templateName, string templateRoot, IMetadata metadata)
+                    : base(templateRoot, true)
+                {
+                    _metadata = metadata;
+                    Name = templateName;
+                    TemplateOwner = $"templateOwner_{templateName}";
+                    MethodName = $"Create{templateName}";
+                }
+
+                public string Name { get; }
+
+                public string TemplateOwner { get; }
+
+                public string MethodName { get; }
+
+                protected override string ToStringCore()
+                {
+                    StringBuilder builder = new StringBuilder();
+
+                    builder.AppendLine($"private global::{_metadata.SystemWindowsNS}.FrameworkElement {MethodName}(global::{_metadata.SystemWindowsNS}.FrameworkElement {TemplateOwner}, {XamlContextClass} {XamlContext})")
+                        .AppendLine("{")
+                        .Append(StringBuilder.ToString());
+                    AppendNamescope(builder);
+                    builder.AppendLine($"return {Root};")
+                        .AppendLine("}");
+
+                    return builder.ToString();
+                }
+            }
+
             private class GeneratorContext
             {
+                private readonly Stack<GeneratorScope> _scopes = new Stack<GeneratorScope>();
+
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
-                public readonly Dictionary<XElement, Dictionary<string, string>> NamescopeRootToNameToUniqueNameDictionary = new Dictionary<XElement, Dictionary<string, string>>();
-                public readonly StringBuilder StringBuilder = new StringBuilder();
-                public readonly Dictionary<XElement, List<string>> NamescopeRootToMarkupExtensionsAdditionalCode = new Dictionary<XElement, List<string>>();
-                public readonly Dictionary<XElement, Dictionary<string, string>> NamescopeRootToElementsUniqueNameToInstantiatedObjects = new Dictionary<XElement, Dictionary<string, string>>();
                 
-                public readonly Stack<FrameworkTemplateData> FrameworkTemplateNames = new Stack<FrameworkTemplateData>();
-                public readonly string RootXamlContext = GeneratingUniqueNames.GenerateUniqueNameFromString("xamlContext");
+                public GeneratorScope CurrentScope => _scopes.Peek();
+                public StringBuilder StringBuilder => CurrentScope.StringBuilder;
 
-                public string CurrentXamlContext => FrameworkTemplateNames.Count > 0 ? FrameworkTemplateNames.Peek().ParamXamlContext : RootXamlContext;
-            }
+                public void PushScope(GeneratorScope scope)
+                {
+                    _scopes.Push(scope);
+                }
 
-            private struct FrameworkTemplateData
-            {
-                public string Name;
-                public string ParamOwner;
-                public string ParamXamlContext;
+                public void PopScope()
+                {
+                    if (_scopes.Count <= 1)
+                    {
+                        throw new InvalidOperationException();
+                    }
+
+                    ResultingMethods.Add(_scopes.Pop().ToString());
+                }
+
+                public string CurrentXamlContext => CurrentScope.XamlContext;
             }
 
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
@@ -88,11 +192,13 @@ namespace DotNetForHtml5.Compiler
 
             private string GenerateImpl(GeneratorContext parameters)
             {
-                PopulateDictionaryThatAssociatesNamesToUniqueNames(
-                    parameters.NamescopeRootToNameToUniqueNameDictionary,
-                    parameters.NamescopeRootToElementsUniqueNameToInstantiatedObjects);
-
-                parameters.StringBuilder.AppendLine($"var {parameters.RootXamlContext} = {RuntimeHelperClass}.Create_XamlContext();");
+                parameters.PushScope(
+                    new RootScope(GetUniqueName(_reader.Document.Root),
+                        _reflectionOnSeparateAppDomain.IsAssignableFrom(
+                            _metadata.SystemWindowsNS, "FrameworkElement",
+                            _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
+                    )
+                );
 
                 // Traverse the tree in "post order" (ie. start with child elements then traverse parent elements):
                 while (_reader.Read())
@@ -132,12 +238,6 @@ namespace DotNetForHtml5.Compiler
                 GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
                     out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
 
-                string markupExtensionsAdditionalCodeForElementsInRootNamescope =
-                    string.Join(
-                        Environment.NewLine,
-                        GetListThatContainsAdditionalCodeFromDictionary(_reader.Document.Root, parameters.NamescopeRootToMarkupExtensionsAdditionalCode)
-                    );
-
                 bool isClassTheApplicationClass = IsClassTheApplicationClass(baseType);
 
                 string additionalCodeToPlaceAtTheBeginningOfInitializeComponent =
@@ -145,27 +245,16 @@ namespace DotNetForHtml5.Compiler
                     _codeToPutInTheInitializeComponentOfTheApplicationClass :
                     string.Empty;
 
-                string nameScope = null;
-
                 if (hasCodeBehind)
                 {
-                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "DependencyObject",
-                            _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName))
-                    {
-                        nameScope = CreateNameScope(
-                            GetUniqueName(_reader.Document.Root),
-                            GetNameToUniqueNameDictionary(_reader.Document.Root, parameters.NamescopeRootToNameToUniqueNameDictionary)
-                        );
-                    }
-
                     // Create the "IntializeComponent()" method:
                     string initializeComponentMethod = CreateInitializeComponentMethod(
                         GetUniqueName(_reader.Document.Root),
                         codeToWorkWithTheRootElement,
                         parameters.ResultingFindNameCalls,
                         additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
-                        markupExtensionsAdditionalCodeForElementsInRootNamescope,
-                        nameScope,
+                        string.Empty,
+                        string.Empty,
                         _isSLMigration,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot
@@ -209,8 +298,8 @@ namespace DotNetForHtml5.Compiler
                         codeToWorkWithTheRootElement,
                         parameters.ResultingFindNameCalls,
                         additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
-                        markupExtensionsAdditionalCodeForElementsInRootNamescope,
-                        nameScope,
+                        string.Empty,
+                        string.Empty,
                         _isSLMigration,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
@@ -259,132 +348,112 @@ namespace DotNetForHtml5.Compiler
                 // (unless this is the root element)
                 string elementUniqueNameOrThisKeyword = GetUniqueName(element);
 
-                if (element == elementThatIsRootOfTheCurrentNamescope)
-                {
-                    parameters.StringBuilder.AppendLine(
-                        string.Join(
-                            Environment.NewLine,
-                            GetNameToUniqueNameDictionary(
-                                elementThatIsRootOfTheCurrentNamescope,
-                                parameters.NamescopeRootToElementsUniqueNameToInstantiatedObjects
-                            )
-                            .Select(x => x.Value)
-                        )
-                    );
-                }
-
                 bool flag = false;
                 if (!isRootElement)
                 {
-                    // Instantiate the object if it has not been done yet in the 'PopulateDictionaryThatAssociatesNamesToUniqueNames()' method.
-                    Dictionary<string, string> uniqueNameToObjectsMap = null;
-                    if (!parameters.NamescopeRootToElementsUniqueNameToInstantiatedObjects.TryGetValue(elementThatIsRootOfTheCurrentNamescope, out uniqueNameToObjectsMap) ||
-                        !uniqueNameToObjectsMap.ContainsKey(elementUniqueNameOrThisKeyword))
+                    flag = true;
+                    if (isKnownSystemType)
                     {
-                        flag = true;
-                        if (isKnownSystemType)
+                        //------------------------------------------------
+                        // Add the type initialization from literal value:
+                        //------------------------------------------------
+                        string directContent;
+                        if (element.FirstNode is XText xText)
                         {
-                            //------------------------------------------------
-                            // Add the type initialization from literal value:
-                            //------------------------------------------------
-                            string directContent;
-                            if (element.FirstNode is XText xText)
-                            {
-                                directContent = xText.Value;
-                            }
-                            else
-                            {
-                                // If the direct content is not specified, we use the type's
-                                // default value (ex: <sys:String></sys:String>)
-                                directContent = GetDefaultValueOfTypeAsString(
-                                    namespaceName, localTypeName, isKnownSystemType, _reflectionOnSeparateAppDomain, assemblyNameIfAny
-                                );
-                            }
-
-                            parameters.StringBuilder.AppendLine(
-                                string.Format(
-                                    "{1} {0} = {3}.XamlContext_PushScope({4}, {2});",
-                                    elementUniqueNameOrThisKeyword,
-                                    elementTypeInCSharp,
-                                    SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
-                                    RuntimeHelperClass,
-                                    parameters.CurrentXamlContext
-                                )
-                            );
-                        }
-                        else if (isInitializeTypeFromString)
-                        {
-                            //------------------------------------------------
-                            // Add the type initialization from string:
-                            //------------------------------------------------
-
-                            string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
-
-                            bool isKnownCoreType = CoreTypesHelper.IsSupportedCoreType(
-                                elementTypeInCSharp.Substring("global::".Length), assemblyNameIfAny
-                            );
-
-                            string preparedValue = ConvertFromInvariantString(
-                                stringValue, elementTypeInCSharp, isKnownCoreType, isKnownSystemType
-                            );
-
-                            parameters.StringBuilder.AppendLine(
-                                string.Format("var {0} = {2}.XamlContext_PushScope({3}, {1});", 
-                                    elementUniqueNameOrThisKeyword, 
-                                    preparedValue,
-                                    RuntimeHelperClass,
-                                    parameters.CurrentXamlContext
-                                )
-                            );
-
-                        }
-                        else if (isResourceDictionaryReferencedBySourceURI)
-                        {
-                            //------------------------------------------------
-                            // Add the type initialization from "Source" URI:
-                            //------------------------------------------------
-                            string sourceUri = element.Attribute("Source").Value; // Note: this attribute exists because we have checked earlier.
-                            string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(
-                                sourceUri,
-                                _fileNameWithPathRelativeToProjectRoot,
-                                _assemblyNameWithoutExtension);
-
-                            parameters.StringBuilder.AppendLine(
-                                string.Format(
-                                    "var {0} = {3}.XamlContext_PushScope({4}, (({1})new {2}()).CreateComponent());",
-                                    elementUniqueNameOrThisKeyword,
-                                    $"{IXamlComponentFactoryClass}<global::{_metadata.SystemWindowsNS}.ResourceDictionary>",
-                                    XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
-                                    RuntimeHelperClass,
-                                    parameters.CurrentXamlContext
-                                )
-                            );
+                            directContent = xText.Value;
                         }
                         else
                         {
-                            //------------------------------------------------
-                            // Add the type constructor:
-                            //------------------------------------------------
-                            parameters.StringBuilder.AppendLine(string.Format("var {0} = {2}.XamlContext_PushScope({3}, new {1}());", 
-                                elementUniqueNameOrThisKeyword, 
-                                elementTypeInCSharp,
-                                RuntimeHelperClass,
-                                parameters.CurrentXamlContext));
+                            // If the direct content is not specified, we use the type's
+                            // default value (ex: <sys:String></sys:String>)
+                            directContent = GetDefaultValueOfTypeAsString(
+                                namespaceName, localTypeName, isKnownSystemType, _reflectionOnSeparateAppDomain, assemblyNameIfAny
+                            );
                         }
+
+                        parameters.StringBuilder.AppendLine(
+                            string.Format(
+                                "{1} {0} = {3}.XamlContext_PushScope({4}, {2});",
+                                elementUniqueNameOrThisKeyword,
+                                elementTypeInCSharp,
+                                SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
+                                RuntimeHelperClass,
+                                parameters.CurrentXamlContext
+                            )
+                        );
+                    }
+                    else if (isInitializeTypeFromString)
+                    {
+                        //------------------------------------------------
+                        // Add the type initialization from string:
+                        //------------------------------------------------
+
+                        string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
+
+                        bool isKnownCoreType = CoreTypesHelper.IsSupportedCoreType(
+                            elementTypeInCSharp.Substring("global::".Length), assemblyNameIfAny
+                        );
+
+                        string preparedValue = ConvertFromInvariantString(
+                            stringValue, elementTypeInCSharp, isKnownCoreType, isKnownSystemType
+                        );
+
+                        parameters.StringBuilder.AppendLine(
+                            string.Format("var {0} = {2}.XamlContext_PushScope({3}, {1});", 
+                                elementUniqueNameOrThisKeyword, 
+                                preparedValue,
+                                RuntimeHelperClass,
+                                parameters.CurrentXamlContext
+                            )
+                        );
+
+                    }
+                    else if (isResourceDictionaryReferencedBySourceURI)
+                    {
+                        //------------------------------------------------
+                        // Add the type initialization from "Source" URI:
+                        //------------------------------------------------
+                        string sourceUri = element.Attribute("Source").Value; // Note: this attribute exists because we have checked earlier.
+                        string absoluteSourceUri = PathsHelper.ConvertToAbsolutePathWithComponentSyntax(
+                            sourceUri,
+                            _fileNameWithPathRelativeToProjectRoot,
+                            _assemblyNameWithoutExtension);
+
+                        parameters.StringBuilder.AppendLine(
+                            string.Format(
+                                "var {0} = {3}.XamlContext_PushScope({4}, (({1})new {2}()).CreateComponent());",
+                                elementUniqueNameOrThisKeyword,
+                                $"{IXamlComponentFactoryClass}<global::{_metadata.SystemWindowsNS}.ResourceDictionary>",
+                                XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
+                                RuntimeHelperClass,
+                                parameters.CurrentXamlContext
+                            )
+                        );
+                    }
+                    else
+                    {
+                        //------------------------------------------------
+                        // Add the type constructor:
+                        //------------------------------------------------
+                        parameters.StringBuilder.AppendLine(string.Format("var {0} = {2}.XamlContext_PushScope({3}, new {1}());", 
+                            elementUniqueNameOrThisKeyword, 
+                            elementTypeInCSharp,
+                            RuntimeHelperClass,
+                            parameters.CurrentXamlContext));
                     }
                 }
-
                 
                 if (!flag)
                 {
                     parameters.StringBuilder.AppendLine($"_ = {RuntimeHelperClass}.XamlContext_PushScope({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword});");
                 }
 
-                if (parameters.FrameworkTemplateNames.Count > 0)
+                // Set templated parent if any
+                if (parameters.CurrentScope is FrameworkTemplateScope scope)
                 {
                     if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                     {
-                        parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {parameters.FrameworkTemplateNames.Peek().ParamOwner});");
+                        parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {scope.TemplateOwner});");
                     }
                 }
 
@@ -443,6 +512,8 @@ namespace DotNetForHtml5.Compiler
                                 {
                                     parameters.StringBuilder.AppendLine(string.Format("{0}.Name = \"{1}\";", elementUniqueNameOrThisKeyword, name));
                                 }
+
+                                parameters.CurrentScope.RegisterName(name, elementUniqueNameOrThisKeyword);
                                 //todo: throw an exception when both "x:Name" and "Name" are specified in the XAML.
 
                             }
@@ -641,18 +712,15 @@ namespace DotNetForHtml5.Compiler
                     }
 
                     string frameworkTemplateName = GetUniqueName(element);
-                    string templateOwnerName = $"templateOwner_{frameworkTemplateName}";
-                    string xamlContextName = $"xamlContext_{frameworkTemplateName}";
 
-                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, ({templateOwnerName}, {xamlContextName}) => ")
-                        .AppendLine("{");
+                    FrameworkTemplateScope scope = new FrameworkTemplateScope(
+                        frameworkTemplateName,
+                        GetUniqueName(member.Elements().First()),
+                        _metadata);
 
-                    parameters.FrameworkTemplateNames.Push(new FrameworkTemplateData
-                    {
-                        Name = frameworkTemplateName,
-                        ParamOwner = templateOwnerName,
-                        ParamXamlContext = xamlContextName,
-                    });
+                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, {scope.MethodName});");
+
+                    parameters.PushScope(scope);
                 }
             }
 
@@ -663,9 +731,6 @@ namespace DotNetForHtml5.Compiler
                 // Get the namespace, local name, and optional assembly that correspond to the element:
                 string namespaceName, localTypeName, assemblyNameIfAny;
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
-
-                // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
 
                 // Get information about the parent element (to which the property applies) and the element itself:
                 var parentElement = element.Parent;
@@ -679,23 +744,8 @@ namespace DotNetForHtml5.Compiler
 
                 if (isFrameworkTemplateContentProperty)
                 {
-                    XElement frameworkTemplateRoot = element.Elements().First();
-                    string childUniqueName = GetUniqueName(frameworkTemplateRoot);
-
-                    string markupExtensionsAdditionalCode = string.Join(Environment.NewLine,
-                        GetListThatContainsAdditionalCodeFromDictionary(frameworkTemplateRoot, 
-                            parameters.NamescopeRootToMarkupExtensionsAdditionalCode));
-                    
-                    string namescope = CreateNameScope(childUniqueName, 
-                        GetNameToUniqueNameDictionary(frameworkTemplateRoot, parameters.NamescopeRootToNameToUniqueNameDictionary));
-
-                    parameters.StringBuilder
-                        .AppendLine(markupExtensionsAdditionalCode)
-                        .AppendLine(namescope)
-                        .AppendLine($"return {childUniqueName};")
-                        .AppendLine("});");
-
-                    parameters.FrameworkTemplateNames.Pop();
+                    // TODO move call to FrameworkTemplate.SetMethodToInstantiateFrameworkTemplate(...) here
+                    parameters.PopScope();
                 }
                 else
                 {
@@ -875,10 +925,6 @@ namespace DotNetForHtml5.Compiler
                                 // {Binding ...}
                                 //------------------------------
 
-                                // Get a reference to the list to which we add the generated markup extensions code
-                                List<string> markupExtensionsAdditionalCode = GetListThatContainsAdditionalCodeFromDictionary(
-                                    elementThatIsRootOfTheCurrentNamescope, parameters.NamescopeRootToMarkupExtensionsAdditionalCode);
-
                                 bool isDependencyProperty =
                                     _reflectionOnSeparateAppDomain.GetField(
                                         propertyName + "Property",
@@ -929,7 +975,7 @@ namespace DotNetForHtml5.Compiler
                                 }
                                 else
                                 {
-                                    markupExtensionsAdditionalCode.Add(string.Format("global::{3}.BindingOperations.SetBinding({0}, {1}, {2});",
+                                    parameters.StringBuilder.AppendLine(string.Format("global::{3}.BindingOperations.SetBinding({0}, {1}, {2});",
                                         parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), _metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
                                 }
                             }
@@ -947,7 +993,7 @@ namespace DotNetForHtml5.Compiler
                                     parentElementUniqueNameOrThisKeyword,
                                     dependencyPropertyName,
                                     GetUniqueName(child),
-                                    parameters.FrameworkTemplateNames.Count > 0 ? parameters.FrameworkTemplateNames.Peek().ParamOwner : TemplateOwnerValuePlaceHolder));
+                                    parameters.CurrentScope is FrameworkTemplateScope scope ? scope.TemplateOwner : TemplateOwnerValuePlaceHolder));
                             }
                             else if (child.Name == xNamespace + "NullExtension")
                             {
@@ -1168,37 +1214,6 @@ else
                 }
             }
 
-            private void PopulateDictionaryThatAssociatesNamesToUniqueNames(
-                Dictionary<XElement, Dictionary<string, string>> namescopeRootToNameToUniqueNameDictionary,
-                Dictionary<XElement, Dictionary<string, string>> namescopeRootToElementsUniqueNameToInstantiatedObjects)
-            {
-                foreach (var element in PostOrderTreeTraversal.TraverseTreeInPostOrder(_reader.Document.Root)) // Note: any order is fine here.
-                {
-                    // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
-                    XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
-
-                    foreach (XAttribute attribute in element.Attributes())
-                    {
-                        if (IsAttributeTheXNameAttribute(attribute))
-                        {
-                            string elementUniqueNameOrThisKeyword = GetUniqueName(element);
-                            string name = attribute.Value;
-
-                            // Remember the "Name to UniqueName" association:
-                            Dictionary<string, string> nameToUniqueNameDictionary = GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToNameToUniqueNameDictionary);
-                            if (nameToUniqueNameDictionary.ContainsKey(name))
-                                throw new XamlParseException("The name already exists in the tree: " + name);
-                            nameToUniqueNameDictionary.Add(name, elementUniqueNameOrThisKeyword);
-                            if (element != elementThatIsRootOfTheCurrentNamescope)
-                            {
-                                Dictionary<string, string> uniqueNameToInstantiatedObjectDictionary = GetNameToUniqueNameDictionary(elementThatIsRootOfTheCurrentNamescope, namescopeRootToElementsUniqueNameToInstantiatedObjects);
-                                uniqueNameToInstantiatedObjectDictionary.Add(elementUniqueNameOrThisKeyword, GenerateCodeToInstantiateXElement(element, _reflectionOnSeparateAppDomain));
-                            }
-                        }
-                    }
-                }
-            }
-
             private XElement GetRootOfCurrentNamescopeForRuntime(XElement element)
             {
                 XElement currentElement = element;
@@ -1230,152 +1245,9 @@ else
                 return (element == _reader.Document.Root);
             }
 
-            private static string GenerateCodeToInstantiateXElement(XElement element, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
-            {
-                string namespaceName, typeName, assemblyIfAny;
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
-                    element.Name, out namespaceName, out typeName, out assemblyIfAny
-                );
-
-                string elementTypeInCSharp =
-                    reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                        namespaceName, typeName, assemblyIfAny, false
-                    );
-
-                bool isKnownSystemType = SystemTypesHelper.IsSupportedSystemType(
-                    elementTypeInCSharp.Substring("global::".Length), assemblyIfAny
-                );
-
-                bool isInitializeTypeFromString =
-                    element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
-
-                // Add the constructor (in case of object) or a direct initialization (in case
-                // of system type or "isInitializeFromString" or referenced ResourceDictionary)
-                // (unless this is the root element)
-                string elementUniqueNameOrThisKeyword = GetUniqueName(element);
-
-                if (isKnownSystemType)
-                {
-                    //------------------------------------------------
-                    // Add the type initialization from literal value:
-                    //------------------------------------------------
-                    string directContent;
-                    if (element.FirstNode is XText xText)
-                    {
-                        directContent = xText.Value;
-                    }
-                    else
-                    {
-                        // If the direct content is not specified, we use the type's default
-                        // value (ex: <sys:String></sys:String>)
-                        directContent = GetDefaultValueOfTypeAsString(
-                            namespaceName, typeName, isKnownSystemType, reflectionOnSeparateAppDomain, assemblyIfAny
-                        );
-                    }
-
-                    return string.Format(
-                        "{1} {0} = {2};",
-                        elementUniqueNameOrThisKeyword,
-                        elementTypeInCSharp,
-                        SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length))
-                    );
-                }
-                else if (isInitializeTypeFromString)
-                {
-                    //------------------------------------------------
-                    // Add the type initialization from string:
-                    //------------------------------------------------
-
-                    string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
-                    bool isKnownCoreType = CoreTypesHelper.IsSupportedCoreType(
-                        elementTypeInCSharp.Substring("global::".Length), assemblyIfAny
-                    );
-
-                    string preparedValue = ConvertFromInvariantString(
-                        stringValue, elementTypeInCSharp, isKnownCoreType, isKnownSystemType
-                    );
-
-                    return string.Format("var {0} = {1};", elementUniqueNameOrThisKeyword, preparedValue);
-                }
-                else
-                {
-                    //------------------------------------------------
-                    // Add the type constructor:
-                    //------------------------------------------------
-                    return string.Format("var {0} = new {1}();", elementUniqueNameOrThisKeyword, elementTypeInCSharp);
-                }
-            }
-
             private bool IsClassTheApplicationClass(string className)
             {
                 return className == $"global::{_metadata.SystemWindowsNS}.Application";
-            }
-
-            private static List<string> GetListThatContainsAdditionalCodeFromDictionary(XElement elementThatIsRootOfTheCurrentNamescope,
-                Dictionary<XElement, List<string>> namescopeRootToListOfAdditionalCode)
-            {
-                if (namescopeRootToListOfAdditionalCode.ContainsKey(elementThatIsRootOfTheCurrentNamescope))
-                {
-                    List<string> listThatContainsAdditionalCode = namescopeRootToListOfAdditionalCode[elementThatIsRootOfTheCurrentNamescope];
-                    return listThatContainsAdditionalCode;
-                }
-                else
-                {
-                    List<string> listThatContainsAdditionalCode = new List<string>();
-                    namescopeRootToListOfAdditionalCode.Add(elementThatIsRootOfTheCurrentNamescope, listThatContainsAdditionalCode);
-                    return listThatContainsAdditionalCode;
-                }
-            }
-
-            private static string GetUniqueNameFromElementName(string elementName,
-                XElement rootOfTheCurrentNamescope,
-                Dictionary<XElement, Dictionary<string, string>> namescopeRootToNameToUniqueNameDictionary)
-            {
-                if (rootOfTheCurrentNamescope == null)
-                {
-                    return null;
-                }
-                if (namescopeRootToNameToUniqueNameDictionary.ContainsKey(rootOfTheCurrentNamescope))
-                {
-                    if (namescopeRootToNameToUniqueNameDictionary[rootOfTheCurrentNamescope].ContainsKey(elementName))
-                    {
-                        return namescopeRootToNameToUniqueNameDictionary[rootOfTheCurrentNamescope][elementName];
-                    }
-                }
-                return GetUniqueNameFromElementName(elementName, rootOfTheCurrentNamescope.Parent, namescopeRootToNameToUniqueNameDictionary);
-            }
-
-            private static Dictionary<string, string> GetNameToUniqueNameDictionary(XElement elementThatIsRootOfTheCurrentNamescope,
-                Dictionary<XElement, Dictionary<string, string>> namescopeRootToNameToUniqueNameDictionary)
-            {
-                if (namescopeRootToNameToUniqueNameDictionary.ContainsKey(elementThatIsRootOfTheCurrentNamescope))
-                {
-                    Dictionary<string, string> nameToUniqueNameDictionary = namescopeRootToNameToUniqueNameDictionary[elementThatIsRootOfTheCurrentNamescope];
-                    return nameToUniqueNameDictionary;
-                }
-                else
-                {
-                    Dictionary<string, string> nameToUniqueNameDictionary = new Dictionary<string, string>();
-                    namescopeRootToNameToUniqueNameDictionary.Add(elementThatIsRootOfTheCurrentNamescope, nameToUniqueNameDictionary);
-                    return nameToUniqueNameDictionary;
-                }
-            }
-
-            private static IEnumerable<T> PopElementsFromStackAndReadThemInReverseOrder<T>(Stack<T> stack, int count)
-            {
-                // Note: this method is used for example to change the order of the child codes so that they are added in the same order as the in the XAML.
-
-                Stack<T> stackToInvertOrder = new Stack<T>();
-                for (int i = 0; i < count; i++)
-                {
-                    var element = stack.Pop();
-                    stackToInvertOrder.Push(element);
-                }
-                while (stackToInvertOrder.Count > 0)
-                {
-                    var element = stackToInvertOrder.Pop();
-                    yield return element;
-                }
             }
 
             private string GenerateCodeForSetterProperty(XElement styleElement, string attributeValue)
@@ -1491,29 +1363,6 @@ else
                 GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(typeString, elementWhereTheTypeIsUsed, out namespaceName, out localTypeName, out assemblyNameIfAny);
                 string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: false);
                 return elementTypeInCSharp;
-            }
-
-            private static string CreateDataTemplateLambda(
-                string codeToInstantiateTheDataTemplate,
-                string dataTemplateUniqueName,
-                string childUniqueName,
-                string templateInstanceUniqueName,
-                string codeToPlaceAtTheBeginningOfTheMethod,
-                string additionalCodeToPlaceAtTheEndOfTheMethod,
-                string nameScope,
-                string namespaceSystemWindows)
-            {
-                return $@"templateOwner_{dataTemplateUniqueName} => 
-{{
-var {templateInstanceUniqueName} = new global::{namespaceSystemWindows}.TemplateInstance();
-{templateInstanceUniqueName}.TemplateOwner = templateOwner_{dataTemplateUniqueName};
-{codeToPlaceAtTheBeginningOfTheMethod}
-{codeToInstantiateTheDataTemplate}
-{additionalCodeToPlaceAtTheEndOfTheMethod}
-{nameScope}
-{templateInstanceUniqueName}.TemplateContent = {childUniqueName};
-return {templateInstanceUniqueName};
-}}";
             }
 
             private string GetElementXKey(XElement element,
@@ -1963,23 +1812,6 @@ return {templateInstanceUniqueName};
 #endif
             }
 
-            private static string CreateNameScope(string nameScopeRoot, Dictionary<string, string> nameMap)
-            {
-                StringBuilder sb = new StringBuilder();
-
-                sb.AppendLine($"{RuntimeHelperClass}.InitializeNameScope({nameScopeRoot});");
-
-                if (nameMap != null)
-                {
-                    foreach (var kp in nameMap)
-                    {
-                        sb.AppendLine($"{RuntimeHelperClass}.RegisterName({nameScopeRoot}, {EscapeString(kp.Key)}, {kp.Value});");
-                    }
-                }
-
-                return sb.ToString();
-            }
-
             private static bool IsReservedAttribute(string attributeName)
             {
                 if (attributeName == GeneratingUniqueNames.UniqueNameAttribute ||
@@ -1995,8 +1827,6 @@ return {templateInstanceUniqueName};
             {
                 return string.Concat("@\"", stringValue.Replace("\"", "\"\""), "\"");
             }
-
-            private enum EnumerableType { None, Collection, Dictionary }
         }
     }
 }

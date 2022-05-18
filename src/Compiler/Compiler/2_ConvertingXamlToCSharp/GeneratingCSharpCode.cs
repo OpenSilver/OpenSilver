@@ -381,6 +381,7 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
 
         private const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
         private const string IXamlComponentFactoryClass = "global::OpenSilver.Internal.Xaml.IXamlComponentFactory";
+        private const string XamlContextClass = "global::OpenSilver.Internal.Xaml.Context.XamlContext";
 
         public static bool IsDataTemplate(XElement element) => IsXElementOfType(element, "DataTemplate");
 
