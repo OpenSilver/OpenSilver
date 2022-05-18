@@ -220,18 +220,13 @@ namespace Windows.UI.Xaml.Media.Animation
                 Completed(this, new EventArgs());
         }
 
-        internal virtual void Stop(DependencyObject depObj, string groupName, bool revertToFormerValue = false)
+        internal virtual void Stop(IterationParameters parameters, bool revertToFormerValue = false)
         {
             _animationTimer.Stop();
             if (_beginTimeTimer != null)
             {
                 _beginTimeTimer.Stop();
             }
-        }
-
-        internal void Stop(DependencyObject depObj, bool revertToFormerValue)
-        {
-            Stop(depObj, "visualStateGroupName", revertToFormerValue: revertToFormerValue); //visualStateGroupName is the default name for a programatically started storyboard.
         }
 
         /// <summary>
@@ -245,84 +240,44 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 DependencyObject target;
                 PropertyPath propertyPath;
-                GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
-                //DependencyObject lastElementBeforeProperty = propertyPath.INTERNAL_AccessPropertyContainer(target);
-                propertyPath.INTERNAL_PropertySetAnimationValue(target, DependencyProperty.UnsetValue);
+                GetTargetElementAndPropertyInfo(_parameters, out target, out propertyPath);
+                if (target != null && propertyPath != null)
+                {
+                    propertyPath.INTERNAL_PropertySetAnimationValue(target, DependencyProperty.UnsetValue);
+                }
             }
         }
 
-
         internal void GetTargetElementAndPropertyInfo(
-            DependencyObject targetParent, 
-            out DependencyObject target, 
-            out PropertyPath propertyPath, 
-            bool isTargetParentTheTarget = false)
+            IterationParameters parameters,
+            out DependencyObject target,
+            out PropertyPath propertyPath)
         {
-            propertyPath = Storyboard.GetTargetProperty(this);
+            propertyPath = null;
+            target = null;
 
-            DependencyObject targetBeforePath;
-            if (!isTargetParentTheTarget) // "isTargetParentTheTarget" is used when running the Storyboard programmatically via Begin(), because in that case the target is defined at the storyboard level.
+            if (parameters != null && parameters.TimelineMappings.TryGetValue(this, out Tuple<DependencyObject, PropertyPath> info))
             {
-                // First, see if the target element is already known:
-                targetBeforePath = Storyboard.GetTarget(this);
+                DependencyObject targetBeforePath = info.Item1;
+                propertyPath = info.Item2;
 
-                // If not, look for it based on its name:
-                if (targetBeforePath == null)
+                target = targetBeforePath;
+                foreach (Tuple<DependencyObject, DependencyProperty, int?> element in propertyPath.INTERNAL_AccessPropertyContainer(targetBeforePath))
                 {
-                    string targetName = Storyboard.GetTargetName(this);
-                    if (targetParent is FrameworkElement fe)
-                    {
-                        targetBeforePath = (DependencyObject)fe.FindName(targetName);
-                        if (targetBeforePath == null && targetParent is Control control)
-                        {
-                            targetBeforePath = control.GetTemplateChild(targetName);
-                        }
-                    }
+                    target = element.Item1;
                 }
-            }
-            else
-            {
-                targetBeforePath = targetParent;
-            }
-
-            target = targetBeforePath;
-            foreach (Tuple<DependencyObject, DependencyProperty, int?> element in propertyPath.INTERNAL_AccessPropertyContainer(targetBeforePath))
-            {
-                target = element.Item1;
             }
         }
 
         internal void GetPropertyPathAndTargetBeforePath(
-            DependencyObject targetParent, 
-            out DependencyObject targetBeforePath, 
-            out PropertyPath propertyPath, 
-            bool isTargetParentTheTarget = false)
+            IterationParameters parameters,
+            out DependencyObject targetBeforePath,
+            out PropertyPath propertyPath)
         {
-            string targetName = Storyboard.GetTargetName(this);
-            propertyPath = Storyboard.GetTargetProperty(this);
-            if (!isTargetParentTheTarget && targetName != null)
-            {
-                if (targetParent is FrameworkElement fe)
-                {
-                    targetBeforePath = (DependencyObject)fe.FindName(targetName);
-                    if (targetBeforePath == null && targetParent is Control control)
-                    {
-                        targetBeforePath = control.GetTemplateChild(targetName);
-                        if (targetBeforePath == null && control.Name == targetName)
-                        {
-                            targetBeforePath = targetParent;
-                        }
-                    }
-                }
-                else
-                {
-                    targetBeforePath = null;
-                }
-            }
-            else
-            {
-                targetBeforePath = targetParent;
-            }
+            Tuple<DependencyObject, PropertyPath> info = parameters.TimelineMappings[this];
+
+            targetBeforePath = info.Item1;
+            propertyPath = info.Item2;
         }
 
         internal IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> GoThroughElementsToAccessProperty(PropertyPath propertyPath, DependencyObject targetBeforePath)
@@ -344,25 +299,28 @@ namespace Windows.UI.Xaml.Media.Animation
             //todo: check if the following comment is true and relevant or maybe remove the test
             if (frameworkElementAsControl != null) //if frameworkElement is not a control, there can't be a Storyboard?
             {
-                GetTargetElementAndPropertyInfo(frameworkElement, out target, out propertyPath);
+                GetTargetElementAndPropertyInfo(_parameters, out target, out propertyPath);
                 
-                DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
-                    target.GetType(),
-                    propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName
-                );
-
-                // - Get the propertyMetadata from the property
-                PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
-                // - Get the cssPropertyName from the PropertyMetadata
-
-                if (propertyMetadata.GetCSSEquivalent != null)
+                if (target != null && propertyPath != null)
                 {
-                    cssEquivalent = propertyMetadata.GetCSSEquivalent(target);
-                }
-                //todo: use GetCSSEquivalent instead (?)
-                if (propertyMetadata.GetCSSEquivalents != null)
-                {
-                    cssEquivalents = propertyMetadata.GetCSSEquivalents(target);
+                    DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
+                        target.GetType(),
+                        propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName
+                    );
+
+                    // - Get the propertyMetadata from the property
+                    PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
+                    // - Get the cssPropertyName from the PropertyMetadata
+
+                    if (propertyMetadata.GetCSSEquivalent != null)
+                    {
+                        cssEquivalent = propertyMetadata.GetCSSEquivalent(target);
+                    }
+                    //todo: use GetCSSEquivalent instead (?)
+                    if (propertyMetadata.GetCSSEquivalents != null)
+                    {
+                        cssEquivalents = propertyMetadata.GetCSSEquivalents(target);
+                    }
                 }
             }
         }
@@ -443,7 +401,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <param name="parameters">the parameters required for the iteration</param>
         /// <param name="isLastLoop">A boolean that says if it is the last loop</param>
         /// <param name="parentDelay">The Delay due to the BeginTime of the parent Timeline</param>
-        internal void StartFirstIteration(IterationParameters parameters, bool isLastLoop, TimeSpan? parentDelay)
+        internal void StartFirstIteration(IterationParameters parameters,  bool isLastLoop, TimeSpan? parentDelay)
         {
             if (BeginTime != null)
             {
@@ -515,7 +473,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 --remainingIterations;
                 if (remainingIterations <= 0)
                 {
-                    Stop(parameters.Target, revertToFormerValue: false);
+                    Stop(parameters, revertToFormerValue: false);
                     INTERNAL_RaiseCompletedEvent();
                 }
                 else
@@ -526,7 +484,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     }
                     else
                     {
-                        Stop(parameters.Target, revertToFormerValue: true);
+                        Stop(parameters, revertToFormerValue: true);
                     }
 
                     IterateOnce(parameters, isLastLoop: remainingIterations == 1);

@@ -86,7 +86,7 @@ namespace Windows.UI.Xaml.Media.Animation
             DependencyObject target;
             PropertyPath propertyPath;
             DependencyObject targetBeforePath;
-            GetPropertyPathAndTargetBeforePath(parameters.Target, out targetBeforePath, out propertyPath, parameters.IsTargetParentTheTarget);
+            GetPropertyPathAndTargetBeforePath(parameters, out targetBeforePath, out propertyPath);
             DependencyObject parentElement = targetBeforePath; //this will be the parent of the clonable element (if any).
             foreach (Tuple<DependencyObject, DependencyProperty, int?> element in GoThroughElementsToAccessProperty(propertyPath, targetBeforePath))
             {
@@ -119,7 +119,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 }
             }
 
-            GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath, parameters.IsTargetParentTheTarget);
+            GetTargetElementAndPropertyInfo(parameters, out target, out propertyPath);
 
             _propertyContainer = target;
             _targetProperty = propertyPath;
@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 // - Get the cssPropertyName from the PropertyMetadata
 
                 //we make a specific name for this animation:
-                string specificGroupName = parameters.VisualStateGroupName + animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName.ToString();
 
                 bool cssEquivalentExists = false;
                 if (propertyMetadata.GetCSSEquivalent != null)
@@ -333,7 +333,7 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal override void StopAnimation(string groupName)
+        internal override void StopAnimation()
         {
             if (_isInitialized)
             {
@@ -348,7 +348,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     // - Get the cssPropertyName from the PropertyMetadata
 
                     //we make a specific name for this animation:
-                    string specificGroupName = groupName + animationInstanceSpecificName.ToString();
+                    string specificGroupName = animationInstanceSpecificName.ToString();
 
                     bool cssEquivalentExists = false;
                     if (propertyMetadata.GetCSSEquivalent != null)

@@ -90,7 +90,7 @@ namespace Windows.UI.Xaml.Media.Animation
             DependencyObject target;
             PropertyPath propertyPath;
 
-            GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath, parameters.IsTargetParentTheTarget);
+            GetTargetElementAndPropertyInfo(parameters, out target, out propertyPath);
 
             _propertyContainer = target;
             _targetProperty = propertyPath;
@@ -111,7 +111,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
 
                 //we make a specific name for this animation:
-                string specificGroupName = parameters.VisualStateGroupName + animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName.ToString();
 
                 _animationID = Guid.NewGuid();
 
@@ -210,7 +210,7 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal override void StopAnimation(string groupName)
+        internal override void StopAnimation()
         {
             if (_isInitialized)
             {
@@ -221,7 +221,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
 
                     //we make a specific name for this animation:
-                    string specificGroupName = groupName + animationInstanceSpecificName.ToString();
+                    string specificGroupName = animationInstanceSpecificName.ToString();
 
                     // - Get the cssPropertyName from the PropertyMetadata
                     if (propertyMetadata.GetCSSEquivalent != null)

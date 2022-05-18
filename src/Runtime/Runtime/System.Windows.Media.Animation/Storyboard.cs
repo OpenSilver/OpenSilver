@@ -173,11 +173,15 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public void Begin()
         {
-            FrameworkElement target = (FrameworkElement)Storyboard.GetTarget(this);
-            Begin(target, true, "DirectlyStoryboard", isVisualStateChange: false);
+            BeginCommon(this);
         }
 
-        internal void Begin(FrameworkElement target, bool useTransitions, string visualStateGroupName, bool isVisualStateChange)
+        internal void Begin(FrameworkElement target)
+        {
+            BeginCommon(target);
+        }
+
+        private void BeginCommon(DependencyObject containingObject)
         {
             this.IsUnApplied = false; // Note: we set this variable because the animation start is done inside a Dispatcher, so if the user synchronously Starts then Stops then Starts an animation, we want it to be in the started state.
 
@@ -185,17 +189,17 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 if (!this._isUnApplied) // Note: we use this variable because the animation start is done inside a Dispatcher, so if the user Starts then Stops the animation immediately (in the same thread), we want to cancel the start of the animation.
                 {
-                    Guid guid = Guid.NewGuid();
-                    IterationParameters parameters = new IterationParameters()
-                    {
-                        Target = target,
-                        Guid = guid,
-                        UseTransitions = useTransitions,
-                        VisualStateGroupName = visualStateGroupName,
-                        IsVisualStateChange = isVisualStateChange
-                    };
-
                     InitializeIteration();
+
+                    var timelineMappings = new Dictionary<Timeline, Tuple<DependencyObject, PropertyPath>>();
+                    TimelineTreeWalkRecursive(this,
+                        containingObject,
+                        null,
+                        null,
+                        null,
+                        timelineMappings);
+
+                    IterationParameters parameters = new IterationParameters(timelineMappings);
 
                     bool isThisSingleLoop = RepeatBehavior.HasCount && RepeatBehavior.Count == 1;
 
@@ -207,8 +211,6 @@ namespace Windows.UI.Xaml.Media.Animation
                 Debug.WriteLine(ex.Message);
             }
         }
-
-
 
         void timeLine_Completed(object sender, EventArgs e)
         {
@@ -359,29 +361,18 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <summary>
         /// Stops the storyboard.
         /// </summary>
-        internal void Stop(FrameworkElement frameworkElement, string groupName)
-        {
-            foreach (Timeline timeLine in _children)
-            {
-                timeLine.Stop(frameworkElement, groupName);
-            }
-        }
-
-        /// <summary>
-        /// Stops the storyboard.
-        /// </summary>
         public void Stop(FrameworkElement frameworkElement)
         {
-            Stop(frameworkElement, revertToFormerValue: true);
-            foreach (Timeline timeLine in _children)
-            {
-                timeLine.Stop(frameworkElement, revertToFormerValue: true);
-            }
+            Stop();
         }
 
         public void Stop()
         {
-            this.Stop(null);
+            Stop(null, revertToFormerValue: true);
+            foreach (Timeline timeLine in _children)
+            {
+                timeLine.Stop(null, revertToFormerValue: true);
+            }
         }
 
         //todo: make a Stop method with no arguments that actually stops the Storyboard (at least when the storyboard was started programatically).
@@ -393,6 +384,135 @@ namespace Windows.UI.Xaml.Media.Animation
 
         private Dictionary<Guid, IterationParameters> _guidToIterationParametersDict = new Dictionary<Guid, IterationParameters>(); //the purpose of this Dictionary is to be able to retreive the parameters at the next iteration of the Storyboard.
 
+        /// <summary>
+        /// Recursively walks the timeline tree and determine the target object
+        /// and property for each timeline in the tree.
+        /// </summary>
+        /// <remarks>
+        /// The currently active object and property path are passed in as parameters,
+        /// they will be used unless a target/property specification exists on
+        /// the Timeline object corresponding to the current timeline.  (So that the
+        /// leaf-most reference wins.)
+        ///
+        /// The active object and property parameters may be null if they have
+        /// never been specified.  If we reach a leaf node timeline and a needed attribute
+        /// is still null, it is an error condition.  Otherwise we keep hoping they'll be found.
+        /// </remarks>
+        private void TimelineTreeWalkRecursive(
+            Timeline currentTimeline,
+            DependencyObject containingObject,
+            DependencyObject parentObject,
+            string parentObjectName,
+            PropertyPath parentPropertyPath,
+            Dictionary<Timeline, Tuple<DependencyObject, PropertyPath>> timelineMappings)
+        {
+            DependencyObject targetObject = parentObject;
+            string currentObjectName = parentObjectName;
+            PropertyPath currentPropertyPath = parentPropertyPath;
+
+            // If we have target object/property information, use it instead of the
+            //  parent's information.
+            string nameString = (string)currentTimeline.GetValue(TargetNameProperty);
+            if (nameString != null)
+            {
+                currentObjectName = nameString;
+            }
+
+            // The TargetProperty trumps the TargetName property.
+            DependencyObject localTargetObject = (DependencyObject)currentTimeline.GetValue(TargetProperty);
+            if (localTargetObject != null)
+            {
+                targetObject = localTargetObject;
+                currentObjectName = null;
+            }
+
+            PropertyPath propertyPath = (PropertyPath)currentTimeline.GetValue(TargetPropertyProperty);
+            if (propertyPath != null)
+            {
+                currentPropertyPath = propertyPath;
+            }
+
+            if (!(currentTimeline is Storyboard))
+            {
+                if (targetObject == null)
+                {
+                    // Resolve the target object name.  If no name specified, use the
+                    //  containing object.
+                    if (currentObjectName != null)
+                    {
+                        FrameworkElement mentor = FrameworkElement.FindMentor(containingObject);
+
+                        targetObject = ResolveTargetName(currentObjectName, mentor);
+                    }
+                    else
+                    {
+                        // The containing object must be either an FE.
+                        targetObject = containingObject as FrameworkElement;
+
+                        if (targetObject == null)
+                        {
+                            // The containing object is not an FE.
+                            throw new InvalidOperationException(string.Format("No target was specified for '{0}'.", currentTimeline.GetType().ToString()));
+                        }
+                    }
+                }
+
+                // See if we have a property name to use.
+                if (currentPropertyPath == null)
+                {
+                    throw new InvalidOperationException(string.Format("Must specify TargetProperty for '{0}'.", currentTimeline.GetType().ToString()));
+                }
+
+                timelineMappings.Add(currentTimeline, Tuple.Create(targetObject, currentPropertyPath));
+            }
+            else
+            {
+                Storyboard storyboard = (Storyboard)currentTimeline;
+                TimelineCollection childrenTimelines = storyboard.Children;
+
+                for (int i = 0; i < childrenTimelines.Count; i++)
+                {
+                    TimelineTreeWalkRecursive(
+                        childrenTimelines[i],
+                        containingObject,
+                        targetObject,
+                        currentObjectName,
+                        currentPropertyPath,
+                        timelineMappings);
+                }
+            }
+        }
+
+        private static DependencyObject ResolveTargetName(string targetName, FrameworkElement fe)
+        {
+            object namedObject;
+            DependencyObject targetObject;
+
+            if (fe != null)
+            {
+                namedObject = fe.FindName(targetName);
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("No applicable name scope exists to resolve the name '{0}'.", targetName));
+            }
+
+            if (namedObject == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format("'{0}' name cannot be found in the name scope of '{1}'.", 
+                        targetName, 
+                        fe.GetType().ToString()));
+            }
+
+            targetObject = namedObject as DependencyObject;
+            if (targetObject == null)
+            {
+                throw new InvalidOperationException(string.Format("'{0}' target object Name found but the object is not a valid target type.", targetName));
+            }
+
+            return targetObject;
+        }
 
         internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
@@ -416,36 +536,14 @@ namespace Windows.UI.Xaml.Media.Animation
                 //I'm not sure this is useful but we never know.
                 _expectedAmountOfTimelineEndsDict[parameters.Guid] = _children.Count;
                 _guidToIterationParametersDict[parameters.Guid] = parameters;
-            }
-            if (parameters.Target != null)
+            }            
+            
+            foreach (Timeline timeLine in _children)
             {
-                foreach (Timeline timeLine in _children)
-                {
-                    IterationParameters currentParameters = parameters.Clone(); //note: we make a clone for each timeline because the value of IsTargetParentTheTarget can change from one timeline to another.
-                    timeLine.Completed -= timeLine_Completed;
-                    timeLine.Completed += timeLine_Completed;
-                    currentParameters.IsTargetParentTheTarget = true;
-                    if (currentParameters.IsVisualStateChange && Storyboard.GetTargetName(timeLine) != null)
-                    {
-                        currentParameters.IsTargetParentTheTarget = false;
-                    }
-                    bool isTimelineSingleLoop = timeLine.RepeatBehavior.HasCount && timeLine.RepeatBehavior.Count == 1;
-                    timeLine.StartFirstIteration(currentParameters, isTimelineSingleLoop, BeginTime);
-                }
-            }
-            else
-            {
-                foreach (Timeline timeLine in _children)
-                {
-                    DependencyObject target = GetTarget(timeLine);
-                    parameters.Target = target;
-                    timeLine.Completed -= timeLine_Completed;
-                    timeLine.Completed += timeLine_Completed;
-                    parameters.VisualStateGroupName = "visualStateGroupName";
-                    parameters.IsTargetParentTheTarget = false;
-                    bool isTimelineSingleLoop = timeLine.RepeatBehavior.HasCount && timeLine.RepeatBehavior.Count == 1;
-                    timeLine.StartFirstIteration(parameters, isTimelineSingleLoop, BeginTime);
-                }
+                timeLine.Completed -= timeLine_Completed;
+                timeLine.Completed += timeLine_Completed;
+                bool isTimelineSingleLoop = timeLine.RepeatBehavior.HasCount && timeLine.RepeatBehavior.Count == 1;
+                timeLine.StartFirstIteration(parameters, isTimelineSingleLoop, BeginTime);
             }
         }
 
@@ -488,24 +586,13 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     internal partial class IterationParameters
     {
-        internal DependencyObject Target;
-        internal Guid Guid;
-        internal bool UseTransitions;
-        internal string VisualStateGroupName;
-        internal bool IsTargetParentTheTarget;
-        internal bool IsVisualStateChange;
-
-        internal IterationParameters Clone()
+        public IterationParameters(IReadOnlyDictionary<Timeline, Tuple<DependencyObject, PropertyPath>> mappings)
         {
-            return new IterationParameters()
-            {
-                Target = this.Target,
-                Guid = this.Guid,
-                UseTransitions = this.UseTransitions,
-                VisualStateGroupName = this.VisualStateGroupName,
-                IsTargetParentTheTarget = this.IsTargetParentTheTarget,
-                IsVisualStateChange = this.IsVisualStateChange
-            };
+            TimelineMappings = mappings;
+            Guid = Guid.NewGuid();
         }
+
+        internal readonly IReadOnlyDictionary<Timeline, Tuple<DependencyObject, PropertyPath>> TimelineMappings;
+        internal readonly Guid Guid;
     }
 }

@@ -603,58 +603,16 @@ namespace DotNetForHtml5.Compiler
                             string classFullNameForAttachedProperty = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(attachedPropertyTypeNamespaceName, attachedPropertyTypeLocalName, attachedPropertyTypeAssemblyNameIfAny);
                             string propertyName = splitted[1];
 
-                            if (classLocalNameForAttachedProperty != "Storyboard" || propertyName == "TargetName")
-                            {
                                 // Generate the code for instantiating the attribute value:
-                                string codeForInstantiatingTheAttributeValue = GenerateCodeForInstantiatingAttributeValue(
-                                    elementNameForAttachedProperty,
-                                    propertyName,
-                                    isAttachedProperty,
-                                    attributeValue,
-                                    element);
+                            string codeForInstantiatingTheAttributeValue = GenerateCodeForInstantiatingAttributeValue(
+                                elementNameForAttachedProperty,
+                                propertyName,
+                                isAttachedProperty,
+                                attributeValue,
+                                element);
 
-                                // Append the statement:
-                                parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2},{3});", classFullNameForAttachedProperty, propertyName, elementUniqueNameOrThisKeyword, codeForInstantiatingTheAttributeValue));
-                            }
-                            else
-                            {
-                                if (classLocalNameForAttachedProperty == "Storyboard" && propertyName == "TargetProperty")
-                                {
-                                    // Look for a "TargetName" at the animation level (eg. <DoubleAnimation Storyboard.TargetName="border1"/>)
-                                    var targetNameAttributeAtTheAnimationLevel = element.Attribute("Storyboard.TargetName");
-                                    string targetElementUniqueName = null;
-                                    if (targetNameAttributeAtTheAnimationLevel != null)
-                                    {
-                                        if (parameters.NamescopeRootToNameToUniqueNameDictionary[elementThatIsRootOfTheCurrentNamescope].TryGetValue(targetNameAttributeAtTheAnimationLevel.Value, out targetElementUniqueName))
-                                        {
-#if LOG_TARGET_ELEMENTS_NOT_FOUND
-                                                        logger.WriteWarning(string.Format("Could not find an element with name \"{0}\".", targetNameAttributeAtTheAnimationLevel.Value));
-#endif
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // If no "TargetName" was found at the animation level, look at the Storyboard level (eg. <Storyboard Storyboard.TargetName="border1"/>)
-                                        var targetNameAttributeAtTheStoryboardLevel = element.Parent.Parent.Attribute("Storyboard.TargetName"); // Note: here there is ".Parent.Parent" because the first parent is "<Storyboard.Children>", while the second parent is "<Storyboard>".
-                                        if (targetNameAttributeAtTheStoryboardLevel != null)
-                                        {
-                                            if (!parameters.NamescopeRootToNameToUniqueNameDictionary[elementThatIsRootOfTheCurrentNamescope].TryGetValue(targetNameAttributeAtTheStoryboardLevel.Value, out targetElementUniqueName))
-                                            {
-#if LOG_TARGET_ELEMENTS_NOT_FOUND
-                                                            logger.WriteWarning(string.Format("Could not find an element with name \"{0}\".", targetNameAttributeAtTheStoryboardLevel.Value));
-#endif
-                                            }
-                                        }
-                                    }
-
-                                    string timeline = element.Attribute(GeneratingUniqueNames.UniqueNameAttribute).Value;
-                                    parameters.StringBuilder.AppendLine($"global::{_metadata.SystemWindowsMediaAnimationNS}.Storyboard.SetTargetProperty({timeline}, new global::{_metadata.SystemWindowsNS}.PropertyPath(\"{attributeValue}\"));");
-                                    if (targetElementUniqueName != null)
-                                    {
-                                        parameters.StringBuilder.AppendLine($"global::{_metadata.SystemWindowsMediaAnimationNS}.Storyboard.SetTarget({timeline}, {targetElementUniqueName});");
-                                    }
-                                }
-                            }
+                            // Append the statement:
+                            parameters.StringBuilder.AppendLine(string.Format("{0}.Set{1}({2},{3});", classFullNameForAttachedProperty, propertyName, elementUniqueNameOrThisKeyword, codeForInstantiatingTheAttributeValue));
                         }
                     }
                 }

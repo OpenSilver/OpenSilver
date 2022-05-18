@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,10 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
+
 #if MIGRATION
 using System.Windows.Media.Animation;
 #else
@@ -39,32 +35,35 @@ namespace Windows.UI.Xaml
     [ContentProperty("Storyboard")]
     public sealed partial class VisualState : DependencyObject
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VisualState"/> class.
+        /// </summary>
+        public VisualState() { }
 
-
-        ///// <summary>
-        ///// Initializes a new instance of the VisualState class.
-        ///// </summary>
-        //public VisualState();
-
-        private string _name;
         /// <summary>
         /// Gets the name of the VisualState.
         /// </summary>
         public string Name
         {
-            get { return _name; }
-            set { _name = value; } //todo: this was originally not public (but we need it in the compiler)
+            get;
+            set; //todo: this was originally not public (but we need it in the compiler)
         }
 
-        private Storyboard _storyboard = null;
+        private static readonly DependencyProperty StoryboardProperty =
+            DependencyProperty.Register(
+                nameof(Storyboard),
+                typeof(Storyboard),
+                typeof(VisualState),
+                null);
+
         /// <summary>
-        /// Gets or sets a Storyboard that defines the appearance of the control when
-        /// it is the state that is represented by the VisualState.
+        /// Gets or sets a <see cref="Media.Animation.Storyboard"/> that defines the appearance 
+        /// of the control when it is the state that is represented by the <see cref="VisualState"/>.
         /// </summary>
         public Storyboard Storyboard
         {
-            get { return _storyboard; }
-            set { _storyboard = value; }
+            get => (Storyboard)GetValue(StoryboardProperty);
+            set => SetValue(StoryboardProperty, value);
         }
 
         internal Dictionary<Tuple<string, string>, Timeline> GetPropertiesChangedByStoryboard()
@@ -81,7 +80,7 @@ namespace Windows.UI.Xaml
             Dictionary<Tuple<string, string>, Timeline> propertiesChanged = null;
             if (Storyboard != null)
             {
-                Storyboard.Begin(frameworkElement, useTransitions, INTERNAL_Group.Name, isVisualStateChange:true);
+                Storyboard.Begin(frameworkElement);
                 propertiesChanged = Storyboard.GetPropertiesChanged();
 
                 //foreach (Timeline timeLine in Storyboard.Children)
@@ -96,7 +95,7 @@ namespace Windows.UI.Xaml
         {
             if (Storyboard != null)
             {
-                Storyboard.Stop(frameworkElement, INTERNAL_Group.Name);
+                Storyboard.Stop(frameworkElement);
             }
         }
 
