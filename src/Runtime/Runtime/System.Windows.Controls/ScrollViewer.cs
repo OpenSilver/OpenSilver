@@ -20,8 +20,10 @@ using System.Linq;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
 
 #endif
 
@@ -1486,6 +1488,41 @@ namespace Windows.UI.Xaml.Controls
             get
             {
                 return 20;  // Default scrollbar width
+            }
+        }
+
+#if MIGRATION
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+#else
+        protected override void OnPointerWheelChanged(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseWheel(e);
+#else
+            base.OnPointerWheelChanged(e);
+#endif
+
+            if (!e.Handled && ScrollInfo != null)
+            {
+#if MIGRATION
+                if (e.Delta < 0)
+#else
+                if (e.GetCurrentPoint(null).Properties.MouseWheelDelta < 0)
+#endif
+                {
+                    ScrollInfo.MouseWheelDown();
+                }
+#if MIGRATION
+                else if (0 < e.Delta)
+#else
+                else if (0 < e.GetCurrentPoint(null).Properties.MouseWheelDelta)
+#endif
+                {
+                    ScrollInfo.MouseWheelUp();
+                }
+
+                e.Handled = true;
             }
         }
     }
