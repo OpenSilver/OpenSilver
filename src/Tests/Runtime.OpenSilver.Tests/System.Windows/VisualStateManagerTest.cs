@@ -207,18 +207,18 @@ namespace Windows.UI.Xaml.Tests
                  * <local:MyControl1>
                  */
 
-                NameScope.SetNameScope(this, new NameScope());
-
                 InnerControl = new InnerControl() { Name = "InnerControl" };
-
+                
                 // Emulate a template
                 TemplateChild = new Border
                 {
                     Child = InnerControl,
                 };
 
+                NameScope.SetNameScope(TemplateChild, new NameScope());
+
                 // Ensure we can find the InnerControl with Control.GetTempleChild(...)
-                RegisterName("InnerControl", InnerControl);
+                TemplateChild.RegisterName("InnerControl", InnerControl);
 
                 // 1 - VisualStateGroup 1
                 var group1 = new VisualStateGroup { Name = "group1" };
@@ -358,18 +358,18 @@ namespace Windows.UI.Xaml.Tests
                  * <local:MyControl2>
                  */
 
-                NameScope.SetNameScope(this, new NameScope());
-
                 InnerControl = new InnerControl() { Name = "InnerControl" };
-
+                
                 // Emulate a template
                 TemplateChild = new Border
                 {
                     Child = InnerControl,
                 };
 
+                NameScope.SetNameScope(TemplateChild, new NameScope());
+
                 // Ensure we can find the InnerControl with Control.GetTempleChild(...)
-                RegisterName("InnerControl", InnerControl);
+                TemplateChild.RegisterName("InnerControl", InnerControl);
 
                 VisualStateManager.SetCustomVisualStateManager(TemplateChild, new Test_CustomVisualStateManager());
 
