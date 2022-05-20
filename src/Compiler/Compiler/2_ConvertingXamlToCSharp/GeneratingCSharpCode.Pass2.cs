@@ -982,7 +982,7 @@ namespace DotNetForHtml5.Compiler
                             else if (child.Name.LocalName == "TemplateBindingExtension")
                             {
                                 var dependencyPropertyName =
-                                    "global::" + _reflectionOnSeparateAppDomain.GetField(
+                                    _reflectionOnSeparateAppDomain.GetField(
                                         propertyName + "Property",
                                         isAttachedProperty ? elementName.Namespace.NamespaceName : parent.Name.Namespace.NamespaceName,
                                         isAttachedProperty ? elementName.LocalName : parent.Name.LocalName,
