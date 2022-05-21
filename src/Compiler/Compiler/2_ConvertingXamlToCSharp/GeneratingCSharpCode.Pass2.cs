@@ -102,7 +102,7 @@ namespace DotNetForHtml5.Compiler
                     _metadata = metadata;
                     Name = templateName;
                     TemplateOwner = $"templateOwner_{templateName}";
-                    MethodName = $"Create{templateName}";
+                    MethodName = $"Create_{templateName}";
                 }
 
                 public string Name { get; }
@@ -115,7 +115,7 @@ namespace DotNetForHtml5.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"private global::{_metadata.SystemWindowsNS}.FrameworkElement {MethodName}(global::{_metadata.SystemWindowsNS}.FrameworkElement {TemplateOwner}, {XamlContextClass} {XamlContext})")
+                    builder.AppendLine($"private static global::{_metadata.SystemWindowsNS}.FrameworkElement {MethodName}(global::{_metadata.SystemWindowsNS}.FrameworkElement {TemplateOwner}, {XamlContextClass} {XamlContext})")
                         .AppendLine("{")
                         .Append(StringBuilder.ToString());
                     AppendNamescope(builder);
@@ -133,7 +133,8 @@ namespace DotNetForHtml5.Compiler
                 public readonly List<string> ResultingMethods = new List<string>();
                 public readonly List<string> ResultingFieldsForNamedElements = new List<string>();
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
-                
+                public readonly ComponentConnectorBuilder ComponentConnector = new ComponentConnectorBuilder();
+
                 public GeneratorScope CurrentScope => _scopes.Peek();
                 public StringBuilder StringBuilder => CurrentScope.StringBuilder;
 
@@ -230,40 +231,25 @@ namespace DotNetForHtml5.Compiler
                     }
                 }
 
-                string codeToWorkWithTheRootElement = parameters.StringBuilder.ToString();
-
                 // Get general information about the class:
                 string className, namespaceStringIfAny, baseType;
                 bool hasCodeBehind;
                 GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
                     out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
 
-                bool isClassTheApplicationClass = IsClassTheApplicationClass(baseType);
-
-                string additionalCodeToPlaceAtTheBeginningOfInitializeComponent =
-                    isClassTheApplicationClass ?
-                    _codeToPutInTheInitializeComponentOfTheApplicationClass :
-                    string.Empty;
-
                 if (hasCodeBehind)
                 {
-                    // Create the "IntializeComponent()" method:
+                    string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        GetUniqueName(_reader.Document.Root),
-                        codeToWorkWithTheRootElement,
-                        parameters.ResultingFindNameCalls,
-                        additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
-                        string.Empty,
-                        string.Empty,
-                        _isSLMigration,
+                        $"{_metadata.SystemWindowsNS}.Application",
+                        IsClassTheApplicationClass(baseType) ? _codeToPutInTheInitializeComponentOfTheApplicationClass : string.Empty,
                         _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot
-                    );
-
-                    parameters.ResultingMethods.Insert(0, initializeComponentMethod);
+                        _fileNameWithPathRelativeToProjectRoot,
+                        parameters.ResultingFindNameCalls);
 
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(parameters.ResultingMethods,
+                    string partialClass = GeneratePartialClass(initializeComponentMethod,
+                                                               connectMethod,
                                                                parameters.ResultingFieldsForNamedElements,
                                                                className,
                                                                namespaceStringIfAny,
@@ -279,8 +265,11 @@ namespace DotNetForHtml5.Compiler
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
-                        CreateFactoryMethod(componentTypeFullName),
-                        Enumerable.Empty<string>(),
+                        GetUniqueName(_reader.Document.Root),
+                        parameters.CurrentScope.ToString(),
+                        $"return ({componentTypeFullName})global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof({componentTypeFullName}));",
+                        parameters.ResultingMethods,
+                        $"global::{_metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -292,22 +281,15 @@ namespace DotNetForHtml5.Compiler
                 }
                 else
                 {
-                    string factoryImpl = CreateFactoryMethod(
-                        GetUniqueName(_reader.Document.Root),
-                        baseType,
-                        codeToWorkWithTheRootElement,
-                        parameters.ResultingFindNameCalls,
-                        additionalCodeToPlaceAtTheBeginningOfInitializeComponent,
-                        string.Empty,
-                        string.Empty,
-                        _isSLMigration,
-                        _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot);
+                    string rootElementName = GetUniqueName(_reader.Document.Root);
 
                     string finalCode = GenerateFactoryClass(
                         baseType,
-                        factoryImpl,
+                        rootElementName,
+                        parameters.CurrentScope.ToString(),
+                        string.Join(Environment.NewLine, $"var {rootElementName} = new {baseType}();", $"LoadComponentImpl({rootElementName});", $"return {rootElementName};"),
                         parameters.ResultingMethods,
+                        $"global::{_metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -502,8 +484,7 @@ namespace DotNetForHtml5.Compiler
                                     // or any other c# keyword)
                                     string fieldName = "@" + name;
                                     parameters.ResultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementTypeInCSharp, fieldName));
-                                    //resultingFindNameCalls.Add(string.Format("{0} = ({1})this.FindName(\"{2}\");", name, elementTypeInCSharp, name));
-                                    parameters.ResultingFindNameCalls.Add(string.Format("{0} = {1};", fieldName, elementUniqueNameOrThisKeyword));
+                                    parameters.ResultingFindNameCalls.Add($"this.{fieldName} = (({elementTypeInCSharp})(this.FindName(\"{name}\")));");
                                 }
 
                                 // We also set the Name property on the object itself, if the XAML was "Name=..." or (if the XAML was x:Name=... AND the Name property exists in the object).    (Note: setting the Name property on the object is useful for example in <VisualStateGroup Name="Pressed"/> where the parent control looks at the name of its direct children:
@@ -545,8 +526,17 @@ namespace DotNetForHtml5.Compiler
                                             // C# EVENT
                                             //------------
 
-                                            // Append the statement:
-                                            parameters.StringBuilder.AppendLine(string.Format("{0}.{1} += {2};", elementUniqueNameOrThisKeyword, attributeLocalName, attributeValue));
+                                            string eventHandlerType = _reflectionOnSeparateAppDomain.GetEventHandlerType(
+                                                memberName, namespaceName, localTypeName, assemblyNameIfAny
+                                            );
+
+                                            parameters.StringBuilder.AppendLine(
+                                                string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3});",
+                                                    RuntimeHelperClass,
+                                                    parameters.CurrentXamlContext,
+                                                    parameters.ComponentConnector.Connect(elementTypeInCSharp, attributeLocalName, eventHandlerType, attributeValue),
+                                                    elementUniqueNameOrThisKeyword)
+                                            );
 
                                             break;
                                         case MemberTypes.Field:

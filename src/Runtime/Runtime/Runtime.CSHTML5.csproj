@@ -89,6 +89,8 @@
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContext.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContextStack.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlObjectFrame.cs" />
+    <Compile Include="OpenSilver\Internal\Xaml\IComponentConnector.cs" />
+    <Compile Include="OpenSilver\Internal\Xaml\IXamlComponentLoader.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\ServiceProviderContext.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\RuntimeHelpers.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\IXamlComponentFactory.cs" />

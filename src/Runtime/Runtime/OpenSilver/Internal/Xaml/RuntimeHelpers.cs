@@ -155,6 +155,17 @@ namespace OpenSilver.Internal.Xaml
             
             context.PopScope();
         }
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void XamlContext_SetConnectionId(XamlContext context, int connectionId, object instance)
+        {
+            Debug.Assert(context != null);
+
+            if (context.RootInstance is IComponentConnector connector)
+            {
+                connector.Connect(connectionId, instance);
+            }
+        }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static T CallProvideValue<T>(XamlContext context, IMarkupExtension<T> markupExtension) where T : class

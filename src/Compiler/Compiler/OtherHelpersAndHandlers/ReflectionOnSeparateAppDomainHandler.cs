@@ -285,6 +285,11 @@ namespace DotNetForHtml5.Compiler
             return _marshalledObject.GetField(fieldName, namespaceName, typeName, assemblyName);
         }
 
+        public string GetEventHandlerType(string eventName, string namespaceName, string typeName, string assemblyName)
+        {
+            return _marshalledObject.GetEventHandlerType(eventName, namespaceName, typeName, assemblyName);
+        }
+
         public class MarshalledObject : MarshalByRefObject, IMarshalledObject
         {
             const string ASSEMBLY_NOT_IN_LIST_OF_LOADED_ASSEMBLIES = "The specified assembly is not in the list of loaded assemblies.";
@@ -1948,6 +1953,19 @@ namespace DotNetForHtml5.Compiler
                 }
 
                 return null;
+            }
+
+            public string GetEventHandlerType(string eventName, string namespaceName, string typeName, string assemblyName)
+            {
+                Type type = FindType(namespaceName, typeName, assemblyName);
+
+                EventInfo eventInfo = type.GetEvent(eventName);
+                if (eventInfo == null)
+                {
+                    throw new XamlParseException($"'{type}' does not contain an event named '{eventName}'.");
+                }
+
+                return GetTypeNameIncludingGenericArguments(eventInfo.EventHandlerType, true);
             }
         }
 
