@@ -170,7 +170,8 @@ namespace Windows.UI.Xaml.Controls
             double popupContentWidth = PopupChild.ActualWidth;
             double popupContentHeight = PopupChild.ActualHeight;
 
-            if (rootHeight == 0 || rootWidth == 0 || popupContentWidth == 0 || popupContentHeight == 0)
+            // In CustomLayout, ActualWidth/Height might be 0 because they have not been calculated yet
+            if (rootHeight == 0 || rootWidth == 0 || (!PopupChild.CustomLayout && (popupContentWidth == 0 || popupContentHeight == 0)))
             {
                 return;
             }

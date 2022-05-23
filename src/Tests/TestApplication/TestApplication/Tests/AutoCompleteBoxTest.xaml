@@ -4,31 +4,31 @@
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            mc:Ignorable="d"
-           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+           xmlns:system="clr-namespace:System;assembly=mscorlib">
     <StackPanel Orientation="Vertical">
-        <!--SLDISABLED-->
-        <!--<sdk:AutoCompleteBox x:Name="AutoCompleteBox1" Width="250"/>
-        <Button Content="Items.Add UI element" Click="ButtonTestAutoCompleteBox1_ItemsAddUIElement_Click"/>
-        <Button Content="Items.Add string" Click="ButtonTestAutoCompleteBox1_ItemsAddString_Click"/>
-        <Button Content="Items.Add" Click="ButtonTestAutoCompleteBox1_ItemsAdd_Click"/>
-        <Button Content="Items.Clear" Click="ButtonTestAutoCompleteBox1_ItemsClear_Click"/>
-        <Button Content="Items.Remove First" Click="ButtonTestAutoCompleteBox1_ItemsRemoveFirst_Click"/>
-        <Button Content="Set new ItemsSource" Click="ButtonTestAutoCompleteBox1_SetNewItemsSource_Click"/>
-        <Button Content="ItemsSource.Add" Click="ButtonTestAutoCompleteBox1_ItemsSourceAdd_Click"/>
-        <Button Content="ItemsSource.Clear" Click="ButtonTestAutoCompleteBox1_ItemsSourceClear_Click"/>
-        <Button Content="ItemsSource.Remove first" Click="ButtonTestAutoCompleteBox1_ItemsSourceRemove_Click"/>
-        <Button Content="Set ItemsSource to null" Click="ButtonTestAutoCompleteBox1_SetItemsSourceToNull_Click"/>
-        <Button Content="Select second item" Click="ButtonTestAutoCompleteBox1_SelectSecondItem_Click"/>
-        <Button Content="Select second index" Click="ButtonTestAutoCompleteBox1_SelectSecondIndex_Click"/>
-        <Button Content="SelectedItem=null" Click="ButtonTestAutoCompleteBox1_SelectItemNull_Click"/>
-        <Button Content="SelectedIndex=-1" Click="ButtonTestAutoCompleteBox1_SelectedIndexMinusOne_Click"/>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="SelectedIndex:"/>
-            <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=AutoCompleteBox1, Path=SelectedIndex}"/>
+        <StackPanel Orientation="Vertical">
+            <!--SLDISABLED-->
+            <TextBlock Text="Items are 'Initial item #X', and 'Item #X' if added:"/>
+            <sdk:AutoCompleteBox x:Name="AutoCompleteBox1" Width="250"/>
+            <Button Content="Items.Add" Click="ButtonTestAutoCompleteBox1_ItemsAdd_Click"/>
+            <Button Content="Items.Clear" Click="ButtonTestAutoCompleteBox1_ItemsClear_Click"/>
+            <Button Content="Items.Remove First" Click="ButtonTestAutoCompleteBox1_ItemsRemoveFirst_Click"/>
+            <Button Content="Set new ItemsSource" Click="ButtonTestAutoCompleteBox1_SetNewItemsSource_Click"/>
+            <Button Content="ItemsSource.Add" Click="ButtonTestAutoCompleteBox1_ItemsSourceAdd_Click"/>
+            <Button Content="ItemsSource.Clear" Click="ButtonTestAutoCompleteBox1_ItemsSourceClear_Click"/>
+            <Button Content="ItemsSource.Remove first" Click="ButtonTestAutoCompleteBox1_ItemsSourceRemove_Click"/>
+            <Button Content="Set ItemsSource to null" Click="ButtonTestAutoCompleteBox1_SetItemsSourceToNull_Click"/>
+            <Button Content="Select second item" Click="ButtonTestAutoCompleteBox1_SelectSecondItem_Click"/>
+            <Button Content="SelectedItem=null" Click="ButtonTestAutoCompleteBox1_SelectItemNull_Click"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="SelectedItem:"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=AutoCompleteBox1, Path=SelectedItem}"/>
+            </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="SelectedItem:"/>
-            <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=AutoCompleteBox1, Path=SelectedItem}"/>
-        </StackPanel>-->
+        <StackPanel Orientation="Vertical" Margin="0,50,0,0">
+            <TextBlock Text="CustomLayout and VirtualizingStackPanel:"/>
+            <sdk:AutoCompleteBox x:Name="AutoCompleteVirtualized" Width="250" Height="22"/>
+        </StackPanel>
     </StackPanel>
 </sdk:Page>
