@@ -55,7 +55,8 @@ namespace Windows.UI.Xaml.Data
         private DynamicValueConverter _dynamicConverter;
         private object _bindingSource;
         private bool _isUpdateOnLostFocus; // True if this binding expression updates on LostFocus
-        private bool _needsUpdate; // True if this binding expression has a pending source update 
+        private bool _needsUpdate; // True if this binding expression has a pending source update
+        private FrameworkElement _mentor;
 
         private readonly PropertyPathWalker _propertyPathWalker;
 
@@ -274,6 +275,8 @@ namespace Windows.UI.Xaml.Data
                 _isUpdateOnLostFocus = false;
                 ((FrameworkElement)Target).LostFocus -= new RoutedEventHandler(OnTargetLostFocus);
             }
+
+            DetachMentor();
 
             Target.InheritedContextChanged -= new EventHandler(OnTargetInheritedContextChanged);
             Target = null;
@@ -701,9 +704,28 @@ namespace Windows.UI.Xaml.Data
 
             _bindingSource = source;
 
-            if (source == null && useMentor && mentor == null)
+            if (useMentor)
             {
-                Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
+                if (_mentor != mentor)
+                {
+                    DetachMentor();
+                }
+
+                _mentor = mentor;
+
+                if (source == null && mentor == null)
+                {
+                    Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
+                }
+            }
+        }
+
+        private void DetachMentor()
+        {
+            if (_mentor != null)
+            {
+                _mentor.Loaded -= new RoutedEventHandler(OnMentorLoaded);
+                _mentor = null;
             }
         }
 
