@@ -135,6 +135,8 @@ namespace DotNetForHtml5.Compiler
                 public readonly List<string> ResultingFindNameCalls = new List<string>();
                 public readonly ComponentConnectorBuilder ComponentConnector = new ComponentConnectorBuilder();
 
+                public bool GenerateFieldsForNamedElements { get; set; }
+
                 public GeneratorScope CurrentScope => _scopes.Peek();
                 public StringBuilder StringBuilder => CurrentScope.StringBuilder;
 
@@ -193,6 +195,15 @@ namespace DotNetForHtml5.Compiler
 
             private string GenerateImpl(GeneratorContext parameters)
             {
+                parameters.GenerateFieldsForNamedElements = 
+                    !_reflectionOnSeparateAppDomain.IsAssignableFrom(
+                        _metadata.SystemWindowsNS, "ResourceDictionary",
+                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName) 
+                    &&
+                    !_reflectionOnSeparateAppDomain.IsAssignableFrom(
+                        _metadata.SystemWindowsNS, "Application",
+                        _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName);
+
                 parameters.PushScope(
                     new RootScope(GetUniqueName(_reader.Document.Root),
                         _reflectionOnSeparateAppDomain.IsAssignableFrom(
@@ -241,7 +252,7 @@ namespace DotNetForHtml5.Compiler
                 {
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"{_metadata.SystemWindowsNS}.Application",
+                        $"global::{_metadata.SystemWindowsNS}.Application",
                         IsClassTheApplicationClass(baseType) ? _codeToPutInTheInitializeComponentOfTheApplicationClass : string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
@@ -467,11 +478,7 @@ namespace DotNetForHtml5.Compiler
                                 string name = attributeValue;
 
                                 // Add the code to register the name, etc.
-                                if (isElementInRootNamescope && !_reflectionOnSeparateAppDomain.IsAssignableFrom(
-                                    _metadata.SystemWindowsNS,
-                                    "ResourceDictionary",
-                                    elementThatIsRootOfTheCurrentNamescope.Name.NamespaceName,
-                                    elementThatIsRootOfTheCurrentNamescope.Name.LocalName))
+                                if (isElementInRootNamescope && parameters.GenerateFieldsForNamedElements)
                                 {
                                     string fieldModifier = _metadata.FieldModifier;
                                     XAttribute attr = element.Attribute(xNamespace + "FieldModifier");

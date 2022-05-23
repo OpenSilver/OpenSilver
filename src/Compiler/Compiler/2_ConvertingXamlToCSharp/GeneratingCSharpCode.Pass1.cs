@@ -101,7 +101,7 @@ namespace DotNetForHtml5.Compiler
                 {
                     // Create the "IntializeComponent()" method:
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"{_metadata.SystemWindowsNS}.Application",
+                        $"global::{_metadata.SystemWindowsNS}.Application",
                         string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
