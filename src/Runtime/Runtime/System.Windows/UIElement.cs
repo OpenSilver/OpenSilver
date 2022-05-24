@@ -744,10 +744,17 @@ namespace Windows.UI.Xaml
             {
                 // Get a reference to the most outer DOM element to show/hide:
                 object mostOuterDomElement = null;
-                if (uiElement.INTERNAL_VisualParent is UIElement)
-                    mostOuterDomElement = ((UIElement)uiElement.INTERNAL_VisualParent).INTERNAL_VisualChildrenInformation[uiElement].INTERNAL_OptionalChildWrapper_OuterDomElement; // Note: this is useful for example inside a Grid, where we want to hide the whole child wrapper in order to ensure that it doesn't capture mouse clicks thus preventing users from clicking on other elements in the Grid.
+                if (VisualTreeHelper.GetParent(uiElement) is UIElement parent &&
+                    parent.INTERNAL_VisualChildrenInformation != null &&
+                    parent.INTERNAL_VisualChildrenInformation.ContainsKey(uiElement))
+                {
+                    mostOuterDomElement = parent.INTERNAL_VisualChildrenInformation[uiElement].INTERNAL_OptionalChildWrapper_OuterDomElement;
+                }
                 if (mostOuterDomElement == null)
+                {
                     mostOuterDomElement = uiElement.INTERNAL_AdditionalOutsideDivForMargins ?? uiElement.INTERNAL_OuterDomElement;
+                }
+
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(mostOuterDomElement);
 
                 // Apply the visibility:

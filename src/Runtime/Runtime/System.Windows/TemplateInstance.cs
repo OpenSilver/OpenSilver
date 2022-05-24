@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#if !MIGRATION
-using Windows.UI.Xaml.Controls;
-#else
-using System.Windows.Controls;
-#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -34,7 +22,8 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Defines a generated instance of a FrameworkTemplate.
     /// </summary>
-    public partial class TemplateInstance
+    [Obsolete("Deprecated. This will be removed in future releases.")]
+    public class TemplateInstance
     {
         /// <summary>
         /// The element that contains the FrameworkTemplate.

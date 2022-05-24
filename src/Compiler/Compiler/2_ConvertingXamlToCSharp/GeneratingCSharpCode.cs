@@ -33,6 +33,66 @@ namespace DotNetForHtml5.Compiler
 
     internal static partial class GeneratingCSharpCode
     {
+        private class ComponentConnectorBuilder
+        {
+            private const string targetParam = "target";
+            private const string componentIdParam = "componentId";
+
+            private readonly List<ComponentConnectorEntry> _entries = new List<ComponentConnectorEntry>();
+
+            public int Connect(string componentType, string eventName, string handlerType, string handlerName)
+            {
+                int componentId = _entries.Count;
+                _entries.Add(new ComponentConnectorEntry
+                {
+                    componentType = componentType,
+                    eventName = eventName,
+                    handlerType = handlerType,
+                    handlerName = handlerName
+                });
+
+                return componentId;
+            }
+
+            public override string ToString()
+            {
+                StringBuilder builder = new StringBuilder();
+
+                builder.Append(' ', 4 * 2).AppendLine("[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]")
+                    .Append(' ', 4 * 2).AppendLine("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]")
+                    .Append(' ', 4 * 2).AppendLine($"void {IComponentConnectorClass}.Connect(int {componentIdParam}, object {targetParam})")
+                    .Append(' ', 4 * 2).AppendLine("{");
+
+                if (_entries.Count > 0)
+                {
+                    builder.Append(' ', 4 * 3).AppendLine($"switch ({componentIdParam})")
+                      .Append(' ', 4 * 3).AppendLine("{");
+
+                    for (int componentId = 0; componentId < _entries.Count; componentId++)
+                    {
+                        ComponentConnectorEntry eventEntry = _entries[componentId];
+                        builder.Append(' ', 4 * 4).AppendLine($"case {componentId}:");
+                        builder.Append(' ', 4 * 5).AppendLine($"(({eventEntry.componentType})({targetParam})).{eventEntry.eventName} += new {eventEntry.handlerType}(this.{eventEntry.handlerName});");
+                        builder.Append(' ', 4 * 5).AppendLine("return;");
+                    }
+
+                    builder.Append(' ', 4 * 3).AppendLine("}");
+                }
+
+                builder.Append(' ', 4 * 2).AppendLine("}");
+
+                return builder.ToString();
+            }
+
+            private struct ComponentConnectorEntry
+            {
+                public string componentType;
+                public string eventName;
+                public string handlerType;
+                public string handlerName;
+            }
+        }
+
         internal const string DefaultXamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
         private const string LegacyXamlNamespace = "http://schemas.microsoft.com/client/2007"; // XAML namespace used for Silverlight 1.0 application
         
@@ -108,42 +168,34 @@ namespace DotNetForHtml5.Compiler
         }
 
         private static string CreateInitializeComponentMethod(
-            string rootElementName,
-            string codeToWorkWithTheRootElement, 
-            List<string> findNameCalls, 
-            string codeToPlaceAtTheBeginningOfInitializeComponent, 
-            string codeToPlaceAtTheEndOfInitializeComponent, 
-            string nameScope,
-            bool isSLMigration, 
-            string assemblyNameWithoutExtension, 
-            string fileNameWithPathRelativeToProjectRoot)
+            string applicationTypeFullName,
+            string additionalCodeForApplication,
+            string assemblyNameWithoutExtension,
+            string fileNameWithPathRelativeToProjectRoot,
+            List<string> findNameCalls)
         {
-            string uiElementFullyQualifiedTypeName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
+            string componentUri = $"/{assemblyNameWithoutExtension};component/{fileNameWithPathRelativeToProjectRoot.Replace('\\', '/')}";
 
-            string body = CreateMethodBody(
-                codeToWorkWithTheRootElement,
-                findNameCalls,
-                codeToPlaceAtTheBeginningOfInitializeComponent,
-                codeToPlaceAtTheEndOfInitializeComponent,
-                nameScope);
+            string loadComponentCall = $"{applicationTypeFullName}.LoadComponent(this, new global::{XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri)}());";
+            //// enable this to replicate the Silverlight behavior. We use a custom variant of Application.LoadComponent that uses less reflection.
+            //string loadComponentCall = $"{applicationTypeFullName}.LoadComponent(this, new global::System.Uri(\"{componentUri}\", global::System.UriKind.Relative));";
 
             return $@"
         private bool _contentLoaded;
+
+        /// <summary>
+        /// InitializeComponent
+        /// </summary>
         public void InitializeComponent()
         {{
-            if (_contentLoaded)
-                return;
-            _contentLoaded = true;
-
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-            if (this is {uiElementFullyQualifiedTypeName})
+            if (_contentLoaded) 
             {{
-                (({uiElementFullyQualifiedTypeName})(object)this).XamlSourcePath = @""{assemblyNameWithoutExtension}\{fileNameWithPathRelativeToProjectRoot}"";
+                return;
             }}
-#pragma warning restore 0184
-
-            var {rootElementName} = this;
-            {body}
+            _contentLoaded = true;
+            {additionalCodeForApplication}
+            {loadComponentCall}
+            {string.Join(Environment.NewLine + "            ", findNameCalls)}
         }}
 ";
         }
@@ -154,7 +206,8 @@ namespace DotNetForHtml5.Compiler
         }
 
         private static string GeneratePartialClass(
-            List<string> methods,
+            string initializeComponentMethod,
+            string connectMethod,
             List<string> fieldsForNamedElements,
             string className,
             string namespaceStringIfAny,
@@ -171,19 +224,19 @@ public static void Main()
 }}";
             }
 
-            string methodsMergedCode = string.Join(Environment.NewLine + Environment.NewLine, methods);
-            
             string fieldsForNamedElementsMergedCode = string.Join(Environment.NewLine, fieldsForNamedElements);
 
             string classCodeFilled = $@"
-public partial class {className} : {baseType}
+public partial class {className} : {baseType}, {IComponentConnectorClass}
 {{
 
 #pragma warning disable 169, 649, 0628 // Prevents warning CS0169 ('field ... is never used'), CS0649 ('field ... is never assigned to, and will always have its default value null'), and CS0628 ('member : new protected member declared in sealed class')
 {fieldsForNamedElementsMergedCode}
 #pragma warning restore 169, 649, 0628
 
-{methodsMergedCode}
+{initializeComponentMethod}
+
+{connectMethod}
 
 {applicationEntryPointIfAny}
 
@@ -267,8 +320,11 @@ namespace {namespaceStringIfAny}
 
         private static string GenerateFactoryClass(
             string componentTypeFullName,
-            string factoryImpl,
+            string componentParamName,
+            string loadComponentImpl,
+            string createComponentImpl,
             IEnumerable<string> additionalMethods,
+            string uiElementFullyQualifiedTypeName,
             string assemblyName,
             string fileNameWithPathRelativeToProjectRoot)
         {
@@ -289,12 +345,13 @@ namespace {namespaceStringIfAny}
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>
+public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeFullName}>, {IXamlComponentLoaderClass}<{componentTypeFullName}>
 {{
     public static object Instantiate()
     {{
-        return new {factoryName}().CreateComponentImpl();
+        return CreateComponentImpl();
     }}
 
     {componentTypeFullName} {IXamlComponentFactoryClass}<{componentTypeFullName}>.CreateComponent()
@@ -306,7 +363,33 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
     {{
         return CreateComponentImpl();
     }}
-    {factoryImpl}
+
+    void {IXamlComponentLoaderClass}<{componentTypeFullName}>.LoadComponent({componentTypeFullName} component)
+    {{
+        LoadComponentImpl(component);
+    }}
+
+    void {IXamlComponentLoaderClass}.LoadComponent(object component)
+    {{
+        LoadComponentImpl(({componentTypeFullName})component);
+    }}
+
+    private static void LoadComponentImpl({componentTypeFullName} {componentParamName})
+    {{
+#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
+        if ({componentParamName} is {uiElementFullyQualifiedTypeName})
+        {{
+            (({uiElementFullyQualifiedTypeName})(object){componentParamName}).XamlSourcePath = @""{assemblyName}\{fileNameWithPathRelativeToProjectRoot}"";
+        }}
+#pragma warning restore 0184
+
+        {loadComponentImpl}
+    }}
+
+    private static {componentTypeFullName} CreateComponentImpl()
+    {{
+        {createComponentImpl}
+    }}
 
     {string.Join(Environment.NewLine + Environment.NewLine, additionalMethods)}
 }}
@@ -315,72 +398,11 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
             return finalCode;
         }
 
-        private static string CreateFactoryMethod(
-            string rootElementName,
-            string typeFullName,
-            string codeToWorkWithTheRootElement,
-            List<string> findNameCalls,
-            string codeToPlaceAtTheBeginningOfInitializeComponent,
-            string codeToPlaceAtTheEndOfInitializeComponent,
-            string nameScope,
-            bool isSLMigration,
-            string assemblyNameWithoutExtension,
-            string fileNameWithPathRelativeToProjectRoot)
-        {
-            string body = CreateMethodBody(
-                codeToWorkWithTheRootElement,
-                findNameCalls,
-                codeToPlaceAtTheBeginningOfInitializeComponent,
-                codeToPlaceAtTheEndOfInitializeComponent,
-                nameScope);
-            string uiElementFullName = isSLMigration ? "global::System.Windows.UIElement" : "global::Windows.UI.Xaml.UIElement";
-
-            return $@"
-    private {typeFullName} CreateComponentImpl()
-    {{
-        var {rootElementName} = new {typeFullName}();
-    
-#pragma warning disable 0184 // Prevents warning CS0184 ('The given expression is never of the provided ('type') type')
-        if ({rootElementName} is {uiElementFullName})
-        {{
-            (({uiElementFullName})(object){rootElementName}).XamlSourcePath = @""{assemblyNameWithoutExtension}\{fileNameWithPathRelativeToProjectRoot}"";
-        }}
-#pragma warning restore 0184
-    
-        {body}
-    
-        return {rootElementName};
-    }}";
-        }
-
-        private static string CreateFactoryMethod(string componentType)
-        {
-            return $@"
-    private {componentType} CreateComponentImpl()
-    {{
-        return ({componentType})global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof({componentType}));
-    }}
-";
-        }
-
-        private static string CreateMethodBody(
-            string codeToWorkWithTheRootElement,
-            List<string> findNameCalls,
-            string codeToPlaceAtTheBeginningOfInitializeComponent,
-            string codeToPlaceAtTheEndOfInitializeComponent,
-            string nameScope)
-        {
-            return $@"
-{codeToPlaceAtTheBeginningOfInitializeComponent}
-{codeToWorkWithTheRootElement}
-{string.Join("\r\n", findNameCalls)}
-{nameScope}
-{codeToPlaceAtTheEndOfInitializeComponent}    
-";
-        }
-
         private const string RuntimeHelperClass = "global::OpenSilver.Internal.Xaml.RuntimeHelpers";
         private const string IXamlComponentFactoryClass = "global::OpenSilver.Internal.Xaml.IXamlComponentFactory";
+        private const string IXamlComponentLoaderClass = "global::OpenSilver.Internal.Xaml.IXamlComponentLoader";
+        private const string IComponentConnectorClass = "global::OpenSilver.Internal.Xaml.IComponentConnector";
+        private const string XamlContextClass = "global::OpenSilver.Internal.Xaml.Context.XamlContext";
 
         public static bool IsDataTemplate(XElement element) => IsXElementOfType(element, "DataTemplate");
 

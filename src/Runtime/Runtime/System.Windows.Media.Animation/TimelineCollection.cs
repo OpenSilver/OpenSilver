@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -27,10 +20,25 @@ namespace Windows.UI.Xaml.Media.Animation
 #endif
 {
     /// <summary>
-    /// Represents a collection of Timeline objects.
+    /// Represents a collection of <see cref="Timeline"/> objects.
     /// </summary>
-    public sealed partial class TimelineCollection : List<Timeline>// : IList<Timeline>, IEnumerable<Timeline>
+    public sealed partial class TimelineCollection : PresentationFrameworkCollection<Timeline>
     {
-        //todo: if we change the implementation of this class, see this class in WinRT.
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TimelineCollection"/> class.
+        /// </summary>
+        public TimelineCollection() : base(false) { }
+
+        internal override void AddOverride(Timeline value) => AddDependencyObjectInternal(value);
+
+        internal override void ClearOverride() => ClearDependencyObjectInternal();
+
+        internal override Timeline GetItemOverride(int index) => GetItemInternal(index);
+
+        internal override void InsertOverride(int index, Timeline value) => InsertDependencyObjectInternal(index, value);
+
+        internal override void RemoveAtOverride(int index) => RemoveAtDependencyObjectInternal(index);
+
+        internal override void SetItemOverride(int index, Timeline value) => SetItemDependencyObjectInternal(index, value);
     }
 }

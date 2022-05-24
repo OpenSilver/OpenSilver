@@ -353,6 +353,7 @@ document._attachEventListeners = function (element, handler, isFocusable) {
     view.addEventListener('mouseenter', store['mouseenter'] = handler);
     view.addEventListener('mouseleave', store['mouseleave'] = handler);
     if (isFocusable) {
+        view.addEventListener('keypress', store['keypress'] = bubblingEventHandler);
         view.addEventListener('input', store['input'] = bubblingEventHandler);
         view.addEventListener('keydown', store['keydown'] = bubblingEventHandler);
         view.addEventListener('keyup', store['keyup'] = bubblingEventHandler);
@@ -376,6 +377,7 @@ document._removeEventListeners = function (element) {
     view.removeEventListener('mouseenter', store['mouseenter']);
     view.removeEventListener('mouseleave', store['mouseleave']);
     if (store.isFocusable) {
+        view.removeEventListener('keypress', store['keypress']);
         view.removeEventListener('input', store['input']);
         view.removeEventListener('keydown', store['keydown']);
         view.removeEventListener('keyup', store['keyup']);
@@ -917,6 +919,17 @@ document.getRangeStartAndEnd = function getRangeStartAndEnd(currentParent, isFir
         }
     }
     return charactersWentThrough;
+}
+
+document.getCaretPosition = function getCaretCharacterOffsetWithin(element) {
+    var caretOffset = 0;
+    var sel = window.getSelection();
+    var range = sel.getRangeAt(0);
+    var preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(element);
+    preCaretRange.setEnd(sel.focusNode, sel.focusOffset);
+    caretOffset = preCaretRange.toString().length;
+    return caretOffset;
 }
 
 document.doesElementInheritDisplayNone = function getRangeStartAndEnd(domElement) {

@@ -33,7 +33,8 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     public sealed class ScrollContentPresenter : ContentPresenter, IScrollInfo
     {
-        private const double LineDelta = 16.0;
+        private const double LineDelta = 16.0; // Default physical amount to scroll with one Up/Down/Left/Right key
+        private const double WheelDelta = 48.0; // Default physical amount to scroll with one MouseWheel.
 
         bool canHorizontallyScroll;
         bool canVerticallyScroll;
@@ -343,7 +344,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelDown()
         {
-            SetVerticalOffset(VerticalOffset + LineDelta);
+            SetVerticalOffset(VerticalOffset + WheelDelta);
         }
 
         /// <summary>
@@ -351,7 +352,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelLeft()
         {
-            SetHorizontalOffset(HorizontalOffset - LineDelta);
+            SetHorizontalOffset(HorizontalOffset - WheelDelta);
         }
 
         /// <summary>
@@ -359,7 +360,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelRight()
         {
-            SetHorizontalOffset(HorizontalOffset + LineDelta);
+            SetHorizontalOffset(HorizontalOffset + WheelDelta);
         }
 
         /// <summary>
@@ -367,7 +368,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void MouseWheelUp()
         {
-            SetVerticalOffset(VerticalOffset - LineDelta);
+            SetVerticalOffset(VerticalOffset - WheelDelta);
         }
 
         /// <summary>

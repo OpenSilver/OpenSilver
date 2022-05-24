@@ -21,6 +21,7 @@ using System.Collections.Specialized;
 using System.Windows.Markup;
 using System.Diagnostics;
 using CSHTML5.Internals.Controls;
+using OpenSilver.Internal.Xaml.Context;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -142,18 +143,13 @@ namespace Windows.UI.Xaml.Controls
 
         private static ItemsPanelTemplate GetDefaultItemsPanel()
         {
-            ItemsPanelTemplate template = new ItemsPanelTemplate();
-            template.SetMethodToInstantiateFrameworkTemplate(owner =>
+            ItemsPanelTemplate template = new ItemsPanelTemplate
             {
-                var panel = new StackPanel();
-                panel.TemplatedParent = owner;
-
-                return new TemplateInstance
-                {
-                    TemplateOwner = owner,
-                    TemplateContent = panel,
-                };
-            });
+                Template = new TemplateContent(
+                    new XamlContext(),
+                    (owner, context) => new StackPanel { TemplatedParent = owner }                    
+                )
+            };
 
             template.Seal();
 
@@ -854,20 +850,20 @@ namespace Windows.UI.Xaml.Controls
 
         internal static DataTemplate GetDataTemplateForDisplayMemberPath(string displayMemberPath)
         {
-            DataTemplate template = new DataTemplate();
-
-            template.SetMethodToInstantiateFrameworkTemplate(control =>
+            DataTemplate template = new DataTemplate
             {
-                TemplateInstance templateInstance = new TemplateInstance();
+                Template = new TemplateContent(
+                    new XamlContext(),
+                    (control, context) =>
+                    {
+                        TextBlock textBlock = new TextBlock();
+                        textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
+                        textBlock.TemplatedParent = control;
 
-                TextBlock textBlock = new TextBlock();
-                textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
-                textBlock.TemplatedParent = control;
-
-                templateInstance.TemplateContent = textBlock;
-
-                return templateInstance;
-            });
+                        return textBlock;
+                    }                    
+                )
+            };
 
             return template;
         }

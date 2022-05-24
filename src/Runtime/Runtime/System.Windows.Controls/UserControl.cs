@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Markup;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal.Xaml.Context;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -59,16 +60,14 @@ namespace Windows.UI.Xaml.Controls
         static UserControl()
         {
             // UseContentTemplate
-            ControlTemplate template = new ControlTemplate();
-            template.SetMethodToInstantiateFrameworkTemplate((owner) =>
+            ControlTemplate template = new ControlTemplate
             {
-                TemplateInstance instance = new TemplateInstance();
+                Template = new TemplateContent(
+                    new XamlContext(),
+                    (owner, context) => ((UserControl)owner).Content as FrameworkElement
+                )
+            };
 
-                instance.TemplateOwner = owner;
-                instance.TemplateContent = ((UserControl)owner).Content as FrameworkElement;
-
-                return instance;
-            });
             template.Seal();
 
             UseContentTemplate = template;

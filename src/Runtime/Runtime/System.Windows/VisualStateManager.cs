@@ -282,7 +282,7 @@ namespace Windows.UI.Xaml
                 // Background of another with the same Style)
 
                 // we apply the new state
-                Dictionary<Tuple<string, string>, Timeline> newPropertiesChanged = state.ApplyStoryboard(control, useTransitions);
+                Dictionary<Tuple<string, string>, Timeline> newPropertiesChanged = state.ApplyStoryboard(stateGroupsRoot, useTransitions);
 
                 // we remove the former state if any
                 if (lastState != null)
