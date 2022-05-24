@@ -14,6 +14,8 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Xaml;
+using OpenSilver.Internal.Xaml.Context;
 
 #if MIGRATION
 using System.Windows;
@@ -117,6 +119,61 @@ namespace OpenSilver.Internal.Xaml
         public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
         {
             element.TemplatedParent = templatedParent;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static XamlContext Create_XamlContext()
+        {
+            return new XamlContext();
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
+        {
+            Debug.Assert(template != null);
+            Debug.Assert(xamlContext != null);
+            Debug.Assert(factory != null);
+
+            template.Template = new TemplateContent(xamlContext, factory);
+        }
+    
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static T XamlContext_PushScope<T>(XamlContext context, T instance)
+        {
+            Debug.Assert(context != null);
+
+            context.PushScope();
+            context.CurrentInstance = instance;
+
+            return instance;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void XamlContext_PopScope(XamlContext context)
+        {
+            Debug.Assert(context != null);
+            
+            context.PopScope();
+        }
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void XamlContext_SetConnectionId(XamlContext context, int connectionId, object instance)
+        {
+            Debug.Assert(context != null);
+
+            if (context.RootInstance is IComponentConnector connector)
+            {
+                connector.Connect(connectionId, instance);
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static T CallProvideValue<T>(XamlContext context, IMarkupExtension<T> markupExtension) where T : class
+        {
+            Debug.Assert(context != null);
+            Debug.Assert(markupExtension != null);
+
+            return markupExtension.ProvideValue(new ServiceProviderContext(context));
         }
     }
 }

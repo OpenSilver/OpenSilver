@@ -382,20 +382,32 @@ return globalIndexes;
 
         internal void NEW_SET_SELECTION(int startIndex, int endIndex)
         {
+            if (Input.FocusManager.GetFocusedElement() != this.Host)
+                return;
+
             if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 return;
 
             string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
             OpenSilver.Interop.ExecuteJavaScriptAsync($@"
-var range = document.createRange();
-var sel = window.getSelection();
+var sel = window.getSelection()
 var nodesAndOffsets = {{}}; //this will hold the nodes and offsets useful to set the range's start and end.
 document.getRangeStartAndEnd({sDiv}, true, 0, {startIndex.ToInvariantString()}, {endIndex.ToInvariantString()}, nodesAndOffsets, false, false)
-range.setStart(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset']);
-range.setEnd(nodesAndOffsets['endParent'], nodesAndOffsets['endOffset']);
-sel.removeAllRanges();
-sel.addRange(range);
+sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset'], nodesAndOffsets['endParent'], nodesAndOffsets['endOffset'])
 ");
+        }
+
+        internal int GetCaretPosition()
+        {
+
+            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                return 0;
+            }
+
+            var result = OpenSilver.Interop.ExecuteJavaScript(@"document.getCaretPosition($0)", _contentEditableDiv);
+
+            return CastToInt(result);
         }
 
         private object AddContentEditableDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -655,8 +667,14 @@ element.setAttribute(""data-maxlength"", ""{this.Host.MaxLength}"");
 element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
 element.setAttribute(""data-acceptstab"", ""{this.Host.AcceptsTab.ToString().ToLower()}"");");
 
-                // Register the "keydown" javascript event:
-                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+#if CSHTML5BLAZOR
+                if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+                if (!IsRunningInJavaScript())
+#endif
+                {
+                    // Register the "keydown" javascript event:
+                    INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
 var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
 element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
@@ -726,6 +744,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             return false;
     }}
 }}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
+                }
             }
 #endif
 

@@ -106,13 +106,13 @@ namespace Windows.UI.Xaml.Media.Animation
 
         }
 
-        internal override void Stop(DependencyObject depObj, string groupName, bool revertToFormerValue = false)
+        internal override void Stop(IterationParameters parameters, bool revertToFormerValue = false)
         {
             if (_isInitialized)
             {
                 _cancelledAnimation = revertToFormerValue;
-                base.Stop(depObj, groupName, revertToFormerValue);
-                StopAnimation(groupName);
+                base.Stop(parameters, revertToFormerValue);
+                StopAnimation();
                 if (revertToFormerValue)
                 {
                     UnApply();
@@ -120,10 +120,7 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal virtual void StopAnimation(string groupName)
-        {
-            
-        }
+        internal virtual void StopAnimation() { }
 
         private void UnApply()
         {

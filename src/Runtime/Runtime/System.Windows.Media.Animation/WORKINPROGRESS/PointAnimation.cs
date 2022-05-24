@@ -120,7 +120,7 @@ namespace Windows.UI.Xaml.Media.Animation
             DependencyObject target;
             PropertyPath propertyPath;
 
-            GetTargetElementAndPropertyInfo(parameters.Target, out target, out propertyPath, parameters.IsTargetParentTheTarget);
+            GetTargetElementAndPropertyInfo(parameters, out target, out propertyPath);
 
             _propertyContainer = target;
             _targetProperty = propertyPath;

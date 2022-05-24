@@ -500,7 +500,19 @@ namespace Windows.UI.Xaml.Controls
                     _textViewHost.View.NEW_SET_SELECTION(SelectionStart, SelectionStart + value);
                 }
             }
-        }        
+        }
+
+        // It needs to get caret position for selection with Shift key
+        internal int CaretPosition
+        {
+            get
+            {
+                if (_textViewHost != null)
+                    return _textViewHost.View.GetCaretPosition();
+
+                return 0;
+            }
+        }
 
         /// <summary>
         /// Occurs when the text is changed.
@@ -589,12 +601,169 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
         }
 
+#if MIGRATION
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Handled)
+                return;
+
+            base.OnKeyDown(e);
+
+#if CSHTML5BLAZOR
+            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (!IsRunningInJavaScript())
+#endif
+            {
+                // Not implemented for the simulator
+                return;
+            }
+
+            if (this.Text.Contains("\r") || this.Text.Contains("\n"))
+            {
+                // Not implemented for multiple text lines
+                return;
+            }
+
+            if (e.Key == Key.Left || e.Key == Key.Right)
+            {
+                if (e.KeyModifiers == ModifierKeys.None)
+                {
+                    if (SelectionLength > 0)
+                    {
+                        if (e.Key == Key.Left)
+                            Select(SelectionStart, 0);
+                        else
+                            Select(SelectionStart + SelectionLength, 0);
+
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        if (e.Key == Key.Left && SelectionStart > 0)
+                        {
+                            Select(SelectionStart - 1, 0);
+                            e.Handled = true;
+                        }
+                        else if (e.Key == Key.Right && SelectionStart < Text.Length)
+                        {
+                            Select(SelectionStart + 1, 0);
+                            e.Handled = true;
+                        }
+                    }
+                }
+                else if (e.KeyModifiers == ModifierKeys.Shift)
+                {
+                    int caret = CaretPosition;
+                    int selectionStartWithDirection = SelectionStart;
+                    int selectionEndWithDirection = SelectionStart + SelectionLength;
+
+                    if (caret != selectionEndWithDirection)
+                    {
+                        // Selection direction is backward
+                        int tmp = selectionEndWithDirection;
+                        selectionEndWithDirection = selectionStartWithDirection;
+                        selectionStartWithDirection = tmp;
+                    }
+
+                    if (e.Key == Key.Left && selectionEndWithDirection > 0)
+                    {
+                        selectionEndWithDirection--;
+                        
+                        Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
+                        
+                        e.Handled = true;
+                    }
+                    else if (e.Key == Key.Right && selectionEndWithDirection < Text.Length)
+                    {
+                        selectionEndWithDirection++;
+                        Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
+                        
+                        e.Handled = true;
+                    }
+                }
+                else if (e.KeyModifiers == ModifierKeys.Control)
+                {
+                    // Not implemented
+                }
+                else if (e.KeyModifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                {
+                    // Not implemented
+                }
+            }
+
+            if (e.Key == Key.Up || e.Key == Key.Down)
+            {
+                // Not implemented
+            }
+        }
+#endif
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
-            base.OnTextInput(e);
-            
-            e.Handled = true;
+            if (e.Handled)
+                return;
 
+            base.OnTextInput(e);
+
+#if CSHTML5BLAZOR
+            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (!IsRunningInJavaScript())
+#endif
+            {
+                // Not implemented for the simulator
+                return;
+            }
+
+            if (this.IsReadOnly)
+                return;
+
+            if (this.MaxLength != 0 && Text.Length - SelectionLength >= this.MaxLength)
+                return;
+
+            if (e.Text == "\r")
+            {
+                if (this.AcceptsReturn == false)
+                    return;
+
+                // Not implemented for multiple text lines
+                return;
+            }
+
+            if (this.Text.Contains("\r") || this.Text.Contains("\n"))
+            {
+                // Not implemented for multiple text lines
+                return;
+            }
+
+            this.SelectedText = e.Text;
+            e.Handled = true;
+        }
+        internal void INTERNAL_CheckTextInputHandled(TextCompositionEventArgs e, object jsEventArg)
+        {
+#if CSHTML5BLAZOR
+            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#else
+            if (!IsRunningInJavaScript())
+#endif
+            {
+                // Not implemented for the simulator
+                return;
+            }
+
+            bool multiLines = this.Text.Contains("\r") || this.Text.Contains("\n");
+            bool requireNewLine = e.Text == "\r" && this.AcceptsReturn;
+            if (e.Handled == false && (requireNewLine || multiLines))
+            {
+                // Not implemented for multiple text lines
+                return;
+            }
+
+            OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+        }
+
+        internal void INTERNAL_TextUpdated()
+        {
             if (_textViewHost != null)
             {
                 _isProcessingInput = true;
@@ -614,19 +783,16 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void SelectAll()
         {
-            this.SelectionStart = 0;
-            this.SelectionLength = this.Text.Length;
+            Select(0, this.Text.Length);
         }
 
         public void Select(int start, int length)
         {
             if (start < 0)
                 throw new ArgumentOutOfRangeException(nameof(start));
-            if (length < 0)
+            if (start + length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
-
-            SelectionStart = start;
-            SelectionLength = length;
+            _textViewHost.View.NEW_SET_SELECTION(start, start + length);
         }
 
         protected override Size MeasureOverride(Size availableSize)

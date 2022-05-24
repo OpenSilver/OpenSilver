@@ -24,6 +24,7 @@ namespace DotNetForHtml5.Compiler
         private class GeneratorPass1 : ICodeGenerator
         {
             private readonly XamlReader _reader;
+            private readonly IMetadata _metadata;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
             private readonly ReflectionOnSeparateAppDomainHandler _reflectionOnSeparateAppDomain;
@@ -36,6 +37,7 @@ namespace DotNetForHtml5.Compiler
                 bool isSLMigration)
             {
                 _reader = new XamlReader(doc);
+                _metadata = isSLMigration ? Metadata.Silverlight : Metadata.UWP;
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
                 _isSLMigration = isSLMigration;
@@ -98,13 +100,16 @@ namespace DotNetForHtml5.Compiler
                 if (hasCodeBehind)
                 {
                     // Create the "IntializeComponent()" method:
-                    string initializeComponentMethod = CreateInitializeComponentMethod(GetUniqueName(_reader.Document.Root), null, new List<string>(0), null, null, null,
-                        _isSLMigration, _assemblyNameWithoutExtension, _fileNameWithPathRelativeToProjectRoot);
-
-                    resultingMethods.Add(initializeComponentMethod);
+                    string initializeComponentMethod = CreateInitializeComponentMethod(
+                        $"global::{_metadata.SystemWindowsNS}.Application",
+                        string.Empty,
+                        _assemblyNameWithoutExtension,
+                        _fileNameWithPathRelativeToProjectRoot,
+                        new List<string>());
 
                     // Wrap everything into a partial class:
-                    string partialClass = GeneratePartialClass(resultingMethods,
+                    string partialClass = GeneratePartialClass(initializeComponentMethod,
+                                                               new ComponentConnectorBuilder().ToString(),
                                                                resultingFieldsForNamedElements,
                                                                className,
                                                                namespaceStringIfAny,
@@ -120,8 +125,11 @@ namespace DotNetForHtml5.Compiler
 
                     string factoryClass = GenerateFactoryClass(
                         componentTypeFullName,
-                        CreateFactoryMethod(componentTypeFullName),
+                        GetUniqueName(_reader.Document.Root),
+                        "throw new global::System.NotImplementedException();",
+                        "throw new global::System.NotImplementedException();",
                         Enumerable.Empty<string>(),
+                        $"global::{_metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -133,22 +141,13 @@ namespace DotNetForHtml5.Compiler
                 }
                 else
                 {
-                    string factoryImpl = CreateFactoryMethod(
-                        GetUniqueName(_reader.Document.Root),
-                        baseType,
-                        null,
-                        new List<string>(0),
-                        null,
-                        null,
-                        null,
-                        _isSLMigration,
-                        _assemblyNameWithoutExtension,
-                        _fileNameWithPathRelativeToProjectRoot);
-
                     string finalCode = GenerateFactoryClass(
                         baseType,
-                        factoryImpl,
+                        GetUniqueName(_reader.Document.Root),
+                        "throw new global::System.NotImplementedException();",
+                        "throw new global::System.NotImplementedException();",
                         Enumerable.Empty<string>(),
+                        $"global::{_metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 

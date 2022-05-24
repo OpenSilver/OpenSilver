@@ -187,7 +187,10 @@
                             </Grid>
                         </Border>
                         <Popup x:Name="Popup">
-                            <Grid Opacity="{TemplateBinding Opacity}">
+                            <Grid Opacity="{TemplateBinding Opacity}"
+                                    CustomLayout="{TemplateBinding CustomLayout}"
+                                    IsAutoHeightOnCustomLayout="{TemplateBinding IsAutoHeightOnCustomLayout}"
+                                    IsAutoWidthOnCustomLayout="{TemplateBinding IsAutoWidthOnCustomLayout}">
                                 <Border x:Name="PopupBorder"
                                         HorizontalAlignment="Stretch"
                                         Opacity="0"

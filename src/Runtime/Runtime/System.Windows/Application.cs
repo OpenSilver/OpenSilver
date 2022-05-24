@@ -14,16 +14,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows.Resources;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Text;
 using System.Windows;
+using System.Windows.Resources;
 using CSHTML5;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using OpenSilver.Internal;
-using System.Linq;
+using OpenSilver.Internal.Xaml;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
@@ -310,6 +312,16 @@ namespace Windows.UI.Xaml
             }
         }
 
+        internal bool HasResources
+        {
+            get
+            {
+                ResourceDictionary resources = _resources;
+                return (resources != null &&
+                        ((resources.Count > 0) || (resources.MergedDictionaries.Count > 0)));
+            }
+        }
+
         //
         // Internal routine only look up in application resources
         //
@@ -485,7 +497,6 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <param name="component">Root Element</param>
         /// <param name="resourceLocator">Resource Locator</param>
-        [OpenSilver.NotImplemented]
         public static void LoadComponent(object component, Uri resourceLocator)
         {
             if (component is null)
@@ -498,15 +509,67 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(resourceLocator));
             }
 
-            if (resourceLocator.OriginalString is null)
-            {
-                throw new ArgumentNullException(nameof(resourceLocator.OriginalString));
-            }
-
             if (resourceLocator.IsAbsoluteUri)
             {
-                throw new ArgumentException("Application URI must be relative.");
+                throw new ArgumentException("Uri must be relative.");
             }
+
+            string resourceUri = resourceLocator.ToString();
+            if (IsComponentUri(resourceUri))
+            {
+                IXamlComponentLoader factory = GetXamlComponentLoader(resourceUri);
+                if (factory != null)
+                {
+                    factory.LoadComponent(component);
+                }
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static void LoadComponent(object component, IXamlComponentLoader loader)
+        {
+            if (component is null)
+            {
+                throw new ArgumentNullException(nameof(component));
+            }
+
+            if (loader is null)
+            {
+                throw new ArgumentNullException(nameof(loader));
+            }
+
+            loader.LoadComponent(component);
+        }
+
+        private static bool IsComponentUri(string uri)
+        {
+            int index = uri.IndexOf(';');
+            if (index > -1)
+            {
+                return uri.Substring(index).StartsWith(";component/");
+            }
+
+            return false;
+        }
+
+        private static string ExtractAssemblyNameFromComponentUri(string uri)
+        {
+            int offset = uri[0] == '/' ? 1 : 0;
+            return uri.Substring(offset, uri.IndexOf(';') - offset);
+        }
+
+        private static IXamlComponentLoader GetXamlComponentLoader(string componentUri)
+        {
+            string className = XamlResourcesHelper.GenerateClassNameFromComponentUri(componentUri);
+            string assemblyName = ExtractAssemblyNameFromComponentUri(componentUri);
+
+            Type loaderType = Type.GetType($"{className}, {assemblyName}");
+            if (loaderType != null)
+            {
+                return Activator.CreateInstance(loaderType) as IXamlComponentLoader;
+            }
+
+            return null;
         }
 
         // Exceptions:
