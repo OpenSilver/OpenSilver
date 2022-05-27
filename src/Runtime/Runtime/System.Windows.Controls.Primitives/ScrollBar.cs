@@ -578,6 +578,19 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
 #if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
+        {
+            base.OnMouseLeftButtonDown(eventArgs);
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs eventArgs)
+        {
+            base.OnPointerPressed(eventArgs);
+#endif
+
+            eventArgs.Handled = true;
+        }
+
+#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs eventArgs)
         {
             base.OnMouseLeftButtonUp(eventArgs);
