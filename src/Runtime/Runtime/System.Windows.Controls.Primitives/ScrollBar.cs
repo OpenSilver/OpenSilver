@@ -14,10 +14,16 @@
 
 
 #if MIGRATION
-namespace System.Windows.Controls.Primitives
+using System.Windows.Input;
 #else
 using System;
 using Windows.Foundation;
+using Windows.UI.Xaml.Input;
+#endif
+
+#if MIGRATION
+namespace System.Windows.Controls.Primitives
+#else
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
@@ -569,6 +575,33 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     Canvas.SetLeft(_horizontalLargeIncrease, thumbBottomRightPosition);
                 }
             }
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
+        {
+            base.OnMouseLeftButtonDown(eventArgs);
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs eventArgs)
+        {
+            base.OnPointerPressed(eventArgs);
+#endif
+
+            eventArgs.Handled = true;
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs eventArgs)
+        {
+            base.OnMouseLeftButtonUp(eventArgs);
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs eventArgs)
+        {
+            base.OnPointerReleased(eventArgs);
+#endif
+
+            // Setting MouseLeftUp event as handled to not have it bubbled up and trigger selection on host
+            eventArgs.Handled = true;
         }
 
         /// <summary>

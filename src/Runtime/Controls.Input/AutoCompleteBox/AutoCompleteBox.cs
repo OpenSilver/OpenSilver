@@ -1562,6 +1562,14 @@ namespace Windows.UI.Xaml.Controls
                     return true;
                 }
 
+                // If focus is on the selector part of this control (in the dropdown),
+                // then true is returned as to not close the dropdown when scrolling with drag
+                if (SelectionAdapter is SelectorSelectionAdapter selectorSelectionAdapter &&
+                    object.ReferenceEquals(focused, selectorSelectionAdapter.SelectorControl))
+                {
+                    return true;    
+                }
+
                 // This helps deal with popups that may not be in the same 
                 // visual tree
                 DependencyObject parent = VisualTreeHelper.GetParent(focused);
