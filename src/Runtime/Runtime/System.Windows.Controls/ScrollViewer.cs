@@ -1387,13 +1387,16 @@ namespace Windows.UI.Xaml.Controls
         {
             if (ScrollInfo != null)
             {
+                // ScrollBar visibility has to be updated before ViewportHeight/Width, because
+                // that will trigger ScrollBar control sizing which depends on ScrollBar ActualWidth/Height
+                UpdateScrollbarVisibility();
+
                 ExtentHeight = ScrollInfo.ExtentHeight;
                 ExtentWidth = ScrollInfo.ExtentWidth;
                 ViewportHeight = ScrollInfo.ViewportHeight;
                 ViewportWidth = ScrollInfo.ViewportWidth;
                 UpdateScrollBar(Orientation.Horizontal, ScrollInfo.HorizontalOffset);
                 UpdateScrollBar(Orientation.Vertical, ScrollInfo.VerticalOffset);
-                UpdateScrollbarVisibility();
             }
 
             if (Math.Max(0, ExtentHeight - ViewportHeight) != ScrollableHeight)
