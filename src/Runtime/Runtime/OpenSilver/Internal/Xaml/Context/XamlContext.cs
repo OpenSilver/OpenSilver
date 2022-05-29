@@ -87,7 +87,7 @@ namespace OpenSilver.Internal.Xaml.Context
         {
             var retList = new List<object>();
 
-            XamlObjectFrame frame = _stack.PreviousFrame;
+            XamlObjectFrame frame = _stack.CurrentFrame;
             while (frame.Depth >= 1)
             {
                 object inst = frame.Instance;
