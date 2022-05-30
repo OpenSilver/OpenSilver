@@ -131,11 +131,6 @@ namespace Windows.UI.Xaml.Controls
 
         internal static Type GetItemType(this IEnumerable list)
         {
-            if (list is ICollectionView collectionView && collectionView.SourceCollection != null)
-            {
-                list = collectionView.SourceCollection;
-            }
-
             Type listType = list.GetType();
             Type itemType = null;
 
@@ -158,6 +153,15 @@ namespace Windows.UI.Xaml.Controls
                 if (en.MoveNext() && en.Current != null) 
                 {
                     return en.Current.GetType();
+                }
+
+                if (list is ICollectionView icv && icv.SourceCollection != null)
+                {
+                    listType = icv.SourceCollection.GetType();
+                    if (listType.IsEnumerableType())
+                    {
+                        itemType = listType.GetEnumerableItemType();
+                    }
                 }
             }
 
