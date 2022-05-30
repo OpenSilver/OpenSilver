@@ -15,6 +15,7 @@ using System.IO;
 using System.Windows.Markup;
 using System.Reflection;
 using System.Windows.Controls.Primitives;
+using System.ComponentModel;
 
 #if OPENSILVER
 using OpenSilver.Internal.Xaml.Context;
@@ -25,6 +26,14 @@ namespace TestApplication.Tests
     public partial class AutoCompleteBoxTest : Page
     {
         private ObservableCollection<string> _items = new ObservableCollection<string>();
+
+        public ObservableCollection<string> Items
+        {
+            get
+            {
+                return _items;
+            }
+        }
 
         public AutoCompleteBoxTest()
         {
