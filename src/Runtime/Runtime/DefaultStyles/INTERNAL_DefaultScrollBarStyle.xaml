@@ -175,27 +175,27 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Canvas x:Name="HorizontalRoot" Visibility="Collapsed" ClipToBounds="True"  Background="{TemplateBinding Background}">
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" />
                             <Button x:Name="HorizontalSmallDecrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowLeft" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 2,4.5 L 5.5,1 L 5.5,8"/>
                             </Button>
                             <Button x:Name="HorizontalSmallIncrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowRight" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 2,1 L 5.5,4.5 L 2,8"/>
                             </Button>
-                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeDecrease" Padding="0" Cursor="Arrow" />
-                            <Button  Style="{StaticResource ScrollButton}"  x:Name="HorizontalLargeIncrease" Padding="0" Cursor="Arrow" />
                             <Thumb x:Name="HorizontalThumb" Cursor="Arrow" Style="{StaticResource ScrollThumb}" />
 
 
                         </Canvas>
                         <Canvas x:Name="VerticalRoot" Visibility="Collapsed" ClipToBounds="True" Background="{TemplateBinding Background}">
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" />
+                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" />
                             <Button x:Name="VerticalSmallDecrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowTop" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 4.5,2 L 1,5.5 L 8,5.5"/>
                             </Button>
                             <Button x:Name="VerticalSmallIncrease" Padding="0" Cursor="Arrow">
                                 <Path x:Name="ArrowBottom" Fill="#FF555555" Width="9" Height="9" Margin="0,0,3,0" StrokeThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill" Data="M 1,2 L 4.5,5.5 L 8,2"/>
                             </Button>
-                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeDecrease" Padding="0" Cursor="Arrow" />
-                            <Button  Style="{StaticResource ScrollButton}"  x:Name="VerticalLargeIncrease" Padding="0" Cursor="Arrow" />
                             <Thumb x:Name="VerticalThumb"  Style="{StaticResource ScrollThumb}" Cursor="Arrow" />
 
                         </Canvas>
