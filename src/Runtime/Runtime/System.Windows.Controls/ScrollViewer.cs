@@ -592,12 +592,12 @@ namespace Windows.UI.Xaml.Controls
             dynamic innerDivStyle)
 #endif
         {
-            // if it's under customlayout, it works with Measure & Arrange.
-            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
-                return;
-
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
+                // if it's under customlayout, it works with Measure & Arrange.
+                if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                    return;
+
                 //-------------------------------------
                 // Handle the "Overflow X" CSS property:
                 //-------------------------------------
@@ -672,12 +672,12 @@ namespace Windows.UI.Xaml.Controls
             dynamic innerDivStyle)
 #endif
         {
-            // if it's under customlayout, it works with Measure & Arrange.
-            if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
-                return;
-
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
+                // if it's under customlayout, it works with Measure & Arrange.
+                if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                    return;
+
                 //-------------------------------------
                 // Handle the "Overflow Y" CSS property:
                 //-------------------------------------

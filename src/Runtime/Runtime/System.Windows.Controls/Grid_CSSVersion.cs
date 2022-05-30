@@ -210,11 +210,12 @@ namespace Windows.UI.Xaml.Controls
 
         private static void ApplyRowPosition(UIElement element)
         {
-            if (element.IsUnderCustomLayout)
-                return;
             int maxRow = 0;
             if (element.IsConnectedToLiveTree && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
             {
+                if (element.IsUnderCustomLayout)
+                    return;
+
                 Grid parent = (Grid)element.INTERNAL_VisualParent;
                 if (parent._rowDefinitionsOrNull != null && parent._rowDefinitionsOrNull.Count > 0)
                 {
@@ -249,11 +250,12 @@ namespace Windows.UI.Xaml.Controls
 
         private static void ApplyColumnPosition(UIElement element)
         {
-            if (element.IsUnderCustomLayout)
-                return;
             int maxColumn = 0;
             if (element.IsConnectedToLiveTree && element.INTERNAL_VisualParent is Grid) //Note: this also checks if INTERNAL_VisualTreeManager.IsElementInVisualTree(element) is true because there is no point in setting it on Windows and Popups.
             {
+                if (element.IsUnderCustomLayout)
+                    return;
+
                 Grid parent = (Grid)element.INTERNAL_VisualParent;
                 if (parent._columnDefinitionsOrNull != null && parent._columnDefinitionsOrNull.Count > 0)
                 {

@@ -329,17 +329,28 @@ namespace Windows.UI.Xaml
             }
         }
 
+        private bool? isUnderCustomLayout = null;
         internal bool IsUnderCustomLayout
         {
             get
             {
+                if (isUnderCustomLayout != null)
+                    return (bool)isUnderCustomLayout;
+
                 FrameworkElement parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
                 
-                while (parent != null)
+                if (parent != null)
                 {
-                    if (parent.CustomLayout)
+                    if (parent.CustomLayout || parent.IsUnderCustomLayout)
+                    {
+                        isUnderCustomLayout = true;
                         return true;
-                    parent = VisualTreeHelper.GetParent(parent) as FrameworkElement;
+                    }
+                    else
+                    {
+                        isUnderCustomLayout = false;
+                        return false;
+                    }
                 }
 
                 return false;
