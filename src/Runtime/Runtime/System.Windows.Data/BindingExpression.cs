@@ -749,7 +749,7 @@ namespace Windows.UI.Xaml.Data
                     // the (visual) parent - a panel.
                     if (dd == null)
                     {
-                        Panel panel = fe as Panel;
+                        Panel panel = (fe.Parent ?? VisualTreeHelper.GetParent(fe)) as Panel;
                         if (panel != null && panel.IsItemsHost)
                         {
                             dd = panel;
