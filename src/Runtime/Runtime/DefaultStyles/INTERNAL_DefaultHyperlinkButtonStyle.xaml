@@ -24,7 +24,7 @@
                                 <VisualState x:Name="Normal" />
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="UnderlineTextBlock"
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OverlayTextBlock"
                                                                        Storyboard.TargetProperty="Visibility"
                                                                        Duration="0">
                                             <DiscreteObjectKeyFrame KeyTime="0">
@@ -32,12 +32,17 @@
                                                     <Visibility>Visible</Visibility>
                                                 </DiscreteObjectKeyFrame.Value>
                                             </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OverlayTextBlock"
+                                                                       Storyboard.TargetProperty="TextDecorations"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Underline"/>
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="UnderlineTextBlock"
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OverlayTextBlock"
                                                                        Storyboard.TargetProperty="Visibility"
                                                                        Duration="0">
                                             <DiscreteObjectKeyFrame KeyTime="0">
@@ -46,11 +51,16 @@
                                                 </DiscreteObjectKeyFrame.Value>
                                             </DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OverlayTextBlock"
+                                                                       Storyboard.TargetProperty="TextDecorations"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="Underline"/>
+                                        </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DisabledOverlay"
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OverlayTextBlock"
                                                                        Storyboard.TargetProperty="Visibility"
                                                                        Duration="0">
                                             <DiscreteObjectKeyFrame KeyTime="0">
@@ -58,6 +68,11 @@
                                                     <Visibility>Visible</Visibility>
                                                 </DiscreteObjectKeyFrame.Value>
                                             </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OverlayTextBlock"
+                                                                       Storyboard.TargetProperty="Foreground"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#FFAAAAAA"/>
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -74,20 +89,12 @@
                                 <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <TextBlock x:Name="UnderlineTextBlock"
+                        <TextBlock x:Name="OverlayTextBlock"
                                    Text="{TemplateBinding Content}"
                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                    Margin="{TemplateBinding Padding}"
-                                   TextDecorations="Underline"
-                                   Visibility="Collapsed" />
-                        <TextBlock Canvas.ZIndex="1"
-                                   x:Name="DisabledOverlay"
-                                   Text="{TemplateBinding Content}"
-                                   Foreground="#FFAAAAAA"
-                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                   Margin="{TemplateBinding Padding}"
+                                   Canvas.ZIndex="1"
                                    Visibility="Collapsed" />
                         <ContentPresenter x:Name="contentPresenter"
                                           Content="{TemplateBinding Content}"
@@ -95,11 +102,12 @@
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           Margin="{TemplateBinding Padding}" />
-                        <Rectangle x:Name="FocusVisualElement"
-                                   Stroke="#FF6DBDD1"
-                                   StrokeThickness="1"
-                                   Opacity="0"
-                                   IsHitTestVisible="false" />
+                        <Border x:Name="FocusVisualElement"
+                                BorderBrush="#FF6DBDD1"
+                                BorderThickness="1"
+                                Margin="1"
+                                Opacity="0"
+                                IsHitTestVisible="false" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
