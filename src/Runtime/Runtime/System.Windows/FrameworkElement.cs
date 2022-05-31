@@ -890,7 +890,15 @@ namespace Windows.UI.Xaml
                     return nameScope;
                 }
 
-                d = (d as FrameworkElement)?.Parent;
+                DependencyObject parent = (d as FrameworkElement)?.Parent;
+                if (parent != null)
+                {
+                    d = parent;
+                }
+                else
+                {
+                    d = VisualTreeHelper.GetParent(d) is Panel panel ? panel.TemplatedParent : null;
+                }
             }
 
             return null;
