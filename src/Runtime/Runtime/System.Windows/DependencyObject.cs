@@ -541,11 +541,11 @@ namespace Windows.UI.Xaml
             {
                 if (storage.Entry.IsExpression)
                 {
-                    (storage.LocalValue as BindingExpression)?.OnSourceAvailable();
+                    (storage.LocalValue as BindingExpression)?.OnSourceAvailable(false);
                 }
                 else if (storage.Entry.IsExpressionFromStyle)
                 {
-                    (storage.Entry.ModifiedValue.BaseValue as BindingExpression)?.OnSourceAvailable();
+                    (storage.Entry.ModifiedValue.BaseValue as BindingExpression)?.OnSourceAvailable(false);
                 }
             }
         }
