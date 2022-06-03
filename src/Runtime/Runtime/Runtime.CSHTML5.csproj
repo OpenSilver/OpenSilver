@@ -191,6 +191,10 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarDateChangedEventArgs.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarMode.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarModeChangedEventArgs.cs" />
+    <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarSelectionMode.cs" />
     <Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventArgs.cs" />

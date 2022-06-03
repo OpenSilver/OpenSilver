@@ -33,6 +33,9 @@ namespace Windows.UI.Xaml
 		[OpenSilver.NotImplemented]
 		public event DragEventHandler Drop;
 
+        [OpenSilver.NotImplemented]
+        public event DragEventHandler DragOver;
+
         /// <summary>
         /// Gets or sets the brush used to alter the opacity of 
         /// regions of this object.

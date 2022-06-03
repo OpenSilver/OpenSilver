@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Markup;
 using CSHTML5.Internal;
@@ -936,5 +937,44 @@ namespace Windows.UI.Xaml.Controls
 
         [OpenSilver.NotImplemented]
         public double LineHeight { get; set; }
+
+        /// <summary>
+        /// Returns a rectangle for the leading edge of the character at the specified index.
+        /// </summary>
+        /// <param name="charIndex">
+        /// A zero-based character index of the character for which to retrieve the rectangle.
+        /// </param>
+        /// <returns>
+        /// A rectangle for the leading edge of the character at the specified character
+        /// index, or <see cref="Rect.Empty"/> if a bounding rectangle cannot be determined.
+        /// </returns>
+        /// <exception cref="NotImplementedException">Not implemented</exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Rect GetRectFromCharacterIndex(int charIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns a rectangle for the leading or trailing edge of the character at the
+        /// specified index.
+        /// </summary>
+        /// <param name="charIndex">
+        /// A zero-based character index of the character for which to retrieve the rectangle.
+        /// </param>
+        /// <param name="trailingEdge">
+        /// true to get the trailing edge of the character; false to get the leading edge
+        /// of the character.
+        /// </param>
+        /// <returns>
+        /// A rectangle for an edge of the character at the specified character index, or
+        /// <see cref="Rect.Empty"/> if a bounding rectangle cannot be determined.
+        /// </returns>
+        /// <exception cref="NotImplementedException">Not implemented</exception>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Rect GetRectFromCharacterIndex(int charIndex, bool trailingEdge)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

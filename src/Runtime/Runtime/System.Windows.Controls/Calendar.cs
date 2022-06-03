@@ -42,6 +42,8 @@ namespace Windows.UI.Xaml.Controls
         public Calendar()
         {
             this.Loaded += DatePicker_Loaded;
+
+            SelectedDates = new SelectedDatesCollection(this);
         }
 
         /// <summary>
