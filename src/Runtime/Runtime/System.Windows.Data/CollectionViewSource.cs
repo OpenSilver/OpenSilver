@@ -336,7 +336,7 @@ namespace Windows.UI.Xaml.Data
                     }
                 }
 
-                return (CollectionView)view;
+                return view;
             }
         }
 
