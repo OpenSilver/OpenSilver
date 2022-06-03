@@ -14,10 +14,10 @@ namespace Windows.UI.Xaml.Controls
 	{
 		[OpenSilver.NotImplemented]
 		public string InitialDirectory
-        {
+		{
 			get;
 			set;
-        }
+		}
 
 		[OpenSilver.NotImplemented]
 		public bool Multiselect
