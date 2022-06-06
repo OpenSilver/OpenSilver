@@ -34,7 +34,6 @@ namespace Windows.UI.Xaml.Controls
         private PropertyInfo[] _dataProperties;
         private IEnumerable _dataSource;
         private Type _dataType;
-        private Type _previousDataType;
         private bool _expectingCurrentChanged;
         private object _itemToSelectOnCurrentChanged;
         private DataGrid _owner;
@@ -714,8 +713,9 @@ namespace Windows.UI.Xaml.Controls
                     // Did the data type change during the reset?  If not, we can recycle
                     // the existing rows instead of having to clear them all.  We still need to clear our cached
                     // values for DataType and DataProperties, though, because the collection has been reset.
+                    Type previousDataType = this._dataType;
                     this._dataType = null;
-                    if (_previousDataType != this.DataType)
+                    if (previousDataType != this.DataType)
                     {
                         ClearDataProperties();
                         this._owner.InitializeElements(false /*recycleRows*/);
@@ -724,7 +724,6 @@ namespace Windows.UI.Xaml.Controls
                     {
                         this._owner.InitializeElements(!ShouldAutoGenerateColumns /*recycleRows*/);
                     }
-                    _previousDataType = _owner.ItemsSource?.GetItemType();
                     break;
             }
         }

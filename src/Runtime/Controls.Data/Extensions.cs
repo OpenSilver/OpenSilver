@@ -154,6 +154,15 @@ namespace Windows.UI.Xaml.Controls
                 {
                     return en.Current.GetType();
                 }
+
+                if (list is ICollectionView icv && icv.SourceCollection != null)
+                {
+                    listType = icv.SourceCollection.GetType();
+                    if (listType.IsEnumerableType())
+                    {
+                        itemType = listType.GetEnumerableItemType();
+                    }
+                }
             }
 
             // if we're null at this point, give up

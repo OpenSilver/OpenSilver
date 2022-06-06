@@ -189,8 +189,6 @@ namespace Windows.UI.Xaml.Data
             get { return SortDescriptionCollection.Empty; }
         }
 
-        public virtual IComparer CustomSort { get; set; }
-
         /// <summary>
         /// Test if this ICollectionView supports sorting before adding
         /// to <seealso cref="SortDescriptions"/>.
@@ -1555,9 +1553,9 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        #endregion Private Properties
+#endregion Private Properties
 
-        #region Private Methods
+#region Private Methods
 
         // Just move it.  No argument check, no events, just move current to position.
         private void _MoveCurrentToPosition(int position)
