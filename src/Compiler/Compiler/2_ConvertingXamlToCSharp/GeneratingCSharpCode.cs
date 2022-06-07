@@ -410,8 +410,6 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
 
         public static bool IsControlTemplate(XElement element) => IsXElementOfType(element, "ControlTemplate");
 
-        public static bool IsResourceDictionary(XElement element) => IsXElementOfType(element, "ResourceDictionary");
-
         public static bool IsBinding(XElement element) => IsXElementOfType(element, "Binding");
 
         public static bool IsStyle(XElement element) => IsXElementOfType(element, "Style");

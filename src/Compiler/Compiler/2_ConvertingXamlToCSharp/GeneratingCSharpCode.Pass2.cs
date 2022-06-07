@@ -332,7 +332,12 @@ namespace DotNetForHtml5.Compiler
                 );
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
-                bool isResourceDictionary = IsResourceDictionary(element);
+
+                string rdNamespaceName, rdLocalTypeName, rdAssemblyNameIfAny;
+                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName("ResourceDictionary", out rdNamespaceName,
+                    out rdLocalTypeName, out rdAssemblyNameIfAny);
+                bool isResourceDictionary = _reflectionOnSeparateAppDomain.IsTypeAssignableFrom(namespaceName,
+                    localTypeName, assemblyNameIfAny, rdNamespaceName, rdLocalTypeName, rdAssemblyNameIfAny);
                 bool isResourceDictionaryReferencedBySourceURI =
                     isResourceDictionary && element.Attribute("Source") != null;
 
