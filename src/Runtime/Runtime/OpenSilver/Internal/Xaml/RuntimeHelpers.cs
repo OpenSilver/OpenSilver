@@ -102,16 +102,21 @@ namespace OpenSilver.Internal.Xaml
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
+            Debug.Assert(dependencyObject is FrameworkElement);
+
             NameScope.SetNameScope(dependencyObject, new NameScope());
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterName(DependencyObject dependencyObject, string name, object scopedElement)
         {
-            INameScope nameScope = FrameworkElement.FindScope(dependencyObject);
-            if (nameScope != null)
+            if (scopedElement is DependencyObject)
             {
-                nameScope.RegisterName(name, scopedElement);
+                INameScope nameScope = NameScope.GetNameScope(dependencyObject);
+                if (nameScope != null)
+                {
+                    nameScope.RegisterName(name, scopedElement);
+                }
             }
         }
 
