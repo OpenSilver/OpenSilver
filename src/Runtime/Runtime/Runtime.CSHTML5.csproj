@@ -140,9 +140,9 @@
     <Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\IHttpCookieContainerManager.cs" />
     <Compile Include="System.ServiceModel\CommunicationException.cs" />
     <Compile Include="System.Windows.Automation\WORKINPROGRESS\AutomationProperties.cs" />
+    <Compile Include="System.Windows.Browser\BrowserInformation.cs" />
     <Compile Include="System.Windows.Browser\EventSubscriber.cs" />
     <Compile Include="System.Windows.Browser\HttpUtility.CSHTML5.cs" />
-    <Compile Include="System.Windows.Browser\WORKINPROGRESS\BrowserInformation.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlEventArgs.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlPopupWindowOptions.cs" />
     <Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />

@@ -34,6 +34,13 @@ namespace Runtime.OpenSilver.Tests
     [TestClass]
     public class TestSetup
     {
+        public static event EventHandler<ExecuteJavascriptEventArgs> ExecuteJavascript;
+
+        private static void OnExecuteJavascript(ExecuteJavascriptEventArgs e)
+        {
+            ExecuteJavascript?.Invoke(null, e);
+        }
+
         /// <summary>
         /// This method will be executed whenever the assembly is loaded,
         /// so before any number of tests being run.
@@ -47,6 +54,18 @@ namespace Runtime.OpenSilver.Tests
                 .Setup(x => x.ExecuteJavaScriptWithResult(It.IsAny<string>()))
                 .Returns<string>(param =>
                 {
+                    var e = new ExecuteJavascriptEventArgs
+                    {
+                        Javascript = param
+                    };
+
+                    OnExecuteJavascript(e);
+
+                    if (e.Handled)
+                    {
+                        return e.Result;
+                    }
+
                     // Mocks INTERNAL_GridHelpers isCSSGridSupported() and isMSGrid()
                     // JS code example is: document.callScriptSafe("14","document.isGridSupported",9)
                     if (Regex.Matches(param, @"document.callScriptSafe\(""\d+"",""document.isGridSupported"",\d+\)").Count == 1 ||
@@ -71,7 +90,7 @@ namespace Runtime.OpenSilver.Tests
             INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler;
 
             // Instantiating Application because it sets itself as Application.Current
-            new Application();
+            _ = new Application();
         }
 
         public static void AttachVisualChild(UIElement element)
