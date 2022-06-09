@@ -120,7 +120,12 @@ namespace Windows.UI.Xaml.Controls
 
         public static string ConvertGridLengthToCssString(GridLength gridLength, double minSize, string signUsedForPercentage = "%")
         {
-            if (gridLength.IsAuto)
+            if (gridLength.IsAuto && !double.IsNaN(minSize) && !double.IsInfinity(minSize) && minSize > 0)
+            {
+                string minWidthString = minSize.ToInvariantString() + "px";
+                return "minmax(" + minWidthString + ", auto)";
+            }
+            else if(gridLength.IsAuto)
             {
                 return "auto";
             }
