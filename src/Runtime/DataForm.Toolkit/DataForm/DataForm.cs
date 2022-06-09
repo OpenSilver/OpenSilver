@@ -795,9 +795,19 @@ namespace Windows.UI.Xaml.Controls
             dataForm.RegenerateUI(DataFormMode.ReadOnly, null);
         }
 
-#endregion Dependency Properties
+        /// <summary>
+        /// Identifies the ForceAlignment dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ForceAlignmentProperty =
+            DependencyProperty.Register(
+                "ForceAlignment",
+                typeof(bool),
+                typeof(DataForm),
+                new PropertyMetadata(false));
 
-#region Fields
+        #endregion Dependency Properties
+
+        #region Fields
 
         /// <summary>
         /// Holds the add-new contents mapped to mode that have been seen before.
@@ -1624,9 +1634,25 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Public Properties
+        /// <summary>
+        /// Gets or sets a value that indicates whether or not a data filed to force alignment logic run
+        /// </summary>
+        public bool ForceAlignment
+        {
+            get
+            {
+                return (bool)this.GetValue(ForceAlignmentProperty);
+            }
 
-#region Internal Properties
+            set
+            {
+                this.SetValue(ForceAlignmentProperty, value);
+            }
+        }
+
+        #endregion Public Properties
+
+        #region Internal Properties
 
         /// <summary>
         /// Gets a value indicating whether or not the collection allows the

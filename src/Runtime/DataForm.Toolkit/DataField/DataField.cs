@@ -1117,6 +1117,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void AlignDescriptionColumns()
         {
+#if OPENSILVER
+            if (!_parentDataForm.ForceAlignment)
+                return;
+#endif
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
@@ -1160,6 +1164,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void AlignLabelColumns()
         {
+#if OPENSILVER
+            if (!_parentDataForm.ForceAlignment)
+                return;
+#endif
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
@@ -1608,6 +1616,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void RemoveDescriptionColumnAlignment()
         {
+#if OPENSILVER
+            if (!_parentDataForm.ForceAlignment)
+                return;
+#endif
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
@@ -1628,6 +1640,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void RemoveLabelColumnAlignment()
         {
+#if OPENSILVER
+            if (!_parentDataForm.ForceAlignment)
+                return;
+#endif
             IList<DataField> fieldList = this.GetAlignmentGroup();
 
             if (fieldList == null)
