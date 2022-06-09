@@ -10,7 +10,7 @@
         <StackPanel Orientation="Vertical">
             <!--SLDISABLED-->
             <TextBlock Text="Items are 'Initial item #X', and 'Item #X' if added:"/>
-            <sdk:AutoCompleteBox x:Name="AutoCompleteBox1" Width="250"/>
+            <sdk:AutoCompleteBox x:Name="AutoCompleteBox1" ItemsSource="{Binding Items}" Width="250"/>
             <Button Content="Items.Add" Click="ButtonTestAutoCompleteBox1_ItemsAdd_Click"/>
             <Button Content="Items.Clear" Click="ButtonTestAutoCompleteBox1_ItemsClear_Click"/>
             <Button Content="Items.Remove First" Click="ButtonTestAutoCompleteBox1_ItemsRemoveFirst_Click"/>
@@ -28,7 +28,11 @@
         </StackPanel>
         <StackPanel Orientation="Vertical" Margin="0,50,0,0">
             <TextBlock Text="CustomLayout and VirtualizingStackPanel:"/>
-            <sdk:AutoCompleteBox x:Name="AutoCompleteVirtualized" Width="250" Height="22"/>
+            <sdk:AutoCompleteBox x:Name="AutoCompleteVirtualized" ItemsSource="{Binding Items}" Width="250" Height="22"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="SelectedItem:"/>
+                <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=AutoCompleteVirtualized, Path=SelectedItem}"/>
+            </StackPanel>
         </StackPanel>
     </StackPanel>
 </sdk:Page>
