@@ -1624,9 +1624,17 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+#if OPENSILVER
+        /// <summary>
+        /// Gets or sets a value that indicates if datafields should run the alignment logic.
+        /// The default value is true.
+        /// </summary>
+        public bool ForceAlignment { get; set; } = true;
+#endif
+
 #endregion Public Properties
 
-#region Internal Properties
+        #region Internal Properties
 
         /// <summary>
         /// Gets a value indicating whether or not the collection allows the
