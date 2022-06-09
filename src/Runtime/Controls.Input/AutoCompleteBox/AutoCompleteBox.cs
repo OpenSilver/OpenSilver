@@ -2580,6 +2580,17 @@ namespace Windows.UI.Xaml.Controls
                     e.Handled = true;
                     break;
 
+                // Until tabbing sets focus to next element outside of ACB (instead of to the first
+                // item inside the dropdown) and closes the dropdown, completion is manually called below.
+#if MIGRATION
+                case Key.Tab:
+#else
+                case VirtualKey.Tab:
+#endif
+                    OnAdapterSelectionComplete(this, new RoutedEventArgs());
+                    e.Handled = false;
+                    break;
+
                 default:
                     break;
             }
