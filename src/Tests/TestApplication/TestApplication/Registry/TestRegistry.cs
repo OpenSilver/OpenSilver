@@ -128,6 +128,8 @@ namespace TestApplication
 			TestCategory shapes = new TestCategory("Shapes");
 			shapes.Add(new Test("Polygon", "Shapes/Polygon"));
 			Tests.Add(shapes);
-		}
+
+            Tests.Add(new Test("OpenFileDialog", "OpenFileDialog"));
+        }
     }
 }

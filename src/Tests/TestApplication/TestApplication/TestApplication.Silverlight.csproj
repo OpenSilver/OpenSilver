@@ -262,6 +262,9 @@
     <Compile Include="Tests\NestedElementsTest.xaml.cs">
       <DependentUpon>NestedElementsTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\OpenFileDialogTest.xaml.cs">
+      <DependentUpon>OpenFileDialogTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\Paths\PathChangeTest.xaml.cs">
       <DependentUpon>PathChangeTest.xaml</DependentUpon>
     </Compile>
@@ -573,6 +576,10 @@
     <Page Include="Tests\NestedElementsTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\OpenFileDialogTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tests\Paths\PathChangeTest.xaml">
       <SubType>Designer</SubType>
