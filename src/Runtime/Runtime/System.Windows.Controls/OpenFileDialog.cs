@@ -34,11 +34,17 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public sealed partial class OpenFileDialog
+    /// <summary>
+    /// Provides a dialog box that enables the user to select one or more files.
+    /// </summary>
+    public sealed class OpenFileDialog
     {
         private object _windowFocusCallback;
         private readonly object _inputElement;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenFileDialog"/> class.
+        /// </summary>
         public OpenFileDialog()
         {
             // Creates <input> element but does not add to DOM
@@ -160,6 +166,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         private bool _multiselect = false;
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the <see cref="OpenFileDialog"/>
+        /// allows users to select multiple files.
+        /// </summary>
+        /// <returns>
+        /// true if multiple selections are allowed; otherwise, false. The default is false.
+        /// </returns>
         public bool Multiselect
         {
             get { return _multiselect; }
@@ -175,6 +189,15 @@ namespace Windows.UI.Xaml.Controls
         }
 
         private string _filter;
+
+        /// <summary>
+        /// Gets or sets a filter string that specifies the file types and descriptions to
+        /// display in the <see cref="OpenFileDialog"/>.
+        /// </summary>
+        /// <returns>
+        /// A filter string that specifies the file types and descriptions to display in
+        /// the <see cref="OpenFileDialog"/>. The default is <see cref="string.Empty"/>.
+        /// </returns>
         public string Filter
         {
             get
@@ -188,16 +211,46 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        [OpenSilver.NotImplemented]
         // No option to separate html5 'accept' file types into groups, they all appear together as 'Custom',
         // with an additional option for 'All Files' (Chrome).
         // In Firefox they appear all together, and then one option for each file type.
+        //
+        /// <summary>
+        /// Gets or sets the index of the selected item in the <see cref="OpenFileDialog"/>
+        /// filter drop-down list.
+        /// </summary>
+        /// <returns>
+        /// The index of the selected item in the <see cref="OpenFileDialog"/>
+        /// filter drop-down list. The default is 1.
+        /// </returns>
+        [OpenSilver.NotImplemented]
         public int FilterIndex
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the directory displayed when the dialog starts.
+        /// </summary>
+        /// <returns>
+        /// The directory displayed when the dialog starts. The default is an empty string.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public string InitialDirectory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="MemoryFileInfo"/> object for the selected file. If multiple files are
+        /// selected, returns the first selected file.
+        /// </summary>
+        /// <returns>
+        /// The selected file. If multiple files are selected, returns the first selected
+        /// file.
+        /// </returns>
         public MemoryFileInfo File
         {
             get
@@ -206,6 +259,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="MemoryFileInfo"/> objects for the selected files.
+        /// </summary>
         public IEnumerable<MemoryFileInfo> Files
         {
             get;

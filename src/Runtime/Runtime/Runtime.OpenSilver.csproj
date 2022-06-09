@@ -449,7 +449,6 @@
 		<Compile Include="System.Windows.Automation.Provider\WORKINPROGRESS\IWindowProvider.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableTypeAttribute.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\OpenFileDialog.cs" />
 		<Compile Include="System.Windows.Controls\OpenFileDialog.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBox.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SaveFileDialog.cs" />
