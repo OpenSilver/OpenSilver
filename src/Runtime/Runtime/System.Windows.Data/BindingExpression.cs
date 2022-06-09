@@ -732,7 +732,9 @@ namespace Windows.UI.Xaml.Data
         private static object FindName(FrameworkElement mentor, string name)
         {
             object o = null;
-            FrameworkElement fe = mentor;
+            FrameworkElement fe = mentor is UserControl
+                ? (mentor.Parent ?? VisualTreeHelper.GetParent(mentor)) as FrameworkElement
+                : mentor;
 
             while (o == null && fe != null)
             {
