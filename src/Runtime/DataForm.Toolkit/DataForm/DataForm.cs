@@ -1087,11 +1087,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private WeakEventListener<DataForm, object, PropertyChangedEventArgs> _weakEventListenerPropertyChanged;
 
-        /// <summary>
-        /// Holds the private accessor to ForceAlignment 
-        /// </summary>
-        private bool _forceAlignment = true;
-
 #endregion Fields
 
 #region Constructors
