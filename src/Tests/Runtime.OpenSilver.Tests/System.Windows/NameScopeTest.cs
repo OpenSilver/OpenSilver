@@ -465,7 +465,11 @@ namespace Windows.UI.Xaml.Tests
         [ContentProperty("Child")]
         private class Control2 : Control
         {
+#if MIGRATION
             public override void OnApplyTemplate()
+#else
+            protected override void OnApplyTemplate()
+#endif
             {
                 base.OnApplyTemplate();
 
