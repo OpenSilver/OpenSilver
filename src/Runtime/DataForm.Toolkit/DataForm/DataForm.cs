@@ -1087,6 +1087,11 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private WeakEventListener<DataForm, object, PropertyChangedEventArgs> _weakEventListenerPropertyChanged;
 
+        /// <summary>
+        /// Holds the private accessor to ForceAlignment 
+        /// </summary>
+        private bool _forceAlignment = true;
+
 #endregion Fields
 
 #region Constructors
@@ -1621,6 +1626,22 @@ namespace Windows.UI.Xaml.Controls
             set
             {
                 this.SetValue(ReadOnlyTemplateProperty, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether or not a data filed to force alignment logic run
+        /// </summary>
+        public bool ForceAlignment
+        {
+            get
+            {
+                return this._forceAlignment;
+            }
+
+            set
+            {
+                this._forceAlignment = value;
             }
         }
 
