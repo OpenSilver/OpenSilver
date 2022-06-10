@@ -793,7 +793,7 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentOutOfRangeException(nameof(start));
             if (start + length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
-            _textViewHost.View.NEW_SET_SELECTION(start, start + length);
+            _textViewHost?.View.NEW_SET_SELECTION(start, start + length);
         }
 
         protected override Size MeasureOverride(Size availableSize)
