@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,143 +11,102 @@
 *  
 \*====================================================================================*/
 
-
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace System.Windows.Browser
 {
+    /// <summary>
+    /// Provides general information about the browser, such as name, version, and operating
+    /// system.
+    /// </summary>
     public sealed class BrowserInformation
     {
-        private string _name;
-
-        private string _platform;
-
-        private string _productName;
-
-        private Version _browserVersion;
-
-        private string _userAgent;
-
-        //
-        // Summary:
-        //     Gets the version of the browser technology that the current browser is based
-        //     on.
-        //
-        // Returns:
-        //     The version of the underlying browser technology.
-        public Version BrowserVersion
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BrowserInformation"/> class.
+        /// </summary>
+        internal BrowserInformation(string userAgent, string platform)
         {
-            get
-            {
-                if (_browserVersion != null)
-                {
-                    return _browserVersion;
-                }
+            UserAgent = userAgent;
+            Platform = platform;
 
-                //https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent#syntax
-                var filter = new Regex(@"(\d+(?:\.\d+)+)");
-                var match = filter.Match(UserAgent);
-                _browserVersion = match.Success ? Version.Parse(match.Value) : new Version();
-
-                return _browserVersion;
-            }
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent#syntax
+            BrowserVersion = GetVersion(userAgent);
+            Name = GetName(userAgent);
+            ProductName = GetProductName(userAgent);
+            ProductVersion = string.Empty;
         }
 
-        //
-        // Summary:
-        //     Gets a value that indicates whether the browser supports cookies.
-        //
-        // Returns:
-        //     true if the browser supports cookies; otherwise, false.
+        /// <summary>
+        /// Gets the version of the browser technology that the current browser is based on.
+        /// </summary>
+        public Version BrowserVersion { get; }
+
+        /// <summary>
+        /// Gets the name of the browser technology that the current browser is based on.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Gets the name of the browser operating system.
+        /// </summary>
+        public string Platform { get; }
+
+        /// <summary>
+        /// Gets the product name of the browser.
+        /// </summary>
+        public string ProductName { get; }
+
+        /// <summary>
+        /// Gets the product version number of the browser.
+        /// </summary>
+        public string ProductVersion { get; }
+
+        /// <summary>
+        /// Gets the user agent string of the browser.
+        /// </summary>
+        public string UserAgent { get; }
+
+        /// <summary>
+        /// Gets a value that indicates whether the browser supports cookies.
+        /// </summary>
         public bool CookiesEnabled =>
             Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("navigator.cookieEnabled"));
 
-        //
-        // Summary:
-        //     Gets the name of the browser technology that the current browser is based on.
-        //
-        // Returns:
-        //     The name of the underlying browser technology.
-        public string Name {
-            get
-            {
-                if (_name != null)
-                {
-                    return _name;
-                }
-
-                var patterns = new Dictionary<string, string>
-                {
-                    //Order is important
-                    { "opr/|opera", "Opera" },
-                    { "edg", "Edge" },
-                    { "chrome|chromium|crios", "Chrome" },
-                    { "firefox|fxios", "Firefox" },
-                    { "safari", "Safari" }
-                };
-
-                foreach (var kvp in patterns)
-                {
-                    if (!Regex.IsMatch(UserAgent, kvp.Key, RegexOptions.IgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    _name = kvp.Value;
-                    break;
-                }
-
-                return _name ?? (_name = "Netscape");
-            }
-        }
-
-        //
-        // Summary:
-        //     Gets the name of the browser operating system.
-        //
-        // Returns:
-        //     The name of the operating system that the browser is running on.
-        public string Platform => _platform ??
-                                  (_platform =
-                                      Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.platform")));
-
-        //
-        // Summary:
-        //     Gets the product name of the browser.
-        //
-        // Returns:
-        //     The product name of the browser.
-        public string ProductName
+        private static Version GetVersion(string userAgent)
         {
-            get
-            {
-                if (_productName != null)
-                {
-                    return _productName;
-                }
+            var filter = new Regex(@"(\d+(?:\.\d+)+)");
+            var match = filter.Match(userAgent);
 
-                //https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent#syntax
-                _productName = UserAgent.Split('/')[0];
-
-                return _productName;
-            }
+            return match.Success ? Version.Parse(match.Value) : new Version();
         }
 
-        //
-        // Summary:
-        //     Gets the product version number of the browser.
-        //
-        // Returns:
-        //     The product version number of the browser.
-        public string ProductVersion => "";
+        private static string GetName(string userAgent)
+        {
+            var patterns = new Dictionary<string, string>
+            {
+                // Order is important
+                { "opr/|opera", "Opera" },
+                { "edg", "Edge" },
+                { "chrome|chromium|crios", "Chrome" },
+                { "firefox|fxios", "Firefox" },
+                { "safari", "Safari" }
+            };
 
-        //
-        // Summary:
-        //     Gets the user agent string of the browser.
-        //
-        // Returns:
-        //     The user agent string that identifies the browser.
-        public string UserAgent => _userAgent ?? (_userAgent = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.userAgent")));
+            foreach (var kvp in patterns)
+            {
+                if (Regex.IsMatch(userAgent, kvp.Key, RegexOptions.IgnoreCase))
+                {
+                    return kvp.Value;
+                }
+            }
+
+            return "Netscape";
+        }
+
+        private static string GetProductName(string userAgent)
+        {
+            return userAgent.Split('/')[0];
+        }
     }
 }

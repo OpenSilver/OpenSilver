@@ -40,8 +40,6 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
 
         private const string Platform = "Win32";
 
-        private static string _userAgent = ChromeUserAgent;
-
         [ClassInitialize]
         public static void ClassInitialize(TestContext _)
         {
@@ -64,11 +62,13 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
             string result = null;
             if (lastLine.Contains("navigator.userAgent"))
             {
-                result = _userAgent;
-            } else if (lastLine.Contains("navigator.cookieEnabled"))
+                result = ChromeUserAgent;
+            }
+            else if (lastLine.Contains("navigator.cookieEnabled"))
             {
                 result = "true";
-            } else if (lastLine.Contains("navigator.platform"))
+            }
+            else if (lastLine.Contains("navigator.platform"))
             {
                 result = Platform;
             }
@@ -116,76 +116,31 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
         [TestMethod]
         public void Name_Should_Return_Safari()
         {
-            var initUserAgent = _userAgent;
-            _userAgent = SafariUserAgent;
-            try
-            {
-                new BrowserInformation().Name.Should().Be("Safari");
-            }
-            finally
-            {
-                _userAgent = initUserAgent;
-            }
+            new BrowserInformation(SafariUserAgent, Platform).Name.Should().Be("Safari");
         }
 
         [TestMethod]
         public void Name_Should_Return_Opera()
         {
-            var initUserAgent = _userAgent;
-            _userAgent = OperaUserAgent;
-            try
-            {
-                new BrowserInformation().Name.Should().Be("Opera");
-            }
-            finally
-            {
-                _userAgent = initUserAgent;
-            }
+            new BrowserInformation(OperaUserAgent, Platform).Name.Should().Be("Opera");
         }
 
         [TestMethod]
         public void Name_Should_Return_Firefox()
         {
-            var initUserAgent = _userAgent;
-            _userAgent = FirefoxUserAgent;
-            try
-            {
-                new BrowserInformation().Name.Should().Be("Firefox");
-            }
-            finally
-            {
-                _userAgent = initUserAgent;
-            }
+            new BrowserInformation(FirefoxUserAgent, Platform).Name.Should().Be("Firefox");
         }
 
         [TestMethod]
         public void Name_Should_Return_Edge()
         {
-            var initUserAgent = _userAgent;
-            _userAgent = EdgeUserAgent;
-            try
-            {
-                new BrowserInformation().Name.Should().Be("Edge");
-            }
-            finally
-            {
-                _userAgent = initUserAgent;
-            }
+            new BrowserInformation(EdgeUserAgent, Platform).Name.Should().Be("Edge");
         }
 
         [TestMethod]
         public void Name_Should_Return_Netscape()
         {
-            var initUserAgent = _userAgent;
-            _userAgent = "Mozilla/5.0 Unknown";
-            try
-            {
-                new BrowserInformation().Name.Should().Be("Netscape");
-            }
-            finally
-            {
-                _userAgent = initUserAgent;
-            }
+            new BrowserInformation("Mozilla/5.0 Unknown", Platform).Name.Should().Be("Netscape");
         }
 
         [TestMethod]
@@ -197,7 +152,7 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
         [TestMethod]
         public void UserAgent_Should_Return_Value()
         {
-            HtmlPage.BrowserInformation.UserAgent.Should().Be(_userAgent);
+            HtmlPage.BrowserInformation.UserAgent.Should().Be(ChromeUserAgent);
         }
     }
 }

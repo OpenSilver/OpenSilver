@@ -25,23 +25,20 @@ namespace System.Windows.Browser
 {
     public static class HtmlPage
     {
-        static HtmlPage()
-        {
-            Window = new HtmlWindow();
-            Document = new HtmlDocument();
-            Plugin = new HtmlElement();
-            BrowserInformation = new BrowserInformation();
-        }
+        private static HtmlWindow _initWindow;
+        private static HtmlDocument _initDocument;
+        private static HtmlElement _initPlugin;
+        private static BrowserInformation _browserInformation;
 
         /// <summary>
         /// Gets the browser's window object.
         /// </summary>
-        public static HtmlWindow Window { get; }
+        public static HtmlWindow Window => _initWindow ?? (_initWindow = new HtmlWindow());
 
         /// <summary>
         /// Gets the browser's document object.
         /// </summary>
-        public static HtmlDocument Document { get; }
+        public static HtmlDocument Document => _initDocument ?? (_initDocument = new HtmlDocument());
 
         [OpenSilver.NotImplemented]
         public static bool IsPopupWindowAllowed => false;
@@ -52,20 +49,38 @@ namespace System.Windows.Browser
             return null;
         }
 
-        //
-        // Summary:
-        //     Gets a reference to the Silverlight plug-in that is defined within an <object>
-        //     or <embed> tag on the host HTML page.
-        //
-        // Returns:
-        //     The Silverlight plug-in in the Document Object Model (DOM).
+        /// <summary>
+        /// Gets a reference to the Silverlight plug-in that is defined within an &lt;object&gt;
+        /// or &lt;embed&gt; tag on the host HTML page.
+        /// </summary>
         [OpenSilver.NotImplemented]
-        public static HtmlElement Plugin { get; }
+        public static HtmlElement Plugin => _initPlugin ?? (_initPlugin = new HtmlElement());
 
         [OpenSilver.NotImplemented]
         public static bool IsEnabled { get; private set; }
 
-        public static BrowserInformation BrowserInformation { get; }
+        /// <summary>
+        /// Gets general information about the browser, such as name, version, and operating system.
+        /// </summary>
+        /// <returns>
+        /// An object that represents general information about the hosting browser.
+        /// </returns>
+        public static BrowserInformation BrowserInformation
+        {
+            get
+            {
+                if (_browserInformation == null)
+                {
+                    string userAgent = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.userAgent"))
+                        ?? throw new InvalidOperationException("Cannot retrieve UserAgent");
+                    string platform = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.platform"));
+
+                    _browserInformation = new BrowserInformation(userAgent, platform);
+                }
+
+                return _browserInformation;
+            }
+        }
 
         /// <summary>
         /// Registers a managed object for scriptable access by JavaScript code.
