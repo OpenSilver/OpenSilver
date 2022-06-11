@@ -25,38 +25,20 @@ namespace System.Windows.Browser
 {
     public static class HtmlPage
     {
-        static HtmlWindow _initWindow;
-        static HtmlDocument _initDocument;
-        static HtmlElement _initPlugin;
+        private static HtmlWindow _initWindow;
+        private static HtmlDocument _initDocument;
+        private static HtmlElement _initPlugin;
+        private static BrowserInformation _browserInformation;
+
         /// <summary>
         /// Gets the browser's window object.
         /// </summary>
-        public static HtmlWindow Window
-        {
-            get
-            {
-                if (_initWindow == null)
-                {
-                    _initWindow = new HtmlWindow();
-                }
-                return _initWindow;
-            }
-        }
+        public static HtmlWindow Window => _initWindow ?? (_initWindow = new HtmlWindow());
 
         /// <summary>
         /// Gets the browser's document object.
         /// </summary>
-        public static HtmlDocument Document
-        {
-            get
-            {
-                if (_initDocument == null)
-                {
-                    _initDocument = new HtmlDocument();
-                }
-                return _initDocument;
-            }
-        }
+        public static HtmlDocument Document => _initDocument ?? (_initDocument = new HtmlDocument());
 
         [OpenSilver.NotImplemented]
         public static bool IsPopupWindowAllowed => false;
@@ -67,31 +49,38 @@ namespace System.Windows.Browser
             return null;
         }
 
-        //
-        // Summary:
-        //     Gets a reference to the Silverlight plug-in that is defined within an <object>
-        //     or <embed> tag on the host HTML page.
-        //
-        // Returns:
-        //     The Silverlight plug-in in the Document Object Model (DOM).
-		[OpenSilver.NotImplemented]
-        public static HtmlElement Plugin
+        /// <summary>
+        /// Gets a reference to the Silverlight plug-in that is defined within an &lt;object&gt;
+        /// or &lt;embed&gt; tag on the host HTML page.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static HtmlElement Plugin => _initPlugin ?? (_initPlugin = new HtmlElement());
+
+        [OpenSilver.NotImplemented]
+        public static bool IsEnabled { get; private set; }
+
+        /// <summary>
+        /// Gets general information about the browser, such as name, version, and operating system.
+        /// </summary>
+        /// <returns>
+        /// An object that represents general information about the hosting browser.
+        /// </returns>
+        public static BrowserInformation BrowserInformation
         {
             get
             {
-                if (_initPlugin == null)
+                if (_browserInformation == null)
                 {
-                    _initPlugin = new HtmlElement();
+                    string userAgent = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.userAgent"))
+                        ?? throw new InvalidOperationException("Cannot retrieve UserAgent");
+                    string platform = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.platform"));
+
+                    _browserInformation = new BrowserInformation(userAgent, platform);
                 }
-                return _initPlugin;
+
+                return _browserInformation;
             }
         }
-
-		[OpenSilver.NotImplemented]
-        public static bool IsEnabled { get; private set; }
-
-		[OpenSilver.NotImplemented]
-        public static BrowserInformation BrowserInformation { get; private set; }
 
         /// <summary>
         /// Registers a managed object for scriptable access by JavaScript code.

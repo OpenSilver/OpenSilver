@@ -633,7 +633,7 @@
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\HtmlObject.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObject.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptObjectCollection.cs" />
-		<Compile Include="System.Windows.Browser\WORKINPROGRESS\BrowserInformation.cs" />
+		<Compile Include="System.Windows.Browser\BrowserInformation.cs" />
 		<Compile Include="System.Windows.input\Cursor.cs" />
 		<Compile Include="System.Windows.input\Cursors.cs" />
 		<Compile Include="System.Windows.input\Keyboard.cs" />
