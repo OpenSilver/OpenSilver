@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,9 @@
 *  
 \*====================================================================================*/
 
-
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
-
-#if MIGRATION
-using System.Windows;
-using System.Windows.Controls;
-#else
-using System;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -37,158 +24,29 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Provides a dialog box that enables the user to select one or more files.
     /// </summary>
+    [Obsolete("Use OpenSilver.Controls.OpenFileDialog instead.")]
+    [OpenSilver.NotImplemented]
     public sealed class OpenFileDialog
     {
-        private object _windowFocusCallback;
-        private readonly object _inputElement;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenFileDialog"/> class.
         /// </summary>
-        public OpenFileDialog()
-        {
-            // Creates <input> element but does not add to DOM
-            _inputElement = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    var inputElement = document.createElement(""input"");
-                    inputElement.type = ""file"";
-                    return inputElement;
-                })()");
-        }
-
-        private void AddFileChangeCallback(TaskCompletionSource<bool?> showDialogTaskCompletionSource)
-        {
-            // For each file selected in the dialog, this will be called back
-            Action<string, object> onFileChanged = (filename, base64Content) =>
-            {
-                byte[] bytes = null;
-                if (base64Content != null)
-                {
-                    // Removing base64 data type prefix e.g. 'data:image/png;base64,<data>'
-                    string data = base64Content.ToString().Split(',')[1];
-                    bytes = Convert.FromBase64String(data);
-                }
-                Files.Add(new MemoryFileInfo(filename, bytes));
-            };
-
-            Action onFinishedReading = () =>
-            {
-                try
-                {
-                    // Setting result of Task returned by ShowDialog()
-                    showDialogTaskCompletionSource.SetResult(true);
-                }
-                catch (Exception ex)
-                {
-                    showDialogTaskCompletionSource.SetException(ex);
-                }
-            };
-
-            // Listen to the "change" property of the "input" element, and call the callback:
-            OpenSilver.Interop.ExecuteJavaScript(@"
-                $0.addEventListener(""change"", function(e) {
-                    var isRunningInTheSimulator = $2;
-                    if (isRunningInTheSimulator) {
-                        alert(""The file open dialog is not supported in the Simulator. Please test in the browser instead."");
-                    }
-
-                    window.isOpenFileDialogOpen = false;
-
-                    // Removing window focus handler to detect cancels, otherwise we could have multiple handlers
-                    // after calling multiple ShowDialog()
-                    window.removeEventListener('focus', $3);
-
-                    if(!e) {
-                      e = window.event;
-                    }
-                    var input = e.target;
-                    var callback = $1;
-                    var reader = new FileReader();
-
-                    // Reading each file sequentially, some results were null when running concurrently
-                    function readNext(i) {
-                        var file = input.files[i];
-                        reader.onload = function() {
-                            callback(file.name, reader.result);
-
-                            if (input.files.length > i + 1) {
-                                readNext(i + 1);
-                            } else {
-                                // Triggers finished callback
-                                $4();
-                            }
-                        };
-
-                        // For performance improvements, readAsArrayBuffer could be used and Uint8Array sent to C#,
-                        // this has been optimized in .NET 6. However, this would require changes to the C# callback method,
-                        // the array cannot be received as object (must be byte[]).
-                        reader.readAsDataURL(file);
-                    }
-                    readNext(0);
-                });", _inputElement, onFileChanged, OpenSilver.Interop.IsRunningInTheSimulator,
-                    _windowFocusCallback, onFinishedReading);
-        }
-
-        private void SetFilter(string filter)
-        {
-            if (string.IsNullOrEmpty(filter))
-            {
-                return;
-            }
-
-            // Process the filter list to convert the syntax from XAML to HTML5:
-            // Example of syntax in Silverlight: Image Files (*.bmp, *.jpg)|*.bmp;*.jpg|All Files (*.*)|*.*
-            // Example of syntax in HTML5: .gif, .jpg, .png, .doc
-            string[] splitted = filter.Split('|');
-            List<string> itemsKept = new List<string>();
-            if (splitted.Length == 1)
-            {
-                itemsKept.Add(splitted[0]);
-            }
-            else
-            {
-                for (int i = 1; i < splitted.Length; i += 2)
-                {
-                    itemsKept.Add(splitted[i]);
-                }
-            }
-            string filtersInHtml5 = string.Join(",", itemsKept).Replace("*", "").Replace(";", ",");
-
-            // Apply the filter:
-            if (!string.IsNullOrWhiteSpace(filtersInHtml5))
-            {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.accept = $1", _inputElement, filtersInHtml5);
-            }
-            else
-            {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.accept = """"", _inputElement);
-            }
-        }
-
-        private bool _multiselect = false;
+        public OpenFileDialog() { }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the <see cref="OpenFileDialog"/>
-        /// allows users to select multiple files.
+        /// Gets a <see cref="FileInfo"/> object for the selected file. If multiple files are
+        /// selected, returns the first selected file.
         /// </summary>
         /// <returns>
-        /// true if multiple selections are allowed; otherwise, false. The default is false.
+        /// The selected file. If multiple files are selected, returns the first selected
+        /// file.
         /// </returns>
-        public bool Multiselect
-        {
-            get { return _multiselect; }
-            set
-            {
-                _multiselect = value;
+        public FileInfo File { get; }
 
-                if (_multiselect)
-                {
-                    OpenSilver.Interop.ExecuteJavaScript(@"$0.multiple = 'multiple';", _inputElement);
-                }
-            }
-        }
-
-        private string _filter;
+        /// <summary>
+        /// Gets a collection of <see cref="FileInfo"/> objects for the selected files.
+        /// </summary>
+        public IEnumerable<FileInfo> Files { get; }
 
         /// <summary>
         /// Gets or sets a filter string that specifies the file types and descriptions to
@@ -198,23 +56,8 @@ namespace Windows.UI.Xaml.Controls
         /// A filter string that specifies the file types and descriptions to display in
         /// the <see cref="OpenFileDialog"/>. The default is <see cref="string.Empty"/>.
         /// </returns>
-        public string Filter
-        {
-            get
-            {
-                return _filter;
-            }
-            set
-            {
-                _filter = value;
-                SetFilter(_filter);
-            }
-        }
-
-        // No option to separate html5 'accept' file types into groups, they all appear together as 'Custom',
-        // with an additional option for 'All Files' (Chrome).
-        // In Firefox they appear all together, and then one option for each file type.
-        //
+        public string Filter { get; set; } = string.Empty;
+        
         /// <summary>
         /// Gets or sets the index of the selected item in the <see cref="OpenFileDialog"/>
         /// filter drop-down list.
@@ -223,12 +66,10 @@ namespace Windows.UI.Xaml.Controls
         /// The index of the selected item in the <see cref="OpenFileDialog"/>
         /// filter drop-down list. The default is 1.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public int FilterIndex
-        {
-            get;
-            set;
-        }
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The filter index is less than 1.
+        /// </exception>
+        public int FilterIndex { get; set; }
 
         /// <summary>
         /// Gets or sets the directory displayed when the dialog starts.
@@ -236,132 +77,38 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// The directory displayed when the dialog starts. The default is an empty string.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public string InitialDirectory
-        {
-            get;
-            set;
-        }
+        /// <exception cref="ArgumentException">
+        /// The directory specified is not a valid file path.
+        /// </exception>
+        public string InitialDirectory { get; set; }
 
         /// <summary>
-        /// Gets a <see cref="MemoryFileInfo"/> object for the selected file. If multiple files are
-        /// selected, returns the first selected file.
+        /// Gets or sets a value that indicates whether the <see cref="OpenFileDialog"/>
+        /// allows users to select multiple files.
         /// </summary>
         /// <returns>
-        /// The selected file. If multiple files are selected, returns the first selected
-        /// file.
+        /// true if multiple selections are allowed; otherwise, false. The default is false.
         /// </returns>
-        public MemoryFileInfo File
-        {
-            get
-            {
-                return Files.FirstOrDefault();
-            }
-        }
+        public bool Multiselect { get; set; }
 
         /// <summary>
-        /// Gets a collection of <see cref="MemoryFileInfo"/> objects for the selected files.
+        /// Displays an System.Windows.Controls.OpenFileDialog that is modal to the Web browser
+        /// or main window.
         /// </summary>
-        public IEnumerable<MemoryFileInfo> Files
-        {
-            get;
-            private set;
-        } = new List<MemoryFileInfo>();
+        /// <returns>
+        /// true if the user clicked OK; false if the user clicked Cancel or closed the dialog box.
+        /// </returns>
+        public bool? ShowDialog() => null;
 
         /// <summary>
-        /// Opens the default browser file dialog. This returns a Task, differently from Silverlight.
-        /// This is because it is not possible to wait for the dialog to conclude, since the process is single-threaded.
+        /// Displays an <see cref="OpenFileDialog"/> that is modal to the specified window.
         /// </summary>
-        /// <returns>A Task that will have the result of the file dialog. True for files selected, false for cancel/exit.</returns>
-        public Task<bool?> ShowDialog()
-        {
-            return ShowDialog(null);
-        }
-
-        /// <summary>
-        /// Opens the default browser file dialog. This returns a Task, differently from Silverlight.
-        /// This is because it is not possible to wait for the dialog to conclude, since the process is single-threaded.
-        /// </summary>
-        /// <param name="owner"></param>
-        /// <returns>A Task that will have the result of the file dialog. True for files selected, false for cancel/exit.</returns>
-        public Task<bool?> ShowDialog(Window owner)
-        {
-            ClearFiles();
-
-            // This wraps a task to return to the caller and have a result asynchronously
-            TaskCompletionSource<bool?> showDialogTaskCompletionSource = new TaskCompletionSource<bool?>();
-
-            AddCancelCallback(showDialogTaskCompletionSource);
-
-            AddFileChangeCallback(showDialogTaskCompletionSource);
-
-            // Triggers 'click' on <input>, even though it is not on the DOM
-            OpenSilver.Interop.ExecuteJavaScript(@"
-                window.isOpenFileDialogOpen = true;
-                $0.dispatchEvent(new MouseEvent(""click""));", _inputElement);
-
-            return showDialogTaskCompletionSource.Task;
-        }
-
-        private void ClearFiles()
-        {
-            ((IList<MemoryFileInfo>)Files).Clear();
-        }
-
-        private void AddCancelCallback(TaskCompletionSource<bool?> showDialogTaskCompletionSource)
-        {
-            Action<object> onDialogCancel = (result) =>
-            {
-                try
-                {
-                    // Setting result of Task returned by ShowDialog()
-                    showDialogTaskCompletionSource.SetResult(false);
-                }
-                catch (Exception ex)
-                {
-                    showDialogTaskCompletionSource.SetException(ex);
-                }
-            };
-
-            _windowFocusCallback = OpenSilver.Interop.ExecuteJavaScript(@"
-                (function() {
-                    var isChrome = !!window.chrome;
-
-                    var windowFocusCallbackForFileDialogCancel = function(e) {
-                        if (isChrome) {
-                            // If on Chrome, verifies flag after timeout because the window 'focus' is called before
-                            // the 'change' event, timeout should be enough to make sure 'change' hasn't been triggered
-                            setTimeout(function() {
-                                if (window.isOpenFileDialogOpen) {
-                                    window.isOpenFileDialogOpen = false;
-
-                                    // Removing window focus handler to detect cancels, otherwise we could have multiple handlers
-                                    // after calling multiple ShowDialog()
-                                    window.removeEventListener('focus', windowFocusCallbackForFileDialogCancel);
-
-                                    // Calls cancel callback
-                                    $0();
-                                }
-                            }, 1000);
-                        } else {
-                            if (window.isOpenFileDialogOpen) {
-                                window.isOpenFileDialogOpen = false;
-
-                                // Removing window focus handler to detect cancels, otherwise we could have multiple handlers
-                                // after calling multiple ShowDialog()
-                                window.removeEventListener('focus', windowFocusCallbackForFileDialogCancel);
-
-                                // Calls cancel callback
-                                $0();
-                            }
-                        }
-                    }
-
-                    window.addEventListener('focus', windowFocusCallbackForFileDialogCancel);
-
-                    return windowFocusCallbackForFileDialogCancel;
-                })()
-            ", onDialogCancel);
-        }
+        /// <param name="owner">
+        /// The window that serves as the top-level window for the dialog.
+        /// </param>
+        /// <returns>
+        /// true if the user clicked OK; false if the user clicked Cancel or closed the dialog box.
+        /// </returns>
+        public bool? ShowDialog(Window owner) => null;
     }
 }

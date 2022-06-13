@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,12 @@
 *  
 \*====================================================================================*/
 
+using System.IO;
 
-namespace System.IO
+namespace OpenSilver.IO
 {
     /// <summary>
-    /// This is an alternative to having a System.IO.FileInfo in the browser.
+    /// This is an alternative to having a <see cref="FileInfo"/> in the browser.
     /// To accomodate for file system restrictions in the browser, this behaves like an in-memory file.
     /// 
     /// Important: This must follow the System.IO.FileInfo class interface.
