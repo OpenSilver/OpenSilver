@@ -142,6 +142,33 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion public object SelectedItem
 
+        #region public int SelectedIndex
+
+        [OpenSilver.NotImplemented]
+        public int SelectedIndex
+        {
+            get
+            {
+                return (int)GetValue(SelectedIndexProperty);
+            }
+            set
+            {
+                SetValue(SelectedIndexProperty, value);
+            }
+        }
+
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty SelectedIndexProperty = 
+            DependencyProperty.Register(
+                "SelectedIndex", 
+                typeof(int), 
+                typeof(Accordion), 
+                new PropertyMetadata(-1, OnSelectedIndexPropertyChanged));
+
+        [OpenSilver.NotImplemented]
+        private static void OnSelectedIndexPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
+        #endregion
+
 
         #region public SelectionSequence SelectionSequence
         /// <summary>
@@ -177,6 +204,9 @@ namespace Windows.UI.Xaml.Controls
             throw new NotImplementedException();
         }
         #endregion public SelectionSequence SelectionSequence
+
+        [OpenSilver.NotImplemented]
+        public event SelectionChangedEventHandler SelectionChanged;
 
         #region public Style AccordionButtonStyle
         /// <summary>

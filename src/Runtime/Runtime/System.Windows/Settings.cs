@@ -120,9 +120,6 @@ namespace System
             set { Window.Current.INTERNAL_PositionsWatcher.INTERNAL_WatchInterval = value; }
         }
 
-        [OpenSilver.NotImplemented]
-        public bool EnableAutoZoom { get; set; }
-
         public bool Windowless { get; internal set; }
 
         /// <summary>
@@ -131,5 +128,24 @@ namespace System
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsRunningOutOfBrowser { get; set; }
+
+
+        [OpenSilver.NotImplemented]
+        public bool EnableAutoZoom { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public bool EnableCacheVisualization { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public bool EnableFrameRateCounter { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public bool EnableGPUAcceleration { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public bool EnableHTMLAccess { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public bool EnableRedrawRegions { get; set; }
     }
 }

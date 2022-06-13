@@ -17,7 +17,10 @@ namespace System.IO.IsolatedStorage
 {
     public sealed partial class IsolatedStorageSettings
     {
-		[OpenSilver.NotImplemented]
+        [OpenSilver.NotImplemented]
+        public static IsolatedStorageSettings SiteSettings { get; }
+
+        [OpenSilver.NotImplemented]
         public void Save()
         {
 

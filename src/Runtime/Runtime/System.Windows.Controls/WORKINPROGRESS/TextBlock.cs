@@ -22,10 +22,22 @@ namespace Windows.UI.Xaml.Controls
 		// Returns:
 		//     A value that indicates how a line box is determined for each line of text in
 		//     the System.Windows.Controls.TextBlock. The default is System.Windows.LineStackingStrategy.MaxHeight.
-        [OpenSilver.NotImplemented]
-		public LineStackingStrategy LineStackingStrategy { get; set; }
+		[OpenSilver.NotImplemented]
+		public static readonly DependencyProperty LineStackingStrategyProperty =
+			DependencyProperty.Register(
+				"LineStackingStrategy",
+				typeof(LineStackingStrategy),
+				typeof(TextBlock),
+				new PropertyMetadata(LineStackingStrategy.BlockLineHeight));
 
-        [OpenSilver.NotImplemented]
+		[OpenSilver.NotImplemented]
+		public LineStackingStrategy LineStackingStrategy
+		{
+			get { return (LineStackingStrategy)GetValue(LineStackingStrategyProperty); }
+			set { SetValue(LineStackingStrategyProperty, value); }
+		}
+
+		[OpenSilver.NotImplemented]
 		public double BaselineOffset { get; private set; }
 
         [OpenSilver.NotImplemented]

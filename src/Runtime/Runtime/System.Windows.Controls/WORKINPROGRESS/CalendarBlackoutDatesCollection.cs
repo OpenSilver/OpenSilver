@@ -32,5 +32,26 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         [OpenSilver.NotImplemented]
         public void AddDatesInPast() => Add(new CalendarDateRange(DateTime.MinValue, DateTime.Today.AddDays(-1)));
+
+        [OpenSilver.NotImplemented]
+        public bool Contains(DateTime date) { return true; }
+
+        [OpenSilver.NotImplemented]
+        public bool Contains(DateTime start, DateTime end) { return true; }
+
+        [OpenSilver.NotImplemented]
+        public bool ContainsAny(CalendarDateRange range) { return true; }
+
+        [OpenSilver.NotImplemented]
+        protected override void ClearItems() { }
+
+        [OpenSilver.NotImplemented]
+        protected override void InsertItem(int index, CalendarDateRange item) { }
+
+        [OpenSilver.NotImplemented]
+        protected override void RemoveItem(int index) { }
+
+        [OpenSilver.NotImplemented]
+        protected override void SetItem(int index, CalendarDateRange item) { }
     }
 }
