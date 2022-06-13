@@ -114,10 +114,18 @@ namespace Windows.UI.Xaml.Shapes
                     },
                 });
 
+
         private static void Fill_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((Shape)d).ScheduleRedraw();
+            ((Shape)d).OnFillChanged();
         }
+
+        protected virtual void OnFillChanged()
+        {
+
+        }
+
 
         /// <summary>
         /// Gets or sets a Stretch enumeration value that describes how the shape fills
