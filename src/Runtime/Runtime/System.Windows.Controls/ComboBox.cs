@@ -149,6 +149,18 @@ namespace Windows.UI.Xaml.Controls
                 _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick; // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
 
             _popup = GetTemplateChild("Popup") as Popup;
+          
+            //this will enable virtualization in combo box without templating the whole style
+            if (_popup != null)
+            {
+                //reason for following if condition is backward compatibility, till now we had to define template and manually set custom layout of popup to true
+                //and thus we don't need to set custom layout for combo box to make this work.
+                if (this.CustomLayout)
+                {
+                    _popup.CustomLayout = true;
+                }
+            }
+
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
             //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
