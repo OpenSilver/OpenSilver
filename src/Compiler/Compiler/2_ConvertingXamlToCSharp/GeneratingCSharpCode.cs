@@ -72,7 +72,7 @@ namespace DotNetForHtml5.Compiler
                     {
                         ComponentConnectorEntry eventEntry = _entries[componentId];
                         builder.Append(' ', 4 * 4).AppendLine($"case {componentId}:");
-                        builder.Append(' ', 4 * 5).AppendLine($"(({eventEntry.componentType})({targetParam})).{eventEntry.eventName} += new {eventEntry.handlerType}(this.{eventEntry.handlerName});");
+                        builder.Append(' ', 4 * 5).AppendLine($"(({eventEntry.componentType})({targetParam})).{eventEntry.eventName} += this.{eventEntry.handlerName};");
                         builder.Append(' ', 4 * 5).AppendLine("return;");
                     }
 
