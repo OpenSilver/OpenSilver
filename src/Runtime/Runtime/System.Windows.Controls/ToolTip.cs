@@ -35,6 +35,8 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that creates a pop-up window that displays information for an element in the UI.
     /// </summary>
+    [TemplateVisualState(Name = VisualStates.StateToolTipOpen, GroupName = VisualStates.GroupToolTip)]
+    [TemplateVisualState(Name = VisualStates.StateToolTipClosed, GroupName = VisualStates.GroupToolTip)]
     public partial class ToolTip : ContentControl
     {
         private Popup _parentPopup;
@@ -111,6 +113,8 @@ namespace Windows.UI.Xaml.Controls
 
                 toolTip._parentPopup.IsOpen = true;
 
+                VisualStateManager.GoToState(toolTip, VisualStates.StateToolTipOpen, true);
+
                 if (toolTip.Opened != null)
                 {
                     toolTip.Opened(toolTip, new RoutedEventArgs
@@ -123,6 +127,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (toolTip._parentPopup != null && toolTip._parentPopup.IsOpen == true)
                 {
+                    VisualStateManager.GoToState(toolTip, VisualStates.StateToolTipClosed, true);
                     toolTip._parentPopup.IsOpen = false;
 
                     // Raise the "Closed" event:

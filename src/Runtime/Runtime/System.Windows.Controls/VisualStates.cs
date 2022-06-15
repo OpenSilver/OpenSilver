@@ -395,6 +395,20 @@ namespace Windows.UI.Xaml.Controls
 
         #endregion GroupDescription
 
+        #region GroupTooltip
+        public const string GroupToolTip = "OpenStates";
+
+        /// <summary>
+        /// Opened state of the Tooltip state group.
+        /// </summary>
+        public const string StateToolTipOpen = "Open";
+
+        /// <summary>
+        /// Closed state of the Tooltip state group.
+        /// </summary>
+        public const string StateToolTipClosed = "Closed";
+        #endregion
+
         /// <summary>
         /// Use VisualStateManager to change the visual state of the control.
         /// </summary>
