@@ -29,6 +29,20 @@ namespace Windows.UI.Xaml.Documents
     [ContentProperty("Inlines")]
     public partial class Span : Inline
     {
+        internal override int VisualChildrenCount
+        {
+            get { return this.Inlines.Count; }
+        }
+
+        internal override UIElement GetVisualChild(int index)
+        {
+            if (index >= VisualChildrenCount)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            return (Inline)this.Inlines[index];
+        }
 
         /// <summary>
         /// Initializes a new instance of the Span class.
