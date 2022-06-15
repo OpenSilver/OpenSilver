@@ -492,8 +492,8 @@ namespace Windows.UI.Xaml.Controls
         {
             if (item != this)
             {
-                ContentTemplate = template;
                 Content = item;
+                ContentTemplate = template;
             }
         }
 
