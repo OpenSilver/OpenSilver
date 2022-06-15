@@ -41,7 +41,7 @@ namespace System.Windows.Markup
 #if NETSTANDARD
         public abstract object ProvideValue(IServiceProvider serviceProvider);
 #else // BRIDGE
-        public abstract object ProvideValue(ServiceProvider serviceProvider);
+        public abstract object ProvideValue(IServiceProvider serviceProvider);
 #endif
     }
 }

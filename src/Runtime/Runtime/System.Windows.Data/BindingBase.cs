@@ -37,11 +37,7 @@ namespace Windows.UI.Xaml.Data
 
         /// <exclude/>
         ///
-#if BRIDGE && !CSHTML5BLAZOR
-        public override object ProvideValue(ServiceProvider serviceProvider)
-#else
         public override object ProvideValue(IServiceProvider serviceProvider)
-#endif
         {
             //do nothing ?
             return this;

@@ -267,7 +267,11 @@ namespace Windows.UI.Core
 
         public bool CheckAccess()
         {
-            return INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround ? INTERNAL_Simulator.WebControlDispatcherCheckAccess() : true;
+#if OPENSILVER
+            return INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround ? INTERNAL_Simulator.WebControlDispatcherCheckAccess() : true; 
+#else
+            return CSHTML5.Interop.IsRunningInTheSimulator ? INTERNAL_Simulator.WebControlDispatcherCheckAccess() : true;
+#endif
         }
     }
 }

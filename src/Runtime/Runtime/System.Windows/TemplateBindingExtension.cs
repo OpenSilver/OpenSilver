@@ -32,11 +32,7 @@ namespace Windows.UI.Xaml
     {
         public string Path { get; set; }
 
-#if NETSTANDARD
         public override object ProvideValue(IServiceProvider serviceProvider)
-#elif BRIDGE
-        public override object ProvideValue(ServiceProvider serviceProvider)
-#endif
         {
             var provider = (ServiceProvider)serviceProvider.GetService(typeof(ServiceProvider));
             if (provider != null)

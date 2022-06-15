@@ -195,7 +195,7 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarMode.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarModeChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarSelectionMode.cs" />
-    <Compile Include="System.Windows.Data\DependencyPropertyNode.cs" />
+    <Compile Include="System.Windows.Data\DataContextNode.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventHandler.cs" />
@@ -217,13 +217,18 @@
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TriggerAction_1.cs" />
     <Compile Include="System.Windows.Interactivity\WORKINPROGRESS\TypeConstraintAttribute.cs" />
     <Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
-    <Compile Include="System.Windows.Markup\WORKINPROGRESS\XmlLanguage.cs" />
+    <Compile Include="System.Windows.Markup\XmlLanguage.cs" />
+    <Compile Include="System.Windows.Markup\XmlLanguageConverter.cs" />
     <Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />
     <Compile Include="System.Windows.Media.Animation\ColorAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
     <Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
     <Compile Include="System.Windows.Media\TransformConverter.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\AlignmentX.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\AlignmentY.cs" />
     <Compile Include="System.Windows.Media\WORKINPROGRESS\CacheModeConverter.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\ImageBrush.cs" />
+    <Compile Include="System.Windows.Media\WORKINPROGRESS\TileBrush.cs" />
     <Compile Include="System.Windows.Navigation\NavigatingCancelEventArgs.cs" />
     <Compile Include="System.Windows.Navigation\NavigatingCancelEventHandler.cs" />
     <Compile Include="System.Windows.Navigation\NavigationMode.cs" />
@@ -813,9 +818,6 @@
     <Compile Include="System.Windows.Data\IndexedPropertyPathNode.cs" />
     <Compile Include="System.Windows.Data\INTERNAL_DataOperations.cs" />
     <Compile Include="System.Windows.Data\IPropertyChangedListener.cs" />
-    <Compile Include="System.Windows.Data\IPropertyPathNode.cs" />
-    <Compile Include="System.Windows.Data\IPropertyPathNodeListener.cs" />
-    <Compile Include="System.Windows.Data\IPropertyPathWalkerListener.cs" />
     <Compile Include="System.Windows.Data\IValueConverter.cs" />
     <Compile Include="System.Windows.Data\PropertyChangedListener.cs" />
     <Compile Include="System.Windows.Data\PropertyPathNode.cs" />
@@ -1267,6 +1269,9 @@
       <Project>{319582e2-61e2-429a-973c-950cda0d5d1d}</Project>
       <Name>Bridge.TypesThatWillBeForwarded.CSHTML5</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="System.Windows.Markup\WORKINPROGRESS\" />
   </ItemGroup>
   <Import Project="..\..\packages\CSHTML5.2.0.0-alpha69-089\build\CSHTML5.targets" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <Import Project="..\..\packages\CSHTML5.Migration.2.0.0-alpha69-089\build\CSHTML5.Migration.targets" Condition=" '$(Configuration)|$(Platform)' == 'Migration|AnyCPU' " />

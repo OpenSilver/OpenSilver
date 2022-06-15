@@ -27,7 +27,7 @@ namespace System.Windows.Markup
         public NullExtension() { }
 
 #if BRIDGE
-        public override object ProvideValue(ServiceProvider serviceProvider)
+        public override object ProvideValue(IServiceProvider serviceProvider)
 #else
         public override object ProvideValue(IServiceProvider serviceProvider)
 #endif

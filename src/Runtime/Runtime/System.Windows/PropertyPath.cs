@@ -186,12 +186,13 @@ namespace Windows.UI.Xaml
                         break;
 
                     case PropertyNodeType.Indexed:
-                        if (!(currentTarget is IList list))
-                        {
+                        IList list = currentTarget as IList;
+                        if (!(currentTarget is IList))
+                            {
                             throw new InvalidOperationException($"'{currentTarget}' must implement IList.");
                         }
-
-                        if (!int.TryParse(svi.param, out int index))
+                        int index = -1;
+                        if (!int.TryParse(svi.param, out index))
                         {
                             throw new InvalidOperationException($"'{svi.param}' can't be converted to an integer value.");
                         }

@@ -39,7 +39,7 @@ namespace System.Xaml
 #if NETSTANDARD
         T ProvideValue(IServiceProvider serviceProvider);
 #else // BRIDGE
-        T ProvideValue(ServiceProvider serviceProvider);
+        T ProvideValue(IServiceProvider serviceProvider);
 #endif
     }
 }

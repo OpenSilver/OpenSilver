@@ -613,7 +613,7 @@ namespace Windows.UI.Xaml.Controls
 #if CSHTML5BLAZOR
             if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
 #else
-            if (!IsRunningInJavaScript())
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
 #endif
             {
                 // Not implemented for the simulator
@@ -709,7 +709,7 @@ namespace Windows.UI.Xaml.Controls
 #if CSHTML5BLAZOR
             if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
 #else
-            if (!IsRunningInJavaScript())
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
 #endif
             {
                 // Not implemented for the simulator
@@ -745,7 +745,7 @@ namespace Windows.UI.Xaml.Controls
 #if CSHTML5BLAZOR
             if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
 #else
-            if (!IsRunningInJavaScript())
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
 #endif
             {
                 // Not implemented for the simulator

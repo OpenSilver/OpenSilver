@@ -961,7 +961,8 @@ var range,selection;
             string newInnerText = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("getTextAreaInnerText($0)", _contentEditableDiv));
             if (newInnerText != previousInnerText)
             {
-                TextAreaValueChanged();
+                //todo: I don't know what we should do instead of commenting this (do we even still need this method?)
+                //TextAreaValueChanged();
                 previousInnerText = newInnerText;
             }
 #endif

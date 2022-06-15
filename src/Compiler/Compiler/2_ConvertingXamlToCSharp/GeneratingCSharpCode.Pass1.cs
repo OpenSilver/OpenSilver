@@ -167,6 +167,14 @@ namespace DotNetForHtml5.Compiler
                 }
                 return element;
             }
+
+
+#if BRIDGE
+            private bool IsClassTheApplicationClass(string className)
+            {
+                return className == $"global::{_metadata.SystemWindowsNS}.Application";
+            } 
+#endif
         }
     }
 }

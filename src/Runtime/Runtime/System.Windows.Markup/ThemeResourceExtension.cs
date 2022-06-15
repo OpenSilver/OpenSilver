@@ -67,11 +67,7 @@ namespace System.Windows.Markup
         /// <param name="serviceProvider">A service provider helper that can provide services for the StaticResource.</param>
         /// <returns>An object that is provided as the value of the target property for this StaticResource.</returns>
 
-#if BRIDGE
-        public override object ProvideValue(ServiceProvider serviceProvider)
-#else
         public override object ProvideValue(IServiceProvider serviceProvider)
-#endif
         {
 
             //BRIDGETODO :

@@ -14,6 +14,7 @@
 using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using OpenSilver.Internal.Xaml.Context;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -53,8 +54,37 @@ namespace Windows.UI.Xaml.Controls
 
         private static DataTemplate CreateDefaultTemplateForExtendedSelectionMode()
         {
-            DataTemplate template = new DataTemplate();
-            template.SetMethodToInstantiateFrameworkTemplate(GenerateDefaultHeaderTemplateForExtendedSelectionMode);
+            // todo: check if the following replacement works properly, the commented version does not compile anymore because SetMethodToInstantiateFrameworkTemplate is deprecated.
+
+            //DataTemplate template = new DataTemplate();
+            //template.SetMethodToInstantiateFrameworkTemplate(GenerateDefaultHeaderTemplateForExtendedSelectionMode);
+            //return template;
+
+            DataTemplate template = new DataTemplate
+            {
+                Template = new TemplateContent(
+                    new XamlContext(),
+                    (control, context) =>
+                    {
+                        Border border = new Border();
+                        border.HorizontalAlignment = HorizontalAlignment.Stretch;
+                        border.VerticalAlignment = VerticalAlignment.Stretch;
+                        border.Background = new SolidColorBrush(Colors.Gray);
+                        border.TemplatedParent = control;
+                        CheckBox checkbox = new CheckBox();
+                        checkbox.HorizontalAlignment = HorizontalAlignment.Center;
+                        checkbox.VerticalAlignment = VerticalAlignment.Center;
+                        Binding b = new Binding("IsSelected");
+                        b.Mode = BindingMode.TwoWay;
+                        checkbox.SetBinding(CheckBox.IsCheckedProperty, b);
+                        checkbox.TemplatedParent = control;
+                        border.Child = checkbox;
+
+                        return border;
+                    }
+                )
+            };
+
             return template;
         }
 

@@ -93,11 +93,7 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-#if !BRIDGE
         public override object ProvideValue(IServiceProvider serviceProvider)
-#else
-        public override object ProvideValue(ServiceProvider serviceProvider)
-#endif
         {
             // Not implemented
             return null;
