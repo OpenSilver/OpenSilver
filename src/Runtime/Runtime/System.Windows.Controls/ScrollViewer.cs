@@ -44,6 +44,17 @@ namespace Windows.UI.Xaml.Controls
 
         double _verticalOffset = 0;
         double _horizontalOffset = 0;
+        /// <summary>
+        /// This variable is used to know whether the horizontal offset (through scrollLeft on the DOM element) is properly applied.
+        /// It is needed because scrollLeft is ignored when the display is set to none, so if the Visibility is Collapsed, we need to defer applying it until after the Visibility changes to Visible.
+        /// </summary>
+        bool _isHorizontalOffsetInvalid = false;
+        /// <summary>
+        /// This variable is used to know whether the vertical offset (through scrollTop on the DOM element) is properly applied.
+        /// It is needed because scrollTop is ignored when the display is set to none, so if the Visibility is Collapsed, we need to defer applying it until after the Visibility changes to Visible.
+        /// </summary>
+        bool _isVerticalOffsetInvalid = false;
+
 
         /// <summary>
         /// Initializes a new instance of the ScrollViewer class.
@@ -51,6 +62,18 @@ namespace Windows.UI.Xaml.Controls
         public ScrollViewer()
         {
             DefaultStyleKey = typeof(ScrollViewer);
+
+            IsVisibleChanged += ScrollViewer_IsVisibleChanged;
+        }
+
+        private void ScrollViewer_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            bool newValue = (bool)e.NewValue;
+            if (newValue)
+            {
+                UpdateDomHorizontalOffset(this.INTERNAL_OuterDomElement);
+                UpdateDomVerticalOffset(this.INTERNAL_OuterDomElement);
+            }
         }
 
         internal override FrameworkTemplate TemplateCache
@@ -559,11 +582,11 @@ namespace Windows.UI.Xaml.Controls
             //Update the scrollviewer position when we insert again the scrollviewer in the visual tree
             if (_verticalOffset != 0)
             {
-                INTERNAL_HtmlDomManager.SetDomElementProperty(outerDiv, "scrollTop", _verticalOffset);
+                UpdateDomVerticalOffset(outerDiv);
             }
             if (_horizontalOffset != 0)
             {
-                INTERNAL_HtmlDomManager.SetDomElementProperty(outerDiv, "scrollLeft", _horizontalOffset);
+                UpdateDomHorizontalOffset(outerDiv);
             }
 
 
@@ -751,9 +774,30 @@ namespace Windows.UI.Xaml.Controls
             //_horizontalOffset is there so we can remember changes of the value even if the ScrollViewer is not in the visual tree
             _horizontalOffset = offset;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                INTERNAL_HtmlDomManager.SetDomElementProperty(this.INTERNAL_OuterDomElement, "scrollLeft", offset);
+            {
+                UpdateDomHorizontalOffset(INTERNAL_OuterDomElement);
+            }
 
             SetScrollOffset(Orientation.Horizontal, offset);
+        }
+
+        /// <summary>
+        /// If the ScrollViewer is Visible, sets the scrollLeft property to the value held in _horizontalOffset.
+        /// If the ScrollViewer is Collapsed, it will set _isHorizontalOffsetInvalid to true,
+        /// so that we know the current value of this.INTERNAL_OuterDomElement.scrollLeft is invalid and needs to be set when changing the visibility.
+        /// </summary>
+        /// <param name="div">The dom element on which to set the scrollLeft (normally the ScrollViewer's OuterDomElement)</param>
+        internal void UpdateDomHorizontalOffset(object div)
+        {
+            if (this.Visibility == Visibility.Collapsed)
+            {
+                _isHorizontalOffsetInvalid = true;
+            }
+            else
+            {
+                INTERNAL_HtmlDomManager.SetDomElementProperty(div, "scrollLeft", _horizontalOffset);
+                _isHorizontalOffsetInvalid = false;
+            }
         }
 
         /// <summary>
@@ -765,9 +809,30 @@ namespace Windows.UI.Xaml.Controls
             //_verticalOffset is there so we can remember changes of the value even if the ScrollViewer is not in the visual tree
             _verticalOffset = offset;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                INTERNAL_HtmlDomManager.SetDomElementProperty(this.INTERNAL_OuterDomElement, "scrollTop", offset);
+            {
+                UpdateDomVerticalOffset(INTERNAL_OuterDomElement);
+            }
 
             SetScrollOffset(Orientation.Vertical, offset);
+        }
+
+        /// <summary>
+        /// If the ScrollViewer is Visible, sets the scrollTop property to the value held in _verticalOffset.
+        /// If the ScrollViewer is Collapsed, it will set _isVerticalOffsetInvalid to true,
+        /// so that we know the current value of this.INTERNAL_OuterDomElement.scrollTop is invalid and needs to be set when changing the visibility.
+        /// </summary>
+        /// <param name="div">The dom element on which to set the scrollTop (normally the ScrollViewer's OuterDomElement)</param>
+        internal void UpdateDomVerticalOffset(object div)
+        {
+            if (this.Visibility == Visibility.Collapsed)
+            {
+                _isVerticalOffsetInvalid = true;
+            }
+            else
+            {
+                INTERNAL_HtmlDomManager.SetDomElementProperty(div, "scrollTop", _verticalOffset);
+                _isVerticalOffsetInvalid = false;
+            }
         }
 
         // Summary:
