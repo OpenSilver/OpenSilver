@@ -294,9 +294,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Show the popup if it was not already visible, or hide it if it was visible:
                 if (isOpen)
                 {
-                    popup.OnOpened();
                     // Show the popup:
                     popup.ShowPopupRootIfNotAlreadyVisible();
+                    popup.OnOpened();
                 }
                 else
                 {
