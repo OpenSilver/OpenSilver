@@ -526,6 +526,15 @@ namespace Windows.UI.Xaml.Controls
             style.height = "0"; // Same as above.
             style.objectPosition = "center top";
 
+            if (this.MaxHeight > 0)
+            {
+                style.maxHeight = this.MaxHeight.ToString() + "px";
+            }
+            if (this.MaxWidth > 0)
+            {
+                style.maxWidth = this.MaxWidth.ToString() + "px";
+            }
+
             string sImg = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(img);
             CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
 {sImg}.addEventListener('mousedown', function(e) {{
