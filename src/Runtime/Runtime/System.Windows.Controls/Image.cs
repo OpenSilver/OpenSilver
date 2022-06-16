@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using OpenSilver.Internal;
 #else
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -524,11 +525,11 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
 
             if (!double.IsNaN(this.MaxHeight) && this.MaxHeight > 0)
             {
-                style.maxHeight = this.MaxHeight.ToString() + "px";
+                style.maxHeight = this.MaxHeight.ToInvariantString() + "px";
             }
             if (!double.IsNaN(this.MaxWidth) && this.MaxWidth > 0)
             {
-                style.maxWidth = this.MaxWidth.ToString() + "px";
+                style.maxWidth = this.MaxWidth.ToInvariantString() + "px";
             }
 
             CSHTML5.Interop.ExecuteJavaScriptAsync(@"
