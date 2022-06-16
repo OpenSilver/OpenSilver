@@ -33,8 +33,8 @@ namespace OpenSilver.Internal.Data
 
         internal DependencyPropertyListener(DependencyProperty dp, Action<object, IDependencyPropertyChangedEventArgs> callback) 
         {
-            Debug.Assert(_dp != null);
-            Debug.Assert(_callback != null);
+            Debug.Assert(dp != null);
+            Debug.Assert(callback != null);
 
             _dp = dp;
             _callback = callback;
