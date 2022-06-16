@@ -79,7 +79,10 @@ namespace OpenSilver.Internal.Data
         {
             if (!sourceIsCurrentItem && _icv != null)
             {
-                _icv.CurrentChanged -= new EventHandler(OnCurrentChanged);
+                if (Listener.ListenForChanges)
+                {
+                    _icv.CurrentChanged -= new EventHandler(OnCurrentChanged);
+                }
                 _icv = null;
             }
 
@@ -87,15 +90,18 @@ namespace OpenSilver.Internal.Data
 
             if (!sourceIsCurrentItem && !IsBound && newSource is ICollectionView icv)
             {
+                if (Listener.ListenForChanges)
+                {
+                    icv.CurrentChanged += new EventHandler(OnCurrentChanged);
+                }
                 _icv = icv;
-                icv.CurrentChanged += new EventHandler(OnCurrentChanged);
                 UpdateSource(icv.CurrentItem, true);
             }
         }
 
         private void OnCurrentChanged(object sender, EventArgs e)
         {
-            if (_icv == null || !Listener.ListenForChanges)
+            if (_icv == null)
             {
                 return;
             }

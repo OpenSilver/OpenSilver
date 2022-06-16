@@ -138,7 +138,7 @@ namespace OpenSilver.Internal.Data
 
         internal override void OnSourceChanged(object oldValue, object newValue)
         {
-            if (oldValue is INotifyPropertyChanged inpc)
+            if (Listener.ListenForChanges && oldValue is INotifyPropertyChanged inpc)
             {
                 inpc.PropertyChanged -= new PropertyChangedEventHandler(OnSourcePropertyChanged);
             }
@@ -157,10 +157,13 @@ namespace OpenSilver.Internal.Data
             if (Source == null)
                 return;
 
-            inpc = newValue as INotifyPropertyChanged;
-            if (inpc != null)
+            if (Listener.ListenForChanges)
             {
-                inpc.PropertyChanged += new PropertyChangedEventHandler(OnSourcePropertyChanged);
+                inpc = newValue as INotifyPropertyChanged;
+                if (inpc != null)
+                {
+                    inpc.PropertyChanged += new PropertyChangedEventHandler(OnSourcePropertyChanged);
+                }
             }
 
             if (newValue is DependencyObject sourceDO)
@@ -172,7 +175,10 @@ namespace OpenSilver.Internal.Data
                 if (dependencyProperty != null)
                 {
                     _dp = dependencyProperty;
-                    _dpListener = listener = INTERNAL_PropertyStore.ListenToChanged(sourceDO, dependencyProperty, OnPropertyChanged);
+                    if (Listener.ListenForChanges)
+                    {
+                        _dpListener = INTERNAL_PropertyStore.ListenToChanged(sourceDO, dependencyProperty, OnPropertyChanged);
+                    }
                 }
             }
 
@@ -202,11 +208,6 @@ namespace OpenSilver.Internal.Data
 
         private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!Listener.ListenForChanges)
-            {
-                return;
-            }
-
             if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop != null || _field != null))
             {
                 UpdateValue();
@@ -221,11 +222,6 @@ namespace OpenSilver.Internal.Data
 
         private void OnPropertyChanged(object sender, IDependencyPropertyChangedEventArgs args)
         {
-            if (!Listener.ListenForChanges)
-            {
-                return;
-            }
-
             try
             {
                 UpdateValue();
