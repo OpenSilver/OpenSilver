@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,19 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 #if MIGRATION
-namespace System.Windows.Data
+using System.Windows;
 #else
-namespace Windows.UI.Xaml.Data
+using Windows.UI.Xaml;
 #endif
+
+namespace OpenSilver.Internal.Data
 {
-    internal partial interface IDependencyPropertyChangedEventArgs
+    internal interface IDependencyPropertyChangedEventArgs
     {
-        DependencyProperty Property {get; }
+        DependencyProperty Property { get; }
         object OldValue { get; }
         object NewValue { get; }
     }

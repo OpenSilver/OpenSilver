@@ -14,16 +14,12 @@
 using System;
 
 #if MIGRATION
-using CSHTML5.Internal.System.Windows.Data;
+using System.Windows.Data;
 #else
-using CSHTML5.Internal.Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Data;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
+namespace OpenSilver.Internal.Data
 {
     internal class PropertyPathWalker
     {

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,19 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSHTML5.Internal;
 
 #if MIGRATION
-namespace System.Windows.Data
+using System.Windows;
 #else
-namespace Windows.UI.Xaml.Data
+using Windows.UI.Xaml;
 #endif
+
+namespace OpenSilver.Internal.Data
 {
-    internal partial class PropertyChangedListener : IPropertyChangedListener
+    internal class PropertyChangedListener : IPropertyChangedListener
     {
-        
         public DependencyProperty Property { get; set; }
         private INTERNAL_PropertyStorage _storage;
         private Action<object, IDependencyPropertyChangedEventArgs> _sourceCallBack;

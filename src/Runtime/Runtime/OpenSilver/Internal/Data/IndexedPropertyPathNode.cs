@@ -16,11 +16,7 @@ using System.Collections;
 using System.Globalization;
 using System.Reflection;
 
-#if MIGRATION
-namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
+namespace OpenSilver.Internal.Data
 {
     internal sealed class IndexedPropertyPathNode : PropertyPathNode
     {

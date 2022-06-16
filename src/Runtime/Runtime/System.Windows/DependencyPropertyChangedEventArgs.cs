@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if MIGRATION
-using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
+using OpenSilver.Internal.Data;
 
 #if MIGRATION
 namespace System.Windows

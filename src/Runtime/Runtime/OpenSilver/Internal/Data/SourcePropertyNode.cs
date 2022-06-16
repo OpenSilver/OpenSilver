@@ -13,11 +13,7 @@
 
 using System;
 
-#if MIGRATION
-namespace System.Windows.Data
-#else
-namespace Windows.UI.Xaml.Data
-#endif
+namespace OpenSilver.Internal.Data
 {
     internal class SourcePropertyNode : IPropertyPathNode
     {

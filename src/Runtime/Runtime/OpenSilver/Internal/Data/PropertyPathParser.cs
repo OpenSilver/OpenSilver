@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-#if MIGRATION
-namespace CSHTML5.Internal.System.Windows.Data
-#else
-namespace CSHTML5.Internal.Windows.UI.Xaml.Data
-#endif
+namespace OpenSilver.Internal.Data
 {
     internal enum PropertyNodeType
     {
@@ -34,7 +24,7 @@ namespace CSHTML5.Internal.Windows.UI.Xaml.Data
     }
 
     //Property path syntax: http://msdn.microsoft.com/en-us/library/cc645024(v=vs.95).aspx
-    internal partial class PropertyPathParser
+    internal class PropertyPathParser
     {
         string Path;
 

@@ -16,12 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CSHTML5.Internal;
-
-#if MIGRATION
-using CSHTML5.Internal.System.Windows.Data;
-#else
-using CSHTML5.Internal.Windows.UI.Xaml.Data;
-#endif
+using OpenSilver.Internal.Data;
 
 #if MIGRATION
 namespace System.Windows

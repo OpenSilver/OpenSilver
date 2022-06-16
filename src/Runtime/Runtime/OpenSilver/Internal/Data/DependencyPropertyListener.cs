@@ -16,10 +16,12 @@ using System.Diagnostics;
 using CSHTML5.Internal;
 
 #if MIGRATION
-namespace System.Windows.Data
+using System.Windows;
 #else
-namespace Windows.UI.Xaml.Data
+using Windows.UI.Xaml;
 #endif
+
+namespace OpenSilver.Internal.Data
 {
     internal sealed class DependencyPropertyListener
     {

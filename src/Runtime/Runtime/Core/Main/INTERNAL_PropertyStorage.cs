@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using OpenSilver.Internal.Data;
+
 #if MIGRATION
 using System.Windows;
 using System.Windows.Data;

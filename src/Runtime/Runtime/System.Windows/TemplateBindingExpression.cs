@@ -12,16 +12,15 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Diagnostics;
+using CSHTML5.Internal;
+using OpenSilver.Internal.Data;
 
 #if MIGRATION
 using System.Windows.Controls;
-using System.Windows.Data;
 #else
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
 #endif
 
 #if MIGRATION

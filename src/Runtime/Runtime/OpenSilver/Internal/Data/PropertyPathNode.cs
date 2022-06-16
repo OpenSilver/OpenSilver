@@ -15,10 +15,12 @@ using System;
 using System.ComponentModel;
 
 #if MIGRATION
-namespace System.Windows.Data
+using System.Windows;
 #else
-namespace Windows.UI.Xaml.Data
+using Windows.UI.Xaml;
 #endif
+
+namespace OpenSilver.Internal.Data
 {
     internal abstract class PropertyPathNode : IPropertyPathNode
     {

@@ -1,10 +1,11 @@
 ﻿//#define USEASSERT
-using OpenSilver.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 
 #if MIGRATION
 using System.Windows;
