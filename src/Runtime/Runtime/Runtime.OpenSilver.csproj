@@ -122,6 +122,8 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePickerDateValidationErrorEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DomainUpDown.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\InkPresenter.cs" />
+		<Compile Include="System.Windows.Data\IPropertyPathNode.cs" />
+		<Compile Include="System.Windows.Data\SourcePropertyNode.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RangeTimePickerPopup.cs" />
@@ -146,7 +148,7 @@
 		<Compile Include="System.Windows.Controls\ValidSpinDirections.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowserBrush.cs" />
-		<Compile Include="System.Windows.Data\DataContextNode.cs" />
+		<Compile Include="System.Windows.Data\DependencyPropertyListener.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
 		<Compile Include="System.Windows.Ink\WORKINPROGRESS\Stroke.cs" />
 		<Compile Include="System.Windows.Ink\WORKINPROGRESS\StrokeCollection.cs" />

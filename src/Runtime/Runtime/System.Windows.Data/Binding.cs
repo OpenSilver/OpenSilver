@@ -355,7 +355,6 @@ namespace Windows.UI.Xaml.Data
         /// <returns>
         /// true if the binding binds directly to the data source; otherwise, false.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public bool BindsDirectlyToSource
         {
             get { return _bindsDirectlyToSource; }

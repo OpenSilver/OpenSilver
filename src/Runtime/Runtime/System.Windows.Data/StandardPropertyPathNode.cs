@@ -28,7 +28,6 @@ namespace Windows.UI.Xaml.Data
     {
         private readonly Type _resolvedType;
         private readonly string _propertyName;
-        private readonly bool _bindsDirectlyToSource;
 
         private IPropertyChangedListener _dpListener;
         private DependencyProperty _dp;
@@ -40,16 +39,6 @@ namespace Windows.UI.Xaml.Data
         {
             _resolvedType = typeName != null ? Type.GetType(typeName) : null;
             _propertyName = propertyName;
-        }
-
-        /// <summary>
-        /// This constructor is called only when there is no path, which means 
-        /// that the binding's source is directly the value we are looking for.
-        /// </summary>
-        internal StandardPropertyPathNode(PropertyPathWalker listener)
-            : base(listener)
-        {
-            _bindsDirectlyToSource = true;
         }
 
         public override Type Type
@@ -139,10 +128,6 @@ namespace Windows.UI.Xaml.Data
                     UpdateValueAndIsBroken(null, CheckIsBroken());
                 }
             }
-            else if (_bindsDirectlyToSource)
-            {
-                UpdateValueAndIsBroken(Source, CheckIsBroken());
-            }
             else
             {
                 UpdateValueAndIsBroken(null, CheckIsBroken());
@@ -168,9 +153,6 @@ namespace Windows.UI.Xaml.Data
             _field = null;
 
             if (Source == null)
-                return;
-
-            if (_bindsDirectlyToSource)
                 return;
 
             inpc = newValue as INotifyPropertyChanged;
@@ -227,10 +209,10 @@ namespace Windows.UI.Xaml.Data
             {
                 UpdateValue();
 
-                PropertyPathNode next = Next;
+                IPropertyPathNode next = Next;
                 if (next != null)
                 {
-                    next.SetSource(Value);
+                    next.Source = Value;
                 }
             }
         }
@@ -247,7 +229,7 @@ namespace Windows.UI.Xaml.Data
                 UpdateValue();
                 if (Next != null)
                 {
-                    Next.SetSource(Value);
+                    Next.Source = Value;
                 }
             }
             catch (XamlParseException ex)
@@ -266,7 +248,7 @@ namespace Windows.UI.Xaml.Data
 
         private bool CheckIsBroken()
         {
-            return Source == null || (!_bindsDirectlyToSource && (_prop == null && _field == null && _dp == null));
+            return Source == null || (_prop == null && _field == null && _dp == null);
         }
     }
 }

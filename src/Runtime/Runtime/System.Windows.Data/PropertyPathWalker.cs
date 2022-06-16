@@ -27,52 +27,33 @@ namespace Windows.UI.Xaml.Data
 {
     internal class PropertyPathWalker
     {
-        private readonly string _path;
-        private readonly PropertyPathNode _firstNode;
         private readonly BindingExpression _expr;
-        private object _source;
 
         internal PropertyPathWalker(BindingExpression be)
         {
             Binding binding = be.ParentBinding;
 
             _expr = be;
-            _path = binding.XamlPath ?? binding.Path.Path ?? string.Empty;
-            IsDataContextBound = binding.ElementName == null && binding.Source == null && binding.RelativeSource == null;
             ListenForChanges = binding.Mode != BindingMode.OneTime;
 
-            if (IsDataContextBound)
-            {
-                _firstNode = new DataContextNode(this);
-            }
+            string path = binding.XamlPath ?? binding.Path.Path ?? string.Empty;
+            ParsePath(path, out IPropertyPathNode head, out IPropertyPathNode tail);
 
-            ParsePath(_path, out PropertyPathNode head, out PropertyPathNode tail);
-
-            if (_firstNode == null)
-            {
-                _firstNode = head ?? new StandardPropertyPathNode(this);
-            }
-            else
-            {
-                _firstNode.Next = head;
-            }
-
-            FinalNode = tail ?? _firstNode;
+            FirstNode = head;
+            FinalNode = tail;
         }
-
-        internal bool IsDataContextBound { get; }
 
         internal bool ListenForChanges { get; }
 
-        internal PropertyPathNode FinalNode { get; }
+        internal IPropertyPathNode FirstNode { get; }
 
-        internal object ValueInternal { get; private set; }
+        internal IPropertyPathNode FinalNode { get; }
 
         internal bool IsPathBroken
         {
             get
             {
-                PropertyPathNode node = _firstNode;
+                IPropertyPathNode node = FirstNode;
                 while (node != null)
                 {
                     if (node.IsBroken)
@@ -89,17 +70,15 @@ namespace Windows.UI.Xaml.Data
 
         internal void Update(object source)
         {
-            _source = source;
-            _firstNode.SetSource(source);
+            FirstNode.Source = source;
         }
 
-        internal void ValueChanged(PropertyPathNode node)
+        internal void ValueChanged()
         {
-            ValueInternal = node.Value;
             _expr.ValueChanged();
         }
 
-        private void ParsePath(string path, out PropertyPathNode head, out PropertyPathNode tail)
+        private void ParsePath(string path, out IPropertyPathNode head, out IPropertyPathNode tail)
         {
             head = null;
             tail = null;
@@ -131,6 +110,11 @@ namespace Windows.UI.Xaml.Data
 
                 tail.Next = node;
                 tail = node;
+            }
+
+            if (head == null)
+            {
+                head = tail = new SourcePropertyNode(this);
             }
         }
     }

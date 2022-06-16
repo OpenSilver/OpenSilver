@@ -198,7 +198,9 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarMode.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarModeChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarSelectionMode.cs" />
-    <Compile Include="System.Windows.Data\DataContextNode.cs" />
+    <Compile Include="System.Windows.Data\DependencyPropertyListener.cs" />
+    <Compile Include="System.Windows.Data\IPropertyPathNode.cs" />
+    <Compile Include="System.Windows.Data\SourcePropertyNode.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventHandler.cs" />

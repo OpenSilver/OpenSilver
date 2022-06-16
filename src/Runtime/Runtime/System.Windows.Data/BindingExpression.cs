@@ -58,6 +58,9 @@ namespace Windows.UI.Xaml.Data
         private bool _needsUpdate; // True if this binding expression has a pending source update
         private FrameworkElement _mentor;
 
+        private DependencyPropertyListener _dataContextListener;
+        private DependencyPropertyListener _cvsListener;
+
         private readonly PropertyPathWalker _propertyPathWalker;
 
         internal BindingExpression(Binding binding, DependencyObject target, DependencyProperty property)
@@ -74,6 +77,13 @@ namespace Windows.UI.Xaml.Data
             _propertyPathWalker = new PropertyPathWalker(this);
         }
 
+        private void OnDataContextChanged(object sender, IDependencyPropertyChangedEventArgs args)
+        {
+            BindingSource = args.NewValue;
+
+            _propertyPathWalker.Update(BindingSource);
+        }
+
         /// <summary>
         /// The binding target property of this binding expression.
         /// </summary>
@@ -88,23 +98,7 @@ namespace Windows.UI.Xaml.Data
         /// Gets the binding source object that this <see cref="BindingExpression"/>
         /// uses.
         /// </summary>
-        public object DataItem
-        {
-            get
-            {
-                if (ParentBinding.ElementName == null &&
-                    ParentBinding.Source == null &&
-                    ParentBinding.RelativeSource == null &&
-                    _bindingSource is FrameworkElement sourceFE)
-                {
-                    // Note: In the BindingExpression, we set the Source to the
-                    // FrameworkElement and added the DataContext in the Path
-                    return sourceFE.DataContext;
-                }
-
-                return _bindingSource;
-            }
-        }
+        public object DataItem => BindingSource;
 
         /// <summary>
         /// Sends the current binding target value to the binding source property in
@@ -135,7 +129,7 @@ namespace Windows.UI.Xaml.Data
                 // BROKEN PATH
                 //------------------------
 
-                if (_propertyPathWalker.IsDataContextBound && _propertyPathWalker.FinalNode is DataContextNode)
+                if (_dataContextListener != null && _propertyPathWalker.FirstNode is SourcePropertyNode)
                 {
                     value = UseTargetNullValue();
                 }
@@ -150,7 +144,7 @@ namespace Windows.UI.Xaml.Data
                 // NON-BROKEN PATH
                 //------------------------
 
-                value = GetConvertedValue(_propertyPathWalker.ValueInternal);
+                value = GetConvertedValue(_propertyPathWalker.FinalNode.Value);
             }
 
             return value;
@@ -226,7 +220,7 @@ namespace Windows.UI.Xaml.Data
 
             AttachToContext(false);
 
-            if (_bindingSource is FrameworkElement fe)
+            if (BindingSource is FrameworkElement fe)
             {
                 if (ParentBinding.XamlPath == "ActualWidth" || ParentBinding.XamlPath == "ActualHeight")
                 {
@@ -237,7 +231,7 @@ namespace Windows.UI.Xaml.Data
             // FindSource should find the source now. Otherwise, the PropertyPathNodes
             // shoud do the work (their properties will change when the source will
             // become available)
-            _propertyPathWalker.Update(_bindingSource);
+            _propertyPathWalker.Update(BindingSource);
 
             //Listen to changes on the Target if the Binding is TwoWay:
             if (ParentBinding.Mode == BindingMode.TwoWay)
@@ -268,6 +262,18 @@ namespace Windows.UI.Xaml.Data
                 _propertyListener = null;
             }
 
+            if (_dataContextListener != null)
+            {
+                _dataContextListener.Source = null;
+                _dataContextListener = null;
+            }
+
+            if (_cvsListener != null)
+            {
+                _cvsListener.Source = null;
+                _cvsListener = null;
+            }
+
             _propertyPathWalker.Update(null);
 
             if (_isUpdateOnLostFocus)
@@ -282,12 +288,45 @@ namespace Windows.UI.Xaml.Data
             Target = null;
         }
 
-        internal void ValueChanged() { Refresh(); }
+        internal void ValueChanged() => Refresh();
 
         /// <summary>
         /// The element that is the binding target object of this binding expression.
         /// </summary>
         internal DependencyObject Target { get; private set; }
+
+        private object BindingSource
+        {
+            get => _bindingSource;
+            set
+            {
+                _bindingSource = value;
+                if (!ParentBinding.BindsDirectlyToSource)
+                {
+                    if (_cvsListener != null)
+                    {
+                        _cvsListener.Source = null;
+                        _cvsListener = null;
+                    }
+
+                    if (value is CollectionViewSource cvs)
+                    {
+                        _cvsListener = new DependencyPropertyListener(CollectionViewSource.ViewProperty, OnCollectionViewSourceViewChanged)
+                        {
+                            Source = cvs,
+                        };
+                        _bindingSource = cvs.View;
+                    }
+                }
+            }
+        }
+
+        private void OnCollectionViewSourceViewChanged(object sender, IDependencyPropertyChangedEventArgs args)
+        {
+            _bindingSource = args.NewValue;
+
+            _propertyPathWalker.Update(BindingSource);
+        }
 
         /// <summary>
         /// This method is used to check whether the value is Valid if needed.
@@ -302,7 +341,7 @@ namespace Windows.UI.Xaml.Data
                     INTERNAL_ForceValidateOnNextSetValue = false;
                     try
                     {
-                        PropertyPathNode node = _propertyPathWalker.FinalNode;
+                        IPropertyPathNode node = _propertyPathWalker.FinalNode;
                         node.SetValue(node.Value); //we set the source property to its own value to check whether it causes an exception, in which case the value is not valid.
                     }
                     catch (Exception e) //todo: put the content of this catch in a method which will be called here and in UpdateSourceObject (OR put the whole try/catch in the method and put the Value to set as parameter).
@@ -328,9 +367,9 @@ namespace Windows.UI.Xaml.Data
         internal void OnSourceAvailable(bool lastAttempt)
         {
             AttachToContext(lastAttempt);
-            if (_bindingSource != null)
+            if (BindingSource != null)
             {
-                _propertyPathWalker.Update(_bindingSource);
+                _propertyPathWalker.Update(BindingSource);
             }
 
             //Target.SetValue(Property, this); // Read note below
@@ -403,7 +442,7 @@ namespace Windows.UI.Xaml.Data
             if (_propertyPathWalker.IsPathBroken)
                 return;
 
-            PropertyPathNode node = _propertyPathWalker.FinalNode;
+            IPropertyPathNode node = _propertyPathWalker.FinalNode;
             bool oldIsUpdating = IsUpdating;
 
             object convertedValue = value;
@@ -700,9 +739,14 @@ namespace Windows.UI.Xaml.Data
                     useMentor = true;
                     source = mentor = FrameworkElement.FindMentor(Target);
                 }
-            }
 
-            _bindingSource = source;
+                if (_dataContextListener == null)
+                {
+                    _dataContextListener = new DependencyPropertyListener(FrameworkElement.DataContextProperty, OnDataContextChanged);
+                }
+                _dataContextListener.Source = source;
+                source = _dataContextListener.Value;
+            }
 
             if (useMentor)
             {
@@ -718,6 +762,8 @@ namespace Windows.UI.Xaml.Data
                     Target.InheritedContextChanged += new EventHandler(OnTargetInheritedContextChanged);
                 }
             }
+
+            BindingSource = source;
         }
 
         private void DetachMentor()

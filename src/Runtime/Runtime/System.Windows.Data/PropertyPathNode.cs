@@ -20,9 +20,10 @@ namespace System.Windows.Data
 namespace Windows.UI.Xaml.Data
 #endif
 {
-    internal abstract class PropertyPathNode
+    internal abstract class PropertyPathNode : IPropertyPathNode
     {
         private ICollectionView _icv;
+        private object _source;
 
         protected PropertyPathNode(PropertyPathWalker listener)
         {
@@ -31,19 +32,23 @@ namespace Windows.UI.Xaml.Data
 
         public PropertyPathWalker Listener { get; }
 
-        public object Source { get; private set; }
+        public object Source
+        {
+            get => _source;
+            set => SetSource(value, false);
+        }
 
         public object Value { get; private set; } = DependencyProperty.UnsetValue;
 
         public bool IsBroken { get; private set; }
 
-        public PropertyPathNode Next { get; set; }
+        public IPropertyPathNode Next { get; set; }
 
         public abstract Type Type { get; }
 
         public abstract bool IsBound { get; }
 
-        internal void SetSource(object source) => SetSource(source, false);
+        void IPropertyPathNode.SetValue(object value) => SetValue(value);
 
         private void SetSource(object source, bool sourceIsCurrentItem)
         {
@@ -53,16 +58,16 @@ namespace Windows.UI.Xaml.Data
 
             if (Next != null)
             {
-                Next.SetSource(Value == DependencyProperty.UnsetValue ? null : Value, false);
+                Next.Source = Value == DependencyProperty.UnsetValue ? null : Value;
             }
         }
 
         private void UpdateSource(object source, bool sourceIsCurrentItem)
         {
-            object oldSource = Source;
-            Source = source;
+            object oldSource = _source;
+            _source = source;
 
-            if (oldSource != Source)
+            if (oldSource != _source)
             {
                 OnSourceChanged(oldSource, source, sourceIsCurrentItem);
             }
@@ -76,7 +81,7 @@ namespace Windows.UI.Xaml.Data
                 _icv = null;
             }
 
-            OnSourceChanged(oldSource, Source);
+            OnSourceChanged(oldSource, _source);
 
             if (!sourceIsCurrentItem && !IsBound && newSource is ICollectionView icv)
             {
@@ -103,7 +108,7 @@ namespace Windows.UI.Xaml.Data
 
             if (Next == null)
             {
-                Listener.ValueChanged(this);
+                Listener.ValueChanged();
             }
         }
 
