@@ -65,6 +65,9 @@
     <Compile Include="..\OpenSilver.Xaml\System.Xaml\IMarkupExtension.cs">
       <Link>System.Xaml\IMarkupExtension.cs</Link>
     </Compile>
+    <Compile Include="..\OpenSilver.Xaml\System.Xaml\IRootObjectProvider.cs">
+      <Link>System.Xaml\IRootObjectProvider.cs</Link>
+    </Compile>
     <Compile Include="Core\Events\DOMEventManager.cs" />
     <Compile Include="Core\Main\DescendentsWalker.cs" />
     <Compile Include="Core\Main\DescendentsWalkerBase.cs" />

@@ -28,9 +28,7 @@ namespace OpenSilver.Internal.Xaml
     internal class ServiceProviderContext :
         IProvideValueTarget,
         IServiceProvider,
-#if OPENSILVER
-        IRootObjectProvider, 
-#endif
+        IRootObjectProvider,
         IAmbientResourcesProvider
     {
         private readonly XamlContext _xamlContext;
@@ -46,12 +44,12 @@ namespace OpenSilver.Internal.Xaml
             {
                 return this;
             }
-#if OPENSILVER
+            
             if (serviceType == typeof(IRootObjectProvider))
             {
                 return this;
-            } 
-#endif
+            }
+
             if (serviceType == typeof(IAmbientResourcesProvider))
             {
                 return this;
@@ -64,9 +62,7 @@ namespace OpenSilver.Internal.Xaml
 
         object IProvideValueTarget.TargetProperty => throw new NotSupportedException();
 
-#if OPENSILVER
-        object IRootObjectProvider.RootObject => _xamlContext.RootInstance; 
-#endif
+        object IRootObjectProvider.RootObject => _xamlContext.RootInstance;
 
         IEnumerable<object> IAmbientResourcesProvider.GetAllAmbientValues()
             => _xamlContext.ServiceProvider_GetAllAmbientValues();
