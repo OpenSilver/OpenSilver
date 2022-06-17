@@ -237,7 +237,10 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <TimeUpDown x:Name="TimeUpDown" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Culture="{TemplateBinding Culture}" Grid.Column="0" Format="{TemplateBinding Format}" Height="Auto" Maximum="{TemplateBinding Maximum}" Minimum="{TemplateBinding Minimum}" Padding="{TemplateBinding Padding}" Style="{TemplateBinding TimeUpDownStyle}" SpinnerStyle="{TemplateBinding SpinnerStyle}" TimeParsers="{TemplateBinding TimeParsers}" TimeGlobalizationInfo="{TemplateBinding TimeGlobalizationInfo}"/>
+                        <TimeUpDown x:Name="TimeUpDown" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}"
+                                    Culture="{TemplateBinding Culture}" Grid.Column="0" Format="{TemplateBinding Format}" Height="20" Width="20" Maximum="{TemplateBinding Maximum}" 
+                                    Minimum="{TemplateBinding Minimum}" Padding="{TemplateBinding Padding}" Style="{TemplateBinding TimeUpDownStyle}" SpinnerStyle="{TemplateBinding SpinnerStyle}"
+                                    TimeParsers="{TemplateBinding TimeParsers}" TimeGlobalizationInfo="{TemplateBinding TimeGlobalizationInfo}"/>
                         <ToggleButton x:Name="DropDownToggle" Grid.Column="1" HorizontalAlignment="Center" Margin="3,0,0,0" Template="{StaticResource PopupButtonTemplate}" VerticalAlignment="Center"/>
                         <Popup x:Name="Popup" CustomLayout="True">
                             <Border x:Name="PopupRoot" BorderBrush="#FF8d8b8b" BorderThickness="1">
