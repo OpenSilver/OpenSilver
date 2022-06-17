@@ -36,7 +36,13 @@
                                 <VisualState x:Name="HoursAndMinutesOnly"/>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <ListBox x:Name="ListBox" DisplayMemberPath="Key" DataContext="{TemplateBinding TimeItemsSelection}" IsTabStop="True" ItemsSource="{Binding Items}" ItemContainerStyle="{TemplateBinding ListBoxItemStyle}" MaxHeight="130" Style="{TemplateBinding ListBoxStyle}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" TabIndex="1"/>
+                        <ListBox x:Name="ListBox" DisplayMemberPath="Key" DataContext="{TemplateBinding TimeItemsSelection}" IsTabStop="True" ItemsSource="{Binding Items}" ItemContainerStyle="{TemplateBinding ListBoxItemStyle}" MaxHeight="130" Style="{TemplateBinding ListBoxStyle}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" TabIndex="1">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel></VirtualizingStackPanel>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
