@@ -64,6 +64,8 @@ namespace Windows.UI.Xaml.Controls
 
         private bool _isTextChanging;
 
+        private Size _measuredSize;
+
         public TextBlock()
         {
             this.IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
@@ -372,18 +374,23 @@ namespace Windows.UI.Xaml.Controls
 
             if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
             {
+                _measuredSize = noWrapSize;
                 return noWrapSize;
             }
 
             Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
             TextSize = TextSize.Add(BorderThicknessSize);
 
+            _measuredSize = TextSize;
             return TextSize;
         }
 
 		protected override Size ArrangeOverride(Size finalSize)
 		{
-			return finalSize;
+            double w = Math.Max(_measuredSize.Width, finalSize.Width);
+            double h = Math.Max(_measuredSize.Height, finalSize.Height);
+
+            return new Size(w, h);
 		}
     }
 }

@@ -1217,8 +1217,17 @@ namespace Windows.UI.Xaml
 
             Size arrangedSize = ArrangeOverride(finalSize);
             
-            var w = Math.Max(0, Math.Min(finalSize.Width, arrangedSize.Width));
-            var h = Math.Max(0, Math.Min(finalSize.Height, arrangedSize.Height));
+            double w, h;
+            if (this is TextBlock)
+            {
+                w = Math.Max(0, arrangedSize.Width);
+                h = Math.Max(0, arrangedSize.Height);
+            }
+            else
+            {
+                w = Math.Max(0, Math.Min(finalSize.Width, arrangedSize.Width));
+                h = Math.Max(0, Math.Min(finalSize.Height, arrangedSize.Height));
+            }
             arrangedSize = new Size(w, h);
 
             arrangedSize = size.Combine(arrangedSize).Bounds(MinSize, MaxSize);

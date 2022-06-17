@@ -2558,9 +2558,6 @@ namespace Windows.UI.Xaml.Controls
                     UIElement[] childrens = Children.ToArray();
                     foreach (UIElement currentChild in childrens)
                     {
-                        Size childDesiredSize = currentChild.DesiredSize;
-                        innerRect.Width = Math.Max(innerRect.Width, childDesiredSize.Width);
-                        innerRect.Height = Math.Max(innerRect.Height, childDesiredSize.Height);
                         currentChild.Arrange(innerRect);
                     }
                 }

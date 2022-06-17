@@ -547,10 +547,14 @@ document.measureTextBlock = function(uid, textWrapping, padding, width, maxWidth
         var runElement = element.firstElementChild;
         if (runElement != null) {
             var child = elToMeasure;
-            while (child.hasChildNodes()) {
-                child = child.firstChild;
+            if (child.hasChildNodes()) {
+                while (child.hasChildNodes()) {
+                    child = child.firstChild;
+                }
+                runElement.innerHTML = child.parentElement.innerHTML.length == 0 ? 'A' : child.parentElement.innerHTML;
+            } else {
+                runElement.innerHTML = 'A';
             }
-            runElement.innerHTML = child.parentElement.innerHTML.length == 0 ? 'A' : child.parentElement.innerHTML;
         }
 
         element.style.fontSize = computedStyle.fontSize;
