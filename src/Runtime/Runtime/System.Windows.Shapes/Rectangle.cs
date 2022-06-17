@@ -14,6 +14,7 @@
 
 using CSHTML5.Internal;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 #if MIGRATION
@@ -106,19 +107,25 @@ namespace Windows.UI.Xaml.Shapes
                         outerStyle.paddingRight = strokeThickness * 2 + "px";
                     }
                 }
-                else if (Stroke == null)
+                else if (Stroke is LinearGradientBrush)
                 {
+                    var cssValues = ((LinearGradientBrush)Stroke).INTERNAL_ToHtmlString(this);
+                    var cssProps = new List<string>();
+                    cssProps.Add("border-color");
+                    foreach (object cssValue in cssValues)
+                    {
+                        INTERNAL_HtmlDomManager.SetDomElementStyleProperty(_innerDiv, cssProps, cssValue);
+                    }
+                }
+                else if (Stroke == null)
+                {                    
                     INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv).borderColor = "";
                     if (!this.IsUnderCustomLayout)
                     {
                         outerStyle.paddingBottom = "0px";
                         outerStyle.paddingRight = "0px";
                     }
-                }
-                else
-                {
-                    throw new NotSupportedException("The specified brush is not supported.");
-                }
+                }                
             }
         }
 
