@@ -15,6 +15,7 @@ using System;
 using System.Diagnostics;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -473,7 +474,7 @@ namespace Windows.UI.Xaml.Data
 #endif
 
                     if (convertedValue == DependencyProperty.UnsetValue)
-                        return;                    
+                        return;
                 }
 
                 node.SetValue(convertedValue);
@@ -498,6 +499,31 @@ namespace Windows.UI.Xaml.Data
             finally
             {
                 IsUpdating = oldIsUpdating;
+            }
+
+            if (ParentBinding.ValidatesOnNotifyDataErrors)
+            {
+                var notifyDataErrorInfo = BindingSource as INotifyDataErrorInfo;
+                if (notifyDataErrorInfo is null) // find parent node of the bound property
+                {
+                    var parentNode = _propertyPathWalker.FirstNode;
+                    var currentNode = _propertyPathWalker.FirstNode;
+                    while (currentNode != _propertyPathWalker.FinalNode)
+                    {
+                        parentNode = currentNode;
+                        currentNode = currentNode.Next;
+                    }
+
+                    notifyDataErrorInfo = parentNode.Value as INotifyDataErrorInfo;
+                }                
+
+                if (notifyDataErrorInfo?.HasErrors == true && _propertyPathWalker.FinalNode is StandardPropertyPathNode propertyNode)
+                {
+                    foreach (var error in notifyDataErrorInfo.GetErrors(propertyNode._propertyName))
+                    {
+                        Validation.MarkInvalid(this, new ValidationError(this) { ErrorContent = error.ToString() });
+                    }
+                }
             }
         }
 

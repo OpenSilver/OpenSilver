@@ -94,7 +94,7 @@ namespace Windows.UI.Xaml.Data
         private bool _validatesOnExceptions;
         private bool _notifyOnValidationError;
         private bool _bindsDirectlyToSource;
-        private bool _validatesOnNotifyDataErrors;
+        private bool _validatesOnNotifyDataErrors = true;
         private bool _validatesOnDataErrors;
 
         /// <summary>
@@ -370,7 +370,6 @@ namespace Windows.UI.Xaml.Data
         /// true if the binding engine will report System.ComponentModel.INotifyDataErrorInfo
         /// validation errors; otherwise, false. The default is true.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public bool ValidatesOnNotifyDataErrors
         {
             get { return _validatesOnNotifyDataErrors; }

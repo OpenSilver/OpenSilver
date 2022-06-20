@@ -29,7 +29,7 @@ namespace OpenSilver.Internal.Data
     internal class StandardPropertyPathNode : PropertyPathNode
     {
         private readonly Type _resolvedType;
-        private readonly string _propertyName;
+        internal readonly string _propertyName;
 
         private IPropertyChangedListener _dpListener;
         private DependencyProperty _dp;
