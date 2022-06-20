@@ -24,14 +24,12 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a single time format used for parsing and formatting.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public sealed class CustomTimeFormat : ITimeFormat
     {
         /// <summary>
         /// Gets or sets the custom format that is used to parse or display
         /// a String or DateTime.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public string Format { get; set; }
 
         /// <summary>
@@ -39,7 +37,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="format">The format that is used to parse or display
         /// a String or DateTime.</param>
-        [OpenSilver.NotImplemented]
         public CustomTimeFormat(string format)
         {
             Format = format;
@@ -48,7 +45,6 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomTimeFormat"/> class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public CustomTimeFormat()
         {
         }
@@ -60,7 +56,6 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// A format to use during display of a DateTime.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public string GetTimeDisplayFormat(CultureInfo culture)
         {
             return Format;
@@ -73,7 +68,6 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>
         /// An array of formats to be used during parsing.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public string[] GetTimeParseFormats(CultureInfo culture)
         {
             var formats = new List<string>(7) { Format };

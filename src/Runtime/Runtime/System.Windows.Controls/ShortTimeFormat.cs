@@ -23,7 +23,6 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents the short time format used for parsing and formatting.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public class ShortTimeFormat : ITimeFormat
     {
         public string GetTimeDisplayFormat(CultureInfo culture)

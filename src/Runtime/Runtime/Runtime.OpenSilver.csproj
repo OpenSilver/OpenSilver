@@ -315,7 +315,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarDateRange.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CustomTimeFormat.cs" />
+		<Compile Include="System.Windows.Controls\CustomTimeFormat.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\GridSplitter.cs" />
