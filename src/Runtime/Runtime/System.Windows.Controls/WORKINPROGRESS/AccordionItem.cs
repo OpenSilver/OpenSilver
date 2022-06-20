@@ -41,15 +41,18 @@ namespace Windows.UI.Xaml.Controls
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty AccordionButtonStyleProperty =
-            DependencyProperty.Register("AccordionButtonStyle", typeof(Style), typeof(AccordionItem), new PropertyMetadata());
+            DependencyProperty.Register(
+                nameof(AccordionButtonStyle),
+                typeof(Style),
+                typeof(AccordionItem),
+                new PropertyMetadata((object)null));
 
         [OpenSilver.NotImplemented]
         public Style AccordionButtonStyle 
         {
-            get { return (Style)GetValue(AccordionButtonStyleProperty); }
-            set { SetValue(AccordionButtonStyleProperty, value); }
+            get => (Style)GetValue(AccordionButtonStyleProperty);
+            set => SetValue(AccordionButtonStyleProperty, value);
         }
-
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty IsSelectedProperty = 

@@ -147,26 +147,18 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public int SelectedIndex
         {
-            get
-            {
-                return (int)GetValue(SelectedIndexProperty);
-            }
-            set
-            {
-                SetValue(SelectedIndexProperty, value);
-            }
+            get => (int)GetValue(SelectedIndexProperty);
+            set => SetValue(SelectedIndexProperty, value);
         }
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty SelectedIndexProperty = 
             DependencyProperty.Register(
-                "SelectedIndex", 
+                nameof(SelectedIndex), 
                 typeof(int), 
                 typeof(Accordion), 
-                new PropertyMetadata(-1, OnSelectedIndexPropertyChanged));
+                new PropertyMetadata(-1));
 
-        [OpenSilver.NotImplemented]
-        private static void OnSelectedIndexPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) { }
         #endregion
 
 

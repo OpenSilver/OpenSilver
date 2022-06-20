@@ -78,6 +78,21 @@ namespace Windows.UI.Xaml.Controls
             menuItem.Content = newHeader;
         }
 
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty HeaderTemplateProperty =
+            DependencyProperty.Register(
+                nameof(HeaderTemplate),
+                typeof(DataTemplate),
+                typeof(MenuItem),
+                new PropertyMetadata((object)null));
+
+        [OpenSilver.NotImplemented]
+        public DataTemplate HeaderTemplate
+        {
+            get { return (DataTemplate)GetValue(HeaderTemplateProperty); }
+            set { SetValue(HeaderTemplateProperty, value); }
+        }
+
 
         /*protected override void OnPointerPressed(Input.PointerRoutedEventArgs eventArgs)
         {
