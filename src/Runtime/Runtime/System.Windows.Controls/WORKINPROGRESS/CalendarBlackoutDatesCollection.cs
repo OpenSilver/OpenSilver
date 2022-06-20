@@ -34,7 +34,7 @@ namespace Windows.UI.Xaml.Controls
         public void AddDatesInPast() => Add(new CalendarDateRange(DateTime.MinValue, DateTime.Today.AddDays(-1)));
 
         [OpenSilver.NotImplemented]
-        public bool Contains(DateTime date) { return true; }
+        public bool Contains(DateTime date) { return false; }
 
         [OpenSilver.NotImplemented]
         public bool Contains(DateTime start, DateTime end) { return true; }
