@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Controls
         public bool Contains(DateTime date) { return false; }
 
         [OpenSilver.NotImplemented]
-        public bool Contains(DateTime start, DateTime end) { return true; }
+        public bool Contains(DateTime start, DateTime end) { return false; }
 
         [OpenSilver.NotImplemented]
         public bool ContainsAny(CalendarDateRange range) { return true; }
