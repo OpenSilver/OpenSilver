@@ -52,7 +52,18 @@ namespace Windows.UI.Xaml.Controls
 
 
         [OpenSilver.NotImplemented]
-        public bool IsSelected { get; set; }
+        public static readonly DependencyProperty IsSelectedProperty = 
+            DependencyProperty.Register(
+                nameof(IsSelected),
+                typeof(bool),
+                typeof(AccordionItem),
+                new PropertyMetadata(false));
+                     
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
+        }
 
         /// <summary>
         /// Occurs when the accordionItem is selected.
