@@ -14,11 +14,20 @@
 
 using System;
 using System.Globalization;
-using System.Windows.Automation.Peers;
+
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Interop;
+using Windows.UI.Xaml.Media;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -275,10 +284,19 @@ namespace Windows.UI.Xaml.Controls
                 {
                     this.PopupChild.GotFocus -= new RoutedEventHandler(this.PopupChildGotFocus);
                     this.PopupChild.LostFocus -= new RoutedEventHandler(this.PopupChildLostFocus);
-                    this.PopupChild.MouseEnter -= new MouseEventHandler(this.PopupChildMouseEnter);
-                    this.PopupChild.MouseLeave -= new MouseEventHandler(this.PopupChildMouseLeave);
+#if MIGRATION
+                    this.PopupChild.MouseEnter -= this.PopupChildMouseEnter;
+                    this.PopupChild.MouseLeave -= this.PopupChildMouseLeave;
+#else
+                    this.PopupChild.PointerEntered -= this.PopupChildMouseEnter;
+                    this.PopupChild.PointerExited -= this.PopupChildMouseLeave;
+#endif
                     this.PopupChild.SizeChanged -= new SizeChangedEventHandler(this.PopupChildSizeChanged);
-                    this._outsidePopupCanvas.MouseLeftButtonDown -= new MouseButtonEventHandler(this.OutsidePopupMouseLeftButtonDown);
+#if MIGRATION
+                    this._outsidePopupCanvas.MouseLeftButtonDown -= this.OutsidePopupMouseLeftButtonDown;
+#else
+                    this._outsidePopupCanvas.PointerPressed -= this.OutsidePopupMouseLeftButtonDown;
+#endif
                 }
                 this._popupChild = value;
                 if (this._popupChild == null)
@@ -291,10 +309,21 @@ namespace Windows.UI.Xaml.Controls
                 this._popupChildCanvas.Children.Add((UIElement)this.PopupChild);
                 this.PopupChild.GotFocus += new RoutedEventHandler(this.PopupChildGotFocus);
                 this.PopupChild.LostFocus += new RoutedEventHandler(this.PopupChildLostFocus);
-                this.PopupChild.MouseEnter += new MouseEventHandler(this.PopupChildMouseEnter);
-                this.PopupChild.MouseLeave += new MouseEventHandler(this.PopupChildMouseLeave);
+#if MIGRATION
+                this.PopupChild.MouseEnter += this.PopupChildMouseEnter;
+                this.PopupChild.MouseLeave += this.PopupChildMouseLeave;
+#else
+                this.PopupChild.PointerEntered += this.PopupChildMouseEnter;
+                this.PopupChild.PointerExited += this.PopupChildMouseLeave;
+#endif
+
                 this.PopupChild.SizeChanged += new SizeChangedEventHandler(this.PopupChildSizeChanged);
+
+#if MIGRATION
                 this._outsidePopupCanvas.MouseLeftButtonDown += new MouseButtonEventHandler(this.OutsidePopupMouseLeftButtonDown);
+#else
+                this._outsidePopupCanvas.PointerPressed += this.OutsidePopupMouseLeftButtonDown;
+#endif
             }
         }
 
@@ -341,8 +370,13 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the Picker control when a new template is
         /// applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             base.OnApplyTemplate();
             VisualStateGroup visualStateGroup1 = VisualStates.TryGetVisualStateGroup((DependencyObject)this, "PopupStates");
             if (null != visualStateGroup1)
@@ -517,7 +551,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>The mouse has clicked outside of the popup.</summary>
         /// <param name="sender">The source object.</param>
         /// <param name="e">The event data.</param>
-        private void OutsidePopupMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void OutsidePopupMouseLeftButtonDown(object sender,
+#if MIGRATION
+            MouseButtonEventArgs e)
+#else
+            PointerRoutedEventArgs e)
+#endif
         {
             this.IsDropDownOpen = false;
         }
@@ -562,7 +601,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>The popup child has had the mouse enter its bounds.</summary>
         /// <param name="sender">The source object.</param>
         /// <param name="e">The event data.</param>
-        private void PopupChildMouseEnter(object sender, MouseEventArgs e)
+        private void PopupChildMouseEnter(object sender,
+#if MIGRATION
+            MouseEventArgs e)
+#else
+            PointerRoutedEventArgs e)
+#endif
         {
             this.UpdateVisualState(true);
         }
@@ -570,7 +614,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>The mouse has left the popup child's bounds.</summary>
         /// <param name="sender">The source object.</param>
         /// <param name="e">The event data.</param>
-        private void PopupChildMouseLeave(object sender, MouseEventArgs e)
+        private void PopupChildMouseLeave(object sender,
+#if MIGRATION
+            MouseEventArgs e)
+#else
+            PointerRoutedEventArgs e)
+#endif
         {
             if (this.PopupButtonMode == ClickMode.Hover)
                 this.IsDropDownOpen = false;
@@ -682,42 +731,77 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>Provides handling for the MouseEnter event.</summary>
         /// <param name="e">The data for the event.</param>
+#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs e)
+#endif
         {
             if (!this.Interaction.AllowMouseEnter(e))
                 return;
             this.Interaction.OnMouseEnterBase();
+#if MIGRATION
             base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
         }
 
         /// <summary>Provides handling for the MouseLeave event.</summary>
         /// <param name="e">The data for the event.</param>
+#if MIGRATION
         protected internal override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected internal override void OnPointerExited(PointerRoutedEventArgs e)
+#endif
+
         {
             if (!this.Interaction.AllowMouseLeave(e))
                 return;
             this.Interaction.OnMouseLeaveBase();
+
+#if MIGRATION
             base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
         }
 
         /// <summary>Called before the MouseLeftButtonUp event occurs.</summary>
         /// <param name="e">The data for the event.</param>
+#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
         {
             if (!this.Interaction.AllowMouseLeftButtonUp(e))
                 return;
             this.Interaction.OnMouseLeftButtonUpBase();
+
+#if MIGRATION
             base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
         }
 
         /// <summary>Called before the MouseLeftButtonDown event occurs.</summary>
         /// <param name="e">The data for the event.</param>
+#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
         {
             if (!this.Interaction.AllowMouseLeftButtonDown(e))
                 return;
             this.Interaction.OnMouseLeftButtonDownBase();
-            base.OnMouseLeftButtonDown(e);
+#if MIGRATION
+                base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
         }
 
         void IUpdateVisualState.UpdateVisualState(bool useTransitions)

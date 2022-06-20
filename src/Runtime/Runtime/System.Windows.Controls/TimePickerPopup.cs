@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Automation.Peers;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -631,8 +630,13 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the TimePickerPopup control when a new
         /// template is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             base.OnApplyTemplate();
             this.UpdateVisualState(false);
         }

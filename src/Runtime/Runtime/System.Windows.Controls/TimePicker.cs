@@ -17,8 +17,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Automation.Peers;
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
+#else 
+using Windows.UI.Xaml.Controls.Primitives;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -43,7 +47,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(GroupName = "CommonStates", Name = "Pressed")]
     [TemplateVisualState(GroupName = "CommonStates", Name = "Disabled")]
     [TemplateVisualState(GroupName = "FocusStates", Name = "Focused")]
-    [TemplatePart(Name = "Popup", Type = typeof(System.Windows.Controls.Primitives.Popup))]
+    [TemplatePart(Name = "Popup", Type = typeof(Popup))]
     [TemplatePart(Name = "DropDownToggle", Type = typeof(ToggleButton))]
     [TemplatePart(Name = "PopupPlaceHolder", Type = typeof(ContentControl))]
     [StyleTypedProperty(Property = "TimeUpDownStyle", StyleTargetType = typeof(TimeUpDown))]
@@ -780,7 +784,11 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the TimePicker control when a new
         /// template is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
             this.TimeUpDownPart = this.GetTemplateChild("TimeUpDown") as TimeUpDown;

@@ -18,16 +18,17 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Automation;
-using System.Windows.Automation.Peers;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 #else
+using Windows.System;
+using Windows.Foundation;
 using Windows.UI.Xaml.Controls.Primitives;
  using Windows.UI.Xaml.Input;
+ using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -650,12 +651,24 @@ namespace Windows.UI.Xaml.Controls
             set
             {
                 if (this._timeHintPopupPart != null && this._timeHintPopupPart.Child != null)
-                    this._timeHintPopupPart.Child.MouseLeftButtonDown -= new MouseButtonEventHandler(this.OnTimeHintMouseLeftButtonDown);
+                {
+#if MIGRATION
+                    this._timeHintPopupPart.Child.MouseLeftButtonDown -= this.OnTimeHintMouseLeftButtonDown;
+#else
+                    this._timeHintPopupPart.Child.PointerPressed -= this.OnTimeHintMouseLeftButtonDown;
+#endif
+                }
                 this._timeHintPopupPart = value;
                 if (this._timeHintPopupPart == null)
                     return;
                 if (this._timeHintPopupPart.Child != null)
-                    this._timeHintPopupPart.Child.MouseLeftButtonDown += new MouseButtonEventHandler(this.OnTimeHintMouseLeftButtonDown);
+                {
+#if MIGRATION
+                    this._timeHintPopupPart.Child.MouseLeftButtonDown += this.OnTimeHintMouseLeftButtonDown;
+#else
+                    this._timeHintPopupPart.Child.PointerPressed += this.OnTimeHintMouseLeftButtonDown;
+#endif
+                }
                 this.Dispatcher.BeginInvoke((Action)(() => this._timeHintPopupPart.IsOpen = true));
             }
         }
@@ -1462,7 +1475,12 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="T:System.Windows.Input.MouseButtonEventArgs" />
         /// instance containing the event data.</param>
-        private void OnTimeHintMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void OnTimeHintMouseLeftButtonDown(object sender,
+#if MIGRATION
+            MouseButtonEventArgs e)
+#else
+            PointerRoutedEventArgs e)
+#endif
         {
             this.IsShowTimeHint = false;
             this.ApplyValue(this._timeHintDate);
@@ -1471,7 +1489,11 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>Provides handling for the KeyDown event.</summary>
         /// <param name="e">Key event args.</param>
         /// <remarks>Only support up and down arrow keys.</remarks>
+#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
+#else
+        protected override void OnKeyDown(KeyRoutedEventArgs e)
+#endif
         {
             if (!this.IsEditable)
             {
@@ -1479,6 +1501,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
+#if MIGRATION
                 if (this.Text.Text != this._lastParsedText && (e.Key == Key.Up || e.Key == Key.Down))
                 {
                     int selectionStart = this.Text.SelectionStart;
@@ -1493,6 +1516,22 @@ namespace Windows.UI.Xaml.Controls
                             this.OnDecrement();
                     }
                 }
+#else
+                if (this.Text.Text != this._lastParsedText && (e.Key == VirtualKey.Up || e.Key == VirtualKey.Down))
+                {
+                    int selectionStart = this.Text.SelectionStart;
+                    this.ApplyValue(this.Text.Text);
+                    e.Handled = true;
+                    if (selectionStart >= 0 && selectionStart < this.Text.Text.Length)
+                    {
+                        this.Text.SelectionStart = selectionStart;
+                        if (e.Key == VirtualKey.Up)
+                            this.OnIncrement();
+                        else
+                            this.OnDecrement();
+                    }
+                }
+#endif
                 base.OnKeyDown(e);
             }
         }
@@ -1532,41 +1571,65 @@ namespace Windows.UI.Xaml.Controls
             if (!this.Interaction.AllowMouseEnter(e))
                 return;
             this.Interaction.OnMouseEnterBase();
+#if MIGRATION
             base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
         }
 
         /// <summary>Provides handling for the MouseLeave event.</summary>
         /// <param name="e">The data for the event.</param>
 #if MIGRATION
         protected internal override void OnMouseLeave(MouseEventArgs e)
-#else 
+#else
         protected internal virtual void OnPointerExited(PointerRoutedEventArgs e)
 #endif
         {
             if (!this.Interaction.AllowMouseLeave(e))
                 return;
             this.Interaction.OnMouseLeaveBase();
+#if MIGRATION
             base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
         }
 
         /// <summary>Provides handling for the MouseLeftButtonDown event.</summary>
         /// <param name="e">The data for the event.</param>
+#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
         {
             if (!this.Interaction.AllowMouseLeftButtonDown(e))
                 return;
             this.Interaction.OnMouseLeftButtonDownBase();
-            base.OnMouseLeave((MouseEventArgs)e);
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
         }
 
         /// <summary>Called before the MouseLeftButtonUp event occurs.</summary>
         /// <param name="e">The data for the event.</param>
+#if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
         {
             if (!this.Interaction.AllowMouseLeftButtonUp(e))
                 return;
             this.Interaction.OnMouseLeftButtonUpBase();
+#if MIGRATION
             base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
         }
 
         /// <summary>Selects all text.</summary>

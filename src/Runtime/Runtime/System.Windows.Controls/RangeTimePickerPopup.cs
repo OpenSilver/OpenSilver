@@ -12,12 +12,16 @@
 \*====================================================================================*/
 
 #if MIGRATION
-using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
 namespace System.Windows.Controls
 #else
+using System;
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+
 namespace Windows.UI.Xaml.Controls
 #endif
 {
@@ -99,14 +103,14 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (this._secondsSlider != null)
                 {
-                    this._secondsSlider.ValueChanged -= new RoutedPropertyChangedEventHandler<double>(this.SecondsChanged);
-                    this._secondsSlider.SizeChanged -= new SizeChangedEventHandler(this.SliderSizeChange);
+                    this._secondsSlider.ValueChanged -= this.SecondsChanged;
+                    this._secondsSlider.SizeChanged -= this.SliderSizeChange;
                 }
                 this._secondsSlider = value;
                 if (this._secondsSlider == null)
                     return;
-                this._secondsSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(this.SecondsChanged);
-                this._secondsSlider.SizeChanged += new SizeChangedEventHandler(this.SliderSizeChange);
+                this._secondsSlider.ValueChanged += this.SecondsChanged;
+                this._secondsSlider.SizeChanged += this.SliderSizeChange;
             }
         }
 
@@ -121,14 +125,14 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (this._minutesSlider != null)
                 {
-                    this._minutesSlider.ValueChanged -= new RoutedPropertyChangedEventHandler<double>(this.MinutesChanged);
-                    this._minutesSlider.SizeChanged -= new SizeChangedEventHandler(this.SliderSizeChange);
+                    this._minutesSlider.ValueChanged -= this.MinutesChanged;
+                    this._minutesSlider.SizeChanged -= this.SliderSizeChange;
                 }
                 this._minutesSlider = value;
                 if (this._minutesSlider == null)
                     return;
-                this._minutesSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(this.MinutesChanged);
-                this._minutesSlider.SizeChanged += new SizeChangedEventHandler(this.SliderSizeChange);
+                this._minutesSlider.ValueChanged += this.MinutesChanged;
+                this._minutesSlider.SizeChanged += this.SliderSizeChange;
             }
         }
 
@@ -143,14 +147,14 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (this._hoursSlider != null)
                 {
-                    this._hoursSlider.ValueChanged -= new RoutedPropertyChangedEventHandler<double>(this.HoursChanged);
-                    this._hoursSlider.SizeChanged -= new SizeChangedEventHandler(this.SliderSizeChange);
+                    this._hoursSlider.ValueChanged -= this.HoursChanged;
+                    this._hoursSlider.SizeChanged -= this.SliderSizeChange;
                 }
                 this._hoursSlider = value;
                 if (this._hoursSlider == null)
                     return;
-                this._hoursSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(this.HoursChanged);
-                this._hoursSlider.SizeChanged += new SizeChangedEventHandler(this.SliderSizeChange);
+                this._hoursSlider.ValueChanged += this.HoursChanged;
+                this._hoursSlider.SizeChanged += this.SliderSizeChange;
             }
         }
 
@@ -278,8 +282,13 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the RangeTimePickerPopup control when a
         /// new template is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             base.OnApplyTemplate();
             this.HoursSlider = this.GetTemplateChild("HoursSlider") as RangeBase;
             this.MinutesSlider = this.GetTemplateChild("MinutesSlider") as RangeBase;
@@ -304,7 +313,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>Reacts to a change in the Seconds Slider.</summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
-        private void SecondsChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void SecondsChanged(object sender,
+#if MIGRATION
+            RoutedPropertyChangedEventArgs<double> e)
+#else
+            RangeBaseValueChangedEventArgs e)
+#endif
         {
             if (this._ignoreSliderChange)
                 return;
@@ -318,7 +332,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>Reacts to a change in the Minutes Slider.</summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
-        private void MinutesChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void MinutesChanged(object sender,
+#if MIGRATION
+            RoutedPropertyChangedEventArgs<double> e)
+#else
+            RangeBaseValueChangedEventArgs e)
+#endif
         {
             if (this._ignoreSliderChange)
                 return;
@@ -332,7 +351,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>Reacts to a change in the Hours Slider.</summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
-        private void HoursChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void HoursChanged(object sender,
+#if MIGRATION
+            RoutedPropertyChangedEventArgs<double> e)
+#else
+            RangeBaseValueChangedEventArgs e)
+#endif
         {
             if (this._ignoreSliderChange)
                 return;

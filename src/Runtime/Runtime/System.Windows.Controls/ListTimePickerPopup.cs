@@ -18,10 +18,16 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Automation;
-using System.Windows.Automation.Peers;
+
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+#else
+using Windows.System;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -84,12 +90,21 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (this._listBoxPart != null)
                 {
-                    this._listBoxPart.MouseLeftButtonUp -= new MouseButtonEventHandler(this.ItemSelectedByMouse);
+#if MIGRATION
+                    this._listBoxPart.MouseLeftButtonUp -= this.ItemSelectedByMouse;
+#else
+                    this._listBoxPart.PointerReleased -= this.ItemSelectedByMouse;
+#endif
                 }
                 this._listBoxPart = value;
                 if (this._listBoxPart == null)
                     return;
-                this._listBoxPart.MouseLeftButtonUp += new MouseButtonEventHandler(this.ItemSelectedByMouse);
+
+#if MIGRATION
+                this._listBoxPart.MouseLeftButtonUp += this.ItemSelectedByMouse;
+#else
+                this._listBoxPart.PointerReleased += this.ItemSelectedByMouse;
+#endif
             }
         }
 
@@ -196,8 +211,13 @@ namespace Windows.UI.Xaml.Controls
         /// Builds the visual tree for the ListTimePickerPopup control when a new
         /// template is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
         {
+#else
+        protected override void OnApplyTemplate()
+        {
+#endif
             base.OnApplyTemplate();
             this.ListBoxPart = this.GetTemplateChild("ListBox") as ListBox;
         }
@@ -437,7 +457,12 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="T:System.Windows.Input.MouseButtonEventArgs" /> instance containing the event data.</param>
-        private void ItemSelectedByMouse(object sender, MouseButtonEventArgs e)
+        private void ItemSelectedByMouse(object sender,
+#if MIGRATION
+            MouseButtonEventArgs e)
+#else
+            PointerRoutedEventArgs e)
+#endif
         {
             if (this.TimePickerParent != null)
             {
@@ -469,9 +494,14 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>Provides handling for the KeyDown event.</summary>
         /// <param name="e">The data for the event.</param>
+#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
+#else
+        protected override void OnKeyDown(KeyRoutedEventArgs e)
+#endif
         {
             base.OnKeyDown(e);
+#if MIGRATION
             switch (e.Key)
             {
                 case Key.Enter:
@@ -481,6 +511,17 @@ namespace Windows.UI.Xaml.Controls
                     this.DoCancel();
                     break;
             }
+#else
+            switch (e.Key)
+            {
+                case VirtualKey.Enter:
+                    this.DoCommit();
+                    break;
+                case VirtualKey.Escape:
+                    this.DoCancel();
+                    break;
+            }
+#endif
         }
 
         /// <summary>Gets the valid popup time selection modes.</summary>
