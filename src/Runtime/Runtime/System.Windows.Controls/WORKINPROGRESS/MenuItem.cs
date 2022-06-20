@@ -18,6 +18,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(MenuItem),
                 new PropertyMetadata());
 
+        [OpenSilver.NotImplemented]
         public DataTemplate HeaderTemplate
         {
             get { return (DataTemplate)GetValue(HeaderTemplateProperty); }
