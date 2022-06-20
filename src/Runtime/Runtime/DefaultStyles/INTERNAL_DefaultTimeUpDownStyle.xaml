@@ -176,13 +176,14 @@
                             </Border>
                         </Popup>
                         <ButtonSpinner x:Name="Spinner" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" HorizontalContentAlignment="Stretch" IsTabStop="False" MinWidth="35" Padding="{TemplateBinding Padding}" Style="{TemplateBinding SpinnerStyle}" VerticalContentAlignment="Stretch">
-                            <TextBox x:Name="Text" AcceptsReturn="False" BorderThickness="0" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}" FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" MinWidth="20" TextAlignment="Right" TextWrapping="NoWrap" Text="{TemplateBinding Value}">
+                            <TextBox x:Name="Text" AcceptsReturn="False" BorderThickness="0" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}" FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" MinWidth="20" TextAlignment="Right" TextWrapping="NoWrap" Text="{TemplateBinding Value}"
+                                     VerticalAlignment="Center" VerticalContentAlignment="Center">
                                 <TextBox.Style>
                                     <Style TargetType="TextBox">
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="TextBox">
-                                                    <ScrollViewer x:Name="ContentElement" BorderThickness="0" Padding="0" VerticalScrollBarVisibility="Auto"/>
+                                                    <ScrollViewer x:Name="ContentElement" BorderThickness="0" Padding="0" VerticalScrollBarVisibility="Hidden"/>
                                                 </ControlTemplate>
                                             </Setter.Value>
                                         </Setter>

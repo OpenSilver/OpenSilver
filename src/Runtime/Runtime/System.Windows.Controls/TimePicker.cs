@@ -771,6 +771,9 @@ namespace Windows.UI.Xaml.Controls
         {
             this.DefaultStyleKey = (object)typeof(TimePicker);
             this._timeCoercionHelper = new TimeCoercionHelper((ITimeInput)this);
+
+            // We would want to show popup even if text-box is focused
+            PopupButtonMode = ClickMode.Press;
         }
 
         /// <summary>

@@ -209,37 +209,17 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnValueChanged(RoutedPropertyChangedEventArgs<DateTime?> e)
         {
             base.OnValueChanged(e);
-            DateTime? nullable;
-            int num;
-            if (e.OldValue.HasValue)
+
+            if (this.TimeItemsSelection.Items.Count == 0)
             {
-                nullable = e.NewValue;
-                if (nullable.HasValue)
-                {
-                    nullable = e.OldValue;
-                    DateTime date1 = nullable.Value.Date;
-                    nullable = e.NewValue;
-                    DateTime date2 = nullable.Value.Date;
-                    if (date1 != date2)
-                    {
-                        num = 0;
-                        goto label_8;
-                    }
-                }
-            }
-            nullable = e.OldValue;
-            if (!nullable.HasValue)
-            {
-                nullable = e.NewValue;
-                num = !nullable.HasValue ? 1 : 0;
-            }
-            else
-                num = 1;
-            label_8:
-            if (num == 0)
                 this.RegenerateTimeItems();
+            }
+
             if (this.TimePickerParent != null || this._isValueChangeCausedBySelection)
+            {
                 return;
+            }
+
             this.SelectValue();
             this.ScrollToSelectedValue();
         }
@@ -442,7 +422,12 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnOpened();
             this.UpdateLayout();
-            this.RegenerateTimeItems();
+
+            if (TimeItemsSelection.Items.Count == 0)
+            {
+                this.RegenerateTimeItems();
+            }
+
             this.SelectValue();
             this.ScrollToSelectedValue();
         }
