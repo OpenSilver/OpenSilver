@@ -14,18 +14,33 @@ namespace Windows.UI.Xaml.Controls
 {
 	public partial class TextBlock : Control
 	{
-		//
-		// Summary:
-		//     Gets or sets a value that indicates how a line box is determined for each line
-		//     of text in the System.Windows.Controls.TextBlock.
-		//
-		// Returns:
-		//     A value that indicates how a line box is determined for each line of text in
-		//     the System.Windows.Controls.TextBlock. The default is System.Windows.LineStackingStrategy.MaxHeight.
-        [OpenSilver.NotImplemented]
-		public LineStackingStrategy LineStackingStrategy { get; set; }
+		/// <summary>
+		/// Identifies the <see cref="LineStackingStrategy"/> dependency property.
+		/// </summary>
+		[OpenSilver.NotImplemented]
+		public static readonly DependencyProperty LineStackingStrategyProperty =
+			DependencyProperty.Register(
+				nameof(LineStackingStrategy),
+				typeof(LineStackingStrategy),
+				typeof(TextBlock),
+				new PropertyMetadata(LineStackingStrategy.MaxHeight));
 
-        [OpenSilver.NotImplemented]
+		/// <summary>
+		/// Gets or sets a value that indicates how a line box is determined for each line
+		/// of text in the <see cref="TextBlock"/>.
+		/// </summary>
+		/// <returns>
+		/// A value that indicates how a line box is determined for each line of text in
+		/// the <see cref="TextBlock"/>. The default is <see cref="LineStackingStrategy.MaxHeight"/>.
+		/// </returns>
+		[OpenSilver.NotImplemented]
+		public LineStackingStrategy LineStackingStrategy
+		{
+			get { return (LineStackingStrategy)GetValue(LineStackingStrategyProperty); }
+			set { SetValue(LineStackingStrategyProperty, value); }
+		}
+
+		[OpenSilver.NotImplemented]
 		public double BaselineOffset { get; private set; }
 
         [OpenSilver.NotImplemented]

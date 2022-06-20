@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,18 +11,20 @@
 *  
 \*====================================================================================*/
 
+using System;
 
-namespace System.IO.IsolatedStorage
+#if MIGRATION
+namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
-    public sealed partial class IsolatedStorageSettings
+    /// <summary>
+    /// An exception that is thrown by the layout cycle.
+    /// </summary>
+    [OpenSilver.NotImplemented]
+    public class LayoutCycleException : Exception
     {
-        [OpenSilver.NotImplemented]
-        public static IsolatedStorageSettings SiteSettings { get; }
-
-        [OpenSilver.NotImplemented]
-        public void Save()
-        {
-
-        }
+        internal LayoutCycleException() { }
     }
 }

@@ -21,6 +21,7 @@ using System.Net;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -30,7 +31,6 @@ namespace System
 {
     public partial class Settings
     {
-
         public Settings()
         {
             // Default values:
@@ -54,8 +54,6 @@ namespace System
         /// </summary>
         /// <remarks>Should probably be removed once we get the ResizeObserver fully working.</remarks>
         public bool UseResizeSensor { get; set; }
-
-
 
         public bool EnableInteropLogging
         {
@@ -120,9 +118,13 @@ namespace System
             set { Window.Current.INTERNAL_PositionsWatcher.INTERNAL_WatchInterval = value; }
         }
 
-        [OpenSilver.NotImplemented]
-        public bool EnableAutoZoom { get; set; }
-
+        /// <summary>
+        /// Gets a value that indicates whether the Silverlight plug-in displays as a windowless
+        /// plug-in. (Applies to Windows versions of Silverlight only.)
+        /// </summary>
+        /// <returns>
+        /// true if the Silverlight plug-in displays as a windowless plug-in; otherwise, false.
+        /// </returns>
         public bool Windowless { get; internal set; }
 
         /// <summary>
@@ -131,5 +133,81 @@ namespace System
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsRunningOutOfBrowser { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the Silverlight plug-in will resize
+        /// its content based on the current browser zoom setting.
+        /// </summary>
+        /// <returns>
+        /// true if Silverlight responds to the browser zoom setting; otherwise, false. The
+        /// default is true if there is no handler for the <see cref="Content.Zoomed"/>
+        /// event; otherwise, the default is false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool EnableAutoZoom { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether to use a non-production analysis
+        /// visualization mode, which shows areas of a page that are not being GPU accelerated
+        /// with a colored overlay. Do not use in production code.
+        /// </summary>
+        /// <returns>
+        /// true if cache visualization is enabled; otherwise, false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool EnableCacheVisualization { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether to display the current frame rate
+        /// in the hosting browser's status bar. (Microsoft Internet Explorer only.)
+        /// </summary>
+        /// <returns>
+        /// true if the frames-per-second (fps) of the current rendered Silverlight content
+        /// will be displayed in the hosting browser's status bar; otherwise, false. The
+        /// default is false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool EnableFrameRateCounter { get; set; }
+        
+        /// <summary>
+        /// Gets a value that indicates whether to use graphics processor unit (GPU) hardware
+        /// acceleration for cached compositions, which potentially results in graphics optimization.
+        /// </summary>
+        /// <returns>
+        /// true if hardware acceleration is enabled; otherwise, false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool EnableGPUAcceleration { get; }
+        
+        /// <summary>
+        /// Gets a value that indicates whether the Silverlight plug-in allows hosted content
+        /// or its runtime to access the HTML DOM.
+        /// </summary>
+        /// <returns>
+        /// true if hosted content can access the browser DOM; otherwise, false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool EnableHTMLAccess { get; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether to show the areas of the Silverlight
+        /// plug-in that are being redrawn each frame.
+        /// </summary>
+        /// <returns>
+        /// true if the areas of the plug-in that are being redrawn each frame are shown;
+        /// otherwise, false.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public bool EnableRedrawRegions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of frames to render per second.
+        /// </summary>
+        /// <returns>
+        /// An integer value that specifies the maximum number of frames to render per second.
+        /// The default value is 60.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public int MaxFrameRate { get; set; }
     }
 }
