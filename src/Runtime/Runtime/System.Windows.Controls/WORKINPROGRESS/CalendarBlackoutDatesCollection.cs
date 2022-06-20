@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml.Controls
         public bool Contains(DateTime start, DateTime end) { return false; }
 
         [OpenSilver.NotImplemented]
-        public bool ContainsAny(CalendarDateRange range) { return true; }
+        public bool ContainsAny(CalendarDateRange range) { return false; }
 
         [OpenSilver.NotImplemented]
         protected override void ClearItems() { }
