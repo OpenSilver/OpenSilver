@@ -140,7 +140,7 @@ namespace System
         public bool EnableFrameRateCounter { get; set; }
 
         [OpenSilver.NotImplemented]
-        public bool EnableGPUAcceleration { get; set; }
+        public bool EnableGPUAcceleration { get;  }
 
         [OpenSilver.NotImplemented]
         public bool EnableHTMLAccess { get; set; }
