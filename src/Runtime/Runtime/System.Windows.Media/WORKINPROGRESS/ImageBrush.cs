@@ -2,7 +2,7 @@ using System.Windows;
 using System;
 using System.Collections.Generic;
 using CSHTML5.Internal;
-
+using OpenSilver.Internal;
 #if MIGRATION
 using System.Windows.Media.Imaging;
 namespace System.Windows.Media
@@ -53,17 +53,17 @@ namespace Windows.UI.Xaml.Media
                         Uri sourceUri = null;
                         sourceUri = ((BitmapImage)ImageSource).UriSource;
                         string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, parent as UIElement);
-                        returnValues.Add("url('" + html5Path + "')");
+                        returnValues.Add($"linear-gradient(to right,rgba(255,255,255,{(1.0 - this.Opacity).ToInvariantString()}) 0 100%),url('" + html5Path + "')");
                     }
                     else if (sourceAsBitmapImage.INTERNAL_StreamSource != null)
                     {
                         string dataUrl = "data:image/png;base64," + sourceAsBitmapImage.INTERNAL_StreamAsBase64String;
-                        returnValues.Add("url(" + dataUrl + ")");
+                        returnValues.Add($"linear-gradient(to right,rgba(255,255,255,{(1.0 - this.Opacity).ToInvariantString()}) 0 100%),url(" + dataUrl + ")");
                     }
                     else if (!string.IsNullOrEmpty(sourceAsBitmapImage.INTERNAL_DataURL))
                     {
                         string dataUrl = sourceAsBitmapImage.INTERNAL_DataURL;
-                        returnValues.Add("url(" + dataUrl + ")");
+                        returnValues.Add($"linear-gradient(to right,rgba(255,255,255,{(1.0 - this.Opacity).ToInvariantString()}) 0 100%),url(" + dataUrl + ")");
                     }
                 }
             }

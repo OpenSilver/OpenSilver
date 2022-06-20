@@ -280,8 +280,7 @@ namespace Windows.UI.Xaml.Controls
             string domUid = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
             string backProperties = $"e.style.backgroundSize = \"{cssSize}\";" +
                 "e.style.backgroundRepeat = \"no-repeat\";" +
-                "e.style.backgroundPosition = \"center center\";" +
-                $"e.style.opacity = {imageBrush.Opacity.ToInvariantString()};";
+                "e.style.backgroundPosition = \"center center\";";                
 
             string javaScriptCodeToExecute = $"var e = document.getElementById(\"{domUid}\");if (e) {{ {backProperties} }};";
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
