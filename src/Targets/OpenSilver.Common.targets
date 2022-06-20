@@ -694,4 +694,38 @@
       Importance="normal"/>
   </Target>
 
+  <!--============================================================
+  INCLUDE ADDITIONAL METADATA ATTRIBUTES
+  ============================================================-->
+  <Target Name="SetSourceRevisionId"
+          BeforeTargets="InitializeSourceControlInformation"
+          Condition="'$(EnableAdditionalMetadataAttributes)'=='True' And ('$(IsSecondPass)'=='True' Or '$(IsBrowserProject)'=='True')">
+      <Exec Command="git describe --long --always --dirty --exclude=* --abbrev=8"
+            ConsoleToMSBuild="True" IgnoreExitCode="True" StandardOutputImportance="Low" StandardErrorImportance="Low">
+          <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput"/>
+      </Exec>
+  </Target>
+
+  <Target Name="CustomAssemblyAttributes"
+          BeforeTargets="GetAssemblyAttributes"
+          DependsOnTargets="InitializeSourceControlInformation"
+          Condition="'$(EnableAdditionalMetadataAttributes)'=='True' And ('$(IsSecondPass)'=='True' Or '$(IsBrowserProject)'=='True')">
+      <ItemGroup>
+
+          <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(SourceRevisionId)' != ''">
+              <_Parameter1>SourceRevisionId</_Parameter1>
+              <_Parameter2>$(SourceRevisionId)</_Parameter2>
+          </AssemblyAttribute>
+
+          <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+              <_Parameter1>BuildDate</_Parameter1>
+              <_Parameter2>$([System.DateTime]::Now.ToString("u"))</_Parameter2>
+          </AssemblyAttribute>
+
+          <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+              <_Parameter1>MachineName</_Parameter1>
+              <_Parameter2>$([System.Environment]::MachineName)</_Parameter2>
+          </AssemblyAttribute>
+      </ItemGroup>
+  </Target>
 </Project>
