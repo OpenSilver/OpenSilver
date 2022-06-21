@@ -26,6 +26,7 @@ namespace TestApplication
             Tests.Add(new Test("PopupZIndex", "PopupZIndex"));
             Tests.Add(new Test("Viewbox", "Viewbox"));
             Tests.Add(new Test("Frame", "Frame")); //TODO: fix it
+            Tests.Add(new Test("InkPresenter", "InkPresenter"));
 
             TestCategory events = new TestCategory("Events");
             events.Add(new Test("Grid with multiple elements", "Events/GridWithMultipleElements"));
