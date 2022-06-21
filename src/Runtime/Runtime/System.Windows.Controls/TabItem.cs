@@ -615,7 +615,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 // We need this for when the TabControl/TabItem is not in the
                 // visual tree yet.
-                TabControl tabCtrl = INTERNAL_VisualParent as TabControl;//Parent as TabControl;
+                TabControl tabCtrl = Parent as TabControl;
                 if (tabCtrl != null)
                 {
                     return tabCtrl;
@@ -624,7 +624,7 @@ namespace Windows.UI.Xaml.Controls
                 // Once the TabControl is added to the visual tree, the
                 // TabItem's parent becomes the TabPanel, so we now have to step
                 // up the visual tree to find the owning TabControl.
-                DependencyObject obj = this as DependencyObject;
+                DependencyObject obj = this;
                 while (obj != null)
                 {
                     TabControl tc = obj as TabControl;
@@ -632,7 +632,7 @@ namespace Windows.UI.Xaml.Controls
                     {
                         return tc;
                     }
-                    obj = ((UIElement)obj).INTERNAL_VisualParent; //VisualTreeHelper.GetParent(obj) as DependencyObject;
+                    obj = VisualTreeHelper.GetParent(obj);
                 }
                 return null;
             }
