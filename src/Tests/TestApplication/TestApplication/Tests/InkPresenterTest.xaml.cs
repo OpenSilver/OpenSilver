@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Ink;
 using System.Windows.Input;
@@ -15,7 +16,7 @@ namespace TestApplication.OpenSilver.Tests
         private Stroke LastStroke;
 
         //A new stroke object named MyStroke is created. MyStroke is added to the StrokeCollection of the InkPresenter named MyIP
-        private void OnIP_MouseLeftButtonDown(object sender, MouseEventArgs e)
+        private void OnIP_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             InkPad.CaptureMouse();
             StylusPointCollection MyStylusPointCollection = new StylusPointCollection();
@@ -27,6 +28,11 @@ namespace TestApplication.OpenSilver.Tests
 #endif
             LastStroke = new Stroke(MyStylusPointCollection);
             InkPad.Strokes.Add(LastStroke);
+        }
+
+        private void OnIP_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            InkPad.ReleaseMouseCapture();
         }
 
         //StylusPoint objects are collected from the MouseEventArgs and added to MyStroke. 
@@ -41,7 +47,6 @@ namespace TestApplication.OpenSilver.Tests
                 NewStroke.StylusPoints.Add(e.StylusDevice.GetStylusPoints(MyIP));
 #endif
             }
-
         }
 
         //MyStroke is completed
@@ -50,13 +55,13 @@ namespace TestApplication.OpenSilver.Tests
 
         }
 
-        private void OnClearInkPad(object sender, System.Windows.RoutedEventArgs e)
+        private void OnClearInkPad(object sender, RoutedEventArgs e)
         {
             LastStroke = null;
             InkPad.Strokes.Clear();
         }
 
-        private void OnUndoLastStroke(object sender, System.Windows.RoutedEventArgs e)
+        private void OnUndoLastStroke(object sender, RoutedEventArgs e)
         {
             if (InkPad.Strokes.Contains(LastStroke))
             {
@@ -64,7 +69,7 @@ namespace TestApplication.OpenSilver.Tests
             }
         }
 
-        private void OnRedoLastStroke(object sender, System.Windows.RoutedEventArgs e)
+        private void OnRedoLastStroke(object sender, RoutedEventArgs e)
         {
             if (!InkPad.Strokes.Contains(LastStroke))
             {
