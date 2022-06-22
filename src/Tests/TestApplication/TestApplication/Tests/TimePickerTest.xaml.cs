@@ -24,8 +24,7 @@ namespace TestApplication.OpenSilver.Tests
         private void TimePickerTest_Loaded(object sender, RoutedEventArgs e)
         {
             TimePicker1.Format = new CustomTimeFormat("HHmm");
-            // ShortTimeFormat is added as part of TimePicker implementation
-            //TimePicker2.Format = new ShortTimeFormat();
+            TimePicker2.Format = new ShortTimeFormat();
         }
     }
 
