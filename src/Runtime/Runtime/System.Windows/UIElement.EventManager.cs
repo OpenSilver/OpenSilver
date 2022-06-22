@@ -189,6 +189,18 @@ namespace Windows.UI.Xaml
                     ProcessOnMouseRightButtonUp(jsEventArg);
                     break;
             }
+
+#if MIGRATION
+            if (IsMouseCaptured)
+            {
+                ReleaseMouseCapture();
+            }
+#else 
+            if (IsPointerCaptured)
+            {
+                ReleasePointerCapture();
+            }
+#endif
         }
 
         private void ProcessMouseButtonEvent(
