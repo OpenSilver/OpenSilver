@@ -1,5 +1,23 @@
-﻿#if MIGRATION
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+using System;
+
+#if MIGRATION
 namespace System.Windows.Ink
+#else
+namespace Windows.UI.Xaml.Ink
+#endif
 {
     /// <summary>
     /// Represents a collection of <see cref="Stroke"/> objects.
@@ -9,39 +27,39 @@ namespace System.Windows.Ink
         /// <summary>
         /// Initializes a new instance of the <see cref="StrokeCollection"/> class.
         /// </summary>
-        public StrokeCollection() : base(true)
+        public StrokeCollection()
+            : base(true)
         {
         }
 
         internal override void AddOverride(Stroke point)
         {
-            this.AddInternal(point);
+            AddInternal(point);
         }
 
         internal override void ClearOverride()
         {
-            this.ClearInternal();
+            ClearInternal();
         }
 
         internal override void RemoveAtOverride(int index)
         {
-            this.RemoveAtInternal(index);
+            RemoveAtInternal(index);
         }
 
         internal override void InsertOverride(int index, Stroke point)
         {
-            this.InsertInternal(index, point);
+            InsertInternal(index, point);
         }
 
         internal override Stroke GetItemOverride(int index)
         {
-            return this.GetItemInternal(index);
+            return GetItemInternal(index);
         }
 
         internal override void SetItemOverride(int index, Stroke point)
         {
-            this.SetItemInternal(index, point);
+            SetItemInternal(index, point);
         }
     }
 }
-#endif

@@ -1,18 +1,47 @@
-﻿#if MIGRATION
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+using System;
+using System.Collections.Specialized;
 using CSHTML5.Internal;
+
+#if MIGRATION
 using System.Windows.Ink;
 using System.Windows.Input;
+#else
+using Windows.UI.Xaml.Ink;
+using Windows.UI.Xaml.Input;
+#endif
 
+#if MIGRATION
 namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// Implements a rectangular surface that displays ink strokes.
     /// </summary>
-
     public class InkPresenter : Canvas
     {
         private object _canvasDom;
+        private Stroke _currentStroke;
+        private StylusPoint _lastPos;
+        private StylusPoint _mousePos;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InkPresenter"/> class.
+        /// </summary>
         public InkPresenter()
         {
             Strokes = new StrokeCollection();
@@ -28,20 +57,19 @@ namespace System.Windows.Controls
         {
             if (_canvasDom == null) return;
 
-            var javascript = @"
-                        // get current size of the canvas
-                        let rect = $0.getBoundingClientRect();
-                        // increase the actual size of our canvas
-                        $0.width = rect.width * window.devicePixelRatio;
-                        $0.height = rect.height * window.devicePixelRatio;
-                        let ctx = $0.getContext('2d');
-                        // ensure all drawing operations are scaled
-                        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-                        // scale everything down using CSS
-                        $0.style.width = rect.width + 'px';
-                        $0.style.height = rect.height + 'px';
-                        ctx.strokeStyle=$1; ctx.lineWidth=$2;
-                        ctx.clearRect(0, 0, $0.width, $0.height);";
+            // 1 - get current size of the canvas
+            // 2 - increase the actual size of our canvas
+            // 3 - ensure all drawing operations are scaled
+            // 4 - scale everything down using CSS
+            var javascript = "let rect = $0.getBoundingClientRect();" +
+                "$0.width = rect.width * window.devicePixelRatio;" +
+                "$0.height = rect.height * window.devicePixelRatio;" +
+                "let ctx = $0.getContext('2d');" +
+                "ctx.scale(window.devicePixelRatio, window.devicePixelRatio);" +
+                "$0.style.width = rect.width + 'px';" +
+                "$0.style.height = rect.height + 'px';" +
+                "ctx.strokeStyle=$1; ctx.lineWidth=$2;" +
+                "ctx.clearRect(0, 0, $0.width, $0.height);";
             OpenSilver.Interop.ExecuteJavaScriptAsync(javascript, _canvasDom, "#222222", 4);
         }
 
@@ -52,6 +80,8 @@ namespace System.Windows.Controls
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_canvasDom);
             style.width = "100%";
             style.height = "100%";
+            style.position = "absolute";
+            style.pointerEvents = "none";
             return div;
         }
         
@@ -63,17 +93,32 @@ namespace System.Windows.Controls
         /// </returns>
         public StrokeCollection Strokes
         {
-            get { return (StrokeCollection)GetValue(StrokesProperty); }
+            get
+            {
+                var strokes = (StrokeCollection)GetValue(StrokesProperty);
+                if (strokes == null)
+                {
+                    strokes = new StrokeCollection();
+                    SetValue(StrokesProperty, strokes);
+                }
+                return strokes;
+            }
             set { SetValue(StrokesProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="Strokes"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty StrokesProperty =
-            DependencyProperty.Register("Strokes", typeof(StrokeCollection), typeof(InkPresenter), new PropertyMetadata(OnStrokePropertyChanged));
+            DependencyProperty.Register(
+                nameof(Strokes),
+                typeof(StrokeCollection),
+                typeof(InkPresenter),
+                new PropertyMetadata(OnStrokePropertyChanged));
 
         private static void OnStrokePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            InkPresenter presenter = (InkPresenter)d;
-            presenter?.HandleStrokesPropertyChanged(e);
+            ((InkPresenter)d).HandleStrokesPropertyChanged(e);
         }
 
         private void HandleStrokesPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -97,18 +142,18 @@ namespace System.Windows.Controls
         {            
             ResetCanvas();
 
-            if (Strokes != null)
+            foreach (var stroke in Strokes)
             {
-                foreach (var stroke in Strokes)
-                {
-                    DrawStroke(stroke);
-                }
-            }            
+                DrawStroke(stroke);
+            }
         }
 
         private void DrawStroke(Stroke stroke)
         {
-            if (stroke == null || stroke.StylusPoints.Count <= 1) return;
+            if (stroke.StylusPoints.Count <= 1)
+            {
+                return;
+            }
 
             object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
             var firstPoint = stroke.StylusPoints[0];
@@ -123,57 +168,47 @@ namespace System.Windows.Controls
         }
 
 
-        private Stroke CurrentStroke { get; set; }
-        private void OnStrokeCollectionChanged(object sender, Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void OnStrokeCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            switch(e.Action)
+            switch (e.Action)
             {
-                case Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    if (CurrentStroke != null)
+                case NotifyCollectionChangedAction.Add:
+                    if (_currentStroke != null)
                     {
-                        CurrentStroke.StylusPoints.CollectionChanged -= OnStylusPointsCollectionChanged;
+                        _currentStroke.StylusPoints.CollectionChanged -= OnStylusPointsCollectionChanged;
                     }
 
-                    CurrentStroke = e.NewItems[0] as Stroke;
+                    _currentStroke = e.NewItems[0] as Stroke;
 
+                    DrawStroke(_currentStroke);
 
-                    if (CurrentStroke == null) return;
-
-                    DrawStroke(CurrentStroke);
-
-                    if (CurrentStroke.StylusPoints.Count > 0)
+                    if (_currentStroke.StylusPoints.Count > 0)
                     {
-                        LastPos = CurrentStroke.StylusPoints[CurrentStroke.StylusPoints.Count - 1];
+                        _lastPos = _currentStroke.StylusPoints[_currentStroke.StylusPoints.Count - 1];
                     }
 
-                    CurrentStroke.StylusPoints.CollectionChanged += OnStylusPointsCollectionChanged;
+                    _currentStroke.StylusPoints.CollectionChanged += OnStylusPointsCollectionChanged;
                     break;
 
                 default:
                     // in all other cases, redraw canvas
                     if (e.OldItems != null)
                     {
-                        foreach (var item in e.OldItems)
+                        foreach (Stroke stroke in e.OldItems)
                         {
-                            if (item is Stroke stroke)
+                            stroke.StylusPoints.CollectionChanged -= OnStylusPointsCollectionChanged;
+                            if (stroke == _currentStroke)
                             {
-                                stroke.StylusPoints.CollectionChanged -= OnStylusPointsCollectionChanged;
-                                if (stroke == CurrentStroke)
-                                {
-                                    CurrentStroke = null;
-                                }
+                                _currentStroke = null;
                             }
                         }
                     }
 
                     if (e.NewItems != null)
                     {
-                        foreach (var item in e.NewItems)
+                        foreach (Stroke stroke in e.NewItems)
                         {
-                            if (item is Stroke stroke)
-                            {
-                                stroke.StylusPoints.CollectionChanged += OnStylusPointsCollectionChanged;
-                            }
+                            stroke.StylusPoints.CollectionChanged += OnStylusPointsCollectionChanged;
                         }
                     }
 
@@ -182,14 +217,14 @@ namespace System.Windows.Controls
             }
         }
 
-        private void OnStylusPointsCollectionChanged(object sender, Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void OnStylusPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            switch(e.Action)
+            switch (e.Action)
             {
-                case Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    if (CurrentStroke.StylusPoints.Count > 1)
+                case NotifyCollectionChangedAction.Add:
+                    if (_currentStroke.StylusPoints.Count > 1)
                     {
-                        MousePos = CurrentStroke.StylusPoints[CurrentStroke.StylusPoints.Count - 1];
+                        _mousePos = _currentStroke.StylusPoints[_currentStroke.StylusPoints.Count - 1];
                         DrawCurrentPoint();
                     }
                     break;
@@ -200,21 +235,16 @@ namespace System.Windows.Controls
             
         }
 
-        private StylusPoint LastPos { get; set; }
-        private StylusPoint MousePos { get; set; }
-
         private void DrawCurrentPoint()
         {
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this) || CurrentStroke == null || CurrentStroke.StylusPoints.Count <= 1)
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this) || _currentStroke == null || _currentStroke.StylusPoints.Count <= 1)
             {
                 return;
             }
 
             object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2); $0.lineTo($3, $4); $0.stroke();", context, LastPos.X, LastPos.Y, MousePos.X, MousePos.Y);
-            LastPos = MousePos;
+            OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2); $0.lineTo($3, $4); $0.stroke();", context, _lastPos.X, _lastPos.Y, _mousePos.X, _mousePos.Y);
+            _lastPos = _mousePos;
         }
     }
 }
-
-#endif
