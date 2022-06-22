@@ -68,74 +68,85 @@ namespace Windows.UI.Xaml.Controls
 
         private static void IsOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ToolTip toolTip = (ToolTip)d;
-            bool isOpen = (bool)e.NewValue;
+            (d as ToolTip)?.UpdatePopup((bool)e.NewValue);
+        }
+
+        private void UpdatePopup(bool isOpen)
+        {
             if (isOpen)
             {
-                bool wasPopupAlreadyOpen = (toolTip._parentPopup != null && toolTip._parentPopup.IsOpen == true);
-                // Note: this prevents loops due to the fact that when the popup opens, the "ToolTip.IsOpen_Changed" method is called
+                bool wasPopupAlreadyOpen = (_parentPopup != null && _parentPopup.IsOpen == true);
+                // Note: this prevents loops due to the fact that when the popup opens, the "IsOpen_Changed" method is called
                 // because the tooltip is the child of the Popup so its properties are called when it is loaded into the Visual Tree.
-                if (wasPopupAlreadyOpen) 
+                if (wasPopupAlreadyOpen)
                 {
                     return;
                 }
 
                 // Make sure the tooltip is transparent to clicks:
-                toolTip.IsHitTestVisible = false;
+                IsHitTestVisible = false;
 
                 // Make sure the tooltip is Top/Left-aligned:
-                toolTip.HorizontalAlignment = HorizontalAlignment.Left;
-                toolTip.VerticalAlignment = VerticalAlignment.Top;
+                HorizontalAlignment = HorizontalAlignment.Left;
+                VerticalAlignment = VerticalAlignment.Top;
 
                 // Create the popup if not already created:
-                if (toolTip._parentPopup == null)
+                if (_parentPopup == null)
                 {
-                    toolTip._parentPopup = new Popup()
+                    _parentPopup = new Popup()
                     {
-                        Child = toolTip,
+                        Child = this,
                         HorizontalAlignment = HorizontalAlignment.Left,
                         VerticalAlignment = VerticalAlignment.Top,
                         HorizontalContentAlignment = HorizontalAlignment.Left,
                         VerticalContentAlignment = VerticalAlignment.Top,
                     };
 
-                    toolTip._parentPopup.DataContext = toolTip._owner?.DataContext;
+                    _parentPopup.DataContext = _owner?.DataContext;
 
-                    toolTip._parentPopup.Loaded += new RoutedEventHandler(ParentPopupLoaded);
+                    if (Placement == PlacementMode.Mouse)
+                    {
+                        _parentPopup.Loaded += new RoutedEventHandler(ParentPopupLoaded);
+                    }
                 }
 
-                Point position = GetMousePosition();
-                position.X = Math.Max(position.X + toolTip.HorizontalOffset, 0.0) + 10.0;
-                position.Y = Math.Max(position.Y + toolTip.VerticalOffset, 0.0) + 10.0;
-
-                toolTip._parentPopup.HorizontalOffset = position.X;
-                toolTip._parentPopup.VerticalOffset = position.Y;
-
-                toolTip._parentPopup.IsOpen = true;
-
-                VisualStateManager.GoToState(toolTip, VisualStates.StateToolTipOpen, true);
-
-                if (toolTip.Opened != null)
+                if (Placement == PlacementMode.Mouse)
                 {
-                    toolTip.Opened(toolTip, new RoutedEventArgs
-                    {
-                        OriginalSource = toolTip
-                    });
+                    Point position = GetMousePosition();
+                    position.X = Math.Max(position.X + HorizontalOffset, 0.0) + 10.0;
+                    position.Y = Math.Max(position.Y + VerticalOffset, 0.0) + 10.0;
+
+                    _parentPopup.HorizontalOffset = position.X;
+                    _parentPopup.VerticalOffset = position.Y;
+                }
+                else
+                {
+                    _parentPopup.HorizontalOffset = HorizontalOffset;
+                    _parentPopup.VerticalOffset = VerticalOffset;
+                    _parentPopup.Placement = Placement;
+                    _parentPopup.PlacementTarget = PlacementTarget ?? this._owner;                    
+                }
+
+                _parentPopup.IsOpen = true;
+
+                VisualStateManager.GoToState(this, VisualStates.StateToolTipOpen, true);
+
+                if (Opened != null)
+                {
+                    Opened(this, new RoutedEventArgs { OriginalSource = this });
                 }
             }
             else
             {
-                if (toolTip._parentPopup != null && toolTip._parentPopup.IsOpen == true)
+                if (_parentPopup != null && _parentPopup.IsOpen == true)
                 {
-                    VisualStateManager.GoToState(toolTip, VisualStates.StateToolTipClosed, true);
-                    toolTip._parentPopup.IsOpen = false;
+                    VisualStateManager.GoToState(this, VisualStates.StateToolTipClosed, true);
+                    _parentPopup.IsOpen = false;
 
-                    // Raise the "Closed" event:
-                    if (toolTip.Closed != null)
-                        toolTip.Closed(toolTip, new RoutedEventArgs
-                        {
-                            OriginalSource = toolTip
-                        });
+                    if (Closed != null)
+                    {
+                        Closed(this, new RoutedEventArgs { OriginalSource = this });
+                    }
                 }
             }
         }
@@ -175,9 +186,12 @@ namespace Windows.UI.Xaml.Controls
             );
         }
 
-        private static void ParentPopupLoaded(object sender, RoutedEventArgs e)
+        private void ParentPopupLoaded(object sender, RoutedEventArgs e)
         {
-            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds((Popup)sender);
+            if (Placement == PlacementMode.Mouse)
+            {
+                INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds((Popup)sender);
+            }
         }
 
         /// <summary>
@@ -190,10 +204,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event RoutedEventHandler Opened;
 
-#region Not supported yet
         /// <summary>Gets or sets the visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />.</summary>
         /// <returns>The visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />. The default is null.</returns>
-        [OpenSilver.NotImplemented]
         public UIElement PlacementTarget
         {
             get
@@ -209,12 +221,10 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the PlacementTarget dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PlacementTargetProperty = DependencyProperty.Register("PlacementTarget", typeof(UIElement), typeof(ToolTip), null);
 
         /// <summary>Gets or sets how the <see cref="T:System.Windows.Controls.ToolTip" /> should be positioned in relation to the <see cref="P:System.Windows.Controls.ToolTip.PlacementTarget" />.</summary>
         /// <returns>One of the <see cref="T:System.Windows.Controls.Primitives.PlacementMode" /> values. The default is <see cref="F:System.Windows.Controls.Primitives.PlacementMode.Mouse" />. </returns>
-        [OpenSilver.NotImplemented]
         public PlacementMode Placement
         {
             get
@@ -229,9 +239,7 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>Identifies the <see cref="P:System.Windows.Controls.ToolTip.Placement" /> dependency property.</summary>
         /// <returns>The identifier for the <see cref="P:System.Windows.Controls.ToolTip.Placement" />dependency property.</returns>
-        [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), new PropertyMetadata(PlacementMode.Mouse));
-#endregion
 
         //-----------------------
         // HORIZONTALOFFSET
