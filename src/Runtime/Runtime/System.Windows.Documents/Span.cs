@@ -15,7 +15,7 @@
 
 using CSHTML5.Internal;
 using System.Windows.Markup;
-#if UWP
+#if !MIGRATION
 using System;
 #endif
 

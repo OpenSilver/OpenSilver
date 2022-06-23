@@ -185,6 +185,7 @@
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
     <Compile Include="System.Windows.Controls\DataPager\WeakEventListener.cs" />
+    <Compile Include="System.Windows.Controls\InkPresenter.cs" />
     <Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
     <Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
     <Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
@@ -194,6 +195,7 @@
     <Compile Include="System.Windows.Controls\TextBoxView.cs" />
     <Compile Include="System.Windows.Controls\Spinner.cs" />
     <Compile Include="System.Windows.Controls\ButtonSpinner.cs" />
+    <Compile Include="System.Windows.Controls\TransitioningContentControl.cs" />
     <Compile Include="System.Windows.Controls\UpDownBase.cs" />
     <Compile Include="System.Windows.Controls\UpDownBase.Generic.cs" />
     <Compile Include="System.Windows.Controls\UpDownParseErrorEventArgs.cs" />
@@ -205,7 +207,6 @@
     <Compile Include="System.Windows.Controls\VirtualizingStackPanel.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\DataGridRowGroupHeader.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
-    <Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewExtensions.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarDateChangedEventArgs.cs" />
@@ -213,13 +214,16 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarModeChangedEventArgs.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarSelectionMode.cs" />
     <Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
+    <Compile Include="System.Windows.Ink\DrawingAttributes.cs" />
+    <Compile Include="System.Windows.Ink\Stroke.cs" />
+    <Compile Include="System.Windows.Ink\StrokeCollection.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventArgs.cs" />
     <Compile Include="System.Windows.Input\MouseWheelEventHandler.cs" />
+    <Compile Include="System.Windows.Input\StylusPoint.cs" />
+    <Compile Include="System.Windows.Input\StylusPointCollection.cs" />
     <Compile Include="System.Windows.Input\TextComposition.cs" />
     <Compile Include="System.Windows.Input\TextCompositionEventArgs.cs" />
     <Compile Include="System.Windows.Input\TextCompositionEventHandler.cs" />
-    <Compile Include="System.Windows.Input\WORKINPROGRESS\StylusPoint.cs" />
-    <Compile Include="System.Windows.Input\WORKINPROGRESS\StylusPointCollection.cs" />
     <Compile Include="System.Windows.Interactivity\EventTrigger.cs" />
     <Compile Include="System.Windows.Interactivity\InvokeCommandAction.cs" />
     <Compile Include="System.Windows.Interactivity\TriggerAction.cs" />
@@ -1220,6 +1224,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultToolTipStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultTransitioningContentControlStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

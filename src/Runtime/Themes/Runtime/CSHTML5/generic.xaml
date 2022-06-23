@@ -28,6 +28,7 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTileViewStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTimePickerStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultToolTipStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultTransitioningContentControlStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultViewboxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRepeatButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHeaderedContentControlStyle.xaml" />
