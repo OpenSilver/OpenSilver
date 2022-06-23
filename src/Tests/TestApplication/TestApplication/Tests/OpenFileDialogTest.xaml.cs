@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using OpenFileDialog = OpenSilver.Controls.OpenFileDialog;
 
 namespace TestApplication.OpenSilver.Tests
 {
@@ -24,7 +25,7 @@ namespace TestApplication.OpenSilver.Tests
             openFileDialog.Multiselect = false;
             openFileDialog.Filter = "Image Files(*.BMP;*.JPG;*.GIF;*.PNG)|*.*";
 #if OPENSILVER
-            bool? isOperationSuccessful = await openFileDialog.ShowDialog();
+            bool? isOperationSuccessful = await openFileDialog.ShowDialogAsync();
 #else
             bool? isOperationSuccessful = openFileDialog.ShowDialog();
 #endif
