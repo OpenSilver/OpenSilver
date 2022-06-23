@@ -1,0 +1,30 @@
+﻿<sdk:Page x:Class="TestApplication.OpenSilver.Tests.InkPresenterTest"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+          xmlns:local="clr-namespace:TestApplication.OpenSilver.Tests">
+
+    <Grid>
+        <InkPresenter x:Name="InkPad"
+                      Width="400"
+                      Height="300"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Background="#FFDDDDDD"
+                      MouseLeftButtonDown="OnIP_MouseLeftButtonDown"
+                      MouseLeftButtonUp="OnIP_MouseLeftButtonUp"
+                      MouseMove="OnIP_MouseMove"
+                      LostMouseCapture="OnIP_LostMouseCapture">
+        </InkPresenter>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom">
+            <Button Content="X"
+                    Click="OnClearInkPad" />
+            <Button Content="Undo Stroke"
+                    Click="OnUndoLastStroke" />
+            <Button Content="Redo Stroke"
+                    Click="OnRedoLastStroke" />
+        </StackPanel>
+    </Grid>
+</sdk:Page>

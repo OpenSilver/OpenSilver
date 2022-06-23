@@ -136,7 +136,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarSelectionMode.cs" />		
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePickerDateValidationErrorEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DomainUpDown.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\InkPresenter.cs" />
+		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
@@ -163,10 +163,11 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowser.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WebBrowserBrush.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\FontSource.cs" />
-		<Compile Include="System.Windows.Ink\WORKINPROGRESS\Stroke.cs" />
-		<Compile Include="System.Windows.Ink\WORKINPROGRESS\StrokeCollection.cs" />
-		<Compile Include="System.Windows.input\WORKINPROGRESS\StylusPoint.cs" />
-		<Compile Include="System.Windows.input\WORKINPROGRESS\StylusPointCollection.cs" />
+		<Compile Include="System.Windows.Ink\Stroke.cs" />
+		<Compile Include="System.Windows.Ink\StrokeCollection.cs" />
+		<Compile Include="System.Windows.Ink\DrawingAttributes.cs" />
+		<Compile Include="System.Windows.input\StylusPoint.cs" />
+		<Compile Include="System.Windows.input\StylusPointCollection.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ListBoxDragDropTarget.cs" />
