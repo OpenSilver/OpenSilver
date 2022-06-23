@@ -190,14 +190,17 @@ namespace Windows.UI.Xaml
                     break;
             }
 
-            if (Pointer.INTERNAL_captured != null)
+            Dispatcher.BeginInvoke(() =>
             {
+                if (Pointer.INTERNAL_captured != null)
+                {
 #if MIGRATION
-                Pointer.INTERNAL_captured.ReleaseMouseCapture();
+                    Pointer.INTERNAL_captured.ReleaseMouseCapture();
 #else
-                Pointer.INTERNAL_captured.ReleasePointerCapture();
+                    Pointer.INTERNAL_captured.ReleasePointerCapture();
 #endif
-            }
+                }
+            });
         }
 
         private void ProcessMouseButtonEvent(
