@@ -1252,3 +1252,26 @@ var jsilConfig = {
       "index"
     ]
 };
+
+window.elementsFromPointOpensilver = function (x, y, element) {
+    var elements = [];
+    if (element == undefined || element == null)
+        element = document.body;
+    else if (typeof element === 'string')
+        element = document.getElementById(element);
+    var walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, null, false);
+    var currentNode = walker.currentNode;
+    while (currentNode) {
+        if (currentNode.className != '' && typeof currentNode === 'object' && currentNode !== null && 'getBoundingClientRect' in currentNode) {
+            var visualBound = currentNode.getBoundingClientRect();
+            if (PerformHitTest(x, y, visualBound))
+                elements.push(currentNode.id);
+        }
+        currentNode = walker.nextNode();
+    }
+    return elements;
+};
+
+function PerformHitTest(x, y, rect) {
+    return rect.x <= x && x <= rect.x + rect.width && rect.y <= y && y <= rect.y + rect.height;
+}

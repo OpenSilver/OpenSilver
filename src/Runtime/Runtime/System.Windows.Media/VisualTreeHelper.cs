@@ -131,50 +131,11 @@ namespace Windows.UI.Xaml.Media
         /// subtree.  Note: the current implementation only returns the top-most element.</returns>
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
         {
-            var elementAtCoordinates = FindElementInHostCoordinates(intersectingPoint);
-
-            if (elementAtCoordinates != null)
+            var elementAtCoordinates = INTERNAL_HtmlDomManager.FindElementsInHostCoordinates(intersectingPoint, subtree);
+            foreach (var item in elementAtCoordinates)
             {
-                if (subtree == null)
-                {
-                    return new List<UIElement>() { elementAtCoordinates };
-                }
-                else
-                {
-                    //-------------
-                    // Here, it means that neither the result nor the subtree are null.
-                    // So we verify that the result is in the subtree.
-                    //-------------
-
-                    // Walk up the visual tree until we find the subtree root:
-                    UIElement current = elementAtCoordinates as UIElement;
-                    while (current != null)
-                    {
-                        if (current == subtree)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            current = current.INTERNAL_VisualParent as UIElement;
-                        }
-                    }
-
-                    bool elementIsInSubtree = (current != null);
-
-                    if (elementIsInSubtree)
-                    {
-                        return new List<UIElement>() { elementAtCoordinates };
-                    }
-                    else
-                    {
-                        return new List<UIElement>();
-                    }
-                }
-            }
-            else
-            {
-                return new List<UIElement>();
+                if (item.IsHitTestVisible)
+                    yield return item;
             }
         }
 

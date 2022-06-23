@@ -1211,6 +1211,21 @@ parentElement.appendChild(child);";
 
             return result;
         }
+        internal static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
+        {
+            IList<String> elements = null;
+            if (subtree != null)
+                elements = System.Text.Json.JsonSerializer.Deserialize<List<String>>(Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(@"JSON.stringify(elementsFromPointOpensilver($0,$1,$2))", intersectingPoint.X, intersectingPoint.Y, OpenSilver.Interop.GetDiv(subtree))));
+            else
+                elements = System.Text.Json.JsonSerializer.Deserialize<List<String>>(Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(@"JSON.stringify(elementsFromPointOpensilver($0,$1,null))", intersectingPoint.X, intersectingPoint.Y)));
+            foreach (var id in elements)
+            {
+                if (INTERNAL_HtmlDomManager.INTERNAL_idsToUIElements.ContainsKey(id))
+                {
+                    yield return INTERNAL_HtmlDomManager.INTERNAL_idsToUIElements[id];
+                }
+            }
+        }
 
         public static UIElement GetUIElementFromDomElement(object domElementRef)
         {
