@@ -1,0 +1,85 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+  xmlns:layoutPrimitivesToolkit="clr-namespace:System.Windows.Controls.Primitives"
+  xmlns:layoutToolkit="clr-namespace:System.Windows.Controls">
+
+  <Style TargetType="layoutToolkit:Accordion">
+    <Setter Property="Foreground" Value="#FF000000" />
+    <Setter Property="BorderBrush" Value="#FFEAEAEA"/>
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="Cursor" Value="Arrow" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="TabNavigation" Value="Once" />
+    <!-- Accordion expects a stackpanel to layout its children. -->
+    <Setter Property="ItemsPanel">
+      <Setter.Value>
+        <ItemsPanelTemplate>
+          <StackPanel VerticalAlignment="Top" />
+        </ItemsPanelTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="layoutToolkit:Accordion">
+          <Grid x:Name="Root">
+            <vsm:VisualStateManager.VisualStateGroups>
+              <!-- common states -->
+              <vsm:VisualStateGroup
+                x:Name="CommonStates">
+                <vsm:VisualState
+                  x:Name="Normal" />
+                <vsm:VisualState
+                  x:Name="Pressed" />
+                <vsm:VisualState
+                  x:Name="MouseOver" />
+                <vsm:VisualState
+                  x:Name="Disabled" />
+              </vsm:VisualStateGroup>
+              <!-- focus states -->
+              <vsm:VisualStateGroup
+                x:Name="FocusStates">
+                <vsm:VisualState
+                  x:Name="Focused" />
+                <vsm:VisualState
+                  x:Name="Unfocused" />
+              </vsm:VisualStateGroup>
+            </vsm:VisualStateManager.VisualStateGroups>
+            <Border
+              x:Name="Border"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              Padding="{TemplateBinding Padding}"
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}">
+              <ScrollViewer 
+                IsTabStop="False"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Disabled"
+                Background="{x:Null}"
+                BorderBrush="Transparent"
+                Margin="0"
+                Padding="0"
+                BorderThickness="0">
+                <ItemsPresenter />
+              </ScrollViewer>
+              </Border>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

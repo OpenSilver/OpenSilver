@@ -187,7 +187,12 @@
     <Compile Include="System.Windows.Controls\DataPager\WeakEventListener.cs" />
     <Compile Include="System.Windows.Controls\InkPresenter.cs" />
     <Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
-    <Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
+    <Compile Include="..\Controls.Layout.Toolkit\LayoutTransformer\LayoutTransformer.cs">
+      <Link>System.Windows.Controls\LayoutTransformer.cs</Link>
+    </Compile>
+    <Compile Include="..\Controls.Layout.Toolkit\TransitioningContentControl\TransitioningContentControl.cs">
+      <Link>System.Windows.Controls\TransitioningContentControl.cs</Link>
+    </Compile>
     <Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
     <Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
     <Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
@@ -195,7 +200,6 @@
     <Compile Include="System.Windows.Controls\TextBoxView.cs" />
     <Compile Include="System.Windows.Controls\Spinner.cs" />
     <Compile Include="System.Windows.Controls\ButtonSpinner.cs" />
-    <Compile Include="System.Windows.Controls\TransitioningContentControl.cs" />
     <Compile Include="System.Windows.Controls\UpDownBase.cs" />
     <Compile Include="System.Windows.Controls\UpDownBase.Generic.cs" />
     <Compile Include="System.Windows.Controls\UpDownParseErrorEventArgs.cs" />
@@ -1252,6 +1256,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DefaultStyles\INTERNAL_DefaultCalendarDayButtonStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DefaultStyles\INTERNAL_DefaultLayoutTransformerStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

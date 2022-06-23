@@ -277,6 +277,9 @@ namespace DotNetForHtml5.Compiler
                     case "System.Windows.Controls.Input":
                         assemblyName = "OpenSilver.Controls.Input";
                         return;
+                    case "System.Windows.Controls.Layout.Toolkit":
+                        assemblyName = "OpenSilver.Controls.Layout.Toolkit";
+                        return;
                     case "System.Windows.Interactivity":
                         assemblyName = "OpenSilver.Interactivity";
                         return;

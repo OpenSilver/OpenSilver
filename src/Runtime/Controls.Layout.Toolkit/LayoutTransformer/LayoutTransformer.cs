@@ -1,13 +1,14 @@
-﻿//-----------------------------------------------------------------------
-// <copyright company="Microsoft">
-//      (c) Copyright Microsoft Corporation.
-//      This source is subject to the Microsoft Public License (Ms-PL).
-//      Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
-//      All other rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+// Un-comment the following line for diagnostic output
+// #define DIAGNOSTICWRITELINE
 
 using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -15,7 +16,6 @@ using System.Windows.Media;
 using Windows.Foundation;
 using Windows.UI.Xaml.Media;
 #endif
-
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -26,9 +26,10 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control that applies a layout transformation to its Content.
     /// </summary>
-    [TemplatePart(Name = TransformRootName, Type = typeof(ContentPresenter))]
-    [TemplatePart(Name = PresenterName, Type = typeof(Grid))]
-    public class LayoutTransformer : ContentControl
+    /// <QualityBand>Preview</QualityBand>
+    [TemplatePart(Name = TransformRootName, Type = typeof(Grid))]
+    [TemplatePart(Name = PresenterName, Type = typeof(ContentPresenter))]
+    public sealed class LayoutTransformer : ContentControl
     {
         /// <summary>
         /// Name of the TransformRoot template part.
@@ -40,7 +41,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private const string PresenterName = "Presenter";
 
-
+#if !SILVERLIGHT
+        new  // Hide base class property of same name
+#endif
         /// <summary>
         /// Gets or sets the layout transform to apply on the LayoutTransformer 
         /// control content.
@@ -54,6 +57,9 @@ namespace Windows.UI.Xaml.Controls
             set { SetValue(LayoutTransformProperty, value); }
         }
 
+#if !SILVERLIGHT
+        new  // Hide base class property of same name
+#endif
         /// <summary>
         /// Identifies the LayoutTransform DependencyProperty.
         /// </summary>
@@ -121,7 +127,7 @@ namespace Windows.UI.Xaml.Controls
 
             // Can't tab to LayoutTransformer
             IsTabStop = false;
-#if MIGRATION
+#if SILVERLIGHT
             // Disable layout rounding because its rounding of values confuses things
             UseLayoutRounding = false;
 #endif
@@ -274,6 +280,7 @@ namespace Windows.UI.Xaml.Controls
                 return Size.Empty;
             }
 
+            DiagnosticWriteLine("MeasureOverride < " + availableSize);
             Size measureSize;
             if (_childActualSize == Size.Empty)
             {
@@ -283,11 +290,14 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 // Previous measure/arrange pass determined that Child.DesiredSize was larger than believed
+                DiagnosticWriteLine("  Using _childActualSize");
                 measureSize = _childActualSize;
             }
 
             // Perform a mesaure on the _transformRoot (containing Child)
+            DiagnosticWriteLine("  _transformRoot.Measure < " + measureSize);
             _transformRoot.Measure(measureSize);
+            DiagnosticWriteLine("  _transformRoot.DesiredSize = " + _transformRoot.DesiredSize);
 
             // WPF equivalent of _childActualSize technique (much simpler, but doesn't work on Silverlight 2)
             // // If the child is going to render larger than the available size, re-measure according to that size
@@ -302,6 +312,7 @@ namespace Windows.UI.Xaml.Controls
             Size transformedDesiredSize = new Size(transformedDesiredRect.Width, transformedDesiredRect.Height);
 
             // Return result to allocate enough space for the transformation
+            DiagnosticWriteLine("MeasureOverride > " + transformedDesiredSize);
             return transformedDesiredSize;
         }
 
@@ -322,14 +333,17 @@ namespace Windows.UI.Xaml.Controls
                 return finalSize;
             }
 
+            DiagnosticWriteLine("ArrangeOverride < " + finalSize);
             // Determine the largest available size after the transformation
             Size finalSizeTransformed = ComputeLargestTransformedSize(finalSize);
             if (IsSizeSmaller(finalSizeTransformed, _transformRoot.DesiredSize))
             {
                 // Some elements do not like being given less space than they asked for (ex: TextBlock)
                 // Bump the working size up to do the right thing by them
+                DiagnosticWriteLine("  Replacing finalSizeTransformed with larger _transformRoot.DesiredSize");
                 finalSizeTransformed = _transformRoot.DesiredSize;
             }
+            DiagnosticWriteLine("  finalSizeTransformed = " + finalSizeTransformed);
 
             // Transform the working size to find its width/height
             Rect transformedRect = RectTransform(new Rect(0, 0, finalSizeTransformed.Width, finalSizeTransformed.Height), _transformation);
@@ -341,14 +355,18 @@ namespace Windows.UI.Xaml.Controls
                 finalSizeTransformed.Height);
 
             // Perform an Arrange on _transformRoot (containing Child)
+            DiagnosticWriteLine("  _transformRoot.Arrange < " + finalRect);
             _transformRoot.Arrange(finalRect);
+            DiagnosticWriteLine("  Child.RenderSize = " + child.RenderSize);
 
             // This is the first opportunity under Silverlight to find out the Child's true DesiredSize
             if (IsSizeSmaller(finalSizeTransformed, child.RenderSize) && (Size.Empty == _childActualSize))
             {
                 // Unfortunately, all the work so far is invalid because the wrong DesiredSize was used
+                DiagnosticWriteLine("  finalSizeTransformed smaller than Child.RenderSize");
                 // Make a note of the actual DesiredSize
                 _childActualSize = new Size(child.ActualWidth, child.ActualHeight);
+                DiagnosticWriteLine("  _childActualSize = " + _childActualSize);
                 // Force a new measure/arrange pass
                 InvalidateMeasure();
             }
@@ -357,7 +375,10 @@ namespace Windows.UI.Xaml.Controls
                 // Clear the "need to measure/arrange again" flag
                 _childActualSize = Size.Empty;
             }
+            DiagnosticWriteLine("  _transformRoot.RenderSize = " + _transformRoot.RenderSize);
 
+            // Return result to perform the transformation
+            DiagnosticWriteLine("ArrangeOverride > " + finalSize);
             return finalSize;
         }
 
@@ -368,6 +389,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>Largest Size possible.</returns>
         private Size ComputeLargestTransformedSize(Size arrangeBounds)
         {
+            DiagnosticWriteLine("  ComputeLargestTransformedSize < " + arrangeBounds);
 
             // Computed largest transformed size
             Size computedSize = Size.Empty;
@@ -498,6 +520,8 @@ namespace Windows.UI.Xaml.Controls
                     (slopeFromWidth * computedWidth) + maxHeightFromWidth);
             }
 
+            // Return result
+            DiagnosticWriteLine("  ComputeLargestTransformedSize > " + computedSize);
             return computedSize;
         }
 
@@ -584,6 +608,14 @@ namespace Windows.UI.Xaml.Controls
             return (0 != ((matrix.M11 * matrix.M22) - (matrix.M12 * matrix.M21)));
         }
 
+        /// <summary>
+        /// Outputs diagnostic info if DIAGNOSTICWRITELINE is defined.
+        /// </summary>
+        /// <param name="message">Diagnostic message.</param>
+        [Conditional("DIAGNOSTICWRITELINE")]
+        private static void DiagnosticWriteLine(string message)
+        {
+            Debug.WriteLine(message);
+        }
     }
-
 }

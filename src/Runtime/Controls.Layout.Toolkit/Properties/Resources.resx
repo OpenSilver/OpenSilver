@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccordionItem_InvalidWriteToContentTargetSize" xml:space="preserve">
+    <value>ContentTargetSize is a read-only value and is set through Accordion.</value>
+    <comment>Exception thrown when ContentTargetSize on AccordionItem is changed.</comment>
+  </data>
+  <data name="AccordionItem_InvalidWriteToExpandDirection" xml:space="preserve">
+    <value>ExpandDirection is a read-only value and is set through Accordion.</value>
+    <comment>Exception thrown when ExpandDirection on AccordionItem is changed.</comment>
+  </data>
+  <data name="AccordionItem_OnIsSelectedPropertyChanged_InvalidChange" xml:space="preserve">
+    <value>Cannot modify the IsSelected property while item is locked.</value>
+    <comment>Exception thrown when the IsSelectedProperty is changed, while the AccordionItem is locked.</comment>
+  </data>
+  <data name="AccordionItem_StartAction_InvalidAction" xml:space="preserve">
+    <value>Invalid Action '{0}'.</value>
+    <comment>Exception thrown when the layout action is unknown.</comment>
+  </data>
+  <data name="AccordionItem_StartAction_InvalidCall" xml:space="preserve">
+    <value>Cannot start an action when there is no action scheduled.</value>
+    <comment>Exception thrown when no layout action is available but StartAction is called.</comment>
+  </data>
+  <data name="Accordion_InvalidManipulationOfSelectionCollections" xml:space="preserve">
+    <value>The modification made to the collection lead to an invalid Selection state. Please check the SelectionMode to allow zero or multiple items.</value>
+    <comment>Exception thrown when the SelectionCollections are incorrectly manipulated.</comment>
+  </data>
+  <data name="Accordion_OnActionFinish_InvalidFinish" xml:space="preserve">
+    <value>Should not signal a finish when item is not expected to perform an action.</value>
+    <comment>Exception thrown when an AccordionItem signals the end of an action, but was not registered by Accordion as performing that action.</comment>
+  </data>
+  <data name="Accordion_OnExpandDirectionPropertyChanged_InvalidValue" xml:space="preserve">
+    <value>Invalid ExpandDirection value '{0}'.</value>
+    <comment>Exception thrown when the ExpandDirection property is provided an invalid value.</comment>
+  </data>
+  <data name="Accordion_OnSelectedIndicesChanged_InvalidWrite" xml:space="preserve">
+    <value>Cannot set read-only property SelectedIndices.</value>
+    <comment>Exception thrown when the SelectedIndices property is improperly set.</comment>
+  </data>
+  <data name="Accordion_OnSelectedItemsChanged_InvalidWrite" xml:space="preserve">
+    <value>Cannot set read-only property SelectedItems.</value>
+    <comment>Exception thrown when the SelectedItems property is improperly set.</comment>
+  </data>
+  <data name="Accordion_OnSelectionModePropertyChanged_InvalidValue" xml:space="preserve">
+    <value>Invalid SelectionMode value '{0}'.</value>
+    <comment>Exception thrown when the SelectionMode property is provided an invalid value.</comment>
+  </data>
+  <data name="Accordion_OnSelectionSequencepropertyChanged_InvalidValue" xml:space="preserve">
+    <value>Invalid SelectionSequence value '{0}'.</value>
+    <comment>Exception thrown when the SelectionSequence property is provided an invalid value.</comment>
+  </data>
+  <data name="Accordion_UnsupportedCollectionAction" xml:space="preserve">
+    <value>Unsupported collection action '{0}'.</value>
+    <comment>Exception thrown when the SelectedItems or SelectedIndices collection is changed in a way not supported by Accordion.</comment>
+  </data>
+  <data name="Automation_OperationCannotBePerformed" xml:space="preserve">
+    <value>Cannot perform operation.</value>
+    <comment>Exception thrown by automation peers.</comment>
+  </data>
+  <data name="Expander_OnExpandDirectionPropertyChanged_InvalidValue" xml:space="preserve">
+    <value>Invalid ExpandDirection value '{0}'.</value>
+    <comment>Exception thrown when the ExpandDirection property is provided an invalid value.</comment>
+  </data>
+  <data name="TransitioningContentControl_TransitionNotFound" xml:space="preserve">
+    <value>Transition '{0}' was not defined.</value>
+    <comment>Exception thrown when a Transition is set that is not available.</comment>
+  </data>
+  <data name="TransitiotioningContentControl_IsTransitioningReadOnly" xml:space="preserve">
+    <value>IsTransitioning property is read-only.</value>
+    <comment>Exception thrown when IsTransitioning is altered.</comment>
+  </data>
+</root>

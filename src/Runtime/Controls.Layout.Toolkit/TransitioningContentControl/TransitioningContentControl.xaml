@@ -1,0 +1,155 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/client/2007"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+  xmlns:layoutToolkit="clr-namespace:System.Windows.Controls">
+
+  <Style TargetType="layoutToolkit:TransitioningContentControl">
+    <Setter Property="IsTabStop" Value="True" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="Transition" Value="DefaultTransition" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="layoutToolkit:TransitioningContentControl">
+          <Border
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="2">
+            <vsm:VisualStateManager.VisualStateGroups>
+              <vsm:VisualStateGroup x:Name="PresentationStates">
+                <vsm:VisualState x:Name="DefaultTransition">
+                  <Storyboard>
+                    <DoubleAnimationUsingKeyFrames 
+                      BeginTime="00:00:00" 
+                      Storyboard.TargetName="CurrentContentPresentationSite"
+                      Storyboard.TargetProperty="(UIElement.Opacity)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="1"/>
+                    </DoubleAnimationUsingKeyFrames>
+                    <DoubleAnimationUsingKeyFrames
+                      BeginTime="00:00:00" 
+                      Storyboard.TargetName="PreviousContentPresentationSite" 
+                      Storyboard.TargetProperty="(UIElement.Opacity)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+                  </Storyboard>
+                </vsm:VisualState>
+                <vsm:VisualState x:Name="Normal">
+                  <Storyboard>
+                    <ObjectAnimationUsingKeyFrames 
+                      BeginTime="00:00:00" 
+                      Storyboard.TargetName="PreviousContentPresentationSite" 
+                      Storyboard.TargetProperty="(UIElement.Visibility)">
+                      <DiscreteObjectKeyFrame KeyTime="00:00:00">
+                        <DiscreteObjectKeyFrame.Value>
+                          <Visibility>Collapsed</Visibility>
+                        </DiscreteObjectKeyFrame.Value>
+                      </DiscreteObjectKeyFrame>
+                    </ObjectAnimationUsingKeyFrames>
+                  </Storyboard>
+                </vsm:VisualState>
+
+                <vsm:VisualState x:Name="UpTransition">
+                  <Storyboard>
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="CurrentContentPresentationSite" 
+                                                                       Storyboard.TargetProperty="(UIElement.Opacity)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="1"/>
+                    </DoubleAnimationUsingKeyFrames>
+
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="CurrentContentPresentationSite" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="30"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="PreviousContentPresentationSite" 
+                                                                       Storyboard.TargetProperty="(UIElement.Opacity)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="PreviousContentPresentationSite" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="-30"/>
+                    </DoubleAnimationUsingKeyFrames>
+                  </Storyboard>
+                </vsm:VisualState>
+
+                <vsm:VisualState x:Name="DownTransition">
+                  <Storyboard>
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="CurrentContentPresentationSite" 
+                                                                       Storyboard.TargetProperty="(UIElement.Opacity)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="1"/>
+                    </DoubleAnimationUsingKeyFrames>
+
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="CurrentContentPresentationSite" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="-40"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="PreviousContentPresentationSite" 
+                                                                       Storyboard.TargetProperty="(UIElement.Opacity)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="1"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+
+                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="PreviousContentPresentationSite" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)">
+                      <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
+                      <SplineDoubleKeyFrame KeyTime="00:00:00.300" Value="40"/>
+                    </DoubleAnimationUsingKeyFrames>
+                  </Storyboard>
+                </vsm:VisualState>
+
+              </vsm:VisualStateGroup>
+            </vsm:VisualStateManager.VisualStateGroups>
+
+            <Grid>
+              <ContentPresenter
+                x:Name="PreviousContentPresentationSite"
+                Content="{x:Null}"
+                ContentTemplate="{TemplateBinding ContentTemplate}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <ContentPresenter.RenderTransform>
+                  <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                  </TransformGroup>
+                </ContentPresenter.RenderTransform>
+              </ContentPresenter>
+
+              <ContentPresenter 
+                x:Name="CurrentContentPresentationSite"
+                Content="{x:Null}"
+                ContentTemplate="{TemplateBinding ContentTemplate}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <ContentPresenter.RenderTransform>
+                  <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                  </TransformGroup>
+                </ContentPresenter.RenderTransform>
+              </ContentPresenter>
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

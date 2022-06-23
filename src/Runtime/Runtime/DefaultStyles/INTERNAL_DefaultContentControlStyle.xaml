@@ -951,19 +951,4 @@
         </Setter>
     </Style>
 
-    <!--  LayoutTransformer  -->
-    <Style TargetType="LayoutTransformer">
-        <Setter Property="Foreground" Value="#FF000000" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="LayoutTransformer">
-                    <Grid x:Name="TransformRoot" Background="{TemplateBinding Background}">
-                        <ContentPresenter x:Name="Presenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-
 </ResourceDictionary>
