@@ -332,7 +332,6 @@ ASALocalRun/
 .mfractor/
 
 # NuGet package generation output
-build/output
 build/temp
 
 # Ignore libs and resources in the wwwroot of test application
