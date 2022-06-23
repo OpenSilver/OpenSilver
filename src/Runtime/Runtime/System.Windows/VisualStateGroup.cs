@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -36,7 +37,7 @@ namespace Windows.UI.Xaml
     [ContentProperty("States")]
     public sealed partial class VisualStateGroup : DependencyObject
     {
-        private VisualStatesCollection _states;
+        private Collection<VisualState> _states;
 
         /// <summary>
         /// Gets the most recently set VisualState from a successful call to the GoToState
@@ -66,7 +67,7 @@ namespace Windows.UI.Xaml
             {
                 if (this._states == null)
                 {
-                    this._states = new VisualStatesCollection(this);
+                    this._states = new Collection<VisualState>(new VisualStatesCollection(this));
                 }
                 return this._states; 
             } 
