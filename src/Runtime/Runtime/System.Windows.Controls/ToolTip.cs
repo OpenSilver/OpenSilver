@@ -68,7 +68,7 @@ namespace Windows.UI.Xaml.Controls
 
         private static void IsOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as ToolTip)?.UpdatePopup((bool)e.NewValue);
+            ((ToolTip)d).UpdatePopup((bool)e.NewValue);
         }
 
         private void UpdatePopup(bool isOpen)
@@ -104,13 +104,11 @@ namespace Windows.UI.Xaml.Controls
 
                     _parentPopup.DataContext = _owner?.DataContext;
 
-                    if (Placement == PlacementMode.Mouse)
-                    {
-                        _parentPopup.Loaded += new RoutedEventHandler(ParentPopupLoaded);
-                    }
+                    _parentPopup.Loaded += new RoutedEventHandler(ParentPopupLoaded);
                 }
 
-                if (Placement == PlacementMode.Mouse)
+                PlacementMode placement = EffectivePlacement;
+                if (placement == PlacementMode.Mouse)
                 {
                     Point position = GetMousePosition();
                     position.X = Math.Max(position.X + HorizontalOffset, 0.0) + 10.0;
@@ -123,8 +121,8 @@ namespace Windows.UI.Xaml.Controls
                 {
                     _parentPopup.HorizontalOffset = HorizontalOffset;
                     _parentPopup.VerticalOffset = VerticalOffset;
-                    _parentPopup.Placement = Placement;
-                    _parentPopup.PlacementTarget = PlacementTarget ?? this._owner;                    
+                    _parentPopup.Placement = placement;
+                    _parentPopup.PlacementTarget = EffectivePlacementTarget;                    
                 }
 
                 _parentPopup.IsOpen = true;
@@ -188,7 +186,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void ParentPopupLoaded(object sender, RoutedEventArgs e)
         {
-            if (Placement == PlacementMode.Mouse)
+            if (EffectivePlacement == PlacementMode.Mouse)
             {
                 INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds((Popup)sender);
             }
@@ -204,42 +202,80 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event RoutedEventHandler Opened;
 
-        /// <summary>Gets or sets the visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />.</summary>
-        /// <returns>The visual element or control that the tool tip should be positioned in relation to when opened by the <see cref="T:System.Windows.Controls.ToolTipService" />. The default is null.</returns>
+        /// <summary>
+        /// Identifies the <see cref="PlacementTarget"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PlacementTargetProperty =
+            DependencyProperty.Register(
+                nameof(PlacementTarget),
+                typeof(UIElement),
+                typeof(ToolTip),
+                null);
+
+        /// <summary>
+        /// Gets or sets the visual element or control that the tool tip should be 
+        /// positioned in relation to when opened by the <see cref="ToolTipService" />.
+        /// </summary>
+        /// <returns>
+        /// The visual element or control that the tool tip should be positioned in 
+        /// relation to when opened by the <see cref="ToolTipService" />.
+        /// The default is null.
+        /// </returns>
         public UIElement PlacementTarget
+        {
+            get { return (UIElement)GetValue(PlacementTargetProperty); }
+            set { SetValue(PlacementTargetProperty, value); }
+        }
+
+        private UIElement EffectivePlacementTarget
         {
             get
             {
-                return (UIElement)this.GetValue(ToolTip.PlacementTargetProperty);
-            }
-            set
-            {
-                this.SetValue(ToolTip.PlacementTargetProperty, (DependencyObject)value);
+                if (_owner != null)
+                {
+                    return ToolTipService.GetPlacementTarget(_owner) ?? _owner;
+                }
+
+                return PlacementTarget;
             }
         }
 
         /// <summary>
-        /// Identifies the PlacementTarget dependency property.
+        /// Identifies the <see cref="Placement"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty PlacementTargetProperty = DependencyProperty.Register("PlacementTarget", typeof(UIElement), typeof(ToolTip), null);
+        public static readonly DependencyProperty PlacementProperty =
+            DependencyProperty.Register(
+                nameof(Placement),
+                typeof(PlacementMode),
+                typeof(ToolTip),
+                new PropertyMetadata(PlacementMode.Mouse));
 
-        /// <summary>Gets or sets how the <see cref="T:System.Windows.Controls.ToolTip" /> should be positioned in relation to the <see cref="P:System.Windows.Controls.ToolTip.PlacementTarget" />.</summary>
-        /// <returns>One of the <see cref="T:System.Windows.Controls.Primitives.PlacementMode" /> values. The default is <see cref="F:System.Windows.Controls.Primitives.PlacementMode.Mouse" />. </returns>
+        /// <summary>
+        /// Gets or sets how the <see cref="ToolTip" /> should be positioned
+        /// in relation to the <see cref="PlacementTarget" />.
+        /// </summary>
+        /// <returns>
+        /// One of the <see cref="PlacementMode" /> values.
+        /// The default is <see cref="PlacementMode.Mouse" />.
+        /// </returns>
         public PlacementMode Placement
+        {
+            get { return (PlacementMode)GetValue(PlacementProperty); }
+            set { SetValue(PlacementProperty, value); }
+        }
+
+        private PlacementMode EffectivePlacement
         {
             get
             {
-                return (PlacementMode)this.GetValue(ToolTip.PlacementProperty);
-            }
-            set
-            {
-                this.SetValue(ToolTip.PlacementProperty, (Enum)value);
+                if (_owner != null && !_owner.HasDefaultValue(ToolTipService.PlacementProperty))
+                {
+                    return ToolTipService.GetPlacement(_owner);
+                }
+
+                return Placement;
             }
         }
-
-        /// <summary>Identifies the <see cref="P:System.Windows.Controls.ToolTip.Placement" /> dependency property.</summary>
-        /// <returns>The identifier for the <see cref="P:System.Windows.Controls.ToolTip.Placement" />dependency property.</returns>
-        public static readonly DependencyProperty PlacementProperty = DependencyProperty.Register("Placement", typeof(PlacementMode), typeof(ToolTip), new PropertyMetadata(PlacementMode.Mouse));
 
         //-----------------------
         // HORIZONTALOFFSET
