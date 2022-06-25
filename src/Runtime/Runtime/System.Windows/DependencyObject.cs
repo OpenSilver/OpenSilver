@@ -346,6 +346,12 @@ namespace Windows.UI.Xaml
             return DependencyProperty.UnsetValue;
         }
 
+        internal bool HasDefaultValue(DependencyProperty dp)
+        {
+            return !INTERNAL_PropertyStore.TryGetStorage(this, dp, false, out var storage) || 
+                storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default;
+        }
+
         public object GetVisualStateValue(DependencyProperty dependencyProperty) //todo: see if this is actually useful (to get specifically the VisualStateValue) and if so, change the GetValue into a GetVisualStateValue at the "return" line.
         {
             if (dependencyProperty == null)

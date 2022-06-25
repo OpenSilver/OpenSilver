@@ -62,20 +62,31 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the ToolTipService.Placement XAML attached property.
         /// </summary>
         public static readonly DependencyProperty PlacementProperty =
-            DependencyProperty.RegisterAttached("Placement", typeof(PlacementMode), typeof(ToolTipService), new PropertyMetadata(PlacementMode.Bottom));
+            DependencyProperty.RegisterAttached(
+                "Placement",
+                typeof(PlacementMode),
+                typeof(ToolTipService),
+                new PropertyMetadata(PlacementMode.Mouse));
 
         /// <summary>
         /// Identifies the ToolTipService.PlacementTarget XAML attached property.
         /// </summary>
         public static readonly DependencyProperty PlacementTargetProperty =
-            DependencyProperty.RegisterAttached("PlacementTarget", typeof(UIElement), typeof(ToolTipService), new PropertyMetadata(null));
+            DependencyProperty.RegisterAttached(
+                "PlacementTarget",
+                typeof(UIElement),
+                typeof(ToolTipService),
+                new PropertyMetadata((object)null));
 
         /// <summary>
         /// Identifies the ToolTipService.ToolTip XAML attached property.
         /// </summary>
         public static readonly DependencyProperty ToolTipProperty =
-            DependencyProperty.RegisterAttached("ToolTip", typeof(object), typeof(ToolTipService),
-            new PropertyMetadata(null, ToolTip_Changed));
+            DependencyProperty.RegisterAttached(
+                "ToolTip",
+                typeof(object),
+                typeof(ToolTipService),
+                new PropertyMetadata(null, ToolTip_Changed));
 
         private static readonly DependencyProperty ToolTipInternalProperty =
             DependencyProperty.Register(
@@ -102,7 +113,7 @@ namespace Windows.UI.Xaml.Controls
         public static object GetToolTip(DependencyObject element)
         {
             if (element == null)
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
 
             return element.GetValue(ToolTipProperty);
         }
@@ -115,7 +126,7 @@ namespace Windows.UI.Xaml.Controls
         public static void SetToolTip(DependencyObject element, object value)
         {
             if (element == null)
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
 
             element.SetValue(ToolTipProperty, value);
         }
@@ -159,9 +170,14 @@ namespace Windows.UI.Xaml.Controls
             uiElement.PointerExited -= UIElement_PointerExited;
 #endif
             ToolTip oldToolTip = GetToolTipInternal(uiElement);
-            if (oldToolTip != null && oldToolTip.IsOpen)
+            if (oldToolTip != null)
             {
-                CloseToolTip(oldToolTip);
+                oldToolTip.SetOwner(null);
+
+                if (oldToolTip.IsOpen)
+                {
+                    CloseToolTip(oldToolTip);
+                }
             }
 
             SetToolTipInternal(uiElement, null);
@@ -267,7 +283,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="element">The tooltip to retrieve the visual element of.</param>
         public static UIElement GetPlacementTarget(DependencyObject element)
         {
-            return (UIElement)element.GetValue(ToolTipService.PlacementTargetProperty);
+            return (UIElement)element.GetValue(PlacementTargetProperty);
         }
 
         /// <summary>Sets the position of the specified <see cref="P:System.Windows.Controls.ToolTipService.ToolTip" /> relative to the specified value element.</summary>
@@ -275,7 +291,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="value">The visual element to set the tooltip for.</param>
         public static void SetPlacementTarget(DependencyObject element, UIElement value)
         {
-            element.SetValue(ToolTipService.PlacementTargetProperty, (DependencyObject)value);
+            element.SetValue(PlacementTargetProperty, value);
         }
     }
 }
