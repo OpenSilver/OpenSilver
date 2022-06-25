@@ -2,7 +2,7 @@
 {
     public enum BlazorVersion
     {
-        Net5,
-        Net6
+        Net6,
+        Net7
     }
 }

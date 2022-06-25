@@ -18,8 +18,8 @@
             <StackPanel Margin="10" x:Name="BlazorVersionStackPanel">
                 <TextBlock Margin="5" Text="Blazor version:"/>
                 <ComboBox x:Name="BlazorVersionComboBox">
-                    <ComboBoxItem IsSelected="True">.NET 5</ComboBoxItem>
-                    <ComboBoxItem>.NET 6 (SDK required)</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">.NET 6</ComboBoxItem>
+                    <ComboBoxItem>.NET 7 Preview (SDK required)</ComboBoxItem>
                 </ComboBox>
             </StackPanel>
         </StackPanel>

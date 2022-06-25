@@ -77,13 +77,13 @@ namespace OpenSilver.TemplateWizards
             {
                 switch (window.BlazorVersion)
                 {
-                    case BlazorVersion.Net5:
-                        replacementsDictionary.Add("$blazortargetframework$", "net5.0");
-                        replacementsDictionary.Add("$blazorpackagesversion$", "5.0.7");
-                        break;
                     case BlazorVersion.Net6:
                         replacementsDictionary.Add("$blazortargetframework$", "net6.0");
                         replacementsDictionary.Add("$blazorpackagesversion$", "6.0.0");
+                        break;
+                    case BlazorVersion.Net7:
+                        replacementsDictionary.Add("$blazortargetframework$", "net7.0");
+                        replacementsDictionary.Add("$blazorpackagesversion$", "7.0.0-*");
                         break;
                 }
             }
