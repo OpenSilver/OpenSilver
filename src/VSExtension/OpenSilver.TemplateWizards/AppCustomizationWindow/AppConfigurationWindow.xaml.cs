@@ -23,9 +23,9 @@ namespace OpenSilver.TemplateWizards.AppCustomizationWindow
                 switch (BlazorVersionComboBox.SelectedIndex)
                 {
                     case 0:
-                        return BlazorVersion.Net5;
-                    case 1:
                         return BlazorVersion.Net6;
+                    case 1:
+                        return BlazorVersion.Net7;
                     default:
                         throw new InvalidOperationException("Error retrieving selected blazor version");
                 }

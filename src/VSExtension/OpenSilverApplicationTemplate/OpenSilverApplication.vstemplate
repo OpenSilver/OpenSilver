@@ -13,11 +13,11 @@
     </TemplateData>
     <TemplateContent>
         <ProjectCollection>
-            <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">
-                OpenSilverApplication\OpenSilverApplication.vstemplate
-            </ProjectTemplateLink>
             <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Browser">
                 OpenSilverApplication.Browser\OpenSilverApplication.Browser.vstemplate
+            </ProjectTemplateLink>
+            <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">
+                OpenSilverApplication\OpenSilverApplication.vstemplate
             </ProjectTemplateLink>
             <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Simulator">
                 OpenSilverApplication.Simulator\OpenSilverApplication.Simulator.vstemplate
@@ -25,13 +25,13 @@
         </ProjectCollection>
     </TemplateContent>
     <WizardExtension>
-		<Assembly>OpenSilver.TemplateWizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</Assembly>
-		<FullClassName>OpenSilver.TemplateWizards.AppCustomizationWizard</FullClassName>
-	</WizardExtension>
-	<WizardData>
-		<OpenSilverInfo>
-			<Api>Silverlight</Api>
-			<Type>Application</Type>
-		</OpenSilverInfo>
-	</WizardData>
+        <Assembly>OpenSilver.TemplateWizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</Assembly>
+        <FullClassName>OpenSilver.TemplateWizards.AppCustomizationWizard</FullClassName>
+    </WizardExtension>
+    <WizardData>
+        <OpenSilverInfo>
+            <Api>Silverlight</Api>
+            <Type>Application</Type>
+        </OpenSilverInfo>
+    </WizardData>
 </VSTemplate>
