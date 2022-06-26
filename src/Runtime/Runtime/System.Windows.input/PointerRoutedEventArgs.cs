@@ -90,6 +90,15 @@ namespace Windows.UI.Xaml.Input
             internal set { _keyModifiers = value; }
         }
 
+        /// <summary>
+        /// Gets an object that reports stylus device information, such as the collection
+        /// of stylus points associated with the input.
+        /// </summary>
+        /// <returns>
+        /// The stylus device information object.
+        /// </returns>
+        public StylusDevice StylusDevice => new StylusDevice(this);
+
         internal bool CheckIfEventShouldBeTreated(UIElement element, object jsEventArg)
         {
             //todo: this method is called by "OnMouseEvent", "OnMouseLeave", etc., but there appears to be other events where this method is not called: shouldn't we call it in those methods too? todo: verify that the handler is not called twice when an element has captured the pointer and registered the PointerPressed event for example.
@@ -321,42 +330,26 @@ namespace Windows.UI.Xaml.Input
         /// </returns>
 #if MIGRATION
         public Point GetPosition(UIElement relativeTo)
-        {
-            if (relativeTo == null)
-            {
-                //-----------------------------------
-                // Return the absolute pointer coordinates:
-                //-----------------------------------
-                return new Point(_pointerAbsoluteX, _pointerAbsoluteY);
-            }
-            else
-            {
-                //-----------------------------------
-                // Returns the pointer coordinates relative to the "relativeTo" element:
-                //-----------------------------------
-
-                // Get the opposite of the absolute position of the "relativeTo" element:
-                GeneralTransform generalTransform = Window.Current.TransformToVisual(relativeTo);
-
-                // Get the pointer coordinates relative to "relativeTo" element: 
-                return generalTransform.TransformPoint(new Point(_pointerAbsoluteX, _pointerAbsoluteY));
-            }
-        }
+            => GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
 #else
         public PointerPoint GetCurrentPoint(UIElement relativeTo)
         {
-            int wheelDelta = PointerPointProperties.GetPointerWheelDelta(INTERNAL_OriginalJSEventArg);
+            PointerPoint pointerPoint = new PointerPoint();
+            pointerPoint.Properties.MouseWheelDelta = PointerPointProperties.GetPointerWheelDelta(INTERNAL_OriginalJSEventArg);
+            pointerPoint.Position = GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
+
+            return pointerPoint;
+        }
+#endif
+
+        internal static Point GetPosition(Point origin, UIElement relativeTo)
+        {
             if (relativeTo == null)
             {
                 //-----------------------------------
                 // Return the absolute pointer coordinates:
                 //-----------------------------------
-                PointerPoint pointerPoint = new PointerPoint()
-                {
-                    Position = new Point(_pointerAbsoluteX, _pointerAbsoluteY)
-                };
-                pointerPoint.Properties.MouseWheelDelta = wheelDelta;
-                return pointerPoint;
+                return origin;
             }
             else
             {
@@ -368,40 +361,9 @@ namespace Windows.UI.Xaml.Input
                 GeneralTransform generalTransform = Window.Current.TransformToVisual(relativeTo);
 
                 // Get the pointer coordinates relative to "relativeTo" element: 
-                PointerPoint pointerPoint = new PointerPoint()
-                {
-                    Position = generalTransform.TransformPoint(new Point(_pointerAbsoluteX, _pointerAbsoluteY))
-                };
-                pointerPoint.Properties.MouseWheelDelta = wheelDelta;
-                return pointerPoint;
+                return generalTransform.TransformPoint(origin);
             }
         }
-#endif
-
-        ////
-        //// Summary:
-        ////     Returns the historical pointer positions for this event occurrence, optionally
-        ////     evaluated against a coordinate origin of a supplied UIElement.
-        ////
-        //// Parameters:
-        ////   relativeTo:
-        ////     Any UIElement-derived object that is connected to the same object tree. To
-        ////     specify the object relative to the overall coordinate system, use a relativeTo value
-        ////     of null.
-        ////
-        //// Returns:
-        ////     A list of PointerPoint values that represent the intermediate, historical
-        ////     pointer points associated with this event. If null was passed as relativeTo,
-        ////     the coordinates are in the frame of reference of the overall window. If a
-        ////     non-null relativeTo was passed, the coordinates are relative to the object
-        ////     referenced by relativeTo.
-        //public IList<PointerPoint> GetIntermediatePoints(UIElement relativeTo)
-        //{
-
-        //}
-
-        [OpenSilver.NotImplemented]
-        public StylusDevice StylusDevice { get; private set; }
 
 #if MIGRATION
         [OpenSilver.NotImplemented]

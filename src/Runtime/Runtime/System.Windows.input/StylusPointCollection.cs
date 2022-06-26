@@ -32,6 +32,25 @@ namespace Windows.UI.Xaml.Input
         {
         }
 
+        /// <summary>
+        /// Adds a collection of <see cref="StylusPoint"/> objects to the collection.
+        /// </summary>
+        /// <param name="stylusPoints">
+        /// The collection of <see cref="StylusPoint"/> objects to add to the collection.
+        /// </param>
+        public void Add(StylusPointCollection stylusPoints)
+        {
+            if (stylusPoints is null)
+            {
+                throw new ArgumentNullException(nameof(stylusPoints));
+            }
+
+            foreach (StylusPoint point in stylusPoints)
+            {
+                Add(point);
+            }
+        }
+
         internal override void AddOverride(StylusPoint point)
         {
             AddInternal(point);

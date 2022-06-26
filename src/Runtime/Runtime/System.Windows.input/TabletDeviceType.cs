@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -18,22 +17,22 @@ namespace System.Windows.Input
 namespace Windows.UI.Xaml.Input
 #endif
 {
-    //
-    // Summary:
-    //     Defines values for the type of devices the tablet device uses.
+    /// <summary>
+    /// Defines values for the type of devices the tablet device uses.
+    /// </summary>
     public enum TabletDeviceType
     {
-        //
-        // Summary:
-        //     Indicates the tablet device is a mouse.
+        /// <summary>
+        /// Indicates the tablet device is a mouse.
+        /// </summary>
         Mouse = 0,
-        //
-        // Summary:
-        //     Indicates the tablet device is a stylus.
+        /// <summary>
+        /// Indicates the tablet device is a stylus.
+        /// </summary>
         Stylus = 1,
-        //
-        // Summary:
-        //     Indicates the tablet device is a touch screen.
+        /// <summary>
+        /// Indicates the tablet device is a touch screen.
+        /// </summary>
         Touch = 2
     }
 }

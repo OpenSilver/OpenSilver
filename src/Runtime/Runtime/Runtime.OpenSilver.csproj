@@ -875,8 +875,8 @@
 		<Compile Include="System.Windows.input\TextComposition.cs" />
 		<Compile Include="System.Windows.input\TextCompositionEventArgs.cs" />
 		<Compile Include="System.Windows.input\MouseWheelEventHandler.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\StylusDevice.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\TabletDeviceType.cs" />
+		<Compile Include="System.Windows.input\StylusDevice.cs" />
+		<Compile Include="System.Windows.input\TabletDeviceType.cs" />
 		<Compile Include="System.Windows.input\TextCompositionEventHandler.cs" />
 		<Compile Include="System.Windows.Media.Animation\AnimationHelpers.cs" />
 		<Compile Include="System.Windows.Media.Animation\AnimationTimeline.cs" />
