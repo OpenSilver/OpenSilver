@@ -20,12 +20,7 @@ namespace TestApplication.OpenSilver.Tests
         {
             InkPad.CaptureMouse();
             StylusPointCollection MyStylusPointCollection = new StylusPointCollection();
-#if OPENSILVER
-            var point = e.GetPosition(InkPad);
-            MyStylusPointCollection.Add(new StylusPoint() { X = point.X, Y = point.Y });
-#else
-            MyStylusPointCollection.Add(e.StylusDevice.GetStylusPoints(MyIP));
-#endif
+            MyStylusPointCollection.Add(e.StylusDevice.GetStylusPoints(InkPad));
             LastStroke = new Stroke(MyStylusPointCollection);
             InkPad.Strokes.Add(LastStroke);
         }
@@ -40,12 +35,7 @@ namespace TestApplication.OpenSilver.Tests
         {
             if (LastStroke != null && InkPad.IsMouseCaptured)
             {
-#if OPENSILVER
-                var point = e.GetPosition(InkPad);
-                LastStroke.StylusPoints.Add(new StylusPoint() { X = point.X, Y = point.Y });
-#else
-                NewStroke.StylusPoints.Add(e.StylusDevice.GetStylusPoints(MyIP));
-#endif
+                LastStroke.StylusPoints.Add(e.StylusDevice.GetStylusPoints(InkPad));
             }
         }
 
