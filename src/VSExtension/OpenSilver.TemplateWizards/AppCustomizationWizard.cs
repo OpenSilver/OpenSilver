@@ -3,12 +3,40 @@ using Microsoft.VisualStudio.TemplateWizard;
 using OpenSilver.TemplateWizards.AppCustomizationWindow;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Xml.Linq;
 
 namespace OpenSilver.TemplateWizards
 {
     class AppCustomizationWizard : IWizard
     {
+        private const string NugetConfig = "Nuget.Config";
+
+        private static string GetVsixFullPath(string filename)
+        {
+            var vsixDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (string.IsNullOrEmpty(vsixDir))
+            {
+                return null;
+            }
+
+            return Path.Combine(
+                vsixDir,
+                filename
+            );
+        }
+
+        private static void CopyNugetConfig(Dictionary<string, string> replacementsDictionary)
+        {
+            var solutionDir = replacementsDictionary["$solutiondirectory$"];
+            var vsixNugetConfig = GetVsixFullPath(NugetConfig);
+            if (solutionDir != null && vsixNugetConfig != null)
+            {
+                File.Copy(vsixNugetConfig, Path.Combine(solutionDir, NugetConfig));
+            }
+        }
+
         public void BeforeOpeningFile(ProjectItem projectItem)
         {
 
@@ -26,10 +54,10 @@ namespace OpenSilver.TemplateWizards
 
         public void RunFinished()
         {
-
         }
 
-        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
+        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary,
+            WizardRunKind runKind, object[] customParams)
         {
             XElement openSilverInfo = XElement.Parse(replacementsDictionary["$wizarddata$"]);
 
@@ -41,7 +69,8 @@ namespace OpenSilver.TemplateWizards
 
             AppConfigurationWindow window = new AppConfigurationWindow(openSilverType);
 
-            if (openSilverType != "Library") // In the case of a class Library, the user has no other choices to make so we do not show the app configuration window.
+            // In the case of a class Library, the user has no other choices to make so we do not show the app configuration window.
+            if (openSilverType != "Library")
             {
                 bool? result = window.ShowDialog();
                 if (!result.HasValue || !result.Value)
@@ -86,8 +115,9 @@ namespace OpenSilver.TemplateWizards
                         replacementsDictionary.Add("$blazorpackagesversion$", "7.0.0-*");
                         break;
                 }
-            }
 
+                CopyNugetConfig(replacementsDictionary);
+            }
 
             replacementsDictionary.Add("$opensilverpackageversion$", "1.0.0");
         }
