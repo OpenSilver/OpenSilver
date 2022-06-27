@@ -66,29 +66,20 @@ namespace Windows.UI.Xaml.Controls
             // 2 - increase the actual size of our canvas
             // 3 - ensure all drawing operations are scaled
             // 4 - scale everything down using CSS
-#if OPENSILVER
-            var javascript = "let rect = $0.getBoundingClientRect();" +
-                    "$0.width = rect.width * window.devicePixelRatio;" +
-                    "$0.height = rect.height * window.devicePixelRatio;" +
-                    "let ctx = $0.getContext('2d');" +
-                    "ctx.scale(window.devicePixelRatio, window.devicePixelRatio);" +
-                    "$0.style.width = rect.width + 'px';" +
-                    "$0.style.height = rect.height + 'px';" +
-                    "ctx.strokeStyle=$1; ctx.lineWidth=$2;" +
-                    "ctx.clearRect(0, 0, $0.width, $0.height);";
 
-            OpenSilver.Interop.ExecuteJavaScriptAsync(javascript, _canvasDom, "#222222", 4); 
-#else
             OpenSilver.Interop.ExecuteJavaScriptAsync(@"let rect = $0.getBoundingClientRect();
-$0.width = rect.width * window.devicePixelRatio;
-$0.height = rect.height * window.devicePixelRatio;
-let ctx = $0.getContext('2d');
-ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-$0.style.width = rect.width + 'px';
-$0.style.height = rect.height + 'px';
-ctx.strokeStyle=$1; ctx.lineWidth=$2;
-ctx.clearRect(0, 0, $0.width, $0.height);", _canvasDom, "#222222", 4);
-#endif
+                    $0.width = rect.width * window.devicePixelRatio;
+                    $0.height = rect.height * window.devicePixelRatio;
+                    let ctx = $0.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.webkitImageSmoothingEnabled = true;
+                    ctx.mozImageSmoothingEnabled = true;
+                    ctx.msImageSmoothingEnabled = true;
+                    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+                    $0.style.width = rect.width + 'px';
+                    $0.style.height = rect.height + 'px';
+                    ctx.strokeStyle=$1; ctx.lineWidth=$2;
+                    ctx.clearRect(0, 0, $0.width, $0.height);", _canvasDom, "#222222", 4);
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)

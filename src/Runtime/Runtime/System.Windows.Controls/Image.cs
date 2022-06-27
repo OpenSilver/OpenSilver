@@ -154,37 +154,53 @@ namespace Windows.UI.Xaml.Controls
             RefreshSource();
         }
 
+        internal static string GetImageTagSrc(ImageSource Source, UIElement relativeToPath = null)
+        {
+            string imageSrc = string.Empty;
+            if (Source is BitmapImage)
+            {
+                BitmapImage sourceAsBitmapImage = (BitmapImage)Source;
+                if (sourceAsBitmapImage.UriSource != null)
+                {
+                    Uri sourceUri = ((BitmapImage)Source).UriSource;
+                    imageSrc = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, relativeToPath);
+                }
+                else if (sourceAsBitmapImage.INTERNAL_StreamSource != null)
+                {
+                    imageSrc = "data:image/png;base64," + sourceAsBitmapImage.INTERNAL_StreamAsBase64String;
+                }
+                else if (!string.IsNullOrEmpty(sourceAsBitmapImage.INTERNAL_DataURL))
+                {
+                    imageSrc = sourceAsBitmapImage.INTERNAL_DataURL;
+                }
+            }
+            else if (Source is BitmapSource)
+            {
+                BitmapSource sourceAsBitmapImage = (BitmapSource)Source;
+                if (sourceAsBitmapImage.INTERNAL_StreamSource != null)
+                {
+                    imageSrc = "data:image/png;base64," + sourceAsBitmapImage.INTERNAL_StreamAsBase64String;
+                }
+                else if (!string.IsNullOrEmpty(sourceAsBitmapImage.INTERNAL_DataURL))
+                {
+                    imageSrc = sourceAsBitmapImage.INTERNAL_DataURL;
+                }
+            }
+            return imageSrc;
+        }
         private void RefreshSource()
         {
             if (Source != null)
             {
                 Loaded += Image_Loaded;
-                if (Source is BitmapImage)
+                var imageSrc = GetImageTagSrc(Source, this);
+                if (!string.IsNullOrEmpty(imageSrc))
                 {
-                    BitmapImage sourceAsBitmapImage = (BitmapImage)Source;
-                    if (sourceAsBitmapImage.UriSource != null)
-                    {
-                        Uri sourceUri = null;
-                        sourceUri = ((BitmapImage)Source).UriSource;
-
-                        string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, this);
-
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", html5Path);
-                    }
-                    else if (sourceAsBitmapImage.INTERNAL_StreamSource != null)
-                    {
-                        string dataUrl = "data:image/png;base64," + sourceAsBitmapImage.INTERNAL_StreamAsBase64String;
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", dataUrl);
-                    }
-                    else if (!string.IsNullOrEmpty(sourceAsBitmapImage.INTERNAL_DataURL))
-                    {
-                        string dataUrl = sourceAsBitmapImage.INTERNAL_DataURL;
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", dataUrl);
-                    }
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc);
                     //set the width and height to "inherit" so the image takes up the size defined for it (and applied to _imageDiv's parent):
                     CSHTML5.Interop.ExecuteJavaScript("$0.style.width = 'inherit'; $0.style.height = 'inherit'", _imageDiv);
                 }
-            }
+            }            
             else
             {
                 //If Source == null we show empty image to prevent broken image icon

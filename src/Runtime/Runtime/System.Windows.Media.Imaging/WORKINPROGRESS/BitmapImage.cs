@@ -15,12 +15,14 @@
 using CSHTML5.Internal;
 #endif
 
+
 using System;
 using System.Reflection;
 
 #if MIGRATION
 namespace System.Windows.Media.Imaging
 #else
+using Windows.Foundation;
 namespace Windows.UI.Xaml.Media.Imaging
 #endif
 {

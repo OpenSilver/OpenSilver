@@ -114,7 +114,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         [OpenSilver.NotImplemented]
         public int PixelHeight
         {
-            get { return (int)this.GetValue(BitmapSource.PixelHeightProperty); }
+            get { return PixelHeightInternal; }
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         [OpenSilver.NotImplemented]
         public int PixelWidth
         {
-            get { return (int)this.GetValue(BitmapSource.PixelWidthProperty); }
+            get { return PixelWidthInternal; }
         }
 
         /// <summary>
@@ -141,8 +141,8 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PixelWidthProperty = DependencyProperty.Register("PixelWidth", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
-        
-        
+
+
         ////
         //// Summary:
         ////     Sets the source image for a BitmapSource by accessing a stream and processing
@@ -156,5 +156,25 @@ namespace Windows.UI.Xaml.Media.Imaging
         ////     An asynchronous handler called when the operation is complete.
         //public IAsyncAction SetSourceAsync(IRandomAccessStream streamSource);
         #endregion
+
+
+        internal virtual int PixelHeightInternal
+        {
+            get
+            {
+                return (int)this.GetValue(PixelHeightProperty);
+            }
+        }
+
+        internal virtual int PixelWidthInternal
+        {
+            get
+            {
+                return (int)this.GetValue(PixelWidthProperty);
+            }
+        }
+
+        /// <summary>Sets the source of the <see cref="T:System.Windows.Media.Imaging.BitmapSource" />.</summary>
+        /// <param name="streamSource">The stream to set the source to.</param>
     }
 }

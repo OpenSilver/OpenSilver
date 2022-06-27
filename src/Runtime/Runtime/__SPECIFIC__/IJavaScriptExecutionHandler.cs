@@ -25,6 +25,8 @@ namespace DotNetForHtml5
         void ExecuteJavaScript(string javaScriptToExecute);
 
         object ExecuteJavaScriptWithResult(string javaScriptToExecute);
+
+        TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
     }
 }
 

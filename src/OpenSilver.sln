@@ -55,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99A3
 		Runtime\Scripts\fastclick.js = Runtime\Scripts\fastclick.js
 		Runtime\Scripts\flatpickr.css = Runtime\Scripts\flatpickr.css
 		Runtime\Scripts\flatpickr.js = Runtime\Scripts\flatpickr.js
+		Runtime\Scripts\html2canvas.min.js = Runtime\Scripts\html2canvas.min.js
 		Runtime\Scripts\OpenSilver.js = Runtime\Scripts\OpenSilver.js
 		Runtime\Scripts\quill.core.css = Runtime\Scripts\quill.core.css
 		Runtime\Scripts\quill.min.js = Runtime\Scripts\quill.min.js

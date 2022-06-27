@@ -211,6 +211,7 @@
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
+		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
@@ -558,7 +559,7 @@
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\PixelShader.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\SamplingMode.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\ShaderEffect.cs" />
-		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\WriteableBitmap.cs" />
+		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.cs" />
 		<Compile Include="System.Windows.Media.Media3D\WORKINPROGRESS\Matrix3D.cs" />
 		<Compile Include="System.Windows.Printing\BeginPrintEventArgs.cs" />
 		<Compile Include="System.Windows.Printing\PrinterFallbackSettings.cs" />
@@ -978,7 +979,7 @@
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplineDoubleKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\FillBehavior.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ClockState.cs" />
-		<Compile Include="System.Windows.Media.Imaging\BitmapImage.cs" />
+		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\BitmapImage.cs" />
 		<Compile Include="System.Windows.Media.Imaging\BitmapSource.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\BitmapCreateOptions.cs" />
 		<Compile Include="System.Windows.Media\ArcSegment.cs" />

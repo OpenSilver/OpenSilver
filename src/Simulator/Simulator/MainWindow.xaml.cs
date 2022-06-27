@@ -985,6 +985,7 @@ Click OK to continue.";
                     File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.css"), Path.Combine(destinationPath, "flatpickr.css"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.js"), Path.Combine(destinationPath, "flatpickr.js"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "ResizeSensor.js"), Path.Combine(destinationPath, "ResizeSensor.js"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "html2canvas.min.js"), Path.Combine(destinationPath, "html2canvas.min.js"), true);                    
 
                     // Create "interopcalls.js" which contains all the JS executed by the Simulator so far:
                     string fullLog = _javaScriptExecutionHandler.FullLogOfExecutedJavaScriptCode;
