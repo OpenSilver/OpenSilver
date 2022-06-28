@@ -15,6 +15,7 @@
 
 #if !MIGRATION
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media;
 #endif
 
 namespace System.Windows.Media.Effects
@@ -53,12 +54,12 @@ namespace System.Windows.Media.Effects
 		[OpenSilver.NotImplemented]
         protected static DependencyProperty RegisterPixelShaderSamplerProperty(string @dpName, Type @ownerType, int @samplerRegisterIndex)
         {
-            return null;
+            return DependencyProperty.Register(dpName, typeof(Brush), ownerType, new PropertyMetadata());
         }
 		[OpenSilver.NotImplemented]
         protected static DependencyProperty RegisterPixelShaderSamplerProperty(string @dpName, Type @ownerType, int @samplerRegisterIndex, SamplingMode @samplingMode)
         {
-            return null;
+            return DependencyProperty.Register(dpName, typeof(Brush), ownerType, new PropertyMetadata());
         }
     }
 }
