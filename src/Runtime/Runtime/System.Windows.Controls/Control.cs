@@ -1055,17 +1055,13 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
 
         internal void UpdateValidationState()
         {
-            if (!this._isInvalid)
-                VisualStateManager.GoToState(this, "Valid", true);
-            else
+            if (this._isInvalid)
             {
                 VisualStateManager.GoToState(this, _isFocused ? "InvalidFocused" : "InvalidUnfocused", true);
-
-                Popup popup = this.INTERNAL_ValidationErrorPopup;
-                if (popup != null)
-                {
-                    popup.IsOpen = _isFocused;
-                }
+            }                
+            else
+            {
+                VisualStateManager.GoToState(this, "Valid", true);
             }
         }
 
