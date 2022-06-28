@@ -242,12 +242,12 @@ namespace Windows.UI.Xaml
 
         private static DependencyObject AsDependencyObject(object item)
         {
-            if (!(item is DependencyObject depObj))
+            if (!(item is DependencyObject) && item != null)
             {
                 throw new ArgumentException("item is not a DependencyObject.");
             }
 
-            return depObj;
+            return (DependencyObject)item;
         }
 
         private static T AsT(object item)
