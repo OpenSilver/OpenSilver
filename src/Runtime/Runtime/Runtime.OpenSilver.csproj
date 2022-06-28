@@ -132,7 +132,6 @@
 		<Compile Include="System.Windows.Controls\DateTimeHelper.cs" />
 		<Compile Include="System.Windows.Controls\DragDecorator.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
-		<Compile Include="System.Windows.Controls\LayoutTransformer.cs" />
 		<Compile Include="System.Windows.Controls\LongTimeFormat.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
@@ -153,7 +152,6 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RatingItem.cs" />
 		<Compile Include="System.Windows.Controls\ShortTimeFormat.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TransitioningContentControl.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewConnectingLines.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewExtensions.cs" />
 		<Compile Include="System.ComponentModel\ReflectedPropertyCollection.cs" />
