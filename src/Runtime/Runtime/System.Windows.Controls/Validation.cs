@@ -185,8 +185,6 @@ namespace Windows.UI.Xaml.Controls
                         }
                     }
 
-                    RefreshPopup(target, errors);
-
                     if (target is Control c)
                     {
                         c.HideValidationError();
@@ -271,8 +269,6 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
 
-                RefreshPopup(target, validationErrors);
-
                 if (target is Control c)
                 {
                     c.ShowValidationError();
@@ -280,91 +276,6 @@ namespace Windows.UI.Xaml.Controls
             }
 
         }
-
-        private static void RefreshPopup(UIElement target, ObservableCollection<ValidationError> errors)
-        {
-            Popup popup = target.INTERNAL_ValidationErrorPopup;
-            if (errors.Count == 0)
-            {
-                if (popup != null)
-                {
-                    popup.IsOpen = false;
-                }
-            }
-            else
-            {
-                if (popup == null)
-                {
-                    popup = new Popup();
-                    target.INTERNAL_ValidationErrorPopup = popup;
-
-                    //we define the content of the popup:
-                    Border border = new Border()
-                    {
-                        Background = new SolidColorBrush(Color.FromArgb(255, 219, 2, 12)),
-                        CornerRadius = new CornerRadius(2),
-                        Margin = new Thickness(5, 0, 0, 0),
-                    };
-                    TextBlock textBlock = new TextBlock()
-                    {
-                        Foreground = new SolidColorBrush(Colors.White),
-                        FontSize = 11.0,
-                        Margin = new Thickness(5, 3, 5, 3),
-                        TextWrapping = TextWrapping.Wrap,
-                        MaxWidth = 250,
-                    };
-                    border.Child = textBlock;
-                    popup.Child = border;
-                    popup.IsHitTestVisible = false;
-                    popup.PlacementTarget = target;
-                    popup.Placement = PlacementMode.Right;
-                }
-
-                //Point PopupAbsolutePosition = INTERNAL_PopupsManager.CalculatePopupAbsolutePositionBasedOnElementPosition(target, 0d, 0d);
-                //popup.HorizontalOffset = PopupAbsolutePosition.X;
-                //popup.VerticalOffset = PopupAbsolutePosition.Y;
-                string errorsInString = "";
-                bool isFirst = true;
-                foreach (ValidationError validationError in errors)
-                {
-                    errorsInString += Environment.NewLine;
-                    if (isFirst)
-                    {
-                        errorsInString = "";
-                        isFirst = false;
-                    }
-                    errorsInString += validationError.ErrorContent;
-                }
-
-                //Note: if the popup is not new, its Child (currently a textBlock) is already set.
-                //Todo: when we will support Templates for the validation error messages, make sure we correctly refresh the template visually.
-                ((TextBlock)((Border)popup.Child).Child).Text = errorsInString;
-                //Note: the line above will need to change when we will support templates.
-                //      At this time, we will probably use a Binding and set the Text as the DataContext of the Popup
-                //      OR we might need to set the whole errors collection as the DataContext depending on how it works in WPF and Silverlight.
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(target))
-                    popup.IsOpen = true;
-            }
-        }
-
-        private static void Popup_PopupMoved(object sender, EventArgs e)
-        {
-            Popup popup = (Popup)sender;
-            PopupRoot popupRoot = popup.PopupRoot;
-
-            // Hide the popup if the parent element is not visible (for example, if the 
-            // user scrolls and the TextBox becomes hidden under another control, cf. ZenDesk #628):
-            if (popup.PlacementTarget is FrameworkElement && popupRoot != null)
-            {
-                bool isParentVisible = INTERNAL_PopupsManager.IsPopupParentVisibleOnScreen(popup);
-
-                popupRoot.Visibility = (isParentVisible ? Visibility.Visible : Visibility.Collapsed);
-
-            }
-        }
-
-
-
 
         #region to be implemented
 

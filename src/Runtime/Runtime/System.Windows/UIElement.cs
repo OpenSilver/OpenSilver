@@ -250,7 +250,6 @@ namespace Windows.UI.Xaml
         internal string INTERNAL_HtmlRepresentation { get; set; } // This can be used instead of overriding the "CreateDomElement" method to specify the appearance of the control.
         internal Dictionary<UIElement, INTERNAL_VisualChildInformation> INTERNAL_VisualChildrenInformation { get; set; } //todo-performance: verify that JavaScript output is a performant dictionary too, otherwise change structure.
         internal bool INTERNAL_RenderTransformOriginHasBeenApplied = false; // This is useful to ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS.
-        internal Popup INTERNAL_ValidationErrorPopup;
         //Note: the two following fields are only used in the PointerRoutedEventArgs class to determine how many clicks have been made on this UIElement in a short amount of time.
         internal int INTERNAL_clickCount; //this is used in the PointerPressed event to fill the ClickCount Property.
         internal int INTERNAL_lastClickDate; //this is used in the PointerPressed event to fill the ClickCount Property.
