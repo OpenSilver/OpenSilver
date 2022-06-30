@@ -697,7 +697,7 @@ namespace Windows.UI.Xaml
         {
             var builtInParams = new List<string>() { "windowless" };
 
-            var builtInParamsFromArgs = startupEventArgs.InitParams.Where(kv => builtInParams.Contains(kv.Key));
+            var builtInParamsFromArgs = startupEventArgs.InitParams.Where(kv => builtInParams.Contains(kv.Key.ToLower()));
 
             foreach (var param in builtInParamsFromArgs)
             {
