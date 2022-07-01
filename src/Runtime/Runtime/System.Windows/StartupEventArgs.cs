@@ -84,6 +84,9 @@ namespace Windows.UI.Xaml
                 return;
 
             var paramArrayJson = OpenSilver.Interop.ExecuteJavaScript("document.getInitParams()");
+            if (paramArrayJson == null)
+                return;
+
             var paramArry = JsonSerializer.Deserialize(paramArrayJson.ToString(), typeof(List<InitParam>)) as List<InitParam>;
 
             InitParamsDict = new Dictionary<string, string>();
