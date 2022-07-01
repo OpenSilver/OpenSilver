@@ -71,7 +71,12 @@ namespace DotNetForHtml5.Compiler
 
         private static string PrepareStringForChar(string source)
         {
-            return string.Concat("'", source, "'");
+            if (source != null && source.Length == 1)
+            {
+                return $"'{source}'";
+            }
+
+            return "'\\0'";
         }
 
         private static string PrepareStringForDecimal(string source)
