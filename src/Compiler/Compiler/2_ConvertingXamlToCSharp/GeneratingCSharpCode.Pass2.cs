@@ -332,9 +332,6 @@ namespace DotNetForHtml5.Compiler
                 );
                 bool isInitializeTypeFromString =
                     element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute) != null;
-                bool isResourceDictionary = IsResourceDictionary(element);
-                bool isResourceDictionaryReferencedBySourceURI =
-                    isResourceDictionary && element.Attribute("Source") != null;
 
                 // Add the constructor (in case of object) or a direct initialization (in case
                 // of system type or "isInitializeFromString" or referenced ResourceDictionary)
@@ -401,7 +398,8 @@ namespace DotNetForHtml5.Compiler
                         );
 
                     }
-                    else if (isResourceDictionaryReferencedBySourceURI)
+                    else if (element.Attribute("Source") != null && _reflectionOnSeparateAppDomain.IsAssignableFrom(
+                        _metadata.SystemWindowsNS, "ResourceDictionary", element.Name.NamespaceName, element.Name.LocalName))
                     {
                         //------------------------------------------------
                         // Add the type initialization from "Source" URI:
@@ -416,7 +414,7 @@ namespace DotNetForHtml5.Compiler
                             string.Format(
                                 "var {0} = {3}.XamlContext_PushScope({4}, (({1})new {2}()).CreateComponent());",
                                 elementUniqueNameOrThisKeyword,
-                                $"{IXamlComponentFactoryClass}<global::{_metadata.SystemWindowsNS}.ResourceDictionary>",
+                                $"{IXamlComponentFactoryClass}<{elementTypeInCSharp}>",
                                 XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
                                 RuntimeHelperClass,
                                 parameters.CurrentXamlContext
