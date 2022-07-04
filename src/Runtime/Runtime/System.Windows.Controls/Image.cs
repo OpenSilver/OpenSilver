@@ -314,7 +314,7 @@ namespace Windows.UI.Xaml.Controls
                         //img.width = "auto";
                         //img.height = "auto";
                         objectFitvalue = "none";
-                        objectPosition = "left top";
+                        objectPosition = "center center";
                         break;
                     case Stretch.Fill:
                         // Commented because it should be the same as the one set by the FrameworkElement Width/Height.
@@ -508,6 +508,9 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             //<img style="width: 100%; height: 100%;" src="C:\Users\Sylvain\Documents\Adventure Maker v4.7\Projects\ASA_game\Icons\settings.ico" alt="settings" />
+            var parentDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(parentRef);
+            parentDivStyle.width = "100%";
+            parentDivStyle.height = "100%";
             var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
             var intermediaryDomStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             intermediaryDomStyle.lineHeight = "0px"; //this one is to fix in Firefox the few pixels gap that appears below the image whith certain displays (table, table-cell and possibly some others)
