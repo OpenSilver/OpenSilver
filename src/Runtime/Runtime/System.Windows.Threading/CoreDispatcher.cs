@@ -259,10 +259,12 @@ namespace Windows.UI.Core
             return false;
         }
 
-		[OpenSilver.NotImplemented]
         public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
         {
-            return null;
+            return BeginInvoke(() =>
+            {
+                d.DynamicInvoke(args);
+            });
         }
 
         public bool CheckAccess()
