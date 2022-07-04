@@ -88,7 +88,6 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!e.Handled)
             {
-                e.Handled = true;
                 ListBox parent = ParentListBox;
                 if (parent != null)
                 {

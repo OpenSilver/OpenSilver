@@ -130,9 +130,40 @@ namespace Windows.UI.Xaml.Controls
                 };
         }
 
-        internal override int INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget()
+        [OpenSilver.NotImplemented]
+        protected override int GetItemCount(Panel itemsControl)
         {
-            return 2;
+            throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        protected override Panel GetItemsHost(Panel itemsControl)
+        {
+            throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        protected override object ItemFromContainer(Panel itemsControl, UIElement itemContainer)
+        {
+            throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        protected override bool CanRemove(Panel itemsControl)
+        {
+            throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        protected override bool CanAddItem(Panel itemsControl, object data)
+        {
+            throw new NotImplementedException();
+        }
+
+        [OpenSilver.NotImplemented]
+        protected override bool IsItemContainerOfItemsControl(Panel itemsControl, DependencyObject itemContainer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

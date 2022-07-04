@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -19,11 +18,15 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    [OpenSilver.NotImplemented]
-    public abstract partial class ItemsControlDragDropTarget<TItemsControl, TItemContainerType> :
-        DragDropTarget<TItemsControl, TItemContainerType>
-        where TItemsControl : ItemsControl
-        where TItemContainerType : FrameworkElement
+    public sealed partial class ListBoxDragDropTarget : ItemsControlDragDropTarget<ListBox, ListBoxItem>
     {
+        /// <summary>
+        /// Gets a new instance of the item control.
+        /// </summary>
+        /// <returns>The item control.</returns>
+        protected override ListBox INTERNAL_ReturnNewTItemsControl()
+        {
+            return new ListBox();
+        }
     }
 }
