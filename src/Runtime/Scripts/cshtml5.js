@@ -93,24 +93,22 @@ document.getXamlRoot = function()
 }
 
 document.clearXamlRoot = function () {
-    var children = document.getXamlRoot().children;
+    const children = document.getXamlRoot().children;
 
     for (i = children.length - 1; i >= 0; i--) {
-        if (children[i].tagName.toLowerCase() != "param")
+        if (children[i].tagName !== "PARAM") {
             children[i].remove();
+        }
     }
 }
 
-document.getInitParams = function () {
-    var paramTags = document.getXamlRoot().getElementsByTagName("param");
-    var params = new Array();
-
-    for (i = 0; i < paramTags.length; i++) {
-        var paramObj = { Name: paramTags[i].attributes["name"].value, Value: paramTags[i].attributes["value"].value };
-        params.push(paramObj);
-    }
-
-    return JSON.stringify(params);
+document.getAppParams = function () {
+    return JSON.stringify(
+        Array.from(
+            document.getXamlRoot().getElementsByTagName("param"),
+            function (p) { return { Name: p.name, Value: p.value }; }
+        )
+    );
 }
 
 document.ResXFiles = {};

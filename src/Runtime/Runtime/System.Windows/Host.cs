@@ -28,6 +28,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         private Content _content;
         private Settings _settings;
         private string _navigationState;
+        private Dictionary<string, string> _initParams;
 
         public Host() : this(false) { }
 
@@ -138,11 +139,46 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         /// of a Silverlight plug-in.
         /// </summary>
         /// <returns>
-        /// The set of initialization parameters, as a dictionary with key strings and
-        /// value strings.
+        /// The set of initialization parameters, as a dictionary with key strings and value
+        /// strings.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public IDictionary<string, string> InitParams => new Dictionary<string, string>();
+        public IDictionary<string, string> InitParams => _initParams ?? (_initParams = ParseInitParams());
+
+        private Dictionary<string, string> ParseInitParams()
+        {
+            const string InitParamsName = "InitParams";
+
+            var initParams = new Dictionary<string, string>();
+
+            Application app = Application.Current;
+            if (app != null && app.AppParams.TryGetValue(InitParamsName, out string initParamsString))
+            {
+                foreach (string p in initParamsString.Split(','))
+                {
+                    string key;
+                    string value;
+
+                    int idx = p.IndexOf('=');
+                    if (idx > -1)
+                    {
+                        key = p.Substring(0, idx).Trim();
+                        value = p.Substring(idx + 1).Trim();
+                    }
+                    else
+                    {
+                        key = p.Trim();
+                        value = string.Empty;
+                    }
+
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        initParams[key] = value;
+                    }
+                }
+            }
+
+            return initParams;
+        }
 
         //// Summary:
         ////     Gets the background color value that was applied to the Silverlight plug-in
