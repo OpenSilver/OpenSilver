@@ -793,7 +793,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 _isHorizontalOffsetInvalid = true;
             }
-            else
+            else if (div != null) //Note: this can happen when we remove the ScrollViewer from the visual tree and one of its parents had its Visibility Collapsed.
             {
                 INTERNAL_HtmlDomManager.SetDomElementProperty(div, "scrollLeft", _horizontalOffset);
                 _isHorizontalOffsetInvalid = false;
@@ -828,7 +828,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 _isVerticalOffsetInvalid = true;
             }
-            else
+            else if (div != null) //Note: this can happen when we remove the ScrollViewer from the visual tree and one of its parents had its Visibility Collapsed.
             {
                 INTERNAL_HtmlDomManager.SetDomElementProperty(div, "scrollTop", _verticalOffset);
                 _isVerticalOffsetInvalid = false;
