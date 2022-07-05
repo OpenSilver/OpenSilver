@@ -18,6 +18,7 @@ using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Markup;
@@ -70,7 +71,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         internal override int VisualChildrenCount
         {
-            get { return (_child == null) ? 0 : 1; }
+            get { return (Child == null) ? 0 : 1; }
         }
 
         /// <summary>
@@ -78,13 +79,13 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         internal override UIElement GetVisualChild(int index)
         {
-            if ((_child == null)
+            if ((Child == null)
                 || (index != 0))
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            return _child;
+            return Child;
         }
 
         /// <summary> 
@@ -95,13 +96,13 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (this._child == null)
+                if (this.Child == null)
                 {
                     return EmptyEnumerator.Instance;
                 }
 
                 // otherwise, its logical children is its visual children
-                return new SingleChildEnumerator(_child);
+                return new SingleChildEnumerator(Child);
             }
         }
 
@@ -118,32 +119,40 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private UIElement _child;
+        /// <summary>
+        /// Identifies the <see cref="Child"/> dependency property.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly DependencyProperty ChildProperty =
+            DependencyProperty.Register(
+                nameof(Child),
+                typeof(UIElement),
+                typeof(Border),
+                new PropertyMetadata(null, OnChildChanged));
 
         /// <summary>
         /// Gets or sets the child element to draw the border around.
         /// </summary>
         public UIElement Child
         {
-            get
-            {
-                return _child;
-            }
-            set
-            {
-                if (ReferenceEquals(_child, value))
-                    return;
+            get => (UIElement)GetValue(ChildProperty);
+            set => SetValue(ChildProperty, value);
+        }
 
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
+        private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Border border = (Border)d;
+            UIElement oldChild = (UIElement)e.OldValue;
+            UIElement newChild = (UIElement)e.NewValue;
 
-                RemoveVisualChild(_child);
-                RemoveLogicalChild(_child);
-                _child = value;
-                AddLogicalChild(value);
-                AddVisualChild(value);
+            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, border);
 
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(value, this);
-            }
+            border.RemoveVisualChild(oldChild);
+            border.RemoveLogicalChild(oldChild);
+            border.AddLogicalChild(newChild);
+            border.AddVisualChild(newChild);
+
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, border);
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
@@ -157,7 +166,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (!this.INTERNAL_EnableProgressiveLoading)
             {
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
             }
             else
             {
@@ -173,7 +182,7 @@ namespace Windows.UI.Xaml.Controls
                 //this can happen if the Panel is detached during the delay.
                 return;
             }
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
+            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
         }
 
         /// <summary>
