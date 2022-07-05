@@ -87,6 +87,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         protected Series()
         {
             this.LegendItems = (ObservableCollection<object>)new NoResetObservableCollection<object>();
+            this.ClipToBounds = true;
         }
     }
 }

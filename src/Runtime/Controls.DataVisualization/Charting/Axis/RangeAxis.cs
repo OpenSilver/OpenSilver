@@ -204,7 +204,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>Instantiates a new instance of the RangeAxis class.</summary>
         protected RangeAxis()
         {
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(RangeAxis);
+#endif
             this._labelPool = new ObjectPool<Control>((Func<Control>)(() => this.CreateAxisLabel()));
             this._majorTickMarkPool = new ObjectPool<Line>((Func<Line>)(() => this.CreateMajorTickMark()));
             this._minorTickMarkPool = new ObjectPool<Line>((Func<Line>)(() => this.CreateMinorTickMark()));
@@ -215,6 +217,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
                 this.UpdateActualRange();
             };
             this.SizeChanged += handler;
+
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(RangeAxis);
+#endif
         }
 
         /// <summary>Creates a minor axis tick mark.</summary>

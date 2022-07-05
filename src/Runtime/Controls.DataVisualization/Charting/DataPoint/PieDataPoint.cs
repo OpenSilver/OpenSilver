@@ -378,7 +378,9 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>Initializes a new instance of the PieDataPoint class.</summary>
         public PieDataPoint()
         {
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(PieDataPoint);
+#endif
             if (!DesignerProperties.GetIsInDesignMode((DependencyObject)this))
                 return;
             this.ActualRatio = 0.2;
@@ -390,6 +392,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 double height = newSize.Height;
                 PieSeries.UpdatePieDataPointGeometry(this, width, height);
             });
+
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(PieDataPoint);
+#endif
         }
 
         /// <summary>

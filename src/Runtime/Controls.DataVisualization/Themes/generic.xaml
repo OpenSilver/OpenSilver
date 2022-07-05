@@ -1232,4 +1232,18 @@
         </Setter>
     </Style>-->
 
+    <Style TargetType="charting:LayoutTransformControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:LayoutTransformControl">
+                    <Grid x:Name='LayoutRoot' Background='{TemplateBinding Background}'>
+                        <Grid.RenderTransform>
+                            <MatrixTransform x:Name='MatrixTransform'/>
+                        </Grid.RenderTransform>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

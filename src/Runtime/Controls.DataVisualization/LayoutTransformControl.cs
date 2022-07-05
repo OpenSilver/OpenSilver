@@ -83,7 +83,9 @@ namespace System.Windows.Controls.DataVisualization
         {
             this.IsTabStop = false;
             this.UseLayoutRounding = false;
-            this.Template = (ControlTemplate)XamlReader.Load("<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'><Grid x:Name='LayoutRoot' Background='{TemplateBinding Background}'><Grid.RenderTransform><MatrixTransform x:Name='MatrixTransform'/></Grid.RenderTransform></Grid></ControlTemplate>");
+            // Moved the template to generic.xaml
+            //this.Template = (ControlTemplate)XamlReader.Load("<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'><Grid x:Name='LayoutRoot' Background='{TemplateBinding Background}'><Grid.RenderTransform><MatrixTransform x:Name='MatrixTransform'/></Grid.RenderTransform></Grid></ControlTemplate>");
+            DefaultStyleKey = typeof(LayoutTransformControl);
         }
 
         /// <summary>Called whenever the control's template changes.</summary>

@@ -513,9 +513,16 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         protected DataPointSeries()
         {
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(DataPointSeries);
+#endif
+
             this.ClipGeometry = new RectangleGeometry();
             this.Clip = (Geometry)this.ClipGeometry;
+
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(DataPointSeries);
+#endif
         }
 
         /// <summary>

@@ -58,12 +58,17 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>Initializes a new instance of the PieSeries class.</summary>
         public PieSeries()
         {
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(PieSeries);
+#endif
             this.ResourceDictionaryDispenser = new ResourceDictionaryDispenser();
             this.ResourceDictionaryDispenser.ResourceDictionariesChanged += (EventHandler)delegate
             {
                 this.OnResourceDictionariesChanged(EventArgs.Empty);
             };
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(PieSeries);
+#endif
         }
 
         /// <summary>Invokes the ResourceDictionariesChanged event.</summary>

@@ -200,6 +200,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="dataPoint">The data point to update.</param>
         protected override void UpdateDataPoint(DataPoint dataPoint)
         {
+            if (this.ActualDependentRangeAxis == null)
+            {
+                return;
+            }
             double num1 = this.ActualDependentRangeAxis.GetPlotAreaCoordinate((object)this.ActualDependentRangeAxis.Range.Maximum).Value;
             if (ValueHelper.CanGraph(num1))
             {

@@ -285,7 +285,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>Initializes a new instance of the Chart class.</summary>
         public Chart()
         {
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(Chart);
+#endif
             UniqueObservableCollection<ISeries> observableCollection1 = new UniqueObservableCollection<ISeries>();
             observableCollection1.CollectionChanged += new NotifyCollectionChangedEventHandler(this.SeriesCollectionChanged);
             this._series = (Collection<ISeries>)observableCollection1;
@@ -307,6 +309,11 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             {
                 this.OnResourceDictionariesChanged(EventArgs.Empty);
             };
+
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(Chart);
+            CustomLayout = true;
+#endif
         }
 
         /// <summary>Invokes the ResourceDictionariesChanged event.</summary>

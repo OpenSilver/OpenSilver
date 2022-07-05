@@ -377,13 +377,19 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         protected DisplayAxis()
         {
             this.OrientedPanel = new OrientedPanel();
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(DisplayAxis);
+#endif
             this.OrientedPanel.UseLayoutRounding = true;
             this.DependentAxisGrid = new Grid();
             this.TitleLayoutTransformControl = new LayoutTransformControl();
             this.TitleLayoutTransformControl.HorizontalAlignment = HorizontalAlignment.Center;
             this.TitleLayoutTransformControl.VerticalAlignment = VerticalAlignment.Center;
             this.SizeChanged += new SizeChangedEventHandler(this.DisplayAxisSizeChanged);
+
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(DisplayAxis);
+#endif
         }
 
         /// <summary>If display axis has just become visible, invalidate.</summary>

@@ -118,11 +118,16 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         protected DefinitionSeries()
         {
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(DefinitionSeries);
+#endif
             this._seriesDefinitions.CollectionChanged += new NotifyCollectionChangedEventHandler(this.SeriesDefinitionsCollectionChanged);
             this._seriesAreaChildrenListAdapter.Collection = (IEnumerable)this._seriesDefinitions;
             this._selectedItems.CollectionChanged += new NotifyCollectionChangedEventHandler(this.SelectedItemsCollectionChanged);
             this.DataItems = new ObservableCollection<DefinitionSeries.DataItem>();
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(DefinitionSeries);
+#endif
         }
 
         /// <summary>Gets or sets the dependent axis of the series.</summary>

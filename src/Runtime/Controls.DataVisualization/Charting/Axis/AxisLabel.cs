@@ -63,12 +63,17 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>Instantiates a new instance of the AxisLabel class.</summary>
         public AxisLabel()
         {
+#if !MIGRATION
             this.DefaultStyleKey = (object)typeof(AxisLabel);
+#endif
             this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
             {
                 Converter = (IValueConverter)new StringFormatConverter(),
                 ConverterParameter = (object)(this.StringFormat ?? "{0}")
             });
+#if MIGRATION
+            this.DefaultStyleKey = (object)typeof(AxisLabel);
+#endif
         }
 
         /// <summary>Updates the formatted text.</summary>

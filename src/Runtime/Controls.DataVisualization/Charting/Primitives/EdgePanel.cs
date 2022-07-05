@@ -369,7 +369,8 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
                 }
             }
             Rect rect1 = EdgePanel.SafeCreateRect(this._leftRect.RightOrDefault(0.0), this._topRect.BottomOrDefault(0.0), arrangeSize.Width - this._leftRect.WidthOrDefault(0.0) - this._rightRect.WidthOrDefault(0.0), arrangeSize.Height - this._topRect.HeightOrDefault(0.0) - this._bottomRect.HeightOrDefault(0.0));
-            foreach (UIElement uiElement in this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(child => EdgePanel.GetEdge(child) == Edge.Center)))
+            var children = this.Children.ToList();
+            foreach (UIElement uiElement in children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(child => EdgePanel.GetEdge(child) == Edge.Center)))
                 uiElement.Arrange(rect1);
             return arrangeSize;
         }
