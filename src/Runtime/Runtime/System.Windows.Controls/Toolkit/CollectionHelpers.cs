@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Controls
     /// A set of extension methods for manipulating collections.
     /// </summary>
     /// <QualityBand>Experimental</QualityBand>
-    internal static class CollectionHelper
+    public static class CollectionHelper
     {
         /// <summary>
         /// Returns a value indicating whether a collection is read-only.

@@ -3,7 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Diagnostics.CodeAnalysis;
+using System.Windows.Data;
 
 #if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
@@ -11,75 +11,87 @@ namespace System.Windows.Controls.DataVisualization.Charting
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
-    /// <summary>
-    /// An axis label for displaying DateTime values.
-    /// </summary>
-    [OpenSilver.NotImplemented]
+    /// <summary>An axis label for displaying DateTime values.</summary>
     public class DateTimeAxisLabel : AxisLabel
     {
-        #region public DateTimeIntervalType IntervalType
+        /// <summary>Identifies the IntervalType dependency property.</summary>
+        public static readonly DependencyProperty IntervalTypeProperty = DependencyProperty.Register(nameof(IntervalType), typeof(DateTimeIntervalType), typeof(DateTimeAxisLabel), new PropertyMetadata((object)DateTimeIntervalType.Auto, new PropertyChangedCallback(DateTimeAxisLabel.OnIntervalTypePropertyChanged)));
         /// <summary>
-        /// Gets or sets the interval type of the DateTimeAxis2.
+        /// Identifies the YearsIntervalStringFormat dependency property.
         /// </summary>
+        public static readonly DependencyProperty YearsIntervalStringFormatProperty = DependencyProperty.Register(nameof(YearsIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnYearsIntervalStringFormatPropertyChanged)));
+        /// <summary>
+        /// Identifies the MonthsIntervalStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MonthsIntervalStringFormatProperty = DependencyProperty.Register(nameof(MonthsIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnMonthsIntervalStringFormatPropertyChanged)));
+        /// <summary>
+        /// Identifies the WeeksIntervalStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty WeeksIntervalStringFormatProperty = DependencyProperty.Register(nameof(WeeksIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnWeeksIntervalStringFormatPropertyChanged)));
+        /// <summary>
+        /// Identifies the DaysIntervalStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty DaysIntervalStringFormatProperty = DependencyProperty.Register(nameof(DaysIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnDaysIntervalStringFormatPropertyChanged)));
+        /// <summary>
+        /// Identifies the HoursIntervalStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty HoursIntervalStringFormatProperty = DependencyProperty.Register(nameof(HoursIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnHoursIntervalStringFormatPropertyChanged)));
+        /// <summary>
+        /// Identifies the MinutesIntervalStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MinutesIntervalStringFormatProperty = DependencyProperty.Register(nameof(MinutesIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnMinutesIntervalStringFormatPropertyChanged)));
+        /// <summary>
+        /// Identifies the SecondsIntervalStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SecondsIntervalStringFormatProperty = DependencyProperty.Register(nameof(SecondsIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnSecondsIntervalStringFormatPropertyChanged)));
+        /// <summary>
+        /// Identifies the MillisecondsIntervalStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MillisecondsIntervalStringFormatProperty = DependencyProperty.Register(nameof(MillisecondsIntervalStringFormat), typeof(string), typeof(DateTimeAxisLabel), new PropertyMetadata((object)null, new PropertyChangedCallback(DateTimeAxisLabel.OnMillisecondsIntervalStringFormatPropertyChanged)));
+
+        /// <summary>Gets or sets the interval type of the DateTimeAxis2.</summary>
         public DateTimeIntervalType IntervalType
         {
-            get { return (DateTimeIntervalType)GetValue(IntervalTypeProperty); }
-            set { SetValue(IntervalTypeProperty, value); }
+            get
+            {
+                return (DateTimeIntervalType)this.GetValue(DateTimeAxisLabel.IntervalTypeProperty);
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.IntervalTypeProperty, (object)value);
+            }
         }
 
-        /// <summary>
-        /// Identifies the IntervalType dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IntervalTypeProperty =
-            DependencyProperty.Register(
-                "IntervalType",
-                typeof(DateTimeIntervalType),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(DateTimeIntervalType.Auto, OnIntervalTypePropertyChanged));
-
-        /// <summary>
-        /// IntervalTypeProperty property changed handler.
-        /// </summary>
+        /// <summary>IntervalTypeProperty property changed handler.</summary>
         /// <param name="d">DateTimeAxisLabel that changed its IntervalType.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnIntervalTypePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            DateTimeIntervalType oldValue = (DateTimeIntervalType)e.OldValue;
-            DateTimeIntervalType newValue = (DateTimeIntervalType)e.NewValue;
-            source.OnIntervalTypePropertyChanged(oldValue, newValue);
+            ((DateTimeAxisLabel)d).OnIntervalTypePropertyChanged((DateTimeIntervalType)e.OldValue, (DateTimeIntervalType)e.NewValue);
         }
 
-        /// <summary>
-        /// IntervalTypeProperty property changed handler.
-        /// </summary>
+        /// <summary>IntervalTypeProperty property changed handler.</summary>
         /// <param name="oldValue">Old value.</param>
-        /// <param name="newValue">New value.</param>        
+        /// <param name="newValue">New value.</param>
         protected virtual void OnIntervalTypePropertyChanged(DateTimeIntervalType oldValue, DateTimeIntervalType newValue)
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public DateTimeIntervalType IntervalType
 
-        #region public string YearsIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string YearsIntervalStringFormat
         {
-            get { return GetValue(YearsIntervalStringFormatProperty) as string; }
-            set { SetValue(YearsIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.YearsIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.YearsIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the YearsIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty YearsIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "YearsIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnYearsIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// YearsIntervalStringFormatProperty property changed handler.
@@ -88,38 +100,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnYearsIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnYearsIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnYearsIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// YearsIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnYearsIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string YearsIntervalStringFormat
 
-        #region public string MonthsIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string MonthsIntervalStringFormat
         {
-            get { return GetValue(MonthsIntervalStringFormatProperty) as string; }
-            set { SetValue(MonthsIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.MonthsIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.MonthsIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the MonthsIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MonthsIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "MonthsIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnMonthsIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// MonthsIntervalStringFormatProperty property changed handler.
@@ -128,38 +133,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnMonthsIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnMonthsIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnMonthsIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// MonthsIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnMonthsIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string MonthsIntervalStringFormat
 
-        #region public string WeeksIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string WeeksIntervalStringFormat
         {
-            get { return GetValue(WeeksIntervalStringFormatProperty) as string; }
-            set { SetValue(WeeksIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.WeeksIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.WeeksIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the WeeksIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty WeeksIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "WeeksIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnWeeksIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// WeeksIntervalStringFormatProperty property changed handler.
@@ -168,38 +166,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnWeeksIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnWeeksIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnWeeksIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// WeeksIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnWeeksIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string WeeksIntervalStringFormat
 
-        #region public string DaysIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string DaysIntervalStringFormat
         {
-            get { return GetValue(DaysIntervalStringFormatProperty) as string; }
-            set { SetValue(DaysIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.DaysIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.DaysIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the DaysIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty DaysIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "DaysIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnDaysIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// DaysIntervalStringFormatProperty property changed handler.
@@ -208,38 +199,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnDaysIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnDaysIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnDaysIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// DaysIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnDaysIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string DaysIntervalStringFormat
 
-        #region public string HoursIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string HoursIntervalStringFormat
         {
-            get { return GetValue(HoursIntervalStringFormatProperty) as string; }
-            set { SetValue(HoursIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.HoursIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.HoursIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the HoursIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty HoursIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "HoursIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnHoursIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// HoursIntervalStringFormatProperty property changed handler.
@@ -248,38 +232,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnHoursIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnHoursIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnHoursIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// HoursIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnHoursIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string HoursIntervalStringFormat
 
-        #region public string MinutesIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string MinutesIntervalStringFormat
         {
-            get { return GetValue(MinutesIntervalStringFormatProperty) as string; }
-            set { SetValue(MinutesIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.MinutesIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.MinutesIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the MinutesIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MinutesIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "MinutesIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnMinutesIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// MinutesIntervalStringFormatProperty property changed handler.
@@ -288,38 +265,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnMinutesIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnMinutesIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnMinutesIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// MinutesIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnMinutesIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string MinutesIntervalStringFormat
 
-        #region public string SecondsIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string SecondsIntervalStringFormat
         {
-            get { return GetValue(SecondsIntervalStringFormatProperty) as string; }
-            set { SetValue(SecondsIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.SecondsIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.SecondsIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the SecondsIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty SecondsIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "SecondsIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnSecondsIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// SecondsIntervalStringFormatProperty property changed handler.
@@ -328,38 +298,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnSecondsIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnSecondsIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnSecondsIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// SecondsIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnSecondsIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string SecondsIntervalStringFormat
 
-        #region public string MillisecondsIntervalStringFormat
         /// <summary>
         /// Gets or sets the format string to use when the interval is hours.
         /// </summary>
         public string MillisecondsIntervalStringFormat
         {
-            get { return GetValue(MillisecondsIntervalStringFormatProperty) as string; }
-            set { SetValue(MillisecondsIntervalStringFormatProperty, value); }
+            get
+            {
+                return this.GetValue(DateTimeAxisLabel.MillisecondsIntervalStringFormatProperty) as string;
+            }
+            set
+            {
+                this.SetValue(DateTimeAxisLabel.MillisecondsIntervalStringFormatProperty, (object)value);
+            }
         }
-
-        /// <summary>
-        /// Identifies the MillisecondsIntervalStringFormat dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MillisecondsIntervalStringFormatProperty =
-            DependencyProperty.Register(
-                "MillisecondsIntervalStringFormat",
-                typeof(string),
-                typeof(DateTimeAxisLabel),
-                new PropertyMetadata(null, OnMillisecondsIntervalStringFormatPropertyChanged));
 
         /// <summary>
         /// MillisecondsIntervalStringFormatProperty property changed handler.
@@ -368,48 +331,95 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnMillisecondsIntervalStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DateTimeAxisLabel source = (DateTimeAxisLabel)d;
-            source.OnMillisecondsIntervalStringFormatPropertyChanged();
+            ((DateTimeAxisLabel)d).OnMillisecondsIntervalStringFormatPropertyChanged();
         }
 
         /// <summary>
         /// MillisecondsIntervalStringFormatProperty property changed handler.
-        /// </summary>    
+        /// </summary>
         protected virtual void OnMillisecondsIntervalStringFormatPropertyChanged()
         {
-            UpdateFormattedContent();
+            this.UpdateFormattedContent();
         }
-        #endregion public string MillisecondsIntervalStringFormat
-
-#if !SILVERLIGHT
-        /// <summary>
-        /// Initializes the static members of the DateTimeAxisLabel class.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
-        static DateTimeAxisLabel()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(DateTimeAxisLabel), new FrameworkPropertyMetadata(typeof(DateTimeAxisLabel)));
-        }
-
-#endif    
 
         /// <summary>
         /// Instantiates a new instance of the DateTimeAxisLabel class.
         /// </summary>
         public DateTimeAxisLabel()
         {
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(DateTimeAxisLabel);
-#endif
+            this.DefaultStyleKey = (object)typeof(DateTimeAxisLabel);
         }
 
-        /// <summary>
-        /// Updates the formatted text.
-        /// </summary>
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Code is not overly complex.")]
-        [OpenSilver.NotImplemented]
+        /// <summary>Updates the formatted text.</summary>
         protected override void UpdateFormattedContent()
         {
+            if (this.StringFormat == null)
+            {
+                switch (this.IntervalType)
+                {
+                    case DateTimeIntervalType.Milliseconds:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.MillisecondsIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    case DateTimeIntervalType.Seconds:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.SecondsIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    case DateTimeIntervalType.Minutes:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.MinutesIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    case DateTimeIntervalType.Hours:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.HoursIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    case DateTimeIntervalType.Days:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.DaysIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    case DateTimeIntervalType.Weeks:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.WeeksIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    case DateTimeIntervalType.Months:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.MonthsIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    case DateTimeIntervalType.Years:
+                        this.SetBinding(AxisLabel.FormattedContentProperty, new Binding()
+                        {
+                            Converter = (IValueConverter)new StringFormatConverter(),
+                            ConverterParameter = (object)(this.YearsIntervalStringFormat ?? this.StringFormat ?? "{0}")
+                        });
+                        break;
+                    default:
+                        base.UpdateFormattedContent();
+                        break;
+                }
+            }
+            else
+                base.UpdateFormattedContent();
         }
     }
 }

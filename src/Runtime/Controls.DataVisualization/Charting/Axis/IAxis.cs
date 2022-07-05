@@ -11,15 +11,20 @@ namespace System.Windows.Controls.DataVisualization.Charting
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
+    /// <summary>An object that listens for changes in an axis.</summary>
+    public interface IAxisListener
+    {
+        /// <summary>This method is called when the axis is invalidated.</summary>
+        /// <param name="axis">The axis that has been invalidated.</param>
+        void AxisInvalidated(IAxis axis);
+    }
+
     /// <summary>
     /// An axis interface used to determine the plot area coordinate of values.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public interface IAxis
     {
-        /// <summary>
-        /// Gets or sets the orientation of the axis.
-        /// </summary>
+        /// <summary>Gets or sets the orientation of the axis.</summary>
         AxisOrientation Orientation { get; set; }
 
         /// <summary>
@@ -31,13 +36,19 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Returns a value indicating whether the axis can plot a value.
         /// </summary>
         /// <param name="value">The value to plot.</param>
-        /// <returns>A value indicating whether the axis can plot a value.
-        /// </returns>
+        /// <returns>A value indicating whether the axis can plot a value.</returns>
         bool CanPlot(object value);
 
-        /// <summary>
-        /// Gets the collection of child axes.
-        /// </summary>
+        /// <summary>The plot area coordinate of a value.</summary>
+        /// <param name="value">The value for which to retrieve the plot area
+        /// coordinate.</param>
+        /// <returns>The plot area coordinate.</returns>
+        UnitValue GetPlotAreaCoordinate(object value);
+
+        /// <summary>Gets the registered IAxisListeners.</summary>
+        ObservableCollection<IAxisListener> RegisteredListeners { get; }
+
+        /// <summary>Gets the collection of child axes.</summary>
         ObservableCollection<IAxis> DependentAxes { get; }
     }
 }

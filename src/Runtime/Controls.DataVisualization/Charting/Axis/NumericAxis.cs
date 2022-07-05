@@ -12,220 +12,204 @@ using System;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
-    /// <summary>
-    /// An axis that displays numeric values.
-    /// </summary>
-    [OpenSilver.NotImplemented]
+    /// <summary>An axis that displays numeric values.</summary>
     public abstract class NumericAxis : RangeAxis
     {
-        #region public double? ActualMaximum
+        /// <summary>Identifies the ActualMaximum dependency property.</summary>
+        public static readonly DependencyProperty ActualMaximumProperty = DependencyProperty.Register(nameof(ActualMaximum), typeof(double?), typeof(NumericAxis), (PropertyMetadata)null);
+        /// <summary>Identifies the ActualMinimum dependency property.</summary>
+        public static readonly DependencyProperty ActualMinimumProperty = DependencyProperty.Register(nameof(ActualMinimum), typeof(double?), typeof(NumericAxis), (PropertyMetadata)null);
+        /// <summary>Identifies the Maximum dependency property.</summary>
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(double?), typeof(NumericAxis), new PropertyMetadata((object)null, new PropertyChangedCallback(NumericAxis.OnMaximumPropertyChanged)));
+        /// <summary>Identifies the Minimum dependency property.</summary>
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(double?), typeof(NumericAxis), new PropertyMetadata((object)null, new PropertyChangedCallback(NumericAxis.OnMinimumPropertyChanged)));
         /// <summary>
-        /// Gets the actual maximum value plotted on the chart.
+        /// Identifies the ExtendRangeToOrigin dependency property.
         /// </summary>
+        public static readonly DependencyProperty ExtendRangeToOriginProperty = DependencyProperty.Register(nameof(ExtendRangeToOrigin), typeof(bool), typeof(NumericAxis), new PropertyMetadata((object)false, new PropertyChangedCallback(NumericAxis.OnExtendRangeToOriginPropertyChanged)));
+
+        /// <summary>Gets the actual maximum value plotted on the chart.</summary>
         public double? ActualMaximum
         {
-            get { return (double?)GetValue(ActualMaximumProperty); }
-            private set { SetValue(ActualMaximumProperty, value); }
+            get
+            {
+                return (double?)this.GetValue(NumericAxis.ActualMaximumProperty);
+            }
+            private set
+            {
+                this.SetValue(NumericAxis.ActualMaximumProperty, (object)value);
+            }
         }
 
-        /// <summary>
-        /// Identifies the ActualMaximum dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ActualMaximumProperty =
-            DependencyProperty.Register(
-                "ActualMaximum",
-                typeof(double?),
-                typeof(NumericAxis),
-                null);
-
-        #endregion public double? ActualMaximum
-
-        #region public double? ActualMinimum
-        /// <summary>
-        /// Gets the actual maximum value plotted on the chart.
-        /// </summary>
+        /// <summary>Gets the actual maximum value plotted on the chart.</summary>
         public double? ActualMinimum
         {
-            get { return (double?)GetValue(ActualMinimumProperty); }
-            private set { SetValue(ActualMinimumProperty, value); }
+            get
+            {
+                return (double?)this.GetValue(NumericAxis.ActualMinimumProperty);
+            }
+            private set
+            {
+                this.SetValue(NumericAxis.ActualMinimumProperty, (object)value);
+            }
         }
 
-        /// <summary>
-        /// Identifies the ActualMinimum dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ActualMinimumProperty =
-            DependencyProperty.Register(
-                "ActualMinimum",
-                typeof(double?),
-                typeof(NumericAxis),
-                null);
-
-        #endregion public double? ActualMinimum
-
-        #region public double? Maximum
-        /// <summary>
-        /// Gets or sets the maximum value plotted on the axis.
-        /// </summary>
+        /// <summary>Gets or sets the maximum value plotted on the axis.</summary>
         [TypeConverter(typeof(NullableConverter<double>))]
         public double? Maximum
         {
-            get { return (double?)GetValue(MaximumProperty); }
-            set { SetValue(MaximumProperty, value); }
+            get
+            {
+                return (double?)this.GetValue(NumericAxis.MaximumProperty);
+            }
+            set
+            {
+                this.SetValue(NumericAxis.MaximumProperty, (object)value);
+            }
         }
 
-        /// <summary>
-        /// Identifies the Maximum dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register(
-                "Maximum",
-                typeof(double?),
-                typeof(NumericAxis),
-                new PropertyMetadata(null, OnMaximumPropertyChanged));
-
-        /// <summary>
-        /// MaximumProperty property changed handler.
-        /// </summary>
+        /// <summary>MaximumProperty property changed handler.</summary>
         /// <param name="d">NumericAxis that changed its Maximum.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnMaximumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            NumericAxis source = (NumericAxis)d;
-            double? newValue = (double?)e.NewValue;
-            source.OnMaximumPropertyChanged(newValue);
+            ((NumericAxis)d).OnMaximumPropertyChanged((double?)e.NewValue);
         }
 
-        /// <summary>
-        /// MaximumProperty property changed handler.
-        /// </summary>
+        /// <summary>MaximumProperty property changed handler.</summary>
         /// <param name="newValue">New value.</param>
         protected virtual void OnMaximumPropertyChanged(double? newValue)
         {
-            this.ProtectedMaximum = newValue;
+            this.ProtectedMaximum = (IComparable)newValue;
         }
-        #endregion public double? Maximum
 
-        #region public double? Minimum
-        /// <summary>
-        /// Gets or sets the minimum value to plot on the axis.
-        /// </summary>
+        /// <summary>Gets or sets the minimum value to plot on the axis.</summary>
         [TypeConverter(typeof(NullableConverter<double>))]
         public double? Minimum
         {
-            get { return (double?)GetValue(MinimumProperty); }
-            set { SetValue(MinimumProperty, value); }
+            get
+            {
+                return (double?)this.GetValue(NumericAxis.MinimumProperty);
+            }
+            set
+            {
+                this.SetValue(NumericAxis.MinimumProperty, (object)value);
+            }
         }
 
-        /// <summary>
-        /// Identifies the Minimum dependency property.
-        /// </summary>
-        public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register(
-                "Minimum",
-                typeof(double?),
-                typeof(NumericAxis),
-                new PropertyMetadata(null, OnMinimumPropertyChanged));
-
-        /// <summary>
-        /// MinimumProperty property changed handler.
-        /// </summary>
+        /// <summary>MinimumProperty property changed handler.</summary>
         /// <param name="d">NumericAxis that changed its Minimum.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnMinimumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            NumericAxis source = (NumericAxis)d;
-            double? newValue = (double?)e.NewValue;
-            source.OnMinimumPropertyChanged(newValue);
+            ((NumericAxis)d).OnMinimumPropertyChanged((double?)e.NewValue);
         }
 
-        /// <summary>
-        /// MinimumProperty property changed handler.
-        /// </summary>
+        /// <summary>MinimumProperty property changed handler.</summary>
         /// <param name="newValue">New value.</param>
         protected virtual void OnMinimumPropertyChanged(double? newValue)
         {
-            this.ProtectedMinimum = newValue;
+            this.ProtectedMinimum = (IComparable)newValue;
         }
-        #endregion public double? Minimum
 
-        #region public bool ExtendRangeToOrigin
         /// <summary>
         /// Gets or sets a value indicating whether to always show the origin.
         /// </summary>
         public bool ExtendRangeToOrigin
         {
-            get { return (bool)GetValue(ExtendRangeToOriginProperty); }
-            set { SetValue(ExtendRangeToOriginProperty, value); }
+            get
+            {
+                return (bool)this.GetValue(NumericAxis.ExtendRangeToOriginProperty);
+            }
+            set
+            {
+                this.SetValue(NumericAxis.ExtendRangeToOriginProperty, (object)value);
+            }
         }
 
-        /// <summary>
-        /// Identifies the ExtendRangeToOrigin dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ExtendRangeToOriginProperty =
-            DependencyProperty.Register(
-                "ExtendRangeToOrigin",
-                typeof(bool),
-                typeof(NumericAxis),
-                new PropertyMetadata(false, OnExtendRangeToOriginPropertyChanged));
-
-        /// <summary>
-        /// ExtendRangeToOriginProperty property changed handler.
-        /// </summary>
+        /// <summary>ExtendRangeToOriginProperty property changed handler.</summary>
         /// <param name="d">NumericAxis that changed its ExtendRangeToOrigin.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnExtendRangeToOriginPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            NumericAxis source = (NumericAxis)d;
-            bool oldValue = (bool)e.OldValue;
-            bool newValue = (bool)e.NewValue;
-            source.OnExtendRangeToOriginPropertyChanged(oldValue, newValue);
+            ((NumericAxis)d).OnExtendRangeToOriginPropertyChanged((bool)e.OldValue, (bool)e.NewValue);
         }
 
-        /// <summary>
-        /// ExtendRangeToOriginProperty property changed handler.
-        /// </summary>
+        /// <summary>ExtendRangeToOriginProperty property changed handler.</summary>
         /// <param name="oldValue">Old value.</param>
         /// <param name="newValue">New value.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnExtendRangeToOriginPropertyChanged(bool oldValue, bool newValue)
         {
+            this.ActualRange = this.OverrideDataRange(this.ActualRange);
         }
-        #endregion public bool ExtendRangeToOrigin
 
-        /// <summary>
-        /// Gets the origin value on the axis.
-        /// </summary>
+        /// <summary>Gets the origin value on the axis.</summary>
         protected override IComparable Origin
         {
-            get { return 0.0; }
+            get
+            {
+                return (IComparable)0.0;
+            }
         }
 
         /// <summary>
-        /// Instantiates a new instance of the NumericAxis class.
+        /// Updates the typed actual maximum and minimum properties when the
+        /// actual range changes.
         /// </summary>
-        protected NumericAxis()
+        /// <param name="range">The actual range.</param>
+        protected override void OnActualRangeChanged(Range<IComparable> range)
         {
+            if (range.HasData)
+            {
+                this.ActualMaximum = new double?((double)range.Maximum);
+                this.ActualMinimum = new double?((double)range.Minimum);
+            }
+            else
+            {
+                this.ActualMaximum = new double?();
+                this.ActualMinimum = new double?();
+            }
+            base.OnActualRangeChanged(range);
         }
 
-        /// <summary>
-        /// Returns a value indicating whether a value can plot.
-        /// </summary>
+        /// <summary>Returns a value indicating whether a value can plot.</summary>
         /// <param name="value">The value to plot.</param>
         /// <returns>A value indicating whether a value can plot.</returns>
-        [OpenSilver.NotImplemented]
         public override bool CanPlot(object value)
         {
-            return false;
+            double doubleValue;
+            return ValueHelper.TryConvert(value, out doubleValue);
+        }
+
+        /// <summary>Returns a numeric axis label.</summary>
+        /// <returns>A numeric axis label.</returns>
+        protected override Control CreateAxisLabel()
+        {
+            return (Control)new NumericAxisLabel();
         }
 
         /// <summary>
-        /// Returns a numeric axis label.
+        /// Overrides the data value range and returns a range that takes the
+        /// margins of the values into account.
         /// </summary>
-        /// <returns>A numeric axis label.</returns>
-        [OpenSilver.NotImplemented]
-        protected override Control CreateAxisLabel()
+        /// <param name="range">The range of data values.</param>
+        /// <returns>A range that can store both the data values and their
+        /// margins.</returns>
+        protected override Range<IComparable> OverrideDataRange(Range<IComparable> range)
         {
-            return null;
+            range = base.OverrideDataRange(range);
+            if (!this.ExtendRangeToOrigin)
+                return range;
+            Range<double> doubleRange = range.ToDoubleRange();
+            if (!doubleRange.HasData)
+                return new Range<IComparable>((IComparable)0.0, (IComparable)0.0);
+            double num1 = doubleRange.Minimum;
+            double num2 = doubleRange.Maximum;
+            if (num1 > 0.0)
+                num1 = 0.0;
+            else if (num2 < 0.0)
+                num2 = 0.0;
+            return new Range<IComparable>((IComparable)num1, (IComparable)num2);
         }
     }
 }

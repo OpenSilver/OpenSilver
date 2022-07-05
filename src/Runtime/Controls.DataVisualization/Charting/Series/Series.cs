@@ -11,48 +11,64 @@ namespace System.Windows.Controls.DataVisualization.Charting
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
-    /// <summary>
-    /// Represents a control that contains a data series.
-    /// </summary>
+    /// <summary>Represents a control that contains a data series.</summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
-    public abstract partial class Series : Control, ISeries //, IRequireSeriesHost
+    public abstract class Series : Control, ISeries, IRequireSeriesHost
     {
-        /// <summary>
-        /// The name of the Title property.
-        /// </summary>
+        /// <summary>Identifies the Title dependency property.</summary>
+        public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(object), typeof(Series), new PropertyMetadata(new PropertyChangedCallback(Series.OnTitleChanged)));
+        /// <summary>The name of the Title property.</summary>
         protected const string TitleName = "Title";
+        /// <summary>Stores the Parent instance the Series belongs to.</summary>
+        private ISeriesHost _seriesHost;
 
-        #region public ObservableCollection<object> LegendItems
         /// <summary>
-        /// Gets the legend items to be added to the legend.
+        /// Gets or sets the parent instance the Series belongs to.
         /// </summary>
-        public ObservableCollection<object> LegendItems { get; private set; }
-        #endregion public ObservableCollection<object> LegendItems
-
-        #region public object Title
-        /// <summary>
-        /// Gets or sets the title content of the Series.
-        /// </summary>
-        public object Title
+        public ISeriesHost SeriesHost
         {
-            get { return GetValue(TitleProperty); }
-            set { SetValue(TitleProperty, value); }
+            get
+            {
+                return this._seriesHost;
+            }
+            set
+            {
+                ISeriesHost seriesHost = this._seriesHost;
+                this._seriesHost = value;
+                if (seriesHost == this._seriesHost)
+                    return;
+                this.OnSeriesHostPropertyChanged(seriesHost, this._seriesHost);
+            }
         }
 
         /// <summary>
-        /// Identifies the Title dependency property.
+        /// Called when the value of the SeriesHost property changes.
         /// </summary>
-        public static readonly DependencyProperty TitleProperty =
-            DependencyProperty.Register(
-                TitleName,
-                typeof(object),
-                typeof(Series),
-                new PropertyMetadata(OnTitleChanged));
+        /// <param name="oldValue">The value to be replaced.</param>
+        /// <param name="newValue">The new series host value.</param>
+        protected virtual void OnSeriesHostPropertyChanged(ISeriesHost oldValue, ISeriesHost newValue)
+        {
+            if (newValue != null && oldValue != null)
+                throw new InvalidOperationException("Series.SeriesHost: SeriesHost Property Not Null");
+        }
 
-        /// <summary>
-        /// TitleProperty property changed callback.
-        /// </summary>
+        /// <summary>Gets the legend items to be added to the legend.</summary>
+        public ObservableCollection<object> LegendItems { get; private set; }
+
+        /// <summary>Gets or sets the title content of the Series.</summary>
+        public object Title
+        {
+            get
+            {
+                return this.GetValue(Series.TitleProperty);
+            }
+            set
+            {
+                this.SetValue(Series.TitleProperty, value);
+            }
+        }
+
+        /// <summary>TitleProperty property changed callback.</summary>
         /// <param name="o">Series for which the Title changed.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnTitleChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
@@ -60,23 +76,17 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             ((Series)o).OnTitleChanged(e.OldValue, e.NewValue);
         }
 
-        /// <summary>
-        /// Called when the Title property changes.
-        /// </summary>
+        /// <summary>Called when the Title property changes.</summary>
         /// <param name="oldValue">The old value of the Title property.</param>
         /// <param name="newValue">The new value of the Title property.</param>
         protected virtual void OnTitleChanged(object oldValue, object newValue)
         {
         }
-        #endregion public object Title
 
-        /// <summary>
-        /// Initializes a new instance of the Series class.
-        /// </summary>
-        [OpenSilver.NotImplemented]
+        /// <summary>Initializes a new instance of the Series class.</summary>
         protected Series()
         {
-            LegendItems = new ObservableCollection<object>(); //new NoResetObservableCollection<object>();
+            this.LegendItems = (ObservableCollection<object>)new NoResetObservableCollection<object>();
         }
     }
 }

@@ -11,11 +11,8 @@ namespace System.Windows.Controls.DataVisualization.Charting
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
-    /// <summary>
-    /// Represents a series in a chart.
-    /// </summary>
-    [OpenSilver.NotImplemented]
-    public interface ISeries //: IRequireSeriesHost
+    /// <summary>Represents a series in a chart.</summary>
+    public interface ISeries : IRequireSeriesHost
     {
         /// <summary>
         /// Gets a list of the legend items associated with the object.

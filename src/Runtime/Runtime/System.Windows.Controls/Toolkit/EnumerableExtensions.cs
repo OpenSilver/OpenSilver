@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Extension methods for Enumerable.
     /// </summary>
-    internal static class EnumerableExtensions
+    public static class EnumerableExtensions
     {
         /// <summary>
         /// Creates a sequence from an integer, to an integer, skipping 
