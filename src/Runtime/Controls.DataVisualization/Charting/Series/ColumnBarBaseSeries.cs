@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace System.Windows.Controls.DataVisualization.Charting
@@ -7,84 +13,109 @@ namespace System.Windows.Controls.DataVisualization.Charting
     /// This series serves as the base class for the column and bar series.
     /// </summary>
     /// <typeparam name="T">The type of the data point.</typeparam>
-    public abstract class ColumnBarBaseSeries<T> : DataPointSingleSeriesWithAxes, IAnchoredToOrigin where T : DataPoint, new()
+    public abstract class ColumnBarBaseSeries<T> : DataPointSingleSeriesWithAxes, IAnchoredToOrigin
+        where T : DataPoint, new()
     {
+        #region public IRangeAxis DependentRangeAxis
+        /// <summary>
+        /// Gets or sets the dependent range axis.
+        /// </summary>
+        public IRangeAxis DependentRangeAxis
+        {
+            get { return GetValue(DependentRangeAxisProperty) as IRangeAxis; }
+            set { SetValue(DependentRangeAxisProperty, value); }
+        }
+
         /// <summary>
         /// Identifies the DependentRangeAxis dependency property.
         /// </summary>
-        public static readonly DependencyProperty DependentRangeAxisProperty = DependencyProperty.Register(nameof(DependentRangeAxis), typeof(IRangeAxis), typeof(ColumnBarBaseSeries<T>), new PropertyMetadata((object)null, new PropertyChangedCallback(ColumnBarBaseSeries<T>.OnDependentRangeAxisPropertyChanged)));
-        /// <summary>Identifies the IndependentAxis dependency property.</summary>
-        public static readonly DependencyProperty IndependentAxisProperty = DependencyProperty.Register(nameof(IndependentAxis), typeof(IAxis), typeof(ColumnBarBaseSeries<T>), new PropertyMetadata((object)null, new PropertyChangedCallback(ColumnBarBaseSeries<T>.OnIndependentAxisPropertyChanged)));
+        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "This member is necessary because child classes need to share this dependency property.")]
+        public static readonly DependencyProperty DependentRangeAxisProperty =
+            DependencyProperty.Register(
+                "DependentRangeAxis",
+                typeof(IRangeAxis),
+                typeof(ColumnBarBaseSeries<T>),
+                new PropertyMetadata(null, OnDependentRangeAxisPropertyChanged));
+
         /// <summary>
-        /// Keeps a list of DataPoints that share the same category.
+        /// DependentRangeAxisProperty property changed handler.
         /// </summary>
-        private IDictionary<object, IGrouping<object, DataPoint>> _categoriesWithMultipleDataPoints;
-        /// <summary>The length of each data point.</summary>
-        private double? _dataPointlength;
-
-        /// <summary>Gets or sets the dependent range axis.</summary>
-        public IRangeAxis DependentRangeAxis
-        {
-            get
-            {
-                return this.GetValue(ColumnBarBaseSeries<T>.DependentRangeAxisProperty) as IRangeAxis;
-            }
-            set
-            {
-                this.SetValue(ColumnBarBaseSeries<T>.DependentRangeAxisProperty, (object)value);
-            }
-        }
-
-        /// <summary>DependentRangeAxisProperty property changed handler.</summary>
         /// <param name="d">ColumnBarBaseSeries that changed its DependentRangeAxis.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnDependentRangeAxisPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ColumnBarBaseSeries<T>)d).OnDependentRangeAxisPropertyChanged((IRangeAxis)e.NewValue);
+            ColumnBarBaseSeries<T> source = (ColumnBarBaseSeries<T>)d;
+            IRangeAxis newValue = (IRangeAxis)e.NewValue;
+            source.OnDependentRangeAxisPropertyChanged(newValue);
         }
 
-        /// <summary>DependentRangeAxisProperty property changed handler.</summary>
+        /// <summary>
+        /// DependentRangeAxisProperty property changed handler.
+        /// </summary>
         /// <param name="newValue">New value.</param>
         private void OnDependentRangeAxisPropertyChanged(IRangeAxis newValue)
         {
-            this.InternalDependentAxis = (IAxis)newValue;
+            InternalDependentAxis = (IAxis)newValue;
         }
+        #endregion public IRangeAxis DependentRangeAxis
 
-        /// <summary>Gets or sets the independent category axis.</summary>
+        #region public IAxis IndependentAxis
+        /// <summary>
+        /// Gets or sets the independent category axis.
+        /// </summary>
         public IAxis IndependentAxis
         {
-            get
-            {
-                return this.GetValue(ColumnBarBaseSeries<T>.IndependentAxisProperty) as IAxis;
-            }
-            set
-            {
-                this.SetValue(ColumnBarBaseSeries<T>.IndependentAxisProperty, (object)value);
-            }
+            get { return GetValue(IndependentAxisProperty) as IAxis; }
+            set { SetValue(IndependentAxisProperty, value); }
         }
 
-        /// <summary>IndependentAxisProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the IndependentAxis dependency property.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "This member is necessary because child classes need to share this dependency property.")]
+        public static readonly DependencyProperty IndependentAxisProperty =
+            DependencyProperty.Register(
+                "IndependentAxis",
+                typeof(IAxis),
+                typeof(ColumnBarBaseSeries<T>),
+                new PropertyMetadata(null, OnIndependentAxisPropertyChanged));
+
+        /// <summary>
+        /// IndependentAxisProperty property changed handler.
+        /// </summary>
         /// <param name="d">ColumnBarBaseSeries that changed its IndependentAxis.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnIndependentAxisPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ColumnBarBaseSeries<T>)d).OnIndependentAxisPropertyChanged((IAxis)e.NewValue);
+            ColumnBarBaseSeries<T> source = (ColumnBarBaseSeries<T>)d;
+            IAxis newValue = (IAxis)e.NewValue;
+            source.OnIndependentAxisPropertyChanged(newValue);
         }
 
-        /// <summary>IndependentAxisProperty property changed handler.</summary>
+        /// <summary>
+        /// IndependentAxisProperty property changed handler.
+        /// </summary>
         /// <param name="newValue">New value.</param>
         private void OnIndependentAxisPropertyChanged(IAxis newValue)
         {
-            this.InternalIndependentAxis = newValue;
+            InternalIndependentAxis = (IAxis)newValue;
         }
+        #endregion public IAxis IndependentAxis
 
-        /// <summary>Returns the group of data points in a given category.</summary>
+        /// <summary>
+        /// Keeps a list of DataPoints that share the same category.
+        /// </summary>
+        private IDictionary<object, IGrouping<object, DataPoint>> _categoriesWithMultipleDataPoints;
+
+        /// <summary>
+        /// Returns the group of data points in a given category.
+        /// </summary>
         /// <param name="category">The category for which to return the data
         /// point group.</param>
         /// <returns>The group of data points in a given category.</returns>
         protected IGrouping<object, DataPoint> GetDataPointGroup(object category)
         {
-            return this._categoriesWithMultipleDataPoints[category];
+            return _categoriesWithMultipleDataPoints[category];
         }
 
         /// <summary>
@@ -96,42 +127,58 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// a category is grouped.</returns>
         protected bool GetIsDataPointGrouped(object category)
         {
-            return this._categoriesWithMultipleDataPoints.ContainsKey(category);
+            return _categoriesWithMultipleDataPoints.ContainsKey(category);
         }
 
-        /// <summary>Gets the dependent axis as a range axis.</summary>
-        public IRangeAxis ActualDependentRangeAxis
+        /// <summary>
+        /// The length of each data point.
+        /// </summary>
+        private double? _dataPointlength;
+
+        /// <summary>
+        /// Gets the dependent axis as a range axis.
+        /// </summary>
+        public IRangeAxis ActualDependentRangeAxis { get { return this.InternalActualDependentAxis as IRangeAxis; } }
+
+        /// <summary>
+        /// Gets the independent axis as a category axis.
+        /// </summary>
+        public IAxis ActualIndependentAxis { get { return this.InternalActualIndependentAxis; } }
+
+        /// <summary>
+        /// Initializes a new instance of the ColumnBarBaseSeries class.
+        /// </summary>
+        protected ColumnBarBaseSeries()
         {
-            get
-            {
-                return this.InternalActualDependentAxis as IRangeAxis;
-            }
         }
 
-        /// <summary>Gets the independent axis as a category axis.</summary>
-        public IAxis ActualIndependentAxis
-        {
-            get
-            {
-                return this.InternalActualIndependentAxis;
-            }
-        }
-
-        /// <summary>Method run before DataPoints are updated.</summary>
+        /// <summary>
+        /// Method run before DataPoints are updated.
+        /// </summary>
         protected override void OnBeforeUpdateDataPoints()
         {
             base.OnBeforeUpdateDataPoints();
-            this.CalculateDataPointLength();
-            this._categoriesWithMultipleDataPoints = (IDictionary<object, IGrouping<object, DataPoint>>)this.ActiveDataPoints.Where<DataPoint>((Func<DataPoint, bool>)(point => null != point.IndependentValue)).OrderBy<DataPoint, IComparable>((Func<DataPoint, IComparable>)(point => point.DependentValue)).GroupBy<DataPoint, object>((Func<DataPoint, object>)(point => point.IndependentValue)).Where<IGrouping<object, DataPoint>>((Func<IGrouping<object, DataPoint>, bool>)(grouping => 1 < CollectionHelper.Count(grouping))).ToDictionary<IGrouping<object, DataPoint>, object>((Func<IGrouping<object, DataPoint>, object>)(grouping => grouping.Key));
+
+            CalculateDataPointLength();
+
+            // Update the list of DataPoints with the same category
+            _categoriesWithMultipleDataPoints = ActiveDataPoints
+                .Where(point => null != point.IndependentValue)
+                .OrderBy(point => point.DependentValue)
+                .GroupBy(point => point.IndependentValue)
+                .Where(grouping => 1 < grouping.Count())
+                .ToDictionary(grouping => grouping.Key);
         }
 
         /// <summary>
         /// Returns the custom ResourceDictionary to use for necessary resources.
         /// </summary>
-        /// <returns>ResourceDictionary to use for necessary resources.</returns>
+        /// <returns>
+        /// ResourceDictionary to use for necessary resources.
+        /// </returns>
         protected override IEnumerator<ResourceDictionary> GetResourceDictionaryEnumeratorFromHost()
         {
-            return DataPointSeries.GetResourceDictionaryWithTargetType((IResourceDictionaryDispenser)this.SeriesHost, typeof(T), true);
+            return GetResourceDictionaryWithTargetType(SeriesHost, typeof(T), true);
         }
 
         /// <summary>
@@ -142,7 +189,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         protected override void OnDataPointActualDependentValueChanged(DataPoint dataPoint, IComparable oldValue, IComparable newValue)
         {
-            this.UpdateDataPoint(dataPoint);
+            UpdateDataPoint(dataPoint);
             base.OnDataPointActualDependentValueChanged(dataPoint, oldValue, newValue);
         }
 
@@ -154,8 +201,12 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected void RedrawOtherSeries(ISeriesHost seriesHost)
         {
             Type thisType = typeof(ColumnBarBaseSeries<T>);
-            foreach (ColumnBarBaseSeries<T> columnBarBaseSeries in seriesHost.Series.Where<ISeries>((Func<ISeries, bool>)(series => thisType.IsAssignableFrom(series.GetType()))).OfType<ColumnBarBaseSeries<T>>().Where<ColumnBarBaseSeries<T>>((Func<ColumnBarBaseSeries<T>, bool>)(series => series != this)))
-                columnBarBaseSeries.UpdateDataPoints(columnBarBaseSeries.ActiveDataPoints);
+
+            // redraw all other column series to ensure they make space for new one
+            foreach (ColumnBarBaseSeries<T> series in seriesHost.Series.Where(series => thisType.IsAssignableFrom(series.GetType())).OfType<ColumnBarBaseSeries<T>>().Where(series => series != this))
+            {
+                series.UpdateDataPoints(series.ActiveDataPoints);
+            }
         }
 
         /// <summary>
@@ -166,10 +217,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected override void OnDataPointsChanged(IList<DataPoint> newDataPoints, IList<DataPoint> oldDataPoints)
         {
             base.OnDataPointsChanged(newDataPoints, oldDataPoints);
-            this.CalculateDataPointLength();
-            if (this.SeriesHost == null)
-                return;
-            this.RedrawOtherSeries(this.SeriesHost);
+
+            CalculateDataPointLength();
+
+            if (this.SeriesHost != null)
+            {
+                RedrawOtherSeries(this.SeriesHost);
+            }
         }
 
         /// <summary>
@@ -180,79 +234,125 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected override void OnSeriesHostPropertyChanged(ISeriesHost oldValue, ISeriesHost newValue)
         {
             base.OnSeriesHostPropertyChanged(oldValue, newValue);
-            if (newValue != null && oldValue == null)
-                return;
-            this.RedrawOtherSeries(oldValue);
+
+            // If being removed from series host, redraw all column series.
+            if (newValue == null || oldValue != null)
+            {
+                RedrawOtherSeries(oldValue);
+            }
         }
 
-        /// <summary>Creates the bar data point.</summary>
+        /// <summary>
+        /// Creates the bar data point.
+        /// </summary>
         /// <returns>A bar data point.</returns>
         protected override DataPoint CreateDataPoint()
         {
-            return (DataPoint)Activator.CreateInstance<T>();
+            return new T();
         }
 
-        /// <summary>Calculates the length of the data points.</summary>
+        /// <summary>
+        /// Calculates the length of the data points.
+        /// </summary>
         protected void CalculateDataPointLength()
         {
-            if (this.ActualIndependentAxis is ICategoryAxis)
-                return;
-            IEnumerable<UnitValue> list = (IEnumerable<UnitValue>)this.ActiveDataPoints.Select<DataPoint, UnitValue>((Func<DataPoint, UnitValue>)(dataPoint => this.ActualIndependentAxis.GetPlotAreaCoordinate(dataPoint.ActualIndependentValue))).Where<UnitValue>((Func<UnitValue, bool>)(value => ValueHelper.CanGraph(value.Value))).OrderBy<UnitValue, double>((Func<UnitValue, double>)(value => value.Value)).ToList<UnitValue>();
-            this._dataPointlength = EnumerableFunctions.Zip<UnitValue, UnitValue, Range<double>>(list, list.Skip<UnitValue>(1), (Func<UnitValue, UnitValue, Range<double>>)((left, right) => new Range<double>(left.Value, right.Value))).Select<Range<double>, double>((Func<Range<double>, double>)(range => range.Maximum - range.Minimum)).MinOrNullable<double>();
+            if (!(ActualIndependentAxis is ICategoryAxis))
+            {
+                IEnumerable<UnitValue> values =
+                    ActiveDataPoints
+                        .Select(dataPoint => ActualIndependentAxis.GetPlotAreaCoordinate(dataPoint.ActualIndependentValue))
+                        .Where(value => ValueHelper.CanGraph(value.Value))
+                        .OrderBy(value => value.Value)
+                        .ToList();
+
+                _dataPointlength =
+                    EnumerableFunctions.Zip(
+                        values,
+                        values.Skip(1),
+                        (left, right) => new Range<double>(left.Value, right.Value))
+                        .Select(range => range.Maximum - range.Minimum)
+                        .MinOrNullable();
+            }
         }
 
-        /// <summary>Returns the value margins for a given axis.</summary>
-        /// <param name="consumer">The axis to retrieve the value margins for.</param>
+        /// <summary>
+        /// Returns the value margins for a given axis.
+        /// </summary>
+        /// <param name="consumer">The axis to retrieve the value margins for.
+        /// </param>
         /// <returns>A sequence of value margins.</returns>
         protected override IEnumerable<ValueMargin> GetValueMargins(IValueMarginConsumer consumer)
         {
-            double dependentValueMargin = this.ActualHeight / 10.0;
+            double dependentValueMargin = this.ActualHeight / 10;
             IAxis axis = consumer as IAxis;
-            if (axis != null && this.ActiveDataPoints.Any<DataPoint>())
+            if (axis != null && ActiveDataPoints.Any())
             {
-                Func<DataPoint, IComparable> selector = (Func<DataPoint, IComparable>)null;
-                if (axis == this.InternalActualIndependentAxis)
+                Func<DataPoint, IComparable> selector = null;
+                if (axis == InternalActualIndependentAxis)
                 {
-                    selector = (Func<DataPoint, IComparable>)(dataPoint => (IComparable)dataPoint.ActualIndependentValue);
-                    DataPoint minimumPoint = this.ActiveDataPoints.MinOrNull<DataPoint>(selector);
-                    DataPoint maximumPoint = this.ActiveDataPoints.MaxOrNull<DataPoint>(selector);
+                    selector = (dataPoint) => (IComparable)dataPoint.ActualIndependentValue;
+
+                    DataPoint minimumPoint = ActiveDataPoints.MinOrNull(selector);
+                    DataPoint maximumPoint = ActiveDataPoints.MaxOrNull(selector);
+
                     double minimumMargin = minimumPoint.GetMargin(axis);
-                    yield return new ValueMargin((object)selector(minimumPoint), minimumMargin, minimumMargin);
+                    yield return new ValueMargin(selector(minimumPoint), minimumMargin, minimumMargin);
+
                     double maximumMargin = maximumPoint.GetMargin(axis);
-                    yield return new ValueMargin((object)selector(maximumPoint), maximumMargin, maximumMargin);
+                    yield return new ValueMargin(selector(maximumPoint), maximumMargin, maximumMargin);
                 }
-                else if (axis == this.InternalActualDependentAxis)
+                else if (axis == InternalActualDependentAxis)
                 {
-                    selector = (Func<DataPoint, IComparable>)(dataPoint => dataPoint.ActualDependentValue);
-                    DataPoint minimumPoint = this.ActiveDataPoints.MinOrNull<DataPoint>(selector);
-                    DataPoint maximumPoint = this.ActiveDataPoints.MaxOrNull<DataPoint>(selector);
-                    yield return new ValueMargin((object)selector(minimumPoint), dependentValueMargin, dependentValueMargin);
-                    yield return new ValueMargin((object)selector(maximumPoint), dependentValueMargin, dependentValueMargin);
+                    selector = (dataPoint) => (IComparable)dataPoint.ActualDependentValue;
+
+                    DataPoint minimumPoint = ActiveDataPoints.MinOrNull(selector);
+                    DataPoint maximumPoint = ActiveDataPoints.MaxOrNull(selector);
+
+                    yield return new ValueMargin(selector(minimumPoint), dependentValueMargin, dependentValueMargin);
+                    yield return new ValueMargin(selector(maximumPoint), dependentValueMargin, dependentValueMargin);
                 }
+            }
+            else
+            {
+                yield break;
             }
         }
 
-        /// <summary>Gets a range in which to render a data point.</summary>
-        /// <param name="category">The category to retrieve the range for.</param>
+        /// <summary>
+        /// Gets a range in which to render a data point.
+        /// </summary>
+        /// <param name="category">The category to retrieve the range for.
+        /// </param>
         /// <returns>The range in which to render a data point.</returns>
         protected Range<UnitValue> GetCategoryRange(object category)
         {
-            ICategoryAxis actualIndependentAxis = (ICategoryAxis)(this.ActualIndependentAxis as CategoryAxis);
-            if (actualIndependentAxis != null)
-                return actualIndependentAxis.GetPlotAreaCoordinateRange(category);
-            UnitValue plotAreaCoordinate = this.ActualIndependentAxis.GetPlotAreaCoordinate(category);
-            if (!ValueHelper.CanGraph(plotAreaCoordinate.Value) || !this._dataPointlength.HasValue)
+            ICategoryAxis categoryAxis = ActualIndependentAxis as CategoryAxis;
+            if (categoryAxis != null)
+            {
+                return categoryAxis.GetPlotAreaCoordinateRange(category);
+            }
+            else
+            {
+                UnitValue unitValue = ActualIndependentAxis.GetPlotAreaCoordinate(category);
+                if (ValueHelper.CanGraph(unitValue.Value) && _dataPointlength.HasValue)
+                {
+                    double halfLength = _dataPointlength.Value / 2.0;
+
+                    return new Range<UnitValue>(
+                        new UnitValue(unitValue.Value - halfLength, unitValue.Unit),
+                        new UnitValue(unitValue.Value + halfLength, unitValue.Unit));
+                }
+
                 return new Range<UnitValue>();
-            double num = this._dataPointlength.Value / 2.0;
-            return new Range<UnitValue>(new UnitValue(plotAreaCoordinate.Value - num, plotAreaCoordinate.Unit), new UnitValue(plotAreaCoordinate.Value + num, plotAreaCoordinate.Unit));
+            }
         }
 
+        /// <summary>
+        /// Gets the axis to which the data is anchored.
+        /// </summary>
         IRangeAxis IAnchoredToOrigin.AnchoredAxis
         {
-            get
-            {
-                return this.ActualDependentRangeAxis;
-            }
+            get { return this.ActualDependentRangeAxis; }
         }
     }
 }

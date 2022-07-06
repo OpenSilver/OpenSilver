@@ -4,44 +4,31 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Media;
-#else
-using System;
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting.Primitives
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
-#endif
 {
+    /// <summary>
+    /// Defines an area where you can arrange child elements either horizontally
+    /// or vertically, relative to each other.
+    /// </summary>
+    /// <QualityBand>Preview</QualityBand>
     public class EdgePanel : Panel
     {
-        /// <summary>Identifies the Edge dependency property.</summary>
-        public static readonly DependencyProperty EdgeProperty = DependencyProperty.RegisterAttached("Edge", typeof(Edge), typeof(EdgePanel), new PropertyMetadata((object)Edge.Center, new PropertyChangedCallback(EdgePanel.OnEdgePropertyChanged)));
-        /// <summary>The maximum number of iterations.</summary>
+        /// <summary>
+        /// The maximum number of iterations.
+        /// </summary>
         private const int MaximumIterations = 10;
-        /// <summary>A flag that ignores a property change when set.</summary>
-        private static bool _ignorePropertyChange;
-        /// <summary>The left rectangle in which to render left elements.</summary>
-        private Rect _leftRect;
-        /// <summary>
-        /// The right rectangle in which to render right elements.
-        /// </summary>
-        private Rect _rightRect;
-        /// <summary>The top rectangle in which to render top elements.</summary>
-        private Rect _topRect;
-        /// <summary>
-        /// The bottom rectangle in which to render bottom elements.
-        /// </summary>
-        private Rect _bottomRect;
 
+        /// <summary>
+        /// A flag that ignores a property change when set.
+        /// </summary>
+        private static bool _ignorePropertyChange;
+
+        #region public attached Edge Edge
         /// <summary>
         /// Gets the value of the Edge attached property for a specified
         /// UIElement.
@@ -50,11 +37,14 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
         /// The element from which the property value is read.
         /// </param>
         /// <returns>The Edge property value for the element.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "EdgePanel only has UIElement children")]
         public static Edge GetEdge(UIElement element)
         {
             if (element == null)
-                throw new ArgumentNullException(nameof(element));
-            return (Edge)element.GetValue(EdgePanel.EdgeProperty);
+            {
+                throw new ArgumentNullException("element");
+            }
+            return (Edge)element.GetValue(EdgeProperty);
         }
 
         /// <summary>
@@ -64,68 +54,109 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
         /// The element to which the attached property is written.
         /// </param>
         /// <param name="edge">The needed Edge value.</param>
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "EdgePanel only has UIElement children")]
         public static void SetEdge(UIElement element, Edge edge)
         {
             if (element == null)
-                throw new ArgumentNullException(nameof(element));
-            element.SetValue(EdgePanel.EdgeProperty, (object)edge);
+            {
+                throw new ArgumentNullException("element");
+            }
+            element.SetValue(EdgeProperty, edge);
         }
 
-        /// <summary>EdgeProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the Edge dependency property.
+        /// </summary>
+        public static readonly DependencyProperty EdgeProperty =
+            DependencyProperty.RegisterAttached(
+                "Edge",
+                typeof(Edge),
+                typeof(EdgePanel),
+                new PropertyMetadata(Edge.Center, OnEdgePropertyChanged));
+
+        /// <summary>
+        /// EdgeProperty property changed handler.
+        /// </summary>
         /// <param name="d">UIElement that changed its Edge.</param>
         /// <param name="e">Event arguments.</param>
+        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly", Justification = "Almost always set from the attached property CLR setter.")]
         private static void OnEdgePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (EdgePanel._ignorePropertyChange)
+            // Ignore the change if requested
+            if (_ignorePropertyChange)
             {
-                EdgePanel._ignorePropertyChange = false;
+                _ignorePropertyChange = false;
+                return;
             }
-            else
+
+            UIElement element = (UIElement)d;
+            Edge value = (Edge)e.NewValue;
+
+            // Validate the Edge property
+            if ((value != Edge.Left) &&
+                (value != Edge.Top) &&
+                (value != Edge.Right) &&
+                (value != Edge.Center) &&
+                (value != Edge.Bottom))
             {
-                UIElement uiElement = (UIElement)d;
-                Edge newValue = (Edge)e.NewValue;
-                int num;
-                switch (newValue)
-                {
-                    case Edge.Left:
-                    case Edge.Top:
-                    case Edge.Right:
-                    case Edge.Center:
-                        num = 1;
-                        break;
-                    default:
-                        num = newValue == Edge.Bottom ? 1 : 0;
-                        break;
-                }
-                if (num == 0)
-                {
-                    EdgePanel._ignorePropertyChange = true;
-                    uiElement.SetValue(EdgePanel.EdgeProperty, (object)(Edge)e.OldValue);
-                    throw new ArgumentException(string.Format((IFormatProvider)CultureInfo.InvariantCulture, "{0}", new object[1]
-                    {
-            (object) newValue
-                    }), "value");
-                }
-                EdgePanel parent = VisualTreeHelper.GetParent((DependencyObject)uiElement) as EdgePanel;
-                if (parent == null)
-                    return;
-                parent.InvalidateMeasure();
+                // Reset the property to its original state before throwing
+                _ignorePropertyChange = true;
+                element.SetValue(EdgeProperty, (Edge)e.OldValue);
+
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    OpenSilver.Controls.DataVisualization.Properties.Resources.EdgePanel_OnEdgePropertyChanged,
+                    value);
+                 
+                throw new ArgumentException(message, "value");
+            }
+                 
+            // Cause the EdgePanel to update its layout when a child changes
+            EdgePanel panel = VisualTreeHelper.GetParent(element) as EdgePanel;
+            if (panel != null)
+            {
+                panel.InvalidateMeasure();
             }
         }
+        #endregion public attached Edge Edge
 
-        /// <summary>Initializes a new instance of the EdgePanel class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the EdgePanel class.
+        /// </summary>
         public EdgePanel()
         {
-            this.SizeChanged += new SizeChangedEventHandler(this.EdgePanelSizeChanged);
+            this.SizeChanged += new SizeChangedEventHandler(EdgePanelSizeChanged);
         }
 
-        /// <summary>Invalidate measure when edge panel is resized.</summary>
+        /// <summary>
+        /// Invalidate measure when edge panel is resized.
+        /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">Information about the event.</param>
         private void EdgePanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.InvalidateMeasure();
+            InvalidateMeasure();
         }
+
+        /// <summary>
+        /// The left rectangle in which to render left elements.
+        /// </summary>
+        private Rect _leftRect;
+
+        /// <summary>
+        /// The right rectangle in which to render right elements.
+        /// </summary>
+        private Rect _rightRect;
+
+        /// <summary>
+        /// The top rectangle in which to render top elements.
+        /// </summary>
+        private Rect _topRect;
+
+        /// <summary>
+        /// The bottom rectangle in which to render bottom elements.
+        /// </summary>
+        private Rect _bottomRect;
 
         /// <summary>
         /// Measures the children of a EdgePanel in anticipation of arranging
@@ -133,148 +164,302 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
         /// </summary>
         /// <param name="constraint">A maximum Size to not exceed.</param>
         /// <returns>The desired size of the EdgePanel.</returns>
+        [SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode", Justification = "Code is by nature difficult to refactor into several methods.")] 
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#", Justification = "Compat with WPF.")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Splitting up method will make it more difficult to understand.")]
         protected override Size MeasureOverride(Size constraint)
         {
             constraint = new Size(this.ActualWidth, this.ActualHeight);
-            IList<UIElement> list1 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Left)).ToList<UIElement>();
-            IList<UIElement> list2 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Right)).ToList<UIElement>();
-            IList<UIElement> list3 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Bottom)).ToList<UIElement>();
-            IList<UIElement> list4 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Top)).ToList<UIElement>();
-            Rect rect = EdgePanel.SafeCreateRect(0.0, 0.0, constraint.Width, constraint.Height);
-            this._leftRect = list1.Count > 0 ? rect : Rect.Empty;
-            this._bottomRect = list3.Count > 0 ? rect : Rect.Empty;
-            this._rightRect = list2.Count > 0 ? rect : Rect.Empty;
-            this._topRect = list4.Count > 0 ? rect : Rect.Empty;
-            double num1 = 0.0;
-            double val2 = 0.0;
-            double num2 = 0.0;
-            double num3 = 0.0;
-            double num4 = 0.0;
-            double num5 = 0.0;
-            double num6 = 0.0;
-            double num7 = 0.0;
-            double num8 = num1;
-            double num9 = val2;
-            double num10 = num2;
-            double num11 = num3;
-            int num12 = 0;
+
+            IList<UIElement> leftElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Left).ToList();
+            IList<UIElement> rightElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Right).ToList();
+            IList<UIElement> bottomElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Bottom).ToList();
+            IList<UIElement> topElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Top).ToList();
+
+            Rect totalRect = SafeCreateRect(0, 0, constraint.Width, constraint.Height);
+
+            _leftRect = (leftElements.Count > 0) ? totalRect : Rect.Empty;
+            _bottomRect = (bottomElements.Count > 0) ? totalRect : Rect.Empty;
+            _rightRect = (rightElements.Count > 0) ? totalRect : Rect.Empty;
+            _topRect = (topElements.Count > 0) ? totalRect : Rect.Empty;
+
+            double rightAxesWidth = 0.0;
+            double leftAxesWidth = 0.0;
+            double topAxesHeight = 0.0;
+            double bottomAxesHeight = 0.0;
+
+            double maxRightRequestedWidth = 0;
+            double maxLeftRequestedWidth = 0;
+            double maxTopRequestedHeight = 0;
+            double maxBottomRequestedHeight = 0;
+
+            double previousRightAxesWidth = rightAxesWidth;
+            double previousLeftAxesWidth = leftAxesWidth;
+            double previousTopAxesHeight = topAxesHeight;
+            double previousBottomAxesHeight = bottomAxesHeight;
+
+            int iterations = 0;
+            // Measure each of the Children
             while (true)
             {
-                if (list2.Count > 0)
+                // Measure the children using the rectangle regions.
+                if (rightElements.Count > 0)
                 {
-                    Size availableSize = new Size(constraint.Width, this._rightRect.Height);
-                    foreach (UIElement uiElement in (IEnumerable<UIElement>)list2)
-                        uiElement.Measure(availableSize);
-                    num8 = num1;
-                    num1 = list2.Select<UIElement, double>((Func<UIElement, double>)(axis => axis.DesiredSize.Width)).SumOrDefault();
-                    num4 = Math.Max(num4, num1);
-                    this._rightRect = EdgePanel.SafeCreateRect(constraint.Width - num1, this._rightRect.Top, num1, this._rightRect.Height);
-                }
-                if (list4.Count > 0)
-                {
-                    Size availableSize = new Size(this._topRect.Width, constraint.Height);
-                    foreach (UIElement uiElement in (IEnumerable<UIElement>)list4)
-                        uiElement.Measure(availableSize);
-                    num10 = num2;
-                    num2 = list4.Select<UIElement, double>((Func<UIElement, double>)(axis => axis.DesiredSize.Height)).SumOrDefault();
-                    num6 = Math.Max(num6, num2);
-                    this._topRect = EdgePanel.SafeCreateRect(this._topRect.Left, this._topRect.Top, this._topRect.Width, num2);
-                }
-                if (list1.Count > 0)
-                {
-                    Size availableSize = new Size(constraint.Width, this._leftRect.Height);
-                    foreach (UIElement uiElement in (IEnumerable<UIElement>)list1)
-                        uiElement.Measure(availableSize);
-                    num9 = val2;
-                    val2 = list1.Select<UIElement, double>((Func<UIElement, double>)(axis => axis.DesiredSize.Width)).SumOrDefault();
-                    num5 = Math.Max(num5, val2);
-                    this._leftRect = EdgePanel.SafeCreateRect(this._leftRect.Left, this._leftRect.Top, list1.Select<UIElement, double>((Func<UIElement, double>)(axis => axis.DesiredSize.Width)).SumOrDefault(), this._leftRect.Height);
-                }
-                if (list3.Count > 0)
-                {
-                    Size availableSize = new Size(this._bottomRect.Width, constraint.Height);
-                    foreach (UIElement uiElement in (IEnumerable<UIElement>)list3)
-                        uiElement.Measure(availableSize);
-                    num11 = num3;
-                    num3 = list3.Select<UIElement, double>((Func<UIElement, double>)(axis => axis.DesiredSize.Height)).SumOrDefault();
-                    num7 = Math.Max(num7, num3);
-                    this._bottomRect = EdgePanel.SafeCreateRect(this._bottomRect.Left, constraint.Height - num3, this._bottomRect.Width, num3);
-                }
-                Rect leftRect1 = this._leftRect;
-                leftRect1.Intersect(this._rightRect);
-                Rect topRect = this._topRect;
-                topRect.Intersect(this._bottomRect);
-                if (leftRect1.IsEmptyOrHasNoSize() && topRect.IsEmptyOrHasNoSize())
-                {
-                    Rect leftRect2 = this._leftRect;
-                    leftRect2.Intersect(this._topRect);
-                    Rect rightRect1 = this._rightRect;
-                    rightRect1.Intersect(this._topRect);
-                    Rect leftRect3 = this._leftRect;
-                    leftRect3.Intersect(this._bottomRect);
-                    Rect rightRect2 = this._rightRect;
-                    rightRect2.Intersect(this._bottomRect);
-                    if (!leftRect3.IsEmptyOrHasNoSize() || !rightRect2.IsEmptyOrHasNoSize() || (!leftRect2.IsEmptyOrHasNoSize() || !rightRect1.IsEmptyOrHasNoSize()) || (num11 != num3 || num9 != val2 || num8 != num1) || num10 != num2)
+                    Size rightSize = new Size(constraint.Width, _rightRect.Height);
+                    foreach (UIElement rightUIElement in rightElements)
                     {
-                        if (num12 != 10)
-                        {
-                            if (!leftRect3.IsEmptyOrHasNoSize())
-                            {
-                                this._leftRect = EdgePanel.SafeCreateRect(this._leftRect.Left, this._leftRect.Top, this._leftRect.Width, this._leftRect.Height - leftRect3.Height);
-                                this._bottomRect = EdgePanel.SafeCreateRect(this._bottomRect.Left + leftRect3.Width, this._bottomRect.Top, this._bottomRect.Width - leftRect3.Width, this._bottomRect.Height);
-                            }
-                            if (!leftRect2.IsEmptyOrHasNoSize())
-                            {
-                                this._leftRect = EdgePanel.SafeCreateRect(this._leftRect.Left, this._leftRect.Top + leftRect2.Height, this._leftRect.Width, this._leftRect.Height - leftRect2.Height);
-                                this._topRect = EdgePanel.SafeCreateRect(this._topRect.Left + leftRect2.Width, this._topRect.Top, this._topRect.Width - leftRect2.Width, this._topRect.Height);
-                            }
-                            if (!rightRect2.IsEmptyOrHasNoSize())
-                            {
-                                this._rightRect = EdgePanel.SafeCreateRect(this._rightRect.Left, this._rightRect.Top, this._rightRect.Width, this._rightRect.Height - rightRect2.Height);
-                                this._bottomRect = EdgePanel.SafeCreateRect(this._bottomRect.Left, this._bottomRect.Top, this._bottomRect.Width - rightRect2.Width, this._bottomRect.Height);
-                            }
-                            if (!rightRect1.IsEmptyOrHasNoSize())
-                            {
-                                this._rightRect = EdgePanel.SafeCreateRect(this._rightRect.Left, this._rightRect.Top + rightRect1.Height, this._rightRect.Width, this._rightRect.Height - rightRect1.Height);
-                                this._topRect = EdgePanel.SafeCreateRect(this._topRect.Left, this._topRect.Top, this._topRect.Width - rightRect1.Width, this._topRect.Height);
-                            }
-                            if (!this._leftRect.IsEmpty)
-                                this._leftRect = new Rect(new Point(this._leftRect.Left, this._topRect.BottomOrDefault(0.0)), new Point(this._leftRect.Right, this._bottomRect.TopOrDefault(constraint.Height)));
-                            if (!this._rightRect.IsEmpty)
-                                this._rightRect = new Rect(new Point(this._rightRect.Left, this._topRect.BottomOrDefault(0.0)), new Point(this._rightRect.Right, this._bottomRect.TopOrDefault(constraint.Height)));
-                            if (!this._bottomRect.IsEmpty)
-                                this._bottomRect = new Rect(new Point(this._leftRect.RightOrDefault(0.0), this._bottomRect.Top), new Point(this._rightRect.LeftOrDefault(constraint.Width), this._bottomRect.Bottom));
-                            if (!this._topRect.IsEmpty)
-                                this._topRect = new Rect(new Point(this._leftRect.RightOrDefault(0.0), this._topRect.Top), new Point(this._rightRect.LeftOrDefault(constraint.Width), this._topRect.Bottom));
-                            ++num12;
-                        }
-                        else
-                            goto label_40;
+                        rightUIElement.Measure(rightSize);
                     }
-                    else
-                        goto label_86;
+
+                    previousRightAxesWidth = rightAxesWidth;
+                    rightAxesWidth = rightElements.Select(axis => axis.DesiredSize.Width).SumOrDefault();
+                    maxRightRequestedWidth = Math.Max(maxRightRequestedWidth, rightAxesWidth);
+                    _rightRect =
+                        SafeCreateRect(
+                            constraint.Width - rightAxesWidth,
+                            _rightRect.Top,
+                            rightAxesWidth,
+                            _rightRect.Height);
                 }
-                else
+
+                if (topElements.Count > 0)
+                {
+                    Size topSize = new Size(_topRect.Width, constraint.Height);
+                    foreach (UIElement topUIElement in topElements)
+                    {
+                        topUIElement.Measure(topSize);
+                    }
+
+                    previousTopAxesHeight = topAxesHeight;
+                    topAxesHeight = topElements.Select(axis => axis.DesiredSize.Height).SumOrDefault();
+                    maxTopRequestedHeight = Math.Max(maxTopRequestedHeight, topAxesHeight);
+                    _topRect =
+                        SafeCreateRect(
+                            _topRect.Left,
+                            _topRect.Top,
+                            _topRect.Width,
+                            topAxesHeight);
+                }
+
+                if (leftElements.Count > 0)
+                {
+                    Size leftSize = new Size(constraint.Width, _leftRect.Height);
+                    foreach (UIElement leftUIElement in leftElements)
+                    {
+                        leftUIElement.Measure(leftSize);
+                    }
+
+                    previousLeftAxesWidth = leftAxesWidth;
+                    leftAxesWidth = leftElements.Select(axis => axis.DesiredSize.Width).SumOrDefault();
+                    maxLeftRequestedWidth = Math.Max(maxLeftRequestedWidth, leftAxesWidth);
+                    _leftRect =
+                        SafeCreateRect(
+                            _leftRect.Left,
+                            _leftRect.Top,
+                            leftElements.Select(axis => axis.DesiredSize.Width).SumOrDefault(),
+                            _leftRect.Height);
+                }
+
+                if (bottomElements.Count > 0)
+                {
+                    Size bottomSize = new Size(_bottomRect.Width, constraint.Height);
+                    foreach (UIElement bottomUIElement in bottomElements)
+                    {
+                        bottomUIElement.Measure(bottomSize);
+                    }
+
+                    previousBottomAxesHeight = bottomAxesHeight;
+                    bottomAxesHeight = bottomElements.Select(axis => axis.DesiredSize.Height).SumOrDefault();
+                    maxBottomRequestedHeight = Math.Max(maxBottomRequestedHeight, bottomAxesHeight);
+                    _bottomRect =
+                        SafeCreateRect(
+                            _bottomRect.Left,
+                            constraint.Height - bottomAxesHeight,
+                            _bottomRect.Width,
+                            bottomAxesHeight);
+                }
+
+                // Ensuring that parallel axes don't collide
+                Rect leftRightCollisionRect = _leftRect;
+                leftRightCollisionRect.Intersect(_rightRect);
+
+                Rect topBottomCollisionRect = _topRect;
+                topBottomCollisionRect.Intersect(_bottomRect);
+
+                if (!leftRightCollisionRect.IsEmptyOrHasNoSize() || !topBottomCollisionRect.IsEmptyOrHasNoSize())
+                {
+                    return new Size();
+                }
+
+                // Resolving perpendicular axes collisions
+                Rect leftTopCollisionRect = _leftRect;
+                leftTopCollisionRect.Intersect(_topRect);
+                
+                Rect rightTopCollisionRect = _rightRect;
+                rightTopCollisionRect.Intersect(_topRect);
+
+                Rect leftBottomCollisionRect = _leftRect;
+                leftBottomCollisionRect.Intersect(_bottomRect);
+
+                Rect rightBottomCollisionRect = _rightRect;
+                rightBottomCollisionRect.Intersect(_bottomRect);
+
+                if (leftBottomCollisionRect.IsEmptyOrHasNoSize()
+                    && rightBottomCollisionRect.IsEmptyOrHasNoSize()
+                    && leftTopCollisionRect.IsEmptyOrHasNoSize()
+                    && rightTopCollisionRect.IsEmptyOrHasNoSize()                    
+                    && previousBottomAxesHeight == bottomAxesHeight
+                    && previousLeftAxesWidth == leftAxesWidth
+                    && previousRightAxesWidth == rightAxesWidth
+                    && previousTopAxesHeight == topAxesHeight)
+                {
                     break;
+                }
+
+                if (iterations == MaximumIterations)
+                {
+                    _leftRect = SafeCreateRect(0, maxTopRequestedHeight, maxLeftRequestedWidth, (constraint.Height - maxTopRequestedHeight) - maxBottomRequestedHeight);
+                    _rightRect = SafeCreateRect(constraint.Width - maxRightRequestedWidth, maxTopRequestedHeight, maxRightRequestedWidth, (constraint.Height - maxTopRequestedHeight) - maxBottomRequestedHeight);
+                    _bottomRect = SafeCreateRect(maxLeftRequestedWidth, constraint.Height - maxBottomRequestedHeight, (constraint.Width - maxLeftRequestedWidth) - maxRightRequestedWidth, maxBottomRequestedHeight);
+                    _topRect = SafeCreateRect(maxLeftRequestedWidth, 0, (constraint.Width - maxLeftRequestedWidth) - maxRightRequestedWidth, maxTopRequestedHeight);
+
+                    foreach (UIElement leftElement in leftElements)
+                    {
+                        leftElement.Measure(new Size(_leftRect.Width, _leftRect.Height));
+                    }
+
+                    foreach (UIElement rightElement in rightElements)
+                    {
+                        rightElement.Measure(new Size(_rightRect.Width, _rightRect.Height));
+                    }
+
+                    foreach (UIElement bottomElement in bottomElements)
+                    {
+                        bottomElement.Measure(new Size(_bottomRect.Width, _bottomRect.Height));
+                    }
+
+                    foreach (UIElement topElement in topElements)
+                    {
+                        topElement.Measure(new Size(_topRect.Width, _topRect.Height));
+                    }
+                    break;
+                }
+
+                if (!leftBottomCollisionRect.IsEmptyOrHasNoSize())
+                {
+                    _leftRect =
+                        SafeCreateRect(
+                            _leftRect.Left,
+                            _leftRect.Top,
+                            _leftRect.Width,
+                            _leftRect.Height - leftBottomCollisionRect.Height);
+
+                    _bottomRect =
+                        SafeCreateRect(
+                            _bottomRect.Left + leftBottomCollisionRect.Width,
+                            _bottomRect.Top,
+                            _bottomRect.Width - leftBottomCollisionRect.Width,
+                            _bottomRect.Height);
+                }
+
+                if (!leftTopCollisionRect.IsEmptyOrHasNoSize())
+                {
+                    _leftRect =
+                        SafeCreateRect(
+                            _leftRect.Left,
+                            _leftRect.Top + leftTopCollisionRect.Height,
+                            _leftRect.Width,
+                            _leftRect.Height - leftTopCollisionRect.Height);
+
+                    _topRect =
+                        SafeCreateRect(
+                            _topRect.Left + leftTopCollisionRect.Width,
+                            _topRect.Top,
+                            _topRect.Width - leftTopCollisionRect.Width,
+                            _topRect.Height);
+                }
+
+                if (!rightBottomCollisionRect.IsEmptyOrHasNoSize())
+                {
+                    _rightRect =
+                        SafeCreateRect(
+                            _rightRect.Left,
+                            _rightRect.Top,
+                            _rightRect.Width,
+                            _rightRect.Height - rightBottomCollisionRect.Height);
+
+                    _bottomRect =
+                        SafeCreateRect(
+                            _bottomRect.Left,
+                            _bottomRect.Top,
+                            _bottomRect.Width - rightBottomCollisionRect.Width,
+                            _bottomRect.Height);
+                }
+
+                if (!rightTopCollisionRect.IsEmptyOrHasNoSize())
+                {
+                    _rightRect =
+                        SafeCreateRect(
+                            _rightRect.Left,
+                            _rightRect.Top + rightTopCollisionRect.Height,
+                            _rightRect.Width,
+                            _rightRect.Height - rightTopCollisionRect.Height);
+
+                    _topRect =
+                        SafeCreateRect(
+                            _topRect.Left,
+                            _topRect.Top,
+                            _topRect.Width - rightTopCollisionRect.Width,
+                            _topRect.Height);
+                }
+
+                // Bring axis measure rectangles together if there are gaps 
+                // between them.
+                if (!_leftRect.IsEmpty)
+                {
+                    _leftRect =
+                        new Rect(
+                            new Point(_leftRect.Left, _topRect.BottomOrDefault(0)),
+                            new Point(_leftRect.Right, _bottomRect.TopOrDefault(constraint.Height)));
+                }
+
+                if (!_rightRect.IsEmpty)
+                {
+                    _rightRect =
+                        new Rect(
+                            new Point(_rightRect.Left, _topRect.BottomOrDefault(0)),
+                            new Point(_rightRect.Right, _bottomRect.TopOrDefault(constraint.Height)));
+                }
+
+                if (!_bottomRect.IsEmpty)
+                {
+                    _bottomRect =
+                        new Rect(
+                            new Point(_leftRect.RightOrDefault(0), _bottomRect.Top),
+                            new Point(_rightRect.LeftOrDefault(constraint.Width), _bottomRect.Bottom));
+                }
+
+                if (!_topRect.IsEmpty)
+                {
+                    _topRect =
+                        new Rect(
+                            new Point(_leftRect.RightOrDefault(0), _topRect.Top),
+                            new Point(_rightRect.LeftOrDefault(constraint.Width), _topRect.Bottom));
+                }
+
+                iterations++;
             }
-            return new Size();
-        label_40:
-            this._leftRect = EdgePanel.SafeCreateRect(0.0, num6, num5, constraint.Height - num6 - num7);
-            this._rightRect = EdgePanel.SafeCreateRect(constraint.Width - num4, num6, num4, constraint.Height - num6 - num7);
-            this._bottomRect = EdgePanel.SafeCreateRect(num5, constraint.Height - num7, constraint.Width - num5 - num4, num7);
-            this._topRect = EdgePanel.SafeCreateRect(num5, 0.0, constraint.Width - num5 - num4, num6);
-            foreach (UIElement uiElement in (IEnumerable<UIElement>)list1)
-                uiElement.Measure(new Size(this._leftRect.Width, this._leftRect.Height));
-            foreach (UIElement uiElement in (IEnumerable<UIElement>)list2)
-                uiElement.Measure(new Size(this._rightRect.Width, this._rightRect.Height));
-            foreach (UIElement uiElement in (IEnumerable<UIElement>)list3)
-                uiElement.Measure(new Size(this._bottomRect.Width, this._bottomRect.Height));
-            foreach (UIElement uiElement in (IEnumerable<UIElement>)list4)
-                uiElement.Measure(new Size(this._topRect.Width, this._topRect.Height));
-            label_86:
-            Size availableSize1 = new Size(constraint.Width - this._leftRect.WidthOrDefault(0.0) - this._rightRect.WidthOrDefault(0.0), constraint.Height - this._topRect.HeightOrDefault(0.0) - this._bottomRect.HeightOrDefault(0.0));
-            foreach (UIElement uiElement in this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(child => EdgePanel.GetEdge(child) == Edge.Center)))
-                uiElement.Measure(availableSize1);
+
+            Size centerSize = 
+                new Size(
+                    (constraint.Width - _leftRect.WidthOrDefault(0)) - _rightRect.WidthOrDefault(0), 
+                    (constraint.Height - _topRect.HeightOrDefault(0)) - _bottomRect.HeightOrDefault(0));
+
+            foreach (UIElement element in Children.OfType<UIElement>().Where(child => GetEdge(child) == Edge.Center))
+            {
+                element.Measure(centerSize);
+            }
+
             return new Size();
         }
 
@@ -285,93 +470,73 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
         /// The Size the EdgePanel uses to arrange its child elements.
         /// </param>
         /// <returns>The arranged size of the EdgePanel.</returns>
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Splitting up method will make it more difficult to understand.")]
+        [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", MessageId = "0#", Justification = "Compat with WPF.")]
         protected override Size ArrangeOverride(Size arrangeSize)
         {
-            if (arrangeSize.Width == 0.0 || arrangeSize.Height == 0.0 || !ValueHelper.CanGraph(arrangeSize.Width) || !ValueHelper.CanGraph(arrangeSize.Height))
+            if (arrangeSize.Width == 0 || arrangeSize.Height == 0 || !ValueHelper.CanGraph(arrangeSize.Width) || !ValueHelper.CanGraph(arrangeSize.Height))
+            {
                 return arrangeSize;
-            IList<UIElement> list1 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Left)).ToList<UIElement>();
-            IList<UIElement> list2 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Right)).ToList<UIElement>();
-            IList<UIElement> list3 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Bottom)).ToList<UIElement>();
-            IList<UIElement> list4 = (IList<UIElement>)this.Children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(element => EdgePanel.GetEdge(element) == Edge.Top)).ToList<UIElement>();
-            if (!this._bottomRect.IsEmpty)
+            }
+
+            IList<UIElement> leftElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Left).ToList();
+            IList<UIElement> rightElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Right).ToList();
+            IList<UIElement> bottomElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Bottom).ToList();
+            IList<UIElement> topElements = this.Children.OfType<UIElement>().Where(element => GetEdge(element) == Edge.Top).ToList();
+            
+            if (!_bottomRect.IsEmpty)
             {
-                double num1 = this._bottomRect.Top;
-                foreach (UIElement uiElement1 in (IEnumerable<UIElement>)list3)
+                double workingHeight = _bottomRect.Top;
+                foreach (UIElement bottomUIElement in bottomElements)
                 {
-                    UIElement uiElement2 = uiElement1;
-                    double left = this._leftRect.RightOrDefault(0.0);
-                    double top = num1;
-                    double width = arrangeSize.Width - this._leftRect.WidthOrDefault(0.0) - this._rightRect.WidthOrDefault(0.0);
-                    Size desiredSize = uiElement1.DesiredSize;
-                    double height1 = desiredSize.Height;
-                    Rect rect = EdgePanel.SafeCreateRect(left, top, width, height1);
-                    uiElement2.Arrange(rect);
-                    double num2 = num1;
-                    desiredSize = uiElement1.DesiredSize;
-                    double height2 = desiredSize.Height;
-                    num1 = num2 + height2;
+                    bottomUIElement.Arrange(SafeCreateRect(_leftRect.RightOrDefault(0), workingHeight, (arrangeSize.Width - _leftRect.WidthOrDefault(0)) - _rightRect.WidthOrDefault(0), bottomUIElement.DesiredSize.Height));
+                    workingHeight += bottomUIElement.DesiredSize.Height;
                 }
             }
-            if (!this._topRect.IsEmpty)
+            if (!_topRect.IsEmpty)
             {
-                double num1 = this._topRect.Bottom;
-                foreach (UIElement uiElement1 in (IEnumerable<UIElement>)list4)
+                double workingTop = _topRect.Bottom;
+                foreach (UIElement topUIElement in topElements)
                 {
-                    double num2 = num1;
-                    Size desiredSize = uiElement1.DesiredSize;
-                    double height1 = desiredSize.Height;
-                    num1 = num2 - height1;
-                    UIElement uiElement2 = uiElement1;
-                    double left = this._leftRect.RightOrDefault(0.0);
-                    double top = num1;
-                    double width = arrangeSize.Width - this._leftRect.WidthOrDefault(0.0) - this._rightRect.WidthOrDefault(0.0);
-                    desiredSize = uiElement1.DesiredSize;
-                    double height2 = desiredSize.Height;
-                    Rect rect = EdgePanel.SafeCreateRect(left, top, width, height2);
-                    uiElement2.Arrange(rect);
+                    workingTop -= topUIElement.DesiredSize.Height;
+                    topUIElement.Arrange(SafeCreateRect(_leftRect.RightOrDefault(0), workingTop, (arrangeSize.Width - _leftRect.WidthOrDefault(0)) - _rightRect.WidthOrDefault(0), topUIElement.DesiredSize.Height));
                 }
             }
-            if (!this._rightRect.IsEmpty)
+
+            if (!_rightRect.IsEmpty)
             {
-                double num1 = this._rightRect.Left;
-                foreach (UIElement uiElement1 in (IEnumerable<UIElement>)list2)
+                double workingRight = _rightRect.Left;
+                foreach (UIElement rightUIElement in rightElements)
                 {
-                    UIElement uiElement2 = uiElement1;
-                    double left = num1;
-                    double top = this._topRect.BottomOrDefault(0.0);
-                    Size desiredSize = uiElement1.DesiredSize;
-                    double width1 = desiredSize.Width;
-                    double height = arrangeSize.Height - this._bottomRect.HeightOrDefault(0.0) - this._topRect.HeightOrDefault(0.0);
-                    Rect rect = EdgePanel.SafeCreateRect(left, top, width1, height);
-                    uiElement2.Arrange(rect);
-                    double num2 = num1;
-                    desiredSize = uiElement1.DesiredSize;
-                    double width2 = desiredSize.Width;
-                    num1 = num2 + width2;
+                    rightUIElement.Arrange(SafeCreateRect(workingRight, _topRect.BottomOrDefault(0), rightUIElement.DesiredSize.Width, (arrangeSize.Height - _bottomRect.HeightOrDefault(0)) - _topRect.HeightOrDefault(0)));
+                    workingRight += rightUIElement.DesiredSize.Width;
                 }
             }
-            if (!this._leftRect.IsEmpty)
+
+            if (!_leftRect.IsEmpty)
             {
-                double num1 = this._leftRect.Right;
-                foreach (UIElement uiElement in (IEnumerable<UIElement>)list1)
+                double workingLeft = _leftRect.Right;
+                foreach (UIElement leftUIElement in leftElements)
                 {
-                    double num2 = num1;
-                    Size desiredSize = uiElement.DesiredSize;
-                    double width1 = desiredSize.Width;
-                    num1 = num2 - width1;
-                    double left = num1;
-                    double top = this._topRect.BottomOrDefault(0.0);
-                    desiredSize = uiElement.DesiredSize;
-                    double width2 = desiredSize.Width;
-                    double height = arrangeSize.Height - this._bottomRect.HeightOrDefault(0.0) - this._topRect.HeightOrDefault(0.0);
-                    Rect rect = EdgePanel.SafeCreateRect(left, top, width2, height);
-                    uiElement.Arrange(rect);
+                    workingLeft -= leftUIElement.DesiredSize.Width;
+                    Rect leftRect = SafeCreateRect(workingLeft, _topRect.BottomOrDefault(0), leftUIElement.DesiredSize.Width, (arrangeSize.Height - _bottomRect.HeightOrDefault(0)) - _topRect.HeightOrDefault(0));
+                    leftUIElement.Arrange(leftRect);
                 }
             }
-            Rect rect1 = EdgePanel.SafeCreateRect(this._leftRect.RightOrDefault(0.0), this._topRect.BottomOrDefault(0.0), arrangeSize.Width - this._leftRect.WidthOrDefault(0.0) - this._rightRect.WidthOrDefault(0.0), arrangeSize.Height - this._topRect.HeightOrDefault(0.0) - this._bottomRect.HeightOrDefault(0.0));
-            var children = this.Children.ToList();
-            foreach (UIElement uiElement in children.OfType<UIElement>().Where<UIElement>((Func<UIElement, bool>)(child => EdgePanel.GetEdge(child) == Edge.Center)))
-                uiElement.Arrange(rect1);
+
+            Rect centerRect = SafeCreateRect(
+                        _leftRect.RightOrDefault(0),
+                        _topRect.BottomOrDefault(0),
+                        ((arrangeSize.Width - _leftRect.WidthOrDefault(0)) - _rightRect.WidthOrDefault(0)),
+                        ((arrangeSize.Height - _topRect.HeightOrDefault(0)) - _bottomRect.HeightOrDefault(0)));
+
+            var children = Children.ToList();
+
+            foreach (UIElement element in children.OfType<UIElement>().Where(child => GetEdge(child) == Edge.Center))
+            {
+                element.Arrange(centerRect);
+            }
+
             return arrangeSize;
         }
 

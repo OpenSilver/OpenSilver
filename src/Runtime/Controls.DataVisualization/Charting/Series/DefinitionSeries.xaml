@@ -1,0 +1,44 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting"
+    xmlns:chartingprimitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives">
+
+    <Style TargetType="charting:DefinitionSeries">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:DefinitionSeries">
+                    <Grid x:Name="SeriesArea" Background="{TemplateBinding Background}">
+                        <chartingprimitives:DelegatingListBox x:Name="ItemContainer" Background="Transparent" BorderThickness="0">
+                            <chartingprimitives:DelegatingListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </chartingprimitives:DelegatingListBox.ItemsPanel>
+                            <chartingprimitives:DelegatingListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border Child="{TemplateBinding Content}"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </chartingprimitives:DelegatingListBox.ItemContainerStyle>
+                        </chartingprimitives:DelegatingListBox>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

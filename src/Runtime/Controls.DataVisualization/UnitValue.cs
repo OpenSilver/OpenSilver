@@ -1,76 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System;
 
 namespace System.Windows.Controls.DataVisualization
 {
-    internal class ResourceDictionaryDispensedEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new instance of the ResourceDictionaryDispensedEventArgs class.
-        /// </summary>
-        /// <param name="index">The index of the ResourceDictionary dispensed.</param>
-        /// <param name="resourceDictionary">The ResourceDictionary dispensed.</param>
-        public ResourceDictionaryDispensedEventArgs(int index, ResourceDictionary resourceDictionary)
-        {
-            this.ResourceDictionary = resourceDictionary;
-            this.Index = index;
-        }
-
-        /// <summary>Gets the index of the ResourceDictionary dispensed.</summary>
-        public int Index { get; private set; }
-
-        /// <summary>Gets the ResourceDictionary dispensed.</summary>
-        public ResourceDictionary ResourceDictionary { get; private set; }
-
-        /// <summary>
-        /// Returns a value indicating whether two objects are equal.
-        /// </summary>
-        /// <param name="obj">The other object.</param>
-        /// <returns>A value indicating whether the two objects are equal.</returns>
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-
-        /// <summary>Returns a hash code.</summary>
-        /// <returns>A hash code.</returns>
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-    }
-
-    /// <summary>Units of measure.</summary>
-    public enum Unit
-    {
-        Pixels,
-        Degrees,
-    }
-    /// <summary>A value in units.</summary>
+    /// <summary>
+    /// A value in units.
+    /// </summary>
     public struct UnitValue : IComparable
     {
-        /// <summary>Returns a UnitValue representing an invalid value.</summary>
+        /// <summary>
+        /// Returns a UnitValue representing an invalid value.
+        /// </summary>
         /// <returns>UnitValue instance.</returns>
         public static UnitValue NaN()
         {
-            return new UnitValue() { Value = double.NaN };
+            return new UnitValue { Value = double.NaN };
         }
 
-        /// <summary>Instantiates a new instance of the UnitValue struct.</summary>
+        /// <summary>
+        /// Instantiates a new instance of the UnitValue struct.
+        /// </summary>
         /// <param name="value">The value associated with the units.</param>
         /// <param name="unit">The units associated with the value.</param>
-        public UnitValue(double value, Unit unit)
+        public UnitValue(double value, Unit unit) : this()
         {
-            this = new UnitValue();
-            this.Value = value;
-            this.Unit = unit;
+            Value = value;
+            Unit = unit;
         }
 
-        /// <summary>Gets the value associated with the units.</summary>
+        /// <summary>
+        /// Gets the value associated with the units.
+        /// </summary>
         public double Value { get; private set; }
 
-        /// <summary>Gets the units associated with the value.</summary>
+        /// <summary>
+        /// Gets the units associated with the value.
+        /// </summary>
         public Unit Unit { get; private set; }
 
         /// <summary>
@@ -78,35 +47,50 @@ namespace System.Windows.Controls.DataVisualization
         /// </summary>
         /// <param name="obj">The object being compared.</param>
         /// <returns>A number smaller than zero if the obj is larger than this
-        /// object.  A number equal to 0 if they are equal.  A number greater
+        /// object.  A number equal to 0 if they are equal.  A number greater 
         /// than zero if this unit value is greater than obj.</returns>
         public int CompareTo(object obj)
         {
-            UnitValue unitValue = (UnitValue)obj;
+            UnitValue unitValue = (UnitValue) obj;
+
             if (unitValue.Unit != this.Unit)
+            {
                 throw new InvalidOperationException("Cannot compare two unit values with different units.");
+            }
+
             return this.Value.CompareTo(unitValue.Value);
         }
 
-        /// <summary>Determines if two values are equal.</summary>
+        /// <summary>
+        /// Determines if two values are equal.
+        /// </summary>
         /// <param name="obj">The other value.</param>
         /// <returns>A value indicating whether values are equal.</returns>
         public override bool Equals(object obj)
         {
             if (!(obj is UnitValue))
+            {
                 return false;
+            }
             UnitValue unitValue = (UnitValue)obj;
-            return (object.ReferenceEquals((object)unitValue.Value, (object)this.Value) || object.Equals((object)unitValue.Value, (object)this.Value)) && unitValue.Unit == this.Unit;
+
+            if ((Object.ReferenceEquals(unitValue.Value, this.Value) || Object.Equals(unitValue.Value, this.Value)) && unitValue.Unit == this.Unit)
+            {
+                return true;
+            }
+            return false;
         }
 
-        /// <summary>Determines whether two unit value objects are equal.</summary>
+        /// <summary>
+        /// Determines whether two unit value objects are equal.
+        /// </summary>
         /// <param name="left">The left unit value.</param>
         /// <param name="right">The right unit value.</param>
-        /// <returns>A value indicating  whether two unit value objects are
+        /// <returns>A value indicating  whether two unit value objects are 
         /// equal.</returns>
         public static bool operator ==(UnitValue left, UnitValue right)
         {
-            return left.Equals((object)right);
+            return left.Equals(right);
         }
 
         /// <summary>
@@ -118,7 +102,7 @@ namespace System.Windows.Controls.DataVisualization
         /// equal.</returns>
         public static bool operator !=(UnitValue left, UnitValue right)
         {
-            return !left.Equals((object)right);
+            return !left.Equals(right);
         }
 
         /// <summary>
@@ -130,7 +114,7 @@ namespace System.Windows.Controls.DataVisualization
         /// the right.</returns>
         public static bool operator <(UnitValue left, UnitValue right)
         {
-            return left.CompareTo((object)right) < 0;
+            return left.CompareTo(right) < 0;
         }
 
         /// <summary>
@@ -142,14 +126,19 @@ namespace System.Windows.Controls.DataVisualization
         /// the right.</returns>
         public static bool operator >(UnitValue left, UnitValue right)
         {
-            return left.CompareTo((object)right) > 0;
+            return left.CompareTo(right) > 0;
         }
 
-        /// <summary>Returns the hash code of the unit value object.</summary>
+        /// <summary>
+        /// Returns the hash code of the unit value object.
+        /// </summary>
         /// <returns>The hash code.</returns>
         public override int GetHashCode()
         {
-            return (int)(this.Value.GetHashCode() + this.Unit);
+            unchecked
+            {
+                return this.Value.GetHashCode() + (int)this.Unit;
+            }
         }
     }
 }

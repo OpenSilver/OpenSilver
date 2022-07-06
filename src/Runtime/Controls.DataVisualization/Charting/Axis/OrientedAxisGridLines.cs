@@ -1,6 +1,15 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace System.Windows.Controls.DataVisualization.Charting
@@ -8,9 +17,13 @@ namespace System.Windows.Controls.DataVisualization.Charting
     /// <summary>
     /// This control draws gridlines with the help of an axis.
     /// </summary>
+    [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "This is the expected capitalization.")]
+    [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLines", Justification = "This is the expected capitalization.")]
     internal class OrientedAxisGridLines : DisplayAxisGridLines
     {
-        /// <summary>A pool of grid lines.</summary>
+        /// <summary>
+        /// A pool of grid lines.
+        /// </summary>
         private ObjectPool<Line> _gridLinePool;
 
         /// <summary>
@@ -18,59 +31,60 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="displayAxis">The axis to draw grid lines for.</param>
         public OrientedAxisGridLines(DisplayAxis displayAxis)
-          : base(displayAxis)
+            : base(displayAxis)
         {
-            this._gridLinePool = new ObjectPool<Line>((Func<Line>)(() =>
-            {
-                return new Line()
-                {
-                    Style = this.Axis.GridLineStyle
-                };
-            }));
+            _gridLinePool = new ObjectPool<Line>(() => new Line { Style = Axis.GridLineStyle });
         }
 
-        /// <summary>Draws the grid lines.</summary>
+        /// <summary>
+        /// Draws the grid lines.
+        /// </summary>
         protected override void Invalidate()
         {
-            this._gridLinePool.Reset();
+            _gridLinePool.Reset();
+
             try
             {
-                IList<UnitValue> list = (IList<UnitValue>)this.Axis.InternalGetMajorGridLinePositions().ToList<UnitValue>();
+                IList<UnitValue> intervals = Axis.InternalGetMajorGridLinePositions().ToList();
+
                 this.Children.Clear();
-                double num1 = Math.Max(Math.Round(this.ActualHeight - 1.0), 0.0);
-                double num2 = Math.Max(Math.Round(this.ActualWidth - 1.0), 0.0);
-                for (int index = 0; index < list.Count; ++index)
+
+                double maximumHeight = Math.Max(Math.Round(ActualHeight - 1), 0);
+                double maximumWidth = Math.Max(Math.Round(ActualWidth - 1), 0);
+                for (int index = 0; index < intervals.Count; index++)
                 {
-                    double d = list[index].Value;
-                    if (!double.IsNaN(d))
+                    double currentValue = intervals[index].Value;
+
+                    double position = currentValue;
+                    if (!double.IsNaN(position))
                     {
-                        Line line = this._gridLinePool.Next();
-                        if (this.Axis.Orientation == AxisOrientation.Y)
+                        Line line = _gridLinePool.Next();
+                        if (Axis.Orientation == AxisOrientation.Y)
                         {
-                            line.Y1 = line.Y2 = num1 - Math.Round(d - line.StrokeThickness / 2.0);
+                            line.Y1 = line.Y2 = maximumHeight - Math.Round(position - (line.StrokeThickness / 2));
                             line.X1 = 0.0;
-                            line.X2 = num2;
+                            line.X2 = maximumWidth;
                         }
-                        else if (this.Axis.Orientation == AxisOrientation.X)
+                        else if (Axis.Orientation == AxisOrientation.X)
                         {
-                            line.X1 = line.X2 = Math.Round(d - line.StrokeThickness / 2.0);
+                            line.X1 = line.X2 = Math.Round(position - (line.StrokeThickness / 2));
                             line.Y1 = 0.0;
-                            line.Y2 = num1;
+                            line.Y2 = maximumHeight;
                         }
-                        if (line.StrokeThickness % 2.0 > 0.0)
+                        // workaround for '1px line thickness issue'
+                        if (line.StrokeThickness % 2 > 0)
                         {
-                            line.SetValue(Canvas.LeftProperty, (object)0.5);
-                            line.SetValue(Canvas.TopProperty, (object)0.5);
+                            line.SetValue(Canvas.LeftProperty, 0.5);
+                            line.SetValue(Canvas.TopProperty, 0.5);
                         }
-                        this.Children.Add((UIElement)line);
+                        this.Children.Add(line);
                     }
                 }
             }
             finally
             {
-                this._gridLinePool.Done();
+                _gridLinePool.Done();
             }
         }
     }
 }
-

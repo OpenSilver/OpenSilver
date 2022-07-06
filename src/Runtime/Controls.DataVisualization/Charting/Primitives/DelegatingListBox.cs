@@ -1,4 +1,9 @@
-﻿namespace System.Windows.Controls.DataVisualization.Charting.Primitives
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+namespace System.Windows.Controls.DataVisualization.Charting.Primitives
 {
     /// <summary>
     /// Subclasses ListBox to provide an easy way for a consumer of
@@ -32,12 +37,24 @@
         /// </summary>
         public Action<DependencyObject, object> ClearContainerForItem { get; set; }
 
+#if !SILVERLIGHT
+        /// <summary>
+        /// Initializes static members of the DelegatingListBox class.
+        /// </summary>
+        static DelegatingListBox()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(DelegatingListBox), new FrameworkPropertyMetadata(typeof(DelegatingListBox)));
+        }
+#endif
+
         /// <summary>
         /// Initializes a new instance of the DelegatingListBox class.
         /// </summary>
         public DelegatingListBox()
         {
-            this.DefaultStyleKey = (object)typeof(DelegatingListBox);
+#if SILVERLIGHT
+            DefaultStyleKey = typeof(DelegatingListBox);
+#endif
         }
 
         /// <summary>
@@ -47,7 +64,9 @@
         /// <returns>True if the item is (or is eligible to be) its own container; otherwise, false.</returns>
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            return this.IsItemItsOwnContainer != null ? this.IsItemItsOwnContainer(item) : base.IsItemItsOwnContainerOverride(item);
+            return (null != IsItemItsOwnContainer) ?
+                IsItemItsOwnContainer(item) :
+                base.IsItemItsOwnContainerOverride(item);
         }
 
         /// <summary>
@@ -56,7 +75,9 @@
         /// <returns>The element that is used to display the given item.</returns>
         protected override DependencyObject GetContainerForItemOverride()
         {
-            return this.GetContainerForItem != null ? this.GetContainerForItem() : base.GetContainerForItemOverride();
+            return (null != GetContainerForItem) ?
+                GetContainerForItem() :
+                base.GetContainerForItemOverride();
         }
 
         /// <summary>
@@ -67,9 +88,10 @@
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
-            if (null == this.PrepareContainerForItem)
-                return;
-            this.PrepareContainerForItem(element, item);
+            if (null != PrepareContainerForItem)
+            {
+                PrepareContainerForItem(element, item);
+            }
         }
 
         /// <summary>
@@ -80,9 +102,10 @@
         protected override void ClearContainerForItemOverride(DependencyObject element, object item)
         {
             base.ClearContainerForItemOverride(element, item);
-            if (null == this.ClearContainerForItem)
-                return;
-            this.ClearContainerForItem(element, item);
+            if (null != ClearContainerForItem)
+            {
+                ClearContainerForItem(element, item);
+            }
         }
     }
 }

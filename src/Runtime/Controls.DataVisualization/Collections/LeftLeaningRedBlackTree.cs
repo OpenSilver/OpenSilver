@@ -1,10 +1,24 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+// Uncomment this to enable the following debugging aids:
+//   LeftLeaningRedBlackTree.HtmlFragment
+//   LeftLeaningRedBlackTree.Node.HtmlFragment
+//   LeftLeaningRedBlackTree.AssertInvariants
+// #define DEBUGGING
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Windows.Controls.DataVisualization.Collections
 {
-    /// <summary>Implements a left-leaning red-black tree.</summary>
+    /// <summary>
+    /// Implements a left-leaning red-black tree.
+    /// </summary>
     /// <remarks>
     /// Based on the research paper "Left-leaning Red-Black Trees"
     /// by Robert Sedgewick. More information available at:
@@ -15,12 +29,82 @@ namespace System.Windows.Controls.DataVisualization.Collections
     /// <typeparam name="TValue">Type of values.</typeparam>
     internal class LeftLeaningRedBlackTree<TKey, TValue>
     {
-        /// <summary>Stores the key comparison function.</summary>
+        /// <summary>
+        /// Stores the key comparison function.
+        /// </summary>
         private Comparison<TKey> _keyComparison;
-        /// <summary>Stores the value comparison function.</summary>
+
+        /// <summary>
+        /// Stores the value comparison function.
+        /// </summary>
         private Comparison<TValue> _valueComparison;
-        /// <summary>Stores the root node of the tree.</summary>
-        private LeftLeaningRedBlackTree<TKey, TValue>.Node _rootNode;
+
+        /// <summary>
+        /// Stores the root node of the tree.
+        /// </summary>
+        private Node _rootNode;
+
+        /// <summary>
+        /// Represents a node of the tree.
+        /// </summary>
+        /// <remarks>
+        /// Using fields instead of properties drops execution time by about 40%.
+        /// </remarks>
+        [DebuggerDisplay("Key={Key}, Value={Value}, Siblings={Siblings}")]
+        private class Node
+        {
+            /// <summary>
+            /// Gets or sets the node's key.
+            /// </summary>
+            public TKey Key;
+
+            /// <summary>
+            /// Gets or sets the node's value.
+            /// </summary>
+            public TValue Value;
+
+            /// <summary>
+            /// Gets or sets the left node.
+            /// </summary>
+            public Node Left;
+
+            /// <summary>
+            /// Gets or sets the right node.
+            /// </summary>
+            public Node Right;
+
+            /// <summary>
+            /// Gets or sets the color of the node.
+            /// </summary>
+            public bool IsBlack;
+
+            /// <summary>
+            /// Gets or sets the number of "siblings" (nodes with the same key/value).
+            /// </summary>
+            public int Siblings;
+
+#if DEBUGGING
+        /// <summary>
+        /// Gets an HTML fragment representing the node and its children.
+        /// </summary>
+        public string HtmlFragment
+        {
+            get
+            {
+                return
+                    "<table border='1'>" +
+                        "<tr>" +
+                            "<td colspan='2' align='center' bgcolor='" + (IsBlack ? "gray" : "red") + "'>" + Key + ", " + Value + " [" + Siblings + "]</td>" +
+                        "</tr>" +
+                        "<tr>" +
+                            "<td valign='top'>" + (null != Left ? Left.HtmlFragment : "[null]") + "</td>" +
+                            "<td valign='top'>" + (null != Right ? Right.HtmlFragment : "[null]") + "</td>" +
+                        "</tr>" +
+                    "</table>";
+            }
+        }
+#endif
+        }
 
         /// <summary>
         /// Initializes a new instance of the LeftLeaningRedBlackTree class implementing a normal dictionary.
@@ -29,8 +113,10 @@ namespace System.Windows.Controls.DataVisualization.Collections
         public LeftLeaningRedBlackTree(Comparison<TKey> keyComparison)
         {
             if (null == keyComparison)
-                throw new ArgumentNullException(nameof(keyComparison));
-            this._keyComparison = keyComparison;
+            {
+                throw new ArgumentNullException("keyComparison");
+            }
+            _keyComparison = keyComparison;
         }
 
         /// <summary>
@@ -39,11 +125,13 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <param name="keyComparison">The key comparison function.</param>
         /// <param name="valueComparison">The value comparison function.</param>
         public LeftLeaningRedBlackTree(Comparison<TKey> keyComparison, Comparison<TValue> valueComparison)
-          : this(keyComparison)
+            : this(keyComparison)
         {
             if (null == valueComparison)
-                throw new ArgumentNullException(nameof(valueComparison));
-            this._valueComparison = valueComparison;
+            {
+                throw new ArgumentNullException("valueComparison");
+            }
+            _valueComparison = valueComparison;
         }
 
         /// <summary>
@@ -51,19 +139,21 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// </summary>
         private bool IsMultiDictionary
         {
-            get
-            {
-                return null != this._valueComparison;
-            }
+            get { return null != _valueComparison; }
         }
 
-        /// <summary>Adds a key/value pair to the tree.</summary>
+        /// <summary>
+        /// Adds a key/value pair to the tree.
+        /// </summary>
         /// <param name="key">Key to add.</param>
         /// <param name="value">Value to add.</param>
         public void Add(TKey key, TValue value)
         {
-            this._rootNode = this.Add(this._rootNode, key, value);
-            this._rootNode.IsBlack = true;
+            _rootNode = Add(_rootNode, key, value);
+            _rootNode.IsBlack = true;
+#if DEBUGGING
+            AssertInvariants();
+#endif
         }
 
         /// <summary>
@@ -73,46 +163,65 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <returns>True if key present and removed.</returns>
         public bool Remove(TKey key)
         {
-            if (this.IsMultiDictionary)
+            if (IsMultiDictionary)
+            {
                 throw new InvalidOperationException("Remove is only supported when acting as a normal (non-multi) dictionary.");
-            return this.Remove(key, default(TValue));
+            }
+            return Remove(key, default(TValue));
         }
 
-        /// <summary>Removes a key/value pair from the tree.</summary>
+        /// <summary>
+        /// Removes a key/value pair from the tree.
+        /// </summary>
         /// <param name="key">Key to remove.</param>
         /// <param name="value">Value to remove.</param>
         /// <returns>True if key/value present and removed.</returns>
         public bool Remove(TKey key, TValue value)
         {
-            int count = this.Count;
-            if (null != this._rootNode)
+            int initialCount = Count;
+            if (null != _rootNode)
             {
-                this._rootNode = this.Remove(this._rootNode, key, value);
-                if (null != this._rootNode)
-                    this._rootNode.IsBlack = true;
+                _rootNode = Remove(_rootNode, key, value);
+                if (null != _rootNode)
+                {
+                    _rootNode.IsBlack = true;
+                }
             }
-            return count != this.Count;
+#if DEBUGGING
+            AssertInvariants();
+#endif
+            return initialCount != Count;
         }
 
-        /// <summary>Removes all nodes in the tree.</summary>
+        /// <summary>
+        /// Removes all nodes in the tree.
+        /// </summary>
         public void Clear()
         {
-            this._rootNode = (LeftLeaningRedBlackTree<TKey, TValue>.Node)null;
-            this.Count = 0;
+            _rootNode = null;
+            Count = 0;
+#if DEBUGGING
+            AssertInvariants();
+#endif
         }
 
-        /// <summary>Gets a sorted list of keys in the tree.</summary>
+        /// <summary>
+        /// Gets a sorted list of keys in the tree.
+        /// </summary>
         /// <returns>Sorted list of keys.</returns>
         public IEnumerable<TKey> GetKeys()
         {
             TKey lastKey = default(TKey);
             bool lastKeyValid = false;
-            return this.Traverse<TKey>(this._rootNode, (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, bool>)(n => !lastKeyValid || !object.Equals((object)lastKey, (object)n.Key)), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, TKey>)(n =>
-            {
-                lastKey = n.Key;
-                lastKeyValid = true;
-                return lastKey;
-            }));
+            return Traverse(
+                _rootNode,
+                n => !lastKeyValid || !object.Equals(lastKey, n.Key),
+                n =>
+                {
+                    lastKey = n.Key;
+                    lastKeyValid = true;
+                    return lastKey;
+                });
         }
 
         /// <summary>
@@ -120,14 +229,22 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// </summary>
         /// <param name="key">Specified key.</param>
         /// <returns>Value associated with the specified key.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "GetValueForKey", Justification = "Method name.")]
         public TValue GetValueForKey(TKey key)
         {
-            if (this.IsMultiDictionary)
+            if (IsMultiDictionary)
+            {
                 throw new InvalidOperationException("GetValueForKey is only supported when acting as a normal (non-multi) dictionary.");
-            LeftLeaningRedBlackTree<TKey, TValue>.Node nodeForKey = this.GetNodeForKey(key);
-            if (null != nodeForKey)
-                return nodeForKey.Value;
-            throw new KeyNotFoundException();
+            }
+            Node node = GetNodeForKey(key);
+            if (null != node)
+            {
+                return node.Value;
+            }
+            else
+            {
+                throw new KeyNotFoundException();
+            }
         }
 
         /// <summary>
@@ -137,62 +254,67 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <returns>Sequence of values.</returns>
         public IEnumerable<TValue> GetValuesForKey(TKey key)
         {
-            return this.Traverse<TValue>(this.GetNodeForKey(key), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, bool>)(n => 0 == this._keyComparison(n.Key, key)), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, TValue>)(n => n.Value));
+            return Traverse(GetNodeForKey(key), n => 0 == _keyComparison(n.Key, key), n => n.Value);
         }
 
-        /// <summary>Gets a sequence of all the values in the tree.</summary>
+        /// <summary>
+        /// Gets a sequence of all the values in the tree.
+        /// </summary>
         /// <returns>Sequence of all values.</returns>
         public IEnumerable<TValue> GetValuesForAllKeys()
         {
-            return this.Traverse<TValue>(this._rootNode, (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, bool>)(n => true), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, TValue>)(n => n.Value));
+            return Traverse(_rootNode, n => true, n => n.Value);
         }
 
-        /// <summary>Gets the count of key/value pairs in the tree.</summary>
+        /// <summary>
+        /// Gets the count of key/value pairs in the tree.
+        /// </summary>
         public int Count { get; private set; }
 
-        /// <summary>Gets the minimum key in the tree.</summary>
+        /// <summary>
+        /// Gets the minimum key in the tree.
+        /// </summary>
         public TKey MinimumKey
         {
-            get
-            {
-                return LeftLeaningRedBlackTree<TKey, TValue>.GetExtreme<TKey>(this._rootNode, (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node>)(n => n.Left), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, TKey>)(n => n.Key));
-            }
+            get { return GetExtreme(_rootNode, n => n.Left, n => n.Key); }
         }
 
-        /// <summary>Gets the maximum key in the tree.</summary>
+        /// <summary>
+        /// Gets the maximum key in the tree.
+        /// </summary>
         public TKey MaximumKey
         {
-            get
-            {
-                return LeftLeaningRedBlackTree<TKey, TValue>.GetExtreme<TKey>(this._rootNode, (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node>)(n => n.Right), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, TKey>)(n => n.Key));
-            }
+            get { return GetExtreme(_rootNode, n => n.Right, n => n.Key); }
         }
 
-        /// <summary>Gets the minimum key's minimum value.</summary>
+        /// <summary>
+        /// Gets the minimum key's minimum value.
+        /// </summary>
         public TValue MinimumValue
         {
-            get
-            {
-                return LeftLeaningRedBlackTree<TKey, TValue>.GetExtreme<TValue>(this._rootNode, (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node>)(n => n.Left), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, TValue>)(n => n.Value));
-            }
+            get { return GetExtreme(_rootNode, n => n.Left, n => n.Value); }
         }
 
-        /// <summary>Gets the maximum key's maximum value.</summary>
+        /// <summary>
+        /// Gets the maximum key's maximum value.
+        /// </summary>
         public TValue MaximumValue
         {
-            get
-            {
-                return LeftLeaningRedBlackTree<TKey, TValue>.GetExtreme<TValue>(this._rootNode, (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node>)(n => n.Right), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, TValue>)(n => n.Value));
-            }
+            get { return GetExtreme(_rootNode, n => n.Right, n => n.Value); }
         }
 
-        /// <summary>Returns true if the specified node is red.</summary>
+        /// <summary>
+        /// Returns true if the specified node is red.
+        /// </summary>
         /// <param name="node">Specified node.</param>
         /// <returns>True if specified node is red.</returns>
-        private static bool IsRed(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private static bool IsRed(Node node)
         {
             if (null == node)
+            {
+                // "Virtual" leaf nodes are always black
                 return false;
+            }
             return !node.IsBlack;
         }
 
@@ -203,35 +325,58 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <param name="key">Key to add.</param>
         /// <param name="value">Value to add.</param>
         /// <returns>New root node.</returns>
-        private LeftLeaningRedBlackTree<TKey, TValue>.Node Add(LeftLeaningRedBlackTree<TKey, TValue>.Node node, TKey key, TValue value)
+        private Node Add(Node node, TKey key, TValue value)
         {
             if (null == node)
             {
-                ++this.Count;
-                return new LeftLeaningRedBlackTree<TKey, TValue>.Node()
-                {
-                    Key = key,
-                    Value = value
-                };
+                // Insert new node
+                Count++;
+                return new Node { Key = key, Value = value };
             }
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left) && LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right))
-                LeftLeaningRedBlackTree<TKey, TValue>.FlipColor(node);
-            int num = this.KeyAndValueComparison(key, value, node.Key, node.Value);
-            if (num < 0)
-                node.Left = this.Add(node.Left, key, value);
-            else if (0 < num)
-                node.Right = this.Add(node.Right, key, value);
-            else if (this.IsMultiDictionary)
+
+            if (IsRed(node.Left) && IsRed(node.Right))
             {
-                ++node.Siblings;
-                ++this.Count;
+                // Split node with two red children
+                FlipColor(node);
+            }
+
+            // Find right place for new node
+            int comparisonResult = KeyAndValueComparison(key, value, node.Key, node.Value);
+            if (comparisonResult < 0)
+            {
+                node.Left = Add(node.Left, key, value);
+            }
+            else if (0 < comparisonResult)
+            {
+                node.Right = Add(node.Right, key, value);
             }
             else
-                node.Value = value;
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right))
-                node = LeftLeaningRedBlackTree<TKey, TValue>.RotateLeft(node);
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left) && LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left.Left))
-                node = LeftLeaningRedBlackTree<TKey, TValue>.RotateRight(node);
+            {
+                if (IsMultiDictionary)
+                {
+                    // Store the presence of a "duplicate" node
+                    node.Siblings++;
+                    Count++;
+                }
+                else
+                {
+                    // Replace the value of the existing node
+                    node.Value = value;
+                }
+            }
+
+            if (IsRed(node.Right))
+            {
+                // Rotate to prevent red node on right
+                node = RotateLeft(node);
+            }
+
+            if (IsRed(node.Left) && IsRed(node.Left.Left))
+            {
+                // Rotate to prevent consecutive red nodes
+                node = RotateRight(node);
+            }
+
             return node;
         }
 
@@ -242,94 +387,128 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <param name="key">Key to remove.</param>
         /// <param name="value">Value to remove.</param>
         /// <returns>True if key/value present and removed.</returns>
-        private LeftLeaningRedBlackTree<TKey, TValue>.Node Remove(LeftLeaningRedBlackTree<TKey, TValue>.Node node, TKey key, TValue value)
+        private Node Remove(Node node, TKey key, TValue value)
         {
-            if (this.KeyAndValueComparison(key, value, node.Key, node.Value) < 0)
+            int comparisonResult = KeyAndValueComparison(key, value, node.Key, node.Value);
+            if (comparisonResult < 0)
             {
+                // * Continue search if left is present
                 if (null != node.Left)
                 {
-                    if (!LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left) && !LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left.Left))
-                        node = LeftLeaningRedBlackTree<TKey, TValue>.MoveRedLeft(node);
-                    node.Left = this.Remove(node.Left, key, value);
+                    if (!IsRed(node.Left) && !IsRed(node.Left.Left))
+                    {
+                        // Move a red node over
+                        node = MoveRedLeft(node);
+                    }
+
+                    // Remove from left
+                    node.Left = Remove(node.Left, key, value);
                 }
             }
             else
             {
-                if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left))
-                    node = LeftLeaningRedBlackTree<TKey, TValue>.RotateRight(node);
-                if (this.KeyAndValueComparison(key, value, node.Key, node.Value) == 0 && null == node.Right)
+                if (IsRed(node.Left))
                 {
-                    Debug.Assert(null == node.Left, "About to remove an extra node.");
-                    --this.Count;
-                    if (0 >= node.Siblings)
-                        return (LeftLeaningRedBlackTree<TKey, TValue>.Node)null;
-                    Debug.Assert(this.IsMultiDictionary, "Should not have siblings if tree is not a multi-dictionary.");
-                    --node.Siblings;
-                    return node;
+                    // Flip a 3 node or unbalance a 4 node
+                    node = RotateRight(node);
                 }
+                if ((0 == KeyAndValueComparison(key, value, node.Key, node.Value)) && (null == node.Right))
+                {
+                    // Remove leaf node
+                    Debug.Assert(null == node.Left, "About to remove an extra node.");
+                    Count--;
+                    if (0 < node.Siblings)
+                    {
+                        // Record the removal of the "duplicate" node
+                        Debug.Assert(IsMultiDictionary, "Should not have siblings if tree is not a multi-dictionary.");
+                        node.Siblings--;
+                        return node;
+                    }
+                    else
+                    {
+                        // Leaf node is gone
+                        return null;
+                    }
+                }
+                // * Continue search if right is present
                 if (null != node.Right)
                 {
-                    if (!LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right) && !LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right.Left))
-                        node = LeftLeaningRedBlackTree<TKey, TValue>.MoveRedRight(node);
-                    if (0 == this.KeyAndValueComparison(key, value, node.Key, node.Value))
+                    if (!IsRed(node.Right) && !IsRed(node.Right.Left))
                     {
-                        --this.Count;
+                        // Move a red node over
+                        node = MoveRedRight(node);
+                    }
+                    if (0 == KeyAndValueComparison(key, value, node.Key, node.Value))
+                    {
+                        // Remove leaf node
+                        Count--;
                         if (0 < node.Siblings)
                         {
-                            Debug.Assert(this.IsMultiDictionary, "Should not have siblings if tree is not a multi-dictionary.");
-                            --node.Siblings;
+                            // Record the removal of the "duplicate" node
+                            Debug.Assert(IsMultiDictionary, "Should not have siblings if tree is not a multi-dictionary.");
+                            node.Siblings--;
                         }
                         else
                         {
-                            LeftLeaningRedBlackTree<TKey, TValue>.Node extreme = LeftLeaningRedBlackTree<TKey, TValue>.GetExtreme<LeftLeaningRedBlackTree<TKey, TValue>.Node>(node.Right, (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node>)(n => n.Left), (Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node>)(n => n));
-                            node.Key = extreme.Key;
-                            node.Value = extreme.Value;
-                            node.Siblings = extreme.Siblings;
-                            node.Right = this.DeleteMinimum(node.Right);
+                            // Find the smallest node on the right, swap, and remove it
+                            Node m = GetExtreme(node.Right, n => n.Left, n => n);
+                            node.Key = m.Key;
+                            node.Value = m.Value;
+                            node.Siblings = m.Siblings;
+                            node.Right = DeleteMinimum(node.Right);
                         }
                     }
                     else
-                        node.Right = this.Remove(node.Right, key, value);
+                    {
+                        // Remove from right
+                        node.Right = Remove(node.Right, key, value);
+                    }
                 }
             }
-            return LeftLeaningRedBlackTree<TKey, TValue>.FixUp(node);
+
+            // Maintain invariants
+            return FixUp(node);
         }
 
         /// <summary>
         /// Flip the colors of the specified node and its direct children.
         /// </summary>
         /// <param name="node">Specified node.</param>
-        private static void FlipColor(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private static void FlipColor(Node node)
         {
             node.IsBlack = !node.IsBlack;
             node.Left.IsBlack = !node.Left.IsBlack;
             node.Right.IsBlack = !node.Right.IsBlack;
         }
 
-        /// <summary>Rotate the specified node "left".</summary>
+        /// <summary>
+        /// Rotate the specified node "left".
+        /// </summary>
         /// <param name="node">Specified node.</param>
         /// <returns>New root node.</returns>
-        private static LeftLeaningRedBlackTree<TKey, TValue>.Node RotateLeft(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private static Node RotateLeft(Node node)
         {
-            LeftLeaningRedBlackTree<TKey, TValue>.Node right = node.Right;
-            node.Right = right.Left;
-            right.Left = node;
-            right.IsBlack = node.IsBlack;
+            Node x = node.Right;
+            node.Right = x.Left;
+            x.Left = node;
+            x.IsBlack = node.IsBlack;
             node.IsBlack = false;
-            return right;
+            return x;
         }
 
-        /// <summary>Rotate the specified node "right".</summary>
+        /// <summary>
+        /// Rotate the specified node "right".
+        /// </summary>
         /// <param name="node">Specified node.</param>
         /// <returns>New root node.</returns>
-        private static LeftLeaningRedBlackTree<TKey, TValue>.Node RotateRight(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private static Node RotateRight(Node node)
         {
-            LeftLeaningRedBlackTree<TKey, TValue>.Node left = node.Left;
-            node.Left = left.Right;
-            left.Right = node;
-            left.IsBlack = node.IsBlack;
+            Node x = node.Left;
+            node.Left = x.Right;
+            x.Right = node;
+            x.IsBlack = node.IsBlack;
             node.IsBlack = false;
-            return left;
+            return x;
         }
 
         /// <summary>
@@ -337,16 +516,20 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// </summary>
         /// <param name="node">Parent node.</param>
         /// <returns>New root node.</returns>
-        private static LeftLeaningRedBlackTree<TKey, TValue>.Node MoveRedLeft(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private static Node MoveRedLeft(Node node)
         {
-            LeftLeaningRedBlackTree<TKey, TValue>.FlipColor(node);
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right.Left))
+            FlipColor(node);
+            if (IsRed(node.Right.Left))
             {
-                node.Right = LeftLeaningRedBlackTree<TKey, TValue>.RotateRight(node.Right);
-                node = LeftLeaningRedBlackTree<TKey, TValue>.RotateLeft(node);
-                LeftLeaningRedBlackTree<TKey, TValue>.FlipColor(node);
-                if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right.Right))
-                    node.Right = LeftLeaningRedBlackTree<TKey, TValue>.RotateLeft(node.Right);
+                node.Right = RotateRight(node.Right);
+                node = RotateLeft(node);
+                FlipColor(node);
+
+                // * Avoid creating right-leaning nodes
+                if (IsRed(node.Right.Right))
+                {
+                    node.Right = RotateLeft(node.Right);
+                }
             }
             return node;
         }
@@ -356,28 +539,41 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// </summary>
         /// <param name="node">Parent node.</param>
         /// <returns>New root node.</returns>
-        private static LeftLeaningRedBlackTree<TKey, TValue>.Node MoveRedRight(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private static Node MoveRedRight(Node node)
         {
-            LeftLeaningRedBlackTree<TKey, TValue>.FlipColor(node);
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left.Left))
+            FlipColor(node);
+            if (IsRed(node.Left.Left))
             {
-                node = LeftLeaningRedBlackTree<TKey, TValue>.RotateRight(node);
-                LeftLeaningRedBlackTree<TKey, TValue>.FlipColor(node);
+                node = RotateRight(node);
+                FlipColor(node);
             }
             return node;
         }
 
-        /// <summary>Deletes the minimum node under the specified node.</summary>
+        /// <summary>
+        /// Deletes the minimum node under the specified node.
+        /// </summary>
         /// <param name="node">Specified node.</param>
         /// <returns>New root node.</returns>
-        private LeftLeaningRedBlackTree<TKey, TValue>.Node DeleteMinimum(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private Node DeleteMinimum(Node node)
         {
             if (null == node.Left)
-                return (LeftLeaningRedBlackTree<TKey, TValue>.Node)null;
-            if (!LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left) && !LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left.Left))
-                node = LeftLeaningRedBlackTree<TKey, TValue>.MoveRedLeft(node);
-            node.Left = this.DeleteMinimum(node.Left);
-            return LeftLeaningRedBlackTree<TKey, TValue>.FixUp(node);
+            {
+                // Nothing to do
+                return null;
+            }
+
+            if (!IsRed(node.Left) && !IsRed(node.Left.Left))
+            {
+                // Move red node left
+                node = MoveRedLeft(node);
+            }
+
+            // Recursively delete
+            node.Left = DeleteMinimum(node.Left);
+
+            // Maintain invariants
+            return FixUp(node);
         }
 
         /// <summary>
@@ -385,20 +581,37 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// </summary>
         /// <param name="node">Specified node.</param>
         /// <returns>New root node.</returns>
-        private static LeftLeaningRedBlackTree<TKey, TValue>.Node FixUp(LeftLeaningRedBlackTree<TKey, TValue>.Node node)
+        private static Node FixUp(Node node)
         {
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right))
-                node = LeftLeaningRedBlackTree<TKey, TValue>.RotateLeft(node);
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left) && LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left.Left))
-                node = LeftLeaningRedBlackTree<TKey, TValue>.RotateRight(node);
-            if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left) && LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Right))
-                LeftLeaningRedBlackTree<TKey, TValue>.FlipColor(node);
-            if (node.Left != null && LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left.Right) && !LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left.Left))
+            if (IsRed(node.Right))
             {
-                node.Left = LeftLeaningRedBlackTree<TKey, TValue>.RotateLeft(node.Left);
-                if (LeftLeaningRedBlackTree<TKey, TValue>.IsRed(node.Left))
-                    node = LeftLeaningRedBlackTree<TKey, TValue>.RotateRight(node);
+                // Avoid right-leaning node
+                node = RotateLeft(node);
             }
+
+            if (IsRed(node.Left) && IsRed(node.Left.Left))
+            {
+                // Balance 4-node
+                node = RotateRight(node);
+            }
+
+            if (IsRed(node.Left) && IsRed(node.Right))
+            {
+                // Push red up
+                FlipColor(node);
+            }
+
+            // * Avoid leaving behind right-leaning nodes
+            if ((null != node.Left) && IsRed(node.Left.Right) && !IsRed(node.Left.Left))
+            {
+                node.Left = RotateLeft(node.Left);
+                if (IsRed(node.Left))
+                {
+                    // Balance 4-node
+                    node = RotateRight(node);
+                }
+            }
+
             return node;
         }
 
@@ -407,38 +620,53 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// </summary>
         /// <param name="key">Key to search for.</param>
         /// <returns>Corresponding node or null if none found.</returns>
-        private LeftLeaningRedBlackTree<TKey, TValue>.Node GetNodeForKey(TKey key)
+        private Node GetNodeForKey(TKey key)
         {
-            LeftLeaningRedBlackTree<TKey, TValue>.Node node = this._rootNode;
+            // Initialize
+            Node node = _rootNode;
             while (null != node)
             {
-                int num = this._keyComparison(key, node.Key);
-                if (num < 0)
+                // Compare keys and go left/right
+                int comparisonResult = _keyComparison(key, node.Key);
+                if (comparisonResult < 0)
                 {
                     node = node.Left;
                 }
-                else
+                else if (0 < comparisonResult)
                 {
-                    if (0 >= num)
-                        return node;
                     node = node.Right;
                 }
+                else
+                {
+                    // Match; return node
+                    return node;
+                }
             }
-            return (LeftLeaningRedBlackTree<TKey, TValue>.Node)null;
+
+            // No match found
+            return null;
         }
 
-        /// <summary>Gets an extreme (ex: minimum/maximum) value.</summary>
+        /// <summary>
+        /// Gets an extreme (ex: minimum/maximum) value.
+        /// </summary>
         /// <typeparam name="T">Type of value.</typeparam>
         /// <param name="node">Node to start from.</param>
         /// <param name="successor">Successor function.</param>
         /// <param name="selector">Selector function.</param>
         /// <returns>Extreme value.</returns>
-        private static T GetExtreme<T>(LeftLeaningRedBlackTree<TKey, TValue>.Node node, Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node> successor, Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, T> selector)
+        private static T GetExtreme<T>(Node node, Func<Node, Node> successor, Func<Node, T> selector)
         {
-            T obj = default(T);
-            for (LeftLeaningRedBlackTree<TKey, TValue>.Node node1 = node; null != node1; node1 = successor(node1))
-                obj = selector(node1);
-            return obj;
+            // Initialize
+            T extreme = default(T);
+            Node current = node;
+            while (null != current)
+            {
+                // Go to extreme
+                extreme = selector(current);
+                current = successor(current);
+            }
+            return extreme;
         }
 
         /// <summary>
@@ -449,14 +677,16 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <param name="condition">Condition method.</param>
         /// <param name="selector">Selector method.</param>
         /// <returns>Sequence of selected nodes.</returns>
-        private IEnumerable<T> Traverse<T>(LeftLeaningRedBlackTree<TKey, TValue>.Node node, Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, bool> condition, Func<LeftLeaningRedBlackTree<TKey, TValue>.Node, T> selector)
+        private IEnumerable<T> Traverse<T>(Node node, Func<Node, bool> condition, Func<Node, T> selector)
         {
-            Stack<LeftLeaningRedBlackTree<TKey, TValue>.Node> stack = new Stack<LeftLeaningRedBlackTree<TKey, TValue>.Node>();
-            LeftLeaningRedBlackTree<TKey, TValue>.Node current = node;
+            // Create a stack to avoid recursion
+            Stack<Node> stack = new Stack<Node>();
+            Node current = node;
             while (null != current)
             {
                 if (null != current.Left)
                 {
+                    // Save current state and go left
                     stack.Push(current);
                     current = current.Left;
                 }
@@ -464,14 +694,20 @@ namespace System.Windows.Controls.DataVisualization.Collections
                 {
                     do
                     {
-                        for (int i = 0; i <= current.Siblings; ++i)
+                        for (int i = 0; i <= current.Siblings; i++)
                         {
+                            // Select current node if relevant
                             if (condition(current))
+                            {
                                 yield return selector(current);
+                            }
                         }
+                        // Go right - or up if nothing to the right
                         current = current.Right;
                     }
-                    while (current == null && 0 < stack.Count && null != (current = stack.Pop()));
+                    while ((null == current) &&
+                           (0 < stack.Count) &&
+                           (null != (current = stack.Pop())));
                 }
             }
         }
@@ -486,33 +722,94 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <returns>CompareTo-style results: -1 if left is less, 0 if equal, and 1 if greater than right.</returns>
         private int KeyAndValueComparison(TKey leftKey, TValue leftValue, TKey rightKey, TValue rightValue)
         {
-            int num = this._keyComparison(leftKey, rightKey);
-            if (num == 0 && null != this._valueComparison)
-                num = this._valueComparison(leftValue, rightValue);
-            return num;
+            // Compare keys
+            int comparisonResult = _keyComparison(leftKey, rightKey);
+            if ((0 == comparisonResult) && (null != _valueComparison))
+            {
+                // Keys match; compare values
+                comparisonResult = _valueComparison(leftValue, rightValue);
+            }
+            return comparisonResult;
         }
 
-        /// <summary>Represents a node of the tree.</summary>
-        /// <remarks>
-        /// Using fields instead of properties drops execution time by about 40%.
-        /// </remarks>
-        [DebuggerDisplay("Key={Key}, Value={Value}, Siblings={Siblings}")]
-        private class Node
+#if DEBUGGING
+        /// <summary>
+        /// Asserts that tree invariants are not violated.
+        /// </summary>
+        private void AssertInvariants()
         {
-            /// <summary>Gets or sets the node's key.</summary>
-            public TKey Key;
-            /// <summary>Gets or sets the node's value.</summary>
-            public TValue Value;
-            /// <summary>Gets or sets the left node.</summary>
-            public LeftLeaningRedBlackTree<TKey, TValue>.Node Left;
-            /// <summary>Gets or sets the right node.</summary>
-            public LeftLeaningRedBlackTree<TKey, TValue>.Node Right;
-            /// <summary>Gets or sets the color of the node.</summary>
-            public bool IsBlack;
-            /// <summary>
-            /// Gets or sets the number of "siblings" (nodes with the same key/value).
-            /// </summary>
-            public int Siblings;
+            // Root is black
+            Debug.Assert((null == _rootNode) || _rootNode.IsBlack, "Root is not black");
+            // Every path contains the same number of black nodes
+            Dictionary<Node, Node> parents = new Dictionary<LeftLeaningRedBlackTree<TKey, TValue>.Node, LeftLeaningRedBlackTree<TKey, TValue>.Node>();
+            foreach (Node node in Traverse(_rootNode, n => true, n => n))
+            {
+                if (null != node.Left)
+                {
+                    parents[node.Left] = node;
+                }
+                if (null != node.Right)
+                {
+                    parents[node.Right] = node;
+                }
+            }
+            if (null != _rootNode)
+            {
+                parents[_rootNode] = null;
+            }
+            int treeCount = -1;
+            foreach (Node node in Traverse(_rootNode, n => (null == n.Left) || (null == n.Right), n => n))
+            {
+                int pathCount = 0;
+                Node current = node;
+                while (null != current)
+                {
+                    if (current.IsBlack)
+                    {
+                        pathCount++;
+                    }
+                    current = parents[current];
+                }
+                Debug.Assert((-1 == treeCount) || (pathCount == treeCount), "Not all paths have the same number of black nodes.");
+                treeCount = pathCount;
+            }
+            // Verify node properties...
+            foreach (Node node in Traverse(_rootNode, n => true, n => n))
+            {
+                // Left node is less
+                if (null != node.Left)
+                {
+                    Debug.Assert(0 > KeyAndValueComparison(node.Left.Key, node.Left.Value, node.Key, node.Value), "Left node is greater than its parent.");
+                }
+                // Right node is greater
+                if (null != node.Right)
+                {
+                    Debug.Assert(0 < KeyAndValueComparison(node.Right.Key, node.Right.Value, node.Key, node.Value), "Right node is less than its parent.");
+                }
+                // Both children of a red node are black
+                Debug.Assert(!IsRed(node) || (!IsRed(node.Left) && !IsRed(node.Right)), "Red node has a red child.");
+                // Always left-leaning
+                Debug.Assert(!IsRed(node.Right) || IsRed(node.Left), "Node is not left-leaning.");
+                // No consecutive reds (subset of previous rule)
+                //Debug.Assert(!(IsRed(node) && IsRed(node.Left)));
+            }
         }
+
+        /// <summary>
+        /// Gets an HTML fragment representing the tree.
+        /// </summary>
+        public string HtmlDocument
+        {
+            get
+            {
+                return
+                    "<html>" +
+                        "<body>" +
+                            (null != _rootNode ? _rootNode.HtmlFragment : "[null]") +
+                        "</body>" +
+                    "</html>";
+            }
+        }
+#endif
     }
 }

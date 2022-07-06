@@ -4,74 +4,91 @@
 // All other rights reserved.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-
-#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Shapes;
-#else
-using Windows.Foundation;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
-#endif
 
 #if !DEFINITION_SERIES_COMPATIBILITY_MODE
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
-    /// Represents a control that contains a data series to be rendered in X/Y
+    /// Represents a control that contains a data series to be rendered in X/Y 
     /// line format.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
+    [StyleTypedProperty(Property = DataPointStyleName, StyleTargetType = typeof(LineDataPoint))]
     [StyleTypedProperty(Property = "LegendItemStyle", StyleTargetType = typeof(LegendItem))]
-    [StyleTypedProperty(Property = "DataPointStyle", StyleTargetType = typeof(LineDataPoint))]
-    [TemplatePart(Name = "PlotArea", Type = typeof(Canvas))]
     [StyleTypedProperty(Property = "PolylineStyle", StyleTargetType = typeof(Polyline))]
-    public class LineSeries : LineAreaBaseSeries<LineDataPoint>
+    [TemplatePart(Name = DataPointSeries.PlotAreaName, Type = typeof(Canvas))]
+    [SuppressMessage("Microsoft.Maintainability", "CA1501:AvoidExcessiveInheritance", Justification = "Depth of hierarchy is necessary to avoid code duplication.")]
+    public partial class LineSeries : LineAreaBaseSeries<LineDataPoint>
     {
-        /// <summary>Identifies the Points dependency property.</summary>
-        public static readonly DependencyProperty PointsProperty = DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(LineSeries), (PropertyMetadata)null);
-        /// <summary>Identifies the PolylineStyle dependency property.</summary>
-        public static readonly DependencyProperty PolylineStyleProperty = DependencyProperty.Register(nameof(PolylineStyle), typeof(Style), typeof(LineSeries), (PropertyMetadata)null);
-
-        /// <summary>Gets the collection of points that make up the line.</summary>
+        #region public PointCollection Points
+        /// <summary>
+        /// Gets the collection of points that make up the line.
+        /// </summary>
         public PointCollection Points
         {
-            get
-            {
-                return this.GetValue(LineSeries.PointsProperty) as PointCollection;
-            }
-            private set
-            {
-                this.SetValue(LineSeries.PointsProperty, (object)value);
-            }
+            get { return GetValue(PointsProperty) as PointCollection; }
+            private set { SetValue(PointsProperty, value); }
         }
 
         /// <summary>
-        /// Gets or sets the style of the Polyline object that follows the data
+        /// Identifies the Points dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PointsProperty =
+            DependencyProperty.Register(
+                "Points",
+                typeof(PointCollection),
+                typeof(LineSeries),
+                null);
+        #endregion public PointCollection Points
+
+        #region public Style PolylineStyle
+        /// <summary>
+        /// Gets or sets the style of the Polyline object that follows the data 
         /// points.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
         public Style PolylineStyle
         {
-            get
-            {
-                return this.GetValue(LineSeries.PolylineStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(LineSeries.PolylineStyleProperty, (object)value);
-            }
+            get { return GetValue(PolylineStyleProperty) as Style; }
+            set { SetValue(PolylineStyleProperty, value); }
         }
 
-        /// <summary>Initializes a new instance of the LineSeries class.</summary>
+        /// <summary>
+        /// Identifies the PolylineStyle dependency property.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Polyline", Justification = "Matches System.Windows.Shapes.Polyline.")]
+        public static readonly DependencyProperty PolylineStyleProperty =
+            DependencyProperty.Register(
+                "PolylineStyle",
+                typeof(Style),
+                typeof(LineSeries),
+                null);
+        #endregion public Style PolylineStyle
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Initializes the static members of the LineSeries class.
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
+        static LineSeries()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(LineSeries), new FrameworkPropertyMetadata(typeof(LineSeries)));
+        }
+
+#endif
+        /// <summary>
+        /// Initializes a new instance of the LineSeries class.
+        /// </summary>
         public LineSeries()
         {
-            this.DefaultStyleKey = (object)typeof(LineSeries);
+#if SILVERLIGHT
+            this.DefaultStyleKey = typeof(LineSeries);
+#endif
         }
 
         /// <summary>
@@ -80,20 +97,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="firstDataPoint">The first data point.</param>
         protected override void GetAxes(DataPoint firstDataPoint)
         {
-            this.GetAxes(firstDataPoint, (Func<IAxis, bool>)(axis => axis.Orientation == AxisOrientation.X), (Func<IAxis>)(() =>
-            {
-                IAxis axis = (IAxis)DataPointSeriesWithAxes.CreateRangeAxisFromData(firstDataPoint.IndependentValue) ?? (IAxis)new CategoryAxis();
-                axis.Orientation = AxisOrientation.X;
-                return axis;
-            }), (Func<IAxis, bool>)(axis => axis.Orientation == AxisOrientation.Y && axis is IRangeAxis), (Func<IAxis>)(() =>
-            {
-                DisplayAxis rangeAxisFromData = (DisplayAxis)DataPointSeriesWithAxes.CreateRangeAxisFromData((object)firstDataPoint.DependentValue);
-                if (rangeAxisFromData == null)
-                    throw new InvalidOperationException("LineSeries.GetAxes: No Suitable Axis Available For Plotting Dependent Value");
-                rangeAxisFromData.ShowGridLines = true;
-                rangeAxisFromData.Orientation = AxisOrientation.Y;
-                return (IAxis)rangeAxisFromData;
-            }));
+            GetAxes(
+                firstDataPoint,
+                (axis) => axis.Orientation == AxisOrientation.X,
+                () =>
+                {
+                    IAxis axis = CreateRangeAxisFromData(firstDataPoint.IndependentValue);
+                    if (axis == null)
+                    {
+                        axis = new CategoryAxis();
+                    }
+                    axis.Orientation = AxisOrientation.X;
+                    return axis;
+                },
+                (axis) => axis.Orientation == AxisOrientation.Y && axis is IRangeAxis,
+                () =>
+                {
+                    DisplayAxis axis = (DisplayAxis)CreateRangeAxisFromData(firstDataPoint.DependentValue);
+                    if (axis == null)
+                    {
+                        throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_NoSuitableAxisAvailableForPlottingDependentValue);
+                    }
+                    axis.ShowGridLines = true;
+                    axis.Orientation = AxisOrientation.Y;
+                    return axis;
+                });
         }
 
         /// <summary>
@@ -102,15 +130,19 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="points">Collection of Points.</param>
         protected override void UpdateShapeFromPoints(IEnumerable<Point> points)
         {
-            if (points.Any<Point>())
+            if (points.Any())
             {
                 PointCollection pointCollection = new PointCollection();
                 foreach (Point point in points)
+                {
                     pointCollection.Add(point);
-                this.Points = pointCollection;
+                }
+                Points = pointCollection;
             }
             else
-                this.Points = (PointCollection)null;
+            {
+                Points = null;
+            }
         }
     }
 }

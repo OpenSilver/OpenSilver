@@ -1,8 +1,15 @@
-﻿using System.Collections.Generic;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System.Collections.Generic;
 
 namespace System.Windows.Controls.DataVisualization
 {
-    /// <summary>A generic equality comparer.</summary>
+    /// <summary>
+    /// A generic equality comparer.
+    /// </summary>
     /// <typeparam name="T">The type of the objects being compared.</typeparam>
     internal class GenericEqualityComparer<T> : EqualityComparer<T>
     {
@@ -19,9 +26,9 @@ namespace System.Windows.Controls.DataVisualization
         /// <summary>
         /// Initializes a new instance of the GenericEqualityComparer class.
         /// </summary>
-        /// <param name="equalityFunction">A function which determines whether
+        /// <param name="equalityFunction">A function which determines whether 
         /// two items are equal.</param>
-        /// <param name="hashCodeFunction">A function that returns a hash code
+        /// <param name="hashCodeFunction">A function that returns a hash code 
         /// for an object.</param>
         public GenericEqualityComparer(Func<T, T, bool> equalityFunction, Func<T, int> hashCodeFunction)
         {
@@ -37,15 +44,17 @@ namespace System.Windows.Controls.DataVisualization
         /// <returns>A value indicating whether the objects. are equal.</returns>
         public override bool Equals(T x, T y)
         {
-            return this.EqualityFunction(x, y);
+            return EqualityFunction(x, y);
         }
 
-        /// <summary>A function that returns a hash code for an object.</summary>
+        /// <summary>
+        /// A function that returns a hash code for an object.
+        /// </summary>
         /// <param name="obj">The object to returns a hash code for.</param>
         /// <returns>The hash code for the object.</returns>
         public override int GetHashCode(T obj)
         {
-            return this.HashCodeFunction(obj);
+            return HashCodeFunction(obj);
         }
     }
 }

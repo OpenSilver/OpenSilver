@@ -1,21 +1,26 @@
-﻿using System.Collections.Generic;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace System.Windows.Controls.DataVisualization
 {
-    /// <summary>A range of values.</summary>
+    /// <summary>
+    /// A range of values.
+    /// </summary>
     /// <typeparam name="T">The type of the values.</typeparam>
     /// <QualityBand>Preview</QualityBand>
-    public struct Range<T> where T : IComparable
+    public struct Range<T>
+        where T : IComparable
     {
         /// <summary>
         /// A flag that determines whether the range is empty or not.
         /// </summary>
         private bool _hasData;
-        /// <summary>The maximum value in the range.</summary>
-        private T _maximum;
-        /// <summary>The minimum value in the range.</summary>
-        private T _minimum;
 
         /// <summary>
         /// Gets a value indicating whether the range is empty or not.
@@ -24,46 +29,75 @@ namespace System.Windows.Controls.DataVisualization
         {
             get
             {
-                return this._hasData;
+                return _hasData;
             }
         }
 
-        /// <summary>Gets the maximum value in the range.</summary>
+        /// <summary>
+        /// The maximum value in the range.
+        /// </summary>
+        private T _maximum;
+
+        /// <summary>
+        /// Gets the maximum value in the range.
+        /// </summary>
         public T Maximum
         {
             get
             {
-                if (!this.HasData)
-                    throw new InvalidOperationException("Range.Maximum: Cannot Read The Maximum Of An Empty Range");
-                return this._maximum;
+                if (!HasData)
+                {
+                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Range_get_Maximum_CannotReadTheMaximumOfAnEmptyRange);
+                }
+                return _maximum;
             }
         }
 
-        /// <summary>Gets the minimum value in the range.</summary>
+        /// <summary>
+        /// The minimum value in the range.
+        /// </summary>
+        private T _minimum;
+
+        /// <summary>
+        /// Gets the minimum value in the range.
+        /// </summary>
         public T Minimum
         {
             get
             {
-                if (!this.HasData)
-                    throw new InvalidOperationException("Range.Minimum: Cannot Read The Minimum Of An Empty Range");
-                return this._minimum;
+                if (!HasData)
+                {
+                    throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Range_get_Minimum_CannotReadTheMinimumOfAnEmptyRange);
+                }
+                return _minimum;
             }
         }
 
-        /// <summary>Initializes a new instance of the Range class.</summary>
+        /// <summary>
+        /// Initializes a new instance of the Range class.
+        /// </summary>
         /// <param name="minimum">The minimum value.</param>
         /// <param name="maximum">The maximum value.</param>
         public Range(T minimum, T maximum)
         {
-            if ((object)minimum == null)
-                throw new ArgumentNullException(nameof(minimum));
-            if ((object)maximum == null)
-                throw new ArgumentNullException(nameof(maximum));
-            this._hasData = true;
-            this._minimum = minimum;
-            this._maximum = maximum;
-            if (ValueHelper.Compare((IComparable)minimum, (IComparable)maximum) == 1)
-                throw new InvalidOperationException("Range: Maximum Value Must Be Larger Than Or Equal To Minimum Value");
+            if (minimum == null)
+            {
+                throw new ArgumentNullException("minimum");
+            }
+            if (maximum == null)
+            {
+                throw new ArgumentNullException("maximum");
+            }
+
+            _hasData = true;
+            _minimum = minimum;
+            _maximum = maximum;
+
+            int compareValue = ValueHelper.Compare(minimum, maximum);
+            if (compareValue == 1)
+            {
+                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Range_ctor_MaximumValueMustBeLargerThanOrEqualToMinimumValue);
+            }
         }
 
         /// <summary>
@@ -76,19 +110,15 @@ namespace System.Windows.Controls.DataVisualization
         public static bool operator ==(Range<T> leftRange, Range<T> rightRange)
         {
             if (!leftRange.HasData)
-                return !rightRange.HasData;
-            if (!rightRange.HasData)
-                return !leftRange.HasData;
-            T obj = leftRange.Minimum;
-            int num;
-            if (obj.Equals((object)rightRange.Minimum))
             {
-                obj = leftRange.Maximum;
-                num = obj.Equals((object)rightRange.Maximum) ? 1 : 0;
+                return !rightRange.HasData;
             }
-            else
-                num = 0;
-            return num != 0;
+            if (!rightRange.HasData)
+            {
+                return !leftRange.HasData;
+            }
+
+            return leftRange.Minimum.Equals(rightRange.Minimum) && leftRange.Maximum.Equals(rightRange.Maximum);
         }
 
         /// <summary>
@@ -97,26 +127,37 @@ namespace System.Windows.Controls.DataVisualization
         /// </summary>
         /// <param name="leftRange">Left-hand side range.</param>
         /// <param name="rightRange">Right-hand side range.</param>
-        /// <returns>A value indicating whether the ranges are not equal.</returns>
+        /// <returns>A value indicating whether the ranges are not equal.
+        /// </returns>
         public static bool operator !=(Range<T> leftRange, Range<T> rightRange)
         {
             return !(leftRange == rightRange);
         }
 
-        /// <summary>Adds a range to the current range.</summary>
+        /// <summary>
+        /// Adds a range to the current range.
+        /// </summary>
         /// <param name="range">A range to add to the current range.</param>
         /// <returns>A new range that encompasses the instance range and the
         /// range parameter.</returns>
         public Range<T> Add(Range<T> range)
         {
             if (!this.HasData)
+            {
                 return range;
-            if (!range.HasData)
+            }
+            else if (!range.HasData)
+            {
                 return this;
-            return new Range<T>(ValueHelper.Compare((IComparable)this.Minimum, (IComparable)range.Minimum) == -1 ? this.Minimum : range.Minimum, ValueHelper.Compare((IComparable)this.Maximum, (IComparable)range.Maximum) == 1 ? this.Maximum : range.Maximum);
+            }
+            T minimum = ValueHelper.Compare(this.Minimum, range.Minimum) == -1 ? this.Minimum : range.Minimum;
+            T maximum = ValueHelper.Compare(this.Maximum, range.Maximum) == 1 ? this.Maximum : range.Maximum;
+            return new Range<T>(minimum, maximum);
         }
 
-        /// <summary>Compares the range to another range.</summary>
+        /// <summary>
+        /// Compares the range to another range.
+        /// </summary>
         /// <param name="range">A different range.</param>
         /// <returns>A value indicating whether the ranges are equal.</returns>
         public bool Equals(Range<T> range)
@@ -124,14 +165,21 @@ namespace System.Windows.Controls.DataVisualization
             return this == range;
         }
 
-        /// <summary>Compares the range to an object.</summary>
+        /// <summary>
+        /// Compares the range to an object.
+        /// </summary>
         /// <param name="obj">Another object.</param>
         /// <returns>A value indicating whether the other object is a range,
         /// and if so, whether that range is equal to the instance range.
         /// </returns>
         public override bool Equals(object obj)
         {
-            return this == (Range<T>)obj;
+            Range<T> range = (Range<T>)obj;
+            if (range == null)
+            {
+                return false;
+            }
+            return this == range;
         }
 
         /// <summary>
@@ -141,8 +189,32 @@ namespace System.Windows.Controls.DataVisualization
         /// <returns>Whether the value is within the range.</returns>
         public bool Contains(T value)
         {
-            return ValueHelper.Compare((IComparable)this.Minimum, (IComparable)value) <= 0 && ValueHelper.Compare((IComparable)value, (IComparable)this.Maximum) <= 0;
+            return ValueHelper.Compare(Minimum, value) <= 0 && ValueHelper.Compare(value, Maximum) <= 0;
         }
+
+        /////// <summary>
+        /////// Returns a new range that contains the value.
+        /////// </summary>
+        /////// <param name="value">The value to extend the range to.</param>
+        /////// <returns>The range which contains the value.</returns>
+        ////public Range<T> ExtendTo(T value)
+        ////{
+        ////    if (!HasData)
+        ////    {
+        ////        return new Range<T>(value, value);
+        ////    }
+
+        ////    if (ValueHelper.Compare(Minimum, value) > 0)
+        ////    {
+        ////        return new Range<T>(value, Maximum);
+        ////    }
+        ////    else if (ValueHelper.Compare(Maximum, value) < 0)
+        ////    {
+        ////        return new Range<T>(Minimum, value);
+        ////    }
+
+        ////    return this;
+        ////}
 
         /// <summary>
         /// Returns a value indicating whether two ranges intersect.
@@ -152,31 +224,48 @@ namespace System.Windows.Controls.DataVisualization
         public bool IntersectsWith(Range<T> range)
         {
             if (!this.HasData || !range.HasData)
+            {
                 return false;
-            Func<Range<T>, Range<T>, bool> func = (Func<Range<T>, Range<T>, bool>)((leftRange, rightRange) => ValueHelper.Compare((IComparable)rightRange.Minimum, (IComparable)leftRange.Maximum) <= 0 && ValueHelper.Compare((IComparable)rightRange.Minimum, (IComparable)leftRange.Minimum) >= 0 || ValueHelper.Compare((IComparable)leftRange.Minimum, (IComparable)rightRange.Maximum) <= 0 && ValueHelper.Compare((IComparable)leftRange.Minimum, (IComparable)rightRange.Minimum) >= 0);
-            return func(this, range) || func(range, this);
+            }
+
+            Func<Range<T>, Range<T>, bool> rightCollidesWithLeft =
+                (leftRange, rightRange) =>
+                    (ValueHelper.Compare(rightRange.Minimum, leftRange.Maximum) <= 0 && ValueHelper.Compare(rightRange.Minimum, leftRange.Minimum) >= 0)
+                    || (ValueHelper.Compare(leftRange.Minimum, rightRange.Maximum) <= 0 && ValueHelper.Compare(leftRange.Minimum, rightRange.Minimum) >= 0);
+
+            return rightCollidesWithLeft(this, range) || rightCollidesWithLeft(range, this);
         }
 
-        /// <summary>Computes a hash code value.</summary>
+        /// <summary>
+        /// Computes a hash code value.
+        /// </summary>
         /// <returns>A hash code value.</returns>
         public override int GetHashCode()
         {
-            if (!this.HasData)
+            if (!HasData)
+            {
                 return 0;
-            return EqualityComparer<T>.Default.GetHashCode(this.Minimum) + EqualityComparer<T>.Default.GetHashCode(this.Maximum);
+            }
+
+            int num = 0x5374e861;
+            num = (-1521134295 * num) + EqualityComparer<T>.Default.GetHashCode(Minimum);
+            return ((-1521134295 * num) + EqualityComparer<T>.Default.GetHashCode(Maximum));
         }
 
-        /// <summary>Returns the string representation of the range.</summary>
+        /// <summary>
+        /// Returns the string representation of the range.
+        /// </summary>
         /// <returns>The string representation of the range.</returns>
         public override string ToString()
         {
             if (!this.HasData)
-                return "{0}, {1}";
-            return string.Format((IFormatProvider)CultureInfo.CurrentCulture, "{0}, {1}", new object[2]
             {
-        (object) this.Minimum,
-        (object) this.Maximum
-            });
+                return OpenSilver.Controls.DataVisualization.Properties.Resources.Range_ToString_NoData;
+            }
+            else
+            {
+                return string.Format(CultureInfo.CurrentCulture, OpenSilver.Controls.DataVisualization.Properties.Resources.Range_ToString_Data, this.Minimum, this.Maximum);
+            }
         }
     }
 }

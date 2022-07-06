@@ -6,26 +6,16 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-#if MIGRATION
 using System.Windows.Data;
-#else
-using System;
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// A dynamic series with axes and only one legend item and style for all 
     /// data points.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
-    public abstract class DataPointSingleSeriesWithAxes : DataPointSeriesWithAxes //, IRequireGlobalSeriesIndex
+    public abstract class DataPointSingleSeriesWithAxes : DataPointSeriesWithAxes, IRequireGlobalSeriesIndex
     {
         /// <summary>
         /// Name of the ActualDataPointStyle property.
@@ -222,6 +212,29 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
 
         /// <summary>
+        /// When the series host property is set retrieves a style to use for all the
+        /// data points.
+        /// </summary>
+        /// <param name="oldValue">The old series host value.</param>
+        /// <param name="newValue">The new series host value.</param>
+        protected override void OnSeriesHostPropertyChanged(ISeriesHost oldValue, ISeriesHost newValue)
+        {
+            base.OnSeriesHostPropertyChanged(oldValue, newValue);
+
+            if (oldValue != null)
+            {
+                oldValue.ResourceDictionariesChanged -= new EventHandler(SeriesHostResourceDictionariesChanged);
+            }
+
+            if (newValue != null)
+            {
+                newValue.ResourceDictionariesChanged += new EventHandler(SeriesHostResourceDictionariesChanged);
+
+                DispensedResourcesChanging();
+            }
+        }
+
+        /// <summary>
         /// Creates the LegendItem Control if conditions are right.
         /// </summary>
         private void CreateLegendItemDataPoint()
@@ -240,11 +253,11 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             if (null == LegendItem.Parent)
             {
 #endif
-            LegendItem.Loaded += delegate
-            {
-                // Wait for Loaded to set the DataPoint
-                LegendItem.DataContext = dataPoint;
-            };
+                LegendItem.Loaded += delegate
+                {
+                    // Wait for Loaded to set the DataPoint
+                    LegendItem.DataContext = dataPoint;
+                };
 #if !SILVERLIGHT
             }
             else
@@ -310,9 +323,30 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Processes the change of the DispensedResources property.
         /// </summary>
-        [OpenSilver.NotImplemented]
         private void DispensedResourcesChanging()
         {
+            if (null != PaletteResources)
+            {
+                Resources.MergedDictionaries.Remove(PaletteResources);
+                PaletteResources = null;
+            }
+            using (IEnumerator<ResourceDictionary> enumerator = GetResourceDictionaryEnumeratorFromHost())
+            {
+                if (enumerator.MoveNext())
+                {
+                    PaletteResources =
+#if SILVERLIGHT
+                        enumerator.Current.ShallowCopy();
+#else
+                        enumerator.Current;
+#endif
+                    Resources.MergedDictionaries.Add(PaletteResources);
+                }
+            }
+            CreateLegendItemDataPoint();
+            ActualDataPointStyle = DataPointStyle ?? (Resources[DataPointStyleName] as Style);
+            ActualLegendItemStyle = LegendItemStyle ?? (Resources[LegendItemStyleName] as Style);
+            Refresh();
         }
     }
 }

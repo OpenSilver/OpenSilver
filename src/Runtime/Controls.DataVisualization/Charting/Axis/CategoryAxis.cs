@@ -1,64 +1,85 @@
-﻿using System.Collections.Generic;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Shapes;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
-    /// <summary>The sort order to use when sorting categories.</summary>
-    public enum CategorySortOrder
-    {
-        None,
-        Ascending,
-        Descending,
-    }
-
-    /// <summary>An axis that displays categories.</summary>
-    [TemplatePart(Name = "AxisGrid", Type = typeof(Grid))]
-    [StyleTypedProperty(Property = "TitleStyle", StyleTargetType = typeof(Title))]
-    [TemplatePart(Name = "AxisTitle", Type = typeof(Title))]
+    /// <summary>
+    /// An axis that displays categories.
+    /// </summary>
     [StyleTypedProperty(Property = "GridLineStyle", StyleTargetType = typeof(Line))]
     [StyleTypedProperty(Property = "MajorTickMarkStyle", StyleTargetType = typeof(Line))]
     [StyleTypedProperty(Property = "AxisLabelStyle", StyleTargetType = typeof(AxisLabel))]
-    public class CategoryAxis : DisplayAxis, ICategoryAxis, IAxis, IDataConsumer
+    [StyleTypedProperty(Property = "TitleStyle", StyleTargetType = typeof(Title))]
+    [TemplatePart(Name = AxisGridName, Type = typeof(Grid))]
+    [TemplatePart(Name = AxisTitleName, Type = typeof(Title))]
+    public class CategoryAxis : DisplayAxis, ICategoryAxis
     {
-        /// <summary>Identifies the SortOrder dependency property.</summary>
-        public static readonly DependencyProperty SortOrderProperty = DependencyProperty.Register(nameof(SortOrder), typeof(CategorySortOrder), typeof(CategoryAxis), new PropertyMetadata((object)CategorySortOrder.None, new PropertyChangedCallback(CategoryAxis.OnSortOrderPropertyChanged)));
-        /// <summary>A pool of major tick marks.</summary>
+        /// <summary>
+        /// A pool of major tick marks.
+        /// </summary>
         private ObjectPool<Line> _majorTickMarkPool;
-        /// <summary>A pool of labels.</summary>
+
+        /// <summary>
+        /// A pool of labels.
+        /// </summary>
         private ObjectPool<Control> _labelPool;
 
-        /// <summary>Gets or sets the sort order used for the categories.</summary>
+        #region public CategorySortOrder SortOrder
+        /// <summary>
+        /// Gets or sets the sort order used for the categories.
+        /// </summary>
         public CategorySortOrder SortOrder
         {
-            get
-            {
-                return (CategorySortOrder)this.GetValue(CategoryAxis.SortOrderProperty);
-            }
-            set
-            {
-                this.SetValue(CategoryAxis.SortOrderProperty, (object)value);
-            }
+            get { return (CategorySortOrder)GetValue(SortOrderProperty); }
+            set { SetValue(SortOrderProperty, value); }
         }
 
-        /// <summary>SortOrderProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the SortOrder dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SortOrderProperty =
+            DependencyProperty.Register(
+                "SortOrder",
+                typeof(CategorySortOrder),
+                typeof(CategoryAxis),
+                new PropertyMetadata(CategorySortOrder.None, OnSortOrderPropertyChanged));
+
+        /// <summary>
+        /// SortOrderProperty property changed handler.
+        /// </summary>
         /// <param name="d">CategoryAxis that changed its SortOrder.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnSortOrderPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((CategoryAxis)d).OnSortOrderPropertyChanged();
+            CategoryAxis source = (CategoryAxis)d;
+            source.OnSortOrderPropertyChanged();
         }
 
-        /// <summary>SortOrderProperty property changed handler.</summary>
+        /// <summary>
+        /// SortOrderProperty property changed handler.
+        /// </summary>
         private void OnSortOrderPropertyChanged()
         {
-            this.Invalidate();
+            Invalidate();
         }
+        #endregion public CategorySortOrder SortOrder
 
-        /// <summary>Gets or sets a list of categories to display.</summary>
+        /// <summary>
+        /// Gets or sets a list of categories to display.
+        /// </summary>
         private IList<object> Categories { get; set; }
 
-        /// <summary>Gets or sets the grid line coordinates to display.</summary>
+        /// <summary>
+        /// Gets or sets the grid line coordinates to display.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "This is the expected capitalization.")]
         private IList<UnitValue> GridLineCoordinatesToDisplay { get; set; }
 
         /// <summary>
@@ -66,76 +87,117 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         public CategoryAxis()
         {
-            this._labelPool = new ObjectPool<Control>((Func<Control>)(() => this.CreateAxisLabel()));
-            this._majorTickMarkPool = new ObjectPool<Line>((Func<Line>)(() => this.CreateMajorTickMark()));
-            this.Categories = (IList<object>)new List<object>();
-            this.GridLineCoordinatesToDisplay = (IList<UnitValue>)new List<UnitValue>();
+            this._labelPool = new ObjectPool<Control>(() => CreateAxisLabel());
+            this._majorTickMarkPool = new ObjectPool<Line>(() => CreateMajorTickMark());
+            this.Categories = new List<object>();
+            this.GridLineCoordinatesToDisplay = new List<UnitValue>();
         }
 
-        /// <summary>Updates categories when a series is registered.</summary>
+        /// <summary>
+        /// Updates categories when a series is registered.
+        /// </summary>
         /// <param name="series">The series to be registered.</param>
         protected override void OnObjectRegistered(IAxisListener series)
         {
             base.OnObjectRegistered(series);
-            if (!(series is IDataProvider))
-                return;
-            this.UpdateCategories();
+            if (series is IDataProvider)
+            {
+                UpdateCategories();
+            }
         }
 
-        /// <summary>Updates categories when a series is unregistered.</summary>
+        /// <summary>
+        /// Updates categories when a series is unregistered.
+        /// </summary>
         /// <param name="series">The series to be unregistered.</param>
         protected override void OnObjectUnregistered(IAxisListener series)
         {
             base.OnObjectUnregistered(series);
-            if (!(series is IDataProvider))
-                return;
-            this.UpdateCategories();
+            if (series is IDataProvider)
+            {
+                UpdateCategories();
+            }
         }
 
-        /// <summary>Returns range of coordinates for a given category.</summary>
+        /// <summary>
+        /// Returns range of coordinates for a given category.
+        /// </summary>
         /// <param name="category">The category to return the range for.</param>
-        /// <returns>The range of coordinates corresponding to the category.</returns>
+        /// <returns>The range of coordinates corresponding to the category.
+        /// </returns>
         public Range<UnitValue> GetPlotAreaCoordinateRange(object category)
         {
             if (category == null)
-                throw new ArgumentNullException(nameof(category));
-            int num1 = this.Categories.IndexOf(category);
-            if (num1 == -1)
-                return new Range<UnitValue>();
-            if (this.Orientation == AxisOrientation.X || this.Orientation == AxisOrientation.Y)
             {
-                double num2 = Math.Max(this.ActualLength - 1.0, 0.0);
-                double num3 = (double)num1 * num2 / (double)this.Categories.Count;
-                double num4 = (double)(num1 + 1) * num2 / (double)this.Categories.Count;
-                if (this.Orientation == AxisOrientation.X)
-                    return new Range<UnitValue>(new UnitValue(num3, Unit.Pixels), new UnitValue(num4, Unit.Pixels));
-                if (this.Orientation == AxisOrientation.Y)
-                    return new Range<UnitValue>(new UnitValue(num2 - num4, Unit.Pixels), new UnitValue(num2 - num3, Unit.Pixels));
+                throw new ArgumentNullException("category");
+            }
+            int index = Categories.IndexOf(category);
+            if (index == -1)
+            {
                 return new Range<UnitValue>();
             }
-            double num5 = 270.0;
-            double num6 = (double)(360 / this.Categories.Count);
-            double num7 = num6 / 2.0;
-            int num8 = this.Categories.IndexOf(category);
-            double num9 = num5 + (double)num8 * num6;
-            return new Range<UnitValue>(new UnitValue(num9 - num7, Unit.Degrees), new UnitValue(num9 + num7, Unit.Degrees));
+
+            if (Orientation == AxisOrientation.X || Orientation == AxisOrientation.Y)
+            {
+                double maximumLength = Math.Max(ActualLength - 1, 0);
+                double lower = (index * maximumLength) / Categories.Count;
+                double upper = ((index + 1) * maximumLength) / Categories.Count;
+
+                if (Orientation == AxisOrientation.X)
+                {
+                    return new Range<UnitValue>(new UnitValue(lower, Unit.Pixels), new UnitValue(upper, Unit.Pixels));
+                }
+                else if (Orientation == AxisOrientation.Y)
+                {
+                    return new Range<UnitValue>(new UnitValue(maximumLength - upper, Unit.Pixels), new UnitValue(maximumLength - lower, Unit.Pixels));
+                }
+            }
+            else
+            {
+                double startingAngle = 270.0;
+                double angleOffset = 360 / this.Categories.Count;
+                double halfAngleOffset = angleOffset / 2.0;
+                int categoryIndex = this.Categories.IndexOf(category);
+                double angle = startingAngle + (categoryIndex * angleOffset);
+
+                return new Range<UnitValue>(new UnitValue(angle - halfAngleOffset, Unit.Degrees), new UnitValue(angle + halfAngleOffset, Unit.Degrees));
+            }
+
+            return new Range<UnitValue>();
         }
 
-        /// <summary>Returns the category at a given coordinate.</summary>
+        /// <summary>
+        /// Returns the category at a given coordinate.
+        /// </summary>
         /// <param name="position">The plot area position.</param>
         /// <returns>The category at the given plot area position.</returns>
         public object GetCategoryAtPosition(UnitValue position)
         {
             if (this.ActualLength == 0.0 || this.Categories.Count == 0)
-                return (object)null;
-            if (position.Unit != Unit.Pixels)
+            {
+                return null;
+            }
+            if (position.Unit == Unit.Pixels)
+            {
+                double coordinate = position.Value;
+                int index = (int)Math.Floor(coordinate / (this.ActualLength / this.Categories.Count));
+                if (index >= 0 && index < this.Categories.Count)
+                {
+                    if (Orientation == AxisOrientation.X)
+                    {
+                        return this.Categories[index];
+                    }
+                    else
+                    {
+                        return this.Categories[(this.Categories.Count - 1) - index];
+                    }
+                }
+            }
+            else
+            {
                 throw new NotImplementedException();
-            int index = (int)Math.Floor(position.Value / (this.ActualLength / (double)this.Categories.Count));
-            if (index < 0 || index >= this.Categories.Count)
-                return (object)null;
-            if (this.Orientation == AxisOrientation.X)
-                return this.Categories[index];
-            return this.Categories[this.Categories.Count - 1 - index];
+            }
+            return null;
         }
 
         /// <summary>
@@ -147,95 +209,132 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="data">A sequence of categories.</param>
         public void DataChanged(IDataProvider dataProvider, IEnumerable<object> data)
         {
-            this.UpdateCategories();
+            UpdateCategories();
         }
 
-        /// <summary>Updates the list of categories.</summary>
+        /// <summary>
+        /// Updates the list of categories.
+        /// </summary>
         private void UpdateCategories()
         {
-            IEnumerable<object> source = this.RegisteredListeners.OfType<IDataProvider>().SelectMany<IDataProvider, object>((Func<IDataProvider, IEnumerable<object>>)(infoProvider => infoProvider.GetData((IDataConsumer)this))).Distinct<object>();
-            if (this.SortOrder == CategorySortOrder.Ascending)
-                source = (IEnumerable<object>)source.OrderBy<object, object>((Func<object, object>)(category => category));
-            else if (this.SortOrder == CategorySortOrder.Descending)
-                source = (IEnumerable<object>)source.OrderByDescending<object, object>((Func<object, object>)(category => category));
-            this.Categories = (IList<object>)source.ToList<object>();
-            this.Invalidate();
+            IEnumerable<object> categories =
+                this.RegisteredListeners
+                .OfType<IDataProvider>()
+                .SelectMany(infoProvider => infoProvider.GetData(this))
+                .Distinct();
+
+            if (SortOrder == CategorySortOrder.Ascending)
+            {
+                categories = categories.OrderBy(category => category);
+            }
+            else if (SortOrder == CategorySortOrder.Descending)
+            {
+                categories = categories.OrderByDescending(category => category);
+            }
+
+            this.Categories = categories.ToList();
+
+            Invalidate();
         }
 
-        /// <summary>Returns the major axis grid line coordinates.</summary>
+        /// <summary>
+        /// Returns the major axis grid line coordinates.
+        /// </summary>
         /// <param name="availableSize">The available size.</param>
         /// <returns>A sequence of the major grid line coordinates.</returns>
         protected override IEnumerable<UnitValue> GetMajorGridLineCoordinates(Size availableSize)
         {
-            return (IEnumerable<UnitValue>)this.GridLineCoordinatesToDisplay;
+            return GridLineCoordinatesToDisplay;
         }
 
-        /// <summary>The plot area coordinate of a value.</summary>
+        /// <summary>
+        /// The plot area coordinate of a value.
+        /// </summary>
         /// <param name="value">The value for which to retrieve the plot area
         /// coordinate.</param>
         /// <returns>The plot area coordinate.</returns>
         public override UnitValue GetPlotAreaCoordinate(object value)
         {
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
-            Range<UnitValue> areaCoordinateRange = this.GetPlotAreaCoordinateRange(value);
-            if (!areaCoordinateRange.HasData)
+            {
+                throw new ArgumentNullException("value");
+            }
+
+            Range<UnitValue> range = GetPlotAreaCoordinateRange(value);
+            if (range.HasData)
+            {
+                double minimum = range.Minimum.Value;
+                double maximum = range.Maximum.Value;
+                return new UnitValue(((maximum - minimum) / 2.0) + minimum, range.Minimum.Unit);
+            }
+            else
+            {
                 return UnitValue.NaN();
-            double num = areaCoordinateRange.Minimum.Value;
-            return new UnitValue((areaCoordinateRange.Maximum.Value - num) / 2.0 + num, areaCoordinateRange.Minimum.Unit);
+            }
         }
 
-        /// <summary>Creates and prepares a new axis label.</summary>
+        /// <summary>
+        /// Creates and prepares a new axis label.
+        /// </summary>
         /// <param name="value">The axis label value.</param>
         /// <returns>The axis label content control.</returns>
         private Control CreateAndPrepareAxisLabel(object value)
         {
-            Control label = this._labelPool.Next();
-            this.PrepareAxisLabel(label, value);
-            return label;
+            Control axisLabel = _labelPool.Next();
+            PrepareAxisLabel(axisLabel, value);
+            return axisLabel;
         }
 
-        /// <summary>Renders as an oriented axis.</summary>
+        /// <summary>
+        /// Renders as an oriented axis.
+        /// </summary>
         /// <param name="availableSize">The available size.</param>
         private void RenderOriented(Size availableSize)
         {
-            this._labelPool.Reset();
-            this._majorTickMarkPool.Reset();
+            _labelPool.Reset();
+            _majorTickMarkPool.Reset();
+
             try
             {
-                this.OrientedPanel.Children.Clear();
+                OrientedPanel.Children.Clear();
                 this.GridLineCoordinatesToDisplay.Clear();
-                if (this.Categories.Count <= 0)
-                    return;
-                double num1 = Math.Max(this.GetLength(availableSize) - 1.0, 0.0);
-                Action<double> action = (Action<double>)(pos =>
+
+                if (this.Categories.Count > 0)
                 {
-                    Line line = this._majorTickMarkPool.Next();
-                    OrientedPanel.SetCenterCoordinate((UIElement)line, pos);
-                    OrientedPanel.SetPriority((UIElement)line, 0);
-                    this.GridLineCoordinatesToDisplay.Add(new UnitValue(pos, Unit.Pixels));
-                    this.OrientedPanel.Children.Add((UIElement)line);
-                });
-                int num2 = 0;
-                int num3 = 0;
-                foreach (object category in (IEnumerable<object>)this.Categories)
-                {
-                    Control prepareAxisLabel = this.CreateAndPrepareAxisLabel(category);
-                    double num4 = (double)num2 * num1 / (double)this.Categories.Count + 0.5;
-                    double num5 = (double)(num2 + 1) * num1 / (double)this.Categories.Count + 0.5;
-                    action(num4);
-                    OrientedPanel.SetCenterCoordinate((UIElement)prepareAxisLabel, (num4 + num5) / 2.0);
-                    OrientedPanel.SetPriority((UIElement)prepareAxisLabel, num3 + 1);
-                    this.OrientedPanel.Children.Add((UIElement)prepareAxisLabel);
-                    ++num2;
-                    num3 = (num3 + 1) % 2;
+                    double maximumLength = Math.Max(GetLength(availableSize) - 1, 0);
+
+                    Action<double> placeTickMarkAt =
+                        (pos) =>
+                        {
+                            Line tickMark = _majorTickMarkPool.Next();
+                            OrientedPanel.SetCenterCoordinate(tickMark, pos);
+                            OrientedPanel.SetPriority(tickMark, 0);
+                            this.GridLineCoordinatesToDisplay.Add(new UnitValue(pos, Unit.Pixels));
+                            OrientedPanel.Children.Add(tickMark);
+                        };
+
+                    int index = 0;
+                    int priority = 0;
+
+                    foreach (object category in Categories)
+                    {
+                        Control axisLabel = CreateAndPrepareAxisLabel(category);
+                        double lower = ((index * maximumLength) / Categories.Count) + 0.5;
+                        double upper = (((index + 1) * maximumLength) / Categories.Count) + 0.5;
+                        placeTickMarkAt(lower);
+                        OrientedPanel.SetCenterCoordinate(axisLabel, (lower + upper) / 2);
+                        OrientedPanel.SetPriority(axisLabel, priority + 1);
+                        OrientedPanel.Children.Add(axisLabel);
+                        index++;
+                        priority = (priority + 1) % 2;
+                    }
+                    placeTickMarkAt(maximumLength + 0.5);
                 }
-                action(num1 + 0.5);
             }
             finally
             {
-                this._labelPool.Done();
-                this._majorTickMarkPool.Done();
+                _labelPool.Done();
+                _majorTickMarkPool.Done();
             }
         }
 
@@ -245,7 +344,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="availableSize">The available size.</param>
         protected override void Render(Size availableSize)
         {
-            this.RenderOriented(availableSize);
+            RenderOriented(availableSize);
         }
 
         /// <summary>

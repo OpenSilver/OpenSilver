@@ -3,225 +3,245 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-#if MIGRATION
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shapes;
-#else
-using System;
-using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
-    /// <summary>An axis that displays numeric values.</summary>
-    [TemplatePart(Name = "AxisTitle", Type = typeof(Title))]
+    /// <summary>
+    /// An axis that displays numeric values.
+    /// </summary>
     [StyleTypedProperty(Property = "GridLineStyle", StyleTargetType = typeof(Line))]
     [StyleTypedProperty(Property = "MajorTickMarkStyle", StyleTargetType = typeof(Line))]
     [StyleTypedProperty(Property = "MinorTickMarkStyle", StyleTargetType = typeof(Line))]
     [StyleTypedProperty(Property = "AxisLabelStyle", StyleTargetType = typeof(NumericAxisLabel))]
     [StyleTypedProperty(Property = "TitleStyle", StyleTargetType = typeof(Title))]
-    [TemplatePart(Name = "AxisGrid", Type = typeof(Grid))]
+    [TemplatePart(Name = AxisGridName, Type = typeof(Grid))]
+    [TemplatePart(Name = AxisTitleName, Type = typeof(Title))]
     public class LinearAxis : NumericAxis
     {
-        /// <summary>Identifies the Interval dependency property.</summary>
-        public static readonly DependencyProperty IntervalProperty = DependencyProperty.Register(nameof(Interval), typeof(double?), typeof(LinearAxis), new PropertyMetadata((object)null, new PropertyChangedCallback(LinearAxis.OnIntervalPropertyChanged)));
-        /// <summary>Identifies the ActualInterval dependency property.</summary>
-        public static readonly DependencyProperty ActualIntervalProperty = DependencyProperty.Register(nameof(ActualInterval), typeof(double), typeof(LinearAxis), new PropertyMetadata((object)double.NaN));
-
-        /// <summary>Gets or sets the axis interval.</summary>
+        #region public double? Interval
+        /// <summary>
+        /// Gets or sets the axis interval.
+        /// </summary>
         [TypeConverter(typeof(NullableConverter<double>))]
         public double? Interval
         {
-            get
-            {
-                return (double?)this.GetValue(LinearAxis.IntervalProperty);
-            }
-            set
-            {
-                this.SetValue(LinearAxis.IntervalProperty, (object)value);
-            }
+            get { return (double?)GetValue(IntervalProperty); }
+            set { SetValue(IntervalProperty, value); }
         }
 
-        /// <summary>IntervalProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the Interval dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IntervalProperty =
+            DependencyProperty.Register(
+                "Interval",
+                typeof(double?),
+                typeof(LinearAxis),
+                new PropertyMetadata(null, OnIntervalPropertyChanged));
+
+        /// <summary>
+        /// IntervalProperty property changed handler.
+        /// </summary>
         /// <param name="d">LinearAxis that changed its Interval.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((LinearAxis)d).OnIntervalPropertyChanged();
+            LinearAxis source = (LinearAxis)d;
+            source.OnIntervalPropertyChanged();
         }
 
-        /// <summary>IntervalProperty property changed handler.</summary>
+        /// <summary>
+        /// IntervalProperty property changed handler.
+        /// </summary>
         private void OnIntervalPropertyChanged()
         {
-            this.OnInvalidated(new RoutedEventArgs());
+            OnInvalidated(new RoutedEventArgs());
         }
+        #endregion public double? Interval
 
-        /// <summary>Gets the actual interval of the axis.</summary>
+        #region public double ActualInterval
+        /// <summary>
+        /// Gets the actual interval of the axis.
+        /// </summary>
         public double ActualInterval
         {
-            get
-            {
-                return (double)this.GetValue(LinearAxis.ActualIntervalProperty);
-            }
-            private set
-            {
-                this.SetValue(LinearAxis.ActualIntervalProperty, (object)value);
-            }
+            get { return (double)GetValue(ActualIntervalProperty); }
+            private set { SetValue(ActualIntervalProperty, value); }
         }
 
-        /// <summary>Instantiates a new instance of the LinearAxis class.</summary>
+        /// <summary>
+        /// Identifies the ActualInterval dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ActualIntervalProperty =
+            DependencyProperty.Register(
+                "ActualInterval",
+                typeof(double),
+                typeof(LinearAxis),
+                new PropertyMetadata(double.NaN));
+        #endregion public double ActualInterval
+
+        /// <summary>
+        /// Instantiates a new instance of the LinearAxis class.
+        /// </summary>
         public LinearAxis()
         {
-            this.ActualRange = new Range<IComparable>((IComparable)0.0, (IComparable)1.0);
+            this.ActualRange = new Range<IComparable>(0.0, 1.0);
         }
 
-        /// <summary>Gets the actual range of double values.</summary>
+        /// <summary>
+        /// Gets the actual range of double values.
+        /// </summary>
         protected Range<double> ActualDoubleRange { get; private set; }
 
-        /// <summary>Updates ActualDoubleRange when ActualRange changes.</summary>
+        /// <summary>
+        /// Updates ActualDoubleRange when ActualRange changes.
+        /// </summary>
         /// <param name="range">New ActualRange value.</param>
         protected override void OnActualRangeChanged(Range<IComparable> range)
         {
-            this.ActualDoubleRange = range.ToDoubleRange();
+            ActualDoubleRange = range.ToDoubleRange();
             base.OnActualRangeChanged(range);
         }
 
-        /// <summary>Returns the plot area coordinate of a value.</summary>
+        /// <summary>
+        /// Returns the plot area coordinate of a value.
+        /// </summary>
         /// <param name="value">The value to plot.</param>
         /// <param name="length">The length of axis.</param>
         /// <returns>The plot area coordinate of a value.</returns>
         protected override UnitValue GetPlotAreaCoordinate(object value, double length)
         {
-            return LinearAxis.GetPlotAreaCoordinate(value, this.ActualDoubleRange, length);
+            return GetPlotAreaCoordinate(value, ActualDoubleRange, length);
         }
 
-        /// <summary>Returns the plot area coordinate of a value.</summary>
+        /// <summary>
+        /// Returns the plot area coordinate of a value.
+        /// </summary>
         /// <param name="value">The value to plot.</param>
         /// <param name="currentRange">The range of values.</param>
         /// <param name="length">The length of axis.</param>
         /// <returns>The plot area coordinate of a value.</returns>
         protected override UnitValue GetPlotAreaCoordinate(object value, Range<IComparable> currentRange, double length)
         {
-            return LinearAxis.GetPlotAreaCoordinate(value, currentRange.ToDoubleRange(), length);
+            return GetPlotAreaCoordinate(value, currentRange.ToDoubleRange(), length);
         }
 
-        /// <summary>Returns the plot area coordinate of a value.</summary>
+        /// <summary>
+        /// Returns the plot area coordinate of a value.
+        /// </summary>
         /// <param name="value">The value to plot.</param>
         /// <param name="currentRange">The range of values.</param>
         /// <param name="length">The length of axis.</param>
         /// <returns>The plot area coordinate of a value.</returns>
         private static UnitValue GetPlotAreaCoordinate(object value, Range<double> currentRange, double length)
         {
-            if (!currentRange.HasData)
-                return UnitValue.NaN();
-            double num1 = ValueHelper.ToDouble(value);
-            double num2 = Math.Max(length - 1.0, 0.0);
-            double num3 = currentRange.Maximum - currentRange.Minimum;
-            return new UnitValue((num1 - currentRange.Minimum) * (num2 / num3), Unit.Pixels);
+            if (currentRange.HasData)
+            {
+                double doubleValue = ValueHelper.ToDouble(value);
+
+                double pixelLength = Math.Max(length - 1, 0);
+                double rangelength = currentRange.Maximum - currentRange.Minimum;
+
+                return new UnitValue((doubleValue - currentRange.Minimum) * (pixelLength / rangelength), Unit.Pixels);
+            }
+
+            return UnitValue.NaN();
         }
 
         /// <summary>
-        /// Returns the actual interval to use to determine which values are
+        /// Returns the actual interval to use to determine which values are 
         /// displayed in the axis.
         /// </summary>
         /// <param name="availableSize">The available size.</param>
-        /// <returns>Actual interval to use to determine which values are
+        /// <returns>Actual interval to use to determine which values are 
         /// displayed in the axis.
         /// </returns>
         protected virtual double CalculateActualInterval(Size availableSize)
         {
-            if (this.Interval.HasValue)
-                return this.Interval.Value;
-            double num1 = (this.Orientation == AxisOrientation.X ? 0.8 : 1.0) * 8.0;
-            double num2 = Math.Max(this.GetLength(availableSize) * num1 / 200.0, 1.0);
-            double num3 = this.ActualDoubleRange.Maximum - this.ActualDoubleRange.Minimum;
-            double d = num3 / num2;
-            double num4 = Math.Pow(10.0, Math.Floor(Math.Log10(d)));
-            int[] numArray = new int[4] { 10, 5, 2, 1 };
-            foreach (int num5 in numArray)
+            if (Interval != null)
             {
-                double num6 = num4 * (double)num5;
-                if (num2 >= num3 / num6)
-                    d = num6;
-                else
-                    break;
+                return Interval.Value;
             }
-            return d;
+
+            // Adjust maximum interval count adjusted for current axis
+            double adjustedMaximumIntervalsPer200Pixels = (Orientation == AxisOrientation.X ? 0.8 : 1.0) * MaximumAxisIntervalsPer200Pixels;
+            // Calculate maximum interval count for current space
+            double maximumIntervalCount = Math.Max(GetLength(availableSize) * adjustedMaximumIntervalsPer200Pixels / 200.0, 1.0);
+            // Calculate range
+            double range = ActualDoubleRange.Maximum - ActualDoubleRange.Minimum;
+            // Calculate largest acceptable interval
+            double bestInterval = range / maximumIntervalCount;
+            // Calculate mimimum ideal interval (ideal => something that gives nice axis values)
+            double minimumIdealInterval = Math.Pow(10, Math.Floor(Math.Log10(bestInterval)));
+            // Walk the list of ideal multipliers
+            foreach (int idealMultiplier in new int[] { 10, 5, 2, 1 })
+            {
+                // Check the current ideal multiplier against the maximum count
+                double currentIdealInterval = minimumIdealInterval * idealMultiplier;
+                if (maximumIntervalCount < (range / currentIdealInterval))
+                {
+                    // Went too far, break out
+                    break;
+                }
+                // Update the best interval
+                bestInterval = currentIdealInterval;
+            }
+            // Return best interval
+            return bestInterval;
         }
 
         /// <summary>
         /// Returns a sequence of values to create major tick marks for.
         /// </summary>
         /// <param name="availableSize">The available size.</param>
-        /// <returns>A sequence of values to create major tick marks for.</returns>
+        /// <returns>A sequence of values to create major tick marks for.
+        /// </returns>
         protected override IEnumerable<IComparable> GetMajorTickMarkValues(Size availableSize)
         {
-            return this.GetMajorValues(availableSize).CastWrapper<IComparable>();
+            return GetMajorValues(availableSize).CastWrapper<IComparable>();
         }
 
-        /// <summary>Returns a sequence of major axis values.</summary>
+        /// <summary>
+        /// Returns a sequence of major axis values.
+        /// </summary>
         /// <param name="availableSize">The available size.</param>
-        /// <returns>A sequence of major axis values.</returns>
+        /// <returns>A sequence of major axis values.
+        /// </returns>
         private IEnumerable<double> GetMajorValues(Size availableSize)
         {
-            Range<IComparable> actualRange = this.ActualRange;
-            int num1;
-            if (actualRange.HasData)
+            if (!ActualRange.HasData || ValueHelper.Compare(ActualRange.Minimum, ActualRange.Maximum) == 0 || GetLength(availableSize) == 0.0)
             {
-                actualRange = this.ActualRange;
-                IComparable minimum = actualRange.Minimum;
-                actualRange = this.ActualRange;
-                IComparable maximum = actualRange.Maximum;
-                if (ValueHelper.Compare(minimum, maximum) != 0)
-                {
-                    num1 = this.GetLength(availableSize) != 0.0 ? 1 : 0;
-                    goto label_5;
-                }
+                yield break;
             }
-            num1 = 0;
-        label_5:
-            if (num1 != 0)
+            this.ActualInterval = CalculateActualInterval(availableSize);
+            double startValue = AlignToInterval(ActualDoubleRange.Minimum, this.ActualInterval);
+            if (startValue < ActualDoubleRange.Minimum)
             {
-                this.ActualInterval = this.CalculateActualInterval(availableSize);
-                double startValue = LinearAxis.AlignToInterval(this.ActualDoubleRange.Minimum, this.ActualInterval);
-                Range<double> actualDoubleRange;
-                if (startValue < this.ActualDoubleRange.Minimum)
-                {
-                    actualDoubleRange = this.ActualDoubleRange;
-                    startValue = LinearAxis.AlignToInterval(actualDoubleRange.Minimum + this.ActualInterval, this.ActualInterval);
-                }
-                double nextValue = startValue;
-                int counter = 1;
-                while (true)
-                {
-                    double num2 = nextValue;
-                    actualDoubleRange = this.ActualDoubleRange;
-                    double maximum = actualDoubleRange.Maximum;
-                    if (num2 <= maximum)
-                    {
-                        yield return nextValue;
-                        nextValue = startValue + (double)counter * this.ActualInterval;
-                        ++counter;
-                    }
-                    else
-                        break;
-                }
+                startValue = AlignToInterval(ActualDoubleRange.Minimum + this.ActualInterval, this.ActualInterval);
+            }
+            double nextValue = startValue;
+            for (int counter = 1; nextValue <= ActualDoubleRange.Maximum; counter++)
+            {
+                yield return nextValue;
+                nextValue = startValue + (counter * this.ActualInterval);
             }
         }
 
-        /// <summary>Returns a sequence of values to plot on the axis.</summary>
+        /// <summary>
+        /// Returns a sequence of values to plot on the axis.
+        /// </summary>
         /// <param name="availableSize">The available size.</param>
         /// <returns>A sequence of values to plot on the axis.</returns>
         protected override IEnumerable<IComparable> GetLabelValues(Size availableSize)
         {
-            return this.GetMajorValues(availableSize).CastWrapper<IComparable>();
+            return GetMajorValues(availableSize).CastWrapper<IComparable>();
         }
 
         /// <summary>
@@ -233,29 +253,36 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <returns>The aligned value.</returns>
         private static double AlignToInterval(double value, double interval)
         {
-            double num = interval;
-            return ValueHelper.RemoveNoiseFromDoubleMath(ValueHelper.RemoveNoiseFromDoubleMath(Math.Floor(value / num)) * num);
+            double typedInterval = (double)interval;
+            double typedValue = (double)value;
+            return ValueHelper.RemoveNoiseFromDoubleMath(ValueHelper.RemoveNoiseFromDoubleMath(Math.Floor(typedValue / typedInterval)) * typedInterval);
         }
 
-        /// <summary>Returns the value range given a plot area coordinate.</summary>
+        /// <summary>
+        /// Returns the value range given a plot area coordinate.
+        /// </summary>
         /// <param name="value">The plot area position.</param>
         /// <returns>The value at that plot area coordinate.</returns>
         protected override IComparable GetValueAtPosition(UnitValue value)
         {
-            if (!this.ActualRange.HasData || this.ActualLength == 0.0)
-                return (IComparable)null;
-            if (value.Unit != Unit.Pixels)
-                throw new NotImplementedException();
-            double num1 = value.Value;
-            Range<double> actualDoubleRange = this.ActualDoubleRange;
-            double maximum = actualDoubleRange.Maximum;
-            actualDoubleRange = this.ActualDoubleRange;
-            double minimum1 = actualDoubleRange.Minimum;
-            double num2 = maximum - minimum1;
-            double num3 = num1 * (num2 / this.ActualLength);
-            actualDoubleRange = this.ActualDoubleRange;
-            double minimum2 = actualDoubleRange.Minimum;
-            return (IComparable)(num3 + minimum2);
+            if (ActualRange.HasData && ActualLength != 0.0)
+            {
+                if (value.Unit == Unit.Pixels)
+                {
+                    double coordinate = value.Value;
+
+                    double rangelength = ActualDoubleRange.Maximum - ActualDoubleRange.Minimum;
+                    double output = ((coordinate * (rangelength / ActualLength)) + ActualDoubleRange.Minimum);
+
+                    return output;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -268,8 +295,8 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <returns>The range object.</returns>
         private static Range<double> LengthToRange(double midPoint, double length)
         {
-            double num = length / 2.0;
-            return new Range<double>(midPoint - num, midPoint + num);
+            double halfLength = length / 2.0;
+            return new Range<double>(midPoint - halfLength, midPoint + halfLength);
         }
 
         /// <summary>
@@ -282,62 +309,89 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         {
             range = base.OverrideDataRange(range);
             if (!range.HasData)
-                return new Range<IComparable>((IComparable)0.0, (IComparable)1.0);
-            if (ValueHelper.Compare(range.Minimum, range.Maximum) == 0)
-                return new Range<IComparable>((IComparable)(ValueHelper.ToDouble((object)range.Minimum) - 1.0), (IComparable)(ValueHelper.ToDouble((object)range.Maximum) + 1.0));
+            {
+                return new Range<IComparable>(0.0, 1.0);
+            }
+            else if (ValueHelper.Compare(range.Minimum, range.Maximum) == 0)
+            {
+                Range<IComparable> outputRange = new Range<IComparable>((ValueHelper.ToDouble(range.Minimum)) - 1, (ValueHelper.ToDouble(range.Maximum)) + 1);
+                return outputRange;
+            }
+
+            // ActualLength of 1.0 or less maps all points to the same coordinate
             if (range.HasData && this.ActualLength > 1.0)
             {
-                bool flag = false;
-                IList<ValueMarginCoordinateAndOverlap> coordinateAndOverlapList = (IList<ValueMarginCoordinateAndOverlap>)new List<ValueMarginCoordinateAndOverlap>();
+                bool isDataAnchoredToOrigin = false;
+                IList<ValueMarginCoordinateAndOverlap> valueMargins = new List<ValueMarginCoordinateAndOverlap>();
                 foreach (IValueMarginProvider valueMarginProvider in this.RegisteredListeners.OfType<IValueMarginProvider>())
                 {
-                    foreach (ValueMargin valueMargin in valueMarginProvider.GetValueMargins((IValueMarginConsumer)this))
+                    foreach (ValueMargin valueMargin in valueMarginProvider.GetValueMargins(this))
                     {
-                        IAnchoredToOrigin anchoredToOrigin = valueMarginProvider as IAnchoredToOrigin;
-                        flag = anchoredToOrigin != null && anchoredToOrigin.AnchoredAxis == this;
-                        coordinateAndOverlapList.Add(new ValueMarginCoordinateAndOverlap()
+                        IAnchoredToOrigin dataAnchoredToOrigin = valueMarginProvider as IAnchoredToOrigin;
+                        isDataAnchoredToOrigin = (dataAnchoredToOrigin != null && dataAnchoredToOrigin.AnchoredAxis == this);
+                        
+                        valueMargins.Add(
+                        new ValueMarginCoordinateAndOverlap
                         {
-                            ValueMargin = valueMargin
+                            ValueMargin = valueMargin,
                         });
                     }
                 }
-                if (coordinateAndOverlapList.Count > 0)
+
+                if (valueMargins.Count > 0)
                 {
-                    double? nullable = coordinateAndOverlapList.Select<ValueMarginCoordinateAndOverlap, double>((Func<ValueMarginCoordinateAndOverlap, double>)(valueMargin =>
+                    double maximumPixelMarginLength =
+                        valueMargins
+                        .Select(valueMargin => valueMargin.ValueMargin.LowMargin + valueMargin.ValueMargin.HighMargin)
+                        .MaxOrNullable().Value;
+
+                    // Requested margin is larger than the axis so give up
+                    // trying to find a range that will fit it.
+                    if (maximumPixelMarginLength > this.ActualLength)
                     {
-                        ValueMargin valueMargin1 = valueMargin.ValueMargin;
-                        double lowMargin = valueMargin1.LowMargin;
-                        valueMargin1 = valueMargin.ValueMargin;
-                        double highMargin = valueMargin1.HighMargin;
-                        return lowMargin + highMargin;
-                    })).MaxOrNullable<double>();
-                    if (nullable.Value > this.ActualLength)
                         return range;
-                    Range<double> doubleRange = range.ToDoubleRange();
-                    Range<double> range1 = range.ToDoubleRange();
-                    if (range1.Minimum == range1.Maximum)
-                        range1 = new Range<double>(range1.Maximum - 1.0, range1.Maximum + 1.0);
+                    }
+
+                    Range<double> originalRange = range.ToDoubleRange();
+                    Range<double> currentRange = range.ToDoubleRange();
+
+                    // Ensure range is not empty.
+                    if (currentRange.Minimum == currentRange.Maximum)
+                    {
+                        currentRange = new Range<double>(currentRange.Maximum - 1, currentRange.Maximum + 1);
+                    }
+
+                    // priming the loop
                     double actualLength = this.ActualLength;
-                    this.UpdateValueMargins(coordinateAndOverlapList, range1.ToComparableRange());
                     ValueMarginCoordinateAndOverlap maxLeftOverlapValueMargin;
                     ValueMarginCoordinateAndOverlap maxRightOverlapValueMargin;
-                    RangeAxis.GetMaxLeftAndRightOverlap(coordinateAndOverlapList, out maxLeftOverlapValueMargin, out maxRightOverlapValueMargin);
-                    while (maxLeftOverlapValueMargin.LeftOverlap > 0.0 || maxRightOverlapValueMargin.RightOverlap > 0.0)
+                    UpdateValueMargins(valueMargins, currentRange.ToComparableRange());
+                    GetMaxLeftAndRightOverlap(valueMargins, out maxLeftOverlapValueMargin, out maxRightOverlapValueMargin);
+
+                    while (maxLeftOverlapValueMargin.LeftOverlap > 0 || maxRightOverlapValueMargin.RightOverlap > 0)
                     {
-                        nullable = range1.GetLength();
-                        double num = nullable.Value / actualLength;
-                        range1 = new Range<double>(range1.Minimum - (maxLeftOverlapValueMargin.LeftOverlap + 0.5) * num, range1.Maximum + (maxRightOverlapValueMargin.RightOverlap + 0.5) * num);
-                        this.UpdateValueMargins(coordinateAndOverlapList, range1.ToComparableRange());
-                        RangeAxis.GetMaxLeftAndRightOverlap(coordinateAndOverlapList, out maxLeftOverlapValueMargin, out maxRightOverlapValueMargin);
+                        double unitOverPixels = currentRange.GetLength().Value / actualLength;
+                        double newMinimum = currentRange.Minimum - ((maxLeftOverlapValueMargin.LeftOverlap + 0.5) * unitOverPixels);
+                        double newMaximum = currentRange.Maximum + ((maxRightOverlapValueMargin.RightOverlap + 0.5) * unitOverPixels);
+
+                        currentRange = new Range<double>(newMinimum, newMaximum);
+                        UpdateValueMargins(valueMargins, currentRange.ToComparableRange());
+                        GetMaxLeftAndRightOverlap(valueMargins, out maxLeftOverlapValueMargin, out maxRightOverlapValueMargin);
                     }
-                    if (flag)
+
+                    if (isDataAnchoredToOrigin)
                     {
-                        if (doubleRange.Minimum >= 0.0 && range1.Minimum < 0.0)
-                            range1 = new Range<double>(0.0, range1.Maximum);
-                        else if (doubleRange.Maximum <= 0.0 && range1.Maximum > 0.0)
-                            range1 = new Range<double>(range1.Minimum, 0.0);
+                        if (originalRange.Minimum >= 0 && currentRange.Minimum < 0)
+                        {
+                            currentRange = new Range<double>(0, currentRange.Maximum);
+                        }
+                        else if (originalRange.Maximum <= 0 && currentRange.Maximum > 0)
+                        {
+                            currentRange = new Range<double>(currentRange.Minimum, 0);
+                        }
                     }
-                    return range1.ToComparableRange();
+
+                    return currentRange.ToComparableRange();
                 }
             }
             return range;

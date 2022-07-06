@@ -1,118 +1,137 @@
-﻿using System.Windows.Input;
-using System.Windows.Media;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
-    /// <summary>Represents a data point used for a pie series.</summary>
+    /// <summary>
+    /// Represents a data point used for a pie series.
+    /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [TemplatePart(Name = "Slice", Type = typeof(UIElement))]
-    [TemplateVisualState(GroupName = "SelectionStates", Name = "Unselected")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Normal")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "MouseOver")]
-    [TemplateVisualState(GroupName = "RevealStates", Name = "Shown")]
-    [TemplateVisualState(GroupName = "SelectionStates", Name = "Selected")]
-    [TemplateVisualState(GroupName = "RevealStates", Name = "Hidden")]
+    [TemplatePart(Name = SliceName, Type = typeof(UIElement))]
+    [TemplateVisualState(Name = DataPoint.StateCommonNormal, GroupName = DataPoint.GroupCommonStates)]
+    [TemplateVisualState(Name = DataPoint.StateCommonMouseOver, GroupName = DataPoint.GroupCommonStates)]
+    [TemplateVisualState(Name = DataPoint.StateSelectionUnselected, GroupName = DataPoint.GroupSelectionStates)]
+    [TemplateVisualState(Name = DataPoint.StateSelectionSelected, GroupName = DataPoint.GroupSelectionStates)]
+    [TemplateVisualState(Name = DataPoint.StateRevealShown, GroupName = DataPoint.GroupRevealStates)]
+    [TemplateVisualState(Name = DataPoint.StateRevealHidden, GroupName = DataPoint.GroupRevealStates)]
     public class PieDataPoint : DataPoint
     {
-        /// <summary>Identifies the Geometry dependency property.</summary>
-        public static readonly DependencyProperty GeometryProperty = DependencyProperty.Register(nameof(Geometry), typeof(Geometry), typeof(PieDataPoint), (PropertyMetadata)null);
-        /// <summary>Identifies the GeometrySelection dependency property.</summary>
-        public static readonly DependencyProperty GeometrySelectionProperty = DependencyProperty.Register(nameof(GeometrySelection), typeof(Geometry), typeof(PieDataPoint), (PropertyMetadata)null);
-        /// <summary>Identifies the GeometryHighlight dependency property.</summary>
-        public static readonly DependencyProperty GeometryHighlightProperty = DependencyProperty.Register(nameof(GeometryHighlight), typeof(Geometry), typeof(PieDataPoint), (PropertyMetadata)null);
-        /// <summary>Identifies the ActualOffsetRatio dependency property.</summary>
-        public static readonly DependencyProperty ActualOffsetRatioProperty = DependencyProperty.Register(nameof(ActualOffsetRatio), typeof(double), typeof(PieDataPoint), new PropertyMetadata(new PropertyChangedCallback(PieDataPoint.OnActualOffsetRatioPropertyChanged)));
-        /// <summary>Identifies the ActualRatio dependency property.</summary>
-        public static readonly DependencyProperty ActualRatioProperty = DependencyProperty.Register(nameof(ActualRatio), typeof(double), typeof(PieDataPoint), new PropertyMetadata(new PropertyChangedCallback(PieDataPoint.OnActualRatioPropertyChanged)));
-        /// <summary>Identifies the FormattedRatio dependency property.</summary>
-        public static readonly DependencyProperty FormattedRatioProperty = DependencyProperty.Register(nameof(FormattedRatio), typeof(string), typeof(PieDataPoint), (PropertyMetadata)null);
-        /// <summary>Identifies the OffsetRatio dependency property.</summary>
-        public static readonly DependencyProperty OffsetRatioProperty = DependencyProperty.Register(nameof(OffsetRatio), typeof(double), typeof(PieDataPoint), new PropertyMetadata(new PropertyChangedCallback(PieDataPoint.OnOffsetRatioPropertyChanged)));
-        /// <summary>Identifies the Ratio dependency property.</summary>
-        public static readonly DependencyProperty RatioProperty = DependencyProperty.Register(nameof(Ratio), typeof(double), typeof(PieDataPoint), new PropertyMetadata(new PropertyChangedCallback(PieDataPoint.OnRatioPropertyChanged)));
-        /// <summary>Identifies the RatioStringFormat dependency property.</summary>
-        public static readonly DependencyProperty RatioStringFormatProperty = DependencyProperty.Register(nameof(RatioStringFormat), typeof(string), typeof(PieDataPoint), new PropertyMetadata((object)null, new PropertyChangedCallback(PieDataPoint.OnRatioStringFormatPropertyChanged)));
         /// <summary>
-        /// Identifies the ActualDataPointStyle dependency property.
+        /// The name of the slice template part.
         /// </summary>
-        internal static readonly DependencyProperty ActualDataPointStyleProperty = DependencyProperty.Register(nameof(ActualDataPointStyle), typeof(Style), typeof(PieDataPoint), (PropertyMetadata)null);
-        /// <summary>
-        /// Identifies the ActualLegendItemStyle dependency property.
-        /// </summary>
-        internal static readonly DependencyProperty ActualLegendItemStyleProperty = DependencyProperty.Register(nameof(ActualLegendItemStyle), typeof(Style), typeof(PieDataPoint), (PropertyMetadata)null);
-        /// <summary>The name of the slice template part.</summary>
         private const string SliceName = "Slice";
-        /// <summary>Name of the ActualDataPointStyle property.</summary>
+
+        /// <summary>
+        /// Name of the ActualDataPointStyle property.
+        /// </summary>
         internal const string ActualDataPointStyleName = "ActualDataPointStyle";
 
+        #region public Geometry Geometry
         /// <summary>
         /// Gets or sets the Geometry property which defines the shape of the
         /// data point.
         /// </summary>
         public Geometry Geometry
         {
-            get
-            {
-                return this.GetValue(PieDataPoint.GeometryProperty) as Geometry;
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.GeometryProperty, (object)value);
-            }
+            get { return GetValue(GeometryProperty) as Geometry; }
+            set { SetValue(GeometryProperty, value); }
         }
 
         /// <summary>
-        /// Gets or sets the Geometry which defines the shape of a point. The
+        /// Identifies the Geometry dependency property.
+        /// </summary>
+        public static readonly DependencyProperty GeometryProperty =
+            DependencyProperty.Register(
+                "Geometry",
+                typeof(Geometry),
+                typeof(PieDataPoint),
+                null);
+        #endregion public Geometry Geometry
+
+        // GeometrySelection and GeometryHighlight exist on Silverlight because
+        // a single Geometry object can not be the target of multiple
+        // TemplateBindings - yet the default template has 3 Paths that bind.
+
+        #region public Geometry GeometrySelection
+        /// <summary>
+        /// Gets or sets the Geometry which defines the shape of a point. The 
         /// GeometrySelection property is a copy of the Geometry property.
         /// </summary>
         public Geometry GeometrySelection
         {
-            get
-            {
-                return this.GetValue(PieDataPoint.GeometrySelectionProperty) as Geometry;
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.GeometrySelectionProperty, (object)value);
-            }
+            get { return GetValue(GeometrySelectionProperty) as Geometry; }
+            set { SetValue(GeometrySelectionProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the GeometrySelection dependency property.
+        /// </summary>
+        public static readonly DependencyProperty GeometrySelectionProperty =
+            DependencyProperty.Register(
+                "GeometrySelection",
+                typeof(Geometry),
+                typeof(PieDataPoint),
+                null);
+        #endregion public Geometry GeometrySelection
+
+        #region public Geometry GeometryHighlight
         /// <summary>
         /// Gets or sets the GeometryHighlight property which is a clone of the
         /// Geometry property.
         /// </summary>
         public Geometry GeometryHighlight
         {
-            get
-            {
-                return this.GetValue(PieDataPoint.GeometryHighlightProperty) as Geometry;
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.GeometryHighlightProperty, (object)value);
-            }
+            get { return GetValue(GeometryHighlightProperty) as Geometry; }
+            set { SetValue(GeometryHighlightProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the GeometryHighlight dependency property.
+        /// </summary>
+        public static readonly DependencyProperty GeometryHighlightProperty =
+            DependencyProperty.Register(
+                "GeometryHighlight",
+                typeof(Geometry),
+                typeof(PieDataPoint),
+                null);
+        #endregion public Geometry GeometryHighlight
 
         /// <summary>
         /// Occurs when the actual offset ratio of the pie data point changes.
         /// </summary>
         internal event RoutedPropertyChangedEventHandler<double> ActualOffsetRatioChanged;
 
+        #region public double ActualOffsetRatio
         /// <summary>
         /// Gets or sets the offset ratio that is displayed on the screen.
         /// </summary>
         public double ActualOffsetRatio
         {
-            get
-            {
-                return (double)this.GetValue(PieDataPoint.ActualOffsetRatioProperty);
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.ActualOffsetRatioProperty, (object)value);
-            }
+            get { return (double)GetValue(ActualOffsetRatioProperty); }
+            set { SetValue(ActualOffsetRatioProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the ActualOffsetRatio dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ActualOffsetRatioProperty =
+            DependencyProperty.Register(
+                "ActualOffsetRatio",
+                typeof(double),
+                typeof(PieDataPoint),
+                new PropertyMetadata(OnActualOffsetRatioPropertyChanged));
 
         /// <summary>
         /// Called when the value of the ActualOffsetRatioProperty property changes.
@@ -121,7 +140,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnActualOffsetRatioPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((PieDataPoint)d).OnActualOffsetRatioPropertyChanged((double)e.OldValue, (double)e.NewValue);
+            PieDataPoint source = (PieDataPoint)d;
+            double oldValue = (double)e.OldValue;
+            double newValue = (double)e.NewValue;
+            source.OnActualOffsetRatioPropertyChanged(oldValue, newValue);
         }
 
         /// <summary>
@@ -131,13 +153,18 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         private void OnActualOffsetRatioPropertyChanged(double oldValue, double newValue)
         {
-            RoutedPropertyChangedEventHandler<double> offsetRatioChanged = this.ActualOffsetRatioChanged;
-            if (offsetRatioChanged != null)
-                offsetRatioChanged((object)this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
-            if (!DesignerProperties.GetIsInDesignMode((DependencyObject)this))
-                return;
-            PieSeries.UpdatePieDataPointGeometry(this, this.ActualWidth, this.ActualHeight);
+            RoutedPropertyChangedEventHandler<double> handler = this.ActualOffsetRatioChanged;
+            if (handler != null)
+            {
+                handler(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
+            }
+
+            if (DesignerProperties.GetIsInDesignMode(this))
+            {
+                PieSeries.UpdatePieDataPointGeometry(this, ActualWidth, ActualHeight);
+            }
         }
+        #endregion public double ActualOffsetRatio
 
         /// <summary>
         /// An event raised when the actual ratio of the pie data point is
@@ -145,18 +172,25 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         internal event RoutedPropertyChangedEventHandler<double> ActualRatioChanged;
 
-        /// <summary>Gets or sets the ratio displayed on the screen.</summary>
+        #region public double ActualRatio
+        /// <summary>
+        /// Gets or sets the ratio displayed on the screen.
+        /// </summary>
         public double ActualRatio
         {
-            get
-            {
-                return (double)this.GetValue(PieDataPoint.ActualRatioProperty);
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.ActualRatioProperty, (object)value);
-            }
+            get { return (double)GetValue(ActualRatioProperty); }
+            set { SetValue(ActualRatioProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the ActualRatio dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ActualRatioProperty =
+            DependencyProperty.Register(
+                "ActualRatio",
+                typeof(double),
+                typeof(PieDataPoint),
+                new PropertyMetadata(OnActualRatioPropertyChanged));
 
         /// <summary>
         /// Called when the value of the ActualRatioProperty property changes.
@@ -165,7 +199,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnActualRatioPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((PieDataPoint)d).OnActualRatioPropertyChanged((double)e.OldValue, (double)e.NewValue);
+            PieDataPoint source = (PieDataPoint)d;
+            double oldValue = (double)e.OldValue;
+            double newValue = (double)e.NewValue;
+            source.OnActualRatioPropertyChanged(oldValue, newValue);
         }
 
         /// <summary>
@@ -177,27 +214,43 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (ValueHelper.CanGraph(newValue))
             {
-                RoutedPropertyChangedEventHandler<double> actualRatioChanged = this.ActualRatioChanged;
-                if (actualRatioChanged != null)
-                    actualRatioChanged((object)this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
+                RoutedPropertyChangedEventHandler<double> handler = this.ActualRatioChanged;
+                if (handler != null)
+                {
+                    handler(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
+                }
             }
             else
+            {
                 this.ActualRatio = 0.0;
-            if (!DesignerProperties.GetIsInDesignMode((DependencyObject)this))
-                return;
-            PieSeries.UpdatePieDataPointGeometry(this, this.ActualWidth, this.ActualHeight);
-        }
+            }
 
+            if (DesignerProperties.GetIsInDesignMode(this))
+            {
+                PieSeries.UpdatePieDataPointGeometry(this, ActualWidth, ActualHeight);
+            }
+        }
+        #endregion public double ActualRatio
+
+        #region public string FormattedRatio
         /// <summary>
         /// Gets the Ratio with the value of the RatioStringFormat property applied.
         /// </summary>
         public string FormattedRatio
         {
-            get
-            {
-                return this.GetValue(PieDataPoint.FormattedRatioProperty) as string;
-            }
+            get { return GetValue(FormattedRatioProperty) as string; }
         }
+
+        /// <summary>
+        /// Identifies the FormattedRatio dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FormattedRatioProperty =
+            DependencyProperty.Register(
+                "FormattedRatio",
+                typeof(string),
+                typeof(PieDataPoint),
+                null);
+        #endregion public string FormattedRatio
 
         /// <summary>
         /// An event raised when the offset ratio of the pie data point is
@@ -205,18 +258,25 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         internal event RoutedPropertyChangedEventHandler<double> OffsetRatioChanged;
 
-        /// <summary>Gets or sets the offset ratio of the pie data point.</summary>
+        #region public double OffsetRatio
+        /// <summary>
+        /// Gets or sets the offset ratio of the pie data point.
+        /// </summary>
         public double OffsetRatio
         {
-            get
-            {
-                return (double)this.GetValue(PieDataPoint.OffsetRatioProperty);
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.OffsetRatioProperty, (object)value);
-            }
+            get { return (double)GetValue(OffsetRatioProperty); }
+            set { SetValue(OffsetRatioProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the OffsetRatio dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OffsetRatioProperty =
+            DependencyProperty.Register(
+                "OffsetRatio",
+                typeof(double),
+                typeof(PieDataPoint),
+                new PropertyMetadata(OnOffsetRatioPropertyChanged));
 
         /// <summary>
         /// Called when the value of the OffsetRatioProperty property changes.
@@ -225,7 +285,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnOffsetRatioPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((PieDataPoint)d).OnOffsetRatioPropertyChanged((double)e.OldValue, (double)e.NewValue);
+            PieDataPoint source = (PieDataPoint)d;
+            double oldValue = (double)e.OldValue;
+            double newValue = (double)e.NewValue;
+            source.OnOffsetRatioPropertyChanged(oldValue, newValue);
         }
 
         /// <summary>
@@ -237,16 +300,22 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (ValueHelper.CanGraph(newValue))
             {
-                RoutedPropertyChangedEventHandler<double> offsetRatioChanged = this.OffsetRatioChanged;
-                if (offsetRatioChanged != null)
-                    offsetRatioChanged((object)this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
-                if (this.State != DataPointState.Created)
-                    return;
-                this.ActualOffsetRatio = newValue;
+                RoutedPropertyChangedEventHandler<double> handler = this.OffsetRatioChanged;
+                if (handler != null)
+                {
+                    handler(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
+                }
+                if (this.State == DataPointState.Created)
+                {
+                    ActualOffsetRatio = newValue;
+                }
             }
             else
+            {
                 this.OffsetRatio = 0.0;
+            }
         }
+        #endregion public double OffsetRatio
 
         /// <summary>
         /// An event raised when the ratio of the pie data point is
@@ -254,21 +323,26 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         internal event RoutedPropertyChangedEventHandler<double> RatioChanged;
 
+        #region public double Ratio
         /// <summary>
-        /// Gets or sets the ratio of the total that the data point
+        /// Gets or sets the ratio of the total that the data point 
         /// represents.
         /// </summary>
         public double Ratio
         {
-            get
-            {
-                return (double)this.GetValue(PieDataPoint.RatioProperty);
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.RatioProperty, (object)value);
-            }
+            get { return (double)GetValue(RatioProperty); }
+            set { SetValue(RatioProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the Ratio dependency property.
+        /// </summary>
+        public static readonly DependencyProperty RatioProperty =
+            DependencyProperty.Register(
+                "Ratio",
+                typeof(double),
+                typeof(PieDataPoint),
+                new PropertyMetadata(OnRatioPropertyChanged));
 
         /// <summary>
         /// Called when the value of the RatioProperty property changes.
@@ -277,7 +351,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnRatioPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((PieDataPoint)d).OnRatioPropertyChanged((double)e.OldValue, (double)e.NewValue);
+            PieDataPoint source = (PieDataPoint)d;
+            double oldValue = (double)e.OldValue;
+            double newValue = (double)e.NewValue;
+            source.OnRatioPropertyChanged(oldValue, newValue);
         }
 
         /// <summary>
@@ -289,32 +366,44 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             if (ValueHelper.CanGraph(newValue))
             {
-                this.SetFormattedProperty(PieDataPoint.FormattedRatioProperty, this.RatioStringFormat, (object)newValue);
-                RoutedPropertyChangedEventHandler<double> ratioChanged = this.RatioChanged;
-                if (ratioChanged != null)
-                    ratioChanged((object)this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
-                if (this.State != DataPointState.Created)
-                    return;
-                this.ActualRatio = newValue;
+                SetFormattedProperty(FormattedRatioProperty, RatioStringFormat, newValue);
+                RoutedPropertyChangedEventHandler<double> handler = this.RatioChanged;
+                if (handler != null)
+                {
+                    handler(this, new RoutedPropertyChangedEventArgs<double>(oldValue, newValue));
+                }
+
+                if (this.State == DataPointState.Created)
+                {
+                    ActualRatio = newValue;
+                }
             }
             else
+            {
                 this.Ratio = 0.0;
+            }
         }
+        #endregion public double Ratio
 
+        #region public string RatioStringFormat
         /// <summary>
         /// Gets or sets the format string for the FormattedRatio property.
         /// </summary>
         public string RatioStringFormat
         {
-            get
-            {
-                return this.GetValue(PieDataPoint.RatioStringFormatProperty) as string;
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.RatioStringFormatProperty, (object)value);
-            }
+            get { return GetValue(RatioStringFormatProperty) as string; }
+            set { SetValue(RatioStringFormatProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the RatioStringFormat dependency property.
+        /// </summary>
+        public static readonly DependencyProperty RatioStringFormatProperty =
+            DependencyProperty.Register(
+                "RatioStringFormat",
+                typeof(string),
+                typeof(PieDataPoint),
+                new PropertyMetadata(null, OnRatioStringFormatPropertyChanged));
 
         /// <summary>
         /// Called when the value of the RatioStringFormatProperty property changes.
@@ -323,7 +412,9 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private static void OnRatioStringFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as PieDataPoint).OnRatioStringFormatPropertyChanged(e.NewValue as string);
+            PieDataPoint source = d as PieDataPoint;
+            string newValue = e.NewValue as string;
+            source.OnRatioStringFormatPropertyChanged(newValue);
         }
 
         /// <summary>
@@ -332,38 +423,51 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         private void OnRatioStringFormatPropertyChanged(string newValue)
         {
-            this.SetFormattedProperty(PieDataPoint.FormattedRatioProperty, newValue, (object)this.Ratio);
+            SetFormattedProperty(FormattedRatioProperty, newValue, Ratio);
         }
+        #endregion public string RatioStringFormat
 
+        #region internal Style ActualDataPointStyle
         /// <summary>
         /// Gets or sets the actual style used for the data points.
         /// </summary>
         internal Style ActualDataPointStyle
         {
-            get
-            {
-                return this.GetValue(PieDataPoint.ActualDataPointStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.ActualDataPointStyleProperty, (object)value);
-            }
+            get { return GetValue(ActualDataPointStyleProperty) as Style; }
+            set { SetValue(ActualDataPointStyleProperty, value); }
         }
 
+        /// <summary>
+        /// Identifies the ActualDataPointStyle dependency property.
+        /// </summary>
+        internal static readonly DependencyProperty ActualDataPointStyleProperty =
+            DependencyProperty.Register(
+                ActualDataPointStyleName,
+                typeof(Style),
+                typeof(PieDataPoint),
+                null);
+        #endregion internal Style ActualDataPointStyle
+
+        #region internal Style ActualLegendItemStyle
         /// <summary>
         /// Gets or sets the actual style used for the legend item.
         /// </summary>
         internal Style ActualLegendItemStyle
         {
-            get
-            {
-                return this.GetValue(PieDataPoint.ActualLegendItemStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(PieDataPoint.ActualLegendItemStyleProperty, (object)value);
-            }
+            get { return GetValue(ActualLegendItemStyleProperty) as Style; }
+            set { SetValue(ActualLegendItemStyleProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the ActualLegendItemStyle dependency property.
+        /// </summary>
+        internal static readonly DependencyProperty ActualLegendItemStyleProperty =
+            DependencyProperty.Register(
+                DataPointSeries.ActualLegendItemStyleName,
+                typeof(Style),
+                typeof(PieDataPoint),
+                null);
+        #endregion protected Style ActualLegendItemStyle
 
         /// <summary>
         /// Gets the Palette-dispensed ResourceDictionary for the Series.
@@ -375,27 +479,36 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         private UIElement SliceElement { get; set; }
 
-        /// <summary>Initializes a new instance of the PieDataPoint class.</summary>
+#if !SILVERLIGHT
+        /// <summary>
+        /// Initializes the static members of the PieDataPoint class.
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
+        static PieDataPoint()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PieDataPoint), new FrameworkPropertyMetadata(typeof(PieDataPoint)));
+        }
+
+#endif
+        /// <summary>
+        /// Initializes a new instance of the PieDataPoint class.
+        /// </summary>
         public PieDataPoint()
         {
-#if !MIGRATION
-            this.DefaultStyleKey = (object)typeof(PieDataPoint);
+#if SILVERLIGHT
+            DefaultStyleKey = typeof(PieDataPoint);
 #endif
-            if (!DesignerProperties.GetIsInDesignMode((DependencyObject)this))
-                return;
-            this.ActualRatio = 0.2;
-            this.SizeChanged += (SizeChangedEventHandler)((sender, e) =>
-            {
-                Size newSize = e.NewSize;
-                double width = newSize.Width;
-                newSize = e.NewSize;
-                double height = newSize.Height;
-                PieSeries.UpdatePieDataPointGeometry(this, width, height);
-            });
 
-#if MIGRATION
-            this.DefaultStyleKey = (object)typeof(PieDataPoint);
-#endif
+            if (DesignerProperties.GetIsInDesignMode(this))
+            {
+                // Create default design-mode-friendly settings
+                ActualRatio = 0.2;
+                SizeChanged += delegate(object sender, SizeChangedEventArgs e)
+                {
+                    // Handle SizeChanged event to update Geometry dynamically
+                    PieSeries.UpdatePieDataPointGeometry(this, e.NewSize.Width, e.NewSize.Height);
+                };
+            }
         }
 
         /// <summary>
@@ -403,44 +516,60 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         public override void OnApplyTemplate()
         {
-            if (null != this.SliceElement)
+            if (null != SliceElement)
             {
-                this.SliceElement.MouseEnter -= new MouseEventHandler(this.SliceElement_MouseEnter);
-                this.SliceElement.MouseLeave -= new MouseEventHandler(this.SliceElement_MouseLeave);
+                SliceElement.MouseEnter -= new MouseEventHandler(SliceElement_MouseEnter);
+                SliceElement.MouseLeave -= new MouseEventHandler(SliceElement_MouseLeave);
             }
+
             base.OnApplyTemplate();
-            this.SliceElement = this.GetTemplateChild("Slice") as UIElement;
-            if (null == this.SliceElement)
-                return;
-            this.SliceElement.MouseEnter += new MouseEventHandler(this.SliceElement_MouseEnter);
-            this.SliceElement.MouseLeave += new MouseEventHandler(this.SliceElement_MouseLeave);
+
+            SliceElement = GetTemplateChild(SliceName) as UIElement;
+
+            if (null != SliceElement)
+            {
+                SliceElement.MouseEnter += new MouseEventHandler(SliceElement_MouseEnter);
+                SliceElement.MouseLeave += new MouseEventHandler(SliceElement_MouseLeave);
+            }
         }
 
-        /// <summary>Provides handling for the MouseEnter event.</summary>
+        /// <summary>
+        /// Provides handling for the MouseEnter event.
+        /// </summary>
         /// <param name="e">The event data.</param>
         protected override void OnMouseEnter(MouseEventArgs e)
         {
+            // Do nothing because PieDataPoint handles SliceElement.MouseEnter instead
         }
 
-        /// <summary>Provides handling for the MouseLeave event.</summary>
+        /// <summary>
+        /// Provides handling for the MouseLeave event.
+        /// </summary>
         /// <param name="e">The event data.</param>
         protected override void OnMouseLeave(MouseEventArgs e)
         {
+            // Do nothing because PieDataPoint handles SliceElement.MouseLeave instead
         }
 
-        /// <summary>Provides handling for the MouseEnter event.</summary>
+        /// <summary>
+        /// Provides handling for the MouseEnter event.
+        /// </summary>
         /// <param name="sender">Event source.</param>
         /// <param name="e">The event data.</param>
         private void SliceElement_MouseEnter(object sender, MouseEventArgs e)
         {
+            // Defer to Control's default MouseEnter handling
             base.OnMouseEnter(e);
         }
 
-        /// <summary>Provides handling for the MouseLeave event.</summary>
+        /// <summary>
+        /// Provides handling for the MouseLeave event.
+        /// </summary>
         /// <param name="sender">Event source.</param>
         /// <param name="e">The event data.</param>
         private void SliceElement_MouseLeave(object sender, MouseEventArgs e)
         {
+            // Defer to Control's default MouseLeave handling
             base.OnMouseLeave(e);
         }
     }

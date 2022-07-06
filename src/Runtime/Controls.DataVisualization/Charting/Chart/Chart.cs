@@ -3,133 +3,116 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Properties = OpenSilver.Controls.DataVisualization.Properties;
-
-using System.Windows.Markup;
-using System.Collections;
-#if MIGRATION
 using System.Windows.Controls.DataVisualization.Charting.Primitives;
-#else
-using System;
-using Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives;
-#endif
+using System.Windows.Markup;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Represents a control that displays a Chart.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
+    [TemplatePart(Name = Chart.ChartAreaName, Type = typeof(EdgePanel))]
+    [TemplatePart(Name = Chart.LegendName, Type = typeof(Legend))]
+    [StyleTypedProperty(Property = "TitleStyle", StyleTargetType = typeof(Title))]
+    [StyleTypedProperty(Property = "LegendStyle", StyleTargetType = typeof(Legend))]
     [StyleTypedProperty(Property = "ChartAreaStyle", StyleTargetType = typeof(EdgePanel))]
     [StyleTypedProperty(Property = "PlotAreaStyle", StyleTargetType = typeof(Grid))]
     [ContentProperty("Series")]
-    [TemplatePart(Name = "ChartArea", Type = typeof(EdgePanel))]
-    [StyleTypedProperty(Property = "TitleStyle", StyleTargetType = typeof(System.Windows.Controls.DataVisualization.Title))]
-    [StyleTypedProperty(Property = "LegendStyle", StyleTargetType = typeof(Legend))]
-    [TemplatePart(Name = "Legend", Type = typeof(Legend))]
-    public class Chart : Control, ISeriesHost, IRequireSeriesHost, IResourceDictionaryDispenser
+    public partial class Chart : Control, ISeriesHost
     {
-        /// <summary>Identifies the ChartAreaStyle dependency property.</summary>
-        public static readonly DependencyProperty ChartAreaStyleProperty = DependencyProperty.Register(nameof(ChartAreaStyle), typeof(Style), typeof(Chart), (PropertyMetadata)null);
-        /// <summary>Identifies the LegendStyle dependency property.</summary>
-        public static readonly DependencyProperty LegendStyleProperty = DependencyProperty.Register(nameof(LegendStyle), typeof(Style), typeof(Chart), (PropertyMetadata)null);
-        /// <summary>Identifies the LegendTitle dependency property.</summary>
-        public static readonly DependencyProperty LegendTitleProperty = DependencyProperty.Register(nameof(LegendTitle), typeof(object), typeof(Chart), (PropertyMetadata)null);
-        /// <summary>Identifies the PlotAreaStyle dependency property.</summary>
-        public static readonly DependencyProperty PlotAreaStyleProperty = DependencyProperty.Register(nameof(PlotAreaStyle), typeof(Style), typeof(Chart), (PropertyMetadata)null);
-        /// <summary>Identifies the Palette dependency property.</summary>
-        public static readonly DependencyProperty PaletteProperty = DependencyProperty.Register(nameof(Palette), typeof(Collection<ResourceDictionary>), typeof(Chart), new PropertyMetadata(new PropertyChangedCallback(Chart.OnPalettePropertyChanged)));
-        /// <summary>Identifies the Title dependency property.</summary>
-        public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(object), typeof(Chart), (PropertyMetadata)null);
-        /// <summary>Identifies the TitleStyle dependency property.</summary>
-        public static readonly DependencyProperty TitleStyleProperty = DependencyProperty.Register(nameof(TitleStyle), typeof(Style), typeof(Chart), (PropertyMetadata)null);
+        /// <summary>
+        /// Specifies the name of the ChartArea TemplatePart.
+        /// </summary>
+        private const string ChartAreaName = "ChartArea";
+
+        /// <summary>
+        /// Specifies the name of the legend TemplatePart.
+        /// </summary>
+        private const string LegendName = "Legend";
+
+        /// <summary>
+        /// Gets or sets the chart area children collection.
+        /// </summary>
+        private AggregatedObservableCollection<UIElement> ChartAreaChildren { get; set; }
+
         /// <summary>
         /// An adapter that synchronizes changes to the ChartAreaChildren
         /// property to the ChartArea panel's children collection.
         /// </summary>
         private ObservableCollectionListAdapter<UIElement> _chartAreaChildrenListAdapter = new ObservableCollectionListAdapter<UIElement>();
-        /// <summary>The collection of foreground elements.</summary>
-        private ObservableCollection<UIElement> _foregroundElements = (ObservableCollection<UIElement>)new NoResetObservableCollection<UIElement>();
-        /// <summary>The collection of background elements.</summary>
-        private ObservableCollection<UIElement> _backgroundElements = (ObservableCollection<UIElement>)new NoResetObservableCollection<UIElement>();
-        /// <summary>Axes arranged along the edges.</summary>
-        private ObservableCollection<Axis> _edgeAxes = (ObservableCollection<Axis>)new NoResetObservableCollection<Axis>();
-        /// <summary>Specifies the name of the ChartArea TemplatePart.</summary>
-        private const string ChartAreaName = "ChartArea";
-        /// <summary>Specifies the name of the legend TemplatePart.</summary>
-        private const string LegendName = "Legend";
-        /// <summary>Stores the collection of Axes in the Chart.</summary>
-        private Collection<IAxis> _axes;
+
         /// <summary>
-        /// Stores the collection of Series displayed by the Chart.
+        /// Gets or sets a collection of Axes in the Chart.
         /// </summary>
-        private Collection<ISeries> _series;
-
-        /// <summary>Gets or sets the chart area children collection.</summary>
-        private AggregatedObservableCollection<UIElement> ChartAreaChildren { get; set; }
-
-        /// <summary>Gets or sets a collection of Axes in the Chart.</summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "value", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
         public Collection<IAxis> Axes
         {
             get
             {
-                return this._axes;
+                return _axes;
             }
             set
             {
-                throw new NotSupportedException("Chart Axes setter not supported");
+                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.Chart_Axes_SetterNotSupported);
             }
         }
 
-        ObservableCollection<UIElement> ISeriesHost.ForegroundElements
-        {
-            get
-            {
-                return this.ForegroundElements;
-            }
-        }
+        /// <summary>
+        /// Stores the collection of Axes in the Chart.
+        /// </summary>
+        private Collection<IAxis> _axes;
 
-        /// <summary>Gets the collection of foreground elements.</summary>
-        protected ObservableCollection<UIElement> ForegroundElements
-        {
-            get
-            {
-                return this._foregroundElements;
-            }
-        }
+        /// <summary>
+        /// The collection of foreground elements.
+        /// </summary>
+        private ObservableCollection<UIElement> _foregroundElements = new NoResetObservableCollection<UIElement>();
 
-        ObservableCollection<UIElement> ISeriesHost.BackgroundElements
-        {
-            get
-            {
-                return this.BackgroundElements;
-            }
-        }
+        /// <summary>
+        /// The collection of background elements.
+        /// </summary>
+        private ObservableCollection<UIElement> _backgroundElements = new NoResetObservableCollection<UIElement>();
 
-        /// <summary>Gets the collection of background elements.</summary>
-        protected ObservableCollection<UIElement> BackgroundElements
-        {
-            get
-            {
-                return this._backgroundElements;
-            }
-        }
+        /// <summary>
+        /// Gets the collection of foreground elements.
+        /// </summary>
+        ObservableCollection<UIElement> ISeriesHost.ForegroundElements { get { return ForegroundElements; } }
+
+        /// <summary>
+        /// Gets the collection of foreground elements.
+        /// </summary>
+        protected ObservableCollection<UIElement> ForegroundElements { get { return _foregroundElements; } }
+
+        /// <summary>
+        /// Gets the collection of background elements.
+        /// </summary>
+        ObservableCollection<UIElement> ISeriesHost.BackgroundElements { get { return BackgroundElements; } }
+
+        /// <summary>
+        /// Gets the collection of background elements.
+        /// </summary>
+        protected ObservableCollection<UIElement> BackgroundElements { get { return _backgroundElements; } }
+
+        /// <summary>
+        /// Axes arranged along the edges.
+        /// </summary>
+        private ObservableCollection<Axis> _edgeAxes = new NoResetObservableCollection<Axis>();
 
         /// <summary>
         /// Gets or sets the axes that are currently in the chart.
         /// </summary>
         private IList<IAxis> InternalActualAxes { get; set; }
 
-        /// <summary>Gets the actual axes displayed in the chart.</summary>
+        /// <summary>
+        /// Gets the actual axes displayed in the chart.
+        /// </summary>
         public ReadOnlyCollection<IAxis> ActualAxes { get; private set; }
 
         /// <summary>
@@ -137,104 +120,154 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         private EdgePanel ChartArea { get; set; }
 
-        /// <summary>Gets or sets the reference to the Chart's Legend.</summary>
+        /// <summary>
+        /// Gets or sets the reference to the Chart's Legend.
+        /// </summary>
         private Legend Legend { get; set; }
 
         /// <summary>
         /// Gets or sets the collection of Series displayed by the Chart.
         /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "value", Justification = "Setter is public to work around a limitation with the XAML editing tools.")]
         public Collection<ISeries> Series
         {
             get
             {
-                return this._series;
+                return _series;
             }
             set
             {
-                throw new NotSupportedException("Chart Series setter not supported");
+                throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.Chart_Series_SetterNotSupported);
             }
         }
 
+        /// <summary>
+        /// Stores the collection of Series displayed by the Chart.
+        /// </summary>
+        private Collection<ISeries> _series;
+
+        #region public Style ChartAreaStyle
         /// <summary>
         /// Gets or sets the Style of the ISeriesHost's ChartArea.
         /// </summary>
         public Style ChartAreaStyle
         {
-            get
-            {
-                return this.GetValue(Chart.ChartAreaStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(Chart.ChartAreaStyleProperty, (object)value);
-            }
-        }
-
-        /// <summary>Gets the collection of legend items.</summary>
-        public Collection<object> LegendItems { get; private set; }
-
-        /// <summary>Gets or sets the Style of the ISeriesHost's Legend.</summary>
-        public Style LegendStyle
-        {
-            get
-            {
-                return this.GetValue(Chart.LegendStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(Chart.LegendStyleProperty, (object)value);
-            }
-        }
-
-        /// <summary>Gets or sets the Title content of the Legend.</summary>
-        public object LegendTitle
-        {
-            get
-            {
-                return this.GetValue(Chart.LegendTitleProperty);
-            }
-            set
-            {
-                this.SetValue(Chart.LegendTitleProperty, value);
-            }
-        }
-
-        /// <summary>Gets or sets the Style of the ISeriesHost's PlotArea.</summary>
-        public Style PlotAreaStyle
-        {
-            get
-            {
-                return this.GetValue(Chart.PlotAreaStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(Chart.PlotAreaStyleProperty, (object)value);
-            }
+            get { return GetValue(ChartAreaStyleProperty) as Style; }
+            set { SetValue(ChartAreaStyleProperty, value); }
         }
 
         /// <summary>
+        /// Identifies the ChartAreaStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ChartAreaStyleProperty =
+            DependencyProperty.Register(
+                "ChartAreaStyle",
+                typeof(Style),
+                typeof(Chart),
+                null);
+        #endregion public Style ChartAreaStyle
+
+        /// <summary>
+        /// Gets the collection of legend items.
+        /// </summary>
+        public Collection<object> LegendItems { get; private set; }
+
+        #region public Style LegendStyle
+        /// <summary>
+        /// Gets or sets the Style of the ISeriesHost's Legend.
+        /// </summary>
+        public Style LegendStyle
+        {
+            get { return GetValue(LegendStyleProperty) as Style; }
+            set { SetValue(LegendStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the LegendStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LegendStyleProperty =
+            DependencyProperty.Register(
+                "LegendStyle",
+                typeof(Style),
+                typeof(Chart),
+                null);
+        #endregion public Style LegendStyle
+
+        #region public object LegendTitle
+        /// <summary>
+        /// Gets or sets the Title content of the Legend.
+        /// </summary>
+        public object LegendTitle
+        {
+            get { return GetValue(LegendTitleProperty); }
+            set { SetValue(LegendTitleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the LegendTitle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LegendTitleProperty =
+            DependencyProperty.Register(
+                "LegendTitle",
+                typeof(object),
+                typeof(Chart),
+                null);
+        #endregion public object LegendTitle
+
+        #region public Style PlotAreaStyle
+        /// <summary>
+        /// Gets or sets the Style of the ISeriesHost's PlotArea.
+        /// </summary>
+        public Style PlotAreaStyle
+        {
+            get { return GetValue(PlotAreaStyleProperty) as Style; }
+            set { SetValue(PlotAreaStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the PlotAreaStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PlotAreaStyleProperty =
+            DependencyProperty.Register(
+                "PlotAreaStyle",
+                typeof(Style),
+                typeof(Chart),
+                null);
+        #endregion public Style PlotAreaStyle
+
+        #region public Collection<ResourceDictionary> Palette
+        /// <summary>
         /// Gets or sets a palette of ResourceDictionaries used by the children of the Chart.
         /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Want to allow this to be set from XAML.")]
         public Collection<ResourceDictionary> Palette
         {
-            get
-            {
-                return this.GetValue(Chart.PaletteProperty) as Collection<ResourceDictionary>;
-            }
-            set
-            {
-                this.SetValue(Chart.PaletteProperty, (object)value);
-            }
+            get { return GetValue(PaletteProperty) as Collection<ResourceDictionary>; }
+            set { SetValue(PaletteProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the Palette dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PaletteProperty =
+            DependencyProperty.Register(
+                "Palette",
+                typeof(Collection<ResourceDictionary>),
+                typeof(Chart),
+                new PropertyMetadata(OnPalettePropertyChanged));
 
         /// <summary>
         /// Called when the value of the Palette property is changed.
         /// </summary>
-        /// <param name="d">Chart that contains the changed Palette.</param>
+        /// <param name="d">Chart that contains the changed Palette.
+        /// </param>
         /// <param name="e">Event arguments.</param>
         private static void OnPalettePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((Chart)d).OnPalettePropertyChanged((Collection<ResourceDictionary>)e.NewValue);
+            Chart source = (Chart) d;
+            Collection<ResourceDictionary> newValue = (Collection<ResourceDictionary>)e.NewValue;
+            source.OnPalettePropertyChanged(newValue);
         }
 
         /// <summary>
@@ -243,8 +276,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value for the Palette.</param>
         private void OnPalettePropertyChanged(Collection<ResourceDictionary> newValue)
         {
-            this.ResourceDictionaryDispenser.ResourceDictionaries = (IList<ResourceDictionary>)newValue;
+            ResourceDictionaryDispenser.ResourceDictionaries = newValue;
         }
+        #endregion public Collection<ResourceDictionary> Palette
 
         /// <summary>
         /// Gets or sets an object that rotates through the palette.
@@ -256,58 +290,97 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         public event EventHandler ResourceDictionariesChanged;
 
-        /// <summary>Gets or sets the title displayed for the Chart.</summary>
+        #region public object Title
+        /// <summary>
+        /// Gets or sets the title displayed for the Chart.
+        /// </summary>
         public object Title
         {
-            get
-            {
-                return this.GetValue(Chart.TitleProperty);
-            }
-            set
-            {
-                this.SetValue(Chart.TitleProperty, value);
-            }
+            get { return GetValue(TitleProperty); }
+            set { SetValue(TitleProperty, value); }
         }
 
-        /// <summary>Gets or sets the Style of the ISeriesHost's Title.</summary>
+        /// <summary>
+        /// Identifies the Title dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TitleProperty =
+            DependencyProperty.Register(
+                "Title",
+                typeof(object),
+                typeof(Chart),
+                null);
+        #endregion
+
+        #region public Style TitleStyle
+        /// <summary>
+        /// Gets or sets the Style of the ISeriesHost's Title.
+        /// </summary>
         public Style TitleStyle
         {
-            get
-            {
-                return this.GetValue(Chart.TitleStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(Chart.TitleStyleProperty, (object)value);
-            }
+            get { return GetValue(TitleStyleProperty) as Style; }
+            set { SetValue(TitleStyleProperty, value); }
         }
 
-        /// <summary>Initializes a new instance of the Chart class.</summary>
+        /// <summary>
+        /// Identifies the TitleStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TitleStyleProperty =
+            DependencyProperty.Register(
+                "TitleStyle",
+                typeof(Style),
+                typeof(Chart),
+                null);
+        #endregion public Style TitleStyle
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Initializes the static members of the Chart class.
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Dependency properties are initialized in-line.")]
+        static Chart()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(Chart), new FrameworkPropertyMetadata(typeof(Chart)));
+        }
+
+#endif
+        /// <summary>
+        /// Initializes a new instance of the Chart class.
+        /// </summary>
         public Chart()
         {
 #if !MIGRATION
             this.DefaultStyleKey = (object)typeof(Chart);
 #endif
-            UniqueObservableCollection<ISeries> observableCollection1 = new UniqueObservableCollection<ISeries>();
-            observableCollection1.CollectionChanged += new NotifyCollectionChangedEventHandler(this.SeriesCollectionChanged);
-            this._series = (Collection<ISeries>)observableCollection1;
-            UniqueObservableCollection<IAxis> persistentAxes = new UniqueObservableCollection<IAxis>();
-            this._axes = (Collection<IAxis>)persistentAxes;
-            ObservableCollection<IAxis> observableCollection2 = (ObservableCollection<IAxis>)new SeriesHostAxesCollection((ISeriesHost)this, persistentAxes);
-            observableCollection2.CollectionChanged += new NotifyCollectionChangedEventHandler(this.ActualAxesCollectionChanged);
-            this.InternalActualAxes = (IList<IAxis>)observableCollection2;
-            this.ActualAxes = new ReadOnlyCollection<IAxis>(this.InternalActualAxes);
-            this.LegendItems = (Collection<object>)new AggregatedObservableCollection<object>();
-            this.ChartAreaChildren = new AggregatedObservableCollection<UIElement>();
-            this.ChartAreaChildren.ChildCollections.Add((IList)this._edgeAxes);
-            this.ChartAreaChildren.ChildCollections.Add((IList)this._backgroundElements);
-            this.ChartAreaChildren.ChildCollections.Add((IList)this.Series);
-            this.ChartAreaChildren.ChildCollections.Add((IList)this._foregroundElements);
-            this._chartAreaChildrenListAdapter.Collection = (IEnumerable)this.ChartAreaChildren;
-            this.ResourceDictionaryDispenser = new ResourceDictionaryDispenser();
-            this.ResourceDictionaryDispenser.ResourceDictionariesChanged += (EventHandler)delegate
+            // Create the backing collection for Series
+            UniqueObservableCollection<ISeries> series = new UniqueObservableCollection<ISeries>();
+            series.CollectionChanged += new NotifyCollectionChangedEventHandler(SeriesCollectionChanged);
+            _series = series;
+
+            // Create the backing collection for Axes
+            UniqueObservableCollection<IAxis> axes = new UniqueObservableCollection<IAxis>();
+            _axes = axes;
+
+            ObservableCollection<IAxis> actualAxes = new SeriesHostAxesCollection(this, axes);
+            actualAxes.CollectionChanged += ActualAxesCollectionChanged;
+            this.InternalActualAxes = actualAxes;
+            this.ActualAxes = new ReadOnlyCollection<IAxis>(InternalActualAxes);
+
+            // Create collection for LegendItems
+            LegendItems = new AggregatedObservableCollection<object>();
+
+            ChartAreaChildren = new AggregatedObservableCollection<UIElement>();
+            ChartAreaChildren.ChildCollections.Add(_edgeAxes);
+            ChartAreaChildren.ChildCollections.Add(_backgroundElements);
+            ChartAreaChildren.ChildCollections.Add(Series);
+            ChartAreaChildren.ChildCollections.Add(_foregroundElements);
+
+            _chartAreaChildrenListAdapter.Collection = ChartAreaChildren;
+
+            // Create a dispenser
+            ResourceDictionaryDispenser = new ResourceDictionaryDispenser();
+            ResourceDictionaryDispenser.ResourceDictionariesChanged += delegate
             {
-                this.OnResourceDictionariesChanged(EventArgs.Empty);
+                OnResourceDictionariesChanged(EventArgs.Empty);
             };
 
 #if MIGRATION
@@ -316,14 +389,18 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
         }
 
-        /// <summary>Invokes the ResourceDictionariesChanged event.</summary>
+        /// <summary>
+        /// Invokes the ResourceDictionariesChanged event.
+        /// </summary>
         /// <param name="e">Event arguments.</param>
         private void OnResourceDictionariesChanged(EventArgs e)
         {
-            EventHandler dictionariesChanged = this.ResourceDictionariesChanged;
-            if (null == dictionariesChanged)
-                return;
-            dictionariesChanged((object)this, e);
+            // Forward event on to listeners
+            EventHandler handler = ResourceDictionariesChanged;
+            if (null != handler)
+            {
+                handler.Invoke(this, e);
+            }
         }
 
         /// <summary>
@@ -336,29 +413,48 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         {
             if (axis.Orientation == AxisOrientation.X)
             {
-                int num = CollectionHelper.Count(this.InternalActualAxes.OfType<Axis>().Where<Axis>((Func<Axis, bool>)(currentAxis => currentAxis.Location == AxisLocation.Top)));
-                return CollectionHelper.Count(this.InternalActualAxes.OfType<Axis>().Where<Axis>((Func<Axis, bool>)(currentAxis => currentAxis.Location == AxisLocation.Bottom))) > num ? AxisLocation.Top : AxisLocation.Bottom;
+                int numberOfTopAxes = InternalActualAxes.OfType<Axis>().Where(currentAxis => currentAxis.Location == AxisLocation.Top).Count();
+                int numberOfBottomAxes = InternalActualAxes.OfType<Axis>().Where(currentAxis => currentAxis.Location == AxisLocation.Bottom).Count();
+                return (numberOfBottomAxes > numberOfTopAxes) ? AxisLocation.Top : AxisLocation.Bottom;
             }
-            if (axis.Orientation == AxisOrientation.Y)
-                return CollectionHelper.Count(this.InternalActualAxes.OfType<Axis>().Where<Axis>((Func<Axis, bool>)(currentAxis => currentAxis.Location == AxisLocation.Left))) > CollectionHelper.Count(this.InternalActualAxes.OfType<Axis>().Where<Axis>((Func<Axis, bool>)(currentAxis => currentAxis.Location == AxisLocation.Right))) ? AxisLocation.Right : AxisLocation.Left;
-            return AxisLocation.Auto;
+            else if (axis.Orientation == AxisOrientation.Y)
+            {
+                int numberOfLeftAxes = InternalActualAxes.OfType<Axis>().Where(currentAxis => currentAxis.Location == AxisLocation.Left).Count();
+                int numberOfRightAxes = InternalActualAxes.OfType<Axis>().Where(currentAxis => currentAxis.Location == AxisLocation.Right).Count();
+                return (numberOfLeftAxes > numberOfRightAxes) ? AxisLocation.Right : AxisLocation.Left;
+            }
+            else
+            {
+                return AxisLocation.Auto;
+            }
         }
 
-        /// <summary>Adds an axis to the ISeriesHost area.</summary>
+        /// <summary>
+        /// Adds an axis to the ISeriesHost area.
+        /// </summary>
         /// <param name="axis">The axis to add to the ISeriesHost area.</param>
         private void AddAxisToChartArea(Axis axis)
         {
-            IRequireSeriesHost requireSeriesHost = axis as IRequireSeriesHost;
-            if (requireSeriesHost != null)
-                requireSeriesHost.SeriesHost = (ISeriesHost)this;
+            IRequireSeriesHost requiresSeriesHost = axis as IRequireSeriesHost;
+            if (requiresSeriesHost != null)
+            {
+                requiresSeriesHost.SeriesHost = this;
+            }
+
             if (axis.Location == AxisLocation.Auto)
-                axis.Location = this.GetAutoAxisLocation(axis);
-            Chart.SetEdge(axis);
-            axis.LocationChanged += new RoutedPropertyChangedEventHandler<AxisLocation>(this.AxisLocationChanged);
-            axis.OrientationChanged += new RoutedPropertyChangedEventHandler<AxisOrientation>(this.AxisOrientationChanged);
-            if (axis.Location == AxisLocation.Auto)
-                return;
-            this._edgeAxes.Add(axis);
+            {
+                axis.Location = GetAutoAxisLocation(axis);
+            }
+
+            SetEdge(axis);
+
+            axis.LocationChanged += AxisLocationChanged;
+            axis.OrientationChanged += AxisOrientationChanged;
+
+            if (axis.Location != AxisLocation.Auto)
+            {
+                _edgeAxes.Add(axis);
+            }
         }
 
         /// <summary>
@@ -369,7 +465,8 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         private void AxisOrientationChanged(object sender, RoutedPropertyChangedEventArgs<AxisOrientation> args)
         {
             Axis axis = (Axis)sender;
-            axis.Location = this.GetAutoAxisLocation(axis);
+
+            axis.Location = GetAutoAxisLocation(axis);
         }
 
         /// <summary>
@@ -381,17 +478,17 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         {
             switch (axis.Location)
             {
-                case AxisLocation.Left:
-                    EdgePanel.SetEdge((UIElement)axis, Edge.Left);
+                case AxisLocation.Bottom:
+                    EdgePanel.SetEdge(axis, Edge.Bottom);
                     break;
                 case AxisLocation.Top:
-                    EdgePanel.SetEdge((UIElement)axis, Edge.Top);
+                    EdgePanel.SetEdge(axis, Edge.Top);
+                    break;
+                case AxisLocation.Left:
+                    EdgePanel.SetEdge(axis, Edge.Left);
                     break;
                 case AxisLocation.Right:
-                    EdgePanel.SetEdge((UIElement)axis, Edge.Right);
-                    break;
-                case AxisLocation.Bottom:
-                    EdgePanel.SetEdge((UIElement)axis, Edge.Bottom);
+                    EdgePanel.SetEdge(axis, Edge.Right);
                     break;
             }
         }
@@ -404,11 +501,16 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         private void AxisLocationChanged(object sender, RoutedPropertyChangedEventArgs<AxisLocation> args)
         {
             Axis axis = (Axis)sender;
+
             if (args.NewValue == AxisLocation.Auto)
-                throw new InvalidOperationException("Chart.AxisLocationChanged: Cant Be Changed To Auto When Hosted Inside Of A SeriesHost");
-            Chart.SetEdge(axis);
-            this._edgeAxes.Remove(axis);
-            this._edgeAxes.Add(axis);
+            {
+                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Chart_AxisLocationChanged_CantBeChangedToAutoWhenHostedInsideOfASeriesHost);
+            }
+
+            SetEdge(axis);
+
+            _edgeAxes.Remove(axis);
+            _edgeAxes.Add(axis);
         }
 
         /// <summary>
@@ -417,8 +519,11 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="series">The series to add to the plot area.</param>
         private void AddSeriesToPlotArea(ISeries series)
         {
-            series.SeriesHost = (ISeriesHost)this;
-            (this.LegendItems as AggregatedObservableCollection<object>).ChildCollections.Insert(this.Series.IndexOf(series), (IList)series.LegendItems);
+            series.SeriesHost = this;
+
+            AggregatedObservableCollection<object> chartLegendItems = this.LegendItems as AggregatedObservableCollection<object>;
+            int indexOfSeries = this.Series.IndexOf(series);
+            chartLegendItems.ChildCollections.Insert(indexOfSeries, series.LegendItems);
         }
 
         /// <summary>
@@ -427,21 +532,35 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         public override void OnApplyTemplate()
         {
+            // Call base implementation
             base.OnApplyTemplate();
-            if (null != this.ChartArea)
-                this.ChartArea.Children.Clear();
-            if (null != this.Legend)
-                this.Legend.ItemsSource = (IEnumerable)null;
-            this.ChartArea = this.GetTemplateChild("ChartArea") as EdgePanel;
-            this.Legend = this.GetTemplateChild("Legend") as Legend;
-            if (this.ChartArea != null)
+
+            // Unhook events from former template parts
+            if (null != ChartArea)
             {
-                this._chartAreaChildrenListAdapter.TargetList = (IList)this.ChartArea.Children;
-                this._chartAreaChildrenListAdapter.Populate();
+                ChartArea.Children.Clear();
             }
-            if (this.Legend == null)
-                return;
-            this.Legend.ItemsSource = (IEnumerable)this.LegendItems;
+
+            if (null != Legend)
+            {
+                Legend.ItemsSource = null;
+            }
+
+            // Access new template parts
+            ChartArea = GetTemplateChild(ChartAreaName) as EdgePanel;
+
+            Legend = GetTemplateChild(LegendName) as Legend;
+
+            if (ChartArea != null)
+            {
+                _chartAreaChildrenListAdapter.TargetList = ChartArea.Children;
+                _chartAreaChildrenListAdapter.Populate();
+            }
+
+            if (Legend != null)
+            {
+                Legend.ItemsSource = this.LegendItems;
+            }
         }
 
         /// <summary>
@@ -455,32 +574,47 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             if (e.NewItems != null)
             {
                 foreach (Axis axis in e.NewItems.OfType<Axis>())
-                    this.AddAxisToChartArea(axis);
+                {
+                    AddAxisToChartArea(axis);
+                }
             }
-            if (e.OldItems == null)
-                return;
-            foreach (Axis axis in e.OldItems.OfType<Axis>())
-                this.RemoveAxisFromChartArea(axis);
+            if (e.OldItems != null)
+            {
+                foreach (Axis axis in e.OldItems.OfType<Axis>())
+                {
+                    RemoveAxisFromChartArea(axis);
+                }
+            }
         }
 
-        /// <summary>Removes an axis from the Chart area.</summary>
+        /// <summary>
+        /// Removes an axis from the Chart area.
+        /// </summary>
         /// <param name="axis">The axis to remove from the ISeriesHost area.</param>
         private void RemoveAxisFromChartArea(Axis axis)
         {
-            axis.LocationChanged -= new RoutedPropertyChangedEventHandler<AxisLocation>(this.AxisLocationChanged);
-            axis.OrientationChanged -= new RoutedPropertyChangedEventHandler<AxisOrientation>(this.AxisOrientationChanged);
-            IRequireSeriesHost requireSeriesHost = axis as IRequireSeriesHost;
-            if (requireSeriesHost != null)
-                requireSeriesHost.SeriesHost = (ISeriesHost)null;
-            this._edgeAxes.Remove(axis);
+            axis.LocationChanged -= AxisLocationChanged;
+            axis.OrientationChanged -= AxisOrientationChanged;
+            IRequireSeriesHost requiresSeriesHost = axis as IRequireSeriesHost;
+            if (requiresSeriesHost != null)
+            {
+                requiresSeriesHost.SeriesHost = null;
+            }
+
+            _edgeAxes.Remove(axis);
         }
 
-        /// <summary>Removes a series from the plot area.</summary>
-        /// <param name="series">The series to remove from the plot area.</param>
+        /// <summary>
+        /// Removes a series from the plot area.
+        /// </summary>
+        /// <param name="series">The series to remove from the plot area.
+        /// </param>
         private void RemoveSeriesFromPlotArea(ISeries series)
         {
-            (this.LegendItems as AggregatedObservableCollection<object>).ChildCollections.Remove((IList)series.LegendItems);
-            series.SeriesHost = (ISeriesHost)null;
+            AggregatedObservableCollection<object> legendItemsList = LegendItems as AggregatedObservableCollection<object>;
+            legendItemsList.ChildCollections.Remove(series.LegendItems);
+
+            series.SeriesHost = null;
         }
 
         /// <summary>
@@ -491,36 +625,48 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">The event data.</param>
         private void SeriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            // Clear ISeriesHost property of old Series
             if (null != e.OldItems)
             {
-                foreach (ISeries oldItem in (IEnumerable)e.OldItems)
+                foreach (ISeries series in e.OldItems)
                 {
-                    ISeriesHost rootSeriesHost = oldItem as ISeriesHost;
-                    if (rootSeriesHost != null)
+                    ISeriesHost host = series as ISeriesHost;
+                    if (host != null)
                     {
-                        foreach (IRequireGlobalSeriesIndex globalSeriesIndex in rootSeriesHost.GetDescendentSeries().OfType<IRequireGlobalSeriesIndex>())
-                            globalSeriesIndex.GlobalSeriesIndexChanged(new int?());
-                        rootSeriesHost.Series.CollectionChanged -= new NotifyCollectionChangedEventHandler(this.ChildSeriesCollectionChanged);
+                        foreach (IRequireGlobalSeriesIndex tracksGlobalIndex in host.GetDescendentSeries().OfType<IRequireGlobalSeriesIndex>())
+                        {
+                            tracksGlobalIndex.GlobalSeriesIndexChanged(null);
+                        }
+                        host.Series.CollectionChanged -= new NotifyCollectionChangedEventHandler(ChildSeriesCollectionChanged);
                     }
-                    IRequireGlobalSeriesIndex globalSeriesIndex1 = oldItem as IRequireGlobalSeriesIndex;
-                    if (globalSeriesIndex1 != null)
-                        globalSeriesIndex1.GlobalSeriesIndexChanged(new int?());
-                    this.RemoveSeriesFromPlotArea(oldItem);
+                    IRequireGlobalSeriesIndex require = series as IRequireGlobalSeriesIndex;
+                    if (require != null)
+                    {
+                        require.GlobalSeriesIndexChanged(null);
+                    }
+
+                    RemoveSeriesFromPlotArea(series);
                 }
             }
+
+            // Set ISeriesHost property of new Series
             if (null != e.NewItems)
             {
-                foreach (ISeries newItem in (IEnumerable)e.NewItems)
+                foreach (ISeries series in e.NewItems)
                 {
-                    ISeriesHost seriesHost = newItem as ISeriesHost;
-                    if (null != seriesHost)
-                        seriesHost.Series.CollectionChanged += new NotifyCollectionChangedEventHandler(this.ChildSeriesCollectionChanged);
-                    this.AddSeriesToPlotArea(newItem);
+                    ISeriesHost host = series as ISeriesHost;
+                    if (null != host)
+                    {
+                        host.Series.CollectionChanged += new NotifyCollectionChangedEventHandler(ChildSeriesCollectionChanged);
+                    }
+                    AddSeriesToPlotArea(series);
                 }
             }
-            if (e.Action == NotifyCollectionChangedAction.Replace)
-                return;
-            this.OnGlobalSeriesIndexesInvalidated((object)this, new RoutedEventArgs());
+
+            if (e.Action != NotifyCollectionChangedAction.Replace)
+            {
+                OnGlobalSeriesIndexesInvalidated(this, new RoutedEventArgs());
+            }
         }
 
         /// <summary>
@@ -530,7 +676,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="e">Event arguments.</param>
         private void ChildSeriesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            this.OnGlobalSeriesIndexesInvalidated((object)this, new RoutedEventArgs());
+            OnGlobalSeriesIndexesInvalidated(this, new RoutedEventArgs());
         }
 
         /// <summary>
@@ -544,7 +690,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <returns>An enumerator of ResourceDictionaries.</returns>
         public IEnumerator<ResourceDictionary> GetResourceDictionariesWhere(Func<ResourceDictionary, bool> predicate)
         {
-            return this.ResourceDictionaryDispenser.GetResourceDictionariesWhere(predicate);
+            return ResourceDictionaryDispenser.GetResourceDictionariesWhere(predicate);
         }
 
         /// <summary>
@@ -555,7 +701,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="args">The event data.</param>
         private void OnGlobalSeriesIndexesInvalidated(object sender, RoutedEventArgs args)
         {
-            this.UpdateGlobalIndexes();
+            UpdateGlobalIndexes();
         }
 
         /// <summary>
@@ -564,39 +710,43 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         private void UpdateGlobalIndexes()
         {
-            this.GetDescendentSeries().OfType<IRequireGlobalSeriesIndex>().ForEachWithIndex<IRequireGlobalSeriesIndex>((Action<IRequireGlobalSeriesIndex, int>)((seriesThatTracksGlobalIndex, index) => seriesThatTracksGlobalIndex.GlobalSeriesIndexChanged(new int?(index))));
+            (this as ISeriesHost).GetDescendentSeries().OfType<IRequireGlobalSeriesIndex>().ForEachWithIndex(
+                (seriesThatTracksGlobalIndex, index) =>
+                {
+                    seriesThatTracksGlobalIndex.GlobalSeriesIndexChanged(index);
+                });
         }
 
+        /// <summary>
+        /// Gets or sets the Series host of the chart.
+        /// </summary>
+        /// <remarks>This will always return null.</remarks>
         ISeriesHost IRequireSeriesHost.SeriesHost
         {
-            get
-            {
-                return this.SeriesHost;
-            }
-            set
-            {
-                this.SeriesHost = value;
-            }
+            get { return SeriesHost; }
+            set { SeriesHost = value; }
         }
 
-        /// <summary>Gets or sets the Series host of the chart.</summary>
+        /// <summary>
+        /// Gets or sets the Series host of the chart.
+        /// </summary>
         /// <remarks>This will always return null.</remarks>
         protected ISeriesHost SeriesHost { get; set; }
 
+        /// <summary>
+        /// Gets the axes collection of the chart.
+        /// </summary>
         ObservableCollection<IAxis> ISeriesHost.Axes
         {
-            get
-            {
-                return this.InternalActualAxes as ObservableCollection<IAxis>;
-            }
+            get { return InternalActualAxes as ObservableCollection<IAxis>; }
         }
 
+        /// <summary>
+        /// Gets the Series collection of the chart.
+        /// </summary>
         ObservableCollection<ISeries> ISeriesHost.Series
         {
-            get
-            {
-                return (ObservableCollection<ISeries>)this.Series;
-            }
+            get { return (ObservableCollection<ISeries>)Series; }
         }
     }
 }

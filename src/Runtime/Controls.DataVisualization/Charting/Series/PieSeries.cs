@@ -1,5 +1,11 @@
-﻿using System.Collections.Generic;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -11,76 +17,105 @@ namespace System.Windows.Controls.DataVisualization.Charting
     /// format.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [StyleTypedProperty(Property = "DataPointStyle", StyleTargetType = typeof(PieDataPoint))]
+    [StyleTypedProperty(Property = DataPointStyleName, StyleTargetType = typeof(PieDataPoint))]
     [StyleTypedProperty(Property = "LegendItemStyle", StyleTargetType = typeof(LegendItem))]
-    [TemplatePart(Name = "PlotArea", Type = typeof(Canvas))]
-    public class PieSeries : DataPointSeries, IResourceDictionaryDispenser, IRequireGlobalSeriesIndex
+    [TemplatePart(Name = DataPointSeries.PlotAreaName, Type = typeof(Canvas))]
+    public partial class PieSeries : DataPointSeries, IResourceDictionaryDispenser, IRequireGlobalSeriesIndex
     {
-        /// <summary>Identifies the Palette dependency property.</summary>
-        public static readonly DependencyProperty PaletteProperty = DependencyProperty.Register(nameof(Palette), typeof(Collection<ResourceDictionary>), typeof(Series), new PropertyMetadata(new PropertyChangedCallback(PieSeries.OnPalettePropertyChanged)));
-        /// <summary>
-        /// A dictionary that links data points to their legend items.
-        /// </summary>
-        private Dictionary<DataPoint, LegendItem> _dataPointLegendItems = new Dictionary<DataPoint, LegendItem>();
-        /// <summary>The pie data point style enumerator.</summary>
-        private IEnumerator<ResourceDictionary> _resourceDictionaryEnumerator;
-
+        #region public Collection<ResourceDictionary> Palette
         /// <summary>
         /// Gets or sets a palette of ResourceDictionaries used by the series.
         /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Want to allow this to be set from XAML.")]
         public Collection<ResourceDictionary> Palette
         {
-            get
-            {
-                return this.GetValue(PieSeries.PaletteProperty) as Collection<ResourceDictionary>;
-            }
-            set
-            {
-                this.SetValue(PieSeries.PaletteProperty, (object)value);
-            }
+            get { return GetValue(PaletteProperty) as Collection<ResourceDictionary>; }
+            set { SetValue(PaletteProperty, value); }
         }
 
-        /// <summary>PaletteProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the Palette dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PaletteProperty =
+            DependencyProperty.Register(
+                "Palette",
+                typeof(Collection<ResourceDictionary>),
+                typeof(Series),
+                new PropertyMetadata(OnPalettePropertyChanged));
+
+        /// <summary>
+        /// PaletteProperty property changed handler.
+        /// </summary>
         /// <param name="d">Parent that changed its Palette.</param>
         /// <param name="e">Event arguments.</param>
         private static void OnPalettePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as PieSeries).OnPalettePropertyChanged(e.NewValue as Collection<ResourceDictionary>);
+            PieSeries source = d as PieSeries;
+            Collection<ResourceDictionary> newValue = e.NewValue as Collection<ResourceDictionary>;
+            source.OnPalettePropertyChanged(newValue);
         }
 
-        /// <summary>PaletteProperty property changed handler.</summary>
+        /// <summary>
+        /// PaletteProperty property changed handler.
+        /// </summary>
         /// <param name="newValue">New value.</param>
         private void OnPalettePropertyChanged(Collection<ResourceDictionary> newValue)
         {
-            this.ResourceDictionaryDispenser.ResourceDictionaries = (IList<ResourceDictionary>)newValue;
+            ResourceDictionaryDispenser.ResourceDictionaries = newValue;
+        }
+        #endregion public Collection<ResourceDictionary> Palette
+
+        /// <summary>
+        /// The pie data point style enumerator.
+        /// </summary>
+        private IEnumerator<ResourceDictionary> _resourceDictionaryEnumerator;
+
+#if !SILVERLIGHT
+        /// <summary>
+        /// Initializes the static members of the PieSeries class.
+        /// </summary>
+        static PieSeries()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(PieSeries), new FrameworkPropertyMetadata(typeof(PieSeries)));
         }
 
-        /// <summary>Initializes a new instance of the PieSeries class.</summary>
+#endif
+        /// <summary>
+        /// Initializes a new instance of the PieSeries class.
+        /// </summary>
         public PieSeries()
         {
-#if !MIGRATION
-            this.DefaultStyleKey = (object)typeof(PieSeries);
+#if SILVERLIGHT
+            this.DefaultStyleKey = typeof(PieSeries);
 #endif
             this.ResourceDictionaryDispenser = new ResourceDictionaryDispenser();
-            this.ResourceDictionaryDispenser.ResourceDictionariesChanged += (EventHandler)delegate
+            ResourceDictionaryDispenser.ResourceDictionariesChanged += delegate
             {
-                this.OnResourceDictionariesChanged(EventArgs.Empty);
+                OnResourceDictionariesChanged(EventArgs.Empty);
             };
-#if MIGRATION
-            this.DefaultStyleKey = (object)typeof(PieSeries);
-#endif
         }
 
-        /// <summary>Invokes the ResourceDictionariesChanged event.</summary>
+        /// <summary>
+        /// Invokes the ResourceDictionariesChanged event.
+        /// </summary>
         /// <param name="e">Event arguments.</param>
         protected virtual void OnResourceDictionariesChanged(EventArgs e)
         {
-            this.Refresh();
-            EventHandler dictionariesChanged = this.ResourceDictionariesChanged;
-            if (null == dictionariesChanged)
-                return;
-            dictionariesChanged((object)this, e);
+            // Update with new styles
+            Refresh();
+
+            // Forward event on to listeners
+            EventHandler handler = ResourceDictionariesChanged;
+            if (null != handler)
+            {
+                handler.Invoke(this, e);
+            }
         }
+
+        /// <summary>
+        /// A dictionary that links data points to their legend items.
+        /// </summary>
+        private Dictionary<DataPoint, LegendItem> _dataPointLegendItems = new Dictionary<DataPoint, LegendItem>();
 
         /// <summary>
         /// Accepts a ratio of a full rotation, the x and y length and returns
@@ -92,41 +127,51 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <returns>The corresponding 2D point.</returns>
         private static Point ConvertRatioOfRotationToPoint(double ratio, double radiusX, double radiusY)
         {
-            double num = (ratio * 360.0 - 90.0) * (Math.PI / 180.0);
-            return new Point(radiusX * Math.Cos(num), radiusY * Math.Sin(num));
+            double radians = (((ratio * 360) - 90) * (Math.PI / 180));
+            return new Point(radiusX * Math.Cos(radians), radiusY * Math.Sin(radians));
         }
 
-        /// <summary>Creates a legend item for each data point.</summary>
+        /// <summary>
+        /// Creates a legend item for each data point.
+        /// </summary>
         /// <param name="dataPoint">The data point added.</param>
         protected override void AddDataPoint(DataPoint dataPoint)
         {
             base.AddDataPoint(dataPoint);
             PieDataPoint pieDataPoint = (PieDataPoint)dataPoint;
-            int index = this.ActiveDataPoints.IndexOf((object)dataPoint) + 1;
-            LegendItem pieLegendItem = this.CreatePieLegendItem(dataPoint, index);
-            if (this._resourceDictionaryEnumerator == null)
-                this._resourceDictionaryEnumerator = DataPointSeries.GetResourceDictionaryWithTargetType((IResourceDictionaryDispenser)this, typeof(PieDataPoint), true);
-            if (this._resourceDictionaryEnumerator.MoveNext())
+
+            int index = ActiveDataPoints.IndexOf(dataPoint) + 1;
+            LegendItem legendItem = CreatePieLegendItem(dataPoint, index);
+
+            // Grab a style enumerator if we don't have one already.
+            if (_resourceDictionaryEnumerator == null)
             {
-                ResourceDictionary resourceDictionary = this._resourceDictionaryEnumerator.Current.ShallowCopy();
-                pieDataPoint.PaletteResources = resourceDictionary;
-                pieDataPoint.Resources.MergedDictionaries.Add(resourceDictionary);
+                _resourceDictionaryEnumerator = GetResourceDictionaryWithTargetType(this, typeof(PieDataPoint), true);
+            }
+
+            if (_resourceDictionaryEnumerator.MoveNext())
+            {
+                ResourceDictionary paletteResources =
+#if SILVERLIGHT
+                    _resourceDictionaryEnumerator.Current.ShallowCopy();
+#else
+                    _resourceDictionaryEnumerator.Current;
+#endif
+                pieDataPoint.PaletteResources = paletteResources;
+                pieDataPoint.Resources.MergedDictionaries.Add(paletteResources);
             }
             else
-                pieDataPoint.PaletteResources = (ResourceDictionary)null;
-            pieDataPoint.ActualDataPointStyle = this.DataPointStyle ?? pieDataPoint.Resources[(object)"DataPointStyle"] as Style;
-            pieDataPoint.SetBinding(FrameworkElement.StyleProperty, new Binding("ActualDataPointStyle")
             {
-                Source = (object)pieDataPoint
-            });
-            pieDataPoint.ActualLegendItemStyle = this.LegendItemStyle ?? pieDataPoint.Resources[(object)"LegendItemStyle"] as Style;
-            pieLegendItem.SetBinding(FrameworkElement.StyleProperty, new Binding("ActualLegendItemStyle")
-            {
-                Source = (object)pieDataPoint
-            });
-            this._dataPointLegendItems[dataPoint] = pieLegendItem;
-            this.LegendItems.Add((object)pieLegendItem);
-            this.UpdateLegendItemIndexes();
+                pieDataPoint.PaletteResources = null;
+            }
+            pieDataPoint.ActualDataPointStyle = DataPointStyle ?? pieDataPoint.Resources[DataPointStyleName] as Style;
+            pieDataPoint.SetBinding(PieDataPoint.StyleProperty, new Binding(PieDataPoint.ActualDataPointStyleName) { Source = pieDataPoint });
+            pieDataPoint.ActualLegendItemStyle = LegendItemStyle ?? (pieDataPoint.Resources[LegendItemStyleName] as Style);
+            legendItem.SetBinding(LegendItem.StyleProperty, new Binding(ActualLegendItemStyleName) { Source = pieDataPoint });
+
+            _dataPointLegendItems[dataPoint] = legendItem;
+            LegendItems.Add(legendItem);
+            UpdateLegendItemIndexes();
         }
 
         /// <summary>
@@ -136,34 +181,40 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected override void RemoveDataPoint(DataPoint dataPoint)
         {
             base.RemoveDataPoint(dataPoint);
-            if (dataPoint == null)
-                return;
-            LegendItem dataPointLegendItem = this._dataPointLegendItems[dataPoint];
-            this._dataPointLegendItems.Remove(dataPoint);
-            this.LegendItems.Remove((object)dataPointLegendItem);
-            this.UpdateLegendItemIndexes();
-        }
-
-        /// <summary>Creates a data point.</summary>
-        /// <returns>A data point.</returns>
-        protected override DataPoint CreateDataPoint()
-        {
-            return (DataPoint)new PieDataPoint();
-        }
-
-        /// <summary>Gets the active pie data points.</summary>
-        private IEnumerable<PieDataPoint> ActivePieDataPoints
-        {
-            get
+            if (dataPoint != null)
             {
-                return this.ActiveDataPoints.OfType<PieDataPoint>();
+                LegendItem legendItem = _dataPointLegendItems[dataPoint];
+                _dataPointLegendItems.Remove(dataPoint);
+
+                LegendItems.Remove(legendItem);
+                UpdateLegendItemIndexes();
             }
         }
 
-        /// <summary>Updates all ratios before data points are updated.</summary>
+        /// <summary>
+        /// Creates a data point.
+        /// </summary>
+        /// <returns>A data point.</returns>
+        protected override DataPoint CreateDataPoint()
+        {
+            return new PieDataPoint();
+        }
+
+        /// <summary>
+        /// Gets the active pie data points.
+        /// </summary>
+        private IEnumerable<PieDataPoint> ActivePieDataPoints
+        {
+            get { return ActiveDataPoints.OfType<PieDataPoint>(); }
+        }
+
+        /// <summary>
+        /// Updates all ratios before data points are updated.
+        /// </summary>
         protected override void OnBeforeUpdateDataPoints()
         {
-            this.UpdateRatios();
+            UpdateRatios();
+
             base.OnBeforeUpdateDataPoints();
         }
 
@@ -174,7 +225,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="oldDataPoints">Old inactive data points.</param>
         protected override void OnDataPointsChanged(IList<DataPoint> newDataPoints, IList<DataPoint> oldDataPoints)
         {
-            this.UpdateDataPoints((IEnumerable<DataPoint>)newDataPoints);
+            UpdateDataPoints(newDataPoints);
             base.OnDataPointsChanged(newDataPoints, oldDataPoints);
         }
 
@@ -183,165 +234,199 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         private void UpdateLegendItemIndexes()
         {
-            int num = 0;
-            foreach (DataPoint activeDataPoint in this.ActiveDataPoints)
+            int index = 0;
+            foreach (DataPoint dataPoint in ActiveDataPoints)
             {
-                this._dataPointLegendItems[activeDataPoint].Content = activeDataPoint.IndependentValue ?? (object)(num + 1);
-                ++num;
+                LegendItem legendItem = _dataPointLegendItems[dataPoint];
+                legendItem.Content = dataPoint.IndependentValue ?? (index + 1);
+                index++;
             }
         }
 
-        /// <summary>Updates the ratios of each data point.</summary>
+        /// <summary>
+        /// Updates the ratios of each data point.
+        /// </summary>
         private void UpdateRatios()
         {
-            double num1 = this.ActivePieDataPoints.Select<PieDataPoint, double>((Func<PieDataPoint, double>)(pieDataPoint => Math.Abs(ValueHelper.ToDouble((object)pieDataPoint.DependentValue)))).Sum();
-            double num2 = 0.0;
-            foreach (PieDataPoint activePieDataPoint in this.ActivePieDataPoints)
+            double sum = ActivePieDataPoints.Select(pieDataPoint => Math.Abs(ValueHelper.ToDouble(pieDataPoint.DependentValue))).Sum();
+
+            // Priming the loop by calculating initial value of 
+            // offset ratio and its corresponding points.
+            double offsetRatio = 0;
+            foreach (PieDataPoint dataPoint in ActivePieDataPoints)
             {
-                double num3 = Math.Abs(ValueHelper.ToDouble((object)activePieDataPoint.DependentValue)) / num1;
-                if (!ValueHelper.CanGraph(num3))
-                    num3 = 0.0;
-                activePieDataPoint.Ratio = num3;
-                activePieDataPoint.OffsetRatio = num2;
-                num2 += num3;
+                double dependentValue = Math.Abs(ValueHelper.ToDouble(dataPoint.DependentValue));
+                double ratio = dependentValue / sum;
+                if (!ValueHelper.CanGraph(ratio))
+                {
+                    ratio = 0.0;
+                }
+                dataPoint.Ratio = ratio;
+                dataPoint.OffsetRatio = offsetRatio;
+                offsetRatio += ratio;
             }
         }
 
-        /// <summary>Updates a data point.</summary>
+        /// <summary>
+        /// Updates a data point.
+        /// </summary>
         /// <param name="dataPoint">The data point to update.</param>
         protected override void UpdateDataPoint(DataPoint dataPoint)
         {
-            PieDataPoint pieDataPoint = (PieDataPoint)dataPoint;
-            pieDataPoint.Width = this.ActualWidth;
-            pieDataPoint.Height = this.ActualHeight;
-            PieSeries.UpdatePieDataPointGeometry(pieDataPoint, this.ActualWidth, this.ActualHeight);
-            Canvas.SetLeft((UIElement)pieDataPoint, 0.0);
-            Canvas.SetTop((UIElement)pieDataPoint, 0.0);
+            PieDataPoint pieDataPoint = (PieDataPoint) dataPoint;
+            pieDataPoint.Width = ActualWidth;
+            pieDataPoint.Height = ActualHeight;
+            UpdatePieDataPointGeometry(pieDataPoint, ActualWidth, ActualHeight);
+            Canvas.SetLeft(pieDataPoint, 0);
+            Canvas.SetTop(pieDataPoint, 0);
         }
 
-        /// <summary>Updates the PieDataPoint's Geometry property.</summary>
+        /// <summary>
+        /// Updates the PieDataPoint's Geometry property.
+        /// </summary>
         /// <param name="pieDataPoint">PieDataPoint instance.</param>
         /// <param name="plotAreaWidth">PlotArea width.</param>
         /// <param name="plotAreaHeight">PlotArea height.</param>
         internal static void UpdatePieDataPointGeometry(PieDataPoint pieDataPoint, double plotAreaWidth, double plotAreaHeight)
         {
-            double num = (plotAreaWidth < plotAreaHeight ? plotAreaWidth : plotAreaHeight) * 0.95 / 2.0 - 0.0;
-            Point offset = new Point(plotAreaWidth / 2.0, plotAreaHeight / 2.0);
-            if (pieDataPoint.ActualRatio == 1.0)
+            double diameter = (plotAreaWidth < plotAreaHeight) ? plotAreaWidth : plotAreaHeight;
+            diameter *= 0.95;
+            double plotAreaRadius = diameter / 2;
+            double maxDistanceFromCenter = 0.0;
+            double sliceRadius = plotAreaRadius - maxDistanceFromCenter;
+
+            Point translatePoint = new Point(plotAreaWidth / 2, plotAreaHeight / 2);
+
+            if (pieDataPoint.ActualRatio == 1)
             {
-                DependencyProperty[] dependencyPropertyArray = new DependencyProperty[3]
+                foreach (DependencyProperty dependencyProperty in new DependencyProperty[] { PieDataPoint.GeometryProperty, PieDataPoint.GeometrySelectionProperty, PieDataPoint.GeometryHighlightProperty })
                 {
-          PieDataPoint.GeometryProperty,
-          PieDataPoint.GeometrySelectionProperty,
-          PieDataPoint.GeometryHighlightProperty
-                };
-                foreach (DependencyProperty dp in dependencyPropertyArray)
-                {
-                    Geometry geometry = (Geometry)new EllipseGeometry()
-                    {
-                        Center = offset,
-                        RadiusX = num,
-                        RadiusY = num
-                    };
-                    pieDataPoint.SetValue(dp, (object)geometry);
+                    Geometry geometry =
+                        new EllipseGeometry
+                        {
+                            Center = translatePoint,
+                            RadiusX = sliceRadius,
+                            RadiusY = sliceRadius
+                        };
+                    pieDataPoint.SetValue(dependencyProperty, geometry);
                 }
-            }
-            else if (pieDataPoint.ActualRatio == 0.0)
-            {
-                pieDataPoint.Geometry = (Geometry)null;
-                pieDataPoint.GeometryHighlight = (Geometry)null;
-                pieDataPoint.GeometrySelection = (Geometry)null;
             }
             else
             {
-                double actualRatio = pieDataPoint.ActualRatio;
-                double actualOffsetRatio = pieDataPoint.ActualOffsetRatio;
-                double ratio = actualOffsetRatio + actualRatio;
-                Point point1 = PieSeries.ConvertRatioOfRotationToPoint(actualOffsetRatio, num, num).Translate(offset);
-                Point point2 = PieSeries.ConvertRatioOfRotationToPoint(ratio, num, num).Translate(offset);
-                DependencyProperty[] dependencyPropertyArray = new DependencyProperty[3]
+                if (pieDataPoint.ActualRatio == 0.0)
                 {
-          PieDataPoint.GeometryProperty,
-          PieDataPoint.GeometrySelectionProperty,
-          PieDataPoint.GeometryHighlightProperty
-                };
-                foreach (DependencyProperty dp in dependencyPropertyArray)
+                    pieDataPoint.Geometry = null;
+                    pieDataPoint.GeometryHighlight = null;
+                    pieDataPoint.GeometrySelection = null;
+                }
+                else
                 {
-                    PathFigure pathFigure = new PathFigure()
+                    double ratio = pieDataPoint.ActualRatio;
+                    double offsetRatio = pieDataPoint.ActualOffsetRatio;
+                    double currentRatio = offsetRatio + ratio;
+
+                    Point offsetRatioPoint = ConvertRatioOfRotationToPoint(offsetRatio, sliceRadius, sliceRadius);
+
+                    Point adjustedOffsetRatioPoint = offsetRatioPoint.Translate(translatePoint);
+
+                    // Calculate the last clockwise point in the pie slice
+                    Point currentRatioPoint =
+                        ConvertRatioOfRotationToPoint(currentRatio, sliceRadius, sliceRadius);
+
+                    // Adjust point using center of plot area as origin
+                    // instead of 0,0
+                    Point adjustedCurrentRatioPoint =
+                        currentRatioPoint.Translate(translatePoint);
+
+                    foreach (DependencyProperty dependencyProperty in new DependencyProperty[] { PieDataPoint.GeometryProperty, PieDataPoint.GeometrySelectionProperty, PieDataPoint.GeometryHighlightProperty })
                     {
-                        IsClosed = true
-                    };
-                    pathFigure.StartPoint = offset;
-                    pathFigure.Segments.Add((PathSegment)new LineSegment()
-                    {
-                        Point = point1
-                    });
-                    bool flag = ratio - actualOffsetRatio > 0.5;
-                    pathFigure.Segments.Add((PathSegment)new ArcSegment()
-                    {
-                        Point = point2,
-                        IsLargeArc = flag,
-                        Size = new Size(num, num),
-                        SweepDirection = SweepDirection.Clockwise
-                    });
-                    PathGeometry pathGeometry = new PathGeometry();
-                    pathGeometry.Figures.Add(pathFigure);
-                    pieDataPoint.SetValue(dp, (object)pathGeometry);
+                        // Creating the pie slice geometry object
+                        PathFigure pathFigure = new PathFigure { IsClosed = true };
+                        pathFigure.StartPoint = translatePoint;
+                        pathFigure.Segments.Add(new LineSegment { Point = adjustedOffsetRatioPoint });
+                        bool isLargeArc = (currentRatio - offsetRatio) > 0.5;
+                        pathFigure.Segments.Add(
+                            new ArcSegment
+                            {
+                                Point = adjustedCurrentRatioPoint,
+                                IsLargeArc = isLargeArc,
+                                Size = new Size(sliceRadius, sliceRadius),
+                                SweepDirection = SweepDirection.Clockwise
+                            });
+
+                        PathGeometry pathGeometry = new PathGeometry();
+                        pathGeometry.Figures.Add(pathFigure);
+                        pieDataPoint.SetValue(dependencyProperty, pathGeometry);
+                    }
                 }
             }
         }
 
-        /// <summary>Creates a legend item from a data point.</summary>
+        /// <summary>
+        /// Creates a legend item from a data point.
+        /// </summary>
         /// <param name="dataPoint">The data point to use to create the legend item.</param>
         /// <param name="index">The 1-based index of the Control.</param>
         /// <returns>The series host legend item.</returns>
         protected virtual LegendItem CreatePieLegendItem(DataPoint dataPoint, int index)
         {
-            LegendItem legendItem = this.CreateLegendItem((DataPointSeries)this);
-            legendItem.Content = dataPoint.IndependentValue ?? (object)index;
-            DataPoint dataPoint1 = this.CreateDataPoint();
-            dataPoint1.DataContext = dataPoint.DataContext;
-            if (null != this.PlotArea)
+            LegendItem legendItem = CreateLegendItem(this);
+            // Set the Content of the LegendItem
+            legendItem.Content = dataPoint.IndependentValue ?? index;
+            // Create a representative DataPoint for access to styled properties
+            DataPoint legendDataPoint = CreateDataPoint();
+            legendDataPoint.DataContext = dataPoint.DataContext;
+            if (null != PlotArea)
             {
-                this.PlotArea.Children.Add((UIElement)dataPoint1);
-                this.PlotArea.Children.Remove((UIElement)dataPoint1);
+                // Bounce into the visual tree to get default Style applied
+                PlotArea.Children.Add(legendDataPoint);
+                PlotArea.Children.Remove(legendDataPoint);
             }
-            dataPoint1.SetBinding(FrameworkElement.StyleProperty, new Binding("ActualDataPointStyle")
-            {
-                Source = (object)dataPoint
-            });
-            legendItem.DataContext = (object)dataPoint1;
+            legendDataPoint.SetBinding(DataPoint.StyleProperty, new Binding(PieDataPoint.ActualDataPointStyleName) { Source = dataPoint });
+            legendItem.DataContext = legendDataPoint;
             return legendItem;
         }
 
-        /// <summary>Attach event handlers to a data point.</summary>
+        /// <summary>
+        /// Attach event handlers to a data point.
+        /// </summary>
         /// <param name="dataPoint">The data point.</param>
         protected override void AttachEventHandlersToDataPoint(DataPoint dataPoint)
         {
             PieDataPoint pieDataPoint = dataPoint as PieDataPoint;
-            pieDataPoint.ActualRatioChanged += new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointActualRatioChanged);
-            pieDataPoint.ActualOffsetRatioChanged += new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointActualOffsetRatioChanged);
-            pieDataPoint.RatioChanged += new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointRatioChanged);
-            pieDataPoint.OffsetRatioChanged += new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointOffsetRatioChanged);
+
+            pieDataPoint.ActualRatioChanged += OnPieDataPointActualRatioChanged;
+            pieDataPoint.ActualOffsetRatioChanged += OnPieDataPointActualOffsetRatioChanged;
+            pieDataPoint.RatioChanged += OnPieDataPointRatioChanged;
+            pieDataPoint.OffsetRatioChanged += OnPieDataPointOffsetRatioChanged;
+
             base.AttachEventHandlersToDataPoint(dataPoint);
         }
 
-        /// <summary>Detaches event handlers from a data point.</summary>
+        /// <summary>
+        /// Detaches event handlers from a data point.
+        /// </summary>
         /// <param name="dataPoint">The data point.</param>
         protected override void DetachEventHandlersFromDataPoint(DataPoint dataPoint)
         {
             PieDataPoint pieDataPoint = dataPoint as PieDataPoint;
-            pieDataPoint.ActualRatioChanged -= new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointActualRatioChanged);
-            pieDataPoint.ActualOffsetRatioChanged -= new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointActualOffsetRatioChanged);
-            pieDataPoint.RatioChanged -= new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointRatioChanged);
-            pieDataPoint.OffsetRatioChanged -= new RoutedPropertyChangedEventHandler<double>(this.OnPieDataPointOffsetRatioChanged);
+
+            pieDataPoint.ActualRatioChanged -= OnPieDataPointActualRatioChanged;
+            pieDataPoint.ActualOffsetRatioChanged -= OnPieDataPointActualOffsetRatioChanged;
+            pieDataPoint.RatioChanged -= OnPieDataPointRatioChanged;
+            pieDataPoint.OffsetRatioChanged -= OnPieDataPointOffsetRatioChanged;
+
             base.DetachEventHandlersFromDataPoint(dataPoint);
         }
 
-        /// <summary>This method updates the global series index property.</summary>
+        /// <summary>
+        /// This method updates the global series index property.
+        /// </summary>
         /// <param name="globalIndex">The global index of the series.</param>
         public void GlobalSeriesIndexChanged(int? globalIndex)
         {
+            // Do nothing because we want to use up an index but do nothing 
+            // with it.
         }
 
         /// <summary>
@@ -352,7 +437,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         protected override void OnDataPointDependentValueChanged(DataPoint dataPoint, IComparable oldValue, IComparable newValue)
         {
-            this.UpdateRatios();
+            UpdateRatios();
             base.OnDataPointDependentValueChanged(dataPoint, oldValue, newValue);
         }
 
@@ -364,7 +449,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         protected override void OnDataPointIndependentValueChanged(DataPoint dataPoint, object oldValue, object newValue)
         {
-            this._dataPointLegendItems[dataPoint].Content = newValue;
+            _dataPointLegendItems[dataPoint].Content = newValue;
             base.OnDataPointIndependentValueChanged(dataPoint, oldValue, newValue);
         }
 
@@ -376,7 +461,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="args">Information about the event.</param>
         private void OnPieDataPointActualRatioChanged(object sender, RoutedPropertyChangedEventArgs<double> args)
         {
-            this.UpdateDataPoint(sender as DataPoint);
+            UpdateDataPoint(sender as DataPoint);
         }
 
         /// <summary>
@@ -387,7 +472,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="args">Information about the event.</param>
         private void OnPieDataPointActualOffsetRatioChanged(object sender, RoutedPropertyChangedEventArgs<double> args)
         {
-            this.UpdateDataPoint(sender as DataPoint);
+            UpdateDataPoint(sender as DataPoint);
         }
 
         /// <summary>
@@ -397,22 +482,24 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="args">Information about the event.</param>
         private void OnPieDataPointRatioChanged(object sender, RoutedPropertyChangedEventArgs<double> args)
         {
-            (sender as DataPoint).BeginAnimation(PieDataPoint.ActualRatioProperty, "ActualRatio", (object)args.NewValue, this.TransitionDuration, this.TransitionEasingFunction);
+            DataPoint dataPoint = sender as DataPoint;
+            dataPoint.BeginAnimation(PieDataPoint.ActualRatioProperty, "ActualRatio", args.NewValue, TransitionDuration, this.TransitionEasingFunction);
         }
 
         /// <summary>
-        /// Updates the data point when the pie data point's offset ratio is
+        /// Updates the data point when the pie data point's offset ratio is 
         /// changed.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="args">Information about the event.</param>
         private void OnPieDataPointOffsetRatioChanged(object sender, RoutedPropertyChangedEventArgs<double> args)
         {
-            (sender as DataPoint).BeginAnimation(PieDataPoint.ActualOffsetRatioProperty, "ActualOffsetRatio", (object)args.NewValue, this.TransitionDuration, this.TransitionEasingFunction);
+            DataPoint dataPoint = sender as DataPoint;
+            dataPoint.BeginAnimation(PieDataPoint.ActualOffsetRatioProperty, "ActualOffsetRatio", args.NewValue, TransitionDuration, this.TransitionEasingFunction);
         }
 
         /// <summary>
-        /// Gets or sets an object used to dispense styles from the style
+        /// Gets or sets an object used to dispense styles from the style 
         /// palette.
         /// </summary>
         private ResourceDictionaryDispenser ResourceDictionaryDispenser { get; set; }
@@ -433,7 +520,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <returns>An enumerator of ResourceDictionaries.</returns>
         public IEnumerator<ResourceDictionary> GetResourceDictionariesWhere(Func<ResourceDictionary, bool> predicate)
         {
-            return this.ResourceDictionaryDispenser.GetResourceDictionariesWhere(predicate);
+            return ResourceDictionaryDispenser.GetResourceDictionariesWhere(predicate);
         }
 
         /// <summary>
@@ -444,16 +531,27 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected override void OnSeriesHostPropertyChanged(ISeriesHost oldValue, ISeriesHost newValue)
         {
             base.OnSeriesHostPropertyChanged(oldValue, newValue);
+
             if (null != oldValue)
-                oldValue.ResourceDictionariesChanged -= new EventHandler(this.SeriesHostResourceDictionariesChanged);
-            if (null != newValue)
-                newValue.ResourceDictionariesChanged += new EventHandler(this.SeriesHostResourceDictionariesChanged);
-            else if (null != this._resourceDictionaryEnumerator)
             {
-                this._resourceDictionaryEnumerator.Dispose();
-                this._resourceDictionaryEnumerator = (IEnumerator<ResourceDictionary>)null;
+                oldValue.ResourceDictionariesChanged -= new EventHandler(SeriesHostResourceDictionariesChanged);
             }
-            this.ResourceDictionaryDispenser.Parent = (IResourceDictionaryDispenser)newValue;
+
+            if (null != newValue)
+            {
+                newValue.ResourceDictionariesChanged += new EventHandler(SeriesHostResourceDictionariesChanged);
+            }
+            else
+            {
+                // Dispose of the enumerator.
+                if (null != _resourceDictionaryEnumerator)
+                {
+                    _resourceDictionaryEnumerator.Dispose();
+                    _resourceDictionaryEnumerator = null;
+                }
+            }
+
+            this.ResourceDictionaryDispenser.Parent = newValue;
         }
 
         /// <summary>
@@ -463,16 +561,21 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event args.</param>
         private void SeriesHostResourceDictionariesChanged(object sender, EventArgs e)
         {
-            this.Refresh();
+            Refresh();
         }
 
-        /// <summary>DataPointStyleProperty property changed handler.</summary>
+        /// <summary>
+        /// DataPointStyleProperty property changed handler.
+        /// </summary>
         /// <param name="oldValue">Old value.</param>
         /// <param name="newValue">New value.</param>
         protected override void OnDataPointStylePropertyChanged(Style oldValue, Style newValue)
         {
-            foreach (PieDataPoint activeDataPoint in this.ActiveDataPoints)
-                activeDataPoint.ActualDataPointStyle = newValue ?? activeDataPoint.Resources[(object)"DataPointStyle"] as Style;
+            // Propagate change
+            foreach (PieDataPoint pieDataPoint in ActiveDataPoints)
+            {
+                pieDataPoint.ActualDataPointStyle = newValue ?? (pieDataPoint.Resources[DataPointStyleName] as Style);
+            }
             base.OnDataPointStylePropertyChanged(oldValue, newValue);
         }
 
@@ -483,8 +586,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">New value.</param>
         protected override void OnLegendItemStylePropertyChanged(Style oldValue, Style newValue)
         {
-            foreach (PieDataPoint activeDataPoint in this.ActiveDataPoints)
-                activeDataPoint.ActualLegendItemStyle = newValue ?? activeDataPoint.Resources[(object)"LegendItemStyle"] as Style;
+            // Propagate change
+            foreach (PieDataPoint pieDataPoint in ActiveDataPoints)
+            {
+                pieDataPoint.ActualLegendItemStyle = newValue ?? (pieDataPoint.Resources[LegendItemStyleName] as Style);
+            }
             base.OnLegendItemStylePropertyChanged(oldValue, newValue);
         }
     }

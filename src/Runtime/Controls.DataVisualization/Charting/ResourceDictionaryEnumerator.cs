@@ -1,29 +1,46 @@
-﻿using System.Collections;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
 using System.Collections.Generic;
-using System.Text;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
-    internal class ResourceDictionaryEnumerator : IEnumerator<ResourceDictionary>, IDisposable, IEnumerator
+    /// <summary>
+    /// An enumerator that dispenses ResourceDictionaries sequentially by coordinating with
+    /// related enumerators.  Enumerators are related through an association
+    /// with a parent ResourceDictionaryDispenser class.
+    /// </summary>
+    internal class ResourceDictionaryEnumerator : IEnumerator<ResourceDictionary>
     {
         /// <summary>
         /// The index of current item in the ResourceDictionaryDispenser's list.
         /// </summary>
         private int? index;
-        /// <summary>The parent enumerator.</summary>
-        private IEnumerator<ResourceDictionary> _parentEnumerator;
 
-        /// <summary>Gets or sets the current ResourceDictionary.</summary>
+        /// <summary>
+        /// Gets or sets the current ResourceDictionary.
+        /// </summary>
         private ResourceDictionary CurrentResourceDictionary { get; set; }
 
-        /// <summary>Gets the parent enumerator.</summary>
+        /// <summary>
+        /// The parent enumerator.
+        /// </summary>
+        private IEnumerator<ResourceDictionary> _parentEnumerator;
+
+        /// <summary>
+        /// Gets the parent enumerator.
+        /// </summary>
         private IEnumerator<ResourceDictionary> ParentEnumerator
         {
             get
             {
-                if (this._parentEnumerator == null && this.ResourceDictionaryDispenser.Parent != null)
-                    this._parentEnumerator = this.ResourceDictionaryDispenser.Parent.GetResourceDictionariesWhere(this.Predicate);
-                return this._parentEnumerator;
+                if (_parentEnumerator == null && ResourceDictionaryDispenser.Parent != null)
+                {
+                    _parentEnumerator = ResourceDictionaryDispenser.Parent.GetResourceDictionariesWhere(Predicate);
+                }
+                return _parentEnumerator;
             }
         }
 
@@ -36,14 +53,16 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// ResourceDictionaries to return.</param>
         public ResourceDictionaryEnumerator(ResourceDictionaryDispenser dispenser, Func<ResourceDictionary, bool> predicate)
         {
-            this.ResourceDictionaryDispenser = dispenser;
-            this.Predicate = predicate;
+            ResourceDictionaryDispenser = dispenser;
+            Predicate = predicate;
         }
 
-        /// <summary>Called when the parent has changed.</summary>
+        /// <summary>
+        /// Called when the parent has changed.
+        /// </summary>
         internal void ResourceDictionaryDispenserParentChanged()
         {
-            this._parentEnumerator = (IEnumerator<ResourceDictionary>)null;
+            _parentEnumerator = null;
         }
 
         /// <summary>
@@ -53,30 +72,44 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <returns>The index of the next suitable ResourceDictionary.</returns>
         private int? GetIndexOfNextSuitableResourceDictionary(int startIndex)
         {
-            if (this.ResourceDictionaryDispenser.ResourceDictionaries == null || this.ResourceDictionaryDispenser.ResourceDictionaries.Count == 0)
-                return new int?();
-            if (startIndex >= this.ResourceDictionaryDispenser.ResourceDictionaries.Count)
-                startIndex = 0;
-            int index = startIndex;
-            while (!this.Predicate(this.ResourceDictionaryDispenser.ResourceDictionaries[index]))
+            if (ResourceDictionaryDispenser.ResourceDictionaries == null || ResourceDictionaryDispenser.ResourceDictionaries.Count == 0)
             {
-                index = (index + 1) % this.ResourceDictionaryDispenser.ResourceDictionaries.Count;
-                if (startIndex == index)
-                    return new int?();
+                return new int?();
             }
-            return new int?(index);
-        }
 
-        /// <summary>Resets the dispenser.</summary>
-        internal void ResourceDictionaryDispenserResetting()
-        {
-            if (this.ShouldRetrieveFromParentEnumerator)
-                return;
-            this.index = new int?();
+            if (startIndex >= ResourceDictionaryDispenser.ResourceDictionaries.Count)
+            {
+                startIndex = 0;
+            }
+
+            int counter = startIndex;
+            do
+            {
+                if (Predicate(ResourceDictionaryDispenser.ResourceDictionaries[counter]))
+                {
+                    return counter;
+                }
+
+                counter = (counter + 1) % ResourceDictionaryDispenser.ResourceDictionaries.Count;
+            }
+            while (startIndex != counter);
+
+            return new int?();
         }
 
         /// <summary>
-        /// Gets or sets a predicate that returns a value indicating whether a
+        /// Resets the dispenser.
+        /// </summary>
+        internal void ResourceDictionaryDispenserResetting()
+        {
+            if (!ShouldRetrieveFromParentEnumerator)
+            {
+                index = new int?();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a predicate that returns a value indicating whether a 
         /// ResourceDictionary should be returned by this enumerator.
         /// </summary>
         /// <returns>A value indicating whether a ResourceDictionary can be returned by this
@@ -94,56 +127,74 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Information about the event.</param>
         internal void ResourceDictionaryDispenserResourceDictionaryDispensed(object sender, ResourceDictionaryDispensedEventArgs e)
         {
-            if (this.ShouldRetrieveFromParentEnumerator || !this.Predicate(e.ResourceDictionary))
-                return;
-            int? nullable = this.index;
-            nullable = this.GetIndexOfNextSuitableResourceDictionary(nullable ?? 0);
-            if ((nullable ?? -1) == e.Index)
-                this.index = new int?((e.Index + 1) % this.ResourceDictionaryDispenser.ResourceDictionaries.Count);
-        }
-
-        /// <summary>Raises the EnumeratorResourceDictionaryDispensed.</summary>
-        /// <param name="args">Information about the ResourceDictionary dispensed.</param>
-        protected virtual void OnStyleDispensed(ResourceDictionaryDispensedEventArgs args)
-        {
-            this.ResourceDictionaryDispenser.EnumeratorResourceDictionaryDispensed((object)this, args);
-        }
-
-        /// <summary>Gets the dispenser that dispensed this enumerator.</summary>
-        public ResourceDictionaryDispenser ResourceDictionaryDispenser { get; private set; }
-
-        /// <summary>Gets the current ResourceDictionary.</summary>
-        public ResourceDictionary Current
-        {
-            get
+            if (!ShouldRetrieveFromParentEnumerator && Predicate(e.ResourceDictionary))
             {
-                return this.CurrentResourceDictionary;
+                int? nextStyleIndex = GetIndexOfNextSuitableResourceDictionary(index ?? 0);
+                if ((nextStyleIndex ?? -1) == e.Index)
+                {
+                    index = (e.Index + 1) % ResourceDictionaryDispenser.ResourceDictionaries.Count;
+                }
             }
         }
 
-        object IEnumerator.Current => (object)this.CurrentResourceDictionary;
+        /// <summary>
+        /// Raises the EnumeratorResourceDictionaryDispensed.
+        /// </summary>
+        /// <param name="args">Information about the ResourceDictionary dispensed.</param>
+        protected virtual void OnStyleDispensed(ResourceDictionaryDispensedEventArgs args)
+        {
+            ResourceDictionaryDispenser.EnumeratorResourceDictionaryDispensed(this, args);
+        }
 
-        /// <summary>Moves to the next ResourceDictionary.</summary>
+        /// <summary>
+        /// Gets the dispenser that dispensed this enumerator.
+        /// </summary>
+        public ResourceDictionaryDispenser ResourceDictionaryDispenser { get; private set; }
+
+        /// <summary>
+        /// Gets the current ResourceDictionary.
+        /// </summary>
+        public ResourceDictionary Current
+        {
+            get { return CurrentResourceDictionary; }
+        }
+
+        /// <summary>
+        /// Gets the current ResourceDictionary.
+        /// </summary>
+        object System.Collections.IEnumerator.Current
+        {
+            get { return CurrentResourceDictionary; }
+        }
+
+        /// <summary>
+        /// Moves to the next ResourceDictionary.
+        /// </summary>
         /// <returns>A value indicating whether there are any more suitable
         /// ResourceDictionary.</returns>
         public bool MoveNext()
         {
-            if (this.ShouldRetrieveFromParentEnumerator && this.ParentEnumerator != null)
+            if (ShouldRetrieveFromParentEnumerator && ParentEnumerator != null)
             {
-                bool flag = this.ParentEnumerator.MoveNext();
-                if (flag)
-                    this.CurrentResourceDictionary = this.ParentEnumerator.Current;
-                return flag;
+                bool isMore = ParentEnumerator.MoveNext();
+                if (isMore)
+                {
+                    this.CurrentResourceDictionary = ParentEnumerator.Current;
+                }
+                return isMore;
             }
-            this.index = this.GetIndexOfNextSuitableResourceDictionary(this.index ?? 0);
-            if (!this.index.HasValue)
+
+            index = GetIndexOfNextSuitableResourceDictionary(index ?? 0);
+            if (index == null)
             {
-                this.CurrentResourceDictionary = (ResourceDictionary)null;
-                this.Dispose();
+                CurrentResourceDictionary = null;
+                Dispose();
                 return false;
             }
-            this.CurrentResourceDictionary = this.ResourceDictionaryDispenser.ResourceDictionaries[this.index.Value];
-            this.OnStyleDispensed(new ResourceDictionaryDispensedEventArgs(this.index.Value, this.CurrentResourceDictionary));
+            
+            CurrentResourceDictionary = ResourceDictionaryDispenser.ResourceDictionaries[index.Value];
+            OnStyleDispensed(new ResourceDictionaryDispensedEventArgs(index.Value, CurrentResourceDictionary));
+
             return true;
         }
 
@@ -153,25 +204,29 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         private bool ShouldRetrieveFromParentEnumerator
         {
-            get
-            {
-                return this.ResourceDictionaryDispenser.ResourceDictionaries == null;
-            }
+            get { return this.ResourceDictionaryDispenser.ResourceDictionaries == null; }
         }
 
-        /// <summary>Resets the enumerator.</summary>
+        /// <summary>
+        /// Resets the enumerator.
+        /// </summary>
         public void Reset()
         {
-            throw new NotSupportedException("Can't reset enumerator, reset dispenser instead");
+            throw new NotSupportedException(OpenSilver.Controls.DataVisualization.Properties.Resources.ResourceDictionaryEnumerator_CantResetEnumeratorResetDispenserInstead);
         }
 
-        /// <summary>Stops listening to the dispenser.</summary>
+        /// <summary>
+        /// Stops listening to the dispenser.
+        /// </summary>
         public void Dispose()
         {
-            if (this._parentEnumerator != null)
-                this._parentEnumerator.Dispose();
+            if (_parentEnumerator != null)
+            {
+                _parentEnumerator.Dispose();
+            }
+
             this.ResourceDictionaryDispenser.Unregister(this);
-            GC.SuppressFinalize((object)this);
+            GC.SuppressFinalize(this);
         }
     }
 }

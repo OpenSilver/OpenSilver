@@ -1,5 +1,11 @@
-﻿using System.Collections.Generic;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace System.Windows.Controls.DataVisualization.Collections
@@ -29,36 +35,45 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <param name="allowDuplicateValues">The parameter is not used.</param>
         /// <param name="keyEqualityComparer">The parameter is not used.</param>
         /// <param name="valueEqualityComparer">The parameter is not used.</param>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "allowDuplicateValues", Justification = "Unused parameter exists for API compatibility.")]
         public MultipleDictionary(bool allowDuplicateValues, IEqualityComparer<TKey> keyEqualityComparer, IEqualityComparer<TValue> valueEqualityComparer)
         {
             Debug.Assert(null != keyEqualityComparer, "keyEqualityComparer must not be null.");
             Debug.Assert(null != valueEqualityComparer, "valueEqualityComparer must not be null.");
-            this.BinaryTree = new LeftLeaningRedBlackTree<TKey, TValue>((Comparison<TKey>)((left, right) => keyEqualityComparer.GetHashCode(left).CompareTo(keyEqualityComparer.GetHashCode(right))), (Comparison<TValue>)((left, right) => valueEqualityComparer.GetHashCode(left).CompareTo(valueEqualityComparer.GetHashCode(right))));
+            BinaryTree = new LeftLeaningRedBlackTree<TKey, TValue>(
+                (left, right) => keyEqualityComparer.GetHashCode(left).CompareTo(keyEqualityComparer.GetHashCode(right)),
+                (left, right) => valueEqualityComparer.GetHashCode(left).CompareTo(valueEqualityComparer.GetHashCode(right)));
         }
 
-        /// <summary>Adds a key/value pair to the dictionary.</summary>
+        /// <summary>
+        /// Adds a key/value pair to the dictionary.
+        /// </summary>
         /// <param name="key">Key to add.</param>
         /// <param name="value">Value to add.</param>
         public void Add(TKey key, TValue value)
         {
-            this.BinaryTree.Add(key, value);
+            BinaryTree.Add(key, value);
         }
 
-        /// <summary>Removes a key/value pair from the dictionary.</summary>
+        /// <summary>
+        /// Removes a key/value pair from the dictionary.
+        /// </summary>
         /// <param name="key">Key to remove.</param>
         /// <param name="value">Value to remove.</param>
         /// <returns>True if the value was present and removed.</returns>
         public bool Remove(TKey key, TValue value)
         {
-            return this.BinaryTree.Remove(key, value);
+            return BinaryTree.Remove(key, value);
         }
 
-        /// <summary>Gets the count of values in the dictionary.</summary>
+        /// <summary>
+        /// Gets the count of values in the dictionary.
+        /// </summary>
         public int Count
         {
             get
             {
-                return this.BinaryTree.Count;
+                return BinaryTree.Count;
             }
         }
 
@@ -71,15 +86,16 @@ namespace System.Windows.Controls.DataVisualization.Collections
         {
             get
             {
-                return (ICollection<TValue>)this.BinaryTree.GetValuesForKey(key).ToList<TValue>();
+                return BinaryTree.GetValuesForKey(key).ToList();
             }
         }
 
-        /// <summary>Clears the items in the dictionary.</summary>
+        /// <summary>
+        /// Clears the items in the dictionary.
+        /// </summary>
         public void Clear()
         {
-            this.BinaryTree.Clear();
+            BinaryTree.Clear();
         }
     }
 }
-

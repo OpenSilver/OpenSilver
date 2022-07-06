@@ -1,6 +1,13 @@
-﻿using System.Collections;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace System.Windows.Controls.DataVisualization.Collections
 {
@@ -9,7 +16,8 @@ namespace System.Windows.Controls.DataVisualization.Collections
     /// </summary>
     /// <typeparam name="TKey">Type for keys.</typeparam>
     /// <typeparam name="TValue">Type for values.</typeparam>
-    internal class OrderedMultipleDictionary<TKey, TValue> : MultipleDictionary<TKey, TValue>, IEnumerable<TValue>, IEnumerable where TKey : IComparable
+    internal class OrderedMultipleDictionary<TKey, TValue> : MultipleDictionary<TKey, TValue>, IEnumerable<TValue>
+        where TKey : IComparable
     {
         /// <summary>
         /// Initializes a new instance of the MultipleDictionary class.
@@ -17,11 +25,12 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <param name="allowDuplicateValues">The parameter is not used.</param>
         /// <param name="keyComparison">Key comparison class.</param>
         /// <param name="valueComparison">Value comparison class.</param>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "allowDuplicateValues", Justification = "Unused parameter exists for API compatibility.")]
         public OrderedMultipleDictionary(bool allowDuplicateValues, Comparison<TKey> keyComparison, Comparison<TValue> valueComparison)
         {
             Debug.Assert(null != keyComparison, "keyComparison must not be null.");
             Debug.Assert(null != valueComparison, "valueComparison must not be null.");
-            this.BinaryTree = new LeftLeaningRedBlackTree<TKey, TValue>(keyComparison, valueComparison);
+            BinaryTree = new LeftLeaningRedBlackTree<TKey, TValue>(keyComparison, valueComparison);
         }
 
         /// <summary>
@@ -30,9 +39,14 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <returns>Range of keys.</returns>
         public Range<TKey> GetKeyRange()
         {
-            if (0 < this.BinaryTree.Count)
-                return new Range<TKey>(this.BinaryTree.MinimumKey, this.BinaryTree.MaximumKey);
-            return new Range<TKey>();
+            if (0 < BinaryTree.Count)
+            {
+                return new Range<TKey>(BinaryTree.MinimumKey, BinaryTree.MaximumKey);
+            }
+            else
+            {
+                return new Range<TKey>();
+            }
         }
 
         /// <summary>
@@ -41,21 +55,32 @@ namespace System.Windows.Controls.DataVisualization.Collections
         /// <returns>Tuple of the largest and smallest values.</returns>
         public Tuple<TValue, TValue> GetLargestAndSmallestValues()
         {
-            if (0 < this.BinaryTree.Count)
-                return new Tuple<TValue, TValue>(this.BinaryTree.MinimumValue, this.BinaryTree.MaximumValue);
-            return (Tuple<TValue, TValue>)null;
+            if (0 < BinaryTree.Count)
+            {
+                return new Tuple<TValue, TValue>(BinaryTree.MinimumValue, BinaryTree.MaximumValue);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        /// <summary>Gets an enumerator for the values in the dictionary.</summary>
+        /// <summary>
+        /// Gets an enumerator for the values in the dictionary.
+        /// </summary>
         /// <returns>Enumerator for values.</returns>
         public IEnumerator<TValue> GetEnumerator()
         {
-            return this.BinaryTree.GetValuesForAllKeys().GetEnumerator();
+            return BinaryTree.GetValuesForAllKeys().GetEnumerator();
         }
 
+        /// <summary>
+        /// Gets an enumerator for the values in the dictionary.
+        /// </summary>
+        /// <returns>Enumerator for the values.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return (IEnumerator)this.BinaryTree.GetValuesForAllKeys().GetEnumerator();
+            return BinaryTree.GetValuesForAllKeys().GetEnumerator();
         }
     }
 }

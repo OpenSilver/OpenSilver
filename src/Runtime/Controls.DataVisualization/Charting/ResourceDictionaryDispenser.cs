@@ -1,27 +1,39 @@
-﻿using System;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
+    /// <summary>
+    /// A class that rotates through a list of ResourceDictionaries.
+    /// </summary>
     internal class ResourceDictionaryDispenser : IResourceDictionaryDispenser
     {
-        /// <summary>A linked list of ResourceDictionaries dispensed.</summary>
+        /// <summary>
+        /// A linked list of ResourceDictionaries dispensed.
+        /// </summary>
         private LinkedList<ResourceDictionaryDispensedEventArgs> _resourceDictionariesDispensed = new LinkedList<ResourceDictionaryDispensedEventArgs>();
+
         /// <summary>
         /// A bag of weak references to connected style enumerators.
         /// </summary>
         private WeakReferenceBag<ResourceDictionaryEnumerator> _resourceDictionaryEnumerators = new WeakReferenceBag<ResourceDictionaryEnumerator>();
+
         /// <summary>
-        /// Value indicating whether to ignore that the enumerator has
+        /// Value indicating whether to ignore that the enumerator has 
         /// dispensed a ResourceDictionary.
         /// </summary>
         private bool _ignoreResourceDictionaryDispensedByEnumerator;
-        /// <summary>The list of ResourceDictionaries of rotate.</summary>
+
+        /// <summary>
+        /// The list of ResourceDictionaries of rotate.
+        /// </summary>
         private IList<ResourceDictionary> _resourceDictionaries;
-        /// <summary>The parent of the ResourceDictionaryDispenser.</summary>
-        private IResourceDictionaryDispenser _parent;
 
         /// <summary>
         /// Gets or sets the list of ResourceDictionaries to rotate.
@@ -30,20 +42,30 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             get
             {
-                return this._resourceDictionaries;
+                return _resourceDictionaries;
             }
             set
             {
-                if (value == this._resourceDictionaries)
-                    return;
-                INotifyCollectionChanged resourceDictionaries1 = this._resourceDictionaries as INotifyCollectionChanged;
-                if (resourceDictionaries1 != null)
-                    resourceDictionaries1.CollectionChanged -= new NotifyCollectionChangedEventHandler(this.ResourceDictionariesCollectionChanged);
-                this._resourceDictionaries = value;
-                INotifyCollectionChanged resourceDictionaries2 = this._resourceDictionaries as INotifyCollectionChanged;
-                if (resourceDictionaries2 != null)
-                    resourceDictionaries2.CollectionChanged += new NotifyCollectionChangedEventHandler(this.ResourceDictionariesCollectionChanged);
-                this.Reset();
+                if (value != _resourceDictionaries)
+                {
+                    {
+                        INotifyCollectionChanged notifyCollectionChanged = _resourceDictionaries as INotifyCollectionChanged;
+                        if (notifyCollectionChanged != null)
+                        {
+                            notifyCollectionChanged.CollectionChanged -= ResourceDictionariesCollectionChanged;
+                        }
+                    }
+                    _resourceDictionaries = value;
+                    {
+                        INotifyCollectionChanged notifyCollectionChanged = _resourceDictionaries as INotifyCollectionChanged;
+                        if (notifyCollectionChanged != null)
+                        {
+                            notifyCollectionChanged.CollectionChanged += ResourceDictionariesCollectionChanged;
+                        }
+                    }
+
+                    Reset();
+                }
             }
         }
 
@@ -54,10 +76,16 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Information about the event.</param>
         private void ResourceDictionariesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add && this.ResourceDictionaries.Count - e.NewItems.Count == e.NewStartingIndex)
-                return;
-            this.Reset();
+            if (!(e.Action == NotifyCollectionChangedAction.Add && (this.ResourceDictionaries.Count - e.NewItems.Count) == e.NewStartingIndex))
+            {
+                Reset();
+            }
         }
+
+        /// <summary>
+        /// The parent of the ResourceDictionaryDispenser.
+        /// </summary>
+        private IResourceDictionaryDispenser _parent;
 
         /// <summary>
         /// Event that is invoked when the ResourceDictionaryDispenser's contents have changed.
@@ -71,19 +99,31 @@ namespace System.Windows.Controls.DataVisualization.Charting
         {
             get
             {
-                return this._parent;
+                return _parent;
             }
             set
             {
-                if (this._parent == value)
-                    return;
-                if (null != this._parent)
-                    this._parent.ResourceDictionariesChanged -= new EventHandler(this.ParentResourceDictionariesChanged);
-                this._parent = value;
-                if (null != this._parent)
-                    this._parent.ResourceDictionariesChanged += new EventHandler(this.ParentResourceDictionariesChanged);
-                this.OnParentChanged();
+                if (_parent != value)
+                {
+                    if (null != _parent)
+                    {
+                        _parent.ResourceDictionariesChanged -= new EventHandler(ParentResourceDictionariesChanged);
+                    }
+                    _parent = value;
+                    if (null != _parent)
+                    {
+                        _parent.ResourceDictionariesChanged += new EventHandler(ParentResourceDictionariesChanged);
+                    }
+                    OnParentChanged();
+                }
             }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the ResourceDictionaryDispenser class.
+        /// </summary>
+        public ResourceDictionaryDispenser()
+        {
         }
 
         /// <summary>
@@ -91,11 +131,14 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         private void Reset()
         {
-            this.OnResetting();
-            EventHandler dictionariesChanged = this.ResourceDictionariesChanged;
-            if (null == dictionariesChanged)
-                return;
-            dictionariesChanged((object)this, EventArgs.Empty);
+            OnResetting();
+
+            // Invoke event
+            EventHandler handler = ResourceDictionariesChanged;
+            if (null != handler)
+            {
+                handler.Invoke(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -104,7 +147,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="enumerator">The enumerator.</param>
         internal void Unregister(ResourceDictionaryEnumerator enumerator)
         {
-            this._resourceDictionaryEnumerators.Remove(enumerator);
+            _resourceDictionaryEnumerators.Remove(enumerator);
         }
 
         /// <summary>
@@ -116,21 +159,26 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="predicate">A predicate that returns a value indicating
         /// whether to return an item.</param>
         /// <returns>An enumerator of ResourceDictionaries.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Returning a usable enumerator instance.")]
         public IEnumerator<ResourceDictionary> GetResourceDictionariesWhere(Func<ResourceDictionary, bool> predicate)
         {
-            ResourceDictionaryEnumerator dictionaryEnumerator = new ResourceDictionaryEnumerator(this, predicate);
-            this._ignoreResourceDictionaryDispensedByEnumerator = true;
+            ResourceDictionaryEnumerator enumerator = new ResourceDictionaryEnumerator(this, predicate);
+
+            _ignoreResourceDictionaryDispensedByEnumerator = true;
             try
             {
-                foreach (ResourceDictionaryDispensedEventArgs e in this._resourceDictionariesDispensed)
-                    dictionaryEnumerator.ResourceDictionaryDispenserResourceDictionaryDispensed((object)this, e);
+                foreach (ResourceDictionaryDispensedEventArgs args in _resourceDictionariesDispensed)
+                {
+                    enumerator.ResourceDictionaryDispenserResourceDictionaryDispensed(this, args);
+                }
             }
             finally
             {
-                this._ignoreResourceDictionaryDispensedByEnumerator = false;
+                _ignoreResourceDictionaryDispensedByEnumerator = false;
             }
-            this._resourceDictionaryEnumerators.Add(dictionaryEnumerator);
-            return (IEnumerator<ResourceDictionary>)dictionaryEnumerator;
+
+            _resourceDictionaryEnumerators.Add(enumerator);
+            return enumerator;
         }
 
         /// <summary>
@@ -140,16 +188,21 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Information about the event.</param>
         internal void EnumeratorResourceDictionaryDispensed(object sender, ResourceDictionaryDispensedEventArgs e)
         {
-            if (this._ignoreResourceDictionaryDispensedByEnumerator)
-                return;
-            this.OnEnumeratorResourceDictionaryDispensed((object)this, e);
+            if (!_ignoreResourceDictionaryDispensedByEnumerator)
+            {
+                OnEnumeratorResourceDictionaryDispensed(this, e);
+            }
         }
 
-        /// <summary>Raises the ParentChanged event.</summary>
+        /// <summary>
+        /// Raises the ParentChanged event.
+        /// </summary>
         private void OnParentChanged()
         {
-            foreach (ResourceDictionaryEnumerator dictionaryEnumerator in this._resourceDictionaryEnumerators)
-                dictionaryEnumerator.ResourceDictionaryDispenserParentChanged();
+            foreach (ResourceDictionaryEnumerator enumerator in _resourceDictionaryEnumerators)
+            {
+                enumerator.ResourceDictionaryDispenserParentChanged();
+            }
         }
 
         /// <summary>
@@ -159,18 +212,29 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="args">Information about the event.</param>
         private void OnEnumeratorResourceDictionaryDispensed(object source, ResourceDictionaryDispensedEventArgs args)
         {
-            this._resourceDictionariesDispensed.Remove(args);
-            this._resourceDictionariesDispensed.AddLast(args);
-            foreach (ResourceDictionaryEnumerator dictionaryEnumerator in this._resourceDictionaryEnumerators)
-                dictionaryEnumerator.ResourceDictionaryDispenserResourceDictionaryDispensed(source, args);
+            // Remove this item from the list of dispensed styles.
+            _resourceDictionariesDispensed.Remove(args);
+
+            // Add this item to the end of the list of dispensed styles.
+            _resourceDictionariesDispensed.AddLast(args);
+
+            foreach (ResourceDictionaryEnumerator enumerator in _resourceDictionaryEnumerators)
+            {
+                enumerator.ResourceDictionaryDispenserResourceDictionaryDispensed(source, args);
+            }
         }
 
-        /// <summary>This method raises the EnumeratorsResetting event.</summary>
+        /// <summary>
+        /// This method raises the EnumeratorsResetting event.
+        /// </summary>
         private void OnResetting()
         {
-            this._resourceDictionariesDispensed.Clear();
-            foreach (ResourceDictionaryEnumerator dictionaryEnumerator in this._resourceDictionaryEnumerators)
-                dictionaryEnumerator.ResourceDictionaryDispenserResetting();
+            _resourceDictionariesDispensed.Clear();
+
+            foreach (ResourceDictionaryEnumerator enumerator in _resourceDictionaryEnumerators)
+            {
+                enumerator.ResourceDictionaryDispenserResetting();
+            }
         }
 
         /// <summary>
@@ -180,7 +244,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="e">Event args.</param>
         private void ParentResourceDictionariesChanged(object sender, EventArgs e)
         {
-            this.Reset();
+            Reset();
         }
     }
 }

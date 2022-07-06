@@ -1,7 +1,13 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+#if !DEFINITION_SERIES_COMPATIBILITY_MODE
 
 namespace System.Windows.Controls.DataVisualization.Charting
 {
@@ -9,98 +15,122 @@ namespace System.Windows.Controls.DataVisualization.Charting
     /// Represents a control that contains a data series to be rendered in bar format.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [TemplatePart(Name = "PlotArea", Type = typeof(Canvas))]
-    [StyleTypedProperty(Property = "DataPointStyle", StyleTargetType = typeof(BarDataPoint))]
+    [SuppressMessage("Microsoft.Maintainability", "CA1501:AvoidExcessiveInheritance", Justification = "Depth of hierarchy is necessary to avoid code duplication.")]
+    [StyleTypedProperty(Property = DataPointStyleName, StyleTargetType = typeof(BarDataPoint))]
     [StyleTypedProperty(Property = "LegendItemStyle", StyleTargetType = typeof(LegendItem))]
-    public class BarSeries : ColumnBarBaseSeries<BarDataPoint>
+    [TemplatePart(Name = DataPointSeries.PlotAreaName, Type = typeof(Canvas))]
+    public partial class BarSeries : ColumnBarBaseSeries<BarDataPoint>
     {
+        /// <summary>
+        /// Initializes a new instance of the BarSeries class.
+        /// </summary>
+        public BarSeries()
+        {
+        }
+
         /// <summary>
         /// Acquire a horizontal category axis and a vertical linear axis.
         /// </summary>
         /// <param name="firstDataPoint">The first data point.</param>
         protected override void GetAxes(DataPoint firstDataPoint)
         {
-            this.GetAxes(firstDataPoint, (Func<IAxis, bool>)(axis => axis.Orientation == AxisOrientation.Y), (Func<IAxis>)(() =>
-            {
-                return (IAxis)new CategoryAxis()
+            GetAxes(
+                firstDataPoint,
+                (axis) => axis.Orientation == AxisOrientation.Y,
+                () => new CategoryAxis { Orientation = AxisOrientation.Y },
+                (axis) =>
                 {
-                    Orientation = AxisOrientation.Y
-                };
-            }), (Func<IAxis, bool>)(axis =>
-            {
-                IRangeAxis rangeAxis = axis as IRangeAxis;
-                return rangeAxis != null && rangeAxis.Origin != null && axis.Orientation == AxisOrientation.X;
-            }), (Func<IAxis>)(() =>
-            {
-                IRangeAxis rangeAxisFromData = DataPointSeriesWithAxes.CreateRangeAxisFromData((object)firstDataPoint.DependentValue);
-                rangeAxisFromData.Orientation = AxisOrientation.X;
-                if (rangeAxisFromData == null || rangeAxisFromData.Origin == null)
-                    throw new InvalidOperationException("BarSeries.GetAxes: No Suitable Axis Available For Plotting Dependent Value");
-                DisplayAxis displayAxis = rangeAxisFromData as DisplayAxis;
-                if (displayAxis != null)
-                    displayAxis.ShowGridLines = true;
-                return (IAxis)rangeAxisFromData;
-            }));
+                    IRangeAxis rangeAxis = axis as IRangeAxis;
+                    return rangeAxis != null && rangeAxis.Origin != null && axis.Orientation == AxisOrientation.X;
+                },
+                () =>
+                {
+                    IRangeAxis rangeAxis = CreateRangeAxisFromData(firstDataPoint.DependentValue);
+                    rangeAxis.Orientation = AxisOrientation.X;
+                    if (rangeAxis == null || rangeAxis.Origin == null)
+                    {
+                        throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_NoSuitableAxisAvailableForPlottingDependentValue);
+                    }
+                    DisplayAxis axis = rangeAxis as DisplayAxis;
+                    if (axis != null)
+                    {
+                        axis.ShowGridLines = true;
+                    }
+                    return rangeAxis;
+                });
         }
 
-        /// <summary>Updates each point.</summary>
+        /// <summary>
+        /// Updates each point.
+        /// </summary>
         /// <param name="dataPoint">The data point to update.</param>
         protected override void UpdateDataPoint(DataPoint dataPoint)
         {
-            if (this.SeriesHost == null || this.PlotArea == null)
-                return;
-            object category = dataPoint.ActualIndependentValue ?? (object)(this.ActiveDataPoints.IndexOf((object)dataPoint) + 1);
-            Range<UnitValue> categoryRange = this.GetCategoryRange(category);
-            if (!categoryRange.HasData)
-                return;
-            UnitValue unitValue = categoryRange.Maximum;
-            int num1;
-            if (unitValue.Unit == Unit.Pixels)
+            if (SeriesHost == null || PlotArea == null)
             {
-                unitValue = categoryRange.Minimum;
-                num1 = unitValue.Unit == Unit.Pixels ? 1 : 0;
+                return;
             }
-            else
-                num1 = 0;
-            if (num1 == 0)
-                throw new InvalidOperationException("BarSeries.UpdateDataPoint: This Series Does Not Support Radial Axes");
-            unitValue = categoryRange.Minimum;
-            double num2 = unitValue.Value;
-            unitValue = categoryRange.Maximum;
-            double num3 = unitValue.Value;
-            IEnumerable<BarSeries> barSerieses = this.SeriesHost.Series.OfType<BarSeries>().Where<BarSeries>((Func<BarSeries, bool>)(series => series.ActualIndependentAxis == this.ActualIndependentAxis));
-            int num4 = CollectionHelper.Count(barSerieses);
-            double num5 = num3 - num2;
-            double a1 = num5 * 0.8 / (double)num4;
-            int num6 = barSerieses.IndexOf((object)this);
-            unitValue = this.ActualDependentRangeAxis.GetPlotAreaCoordinate((object)ValueHelper.ToDouble((object)dataPoint.ActualDependentValue));
-            double val1 = unitValue.Value;
-            unitValue = this.ActualDependentRangeAxis.GetPlotAreaCoordinate((object)this.ActualDependentRangeAxis.Origin);
-            double val2 = unitValue.Value;
-            double num7 = (double)num6 * Math.Round(a1) + num5 * 0.1;
-            double a2 = num2 + num7;
-            if (this.GetIsDataPointGrouped(category))
+
+            object category = dataPoint.ActualIndependentValue ?? (this.ActiveDataPoints.IndexOf(dataPoint) + 1);
+            Range<UnitValue> coordinateRange = GetCategoryRange(category);
+
+            if (!coordinateRange.HasData)
             {
-                IGrouping<object, DataPoint> dataPointGroup = this.GetDataPointGroup(category);
-                int num8 = dataPointGroup.IndexOf((object)dataPoint);
-                a2 += (double)num8 * (a1 * 0.2) / (double)(CollectionHelper.Count(dataPointGroup) - 1);
-                a1 *= 0.8;
-                Canvas.SetZIndex((UIElement)dataPoint, -num8);
+                return;
             }
-            if (ValueHelper.CanGraph(val1) && ValueHelper.CanGraph(a2) && ValueHelper.CanGraph(val2))
+            else if (coordinateRange.Maximum.Unit != Unit.Pixels || coordinateRange.Minimum.Unit != Unit.Pixels)
+            {
+                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.DataPointSeriesWithAxes_ThisSeriesDoesNotSupportRadialAxes);
+            }
+
+            double minimum = (double)coordinateRange.Minimum.Value;
+            double maximum = (double)coordinateRange.Maximum.Value;
+
+            IEnumerable<BarSeries> barSeries = SeriesHost.Series.OfType<BarSeries>().Where(series => series.ActualIndependentAxis == ActualIndependentAxis);
+            int numberOfSeries = barSeries.Count();
+            double coordinateRangeHeight = (maximum - minimum);
+            double segmentHeight = coordinateRangeHeight * 0.8;
+            double barHeight = segmentHeight / numberOfSeries;
+            int seriesIndex = barSeries.IndexOf(this);
+
+            double dataPointX = ActualDependentRangeAxis.GetPlotAreaCoordinate(ValueHelper.ToDouble(dataPoint.ActualDependentValue)).Value;
+            double zeroPointX = ActualDependentRangeAxis.GetPlotAreaCoordinate(ActualDependentRangeAxis.Origin).Value;
+
+            double offset = seriesIndex * Math.Round(barHeight) + coordinateRangeHeight * 0.1;
+            double dataPointY = minimum + offset;
+
+            if (GetIsDataPointGrouped(category))
+            {
+                // Multiple DataPoints share this category; offset and overlap them appropriately
+                IGrouping<object, DataPoint> categoryGrouping = GetDataPointGroup(category);
+                int index = categoryGrouping.IndexOf(dataPoint);
+                dataPointY += (index * (barHeight * 0.2)) / (categoryGrouping.Count() - 1);
+                barHeight *= 0.8;
+                Canvas.SetZIndex(dataPoint, -index);
+            }
+
+            if (ValueHelper.CanGraph(dataPointX) && ValueHelper.CanGraph(dataPointY) && ValueHelper.CanGraph(zeroPointX))
             {
                 dataPoint.Visibility = Visibility.Visible;
-                double length1 = Math.Round(a2);
-                double num8 = Math.Round(a1);
-                double length2 = Math.Round(Math.Min(val1, val2) - 0.5);
-                double num9 = Math.Round(Math.Max(val1, val2) - 0.5) - length2 + 1.0;
-                Canvas.SetLeft((UIElement)dataPoint, length2);
-                Canvas.SetTop((UIElement)dataPoint, length1);
-                dataPoint.Width = num9;
-                dataPoint.Height = num8;
+
+                double top = Math.Round(dataPointY);
+                double height = Math.Round(barHeight);
+
+                double left = Math.Round(Math.Min(dataPointX, zeroPointX) - 0.5);
+                double right = Math.Round(Math.Max(dataPointX, zeroPointX) - 0.5);
+                double width = right - left + 1;
+
+                Canvas.SetLeft(dataPoint, left);
+                Canvas.SetTop(dataPoint, top);
+                dataPoint.Width = width;
+                dataPoint.Height = height;
             }
             else
+            {
                 dataPoint.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }
+
+#endif

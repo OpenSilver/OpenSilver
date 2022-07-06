@@ -4,18 +4,10 @@
 // All other rights reserved.
 
 using System.Collections.Specialized;
-
-#if MIGRATION
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization
-#endif
 {
     /// <summary>
     /// Represents a control that displays a list of items and has a title.

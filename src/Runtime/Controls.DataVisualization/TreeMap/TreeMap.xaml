@@ -1,0 +1,56 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization">
+
+    <Style TargetType="datavis:TreeMap">
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="datavis:TreeMap">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{TemplateBinding Background}"
+                        Cursor="{TemplateBinding Cursor}"
+                        Opacity="{TemplateBinding Opacity}"
+                        OpacityMask="{TemplateBinding OpacityMask}">
+                        <Canvas x:Name="Container"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemDefinition">
+            <Setter.Value>
+                <datavis:TreeMapItemDefinition
+                    ValueBinding="{Binding}">
+                    <datavis:TreeMapItemDefinition.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                BorderBrush="Black"
+                                Background="Transparent"
+                                BorderThickness="1"
+                                ToolTipService.ToolTip="{Binding}">
+                                <ContentControl
+                                    Content="{Binding}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </datavis:TreeMapItemDefinition.ItemTemplate>
+                </datavis:TreeMapItemDefinition>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

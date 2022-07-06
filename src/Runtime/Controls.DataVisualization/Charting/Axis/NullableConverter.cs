@@ -3,18 +3,10 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.ComponentModel;
 using System.Globalization;
-#if MIGRATION
-#else
-using System;
-#endif
+using System.ComponentModel;
 
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-#else
-namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
-#endif
 {
     /// <summary>
     /// Converts a string or base value to a <see cref="Nullable"/> value.
@@ -78,18 +70,18 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <exception cref="T:System.NotSupportedException">
         /// The conversion cannot be performed.
         /// </exception>
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
         {
             string stringValue = value as string;
             if (value is T)
             {
-                return new T?((T)value);
+                return new Nullable<T>((T)value);
             }
             else if (string.IsNullOrEmpty(stringValue) || String.Equals(stringValue, "Auto", StringComparison.OrdinalIgnoreCase))
             {
-                return new T?();
+                return new Nullable<T>();
             }
-            return new T?((T)Convert.ChangeType(value, typeof(T), culture));
+            return new Nullable<T>((T)Convert.ChangeType(value, typeof(T), culture));
         }
 
         /// <summary>
