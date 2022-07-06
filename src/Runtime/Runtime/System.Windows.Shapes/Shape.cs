@@ -216,7 +216,7 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Stroke), 
                 typeof(Brush), 
                 typeof(Shape),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed));
 
         private static void Stroke_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
