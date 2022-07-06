@@ -495,7 +495,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         public PieDataPoint()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             DefaultStyleKey = typeof(PieDataPoint);
 #endif
 
@@ -509,6 +509,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     PieSeries.UpdatePieDataPointGeometry(this, e.NewSize.Width, e.NewSize.Height);
                 };
             }
+
+#if MIGRATION
+            DefaultStyleKey = typeof(PieDataPoint);
+#endif
         }
 
         /// <summary>

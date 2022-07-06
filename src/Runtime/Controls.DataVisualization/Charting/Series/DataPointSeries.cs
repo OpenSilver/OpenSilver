@@ -652,11 +652,15 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         protected DataPointSeries()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             this.DefaultStyleKey = typeof(DataPointSeries);
 #endif
             ClipGeometry = new RectangleGeometry();
             Clip = ClipGeometry;
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(DataPointSeries);
+#endif
         }
 
         /// <summary>

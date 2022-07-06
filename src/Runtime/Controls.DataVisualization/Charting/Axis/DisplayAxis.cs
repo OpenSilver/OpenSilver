@@ -510,18 +510,22 @@ namespace System.Windows.Controls.DataVisualization.Charting
         protected DisplayAxis()
         {
             this.OrientedPanel = new OrientedPanel();
-#if SILVERLIGHT
-            this.DefaultStyleKey = typeof(DisplayAxis);
             this.OrientedPanel.UseLayoutRounding = true;
+
+#if !MIGRATION
+            this.DefaultStyleKey = typeof(DisplayAxis);
 #endif
 
             this.DependentAxisGrid = new Grid();
-
             this.TitleLayoutTransformControl = new LayoutTransformControl();
             this.TitleLayoutTransformControl.HorizontalAlignment = HorizontalAlignment.Center;
             this.TitleLayoutTransformControl.VerticalAlignment = VerticalAlignment.Center;
 
             this.SizeChanged += new SizeChangedEventHandler(DisplayAxisSizeChanged);
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(DisplayAxis);
+#endif
         }
 
         /// <summary>

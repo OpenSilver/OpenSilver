@@ -85,7 +85,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         public PieSeries()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             this.DefaultStyleKey = typeof(PieSeries);
 #endif
             this.ResourceDictionaryDispenser = new ResourceDictionaryDispenser();
@@ -93,6 +93,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
             {
                 OnResourceDictionariesChanged(EventArgs.Empty);
             };
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(PieSeries);
+#endif
         }
 
         /// <summary>
@@ -449,7 +453,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         protected override void OnDataPointIndependentValueChanged(DataPoint dataPoint, object oldValue, object newValue)
         {
-            _dataPointLegendItems[dataPoint].Content = newValue;
+            if (_dataPointLegendItems.ContainsKey(dataPoint))
+            {
+                _dataPointLegendItems[dataPoint].Content = newValue;
+            }
             base.OnDataPointIndependentValueChanged(dataPoint, oldValue, newValue);
         }
 

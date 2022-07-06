@@ -156,7 +156,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         protected RangeAxis()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             this.DefaultStyleKey = typeof(RangeAxis);
 #endif
             this._labelPool = new ObjectPool<Control>(() => CreateAxisLabel());
@@ -173,6 +173,10 @@ namespace System.Windows.Controls.DataVisualization.Charting
                 UpdateActualRange();
             };
             SizeChanged += handler;
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(RangeAxis);
+#endif
         }
 
         /// <summary>

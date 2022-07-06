@@ -33,11 +33,15 @@ namespace System.Windows.Controls.DataVisualization
         /// </summary>
         public Legend()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             DefaultStyleKey = typeof(Legend);
 #endif
             // By default, the Visibility property should follow ContentVisibility - but users can override it
             SetBinding(VisibilityProperty, new Binding("ContentVisibility") { Source = this });
+
+#if MIGRATION
+            DefaultStyleKey = typeof(Legend);
+#endif
         }
 
         /// <summary>

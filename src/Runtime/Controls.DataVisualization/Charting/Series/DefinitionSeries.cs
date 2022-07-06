@@ -128,13 +128,17 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         protected DefinitionSeries()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             this.DefaultStyleKey = typeof(DefinitionSeries);
 #endif
             _seriesDefinitions.CollectionChanged += new NotifyCollectionChangedEventHandler(SeriesDefinitionsCollectionChanged);
             _seriesAreaChildrenListAdapter.Collection = _seriesDefinitions;
             _selectedItems.CollectionChanged += new NotifyCollectionChangedEventHandler(SelectedItemsCollectionChanged);
             DataItems = new ObservableCollection<DataItem>();
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(DefinitionSeries);
+#endif
         }
 
         /// <summary>

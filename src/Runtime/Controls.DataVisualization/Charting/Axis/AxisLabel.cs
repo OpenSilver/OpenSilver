@@ -95,10 +95,14 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// </summary>
         public AxisLabel()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             this.DefaultStyleKey = typeof(AxisLabel);
 #endif
             this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = StringFormat ?? "{0}" });
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(AxisLabel);
+#endif
         }
 
         /// <summary>

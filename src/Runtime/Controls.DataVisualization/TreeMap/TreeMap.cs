@@ -366,11 +366,17 @@ namespace System.Windows.Controls.DataVisualization
         {
             _helper = new BindingExtractor();
 
+#if !MIGRATION
             DefaultStyleKey = typeof(TreeMap);
+#endif
 
             SetValue(InterpolatorsProperty, new ObservableCollection<Interpolator>());
             (Interpolators as ObservableCollection<Interpolator>).CollectionChanged += 
                 new NotifyCollectionChangedEventHandler(OnInterpolatorsCollectionChanged);
+
+#if MIGRATION
+            DefaultStyleKey = typeof(TreeMap);
+#endif
         }
 
         /// <summary>
