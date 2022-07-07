@@ -14,7 +14,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Collections
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
+#endif
 {
     /// <summary>
     /// Implements a left-leaning red-black tree.

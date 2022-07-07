@@ -5,13 +5,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows.Media.Animation;
 
+#if MIGRATION
+using System.Windows.Media.Animation;
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.UI.Xaml.Media.Animation;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
-    /// <summary>
-    /// Represents a storyboard queue that plays storyboards in sequence.
-    /// </summary>
+/// <summary>
+/// Represents a storyboard queue that plays storyboards in sequence.
+/// </summary>
     internal class StoryboardQueue
     {
         /// <summary>

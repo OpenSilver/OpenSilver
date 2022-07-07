@@ -6,10 +6,18 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System;
+
+#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Shapes;
-
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Shapes;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Control that displays values as a stacked area chart visualization.

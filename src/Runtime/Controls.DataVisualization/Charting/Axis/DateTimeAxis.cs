@@ -9,11 +9,19 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
+
+#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using EF = System.Windows.Controls.DataVisualization.EnumerableFunctions;
-
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.UI.Xaml.Controls;
+using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
+using EF = Windows.UI.Xaml.Controls.DataVisualization.EnumerableFunctions;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis that displays numeric values.

@@ -5,11 +5,15 @@
 
 using System.Windows;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
-{
-    /// <summary>
-    /// A label used to display numeric axis values.
-    /// </summary>
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
+{ 
+/// <summary>
+/// A label used to display numeric axis values.
+/// </summary>
     public class NumericAxisLabel : AxisLabel
     {
 #if !SILVERLIGHT

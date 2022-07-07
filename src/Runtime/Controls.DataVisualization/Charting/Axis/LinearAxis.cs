@@ -8,10 +8,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+
+#if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Shapes;
-
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Shapes;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis that displays numeric values.

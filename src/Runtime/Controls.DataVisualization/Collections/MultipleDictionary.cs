@@ -8,7 +8,11 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Collections
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
+#endif
 {
     /// <summary>
     /// Implements a dictionary that can store multiple values for the same key.

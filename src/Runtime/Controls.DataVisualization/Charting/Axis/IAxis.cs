@@ -5,7 +5,12 @@
 
 using System.Collections.ObjectModel;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis interface used to determine the plot area coordinate of values.

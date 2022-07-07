@@ -10,7 +10,11 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// Aggregated observable collection.
@@ -33,7 +37,7 @@ namespace System.Windows.Controls.DataVisualization
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">Information about the event.</param>
-        private void ChildCollectionsCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void ChildCollectionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             Debug.Assert(e.Action != NotifyCollectionChangedAction.Reset, "Reset is not supported.");
 

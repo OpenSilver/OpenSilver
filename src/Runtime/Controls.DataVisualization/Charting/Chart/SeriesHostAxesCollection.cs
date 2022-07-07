@@ -9,7 +9,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axes collection used by a series host.

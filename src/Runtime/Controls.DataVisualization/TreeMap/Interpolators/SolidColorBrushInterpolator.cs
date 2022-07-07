@@ -2,9 +2,15 @@
 // This source is subject to the Microsoft Public License (Ms-PL).
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
-using System.Windows.Media;
 
+#if MIGRATION
+using System.Windows.Media;
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// Interpolator which converts a numeric value from its [RangeMinimum, RangeMaximum]

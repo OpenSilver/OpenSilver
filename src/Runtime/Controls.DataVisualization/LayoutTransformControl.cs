@@ -4,16 +4,20 @@
 // All other rights reserved.
 
 using System;
+using System.Windows.Markup;
+using System.Diagnostics.CodeAnalysis;
+
+#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Markup;
 using System.Windows.Media;
-#if !SILVERLIGHT
-using System.IO;
-using System.Text;
-#endif
-
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// Control that implements support for transformations as if applied by
@@ -114,7 +118,11 @@ namespace System.Windows.Controls.DataVisualization
         /// <summary>
         /// Called whenever the control's template changes.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             // Save existing content and remove it from the visual tree
             FrameworkElement savedContent = Child;
@@ -399,7 +407,7 @@ namespace System.Windows.Controls.DataVisualization
         /// </summary>
         /// <param name="arrangeBounds">The size to arrange within.</param>
         /// <returns>The size required.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Closely corresponds to WPF's FrameworkElement.FindMaximalAreaLocalSpaceRect.")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Closely corresponds to WPF's FrameworkElement.FindMaximalAreaLocalSpaceRect.")]
         private Size ComputeLargestTransformedSize(Size arrangeBounds)
         {
             // Computed largest transformed size

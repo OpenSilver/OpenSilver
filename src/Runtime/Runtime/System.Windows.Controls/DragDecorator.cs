@@ -1,6 +1,12 @@
-﻿using Microsoft.Windows;
+﻿using System.Windows;
 
+#if MIGRATION
+using Microsoft.Windows;
 namespace System.Windows.Controls
+#else
+using Windows.Foundation;
+namespace Windows.UI.Xaml.Controls
+#endif
 {
     /// <summary>
     /// A content control that visually indicates what actions are available

@@ -4,10 +4,15 @@
 // All other rights reserved.
 
 using System.ComponentModel;
-using System.Windows.Data;
 using System.Windows.Markup;
 
+#if MIGRATION
+using System.Windows.Data;
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.UI.Xaml.Data;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// Represents a class that defines various aspects of TreeMap items.

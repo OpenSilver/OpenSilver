@@ -3,9 +3,15 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.ObjectModel;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a control that contains a data series.

@@ -3,16 +3,22 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Windows.Controls.DataVisualization.Charting.Primitives;
 using System.Windows.Markup;
 
+#if MIGRATION
+using System.Windows.Controls.DataVisualization.Charting.Primitives;
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a control that displays a Chart.
@@ -530,7 +536,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// Builds the visual tree for the Chart control when a new template
         /// is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             // Call base implementation
             base.OnApplyTemplate();

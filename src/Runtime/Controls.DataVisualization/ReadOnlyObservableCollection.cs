@@ -6,7 +6,11 @@
 using System;
 using System.Collections.ObjectModel;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// An observable collection that can only be written to by internal 

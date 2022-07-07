@@ -5,7 +5,11 @@
 
 using System;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// A value in units.

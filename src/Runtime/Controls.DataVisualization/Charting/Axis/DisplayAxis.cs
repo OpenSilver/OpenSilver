@@ -8,11 +8,19 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
+
+#if MIGRATION
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Shapes;
-
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Shapes;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// An axis that has a range.
@@ -344,7 +352,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets the Style of the Axis's gridlines.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
         public Style GridLineStyle
         {
             get { return GetValue(GridLineStyleProperty) as Style; }
@@ -354,7 +362,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the GridlineStyle dependency property.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "Current casing is the expected one.")]
         public static readonly DependencyProperty GridLineStyleProperty =
             DependencyProperty.Register(
                 "GridLineStyle",
@@ -575,7 +583,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Retrieves template parts and configures layout.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 
@@ -625,7 +637,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
                 if (this.Orientation == AxisOrientation.Y)
                 {
-                    this.OrientedPanel.Orientation = System.Windows.Controls.Orientation.Vertical;
+                    this.OrientedPanel.Orientation = Controls.Orientation.Vertical;
                     this.OrientedPanel.IsReversed = true;
 
                     if (this.Location == AxisLocation.Left || this.Location == AxisLocation.Right)
@@ -652,14 +664,14 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
                         if (this.Location == AxisLocation.Right)
                         {
-                            AxisGrid.Mirror(System.Windows.Controls.Orientation.Vertical);
+                            AxisGrid.Mirror(Controls.Orientation.Vertical);
                             this.TitleLayoutTransformControl.Transform = new RotateTransform { Angle = 90 };
                         }
                     }
                 }
                 else if (this.Orientation == AxisOrientation.X)
                 {
-                    this.OrientedPanel.Orientation = System.Windows.Controls.Orientation.Horizontal;
+                    this.OrientedPanel.Orientation = Controls.Orientation.Horizontal;
                     this.OrientedPanel.IsReversed = false;
 
                     if (this.Location == AxisLocation.Top || this.Location == AxisLocation.Bottom)
@@ -685,7 +697,7 @@ namespace System.Windows.Controls.DataVisualization.Charting
 
                         if (this.Location == AxisLocation.Top)
                         {
-                            AxisGrid.Mirror(System.Windows.Controls.Orientation.Horizontal);
+                            AxisGrid.Mirror(Controls.Orientation.Horizontal);
                         }
                     }
                 }

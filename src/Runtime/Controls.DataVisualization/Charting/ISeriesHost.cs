@@ -6,9 +6,15 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
 
+
+#if MIGRATION
+using System.Windows.Controls;
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.UI.Xaml.Controls;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Defines properties, methods and events for classes that host a 

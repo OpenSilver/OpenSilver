@@ -3,13 +3,21 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+
+#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// A label used to display data in an axis.

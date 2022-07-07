@@ -5,7 +5,11 @@
 
 using System;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting.Primitives
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
+#endif
 {
     /// <summary>
     /// Specifies the edge position of a child element that is inside an

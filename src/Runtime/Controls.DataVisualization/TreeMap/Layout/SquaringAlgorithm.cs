@@ -5,8 +5,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.Foundation;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// Class encapsulating the logic of sub-dividing a parent rectangular area into child rectangles.

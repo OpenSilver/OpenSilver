@@ -7,10 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+
+#if MIGRATION
 using System.Windows;
 using System.Windows.Media.Animation;
-
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media.Animation;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// Represents a control that can animate the transitions between its specified

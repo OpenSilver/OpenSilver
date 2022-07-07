@@ -4,8 +4,14 @@
 // All other rights reserved.
 
 using System.Globalization;
+using System;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.Foundation;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// Interpolator which converts a numeric value from its [RangeMinimum, RangeMaximum]

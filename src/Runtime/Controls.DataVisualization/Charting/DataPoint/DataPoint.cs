@@ -8,12 +8,23 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Threading;
 using System.Windows.Input;
+
+#if MIGRATION
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-
+using CommonKeys = System.Windows.Input.ModifierKeys;
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using CommonKeys = Windows.System.VirtualKeyModifiers;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a control that displays a data point.
@@ -239,19 +250,19 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Identifies the ActualDependentValue dependency property.
         /// </summary>
-        public static readonly System.Windows.DependencyProperty ActualDependentValueProperty =
-            System.Windows.DependencyProperty.Register(
+        public static readonly DependencyProperty ActualDependentValueProperty =
+            DependencyProperty.Register(
                 "ActualDependentValue",
                 typeof(IComparable),
                 typeof(DataPoint),
-                new System.Windows.PropertyMetadata(0.0, OnActualDependentValuePropertyChanged));
+                new PropertyMetadata(0.0, OnActualDependentValuePropertyChanged));
 
         /// <summary>
         /// Called when the value of the ActualDependentValue property changes.
         /// </summary>
         /// <param name="d">Control that changed its ActualDependentValue.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnActualDependentValuePropertyChanged(System.Windows.DependencyObject d, System.Windows.DependencyPropertyChangedEventArgs e)
+        private static void OnActualDependentValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DataPoint source = (DataPoint)d;
             IComparable oldValue = (IComparable)e.OldValue;
@@ -854,7 +865,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Builds the visual tree for the DataPoint when a new template is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             // Unhook CurrentStateChanged handler
             VisualStateGroup groupReveal = VisualStateManager.GetVisualStateGroups(ImplementationRoot).CastWrapper<VisualStateGroup>().Where(group => GroupRevealStates == group.Name).FirstOrDefault();
@@ -926,9 +941,17 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// Provides handling for the MouseEnter event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
+#if MIGRATION
         protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs e)
+#endif
         {
+#if MIGRATION
             base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
 
             if (IsSelectionEnabled)
             {
@@ -940,9 +963,18 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// Provides handling for the MouseLeave event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
+#if MIGRATION
         protected override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected override void OnPointerExited(PointerRoutedEventArgs e)
+#endif
         {
-            base.OnMouseLeave(e);
+#if MIGRATION
+             base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
+           
             if (IsSelectionEnabled)
             {
                 IsHovered = false;
@@ -953,7 +985,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// Provides handling for the MouseLeftButtonDown event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
+#if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
         {
             if (DefinitionSeriesIsSelectionEnabledHandling)
             {
@@ -964,15 +1000,23 @@ namespace System.Windows.Controls.DataVisualization.Charting
                     // to avoid letting ListBoxItem select the item
                     e.Handled = true;
                 }
+#if MIGRATION
                 base.OnMouseLeftButtonDown(e);
+#else
+                base.OnPointerPressed(e);
+#endif
             }
             else
             {
                 // Traditional handling
+#if MIGRATION
                 base.OnMouseLeftButtonDown(e);
+#else
+                base.OnPointerPressed(e);
+#endif
                 if (IsSelectionEnabled)
                 {
-                    IsSelected = (ModifierKeys.None == (ModifierKeys.Control & Keyboard.Modifiers));
+                    IsSelected = (CommonKeys.None == (CommonKeys.Control & Keyboard.Modifiers));
                     e.Handled = true;
                 }
             }

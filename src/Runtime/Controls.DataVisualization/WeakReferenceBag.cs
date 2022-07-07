@@ -3,10 +3,16 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// A bag of weak references to items.
@@ -86,9 +92,9 @@ namespace System.Windows.Controls.DataVisualization
         /// Returns a sequence of the elements in the bag.
         /// </summary>
         /// <returns>A sequence of the elements in the bag.</returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<T>) this).GetEnumerator();
+            return ((IEnumerable<T>)this).GetEnumerator();
         }
     }
 }

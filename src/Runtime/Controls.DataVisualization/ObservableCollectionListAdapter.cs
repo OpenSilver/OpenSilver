@@ -7,10 +7,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System;
+
+#if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-
 namespace System.Windows.Controls.DataVisualization
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// An object that synchronizes changes in an observable collection to 

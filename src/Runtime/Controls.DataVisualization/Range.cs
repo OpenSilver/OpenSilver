@@ -7,7 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// A range of values.

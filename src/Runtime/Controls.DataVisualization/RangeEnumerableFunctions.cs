@@ -6,12 +6,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
-{
-    /// <summary>
-    /// Collection of functions that manipulate streams of ranges.
-    /// </summary>
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
+{ 
+/// <summary>
+/// Collection of functions that manipulate streams of ranges.
+/// </summary>
     internal static class RangeEnumerableExtensions
     {
         /// <summary>
@@ -52,7 +57,7 @@ namespace System.Windows.Controls.DataVisualization
         /// </typeparam>
         /// <param name="that">The stream.</param>
         /// <returns>A range encompassing all ranges in a stream.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Nesting necessary to provide method for use with all types of Range<T>.")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Nesting necessary to provide method for use with all types of Range<T>.")]
         public static Range<T> Sum<T>(this IEnumerable<Range<T>> that)
             where T : IComparable
         {

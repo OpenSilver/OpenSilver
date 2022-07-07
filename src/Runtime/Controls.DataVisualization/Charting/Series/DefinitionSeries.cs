@@ -3,6 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,13 +12,22 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Controls.DataVisualization.Charting.Primitives;
+using System.Windows.Markup;
+
+#if MIGRATION
+using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Markup;
-using System.Windows.Media;
-
+using System.Windows.Controls.DataVisualization.Charting.Primitives;
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives;
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Implements a series that is defined by one or more instances of the DefinitionSeries class.
@@ -537,7 +547,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
         /// <summary>
         /// Builds the visual tree for the control when a new template is applied.
         /// </summary>
+#if MIGRATION
         public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
         {
             if (null != _itemContainer)
             {
@@ -1493,7 +1507,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
+#if MIGRATION
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+#else
+            public object Convert(object value, Type targetType, object parameter, string language)
+#endif
             {
                 return _dataItems.Where(di => di.Value == value).FirstOrDefault();
             }
@@ -1506,7 +1524,12 @@ namespace System.Windows.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
+            /// 
+#if MIGRATION
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+#else
+            public object ConvertBack(object value, Type targetType, object parameter, string language)
+#endif
             {
                 DataItem dataItem = value as DataItem;
                 return (null != dataItem) ? dataItem.Value : null;
@@ -1533,7 +1556,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
+#if MIGRATION
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+#else
+            public object Convert(object value, Type targetType, object parameter, string language)
+#endif
             {
                 bool isSelectionEnabled = false;
                 if (value is SeriesSelectionMode)
@@ -1551,7 +1578,11 @@ namespace System.Windows.Controls.DataVisualization.Charting
             /// <param name="parameter">The converter parameter to use.</param>
             /// <param name="culture">The culture to use in the converter.</param>
             /// <returns>Converted value.</returns>
+#if MIGRATION
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+#else
+            public object ConvertBack(object value, Type targetType, object parameter, string language)
+#endif
             {
                 throw new NotImplementedException();
             }

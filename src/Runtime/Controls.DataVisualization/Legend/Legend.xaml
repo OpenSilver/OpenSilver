@@ -8,7 +8,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization">
+    xmlns:datavis="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit">
 
     <Style TargetType="datavis:Legend">
         <Setter Property="BorderBrush" Value="Black"/>

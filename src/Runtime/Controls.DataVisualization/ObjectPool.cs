@@ -6,7 +6,11 @@
 using System;
 using System.Collections.Generic;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization
+#endif
 {
     /// <summary>
     /// A pool of objects that can be reused.

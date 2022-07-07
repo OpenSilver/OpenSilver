@@ -3,13 +3,18 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Collections
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Collections
+#endif
 {
     /// <summary>
     /// Implements a dictionary that can store multiple values for the same key and sorts the values.

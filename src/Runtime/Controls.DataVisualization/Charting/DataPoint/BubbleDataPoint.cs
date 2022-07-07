@@ -5,7 +5,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+#if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
+#else
+namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
+#endif
 {
     /// <summary>
     /// Represents a data point used for a bubble series.
