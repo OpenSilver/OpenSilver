@@ -31,6 +31,20 @@ namespace System
 {
     public partial class Settings
     {
+        private readonly Lazy<bool> _windowless = new Lazy<bool>(() =>
+        {
+            const string WindowlessName = "Windowless";
+
+            Application app = Application.Current;
+            if (app != null && app.AppParams.TryGetValue(WindowlessName, out string str)
+                && bool.TryParse(str.Trim(), out bool windowless))
+            {
+                return windowless;
+            }
+
+            return false;
+        });
+
         public Settings()
         {
             // Default values:
@@ -125,7 +139,7 @@ namespace System
         /// <returns>
         /// true if the Silverlight plug-in displays as a windowless plug-in; otherwise, false.
         /// </returns>
-        public bool Windowless { get; internal set; }
+        public bool Windowless => _windowless.Value;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the application was launched from the out-of-browser state.

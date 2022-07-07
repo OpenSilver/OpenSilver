@@ -26,6 +26,8 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
+using System.Text.Json;
+using System.Collections.ObjectModel;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
@@ -75,6 +77,8 @@ namespace Windows.UI.Xaml
 
             // Initialize Deployment
             _ = Deployment.Current;
+
+            AppParams = GetAppParams();
 
             new DOMEventManager(GetWindow, "unload", ProcessOnExit).AttachToDomEvents();
 
@@ -154,21 +158,17 @@ namespace Windows.UI.Xaml
 #else
             CoreDispatcher
 #endif
-                .INTERNAL_GetCurrentDispatcher().BeginInvoke((Action)(() =>
+                .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
             {
                 StartAppServices();
 
                 // Raise the "Startup" event:
-                var startupEventArgs = new StartupEventArgs();
-                ApplyBuiltInInitParams(startupEventArgs);
-
                 if (this.Startup != null)
-                    Startup(this, startupEventArgs);
+                    Startup(this, new StartupEventArgs());
 
                 // Call the "OnLaunched" method:
                 this.OnLaunched(new LaunchActivatedEventArgs());
-
-            }));
+            });
 
         }
 
@@ -201,6 +201,40 @@ namespace Windows.UI.Xaml
                     }
                 }
             }
+        }
+
+        internal IDictionary<string, string> AppParams { get; }
+
+        private struct HTMLParam
+        {
+            public string Name { get; set; }
+            public string Value { get; set; }
+        }
+
+        private static IDictionary<string, string> GetAppParams()
+        {
+            var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            HTMLParam[] paramsArray;
+            try
+            {
+                paramsArray = JsonSerializer.Deserialize<HTMLParam[]>(
+                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("document.getAppParams()")));
+            }
+            catch
+            {
+                paramsArray = Array.Empty<HTMLParam>();
+            }
+
+            foreach (HTMLParam p in paramsArray)
+            {
+                if (p.Name != null)
+                {
+                    parameters[p.Name] = p.Value;
+                }
+            }
+
+            return new ReadOnlyDictionary<string, string>(parameters);
         }
 
         #region Work around an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
@@ -692,22 +726,5 @@ namespace Windows.UI.Xaml
                 );
         }
 #endif
-
-        private void ApplyBuiltInInitParams(StartupEventArgs startupEventArgs)
-        {
-            var builtInParams = new List<string>() { "windowless" };
-
-            var builtInParamsFromArgs = startupEventArgs.InitParams.Where(kv => builtInParams.Contains(kv.Key));
-
-            foreach (var param in builtInParamsFromArgs)
-            {
-                switch (param.Key)
-                {
-                    case "windowless":
-                        Current.Host.Settings.Windowless = Convert.ToBoolean(param.Value);
-                        break;
-                }
-            }
-        }
     }
 }

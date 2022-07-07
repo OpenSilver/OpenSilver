@@ -23,7 +23,7 @@ namespace Windows.UI.Xaml
 	/// Represents the initial state of a Silverlight application when application extension
 	/// services are started.
 	/// </summary>
-	public partial class ApplicationServiceContext
+	public class ApplicationServiceContext
 	{
 		internal ApplicationServiceContext() { }
 
@@ -34,11 +34,6 @@ namespace Windows.UI.Xaml
 		/// <returns>
 		/// The initialization parameters as a dictionary of key/value pairs.
 		/// </returns>
-		[OpenSilver.NotImplemented]
-		public Dictionary<string, string> ApplicationInitParams
-		{
-			get;
-			private set;
-		}
+		public Dictionary<string, string> ApplicationInitParams => (Dictionary<string, string>)Application.Current.Host.InitParams;
 	}
 }

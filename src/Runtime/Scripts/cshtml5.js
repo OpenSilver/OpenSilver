@@ -92,6 +92,25 @@ document.getXamlRoot = function()
 	return xamlRoot;
 }
 
+document.clearXamlRoot = function () {
+    const children = document.getXamlRoot().children;
+
+    for (i = children.length - 1; i >= 0; i--) {
+        if (children[i].tagName !== "PARAM") {
+            children[i].remove();
+        }
+    }
+}
+
+document.getAppParams = function () {
+    return JSON.stringify(
+        Array.from(
+            document.getXamlRoot().getElementsByTagName("param"),
+            function (p) { return { Name: p.name, Value: p.value }; }
+        )
+    );
+}
+
 document.ResXFiles = {};
 
 document.modifiersPressed = 0;
