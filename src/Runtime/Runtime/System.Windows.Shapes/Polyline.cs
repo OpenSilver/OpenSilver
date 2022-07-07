@@ -79,7 +79,17 @@ namespace Windows.UI.Xaml.Shapes
         {
             get
             {
-                return (PointCollection)GetValue(PointsProperty);
+                PointCollection points = (PointCollection)GetValue(PointsProperty);
+
+                if (points == null)
+                {
+                    points = new PointCollection();
+                    _suspendRendering = true;
+                    this.SetValue(PointsProperty, points);
+                    _suspendRendering = false;
+                }
+
+                return points;
             }
             set
             {
@@ -136,7 +146,9 @@ namespace Windows.UI.Xaml.Shapes
                 return;
             }
 
-            if (Points == null || Points?.Count < 2)
+            var points = (PointCollection)GetValue(PointsProperty);
+
+            if (points == null || points.Count < 2)
             {
                 return;
             }
@@ -173,7 +185,8 @@ namespace Windows.UI.Xaml.Shapes
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (Points == null || Points?.Count < 2)
+            var points = (PointCollection)GetValue(PointsProperty);
+            if (points == null || points.Count < 2)
             {
                 return base.MeasureOverride(availableSize);
             }
