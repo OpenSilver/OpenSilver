@@ -412,7 +412,7 @@ namespace Windows.UI.Xaml.Controls
             _popup = null;
 
             // Prepare the event arguments:
-            Selection selection = new Selection(_sourceItemContainer);
+            Selection selection = new Selection(ItemFromContainer(_sourceItemsControl, _sourceItemContainer));
             SelectionCollection selectionCollection = SelectionCollection.ToSelectionCollection(selection);
 
             UIElement allowDropElementUnderPointer;
@@ -420,6 +420,7 @@ namespace Windows.UI.Xaml.Controls
             DragDropTarget<TItemsControlType, TItemContainerType> dragDropTargetUnderPointer = GetDragDropTargetUnderPointer(_pointerX, _pointerY, out _, out allowDropElementUnderPointer);
 
             bool moveItem = false;
+            MS.DragEventArgs dragArgs = null;
             if (dragDropTargetUnderPointer != null)
             {
                 //---------------------------------
@@ -432,7 +433,8 @@ namespace Windows.UI.Xaml.Controls
                     TItemsControlType targetContainer = (TItemsControlType)dragDropTargetUnderPointer.Content; // Note: a "container" is for example a Panel in case of PanekDragDropTarget.
 
                     // Check if we are dropping on the source element itself (ie. from the source to the placeholder that we put in place of the source) (cf. "ItemDropOnSource" event):
-                    if (ContainerFromIndex(targetContainer, _indexOfSourceContainerWithinItemsControl) == _sourcePlaceholder)
+                    if (dragDropTargetUnderPointer.GetItemCount(targetContainer) > 0
+                        && ContainerFromIndex(targetContainer, _indexOfSourceContainerWithinItemsControl) == _sourcePlaceholder)
                     {
                         //---------------------------------
                         // IF WE ARE DROPPING THE SOURCE ON ITSELF
@@ -466,7 +468,8 @@ namespace Windows.UI.Xaml.Controls
 
                             // Raise the Drop event:
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.Drop(this, new MS.DragEventArgs(dataObject, e));
+                            dragArgs = new MS.DragEventArgs(dataObject, e);
+                            dragDropTargetUnderPointer.Drop(this, dragArgs);
 #endif
                         }
 
@@ -478,17 +481,24 @@ namespace Windows.UI.Xaml.Controls
             // The event is triggered in Silverlight regardless of whether the target has AllowDrop=true
             ItemDroppedOnTarget?.Invoke(this, new ItemDragEventArgs(selectionCollection));
 
-            if (moveItem)
+            if (dragArgs is null || !dragArgs.Handled)
             {
-                object item = _sourceItemContainer.GetValue(ItemContainerGenerator.ItemForItemContainerProperty);
-                RemoveItem(_sourceItemsControl, item);
-                // Put the source into the target:
-                dragDropTargetUnderPointer.AddItem((TItemsControlType)dragDropTargetUnderPointer.Content, item);
-            }
-            else if (allowDropElementUnderPointer != null)
-            {
-                RemoveItem(_sourceItemsControl,
-                    _sourceItemContainer.GetValue(ItemContainerGenerator.ItemForItemContainerProperty));
+                if (moveItem)
+                {
+                    object item = _sourceItemContainer.GetValue(ItemContainerGenerator.ItemForItemContainerProperty);
+                    RemoveItem(_sourceItemsControl, item);
+                    // Put the source into the target:
+                    dragDropTargetUnderPointer.AddItem((TItemsControlType)dragDropTargetUnderPointer.Content, item);
+                }
+                else if (allowDropElementUnderPointer != null)
+                {
+                    RemoveItem(_sourceItemsControl,
+                        _sourceItemContainer.GetValue(ItemContainerGenerator.ItemForItemContainerProperty));
+                }
+                if (dragArgs != null)
+                {
+                    dragArgs.Handled = true;
+                }
             }
 
             // Raise the "ItemDragCompleted" event:
