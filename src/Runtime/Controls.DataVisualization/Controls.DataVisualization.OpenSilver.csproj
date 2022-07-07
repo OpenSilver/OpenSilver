@@ -9,7 +9,7 @@
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <OpenSilverVersion>1.0.0</OpenSilverVersion>
-    <Optimize>True</Optimize>
+    <Optimize>true</Optimize>
     <DefineTrace>true</DefineTrace>
     <DefineConstants>$(DefineConstants);SILVERLIGHT</DefineConstants>
     <DefineConstants Condition="$(Optimize) != true">$(DefineConstants);DEBUG</DefineConstants>
