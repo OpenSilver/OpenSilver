@@ -8,9 +8,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Windows.Media;
+
+#if MIGRATION
 using System.Windows.Controls.Primitives;
-using ItemAndContainer = System.Collections.Generic.KeyValuePair<object, System.Windows.Controls.TreeViewItem>;
+#else
+using Windows.UI.Xaml.Controls.Primitives;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -18,7 +21,12 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    [OpenSilver.NotImplemented]
+    using ItemAndContainer = KeyValuePair<object, TreeViewItem>;
+
+    /// <summary>
+    /// Provides useful extensions to TreeView and TreeViewItem instances.
+    /// </summary>
+    /// <QualityBand>Experimental</QualityBand>
     public static class TreeViewExtensions
     {
         #region Get Parents
