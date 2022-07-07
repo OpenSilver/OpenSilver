@@ -27,11 +27,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
+
 #if !CSHTML5NETSTANDARD
 using DotNetBrowser;
 #endif
@@ -1211,18 +1213,33 @@ parentElement.appendChild(child);";
 
             return result;
         }
+
         internal static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
         {
-            IList<String> elements = null;
+            string[] elements;
             if (subtree != null)
-                elements = System.Text.Json.JsonSerializer.Deserialize<List<String>>(Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(@"JSON.stringify(elementsFromPointOpensilver($0,$1,$2))", intersectingPoint.X, intersectingPoint.Y, OpenSilver.Interop.GetDiv(subtree))));
-            else
-                elements = System.Text.Json.JsonSerializer.Deserialize<List<String>>(Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(@"JSON.stringify(elementsFromPointOpensilver($0,$1,null))", intersectingPoint.X, intersectingPoint.Y)));
-            foreach (var id in elements)
             {
-                if (INTERNAL_HtmlDomManager.INTERNAL_idsToUIElements.ContainsKey(id))
+                elements = JsonSerializer.Deserialize<string[]>(
+                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
+                        @"window.elementsFromPointOpensilver($0,$1,$2)",
+                        intersectingPoint.X,
+                        intersectingPoint.Y,
+                        OpenSilver.Interop.GetDiv(subtree))));
+            }
+            else
+            {
+                elements = JsonSerializer.Deserialize<string[]>(
+                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
+                        @"window.elementsFromPointOpensilver($0,$1,null)",
+                        intersectingPoint.X,
+                        intersectingPoint.Y)));
+            }
+
+            foreach (string id in elements)
+            {
+                if (INTERNAL_idsToUIElements.TryGetValue(id, out UIElement uie))
                 {
-                    yield return INTERNAL_HtmlDomManager.INTERNAL_idsToUIElements[id];
+                    yield return uie;
                 }
             }
         }

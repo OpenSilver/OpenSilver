@@ -122,21 +122,32 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Retrieves a set of objects that are located within a specified point of an object's coordinate space. Note: the current implementation only returns the top-most element.
+        /// Retrieves a set of objects that are located within a specified point of an object's
+        /// coordinate space.
         /// </summary>
-        /// <param name="intersectingPoint">The point to use as the determination point.</param>
-        /// <param name="subtree">The object to search within.</param>
-        /// <returns>An enumerable set of UIElement objects that are determined to be located
-        /// in the visual tree composition at the specified point and within the specified
-        /// subtree.  Note: the current implementation only returns the top-most element.</returns>
+        /// <param name="intersectingPoint">
+        /// The point to use as the determination point.
+        /// </param>
+        /// <param name="subtree">
+        /// The object to search within.
+        /// </param>
+        /// <returns>
+        /// An enumerable set of System.Windows.UIElement objects that are determined to
+        /// be located in the visual tree composition at the specified point and within the
+        /// specified subtee.
+        /// </returns>
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
         {
-            var elementAtCoordinates = INTERNAL_HtmlDomManager.FindElementsInHostCoordinates(intersectingPoint, subtree);
-            foreach (var item in elementAtCoordinates)
+            var list = new List<UIElement>();
+            foreach (UIElement uie in INTERNAL_HtmlDomManager.FindElementsInHostCoordinates(intersectingPoint, subtree))
             {
-                if (item.IsHitTestVisible)
-                    yield return item;
+                if (UIElement.EnablePointerEventsBase(uie))
+                {
+                    list.Add(uie);
+                }
             }
+
+            return list;
         }
 
         /// <summary>
