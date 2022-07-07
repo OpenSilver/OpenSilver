@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using System.Threading;
 
 #if OPENSILVER
 using System.Text.Json;
@@ -33,17 +34,16 @@ namespace CSHTML5
 {
     internal static class INTERNAL_InteropImplementation
     {
-        private static bool IsJavaScriptCSharpInteropSetUp;
-        private static Dictionary<int, Delegate> CallbacksDictionary = new Dictionary<int, Delegate>();
-        private static Random RandomGenerator = new Random();
-        private static List<string> UnmodifiedJavascriptCalls = new List<string>();
-        private static int IndexOfNextUnmodifiedJSCallInList = 0;
+        private static bool _isInitialized;
+        private static readonly SynchronyzedStore<Delegate> _callbacksStore = new SynchronyzedStore<Delegate>();
+        private static readonly SynchronyzedStore<string> _javascriptCallsStore = new SynchronyzedStore<string>();
+        private static readonly ReferenceIDGenerator _refIdGenerator = new ReferenceIDGenerator();
 
         static INTERNAL_InteropImplementation()
         {
             Application.INTERNAL_Reloaded += (sender, e) =>
             {
-                IsJavaScriptCSharpInteropSetUp = false;
+                _isInitialized = false;
             };
         }
 
@@ -67,7 +67,7 @@ namespace CSHTML5
                 throw new ArgumentException("You cannot set both 'noImpactOnPendingJSCode' and 'runAsynchronously' to True. The 'noImpactOnPendingJSCode' only has meaning when running synchronously.");
 
             // Make sure the JS to C# interop is set up:
-            if (!IsJavaScriptCSharpInteropSetUp)
+            if (!_isInitialized)
             {
 #if OPENSILVER
                 if (Interop.IsRunningInTheSimulator_WorkAround)
@@ -75,15 +75,15 @@ namespace CSHTML5
 #endif
                     // Adding a property to the JavaScript "window" object:
                     dynamic jsWindow = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
-                    jsWindow.SetProperty("onCallBack", new OnCallBack(CallbacksDictionary));
+                    jsWindow.SetProperty("onCallBack", new OnCallBack(_callbacksStore));
 #if OPENSILVER
                 }
                 else
                 {
-                    OnCallBack.SetCallbacksDictionary(CallbacksDictionary);
+                    OnCallBack.SetCallbacksDictionary(_callbacksStore);
                 }
 #endif
-                IsJavaScriptCSharpInteropSetUp = true;
+                _isInitialized = true;
             }
 
             string unmodifiedJavascript = javascript;
@@ -95,7 +95,7 @@ namespace CSHTML5
             // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
             // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
             // 10 arguments and using "$10".
-            for (int i = variables.Length - 1; i >= 0; i--)  
+            for (int i = variables.Length - 1; i >= 0; i--)
             {
                 var variable = variables[i];
                 if (variable is INTERNAL_JSObjectReference)
@@ -145,8 +145,7 @@ namespace CSHTML5
                     Delegate callback = (Delegate)variable;
 
                     // Add the callback to the document:
-                    int callbackId = ReferenceIDGenerator.GenerateId();
-                    CallbacksDictionary.Add(callbackId, callback);
+                    int callbackId = _callbacksStore.Add(callback);
 
                     var isVoid = callback.Method.ReturnType == typeof(void);
 
@@ -194,17 +193,14 @@ namespace CSHTML5
                 }
             }
 
-            UnmodifiedJavascriptCalls.Add(unmodifiedJavascript);
-
             // Change the JS code to call ShowErrorMessage in case of error:
-            string errorCallBackId = IndexOfNextUnmodifiedJSCallInList.ToString();
-            ++IndexOfNextUnmodifiedJSCallInList;
+            string errorCallBackId = _javascriptCallsStore.Add(unmodifiedJavascript).ToString();
 
             // Surround the javascript code with some code that will store the
             // result into the "document.jsObjRef" for later
             // use in subsequent calls to this method
-            int referenceId = ReferenceIDGenerator.GenerateId();
-            javascript = $"document.callScriptSafe(\"{referenceId.ToString()}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
+            string referenceId = _refIdGenerator.NewId().ToString();
+            javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
 
             // Execute the javascript code:
             object value = null;
@@ -217,7 +213,7 @@ namespace CSHTML5
                 INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
             }
 
-            return new INTERNAL_JSObjectReference(value, referenceId.ToString());
+            return new INTERNAL_JSObjectReference(value, referenceId);
         }
 
         internal static void ResetLoadedFilesDictionaries()
@@ -228,7 +224,7 @@ namespace CSHTML5
 
         internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
-            string str = UnmodifiedJavascriptCalls.ElementAt(indexOfCallInList);
+            string str = _javascriptCallsStore.Get(indexOfCallInList);
 
 #if OPENSILVER
             if (IsRunningInTheSimulator_WorkAround())
@@ -252,24 +248,6 @@ namespace CSHTML5
             }
         }
 
-
-        /// <summary>
-        /// This class has a method that generates IDs in sequence (0, 1, 2, 3...)
-        /// </summary>
-#if BRIDGE
-        [Bridge.External]
-#endif
-        internal static class ReferenceIDGenerator
-        {
-            static int NextFreeId = 1;
-            internal static int GenerateId()
-            {
-                int freeId = NextFreeId;
-                NextFreeId++;
-                return freeId;
-            }
-        }
-
         //This Dictionary is here to:
         // - know when we are already attempting to load the file so we do not try to load it a second time
         // - call the correct callback (success or failure) for everything that tried to load said file (so
@@ -277,7 +255,7 @@ namespace CSHTML5
         private static Dictionary<string, List<Tuple<Action, Action>>> _pendingJSFile = new Dictionary<string, List<Tuple<Action, Action>>>();
 
         // To know which files have already been successfully loaded so can we simply call the OnSuccess callback.
-        private static HashSet<string> _loadedFiles = new HashSet<string>(); 
+        private static HashSet<string> _loadedFiles = new HashSet<string>();
 
         internal static void LoadJavaScriptFile(string url, string callerAssemblyName, Action callbackOnSuccess, Action callbackOnFailure = null)
         {
@@ -317,7 +295,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); 
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -329,7 +307,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument)); 
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();
@@ -425,5 +403,45 @@ img.src = $0;", html5Path, callback);
             return DotNetForHtml5.Core.INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround;
         }
 #endif
+    }
+
+    /// <summary>
+    /// This class has a method that generates IDs in sequence (0, 1, 2, 3...)
+    /// </summary>
+#if BRIDGE
+    [Bridge.External]
+#endif
+    internal class ReferenceIDGenerator
+    {
+        private int _id = 0;
+
+        internal int NewId() => Interlocked.Increment(ref _id);
+    }
+
+    internal class SynchronyzedStore<T>
+    {
+        private readonly object _lock = new object();
+        private readonly List<T> _items;
+
+        public SynchronyzedStore()
+            : this(8192)
+        {
+        }
+
+        public SynchronyzedStore(int initialCapacity)
+        {
+            _items = new List<T>(initialCapacity);
+        }
+
+        public int Add(T item)
+        {
+            lock (_lock)
+            {
+                _items.Add(item);
+                return _items.Count - 1;
+            }
+        }
+
+        public T Get(int index) => _items[index];
     }
 }

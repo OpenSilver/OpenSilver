@@ -31,17 +31,17 @@ namespace CSHTML5.Internal
     // The Class may be instantiated and cannot be static anymore
     public class OnCallBack
     {
-        static private Dictionary<int, Delegate> _dictionary;
+        private static SynchronyzedStore<Delegate> _store;
 
-        public static void SetCallbacksDictionary(Dictionary<int, Delegate> dictionary)
+        internal static void SetCallbacksDictionary(SynchronyzedStore<Delegate> store)
         {
-            _dictionary = dictionary;
+            _store = store;
         }
 
         //constructor
-        public OnCallBack(Dictionary<int, Delegate> dictionary)
+        internal OnCallBack(SynchronyzedStore<Delegate> store)
         {
-            _dictionary = dictionary;
+            _store = store;
         }
 
         #region CallBack methods
@@ -95,7 +95,7 @@ namespace CSHTML5.Internal
             //----------------------------------
             // Get the C# callback from its ID:
             //----------------------------------
-            Delegate callback = _dictionary[callbackId];
+            Delegate callback = _store.Get(callbackId);
 
             Type callbackType = callback.GetType();
             Type[] callbackGenericArgs = null;
