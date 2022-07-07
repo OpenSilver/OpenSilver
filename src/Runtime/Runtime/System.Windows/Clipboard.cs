@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,130 +11,181 @@
 *  
 \*====================================================================================*/
 
-
-using DotNetForHtml5.Core;
+using System;
 using System.Threading.Tasks;
+using DotNetForHtml5.Core;
 
+#if MIGRATION
 namespace System.Windows
+#else
+namespace Windows.UI.Xaml
+#endif
 {
     /// <summary>
-    /// Provides static methods that facilitate transferring data to and from the
-    /// system clipboard. In Silverlight 5, this access is limited to Unicode text
-    /// strings.
+    /// Provides static methods that facilitate transferring data to and from the system
+    /// clipboard. In Silverlight 5, this access is limited to Unicode text strings.
     /// </summary>
     public static class Clipboard
     {
-        private static void InitClipboard()
-        {
-            Text.StringBuilder function = new Text.StringBuilder();
-            function.Append("if(!navigator.clipboard)");
-            function.Append("{");
-            function.Append("	navigator.clipboard = {};");
-            function.Append("	navigator.clipboard.writeText = function(data)");
-            function.Append("	{");
-            function.Append("		var $tempElement = document.createElement('input');");
-            function.Append("		document.body.append($tempElement);");
-            function.Append("		$tempElement.value=data;$tempElement.select();");
-            function.Append("		document.execCommand('Copy');");
-            function.Append("		$tempElement.remove();");
-            function.Append("	};");
-            function.Append("	navigator.clipboard.readText = function()");
-            function.Append("	{");
-            function.Append("	    return new Promise((resolve,reject)=>{");
-            function.Append("		    var $tempElement = document.createElement('input');");
-            function.Append("		    document.body.append($tempElement);");
-            function.Append("		    $tempElement.focus();");
-            function.Append("		    document.execCommand('paste');");
-            function.Append("		    var returnValue = $tempElement.value;");
-            function.Append("		    $tempElement.remove();");
-            function.Append("		    resolve(returnValue);");
-            function.Append("	    });");
-            function.Append("   };");
-            function.Append("}");
-            OpenSilver.Interop.ExecuteJavaScript(function.ToString());
-        }
         /// <summary>
-        /// Sets text data to store on the clipboard.
+        /// Sets Unicode text data to store on the clipboard, for later access with <see cref="GetText"/>.
         /// </summary>
-        /// <param name="text">A string that contains the Unicode text data to store on the clipboard.</param>
+        /// <param name="text">
+        /// A string that contains the Unicode text data to store on the clipboard.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// text is null.
+        /// </exception>
         public static void SetText(string text)
         {
+            _ = SetTextAsync(text);
+        }
 
-            // Credits: https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-#if OPENSILVER
-            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
+        /// <summary>
+        /// Sets Unicode text data to store on the clipboard, for later access with <see cref="GetTextAsync"/>.
+        /// </summary>
+        /// <param name="text">
+        /// A string that contains the Unicode text data to store on the clipboard.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// text is null.
+        /// </exception>
+        public static Task SetTextAsync(string text)
+        {
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
                 INTERNAL_Simulator.ClipboardHandler.SetText(text);
+                return Task.CompletedTask;
             }
             else
             {
-                InitClipboard();
-                OpenSilver.Interop.ExecuteJavaScript(@"navigator.clipboard.writeText($0);", text);
+                var tcs = new TaskCompletionSource<object>();
+
+                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.writeText($0).then($1());",
+                    text,
+                    new Action(() =>
+                    {
+                        try
+                        {
+                            tcs.SetResult(null);
+                        }
+                        catch (Exception ex)
+                        {
+                            tcs.SetException(ex);
+                        }
+                    }));
+
+                return tcs.Task;
             }
         }
 
-        public static Task<string> GetText()
+        /// <summary>
+        /// Queries the clipboard for the presence of data in the UnicodeText format.
+        /// Not implemented in the browser. Use <see cref="GetTextAsync"/> instead.
+        /// </summary>
+        /// <returns>
+        /// Always returns <see cref="string.Empty"/> in the browser.
+        /// </returns>
+        [Obsolete("Use GetTextAsync() instead.")]
+        [OpenSilver.NotImplemented]
+        public static string GetText()
         {
-            TaskCompletionSource<String> readBlockTaskCompletionSource = new TaskCompletionSource<String>();
-            Action<string> ReadBlockCallback = (content) =>
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                try
-                {
-                    readBlockTaskCompletionSource.SetResult(content);
-                }
-                catch (Exception ex)
-                {
-                    readBlockTaskCompletionSource.SetException(ex);
-                }
-            };
-#if OPENSILVER
-            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
+                return INTERNAL_Simulator.ClipboardHandler.GetText();
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Retrieves Unicode text data from the system clipboard, if Unicode text data exists.
+        /// </summary>
+        /// <returns>
+        /// If Unicode text data is present on the system clipboard, returns a string that
+        /// contains the Unicode text data. Otherwise, returns an empty string.
+        /// </returns>
+        public static Task<string> GetTextAsync()
+        {
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                readBlockTaskCompletionSource.SetResult(INTERNAL_Simulator.ClipboardHandler.GetText());
-                return readBlockTaskCompletionSource.Task;
+                return Task.FromResult<string>(INTERNAL_Simulator.ClipboardHandler.GetText());
             }
             else
             {
-                InitClipboard();
-                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.readText().then(clipText=> $0(clipText));", ReadBlockCallback);
-                return readBlockTaskCompletionSource.Task;
+                var tcs = new TaskCompletionSource<string>();
+
+                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.readText().then(text => $0(text));",
+                    new Action<string>(content =>
+                    {
+                        try
+                        {
+                            tcs.SetResult(content);
+                        }
+                        catch (Exception ex)
+                        {
+                            tcs.SetException(ex);
+                        }
+                    }));
+
+                return tcs.Task;
             }
         }
 
-        public static Task<bool> ContainsText()
+        /// <summary>
+        /// Queries the clipboard for the presence of data in the UnicodeText format.
+        /// Not implemented in the browser. Use <see cref="ContainsTextAsync"/> instead.
+        /// </summary>
+        /// <returns>
+        /// Always return false in the browser.
+        /// </returns>
+        [Obsolete("Use ContainsTextAsync() instead.")]
+        [OpenSilver.NotImplemented]
+        public static bool ContainsText()
         {
-            TaskCompletionSource<bool> readBlockTaskCompletionSource = new TaskCompletionSource<bool>();
-            Action<string> ReadBlockCallback = (content) =>
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                try
-                {
-                    readBlockTaskCompletionSource.SetResult(!String.IsNullOrEmpty(content));
-                }
-                catch (Exception ex)
-                {
-                    readBlockTaskCompletionSource.SetException(ex);
-                }
-            };
-#if OPENSILVER
-            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
+                return INTERNAL_Simulator.ClipboardHandler.ContainsText();
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Queries the clipboard for the presence of data in the UnicodeText format.
+        /// </summary>
+        /// <returns>
+        /// true if the system clipboard contains Unicode text data; otherwise, false.
+        /// </returns>
+        public static Task<bool> ContainsTextAsync()
+        {
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                readBlockTaskCompletionSource.SetResult(INTERNAL_Simulator.ClipboardHandler.GetText());
-                return readBlockTaskCompletionSource.Task;
+                return Task.FromResult<bool>(INTERNAL_Simulator.ClipboardHandler.ContainsText());
             }
             else
-            {                
-                InitClipboard();
-                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.readText().then(clipText=> $0(clipText));", ReadBlockCallback);
-                return readBlockTaskCompletionSource.Task;
+            {
+                var tcs = new TaskCompletionSource<bool>();
+
+                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.readText().then(text => $0(!!text))",
+                    new Action<bool>(b =>
+                    {
+                        try
+                        {
+                            tcs.SetResult(b);
+                        }
+                        catch (Exception ex)
+                        {
+                            tcs.SetException(ex);
+                        }
+                    }));
+
+                return tcs.Task;
             }
         }
     }
