@@ -15,11 +15,9 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -58,11 +56,11 @@ namespace Windows.UI.Xaml.Controls
         /// collection.</returns>
         public static bool CanInsert(this IEnumerable collection, object item)
         {
-            //ICollectionView collectionView = collection as ICollectionView;
-            //if (collectionView != null)
-            //{
-            //    return CanInsert(collectionView.SourceCollection, item);
-            //}
+            ICollectionView collectionView = collection as ICollectionView;
+            if (collectionView != null)
+            {
+                return CanInsert(collectionView.SourceCollection, item);
+            }
 
             if (IsReadOnly(collection))
             {
@@ -90,17 +88,17 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="item">The item to be inserted.</param>
         public static void Insert(this IEnumerable collection, int index, object item)
         {
-            //ICollectionView collectionView = collection as ICollectionView;
-            //if (collectionView != null)
-            //{
-            //    Insert(collectionView.SourceCollection, index, item);
-            //}
-            //else
-            //{
+            ICollectionView collectionView = collection as ICollectionView;
+            if (collectionView != null)
+            {
+                Insert(collectionView.SourceCollection, index, item);
+            }
+            else
+            {
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.IList`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
-                var method = genericListType.GetMethod("Insert");
+                    var method = genericListType.GetMethod("Insert");
                     method.Invoke(collection, new object[] { index, item });
                 }
                 else
@@ -108,7 +106,7 @@ namespace Windows.UI.Xaml.Controls
                     IList list = collection as IList;
                     list.Insert(index, item);
                 }
-            //}
+            }
         }
 
         /// <summary>
@@ -118,13 +116,13 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>The number of items in the collection.</returns>
         public static int Count(this IEnumerable collection)
         {
-            //ICollectionView collectionView = collection as ICollectionView;
-            //if (collectionView != null)
-            //{
-            //    return collectionView.SourceCollection.Count();
-            //}
-            //else
-            //{
+            ICollectionView collectionView = collection as ICollectionView;
+            if (collectionView != null)
+            {
+                return collectionView.SourceCollection.Count();
+            }
+            else
+            {
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.ICollection`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
@@ -138,7 +136,7 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 return Enumerable.Count(collection.OfType<object>());
-            //}
+            }
         }
 
         /// <summary>
@@ -148,17 +146,17 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="item">The item to be added.</param>
         public static void Add(this IEnumerable collection, object item)
         {
-            //ICollectionView collectionView = collection as ICollectionView;
-            //if (collectionView != null)
-            //{
-            //    Add(collectionView.SourceCollection, item);
-            //}
-            //else
-            //{
+            ICollectionView collectionView = collection as ICollectionView;
+            if (collectionView != null)
+            {
+                Add(collectionView.SourceCollection, item);
+            }
+            else
+            {
                 PropertyInfo countProperty = collection.GetType().GetProperty("Count");
                 int count = (int)countProperty.GetValue(collection, new object[] { });
                 Insert(collection, count, item);
-            //}
+            }
         }
 
         /// <summary>
@@ -168,13 +166,13 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="item">The item to be removed.</param>
         public static void Remove(this IEnumerable collection, object item)
         {
-            //ICollectionView collectionView = collection as ICollectionView;
-            //if (collectionView != null)
-            //{
-            //    collectionView.SourceCollection.Remove(item);
-            //}
-            //else
-            //{
+            ICollectionView collectionView = collection as ICollectionView;
+            if (collectionView != null)
+            {
+                collectionView.SourceCollection.Remove(item);
+            }
+            else
+            {
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.IList`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
@@ -189,7 +187,7 @@ namespace Windows.UI.Xaml.Controls
                     IList list = collection as IList;
                     list.Remove(item);
                 }
-            //}
+            }
         }
 
         /// <summary>
@@ -200,13 +198,13 @@ namespace Windows.UI.Xaml.Controls
         //[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Code is linked into multiple projects.")]
         public static void RemoveAt(this IEnumerable collection, int index)
         {
-            //ICollectionView collectionView = collection as ICollectionView;
-            //if (collectionView != null)
-            //{
-            //    collectionView.SourceCollection.RemoveAt(index);
-            //}
-            //else
-            //{
+            ICollectionView collectionView = collection as ICollectionView;
+            if (collectionView != null)
+            {
+                collectionView.SourceCollection.RemoveAt(index);
+            }
+            else
+            {
                 Type genericListType = collection.GetType().GetInterfaces().Where(interfaceType => interfaceType.FullName.StartsWith("System.Collections.Generic.IList`1", StringComparison.Ordinal)).FirstOrDefault();
                 if (genericListType != null)
                 {
@@ -217,7 +215,7 @@ namespace Windows.UI.Xaml.Controls
                     IList list = collection as IList;
                     list.RemoveAt(index);
                 }
-            //}
+            }
         }
     }
 }

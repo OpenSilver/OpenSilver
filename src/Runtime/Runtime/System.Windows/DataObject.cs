@@ -62,10 +62,9 @@ namespace System.Windows
                 return null;
         }
 
-        [OpenSilver.NotImplemented]
         public object GetData(Type format)
         {
-            throw new NotImplementedException();
+            return _data.ContainsKey(format.Name) ? _data[format.Name] : null;
         }
 
         /// <summary>
