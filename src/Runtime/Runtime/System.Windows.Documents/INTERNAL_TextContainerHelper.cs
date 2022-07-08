@@ -52,6 +52,11 @@ namespace Windows.UI.Xaml.Documents
             {
                 container = new INTERNAL_TextContainerSection((Section)parent);
             }
+            else if(parent is RichTextBox)
+            {
+                container = new INTERNAL_TextContainerRichTextBox((RichTextBox)parent);
+            }
+
             return container;
         }
     }

@@ -143,6 +143,8 @@ namespace CSHTML5.Internal
         public string borderTopLeftRadius { set { SetStylePropertyValue("borderTopLeftRadius", value); } }
         public string borderTopRightRadius { set { SetStylePropertyValue("borderTopRightRadius", value); } }
         public string borderWidth { set { SetStylePropertyValue("borderWidth", value); } }
+        public string borderImageSource { set { SetStylePropertyValue("border-image-source", value); } }
+        public string borderImageSlice { set { SetStylePropertyValue("border-image-slice", value); } }
         public string boxSizing { set { SetStylePropertyValue("boxSizing", value); } }
         public string boxShadow { set { SetStylePropertyValue("boxShadow", value); } }
         public string color { set { SetStylePropertyValue("color", value); } }

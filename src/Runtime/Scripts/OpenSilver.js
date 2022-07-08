@@ -66,6 +66,10 @@ velocityScript.setAttribute('type', 'application/javascript');
 velocityScript.setAttribute('src', 'libs/ResizeObserver.js');
 document.getElementsByTagName('head')[0].appendChild(velocityScript);
 
+let quillJsScript = document.createElement('script');
+quillJsScript.setAttribute('type', 'application/javascript');
+quillJsScript.setAttribute('src', 'libs/quill.min.js');
+document.getElementsByTagName('head')[0].appendChild(quillJsScript);
 
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";

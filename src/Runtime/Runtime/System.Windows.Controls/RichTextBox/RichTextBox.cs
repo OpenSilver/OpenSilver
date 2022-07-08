@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System.Windows.Markup;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Documents;
@@ -32,42 +33,50 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
 	[ContentProperty("Blocks")]
-    [OpenSilver.NotImplemented]
 	public partial class RichTextBox : Control
 	{
+		private IRichTextBoxPresenter _presenter;
+		private object _contentEditableDiv;
+
 		#region Constructor
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RichTextBox"/> class.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public RichTextBox()
         {
-			this.DefaultStyleKey = typeof(RichTextBox);
+			//this.DefaultStyleKey = typeof(RichTextBox);
+			this.Blocks = new BlockCollection(this, false);
+			_presenter = new QuillJsPresenter(this);
+            this.Loaded += OnLoaded;
         }
 
-		#endregion Constructor
+        #endregion Constructor
 
-		#region Public Events
+        #region Public Events
 
-		/// <summary>
-		/// Occurs when the content changes in a <see cref="RichTextBox"/>.
-		/// </summary>
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Occurs when the content changes in a <see cref="RichTextBox"/>.
+        /// </summary>
 		public event ContentChangedEventHandler ContentChanged;
 
 		/// <summary>
 		/// Occurs when the text selection has changed.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public event RoutedEventHandler SelectionChanged;
 
 		#endregion Public Events
 
+		#region Private Events
+		private void OnLoaded(object sender, RoutedEventArgs e)
+		{
+			_presenter.Init();
+		}
+		#endregion
+
 		#region Public Properties
 
 		private ScrollBarVisibility _verticalScrollBarVisibility = ScrollBarVisibility.Auto;
-
 		/// <summary>
 		/// Gets or sets the visibility of the vertical scroll bar.
 		/// The default is <see cref="ScrollBarVisibility.Auto"/>.
@@ -79,9 +88,7 @@ namespace Windows.UI.Xaml.Controls
 			set { this._verticalScrollBarVisibility = value; }
 		}
 
-
 		private ScrollBarVisibility _horizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
-		
 		/// <summary>
 		/// Gets or sets the visibility of the horizontal scroll bar.
 		/// </summary>
@@ -101,11 +108,20 @@ namespace Windows.UI.Xaml.Controls
 		/// <returns>
 		/// A <see cref="String"/> object that is a XAML representation of the content in the <see cref="RichTextBox"/>.
 		/// </returns>
-        [OpenSilver.NotImplemented]
 		public string Xaml
 		{
-			get;
-			set;
+			get => _presenter.GetContents();
+            set
+            {
+				this.Blocks.Clear();
+				_presenter.Clear();
+				var parser = new RichTextFormatParser();
+				var blocks = parser.Parse(value);
+				foreach(var block in blocks)
+                {
+					this.Blocks.Add(block);               
+				}
+            }
 		}
 
 		/// <summary>
@@ -127,8 +143,7 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="TextSelection"/> that represents the selected text in
 		/// the <see cref="RichTextBox"/>.
 		/// </returns>
-        [OpenSilver.NotImplemented]
-		public TextSelection Selection { get; }
+		public TextSelection Selection => _presenter.Selection;
 
 		/// <summary>
 		/// Gets a <see cref="TextPointer"/> that indicates the end of content
@@ -159,14 +174,15 @@ namespace Windows.UI.Xaml.Controls
 		/// A <see cref="BlockCollection"/> that contains the contents of the
 		/// <see cref="RichTextBox"/>.
 		/// </returns>
-        [OpenSilver.NotImplemented]
 		public BlockCollection Blocks { get; }
 
-		#region Dependency Properties
+        internal override bool EnablePointerEventsCore => true;
 
-		/// <summary>
-		/// Identifies the <see cref="RichTextBox.IsReadOnly"/> dependency property.
-		/// </summary>
+        #region Dependency Properties
+
+        /// <summary>
+        /// Identifies the <see cref="RichTextBox.IsReadOnly"/> dependency property.
+        /// </summary>
         [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IsReadOnlyProperty =
 			DependencyProperty.Register(
@@ -342,24 +358,24 @@ namespace Windows.UI.Xaml.Controls
             set { this.SetValue(TextWrappingProperty, value); }
         }
 
-		#endregion Dependency Properties
+        #endregion Dependency Properties
 
-		#endregion Public Properties
+        #endregion Public Properties
 
-		#region Public Methods
+        #region Public Methods
 
-		/// <summary>
-		/// Returns a <see cref="TextPointer"/> that indicates the closest insertion
-		/// position for the specified point.
-		/// </summary>
-		/// <param name="point">
-		/// A point in the coordinate space of the <see cref="RichTextBox"/> for
-		/// which the closest insertion position is retrieved.
-		/// </param>
-		/// <returns>
-		/// A <see cref="TextPointer"/> that indicates the closest insertion position
-		/// for the specified point.
-		/// </returns>
+        /// <summary>
+        /// Returns a <see cref="TextPointer"/> that indicates the closest insertion
+        /// position for the specified point.
+        /// </summary>
+        /// <param name="point">
+        /// A point in the coordinate space of the <see cref="RichTextBox"/> for
+        /// which the closest insertion position is retrieved.
+        /// </param>
+        /// <returns>
+        /// A <see cref="TextPointer"/> that indicates the closest insertion position
+        /// for the specified point.
+        /// </returns>
         [OpenSilver.NotImplemented]
 		public TextPointer GetPositionFromPoint(Point point)
 		{
@@ -369,14 +385,37 @@ namespace Windows.UI.Xaml.Controls
 		/// <summary>
 		/// Selects the entire contents in the <see cref="RichTextBox"/>.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public void SelectAll()
 		{
+			_presenter.SelectAll();
 		}
 
-		#endregion Public Methods
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            object outerDiv;
+            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
+			outerDivStyle.borderStyle = "solid";
+			outerDivStyle.borderWidth = "1px";
+            outerDivStyle.borderRadius = "2px";
+			outerDivStyle.borderImageSlice = "1";
+			outerDivStyle.borderImageSource = "linear-gradient(540deg, #A3AEB9 0%, #8399A9 37.5%, #718597 37.5%, #617584 100%)";
 
-		#region Protected Methods
+			object contentEditable;
+            var editableContentStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out contentEditable);
+            editableContentStyle.backgroundColor = "transparent";
+            editableContentStyle.outline = "0px solid transparent";
+            editableContentStyle.overflow = "auto";
+            editableContentStyle.height = "100%";
+
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditable, "contentEditable", true);
+            domElementWhereToPlaceChildren = contentEditable;
+            _contentEditableDiv = contentEditable;
+            return outerDiv;
+        }
+
+        #endregion Public Methods
+
+        #region Protected Methods
 
 #if false
 		/// <summary>
@@ -394,12 +433,12 @@ namespace Windows.UI.Xaml.Controls
         }
 #endif
 
-		/// <summary>
-		/// Called before the <see cref="UIElement.GotFocus"/> event occurs.
-		/// </summary>
-		/// <param name="e">
-		/// The data for the event.
-		/// </param>
+        /// <summary>
+        /// Called before the <see cref="UIElement.GotFocus"/> event occurs.
+        /// </summary>
+        /// <param name="e">
+        /// The data for the event.
+        /// </param>
         [OpenSilver.NotImplemented]
 		protected override void OnGotFocus(RoutedEventArgs e)
         {
@@ -569,6 +608,33 @@ namespace Windows.UI.Xaml.Controls
         {
         }
 
-#endregion Protected Methods
+		#endregion Protected Methods
+
+		#region Internal Methods
+		internal void RaiseContentChanged()
+		{
+			ContentChanged?.Invoke(this, new ContentChangedEventArgs());
+		}
+
+		internal void RaiseSelectionChanged()
+		{
+			SelectionChanged?.Invoke(this, new RoutedEventArgs());
+		}
+
+		internal string GetEditorId()
+		{
+			return ((INTERNAL_HtmlDomElementReference)_contentEditableDiv).UniqueIdentifier;
+		}
+
+		internal string GetRawText()
+        {
+			return _presenter.GetAllText();
+        }
+
+		internal void InsertText(string text)
+        {
+
+        }
+		#endregion
 	}
 }
