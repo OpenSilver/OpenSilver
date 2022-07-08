@@ -1235,9 +1235,9 @@ parentElement.appendChild(child);";
                         intersectingPoint.Y)));
             }
 
-            foreach (string id in elements)
+            for (int i = elements.Length - 1; i >= 0; i--)
             {
-                if (INTERNAL_idsToUIElements.TryGetValue(id, out UIElement uie))
+                if (INTERNAL_idsToUIElements.TryGetValue(elements[i], out UIElement uie))
                 {
                     yield return uie;
                 }

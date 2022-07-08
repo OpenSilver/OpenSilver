@@ -1271,7 +1271,7 @@ window.elementsFromPointOpensilver = function (x, y, element) {
         }
         currentNode = walker.nextNode();
     }
-    return JSON.stringify(elements.reverse());
+    return JSON.stringify(elements);
 };
 
 function PerformHitTest(x, y, rect) {
