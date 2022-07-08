@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Input;
@@ -55,6 +56,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         ButtonBase _verticalLargeDecrease;
         ButtonBase _verticalLargeIncrease;
 
+        private DebounceDispatcher _debounceDispatcher;
+
         /// <summary>
         /// Initializes a new instance of the ScrollBar class.
         /// </summary>
@@ -82,8 +85,54 @@ namespace Windows.UI.Xaml.Controls.Primitives
             _controlWasProperlyDrawn = false;
         }
 
-        public bool? EnableScrollDebouncing { get; set; }
-        public int? ScrollDebouncingInterval { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static readonly DependencyProperty DebounceProperty =
+            DependencyProperty.RegisterAttached(
+                nameof(Debounce),
+                typeof(TimeSpan),
+                typeof(ScrollBar),
+                new PropertyMetadata(GetDefaultDebounce()));
+
+        private static TimeSpan GetDefaultDebounce()
+        {
+            Application app = Application.Current;
+            if (app != null)
+            {
+                return app.Host.Settings.ScrollDebounce;
+            }
+
+            return TimeSpan.Zero;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public TimeSpan Debounce
+        {
+            get => (TimeSpan)GetValue(DebounceProperty);
+            set => SetValue(DebounceProperty, value);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static TimeSpan GetDebounce(FrameworkElement fe)
+        {
+            if (fe is null)
+            {
+                throw new ArgumentNullException(nameof(fe));
+            }
+
+            return (TimeSpan)fe.GetValue(DebounceProperty);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static void SetDebounce(FrameworkElement fe, TimeSpan debounce)
+        {
+            if (fe is null)
+            {
+                throw new ArgumentNullException(nameof(fe));
+            }
+
+            fe.SetValue(DebounceProperty, debounce);
+        }
+
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -109,9 +158,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             _verticalSmallIncrease = this.GetTemplateChild("VerticalSmallIncrease") as ButtonBase;
             _verticalLargeDecrease = this.GetTemplateChild("VerticalLargeDecrease") as ButtonBase;
             _verticalLargeIncrease = this.GetTemplateChild("VerticalLargeIncrease") as ButtonBase;
-
-            if (EnableScrollDebouncing == null) EnableScrollDebouncing = Application.Current.Host.Settings.EnableScrollDebouncing;
-            if (ScrollDebouncingInterval == null) ScrollDebouncingInterval = Application.Current.Host.Settings.ScrollDebouncingInterval;
                     
             //----------------------------
             // Register the events:
@@ -237,26 +283,33 @@ namespace Windows.UI.Xaml.Controls.Primitives
             ChangeValueBasedOnPointerMovement(e.HorizontalChange);
         }
 
-        private DebounceDispatcher _debounceDispatcher = new DebounceDispatcher();
         void OnClickOnSmallOrLargeDecreaseIncreaseButtons(double amountByWhichToIncreaseOrDecreaseTheValue, ScrollEventType scrollEventType)
         {
             double newValue = CoerceValue(this.Value + amountByWhichToIncreaseOrDecreaseTheValue);
             if (newValue != this.Value)
             {
                 this.SetCurrentValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
-                if (EnableScrollDebouncing.Value)
+                OnScroll(newValue, scrollEventType);
+            }
+        }
+
+        private void OnScroll(double value, ScrollEventType scrollEventType)
+        {
+            TimeSpan debounce = Debounce;
+            if (debounce > TimeSpan.Zero)
+            {
+                if (_debounceDispatcher == null)
                 {
-                    _debounceDispatcher.Debounce(this.ScrollDebouncingInterval.Value, () =>
-                    {
-                        if (this.Scroll != null)
-                            this.Scroll(this, new ScrollEventArgs(newValue, scrollEventType));
-                    });
+                    _debounceDispatcher = new DebounceDispatcher();
                 }
-                else
-                {
-                    if (this.Scroll != null)
-                        this.Scroll(this, new ScrollEventArgs(newValue, scrollEventType));
-                }
+
+                _debounceDispatcher.Debounce(
+                    debounce,
+                    () => Scroll?.Invoke(this, new ScrollEventArgs(value, scrollEventType)));
+            }
+            else
+            {
+                Scroll?.Invoke(this, new ScrollEventArgs(value, scrollEventType));
             }
         }
 
@@ -288,22 +341,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (_horizontalLargeIncrease != null)
                 _horizontalLargeIncrease.IsHitTestVisible = true;
 
-            if (EnableScrollDebouncing.Value)
-            {
-                //interval is 0 because we want to immediate scroll when user finish the drag
-                _debounceDispatcher.Debounce(0, () =>
-                {
-                    // Call the "Scroll" event passing the "EndScroll" argument:
-                    if (this.Scroll != null)
-                        this.Scroll(this, new ScrollEventArgs(this.Value, ScrollEventType.EndScroll));
-                });
-            }
-            else
-            {
-                // Call the "Scroll" event passing the "EndScroll" argument:
-                if (this.Scroll != null)
-                    this.Scroll(this, new ScrollEventArgs(this.Value, ScrollEventType.EndScroll));
-            }
+            OnScroll(Value, ScrollEventType.EndScroll);
         }
 
         void ChangeValueBasedOnPointerMovement(double pointerMovementInPixels)
@@ -345,19 +383,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     UpdateThumbPositionAndSize(totalControlSizeInMainDirection);
 
                     // Call the "Scroll" event:
-                    if (EnableScrollDebouncing.Value)
-                    {
-                        _debounceDispatcher.Debounce(this.ScrollDebouncingInterval.Value, () =>
-                        {
-                            if (this.Scroll != null)
-                                this.Scroll(this, new ScrollEventArgs(newValue, ScrollEventType.ThumbTrack));
-                        });
-                    }
-                    else
-                    {
-                        if (this.Scroll != null)
-                            this.Scroll(this, new ScrollEventArgs(newValue, ScrollEventType.ThumbTrack));
-                    }
+                    OnScroll(newValue, ScrollEventType.ThumbTrack);
                 }
             }
         }
@@ -695,31 +721,5 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// Occurs one or more times as content scrolls in a ScrollBar when the user moves the Thumb by using the mouse.
         /// </summary>
         public event ScrollEventHandler Scroll;
-    }
-
-    internal class DebounceDispatcher
-    {
-        private DispatcherTimer _timer;
-
-        public void Debounce(int interval, Action action)
-        {
-            _timer?.Stop();
-            _timer = null;
-
-            // timer is recreated for each event and effectively resets the timeout. 
-            // Action only fires after timeout has fully elapsed without other events firing in between
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromMilliseconds(interval);
-            _timer.Tick += ((s, e) =>
-            {
-                if (_timer == null)
-                    return;
-                _timer?.Stop();
-                _timer = null;
-                action.Invoke();
-            });
-
-            _timer.Start();
-        }
     }
 }

@@ -97,6 +97,7 @@
     <Compile Include="OpenSilver\Internal\Data\SourcePropertyNode.cs" />
     <Compile Include="OpenSilver\Internal\Data\StandardPropertyPathNode.cs" />
     <Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
+    <Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
     <Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
     <Compile Include="OpenSilver\Internal\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />

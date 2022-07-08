@@ -205,7 +205,7 @@
                                 <localprimitives:DataGridRowsPresenter Name="RowsPresenter" ClipToBounds="True" Grid.ColumnSpan="2" Grid.Row="1" />
                                 <Rectangle Name="BottomRightCorner" Fill="#FFE9EEF4" Grid.Column="2" Grid.Row="2" />
                                 <Rectangle Name="BottomLeftCorner" Fill="#FFE9EEF4" Grid.Row="2" Grid.ColumnSpan="2" />
-                                <ScrollBar Name="VerticalScrollbar" Orientation="Vertical" Grid.Column="2" Grid.Row="1" Width="18" Margin="0,-1,-1,-1"/>
+                                <ScrollBar Name="VerticalScrollbar" Orientation="Vertical" Grid.Column="2" Grid.Row="1" Width="18" Margin="0,-1,-1,-1" Debounce="{Binding (ScrollBar.Debounce), RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
 
                                 <Grid Grid.Column="1" Grid.Row="2">
                                     <Grid.ColumnDefinitions>

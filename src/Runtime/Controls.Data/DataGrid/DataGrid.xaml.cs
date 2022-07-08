@@ -2948,7 +2948,6 @@ namespace Windows.UI.Xaml.Controls
             _vScrollBar = GetTemplateChild(DATAGRID_elementVerticalScrollbarName) as ScrollBar;
             if (_vScrollBar != null)
             {
-                _vScrollBar.EnableScrollDebouncing = true;
                 _vScrollBar.IsTabStop = false;
                 _vScrollBar.Maximum = 0.0;
                 _vScrollBar.Orientation = Orientation.Vertical;

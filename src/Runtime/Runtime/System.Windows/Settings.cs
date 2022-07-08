@@ -38,10 +38,11 @@ namespace System
             EnableBindingErrorsLogging = false;
             EnableBindingErrorsThrowing = false;
             EnableInvalidPropertyMetadataDefaultValueExceptions = true;
-            ScrollDebouncingInterval = 400;
+            ScrollDebounce = TimeSpan.Zero;
         }
-        public bool EnableScrollDebouncing { get; set; }
-        public int ScrollDebouncingInterval { get; set; }
+
+        public TimeSpan ScrollDebounce { get; set; }
+
         public CredentialsMode DefaultSoapCredentialsMode { get; set; }
 
         public bool EnableBindingErrorsLogging { get; set; }

@@ -55,6 +55,7 @@
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
 		<Compile Include="Diagnostics\DebugInfo.cs" />
 		<Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
+		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
 		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
