@@ -52,7 +52,10 @@ namespace System
             EnableBindingErrorsLogging = false;
             EnableBindingErrorsThrowing = false;
             EnableInvalidPropertyMetadataDefaultValueExceptions = true;
+            ScrollDebounce = TimeSpan.Zero;
         }
+
+        public TimeSpan ScrollDebounce { get; set; }
 
         public CredentialsMode DefaultSoapCredentialsMode { get; set; }
 
