@@ -27,11 +27,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
+
 #if !CSHTML5NETSTANDARD
 using DotNetBrowser;
 #endif
@@ -1210,6 +1212,36 @@ parentElement.appendChild(child);";
             UIElement result = GetUIElementFromDomElement(domElementAtCoordinates);
 
             return result;
+        }
+
+        internal static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
+        {
+            string[] elements;
+            if (subtree != null)
+            {
+                elements = JsonSerializer.Deserialize<string[]>(
+                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
+                        @"window.elementsFromPointOpensilver($0,$1,$2)",
+                        intersectingPoint.X,
+                        intersectingPoint.Y,
+                        OpenSilver.Interop.GetDiv(subtree))));
+            }
+            else
+            {
+                elements = JsonSerializer.Deserialize<string[]>(
+                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
+                        @"window.elementsFromPointOpensilver($0,$1,null)",
+                        intersectingPoint.X,
+                        intersectingPoint.Y)));
+            }
+
+            for (int i = elements.Length - 1; i >= 0; i--)
+            {
+                if (INTERNAL_idsToUIElements.TryGetValue(elements[i], out UIElement uie))
+                {
+                    yield return uie;
+                }
+            }
         }
 
         public static UIElement GetUIElementFromDomElement(object domElementRef)

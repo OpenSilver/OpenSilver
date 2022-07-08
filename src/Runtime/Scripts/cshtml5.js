@@ -1271,3 +1271,28 @@ var jsilConfig = {
       "index"
     ]
 };
+
+window.elementsFromPointOpensilver = function (x, y, element) {
+    const elements = [];
+    if (element == undefined || element == null) {
+        element = document.body;
+    } else if (typeof element === 'string') {
+        element = document.getElementById(element);
+    }
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, null, false);
+    let currentNode = walker.currentNode;
+    while (currentNode) {
+        if (currentNode.className && currentNode.id && currentNode.getBoundingClientRect) {
+            const visualBound = currentNode.getBoundingClientRect();
+            if (PerformHitTest(x, y, visualBound)) {
+                elements.push(currentNode.id);
+            }
+        }
+        currentNode = walker.nextNode();
+    }
+    return JSON.stringify(elements);
+};
+
+function PerformHitTest(x, y, rect) {
+    return rect.x <= x && x <= rect.x + rect.width && rect.y <= y && y <= rect.y + rect.height;
+}
