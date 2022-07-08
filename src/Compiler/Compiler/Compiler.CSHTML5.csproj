@@ -110,6 +110,7 @@
     <Compile Include="EntryPoints\AfterXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\EntryPointGenerator.cs" />
     <Compile Include="EntryPoints\ResXProcessor.cs" />
+    <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
     <Compile Include="EntryPoints\Wrapper_BridgeVersion.cs" />
     <Compile Include="EntryPoints\OutputPathsEraser.cs" />
     <Compile Include="EntryPoints\ResourcesProcessor.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="OtherHelpersAndHandlers\GeneratingSerializationAssemblies.cs" />
     <Compile Include="OtherHelpersAndHandlers\ShortPathHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs" />
+    <Compile Include="OtherHelpersAndHandlers\Version.cs" />
     <Compile Include="OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\WrapperHelpers.cs" />
