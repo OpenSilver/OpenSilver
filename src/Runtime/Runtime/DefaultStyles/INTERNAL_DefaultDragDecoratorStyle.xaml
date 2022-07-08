@@ -1,0 +1,271 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/client/2007"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="DragDecorator"
+           xmlns="http://schemas.microsoft.com/client/2007">
+        <Setter Property="Margin"
+                Value="0,4,0,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DragDecorator">
+                    <Canvas>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Header"
+                                                                       Storyboard.TargetProperty="Foreground"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <SolidColorBrush Color="#FF999999" />
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="EffectStates">
+                                <VisualState x:Name="Move">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MoveImage"
+                                                                       Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Copy">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CopyImage"
+                                                                       Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Link">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LinkImage"
+                                                                       Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Scroll">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ScrollImage"
+                                                                       Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="None">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NoneImage"
+                                                                       Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Margin="{TemplateBinding Margin}"
+                                          Cursor="{TemplateBinding Cursor}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Opacity="0.25" />
+                        <Grid Canvas.Left="{Binding IconPosition.X, RelativeSource={RelativeSource TemplatedParent}}"
+                              Canvas.Top="{Binding IconPosition.Y, RelativeSource={RelativeSource TemplatedParent}}">
+                            <Border x:Name="MoveImage"
+                                    BorderThickness="1"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Top">
+                                <StackPanel HorizontalAlignment="Left"
+                                            Orientation="Horizontal">
+                                    <Path Stretch="Fill"
+                                          StrokeLineJoin="Round"
+                                          Stroke="White"
+                                          Data="F1 M409.01999,315.047 L384,315.047 L384,305.198 L408.974,305.198 L408.974,304.444 L405.422,304.444 L407.289,299.33301 L428.44315,309.66699 L408.39801,320 L405.422,315.79999 L409.01999,315.79999 L409.01999,315.047 z"
+                                          Height="10"
+                                          Width="10"
+                                          UseLayoutRounding="False"
+                                          StrokeThickness="0.3"
+                                          VerticalAlignment="Bottom">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0.5,0"
+                                                                 EndPoint="0.5,1">
+                                                <GradientStop Color="#FF0019A4"
+                                                              Offset="0" />
+                                                <GradientStop Color="#FF2B2956"
+                                                              Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                        <Path.Effect>
+                                            <DropShadowEffect BlurRadius="8"
+                                                              ShadowDepth="1.51181"
+                                                              Opacity="0.6"
+                                                              Color="#FF000000"
+                                                              Direction="315" />
+                                        </Path.Effect>
+                                    </Path>
+                                </StackPanel>
+                            </Border>
+                            <Border x:Name="CopyImage"
+                                    BorderThickness="1"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Top">
+                                <StackPanel HorizontalAlignment="Left"
+                                            Orientation="Horizontal">
+                                    <Path Stretch="Fill"
+                                          StrokeLineJoin="Round"
+                                          Stroke="#FFFFFFFF"
+                                          StrokeThickness="0.1"
+                                          Data="F1 M 394.667,256.833L 405.333,256.833L 405.333,267.5L 416,267.5L 416,278.167L 405.333,278.167L 405.333,288.833L 394.667,288.833L 394.667,278.167L 384,278.167L 384,267.5L 394.667,267.5L 394.667,256.833 Z "
+                                          UseLayoutRounding="False"
+                                          Width="8"
+                                          Height="8"
+                                          VerticalAlignment="Top">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0.5,0"
+                                                                 EndPoint="0.5,1">
+                                                <GradientStop Color="#FF0019A4"
+                                                              Offset="0" />
+                                                <GradientStop Color="#FF2B2956"
+                                                              Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                        <Path.Effect>
+                                            <DropShadowEffect BlurRadius="8"
+                                                              ShadowDepth="1.51181"
+                                                              Opacity="0.6"
+                                                              Color="#FF000000"
+                                                              Direction="315" />
+                                        </Path.Effect>
+                                    </Path>
+                                </StackPanel>
+                            </Border>
+                            <Border x:Name="LinkImage"
+                                    BorderThickness="1"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Top">
+                                <Path Stretch="Fill"
+                                      StrokeLineJoin="Round"
+                                      Stroke="White"
+                                      Data="F1 M924.995,614.00098 C946.44397,614.00098 965.31097,624.289 976.20599,639.84998 C987.12598,624.41699 1005.91,614.22998 1027.26,614.22998 C1060.99,614.22998 1076.9962,644.49744 1076.9962,675.88147 C1076.9962,707.26544 1060.99,727.88202 1027.26,727.88202 C1005.81,727.88202 986.94,717.59399 976.04401,702.03302 C965.125,717.466 946.33801,727.65198 924.995,727.65198 C891.26398,727.65198 863.91998,702.211 863.91998,670.82703 C863.91998,639.44299 891.26398,614.00098 924.995,614.00098 z M986.06897,670.82703 C986.06897,671.42603 986.06,672.02197 986.03998,672.617 C986.91998,693.09003 1005.04,709.43597 1027.26,709.43597 C1050.04,709.43597 1068.51,692.25299 1068.51,671.05603 C1068.51,649.85999 1050.04,632.677 1027.26,632.677 C1005.1,632.677 987.02899,648.92401 986.04797,669.31097 C986.06201,669.815 986.06897,670.32001 986.06897,670.82703 z M924.995,632.44702 C902.21301,632.44702 883.745,649.63 883.745,670.82703 C883.745,692.02301 902.21301,709.20697 924.995,709.20697 C947.14801,709.20697 965.22198,692.95801 966.20203,672.57001 C966.18799,672.06702 966.18103,671.56299 966.18103,671.05603 C966.18103,670.45801 966.19098,669.862 966.211,669.26801 C965.33197,648.79401 947.21503,632.44702 924.995,632.44702 z"
+                                      Height="6"
+                                      Width="9.5"
+                                      UseLayoutRounding="False"
+                                      StrokeThickness="0.1">
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0.494361,-0.312728"
+                                                             EndPoint="0.292808,2.1524">
+                                            <LinearGradientBrush.GradientStops>
+                                                <GradientStop Color="#FFFF0000"
+                                                              Offset="0" />
+                                                <GradientStop Color="#FF000000"
+                                                              Offset="1" />
+                                            </LinearGradientBrush.GradientStops>
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.Effect>
+                                        <DropShadowEffect BlurRadius="6"
+                                                          ShadowDepth="3.02362"
+                                                          Opacity="0.6"
+                                                          Color="#FF000000"
+                                                          Direction="315" />
+                                    </Path.Effect>
+                                </Path>
+                            </Border>
+                            <Border x:Name="ScrollImage"
+                                    BorderThickness="1"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Top">
+                                <Path  HorizontalAlignment="Left"
+                                       Stroke="Black"
+                                       Data="M 0,5 L 10,5 L 5,0 M 0,8 L 10,8 L 5,13">
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0.494361,-0.312728"
+                                                             EndPoint="0.292808,2.1524">
+                                            <LinearGradientBrush.GradientStops>
+                                                <GradientStop Color="#FF606060"
+                                                              Offset="0" />
+                                                <GradientStop Color="#FF000000"
+                                                              Offset="1" />
+                                            </LinearGradientBrush.GradientStops>
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.Effect>
+                                        <DropShadowEffect BlurRadius="6"
+                                                          ShadowDepth="3.02362"
+                                                          Opacity="0.6"
+                                                          Color="#FF000000"
+                                                          Direction="315" />
+                                    </Path.Effect>
+                                </Path>
+                            </Border>
+                            <Border x:Name="NoneImage"
+                                    BorderThickness="1"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Top">
+                                <Path  HorizontalAlignment="Left"
+                                       Width="10"
+                                       Height="10"
+                                       Stretch="Fill"
+                                       StrokeThickness="0.2"
+                                       StrokeLineJoin="Round"
+                                       Stroke="#FF960000"
+                                       Data="F1 M 690.086,484.334C 678.212,484.334 668.586,493.96 668.586,505.834C 668.586,517.708 678.212,527.334 690.086,527.334C 701.96,527.334 711.586,517.708 711.586,505.834C 711.586,493.96 701.961,484.334 690.086,484.334 Z M 690.086,491.313C 698.106,491.313 704.607,497.814 704.607,505.834C 704.607,508.82 703.706,511.595 702.161,513.903L 683.985,492.654C 685.84,491.793 687.907,491.313 690.086,491.313 Z M 690.086,520.355C 682.067,520.355 675.566,513.854 675.566,505.834C 675.566,502.605 676.62,499.622 678.403,497.21L 696.797,518.715C 694.79,519.763 692.507,520.355 690.086,520.355 Z ">
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0.494361,-0.312728"
+                                                             EndPoint="0.292808,2.1524">
+                                            <LinearGradientBrush.GradientStops>
+                                                <GradientStop Color="#FFFF0000"
+                                                              Offset="0" />
+                                                <GradientStop Color="#FF000000"
+                                                              Offset="1" />
+                                            </LinearGradientBrush.GradientStops>
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                    <Path.Effect>
+                                        <DropShadowEffect BlurRadius="6"
+                                                          ShadowDepth="3.02362"
+                                                          Opacity="0.6"
+                                                          Color="#FF000000"
+                                                          Direction="315" />
+                                    </Path.Effect>
+                                </Path>
+                            </Border>
+                        </Grid>
+                    </Canvas>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
