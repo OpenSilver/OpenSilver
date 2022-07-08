@@ -33,6 +33,8 @@
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.Pass2.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\IMetadata.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\XamlReader.cs" />
+    <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
+    <Compile Include="OtherHelpersAndHandlers\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\CoreTypesHelper.cs" />
