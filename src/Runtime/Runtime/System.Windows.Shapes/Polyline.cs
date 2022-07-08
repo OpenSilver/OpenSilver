@@ -108,9 +108,8 @@ namespace Windows.UI.Xaml.Shapes
             if (e.NewValue != null && e.NewValue is PointCollection)
                 ((PointCollection)(e.NewValue)).SetParentShape(line);
 
-            line.SetValue(PointsProperty, e.NewValue);
 
-            if (line.IsLoaded)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(line))
             {
                 line.InvalidateMeasure();
                 line.ScheduleRedraw();
@@ -147,7 +146,9 @@ namespace Windows.UI.Xaml.Shapes
                 return;
             }
 
-            if (Points?.Count < 2)
+            var points = (PointCollection)GetValue(PointsProperty);
+
+            if (points == null || points.Count < 2)
             {
                 return;
             }
@@ -184,7 +185,8 @@ namespace Windows.UI.Xaml.Shapes
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (Points?.Count < 2)
+            var points = (PointCollection)GetValue(PointsProperty);
+            if (points == null || points.Count < 2)
             {
                 return base.MeasureOverride(availableSize);
             }

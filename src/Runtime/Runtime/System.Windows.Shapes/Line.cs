@@ -289,7 +289,7 @@ if ($0.setLineDash)
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            return new Size(X2.Max(X1), Y2.Max(Y1));
+            return new Size(Math.Max(0, X2.Max(X1)), Math.Max(0, Y2.Max(Y1)));
         }
 
     }
