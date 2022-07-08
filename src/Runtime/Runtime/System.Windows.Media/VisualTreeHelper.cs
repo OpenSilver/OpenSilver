@@ -122,60 +122,32 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Retrieves a set of objects that are located within a specified point of an object's coordinate space. Note: the current implementation only returns the top-most element.
+        /// Retrieves a set of objects that are located within a specified point of an object's
+        /// coordinate space.
         /// </summary>
-        /// <param name="intersectingPoint">The point to use as the determination point.</param>
-        /// <param name="subtree">The object to search within.</param>
-        /// <returns>An enumerable set of UIElement objects that are determined to be located
-        /// in the visual tree composition at the specified point and within the specified
-        /// subtree.  Note: the current implementation only returns the top-most element.</returns>
+        /// <param name="intersectingPoint">
+        /// The point to use as the determination point.
+        /// </param>
+        /// <param name="subtree">
+        /// The object to search within.
+        /// </param>
+        /// <returns>
+        /// An enumerable set of System.Windows.UIElement objects that are determined to
+        /// be located in the visual tree composition at the specified point and within the
+        /// specified subtee.
+        /// </returns>
         public static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
         {
-            var elementAtCoordinates = FindElementInHostCoordinates(intersectingPoint);
-
-            if (elementAtCoordinates != null)
+            var list = new List<UIElement>();
+            foreach (UIElement uie in INTERNAL_HtmlDomManager.FindElementsInHostCoordinates(intersectingPoint, subtree))
             {
-                if (subtree == null)
+                if (UIElement.EnablePointerEventsBase(uie))
                 {
-                    return new List<UIElement>() { elementAtCoordinates };
-                }
-                else
-                {
-                    //-------------
-                    // Here, it means that neither the result nor the subtree are null.
-                    // So we verify that the result is in the subtree.
-                    //-------------
-
-                    // Walk up the visual tree until we find the subtree root:
-                    UIElement current = elementAtCoordinates as UIElement;
-                    while (current != null)
-                    {
-                        if (current == subtree)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            current = current.INTERNAL_VisualParent as UIElement;
-                        }
-                    }
-
-                    bool elementIsInSubtree = (current != null);
-
-                    if (elementIsInSubtree)
-                    {
-                        return new List<UIElement>() { elementAtCoordinates };
-                    }
-                    else
-                    {
-                        return new List<UIElement>();
-                    }
+                    list.Add(uie);
                 }
             }
-            else
-            {
-                return new List<UIElement>();
-            }
+
+            return list;
         }
 
         /// <summary>

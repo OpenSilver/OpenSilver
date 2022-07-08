@@ -155,4 +155,4 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
         else
             return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
-};
+}; 
