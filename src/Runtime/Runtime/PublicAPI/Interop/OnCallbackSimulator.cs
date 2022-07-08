@@ -1,4 +1,5 @@
 ﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,8 +14,6 @@
 
 using CSHTML5.Types;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 
 #if BRIDGE
 using Bridge;
@@ -22,52 +21,47 @@ using DotNetBrowser;
 #endif
 
 #if OPENSILVER
-using Microsoft.JSInterop;
 #endif
 
 namespace CSHTML5.Internal
 {
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class OnCallBack
+    internal class OnCallbackSimulator
     {
-        static OnCallBack()
+        public OnCallbackSimulator()
         {
-            CheckIsRunningInBrowser();
+            CheckIsRunningInTheSimulator();
         }
 
-        [JSInvokable]
-        public static void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
+        public void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
         {
             OnCallBackImpl.Instance.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
         }
 
-        // This method can be removed later. Now it is used for easier migration from old opensilver.js to new one
-        [JSInvokable]
-        public static object OnCallbackFromJavaScript(
+        // This method can be removed later. Now it is used for easier migration from old cshtml5.js to new one
+        public object OnCallbackFromJavaScript(
             int callbackId,
             string idWhereCallbackArgsAreStored,
-            object[] callbackArgsObject)
+            object callbackArgsObject)
         {
-            return OnCallbackFromJavaScriptBrowser(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
+            return OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
                 false);
         }
 
-        [JSInvokable]
-        public static object OnCallbackFromJavaScriptBrowser(
+        public object OnCallbackFromJavaScript(
             int callbackId,
             string idWhereCallbackArgsAreStored,
-            object[] callbackArgsObject,
+            object callbackArgsObject,
             bool returnValue)
         {
             return OnCallBackImpl.Instance.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                MakeArgumentsForCallbackBrowser, false, returnValue);
+                MakeArgumentsForCallbackSimulator, true, returnValue);
         }
 
-        private static object[] MakeArgumentsForCallbackBrowser(
+        private static object[] MakeArgumentsForCallbackSimulator(
             int count,
             int callbackId,
             string idWhereCallbackArgsAreStored,
-            object[] callbackArgs,
+            object callbackArgs,
             Type[] callbackGenericArgs)
         {
             var result = new object[count];
@@ -93,11 +87,11 @@ namespace CSHTML5.Internal
             return result;
         }
 
-        private static void CheckIsRunningInBrowser()
+        private static void CheckIsRunningInTheSimulator()
         {
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            if (!OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                throw new InvalidOperationException($"'{nameof(OnCallBack)}' is not supported in the simulator.");
+                throw new InvalidOperationException($"'{nameof(OnCallbackSimulator)}' is not supported in the browser.");
             }
         }
     }
