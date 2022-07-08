@@ -3,29 +3,26 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
+
 #if MIGRATION
+using System.Windows.Controls.DataVisualization.Collections;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+namespace System.Windows.Controls.DataVisualization.Charting
 #else
-using System;
 using Windows.Foundation;
+using Windows.UI.Xaml.Controls.DataVisualization.Collections;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
-#endif
-#if !SILVERLIGHT
-using System.Diagnostics.CodeAnalysis;
-#endif
-
-#if MIGRATION
-namespace System.Windows.Controls.DataVisualization.Charting
-#else
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
@@ -33,7 +30,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
     /// Represents a control that contains a dynamic data series.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
     public abstract partial class DataPointSeries : Series
     {
         /// <summary>
@@ -69,6 +65,11 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 
         /// <summary>
+        /// Queue of hide/reveal storyboards to play.
+        /// </summary>
+        private StoryboardQueue _storyBoardQueue = new StoryboardQueue();
+
+        /// <summary>
         /// The binding used to identify the dependent value binding.
         /// </summary>
         private Binding _dependentValueBinding;
@@ -91,6 +92,21 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
                 }
             }
         }
+
+        /// <summary>
+        /// Data points collection sorted by object.
+        /// </summary>
+        private MultipleDictionary<object, DataPoint> _dataPointsByObject = 
+            new MultipleDictionary<object, DataPoint>(
+                true,
+                new GenericEqualityComparer<object>(
+                    (left, right) =>
+                        left.Equals(right),
+                    (obj) => obj.GetHashCode()),
+                new GenericEqualityComparer<DataPoint>(
+                    (left, right) =>
+                        object.ReferenceEquals(left, right),
+                    (obj) => obj.GetHashCode()));
 
         /// <summary>
         /// Gets or sets the Binding Path to use for identifying the dependent value.
@@ -195,13 +211,48 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">Old value of the ItemsSource property.</param>
         /// <param name="newValue">New value of the ItemsSource property.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
+            // Remove handler for oldValue.CollectionChanged (if present)
+            INotifyCollectionChanged oldValueINotifyCollectionChanged = oldValue as INotifyCollectionChanged;
+            if (null != oldValueINotifyCollectionChanged)
+            {
+                // Detach the WeakEventListener
+                if (null != _weakEventListener)
+                {
+                    _weakEventListener.Detach();
+                    _weakEventListener = null;
+                }
+            }
+
+            // Add handler for newValue.CollectionChanged (if possible)
+            INotifyCollectionChanged newValueINotifyCollectionChanged = newValue as INotifyCollectionChanged;
+            if (null != newValueINotifyCollectionChanged)
+            {
+                // Use a WeakEventListener so that the backwards reference doesn't keep this object alive
+                _weakEventListener = new WeakEventListener<DataPointSeries, object, NotifyCollectionChangedEventArgs>(this);
+                _weakEventListener.OnEventAction = (instance, source, eventArgs) => instance.ItemsSourceCollectionChanged(source, eventArgs);
+                _weakEventListener.OnDetachAction = (weakEventListener) => newValueINotifyCollectionChanged.CollectionChanged -= weakEventListener.OnEvent;
+                newValueINotifyCollectionChanged.CollectionChanged += _weakEventListener.OnEvent;
+            }
+
+            if (TemplateApplied)
+            {
+                Refresh();
+            }
         }
         #endregion public IEnumerable ItemsSource
 
         #region public AnimationSequence AnimationSequence
+        /// <summary>
+        /// Gets or sets the animation sequence to use for the DataPoints of the Series.
+        /// </summary>
+        public AnimationSequence AnimationSequence
+        {
+            get { return (AnimationSequence)GetValue(AnimationSequenceProperty); }
+            set { SetValue(AnimationSequenceProperty, value); }
+        }
+
         /// <summary>
         /// Gets a stream of the active data points in the plot area.
         /// </summary>
@@ -296,6 +347,15 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
         #endregion public bool IsSelectionEnabled
 
+        /// <summary>
+        /// Identifies the AnimationSequence dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AnimationSequenceProperty =
+            DependencyProperty.Register(
+                "AnimationSequence",
+                typeof(AnimationSequence),
+                typeof(DataPointSeries),
+                new PropertyMetadata(AnimationSequence.Simultaneous));
         #endregion public AnimationSequence AnimationSequence
 
         /// <summary>
@@ -394,9 +454,67 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">The old selected index.</param>
         /// <param name="newValue">The new value.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnSelectedItemPropertyChanged(object oldValue, object newValue)
         {
+            DataPoint dataPoint = null;
+            if (null != newValue)
+            {
+                // Find the corresponding Control
+                dataPoint = _dataPointsByObject[newValue].Where(dp => object.Equals(newValue, dp.DataContext) && dp.IsActive).FirstOrDefault();
+                if (null == dataPoint)
+                {
+                    // None; clear SelectedItem
+                    try
+                    {
+                        _processingOnSelectedItemPropertyChanged = true;
+                        SelectedItem = null;
+                        // Clear newValue so the SelectionChanged event will be correct (or suppressed)
+                        newValue = null;
+                    }
+                    finally
+                    {
+                        _processingOnSelectedItemPropertyChanged = false;
+                    }
+                }
+            }
+            // Unselect everything else
+            foreach (DataPoint dataPointUnselect in ActiveDataPoints.Where(activeDataPoint => (activeDataPoint != dataPoint) && activeDataPoint.IsSelected))
+            {
+                dataPointUnselect.IsSelectedChanged -= OnDataPointIsSelectedChanged;
+                dataPointUnselect.IsSelected = false;
+                dataPointUnselect.IsSelectedChanged += OnDataPointIsSelectedChanged;
+            }
+            if ((null != dataPoint) && !dataPoint.IsSelected)
+            {
+                // Select the new data point
+                dataPoint.IsSelectedChanged -= OnDataPointIsSelectedChanged;
+                dataPoint.IsSelected = true;
+                dataPoint.IsSelectedChanged += OnDataPointIsSelectedChanged;
+            }
+
+            // Fire SelectionChanged (if appropriate)
+            if (!_processingOnSelectedItemPropertyChanged && (oldValue != newValue))
+            {
+                IList oldValues = new List<object>();
+                if (oldValue != null)
+                {
+                    oldValues.Add(oldValue);
+                }
+                IList newValues = new List<object>();
+                if (newValue != null)
+                {
+                    newValues.Add(newValue);
+                }
+#if SILVERLIGHT
+                SelectionChangedEventHandler handler = SelectionChanged;
+                if (null != handler)
+                {
+                    handler(this, new SelectionChangedEventArgs(oldValues, newValues));
+                }
+#else
+                RaiseEvent(new SelectionChangedEventArgs(SelectionChangedEvent, oldValues, newValues));
+#endif
+            }
         }
         #endregion public object SelectedItem
 
@@ -542,11 +660,15 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         protected DataPointSeries()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             this.DefaultStyleKey = typeof(DataPointSeries);
 #endif
             ClipGeometry = new RectangleGeometry();
             Clip = ClipGeometry;
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(DataPointSeries);
+#endif
         }
 
         /// <summary>
@@ -555,9 +677,15 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="dataContext">The object to add to the series host.</param>
         /// <returns>The data point created for the object.</returns>
-        [OpenSilver.NotImplemented]
         protected virtual DataPoint AddObject(object dataContext)
         {
+            if (ShouldCreateDataPoint(dataContext))
+            {
+                DataPoint dataPoint = CreateAndPrepareDataPoint(dataContext);
+                _dataPointsByObject.Add(dataContext, dataPoint);
+                AddDataPoint(dataPoint);
+                return dataPoint;
+            }
             return null;
         }
 
@@ -616,10 +744,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="dataContext">The data context used for the point.
         /// </param>
         /// <returns>The data point associated with the object.</returns>
-        [OpenSilver.NotImplemented]
         protected virtual DataPoint GetDataPoint(object dataContext)
         {
-            return null;
+            DataPoint dataPoint = _dataPointsByObject[dataContext].Where(dp => object.Equals(dataContext, dp.DataContext)).FirstOrDefault();
+            return dataPoint;
         }
 
         /// <summary>
@@ -672,9 +800,44 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="newItems">The items to load.</param>
         /// <param name="oldItems">The items to remove.</param>
-        [OpenSilver.NotImplemented]
         protected void LoadDataPoints(IEnumerable newItems, IEnumerable oldItems)
         {
+            if ((PlotArea != null) && (SeriesHost != null))
+            {
+                IList<DataPoint> removedDataPoints = new List<DataPoint>();
+                if (oldItems != null)
+                {
+                    if (oldItems != null)
+                    {
+                        // Remove existing objects from internal collections.
+                        foreach (object dataContext in oldItems)
+                        {
+                            DataPoint removedDataPoint = RemoveObject(dataContext);
+                            _dataPointsByObject.Remove(dataContext, removedDataPoint);
+                            if (removedDataPoint != null)
+                            {
+                                removedDataPoints.Add(removedDataPoint);
+                            }
+                        }
+                    }
+                    StaggeredStateChange(removedDataPoints, removedDataPoints.Count, DataPointState.Hiding);
+                }
+
+                IList<DataPoint> addedDataPoints = new List<DataPoint>();
+                if (newItems != null)
+                {
+                    foreach (object dataContext in newItems)
+                    {
+                        DataPoint dataPoint = AddObject(dataContext);
+                        if (dataPoint != null)
+                        {
+                            addedDataPoints.Add(dataPoint);
+                        }
+                    }
+                }
+
+                OnDataPointsChanged(addedDataPoints, removedDataPoints);
+            }
         }
 
         /// <summary>
@@ -715,13 +878,29 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
 
         /// <summary>
+        /// Handles changes to the SeriesHost property.
+        /// </summary>
+        /// <param name="oldValue">Old value.</param>
+        /// <param name="newValue">New value.</param>
+        protected override void OnSeriesHostPropertyChanged(ISeriesHost oldValue, ISeriesHost newValue)
+        {
+            base.OnSeriesHostPropertyChanged(oldValue, newValue);
+
+            if (null == newValue)
+            {
+                // Reset flag to prepare for next addition to a series host
+                _needRefreshWhenSizeChanged = true;
+            }
+        }
+
+        /// <summary>
         /// Called after data points have been loaded from the items source.
         /// </summary>
         /// <param name="newDataPoints">New active data points.</param>
         /// <param name="oldDataPoints">Old inactive data points.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnDataPointsChanged(IList<DataPoint> newDataPoints, IList<DataPoint> oldDataPoints)
         {
+            StaggeredStateChange(newDataPoints, newDataPoints.Count(), DataPointState.Showing);
         }
 
         /// <summary>
@@ -729,9 +908,34 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="collection">New value of the collection.</param>
         /// <param name="e">Information about the change.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnItemsSourceCollectionChanged(IEnumerable collection, NotifyCollectionChangedEventArgs e)
         {
+            if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                IList<DataPoint> updatedDataPoints = new List<DataPoint>();
+
+                for (int index = 0; index < e.OldItems.Count; index++)
+                {
+                    DataPoint dataPointToUpdate = _dataPointsByObject[e.OldItems[index]].Where(dp => object.Equals(e.OldItems[index], dp.DataContext)).Except(updatedDataPoints).FirstOrDefault();
+                    if (null != dataPointToUpdate)
+                    {
+                        updatedDataPoints.Add(dataPointToUpdate);
+                        dataPointToUpdate.DataContext = e.NewItems[index];
+                        _dataPointsByObject.Remove(e.OldItems[index], dataPointToUpdate);
+                        _dataPointsByObject.Add(e.NewItems[index], dataPointToUpdate);
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                LoadDataPoints(
+                    e.NewItems,
+                    e.OldItems);
+            }
+            else
+            {
+                Refresh();
+            }
         }
 
         /// <summary>
@@ -832,9 +1036,20 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Removes a data point from the plot area.
         /// </summary>
         /// <param name="dataPoint">The data point to remove.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void RemoveDataPoint(DataPoint dataPoint)
         {
+            if (dataPoint.IsSelected)
+            {
+                Unselect(dataPoint);
+            }
+
+            ActiveDataPointCount--;
+
+#if !SILVERLIGHT
+            // Cancel any Storyboards that might be holding the State property's value
+            dataPoint.BeginAnimation(DataPoint.StateProperty, null);
+#endif
+            dataPoint.State = DataPointState.PendingRemoval;
         }
 
         /// <summary>
@@ -907,7 +1122,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             dataPoint.ActualIndependentValueChanged += OnDataPointActualIndependentValueChanged;
             dataPoint.DependentValueChanged += OnDataPointDependentValueChanged;
             dataPoint.IndependentValueChanged += OnDataPointIndependentValueChanged;
-            //dataPoint.StateChanged += OnDataPointStateChanged;
+            dataPoint.StateChanged += OnDataPointStateChanged;
         }
 
         /// <summary>
@@ -961,7 +1176,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             dataPoint.ActualIndependentValueChanged -= OnDataPointActualIndependentValueChanged;
             dataPoint.DependentValueChanged -= OnDataPointDependentValueChanged;
             dataPoint.IndependentValueChanged -= OnDataPointIndependentValueChanged;
-            //dataPoint.StateChanged -= OnDataPointStateChanged;
+            dataPoint.StateChanged -= OnDataPointStateChanged;
         }
 
         /// <summary>
@@ -1009,6 +1224,88 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             else
             {
                 dataPoint.SetBinding(DataPoint.DependentValueProperty, DependentValueBinding);
+            }
+        }
+
+        /// <summary>
+        /// Reveals data points using a storyboard.
+        /// </summary>
+        /// <param name="dataPoints">The data points to change the state of.
+        /// </param>
+        /// <param name="dataPointCount">The number of data points in the sequence.</param>
+        /// <param name="newState">The state to change to.</param>
+        private void StaggeredStateChange(IEnumerable<DataPoint> dataPoints, int dataPointCount, DataPointState newState)
+        {
+            if (PlotArea == null || dataPointCount == 0)
+            {
+                return;
+            }
+
+            Storyboard stateChangeStoryBoard = new Storyboard();
+
+            dataPoints.ForEachWithIndex((dataPoint, count) =>
+            {
+                // Create an Animation
+                ObjectAnimationUsingKeyFrames objectAnimationUsingKeyFrames = new ObjectAnimationUsingKeyFrames();
+                Storyboard.SetTarget(objectAnimationUsingKeyFrames, dataPoint);
+                Storyboard.SetTargetProperty(objectAnimationUsingKeyFrames, new PropertyPath("State"));
+
+                // Create a key frame
+                DiscreteObjectKeyFrame discreteObjectKeyFrame = new DiscreteObjectKeyFrame();
+                discreteObjectKeyFrame.Value = newState;
+
+                // Create the specified animation type
+                switch (AnimationSequence)
+                {
+                    case AnimationSequence.Simultaneous:
+                        discreteObjectKeyFrame.KeyTime = TimeSpan.Zero;
+                        break;
+                    case AnimationSequence.FirstToLast:
+                        discreteObjectKeyFrame.KeyTime = TimeSpan.FromMilliseconds(1000 * ((double)count / dataPointCount));
+                        break;
+                    case AnimationSequence.LastToFirst:
+                        discreteObjectKeyFrame.KeyTime = TimeSpan.FromMilliseconds(1000 * ((double)(dataPointCount - count - 1) / dataPointCount));
+                        break;
+                }
+
+                // Add the Animation to the Storyboard
+                objectAnimationUsingKeyFrames.KeyFrames.Add(discreteObjectKeyFrame);
+                stateChangeStoryBoard.Children.Add(objectAnimationUsingKeyFrames);
+            });
+            stateChangeStoryBoard.Duration = new Duration(AnimationSequence.Simultaneous == AnimationSequence ?
+                TimeSpan.FromTicks(1) :
+                TimeSpan.FromMilliseconds(1001));
+
+            _storyBoardQueue.Enqueue(
+                stateChangeStoryBoard,
+                (sender, args) =>
+                {
+                    stateChangeStoryBoard.Stop();
+                });
+        }
+
+        /// <summary>
+        /// Handles data point state property change.
+        /// </summary>
+        /// <param name="sender">The data point.</param>
+        /// <param name="args">Information about the event.</param>
+        private void OnDataPointStateChanged(object sender, RoutedPropertyChangedEventArgs<DataPointState> args)
+        {
+            OnDataPointStateChanged(sender as DataPoint, args.OldValue, args.NewValue);
+        }
+
+        /// <summary>
+        /// Handles data point state property change.
+        /// </summary>
+        /// <param name="dataPoint">The data point.</param>
+        /// <param name="oldValue">The old value.</param>
+        /// <param name="newValue">The new value.</param>
+        protected virtual void OnDataPointStateChanged(DataPoint dataPoint, DataPointState oldValue, DataPointState newValue)
+        {
+            if (dataPoint.State == DataPointState.Hidden)
+            {
+                DetachEventHandlersFromDataPoint(dataPoint);
+                PlotArea.Children.Remove(dataPoint);
             }
         }
 
@@ -1090,6 +1387,29 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="newValue">The new value.</param>
         protected virtual void OnDataPointIndependentValueChanged(DataPoint dataPoint, object oldValue, object newValue)
         {
+        }
+
+        /// <summary>
+        /// Returns a ResourceDictionaryEnumerator that returns ResourceDictionaries with a
+        /// DataPointStyle having the specified TargetType or with a TargetType that is an
+        /// ancestor of the specified type.
+        /// </summary>
+        /// <param name="dispenser">The ResourceDictionaryDispenser.</param>
+        /// <param name="targetType">The TargetType.</param>
+        /// <param name="takeAncestors">A value indicating whether to accept ancestors of the TargetType.</param>
+        /// <returns>A ResourceDictionary enumerator.</returns>
+        internal static IEnumerator<ResourceDictionary> GetResourceDictionaryWithTargetType(IResourceDictionaryDispenser dispenser, Type targetType, bool takeAncestors)
+        {
+            return dispenser.GetResourceDictionariesWhere(dictionary =>
+            {
+                Style style = dictionary[DataPointStyleName] as Style;
+                if (null != style)
+                {
+                    return (null != style.TargetType) &&
+                           ((targetType == style.TargetType) || (takeAncestors && style.TargetType.IsAssignableFrom(targetType)));
+                }
+                return false;
+            });
         }
     }
 }

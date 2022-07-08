@@ -1,4 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -17,41 +19,142 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\Runtime\System.Windows.Controls\DataPager\WeakEventListener.cs" Link="WeakEventListener.cs" />
+    <Compile Include="..\Runtime\System.Windows.Controls\Toolkit\CollectionHelpers.cs" Link="Extensions\CollectionHelpers.cs" />
+    <Compile Include="..\Runtime\System.Windows.Controls\Toolkit\EnumerableExtensions.cs" Link="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="AggregatedObservableCollection.cs" />
+    <Compile Include="Charting\AnimationSequence.cs" />
     <Compile Include="Charting\Axis\Axis.cs" />
+    <Compile Include="Charting\Axis\AxisIntervalType.cs" />
     <Compile Include="Charting\Axis\AxisLabel.cs" />
+    <Compile Include="Charting\Axis\AxisLocation.cs" />
     <Compile Include="Charting\Axis\AxisOrientation.cs" />
+    <Compile Include="Charting\Axis\CategoryAxis.cs" />
+    <Compile Include="Charting\Axis\CategorySortOrder.cs" />
     <Compile Include="Charting\Axis\DateTimeAxis.cs" />
     <Compile Include="Charting\Axis\DateTimeAxisLabel.cs" />
     <Compile Include="Charting\Axis\DateTimeIntervalType.cs" />
     <Compile Include="Charting\Axis\DisplayAxis.cs" />
+    <Compile Include="Charting\Axis\DisplayAxisGridLines.cs" />
+    <Compile Include="Charting\Axis\IAnchoredToOrigin.cs" />
     <Compile Include="Charting\Axis\IAxis.cs" />
+    <Compile Include="Charting\Axis\IAxisListener.cs" />
+    <Compile Include="Charting\Axis\ICategoryAxis.cs" />
+    <Compile Include="Charting\Axis\IDataConsumer.cs" />
+    <Compile Include="Charting\Axis\IDataProvider.cs" />
+    <Compile Include="Charting\Axis\IRangeAxis.cs" />
+    <Compile Include="Charting\Axis\IRangeConsumer.cs" />
+    <Compile Include="Charting\Axis\IRangeProvider.cs" />
+    <Compile Include="Charting\Axis\IValueMarginConsumer.cs" />
+    <Compile Include="Charting\Axis\IValueMarginProvider.cs" />
     <Compile Include="Charting\Axis\LinearAxis.cs" />
     <Compile Include="Charting\Axis\NullableConverter.cs" />
     <Compile Include="Charting\Axis\NumericAxis.cs" />
+    <Compile Include="Charting\Axis\NumericAxisLabel.cs" />
+    <Compile Include="Charting\Axis\OrientedAxisGridLines.cs" />
     <Compile Include="Charting\Axis\RangeAxis.cs" />
+    <Compile Include="Charting\Axis\ValueMargin.cs" />
     <Compile Include="Charting\Chart\Chart.cs" />
+    <Compile Include="Charting\Chart\SeriesHostAxesCollection.cs" />
+    <Compile Include="Charting\DataPoint\AreaDataPoint.cs" />
+    <Compile Include="Charting\DataPoint\BarDataPoint.cs" />
+    <Compile Include="Charting\DataPoint\BubbleDataPoint.cs" />
+    <Compile Include="Charting\DataPoint\ColumnDataPoint.cs" />
     <Compile Include="Charting\DataPoint\DataPoint.cs" />
+    <Compile Include="Charting\DataPoint\DataPointState.cs" />
     <Compile Include="Charting\DataPoint\LineDataPoint.cs" />
+    <Compile Include="Charting\DataPoint\PieDataPoint.cs" />
+    <Compile Include="Charting\DataPoint\ScatterDataPoint.cs" />
+    <Compile Include="Charting\FrameworkElementExtensions.cs" />
+    <Compile Include="Charting\IRequireSeriesHost.cs" />
+    <Compile Include="Charting\ISeriesHost.cs" />
+    <Compile Include="Charting\ISeriesHostExtensions.cs" />
+    <Compile Include="Charting\Primitives\DelegatingListBox.cs" />
     <Compile Include="Charting\Primitives\Edge.cs" />
     <Compile Include="Charting\Primitives\EdgePanel.cs" />
+    <Compile Include="Charting\ResourceDictionaryDispensedEventArgs.cs" />
+    <Compile Include="Charting\ResourceDictionaryDispenser.cs" />
+    <Compile Include="Charting\Series\AreaSeries.cs" />
+    <Compile Include="Charting\Series\BarSeries.cs" />
+    <Compile Include="Charting\Series\BubbleSeries.cs" />
+    <Compile Include="Charting\Series\ColumnBarBaseSeries.cs" />
+    <Compile Include="Charting\Series\ColumnSeries.cs" />
     <Compile Include="Charting\Series\DataPointSeries.cs" />
     <Compile Include="Charting\Series\DataPointSeriesWithAxes.cs" />
     <Compile Include="Charting\Series\DataPointSingleSeriesWithAxes.cs" />
+    <Compile Include="Charting\Series\DefinitionSeries.cs" />
+    <Compile Include="Charting\Series\IRequireGlobalSeriesIndex.cs" />
     <Compile Include="Charting\Series\ISeries.cs" />
     <Compile Include="Charting\Series\LegendItem.cs" />
     <Compile Include="Charting\Series\LineAreaBaseSeries.cs" />
     <Compile Include="Charting\Series\LineSeries.cs" />
+    <Compile Include="Charting\Series\PieSeries.cs" />
+    <Compile Include="Charting\Series\ScatterSeries.cs" />
     <Compile Include="Charting\Series\Series.cs" />
+    <Compile Include="Charting\Series\SeriesDefinition.cs" />
+    <Compile Include="Charting\Series\SeriesSelectionMode.cs" />
+    <Compile Include="Charting\Series\Stacked100AreaSeries.cs" />
+    <Compile Include="Charting\Series\Stacked100BarSeries.cs" />
+    <Compile Include="Charting\Series\Stacked100ColumnSeries.cs" />
+    <Compile Include="Charting\Series\Stacked100LineSeries.cs" />
+    <Compile Include="Charting\Series\StackedAreaLineSeries.cs" />
+    <Compile Include="Charting\Series\StackedAreaSeries.cs" />
+    <Compile Include="Charting\Series\StackedBarColumnSeries.cs" />
+    <Compile Include="Charting\Series\StackedBarSeries.cs" />
+    <Compile Include="Charting\Series\StackedColumnSeries.cs" />
+    <Compile Include="Charting\Series\StackedLineSeries.cs" />
+    <Compile Include="Charting\ValueMarginCoordinateAndOverlap.cs" />
+    <Compile Include="Collections\LeftLeaningRedBlackTree.cs" />
+    <Compile Include="Collections\MultipleDictionary.cs" />
+    <Compile Include="Collections\OrderedMultipleDictionary.cs" />
+    <Compile Include="DependencyPropertyAnimationHelper.cs" />
+    <Compile Include="EnumerableFunctions.cs" />
+    <Compile Include="GenericEqualityComparer.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="GridExtensions.cs" />
+    <Compile Include="IResourceDictionaryDispenser.cs" />
+    <Compile Include="LayoutTransformControl.cs" />
     <Compile Include="Legend\Legend.cs" />
+    <Compile Include="NoResetObservableCollection.cs" />
+    <Compile Include="ObjectPool.cs" />
+    <Compile Include="ObservableCollectionListAdapter.cs" />
+    <Compile Include="OrientedPanel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Range.cs" />
+    <Compile Include="RangeEnumerableFunctions.cs" />
+    <Compile Include="ReadOnlyObservableCollection.cs" />
     <Compile Include="ResourceDictionaryCollection.cs" />
+    <Compile Include="Charting\ResourceDictionaryEnumerator.cs" />
+    <Compile Include="ResourceDictionaryExtensions.cs" />
+    <Compile Include="StoryboardQueue.cs" />
+    <Compile Include="StringFormatConverter.cs" />
     <Compile Include="Title\Title.cs" />
+    <Compile Include="TreeMap\BindingExtractor.cs" />
+    <Compile Include="TreeMap\Interpolators\DoubleInterpolator.cs" />
+    <Compile Include="TreeMap\Interpolators\InterpolationMode.cs" />
+    <Compile Include="TreeMap\Interpolators\Interpolator.cs" />
+    <Compile Include="TreeMap\Interpolators\RangeInterpolator.cs" />
+    <Compile Include="TreeMap\Interpolators\SolidColorBrushInterpolator.cs" />
+    <Compile Include="TreeMap\Layout\SquaringAlgorithm.cs" />
+    <Compile Include="TreeMap\Layout\TreeMapNode.cs" />
+    <Compile Include="TreeMap\TreeMap.cs" />
+    <Compile Include="TreeMap\TreeMapItemDefinition.cs" />
+    <Compile Include="TreeMap\TreeMapItemDefinitionSelector.cs" />
+    <Compile Include="Tuple.cs" />
+    <Compile Include="UniqueObservableCollection.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="UnitValue.cs" />
+    <Compile Include="ValueHelper.cs" />
+    <Compile Include="WeakReferenceBag.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,25 +169,77 @@
   <ItemGroup>
     <None Include="Legend\Legend.xaml" />
     <None Include="Title\Title.xaml" />
-    <None Include="Charting\Axis\AxisLabel.xaml" />
-    <None Include="Charting\Axis\DateTimeAxisLabel.xaml" />
-    <None Include="Charting\Axis\DisplayAxis.xaml" />
-    <None Include="Charting\Axis\RangeAxis.xaml" />
-    <None Include="Charting\Chart\Chart.xaml" />
-    <None Include="Charting\Series\DataPointSeries.xaml" />
-    <None Include="Charting\Series\LegendItem.xaml" />
+    <Page Include="Charting\Axis\AxisLabel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Axis\DateTimeAxisLabel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Axis\DisplayAxis.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Axis\NumericAxisLabel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Axis\RangeAxis.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Chart\Chart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\DataPoint\AreaDataPoint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\DataPoint\BarDataPoint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\DataPoint\BubbleDataPoint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\DataPoint\ColumnDataPoint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\DataPoint\LineDataPoint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\DataPoint\PieDataPoint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\DataPoint\ScatterDataPoint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Primitives\DelegatingListBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Series\AreaSeries.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Series\DataPointSeries.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Series\DefinitionSeries.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Series\LegendItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Series\LineSeries.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charting\Series\PieSeries.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\generic.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />
+    <Page Include="TreeMap\TreeMap.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <Import Project="..\..\packages\OpenSilver.$(OpenSilverVersion)\build\OpenSilver.targets" Condition=" '$(Configuration)' == 'SL' " />
   <Import Project="..\..\packages\OpenSilver.UWPCompatible.$(OpenSilverVersion)\build\OpenSilver.UwpCompatible.targets" Condition=" '$(Configuration)' == 'UWP' " />
-  
+
 </Project>

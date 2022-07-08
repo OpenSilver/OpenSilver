@@ -3,9 +3,15 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System.Windows;
+using System;
+
 #if MIGRATION
+using System.Windows.Controls;
 namespace System.Windows.Controls.DataVisualization
 #else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
 namespace Windows.UI.Xaml.Controls.DataVisualization
 #endif
 {

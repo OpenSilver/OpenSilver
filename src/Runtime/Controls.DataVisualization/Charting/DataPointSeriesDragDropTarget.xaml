@@ -1,0 +1,33 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/client/2007"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controlsToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit">
+    <Style TargetType="charting:DataPointSeriesDragDropTarget">
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="charting:DataPointSeriesDragDropTarget">
+                    <Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Cursor="{TemplateBinding Cursor}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Canvas x:Name="InsertionIndicatorContainer" IsHitTestVisible="False">
+                            <Path x:Name="InsertionIndicator" IsHitTestVisible="False" Stroke="Gray" StrokeThickness="2" />
+                        </Canvas>
+                        <Popup x:Name="DragPopup" IsHitTestVisible="False">
+                            <Canvas x:Name="DragContainer" IsHitTestVisible="False">
+                                <controlsToolkit:DragDecorator x:Name="DragDecorator" IsHitTestVisible="False" Visibility="Collapsed" />
+                            </Canvas>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

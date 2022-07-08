@@ -4,17 +4,21 @@
 // All other rights reserved.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Windows;
+using System;
 
 #if MIGRATION
+using System.Windows.Data;
 namespace System.Windows.Controls.DataVisualization.Charting
 #else
+using Windows.UI.Xaml.Data;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
     /// <summary>
     /// An axis label for displaying DateTime values.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public class DateTimeAxisLabel : AxisLabel
     {
         #region public DateTimeIntervalType IntervalType
@@ -42,7 +46,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="d">DateTimeAxisLabel that changed its IntervalType.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnIntervalTypePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIntervalTypePropertyChanged(DependencyObject d,DependencyPropertyChangedEventArgs e)
         {
             DateTimeAxisLabel source = (DateTimeAxisLabel)d;
             DateTimeIntervalType oldValue = (DateTimeIntervalType)e.OldValue;
@@ -407,9 +411,45 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Updates the formatted text.
         /// </summary>
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Code is not overly complex.")]
-        [OpenSilver.NotImplemented]
         protected override void UpdateFormattedContent()
         {
-        }
+            if (StringFormat == null)
+            {
+                switch (IntervalType)
+                {
+                    case DateTimeIntervalType.Years:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = YearsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    case DateTimeIntervalType.Months:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = MonthsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    case DateTimeIntervalType.Weeks:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = WeeksIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    case DateTimeIntervalType.Days:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = DaysIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    case DateTimeIntervalType.Hours:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = HoursIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    case DateTimeIntervalType.Minutes:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = MinutesIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    case DateTimeIntervalType.Seconds:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = SecondsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    case DateTimeIntervalType.Milliseconds:
+                        this.SetBinding(FormattedContentProperty, new Binding { Converter = new StringFormatConverter(), ConverterParameter = MillisecondsIntervalStringFormat ?? StringFormat ?? "{0}" });
+                        break;
+                    default:
+                        base.UpdateFormattedContent();
+                        break;
+                }
+            }
+            else
+            {
+                base.UpdateFormattedContent();
+            }
+        }       
     }
 }

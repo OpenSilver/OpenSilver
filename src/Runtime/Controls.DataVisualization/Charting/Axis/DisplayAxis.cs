@@ -3,26 +3,29 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Diagnostics.CodeAnalysis;
-#if MIGRATION
-using System.Windows.Shapes;
-#else
 using System;
-using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
-#endif
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Windows;
 
 #if MIGRATION
+using System.Windows.Media;
+using System.Windows.Controls;
+using System.Windows.Shapes;
 namespace System.Windows.Controls.DataVisualization.Charting
 #else
+using Windows.Foundation;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Shapes;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
     /// <summary>
     /// An axis that has a range.
     /// </summary>
-    [OpenSilver.NotImplemented]
-    public abstract class DisplayAxis : Axis //, IRequireSeriesHost
+    public abstract class DisplayAxis : Axis, IRequireSeriesHost
     {
         /// <summary>
         /// Maximum intervals per 200 pixels.
@@ -118,6 +121,48 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             }
         }
 
+        #region private GridLines GridLines
+
+        /// <summary>
+        /// This field stores the grid lines element.
+        /// </summary>
+        private DisplayAxisGridLines _gridLines;
+
+        /// <summary>
+        /// Gets or sets the grid lines property.
+        /// </summary>
+        internal DisplayAxisGridLines GridLines
+        {
+            get { return _gridLines; }
+            set 
+            { 
+                if (value != _gridLines)
+                {
+                    DisplayAxisGridLines oldValue = _gridLines;
+                    _gridLines = value;
+                    OnGridLinesPropertyChanged(oldValue, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// GridLinesProperty property changed handler.
+        /// </summary>
+        /// <param name="oldValue">Old value.</param>
+        /// <param name="newValue">New value.</param>        
+        private void OnGridLinesPropertyChanged(DisplayAxisGridLines oldValue, DisplayAxisGridLines newValue)
+        {
+            if (SeriesHost != null && oldValue != null)
+            {
+                SeriesHost.BackgroundElements.Remove(oldValue);
+            }
+            if (SeriesHost != null && newValue != null)
+            {
+                SeriesHost.BackgroundElements.Add(newValue);
+            }
+        }
+        #endregion private GridLines GridLines
+
         #region public Style MajorTickMarkStyle
         /// <summary>
         /// Gets or sets the style applied to the Axis tick marks.
@@ -209,6 +254,11 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
         #endregion public object Title
 
+        /// <summary>
+        /// Gets or sets the LayoutTransformControl used to rotate the title.
+        /// </summary>
+        private LayoutTransformControl TitleLayoutTransformControl { get; set; }
+
         #region public Style TitleStyle
         /// <summary>
         /// Gets or sets the style applied to the Axis title.
@@ -286,9 +336,16 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="newValue">A value indicating whether to display grid 
         /// lines or not.</param>
-        [OpenSilver.NotImplemented]
         private void SetShowGridLines(bool newValue)
         {
+            if (newValue == true)
+            {
+                this.GridLines = new OrientedAxisGridLines(this);
+            }
+            else
+            {
+                this.GridLines = null;
+            }
         }
 
         #region public Style GridLineStyle
@@ -322,7 +379,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Gets or sets the grid used to layout the axis.
         /// </summary>
-        [OpenSilver.NotImplemented]
         private Grid AxisGrid
         {
             get
@@ -342,7 +398,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 
                     if (_grid != null)
                     {
-                        //_grid.Children.Add(this.OrientedPanel);
+                        _grid.Children.Add(this.OrientedPanel);
                         if (this.AxisTitle != null)
                         {
                             _grid.Children.Add(this.AxisTitle);
@@ -356,6 +412,11 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Gets or sets a grid to lay out the dependent axis.
         /// </summary>
         private Grid DependentAxisGrid { get; set; }
+
+        /// <summary>
+        /// Gets the oriented panel used to layout the axis labels.
+        /// </summary>
+        internal OrientedPanel OrientedPanel { get; private set; }
 
         /// <summary>
         /// The control used to display the axis title.
@@ -420,6 +481,26 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             return line;
         }
 
+        /// <summary>
+        /// This method is used to share the grid line coordinates with the
+        /// internal grid lines control.
+        /// </summary>
+        /// <returns>A sequence of the major grid line coordinates.</returns>
+        internal IEnumerable<UnitValue> InternalGetMajorGridLinePositions()
+        {
+            return GetMajorGridLineCoordinates(new Size(this.ActualWidth, this.ActualHeight));
+        }
+        
+        /// <summary>
+        /// Returns the coordinates to use for the grid line control.
+        /// </summary>
+        /// <param name="availableSize">The available size.</param>
+        /// <returns>A sequence of coordinates at which to draw grid lines.
+        /// </returns>
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "GridLine", Justification = "This is the expected capitalization.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Returns the coordinates of the grid lines.")]
+        protected abstract IEnumerable<UnitValue> GetMajorGridLineCoordinates(Size availableSize);
+
 #if !SILVERLIGHT
         /// <summary>
         /// Initializes the static members of the DisplayAxis class.
@@ -434,9 +515,25 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Instantiates a new instance of the DisplayAxis class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         protected DisplayAxis()
         {
+            this.OrientedPanel = new OrientedPanel();
+            this.OrientedPanel.UseLayoutRounding = true;
+
+#if !MIGRATION
+            this.DefaultStyleKey = typeof(DisplayAxis);
+#endif
+
+            this.DependentAxisGrid = new Grid();
+            this.TitleLayoutTransformControl = new LayoutTransformControl();
+            this.TitleLayoutTransformControl.HorizontalAlignment = HorizontalAlignment.Center;
+            this.TitleLayoutTransformControl.VerticalAlignment = VerticalAlignment.Center;
+
+            this.SizeChanged += new SizeChangedEventHandler(DisplayAxisSizeChanged);
+
+#if MIGRATION
+            this.DefaultStyleKey = typeof(DisplayAxis);
+#endif
         }
 
         /// <summary>
@@ -477,11 +574,33 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="label">The axis label to prepare.</param>
         /// <param name="dataContext">The data context to use for the axis 
         /// label.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void PrepareAxisLabel(Control label, object dataContext)
         {
             label.DataContext = dataContext;
-            //label.SetStyle(AxisLabelStyle);
+            label.SetStyle(AxisLabelStyle);
+        }
+
+        /// <summary>
+        /// Retrieves template parts and configures layout.
+        /// </summary>
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+
+            this.AxisGrid = GetTemplateChild(AxisGridName) as Grid;
+            this.AxisTitle = GetTemplateChild(AxisTitleName) as Title;
+            if (this.AxisTitle != null && this.AxisGrid.Children.Contains(this.AxisTitle))
+            {
+                this.AxisGrid.Children.Remove(this.AxisTitle);
+                this.TitleLayoutTransformControl.Child = this.AxisTitle;
+                this.AxisGrid.Children.Add(this.TitleLayoutTransformControl);
+            }
+
+            ArrangeAxisGrid();
         }
 
         /// <summary>
@@ -495,11 +614,96 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
 
         /// <summary>
+        /// Arranges the grid when the location property is changed.
+        /// </summary>
+        /// <param name="oldValue">The old location.</param>
+        /// <param name="newValue">The new location.</param>
+        protected override void OnLocationPropertyChanged(AxisLocation oldValue, AxisLocation newValue)
+        {
+            ArrangeAxisGrid();
+            base.OnLocationPropertyChanged(oldValue, newValue);
+        }
+
+        /// <summary>
         /// Arranges the elements in the axis grid.
         /// </summary>
-        [OpenSilver.NotImplemented]
         private void ArrangeAxisGrid()
         {
+            if (this.AxisGrid != null)
+            {
+                this.AxisGrid.ColumnDefinitions.Clear();
+                this.AxisGrid.RowDefinitions.Clear();
+                this.AxisGrid.Children.Clear();
+
+                if (this.Orientation == AxisOrientation.Y)
+                {
+                    this.OrientedPanel.Orientation = Controls.Orientation.Vertical;
+                    this.OrientedPanel.IsReversed = true;
+
+                    if (this.Location == AxisLocation.Left || this.Location == AxisLocation.Right)
+                    {
+                        this.TitleLayoutTransformControl.Transform = new RotateTransform { Angle = -90.0 };
+
+                        this.OrientedPanel.IsInverted = !(Location == AxisLocation.Right);
+                        this.AxisGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                        this.AxisGrid.RowDefinitions.Add(new RowDefinition());
+
+                        int column = 0;
+                        if (this.AxisTitle != null)
+                        {
+                            this.AxisGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                            Grid.SetRow(this.TitleLayoutTransformControl, 0);
+                            Grid.SetColumn(this.TitleLayoutTransformControl, 0);
+                            column++;
+                        }
+                        Grid.SetRow(this.OrientedPanel, 0);
+                        Grid.SetColumn(this.OrientedPanel, column);
+
+                        this.AxisGrid.Children.Add(this.TitleLayoutTransformControl);
+                        this.AxisGrid.Children.Add(this.OrientedPanel);
+
+                        if (this.Location == AxisLocation.Right)
+                        {
+                            AxisGrid.Mirror(Controls.Orientation.Vertical);
+                            this.TitleLayoutTransformControl.Transform = new RotateTransform { Angle = 90 };
+                        }
+                    }
+                }
+                else if (this.Orientation == AxisOrientation.X)
+                {
+                    this.OrientedPanel.Orientation = Controls.Orientation.Horizontal;
+                    this.OrientedPanel.IsReversed = false;
+
+                    if (this.Location == AxisLocation.Top || this.Location == AxisLocation.Bottom)
+                    {
+                        this.OrientedPanel.IsInverted = (Location == AxisLocation.Top);
+                        this.TitleLayoutTransformControl.Transform = new RotateTransform { Angle = 0 };
+
+                        this.AxisGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                        this.AxisGrid.RowDefinitions.Add(new RowDefinition());
+
+                        if (this.AxisTitle != null)
+                        {
+                            this.AxisGrid.RowDefinitions.Add(new RowDefinition());
+                            Grid.SetColumn(this.TitleLayoutTransformControl, 0);
+                            Grid.SetRow(this.TitleLayoutTransformControl, 1);
+                        }
+
+                        Grid.SetColumn(this.OrientedPanel, 0);
+                        Grid.SetRow(this.OrientedPanel, 0);
+
+                        this.AxisGrid.Children.Add(this.TitleLayoutTransformControl);
+                        this.AxisGrid.Children.Add(this.OrientedPanel);
+
+                        if (this.Location == AxisLocation.Top)
+                        {
+                            AxisGrid.Mirror(Controls.Orientation.Horizontal);
+                        }
+                    }
+                }
+
+                Invalidate();
+            }
         }
 
         /// <summary>
@@ -542,9 +746,12 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="availableSize">The available size in which to render 
         /// the axis.</param>
-        [OpenSilver.NotImplemented]
         private void RenderAxis(Size availableSize)
         {
+            if (Orientation != AxisOrientation.None && Location != AxisLocation.Auto)
+            {
+                Render(availableSize);
+            }
         }
 
         /// <summary>
@@ -559,6 +766,49 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         protected void Invalidate()
         {
             OnInvalidated(new RoutedEventArgs());
+        }
+
+        /// <summary>
+        /// The series host.
+        /// </summary>
+        private ISeriesHost _seriesHost;
+
+        /// <summary>
+        /// Gets or sets the series host.
+        /// </summary>
+        public ISeriesHost SeriesHost
+        {
+            get
+            {
+                return _seriesHost;
+            }
+            set
+            {
+                if (value != _seriesHost)
+                {
+                    ISeriesHost oldValue = _seriesHost;
+                    _seriesHost = value;
+                    OnSeriesHostPropertyChanged(oldValue, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method is run when the series host property is changed.
+        /// </summary>
+        /// <param name="oldValue">The old series host.</param>
+        /// <param name="newValue">The new series host.</param>
+        protected virtual void OnSeriesHostPropertyChanged(ISeriesHost oldValue, ISeriesHost newValue)
+        {
+            if (oldValue != null && this.GridLines != null)
+            {
+                oldValue.BackgroundElements.Remove(this.GridLines);
+            }
+
+            if (newValue != null && this.GridLines != null)
+            {
+                newValue.BackgroundElements.Add(this.GridLines);
+            }
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿<!--
-    // (c) Copyright Microsoft Corporation.
-    // This source is subject to the Microsoft Public License (Ms-PL).
-    // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
-    // All other rights reserved.
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 -->
 
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:datavis="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:datavis="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit">
 
     <Style TargetType="datavis:Legend">
         <Setter Property="BorderBrush" Value="Black"/>
@@ -25,26 +26,31 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="datavis:Legend">
-                    <Border Padding="2"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="2">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <datavis:Title x:Name="HeaderContent"
-                                           Grid.Row="0"
-                                           Content="{TemplateBinding Header}"
-                                           ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                           Style="{TemplateBinding TitleStyle}"/>
-                            <ScrollViewer Grid.Row="1"
-                                          Padding="0"
-                                          BorderThickness="0"
-                                          IsTabStop="False"
-                                          VerticalScrollBarVisibility="Auto">
-                                <ItemsPresenter x:Name="Items" Margin="10,0,10,10"/>
+                            <datavis:Title
+                                Grid.Row="0"
+                                x:Name="HeaderContent"
+                                Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                Style="{TemplateBinding TitleStyle}"/>
+                            <ScrollViewer
+                                Grid.Row="1"
+                                VerticalScrollBarVisibility="Auto"
+                                BorderThickness="0"
+                                Padding="0"
+                                IsTabStop="False">
+                                <ItemsPresenter 
+                                    x:Name="Items" 
+                                    Margin="10,0,10,10" />
                             </ScrollViewer>
                         </Grid>
                     </Border>

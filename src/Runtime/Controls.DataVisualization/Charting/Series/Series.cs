@@ -3,11 +3,13 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.ObjectModel;
 
 #if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
 #else
+using Windows.Foundation;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
@@ -15,13 +17,49 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
     /// Represents a control that contains a data series.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
-    public abstract partial class Series : Control, ISeries //, IRequireSeriesHost
+    public abstract partial class Series : Control, ISeries, IRequireSeriesHost
     {
         /// <summary>
         /// The name of the Title property.
         /// </summary>
         protected const string TitleName = "Title";
+
+        #region public ISeriesHost SeriesHost
+        /// <summary>
+        /// Gets or sets the parent instance the Series belongs to.
+        /// </summary>
+        public ISeriesHost SeriesHost
+        {
+            get { return _seriesHost; }
+            set
+            {
+                ISeriesHost oldValue = _seriesHost;
+                _seriesHost = value;
+                if (oldValue != _seriesHost)
+                {
+                    OnSeriesHostPropertyChanged(oldValue, _seriesHost);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stores the Parent instance the Series belongs to.
+        /// </summary>
+        private ISeriesHost _seriesHost;
+
+        /// <summary>
+        /// Called when the value of the SeriesHost property changes.
+        /// </summary>
+        /// <param name="oldValue">The value to be replaced.</param>
+        /// <param name="newValue">The new series host value.</param>
+        protected virtual void OnSeriesHostPropertyChanged(ISeriesHost oldValue, ISeriesHost newValue)
+        {
+            if (newValue != null && oldValue != null)
+            {
+                throw new InvalidOperationException(OpenSilver.Controls.DataVisualization.Properties.Resources.Series_SeriesHost_SeriesHostPropertyNotNull);
+            }
+        }
+        #endregion public ISeriesHost SeriesHost
 
         #region public ObservableCollection<object> LegendItems
         /// <summary>
@@ -73,10 +111,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Initializes a new instance of the Series class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         protected Series()
         {
-            LegendItems = new ObservableCollection<object>(); //new NoResetObservableCollection<object>();
+            LegendItems = new NoResetObservableCollection<object>();
         }
     }
 }

@@ -3,19 +3,28 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows;
 
 #if MIGRATION
+using System.Windows.Controls;
+using System.Windows.Shapes;
+using EF = System.Windows.Controls.DataVisualization.EnumerableFunctions;
 namespace System.Windows.Controls.DataVisualization.Charting
 #else
-using System;
+using Windows.UI.Xaml.Controls;
+using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
+using EF = Windows.UI.Xaml.Controls.DataVisualization.EnumerableFunctions;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
     /// <summary>
     /// An axis that displays numeric values.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public abstract class NumericAxis : RangeAxis
     {
         #region public double? ActualMaximum
@@ -186,9 +195,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">Old value.</param>
         /// <param name="newValue">New value.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnExtendRangeToOriginPropertyChanged(bool oldValue, bool newValue)
         {
+            this.ActualRange = this.OverrideDataRange(this.ActualRange);
         }
         #endregion public bool ExtendRangeToOrigin
 
@@ -208,24 +217,81 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
 
         /// <summary>
+        /// Updates the typed actual maximum and minimum properties when the
+        /// actual range changes.
+        /// </summary>
+        /// <param name="range">The actual range.</param>
+        protected override void OnActualRangeChanged(Range<IComparable> range)
+        {
+            if (range.HasData)
+            {
+                this.ActualMaximum = (double)range.Maximum;
+                this.ActualMinimum = (double)range.Minimum;
+            }
+            else
+            {
+                this.ActualMaximum = null;
+                this.ActualMinimum = null;
+            }
+
+            base.OnActualRangeChanged(range);
+        }
+
+        /// <summary>
         /// Returns a value indicating whether a value can plot.
         /// </summary>
         /// <param name="value">The value to plot.</param>
         /// <returns>A value indicating whether a value can plot.</returns>
-        [OpenSilver.NotImplemented]
         public override bool CanPlot(object value)
         {
-            return false;
+            double val;
+            return ValueHelper.TryConvert(value, out val);
         }
 
         /// <summary>
         /// Returns a numeric axis label.
         /// </summary>
         /// <returns>A numeric axis label.</returns>
-        [OpenSilver.NotImplemented]
         protected override Control CreateAxisLabel()
         {
-            return null;
+            return new NumericAxisLabel();
+        }
+
+        /// <summary>
+        /// Overrides the data value range and returns a range that takes the
+        /// margins of the values into account.
+        /// </summary>
+        /// <param name="range">The range of data values.</param>
+        /// <returns>A range that can store both the data values and their 
+        /// margins.</returns>
+        protected override Range<IComparable> OverrideDataRange(Range<IComparable> range)
+        {
+            range = base.OverrideDataRange(range);
+
+            if (ExtendRangeToOrigin)
+            {
+                Range<double> adjustedRange = range.ToDoubleRange();
+
+                if (!adjustedRange.HasData)
+                {
+                    return new Range<IComparable>(0.0, 0.0);
+                }
+                else
+                {
+                    double minimum = adjustedRange.Minimum;
+                    double maximum = adjustedRange.Maximum;
+                    if (minimum > 0.0)
+                    {
+                        minimum = 0.0;
+                    }
+                    else if (maximum < 0.0)
+                    {
+                        maximum = 0.0;
+                    }
+                    return new Range<IComparable>(minimum, maximum);
+                }
+            }
+            return range;
         }
     }
 }

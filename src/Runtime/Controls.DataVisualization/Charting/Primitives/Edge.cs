@@ -3,6 +3,8 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
+
 #if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting.Primitives
 #else
@@ -31,7 +33,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting.Primitives
         /// A child element that is positioned at the top of the EdgePanel.
         /// </summary>
         Top,
-
+        
         /// <summary>
         /// A child element that is positioned on the right side of the
         /// EdgePanel.
