@@ -1,14 +1,16 @@
 ﻿<!--
-    // (c) Copyright Microsoft Corporation.
-    // This source is subject to the Microsoft Public License (Ms-PL).
-    // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
-    // All other rights reserved.
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 -->
 
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:charting="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
-                    xmlns:chartingprimitives="clr-namespace:System.Windows.Controls.chartingualization.Charting.Primitives">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:datavis="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    xmlns:charting="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    xmlns:chartingprimitives="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit">
 
     <Style TargetType="charting:Chart">
         <Setter Property="BorderBrush" Value="Black"/>
@@ -17,253 +19,253 @@
         <Setter Property="Padding" Value="10"/>
         <Setter Property="Palette">
             <Setter.Value>
-                <charting:ResourceDictionaryCollection>
-                    <!--  Blue  -->
+                <datavis:ResourceDictionaryCollection>
+                    <!-- Blue -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFB9D6F7"/>
-                            <GradientStop Offset="1" Color="#FF284B70"/>
+                            <GradientStop Color="#FF284B70" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Red  -->
+                    <!-- Red -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFFBB7B5"/>
-                            <GradientStop Offset="1" Color="#FF702828"/>
+                            <GradientStop Color="#FF702828" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Light Green  -->
+                    <!-- Light Green -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFB8C0AC"/>
-                            <GradientStop Offset="1" Color="#FF5F7143"/>
+                            <GradientStop Color="#FF5F7143" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Yellow  -->
+                    <!-- Yellow -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFFDE79C"/>
-                            <GradientStop Offset="1" Color="#FFF6BC0C"/>
+                            <GradientStop Color="#FFF6BC0C" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Indigo  -->
+                    <!-- Indigo -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFA9A3BD"/>
-                            <GradientStop Offset="1" Color="#FF382C6C"/>
+                            <GradientStop Color="#FF382C6C" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Magenta  -->
+                    <!-- Magenta -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFB1A1B1"/>
-                            <GradientStop Offset="1" Color="#FF50224F"/>
+                            <GradientStop Color="#FF50224F" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Dark Green  -->
+                    <!-- Dark Green -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FF9DC2B3"/>
-                            <GradientStop Offset="1" Color="#FF1D7554"/>
+                            <GradientStop Color="#FF1D7554" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Gray Shade  -->
+                    <!-- Gray Shade -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFB5B5B5"/>
-                            <GradientStop Offset="1" Color="#FF4C4C4C"/>
+                            <GradientStop Color="#FF4C4C4C" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Blue  -->
+                    <!-- Blue -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FF98C1DC"/>
-                            <GradientStop Offset="1" Color="#FF0271AE"/>
+                            <GradientStop Color="#FF0271AE" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Brown  -->
+                    <!-- Brown -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFC1C0AE"/>
-                            <GradientStop Offset="1" Color="#FF706E41"/>
+                            <GradientStop Color="#FF706E41" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Cyan  -->
+                    <!-- Cyan -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFADBDC0"/>
-                            <GradientStop Offset="1" Color="#FF446A73"/>
+                            <GradientStop Color="#FF446A73" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Special Blue  -->
+                    <!-- Special Blue -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FF2F8CE2"/>
-                            <GradientStop Offset="1" Color="#FF0C3E69"/>
+                            <GradientStop Color="#FF0C3E69" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Gray Shade 2  -->
+                    <!-- Gray Shade 2 -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFDCDCDC"/>
-                            <GradientStop Offset="1" Color="#FF757575"/>
+                            <GradientStop Color="#FF757575" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Gray Shade 3  -->
+                    <!-- Gray Shade 3 -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFF4F4F4"/>
-                            <GradientStop Offset="1" Color="#FFB7B7B7"/>
+                            <GradientStop Color="#FFB7B7B7" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                    <!--  Gray Shade 4  -->
+                    <!-- Gray Shade 4 -->
                     <ResourceDictionary>
-                        <RadialGradientBrush x:Key="Background" Center="0.075,0.015" GradientOrigin="-0.1,-0.1" RadiusX="1.05" RadiusY="0.9">
+                        <RadialGradientBrush x:Key="Background" GradientOrigin="-0.1,-0.1" Center="0.075,0.015" RadiusX="1.05" RadiusY="0.9">
                             <GradientStop Color="#FFF4F4F4"/>
-                            <GradientStop Offset="1" Color="#FFA3A3A3"/>
+                            <GradientStop Color="#FFA3A3A3" Offset="1"/>
                         </RadialGradientBrush>
                         <Style x:Key="DataPointStyle" TargetType="Control">
                             <Setter Property="Background" Value="{StaticResource Background}"/>
                         </Style>
                         <Style x:Key="DataShapeStyle" TargetType="Shape">
-                            <Setter Property="Stroke" Value="{StaticResource Background}"/>
-                            <Setter Property="StrokeThickness" Value="2"/>
-                            <Setter Property="StrokeMiterLimit" Value="1"/>
-                            <Setter Property="Fill" Value="{StaticResource Background}"/>
+                            <Setter Property="Stroke" Value="{StaticResource Background}" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                            <Setter Property="StrokeMiterLimit" Value="1" />
+                            <Setter Property="Fill" Value="{StaticResource Background}" />
                         </Style>
                     </ResourceDictionary>
-                </charting:ResourceDictionaryCollection>
+                </datavis:ResourceDictionaryCollection>
             </Setter.Value>
         </Setter>
         <Setter Property="TitleStyle">
             <Setter.Value>
-                <Style TargetType="charting:Title">
+                <Style TargetType="datavis:Title">
                     <Setter Property="FontSize" Value="16"/>
                     <Setter Property="HorizontalAlignment" Value="Center"/>
                     <Setter Property="Margin" Value="0,10,0,10"/>
@@ -272,17 +274,17 @@
         </Setter>
         <Setter Property="LegendStyle">
             <Setter.Value>
-                <Style TargetType="charting:Legend">
+                <Style TargetType="datavis:Legend">
                     <Setter Property="Margin" Value="15,0,15,0"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="BorderBrush" Value="#FFDBDBDB"/>
                     <Setter Property="Background">
                         <Setter.Value>
-                            <LinearGradientBrush StartPoint="0.558,0.995" EndPoint="0.442,0.005">
+                            <LinearGradientBrush EndPoint="0.442,0.005" StartPoint="0.558,0.995">
                                 <GradientStop Color="#FFDBDBDB"/>
-                                <GradientStop Offset="1" Color="#FFFFFFFF"/>
+                                <GradientStop Color="#FFFFFFFF" Offset="1"/>
                             </LinearGradientBrush>
-                        </Setter.Value>
+                       </Setter.Value>
                     </Setter>
                 </Style>
             </Setter.Value>
@@ -300,9 +302,9 @@
                 <Style TargetType="Grid">
                     <Setter Property="Background">
                         <Setter.Value>
-                            <LinearGradientBrush StartPoint="0.459,1.296" EndPoint="0.457,0.296">
+                            <LinearGradientBrush EndPoint="0.457,0.296" StartPoint="0.459,1.296">
                                 <GradientStop Color="#FFCBCBCB"/>
-                                <GradientStop Offset="1" Color="#FFFFFFFF"/>
+                                <GradientStop Color="#FFFFFFFF" Offset="1"/>
                             </LinearGradientBrush>
                         </Setter.Value>
                     </Setter>
@@ -312,34 +314,35 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="charting:Chart">
-                    <Border Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <charting:Title Content="{TemplateBinding Title}" Style="{TemplateBinding TitleStyle}"/>
+                            <datavis:Title
+                                Content="{TemplateBinding Title}"
+                                Style="{TemplateBinding TitleStyle}"/>
 
-                            <!--  Use a nested Grid to avoid possible clipping behavior resulting from ColumnSpan+Width=Auto  -->
+                            <!-- Use a nested Grid to avoid possible clipping behavior resulting from ColumnSpan+Width=Auto -->
                             <Grid Grid.Row="1" Margin="0,15,0,15">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <charting:Legend x:Name="Legend"
-                                                Grid.Column="1"
-                                                Header="{TemplateBinding LegendTitle}"
-                                                Style="{TemplateBinding LegendStyle}"/>
+                                <datavis:Legend x:Name="Legend" 
+                                    Header="{TemplateBinding LegendTitle}"
+                                    Style="{TemplateBinding LegendStyle}"
+                                    Grid.Column="1"/>
                                 <chartingprimitives:EdgePanel x:Name="ChartArea" Style="{TemplateBinding ChartAreaStyle}">
-                                    <Grid Canvas.ZIndex="-1" Style="{TemplateBinding PlotAreaStyle}"/>
-                                    <Border BorderBrush="#FF919191"
-                                            BorderThickness="1"
-                                            Canvas.ZIndex="10"/>
+                                    <Grid Canvas.ZIndex="-1" Style="{TemplateBinding PlotAreaStyle}" />
+                                    <Border Canvas.ZIndex="10" BorderBrush="#FF919191" BorderThickness="1" />
                                 </chartingprimitives:EdgePanel>
                             </Grid>
                         </Grid>

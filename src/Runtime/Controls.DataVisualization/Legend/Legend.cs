@@ -4,16 +4,15 @@
 // All other rights reserved.
 
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
+using System;
 
 #if MIGRATION
 using System.Windows.Data;
-#else
-using Windows.UI.Xaml.Data;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Controls.DataVisualization
 #else
+using Windows.Foundation;
+using Windows.UI.Xaml.Data;
 namespace Windows.UI.Xaml.Controls.DataVisualization
 #endif
 {
@@ -41,11 +40,15 @@ namespace Windows.UI.Xaml.Controls.DataVisualization
         /// </summary>
         public Legend()
         {
-#if SILVERLIGHT
+#if !MIGRATION
             DefaultStyleKey = typeof(Legend);
 #endif
             // By default, the Visibility property should follow ContentVisibility - but users can override it
             SetBinding(VisibilityProperty, new Binding("ContentVisibility") { Source = this });
+
+#if MIGRATION
+            DefaultStyleKey = typeof(Legend);
+#endif
         }
 
         /// <summary>

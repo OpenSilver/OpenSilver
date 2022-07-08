@@ -3,21 +3,83 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 #if MIGRATION
+using System.Windows;
+using System.Windows.Controls;
 namespace System.Windows.Controls.DataVisualization.Charting
 #else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
     /// <summary>
     /// An axis class used to determine the plot area coordinate of values.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public abstract class Axis : Control, IAxis
     {
+        #region public AxisLocation Location
+        /// <summary>
+        /// Gets or sets the axis location.
+        /// </summary>
+        public AxisLocation Location
+        {
+            get { return (AxisLocation)GetValue(LocationProperty); }
+            set { SetValue(LocationProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the Location dependency property.
+        /// </summary>
+        public static readonly DependencyProperty LocationProperty =
+            DependencyProperty.Register(
+                "Location",
+                typeof(AxisLocation),
+                typeof(Axis),
+                new PropertyMetadata(AxisLocation.Auto, OnLocationPropertyChanged));
+
+        /// <summary>
+        /// LocationProperty property changed handler.
+        /// </summary>
+        /// <param name="d">Axis that changed its Location.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnLocationPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Axis source = (Axis)d;
+            AxisLocation oldValue = (AxisLocation)e.OldValue;
+            AxisLocation newValue = (AxisLocation)e.NewValue;
+            source.OnLocationPropertyChanged(oldValue, newValue);
+        }
+
+        /// <summary>
+        /// LocationProperty property changed handler.
+        /// </summary>
+        /// <param name="oldValue">Old value.</param>
+        /// <param name="newValue">New value.</param>        
+        protected virtual void OnLocationPropertyChanged(AxisLocation oldValue, AxisLocation newValue)
+        {
+            RoutedPropertyChangedEventHandler<AxisLocation> handler = this.LocationChanged;
+            if (handler != null)
+            {
+                handler(this, new RoutedPropertyChangedEventArgs<AxisLocation>(oldValue, newValue));
+            }
+        }
+
+        /// <summary>
+        /// This event is raised when the location property is changed.
+        /// </summary>
+        public event RoutedPropertyChangedEventHandler<AxisLocation> LocationChanged;
+
+        #endregion public AxisLocation Location
+
         /// <summary>
         /// Gets the list of child axes belonging to this axis.
         /// </summary>
@@ -81,10 +143,18 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Raises the invalidated event.
         /// </summary>
         /// <param name="args">Information about the event.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnInvalidated(RoutedEventArgs args)
         {
+            foreach (IAxisListener listener in RegisteredListeners)
+            {
+                listener.AxisInvalidated(this);
+            }
         }
+
+        /// <summary>
+        /// Gets or the collection of series that are using the Axis.
+        /// </summary>
+        public ObservableCollection<IAxisListener> RegisteredListeners { get; private set; }
 
         /// <summary>
         /// Returns a value indicating whether the axis can plot a value.
@@ -95,13 +165,20 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         public abstract bool CanPlot(object value);
 
         /// <summary>
+        /// The plot area coordinate of a value.
+        /// </summary>
+        /// <param name="value">The value for which to retrieve the plot area
+        /// coordinate.</param>
+        /// <returns>The plot area coordinate.</returns>
+        public abstract UnitValue GetPlotAreaCoordinate(object value);
+
+        /// <summary>
         /// Instantiates a new instance of the Axis class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         protected Axis()
         {
-            //RegisteredListeners = new UniqueObservableCollection<IAxisListener>();
-            //this.RegisteredListeners.CollectionChanged += RegisteredListenersCollectionChanged;
+            RegisteredListeners = new UniqueObservableCollection<IAxisListener>();
+            this.RegisteredListeners.CollectionChanged += RegisteredListenersCollectionChanged;
             this.DependentAxes = new ObservableCollection<IAxis>();
             this.DependentAxes.CollectionChanged += OnChildAxesCollectionChanged;
         }
@@ -129,8 +206,37 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">Information about the event.</param>
-        [OpenSilver.NotImplemented]
         private void RegisteredListenersCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (IAxisListener obj in e.OldItems)
+                {
+                    OnObjectUnregistered(obj);
+                }
+            }
+            if (e.NewItems != null)
+            {
+                foreach (IAxisListener obj in e.NewItems)
+                {
+                    OnObjectRegistered(obj);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method is invoked when a series is registered.
+        /// </summary>
+        /// <param name="series">The series that has been registered.</param>
+        protected virtual void OnObjectRegistered(IAxisListener series)
+        {
+        }
+
+        /// <summary>
+        /// This method is invoked when a series is unregistered.
+        /// </summary>
+        /// <param name="series">The series that has been unregistered.</param>
+        protected virtual void OnObjectUnregistered(IAxisListener series)
         {
         }
     }

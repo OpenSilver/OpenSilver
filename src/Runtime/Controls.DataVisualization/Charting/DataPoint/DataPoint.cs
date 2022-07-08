@@ -3,17 +3,26 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.Globalization;
-#if MIGRATION
-using System.Windows.Media;
-#else
 using System;
-using Windows.UI.Xaml.Media;
-#endif
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using System.Windows;
+using System.Windows.Threading;
+using System.Windows.Input;
 
 #if MIGRATION
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
+using CommonKeys = System.Windows.Input.ModifierKeys;
 namespace System.Windows.Controls.DataVisualization.Charting
 #else
+using Windows.Foundation;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using CommonKeys = Windows.System.VirtualKeyModifiers;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
@@ -27,7 +36,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
     [TemplateVisualState(Name = DataPoint.StateSelectionSelected, GroupName = DataPoint.GroupSelectionStates)]
     [TemplateVisualState(Name = DataPoint.StateRevealShown, GroupName = DataPoint.GroupRevealStates)]
     [TemplateVisualState(Name = DataPoint.StateRevealHidden, GroupName = DataPoint.GroupRevealStates)]
-    [OpenSilver.NotImplemented]
     public abstract partial class DataPoint : Control
     {
         #region CommonStates
@@ -152,7 +160,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         protected bool IsHovered
         {
             get { return _isHovered; }
-            private set
+            private set 
             {
                 bool oldValue = _isHovered;
                 _isHovered = value;
@@ -162,7 +170,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
                 }
             }
         }
-
+        
         /// <summary>
         /// IsHoveredProperty property changed handler.
         /// </summary>
@@ -267,7 +275,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// coerced.
         /// </summary>
         private bool _isCoercingActualDependentValue;
-
+        
         /// <summary>
         /// The preserved previous actual dependent value before coercion.
         /// </summary>
@@ -278,15 +286,14 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">The value to be replaced.</param>
         /// <param name="newValue">The new value.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnActualDependentValuePropertyChanged(IComparable oldValue, IComparable newValue)
         {
             double coercedValue = 0.0;
-            //if (!(newValue is double) && ValueHelper.TryConvert(newValue, out coercedValue))
-            //{
-            //    _isCoercingActualDependentValue = true;
-            //    _oldActualDependentValueBeforeCoercion = oldValue;
-            //}
+            if (!(newValue is double) && ValueHelper.TryConvert(newValue, out coercedValue))
+            {
+                _isCoercingActualDependentValue = true;
+                _oldActualDependentValueBeforeCoercion = oldValue;
+            }
 
             if (!_isCoercingActualDependentValue)
             {
@@ -323,7 +330,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         public IComparable DependentValue
         {
-            get { return (IComparable)GetValue(DependentValueProperty); }
+            get { return (IComparable) GetValue(DependentValueProperty); }
             set { SetValue(DependentValueProperty, value); }
         }
 
@@ -345,8 +352,8 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         private static void OnDependentValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DataPoint source = (DataPoint)d;
-            IComparable oldValue = (IComparable)e.OldValue;
-            IComparable newValue = (IComparable)e.NewValue;
+            IComparable oldValue = (IComparable) e.OldValue;
+            IComparable newValue = (IComparable) e.NewValue;
             source.OnDependentValuePropertyChanged(oldValue, newValue);
         }
 
@@ -355,9 +362,29 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">The value to be replaced.</param>
         /// <param name="newValue">The new value.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnDependentValuePropertyChanged(IComparable oldValue, IComparable newValue)
         {
+            SetFormattedProperty(FormattedDependentValueProperty, DependentValueStringFormat, newValue);
+            RoutedPropertyChangedEventHandler<IComparable> handler = this.DependentValueChanged;
+            if (handler != null)
+            {
+                handler(this, new RoutedPropertyChangedEventArgs<IComparable>(oldValue, newValue));
+            }
+
+            if (this.State == DataPointState.Created)
+            {
+                // Prefer setting the value as a double...
+                double coercedNewValue;
+                if (ValueHelper.TryConvert(newValue, out coercedNewValue))
+                {
+                    ActualDependentValue = coercedNewValue;
+                }
+                else
+                {
+                    // ... but fall back otherwise
+                    ActualDependentValue = newValue;
+                }
+            }
         }
         #endregion public IComparable DependentValue
 
@@ -444,7 +471,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
                 typeof(DataPoint),
                 null);
         #endregion public string FormattedIndependentValue
-
+        
         /// <summary>
         /// Called when the independent value of the data point is changed.
         /// </summary>
@@ -488,9 +515,29 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">The old value.</param>
         /// <param name="newValue">The new value.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnIndependentValuePropertyChanged(object oldValue, object newValue)
         {
+            SetFormattedProperty(FormattedIndependentValueProperty, IndependentValueStringFormat, newValue);
+            RoutedPropertyChangedEventHandler<object> handler = this.IndependentValueChanged;
+            if (handler != null)
+            {
+                handler(this, new RoutedPropertyChangedEventArgs<object>(oldValue, newValue));
+            }
+
+            if (this.State == DataPointState.Created)
+            {
+                // Prefer setting the value as a double...
+                double coercedNewValue;
+                if (ValueHelper.TryConvert(newValue, out coercedNewValue))
+                {
+                    ActualIndependentValue = coercedNewValue;
+                }
+                else
+                {
+                    // ... but fall back otherwise
+                    ActualIndependentValue = newValue;
+                }
+            }
         }
         #endregion public object IndependentValue
 
@@ -593,11 +640,42 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="oldValue">The value to be replaced.</param>
         /// <param name="newValue">The new value.</param>
-        [OpenSilver.NotImplemented]
         protected virtual void OnActualIndependentValuePropertyChanged(object oldValue, object newValue)
         {
+            double coercedValue = 0.0;
+            if (!(newValue is double) && ValueHelper.TryConvert(newValue, out coercedValue))
+            {
+                _isCoercingActualIndependentValue = true;
+                _oldActualIndependentValueBeforeCoercion = oldValue;
+            }
+
+            if (!_isCoercingActualIndependentValue)
+            {
+                if (_oldActualIndependentValueBeforeCoercion != null)
+                {
+                    oldValue = _oldActualIndependentValueBeforeCoercion;
+                    _oldActualIndependentValueBeforeCoercion = null;
+                }
+
+                RoutedPropertyChangedEventHandler<object> handler = this.ActualIndependentValueChanged;
+                if (handler != null)
+                {
+                    handler(this, new RoutedPropertyChangedEventArgs<object>(oldValue, newValue));
+                }
+            }
+
+            if (_isCoercingActualIndependentValue)
+            {
+                _isCoercingActualIndependentValue = false;
+                this.ActualIndependentValue = coercedValue;
+            }
         }
         #endregion public object ActualIndependentValue
+
+        /// <summary>
+        /// Occurs when the state of a data point is changed.
+        /// </summary>
+        internal event RoutedPropertyChangedEventHandler<DataPointState> StateChanged;
 
         #region public DataPointState State
         /// <summary>
@@ -605,6 +683,104 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// coerced to its previous value.
         /// </summary>
         private bool IsCoercingState { get; set; }
+
+        /// <summary>
+        /// Gets or sets the state of the data point.
+        /// </summary>
+        internal DataPointState State
+        {
+            get { return (DataPointState)GetValue(StateProperty); }
+            set { SetValue(StateProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the State dependency property.
+        /// </summary>
+        internal static readonly DependencyProperty StateProperty =
+            DependencyProperty.Register(
+                "State",
+                typeof(DataPointState),
+                typeof(DataPoint),
+                new PropertyMetadata(DataPointState.Created, OnStatePropertyChanged));
+
+        /// <summary>
+        /// Called when the value of the State property changes.
+        /// </summary>
+        /// <param name="d">Control that changed its State.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            DataPoint source = (DataPoint)d;
+            DataPointState oldValue = (DataPointState)e.OldValue;
+            DataPointState newValue = (DataPointState)e.NewValue;
+            source.OnStatePropertyChanged(oldValue, newValue);
+        }
+
+        /// <summary>
+        /// Called when the value of the State property changes.
+        /// </summary>
+        /// <param name="oldValue">The value to be replaced.</param>
+        /// <param name="newValue">The new value.</param>
+        protected virtual void OnStatePropertyChanged(DataPointState oldValue, DataPointState newValue)
+        {
+            if (!IsCoercingState)
+            {
+                // If state ever goes to or past PendingRemoval, the DataPoint is no longer active
+                if (DataPointState.PendingRemoval <= newValue)
+                {
+                    IsActive = false;
+                }
+
+                if (newValue < oldValue)
+                {
+                    // If we've somehow gone backwards in the life cycle (other 
+                    // than when we go back to normal from updating) coerce to 
+                    // old value.
+                    IsCoercingState = true;
+                    this.State = oldValue;
+                    IsCoercingState = false;
+                }
+                else
+                {
+                    // Update selection
+                    if (newValue > DataPointState.Normal)
+                    {
+                        this.IsSelectionEnabled = false;
+                    }
+
+                    // Start state transition
+                    bool transitionStarted = false;
+                    switch (newValue)
+                    {
+                        case DataPointState.Showing:
+                        case DataPointState.Hiding:
+                            transitionStarted = GoToCurrentRevealState();
+                            break;
+                    }
+
+                    // Fire Changed event
+                    RoutedPropertyChangedEventHandler<DataPointState> handler = this.StateChanged;
+                    if (handler != null)
+                    {
+                        handler(this, new RoutedPropertyChangedEventArgs<DataPointState>(oldValue, newValue));
+                    }
+
+                    // Change state if no transition started
+                    if (!transitionStarted && _templateApplied)
+                    {
+                        switch (newValue)
+                        {
+                            case DataPointState.Showing:
+                                State = DataPointState.Normal;
+                                break;
+                            case DataPointState.Hiding:
+                                State = DataPointState.Hidden;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
         #endregion internal DataPointState State
 
         /// <summary>
@@ -649,10 +825,82 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// Updates the Control's visuals to reflect the current state(s).
         /// </summary>
         /// <returns>True if a state transition was started.</returns>
-        [OpenSilver.NotImplemented]
         private bool GoToCurrentRevealState()
         {
-            return false;
+            bool transitionStarted = false;
+            string stateName = null;
+            switch (State)
+            {
+                case DataPointState.Showing:
+                    if (_haveStateRevealShown)
+                    {
+                        stateName = StateRevealShown;
+                    }
+                    break;
+                case DataPointState.Hiding:
+                    if (_haveStateRevealHidden)
+                    {
+                        stateName = StateRevealHidden;
+                    }
+                    break;
+            }
+            if (null != stateName)
+            {
+                if (!DesignerProperties.GetIsInDesignMode(this))
+                {
+                    // The use of Dispatcher.BeginInvoke here is necessary to 
+                    // work around the StackOverflowException Silverlight throws 
+                    // when it tries to play too many VSM animations.
+                    Dispatcher.BeginInvoke(new Action(() => VisualStateManager.GoToState(this, stateName, true)));
+                }
+                else
+                {
+                    VisualStateManager.GoToState(this, stateName, false);
+                }
+                transitionStarted = true;
+            }
+            return transitionStarted;
+        }
+
+        /// <summary>
+        /// Builds the visual tree for the DataPoint when a new template is applied.
+        /// </summary>
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            // Unhook CurrentStateChanged handler
+            VisualStateGroup groupReveal = VisualStateManager.GetVisualStateGroups(ImplementationRoot).CastWrapper<VisualStateGroup>().Where(group => GroupRevealStates == group.Name).FirstOrDefault();
+            if (null != groupReveal)
+            {
+                groupReveal.CurrentStateChanged -= new EventHandler<VisualStateChangedEventArgs>(OnCurrentStateChanged);
+            }
+
+            base.OnApplyTemplate();
+
+            // Hook CurrentStateChanged handler
+            _haveStateRevealShown = false;
+            _haveStateRevealHidden = false;
+            groupReveal = VisualStateManager.GetVisualStateGroups(ImplementationRoot).CastWrapper<VisualStateGroup>().Where(group => GroupRevealStates == group.Name).FirstOrDefault();
+            if (null != groupReveal)
+            {
+                groupReveal.CurrentStateChanged += new EventHandler<VisualStateChangedEventArgs>(OnCurrentStateChanged);
+                _haveStateRevealShown = groupReveal.States.CastWrapper<VisualState>().Where(state => StateRevealShown == state.Name).Any();
+                _haveStateRevealHidden = groupReveal.States.CastWrapper<VisualState>().Where(state => StateRevealHidden == state.Name).Any();
+            }
+
+            _templateApplied = true;
+
+            // Go to current state(s)
+            GoToCurrentRevealState();
+
+            if (DesignerProperties.GetIsInDesignMode(this))
+            {
+                // Transition to Showing state in design mode so DataPoint will be visible
+                State = DataPointState.Showing;
+            }
         }
 
         /// <summary>
@@ -660,9 +908,23 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="sender">Event source.</param>
         /// <param name="e">Event arguments.</param>
-        [OpenSilver.NotImplemented]
         private void OnCurrentStateChanged(object sender, VisualStateChangedEventArgs e)
         {
+            switch (e.NewState.Name)
+            {
+                case StateRevealShown:
+                    if (State == DataPointState.Showing)
+                    {
+                        State = DataPointState.Normal;
+                    }
+                    break;
+                case StateRevealHidden:
+                    if (State == DataPointState.Hiding)
+                    {
+                        State = DataPointState.Hidden;
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -673,6 +935,91 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             GoToCurrentRevealState();
+        }
+
+        /// <summary>
+        /// Provides handling for the MouseEnter event.
+        /// </summary>
+        /// <param name="e">Event arguments.</param>
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
+
+            if (IsSelectionEnabled)
+            {
+                IsHovered = true;
+            }
+        }
+
+        /// <summary>
+        /// Provides handling for the MouseLeave event.
+        /// </summary>
+        /// <param name="e">Event arguments.</param>
+#if MIGRATION
+        protected override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected override void OnPointerExited(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+             base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
+           
+            if (IsSelectionEnabled)
+            {
+                IsHovered = false;
+            }
+        }
+
+        /// <summary>
+        /// Provides handling for the MouseLeftButtonDown event.
+        /// </summary>
+        /// <param name="e">Event arguments.</param>
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
+        {
+            if (DefinitionSeriesIsSelectionEnabledHandling)
+            {
+                // DefinitionSeries-compatible handling
+                if (!IsSelectionEnabled)
+                {
+                    // Prevents clicks from bubbling to background, but necessary
+                    // to avoid letting ListBoxItem select the item
+                    e.Handled = true;
+                }
+#if MIGRATION
+                base.OnMouseLeftButtonDown(e);
+#else
+                base.OnPointerPressed(e);
+#endif
+            }
+            else
+            {
+                // Traditional handling
+#if MIGRATION
+                base.OnMouseLeftButtonDown(e);
+#else
+                base.OnPointerPressed(e);
+#endif
+                if (IsSelectionEnabled)
+                {
+                    IsSelected = (CommonKeys.None == (CommonKeys.Control & Keyboard.Modifiers));
+                    e.Handled = true;
+                }
+            }
         }
 
         /// <summary>

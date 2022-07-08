@@ -3,12 +3,9 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-using System.ComponentModel;
-using System.Globalization;
-#if MIGRATION
-#else
 using System;
-#endif
+using System.Globalization;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Controls.DataVisualization.Charting
@@ -83,13 +80,13 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
             string stringValue = value as string;
             if (value is T)
             {
-                return new T?((T)value);
+                return new Nullable<T>((T)value);
             }
             else if (string.IsNullOrEmpty(stringValue) || String.Equals(stringValue, "Auto", StringComparison.OrdinalIgnoreCase))
             {
-                return new T?();
+                return new Nullable<T>();
             }
-            return new T?((T)Convert.ChangeType(value, typeof(T), culture));
+            return new Nullable<T>((T)Convert.ChangeType(value, typeof(T), culture));
         }
 
         /// <summary>

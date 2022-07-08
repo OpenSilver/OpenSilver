@@ -3,21 +3,23 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using System;
-using Windows.Foundation;
-using Windows.UI.Xaml.Shapes;
-#endif
+using System.Windows;
 
 #if MIGRATION
+using System.Windows.Controls;
+using System.Windows.Shapes;
+using EF = System.Windows.Controls.DataVisualization.EnumerableFunctions;
 namespace System.Windows.Controls.DataVisualization.Charting
 #else
+using Windows.UI.Xaml.Controls;
+using Windows.Foundation;
+using Windows.UI.Xaml.Shapes;
+using EF = Windows.UI.Xaml.Controls.DataVisualization.EnumerableFunctions;
 namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 #endif
 {
@@ -31,7 +33,6 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
     [StyleTypedProperty(Property = "TitleStyle", StyleTargetType = typeof(Title))]
     [TemplatePart(Name = AxisGridName, Type = typeof(Grid))]
     [TemplatePart(Name = AxisTitleName, Type = typeof(Title))]
-    [OpenSilver.NotImplemented]
     public class DateTimeAxis : RangeAxis
     {
         #region public DateTime? ActualMaximum
@@ -301,9 +302,10 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <summary>
         /// Instantiates a new instance of the DateTimeAxis2 class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public DateTimeAxis()
         {
+            int year = DateTime.Now.Year;
+            this.ActualRange = new Range<IComparable>(new DateTime(year, 1, 1), new DateTime(year + 1, 1, 1));
         }
 
         /// <summary>
@@ -336,14 +338,87 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
 
         /// <summary>
+        /// Gets the actual range of DateTime values.
+        /// </summary>
+        protected Range<DateTime> ActualDateTimeRange { get; private set; }
+
+        /// <summary>
+        /// Updates the typed actual maximum and minimum properties when the
+        /// actual range changes.
+        /// </summary>
+        /// <param name="range">The actual range.</param>
+        protected override void OnActualRangeChanged(Range<IComparable> range)
+        {
+            ActualDateTimeRange = range.ToDateTimeRange();
+
+            if (range.HasData)
+            {
+                this.ActualMaximum = (DateTime)range.Maximum;
+                this.ActualMinimum = (DateTime)range.Minimum;
+            }
+            else
+            {
+                this.ActualMaximum = null;
+                this.ActualMinimum = null;
+            }
+
+            base.OnActualRangeChanged(range);
+        }
+
+        /// <summary>
         /// Returns a value indicating whether a value can plot.
         /// </summary>
         /// <param name="value">The value to plot.</param>
         /// <returns>A value indicating whether a value can plot.</returns>
-        [OpenSilver.NotImplemented]
         public override bool CanPlot(object value)
         {
-            return false;
+            DateTime val;
+            return ValueHelper.TryConvert(value, out val);
+        }
+
+        /// <summary>
+        /// Returns the plot area coordinate of a value.
+        /// </summary>
+        /// <param name="value">The value to plot.</param>
+        /// <param name="length">The length of the axis.</param>
+        /// <returns>The plot area coordinate of a value.</returns>
+        protected override UnitValue GetPlotAreaCoordinate(object value, double length)
+        {
+            return GetPlotAreaCoordinate(value, ActualDateTimeRange, length);
+        }
+
+        /// <summary>
+        /// Returns the plot area coordinate of a value.
+        /// </summary>
+        /// <param name="value">The value to plot.</param>
+        /// <param name="currentRange">The range to use determine the coordinate.</param>
+        /// <param name="length">The length of the axis.</param>
+        /// <returns>The plot area coordinate of a value.</returns>
+        protected override UnitValue GetPlotAreaCoordinate(object value, Range<IComparable> currentRange, double length)
+        {
+            return GetPlotAreaCoordinate(value, currentRange.ToDateTimeRange(), length);
+        }
+
+        /// <summary>
+        /// Returns the plot area coordinate of a value.
+        /// </summary>
+        /// <param name="value">The value to plot.</param>
+        /// <param name="currentRange">The range to use determine the coordinate.</param>
+        /// <param name="length">The length of the axis.</param>
+        /// <returns>The plot area coordinate of a value.</returns>
+        private static UnitValue GetPlotAreaCoordinate(object value, Range<DateTime> currentRange, double length)
+        {
+            if (currentRange.HasData)
+            {
+                DateTime dateTimeValue = ValueHelper.ToDateTime(value);
+
+                double rangelength = currentRange.Maximum.ToOADate() - currentRange.Minimum.ToOADate();
+                double pixelLength = Math.Max(length - 1, 0);
+
+                return new UnitValue((dateTimeValue.ToOADate() - currentRange.Minimum.ToOADate()) * (pixelLength / rangelength), Unit.Pixels);
+            }
+
+            return UnitValue.NaN();
         }
 
         /// <summary>
@@ -354,10 +429,17 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <returns>The actual interval to use to determine which values are 
         /// displayed in the axis.
         /// </returns>
-        [OpenSilver.NotImplemented]
         private double CalculateActualInterval(Size availableSize)
         {
-            return 0;
+            if (Interval != null)
+            {
+                return Interval.Value;
+            }
+
+            DateTimeIntervalType intervalType;
+            double interval = CalculateDateTimeInterval(ActualDateTimeRange.Minimum, ActualDateTimeRange.Maximum, out intervalType, availableSize);
+            ActualIntervalType = intervalType;
+            return interval;
         }
 
         /// <summary>
@@ -365,10 +447,31 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="availableSize">The available size.</param>
         /// <returns>A sequence of major values.</returns>
-        [OpenSilver.NotImplemented]
         protected virtual IEnumerable<DateTime> GetMajorAxisValues(Size availableSize)
         {
-            return Enumerable.Empty<DateTime>();
+            if (!ActualRange.HasData || ValueHelper.Compare(ActualRange.Minimum, ActualRange.Maximum) == 0 || GetLength(availableSize) == 0.0)
+            {
+                yield break;
+            }
+
+            this.ActualInterval = CalculateActualInterval(availableSize);
+            DateTime date = ActualDateTimeRange.Minimum;
+
+            DateTime start = AlignIntervalStart(date, this.ActualInterval, ActualIntervalType);
+            while (start < date)
+            {
+                start = IncrementDateTime(start, this.ActualInterval);
+            }
+
+            IEnumerable<DateTime> intermediateDates =
+                EnumerableFunctions
+                    .Iterate(start, next => IncrementDateTime(next, this.ActualInterval))
+                    .TakeWhile(current => ActualDateTimeRange.Contains(current));
+
+            foreach (DateTime current in intermediateDates)
+            {
+                yield return current;
+            }
         }
 
         /// <summary>
@@ -377,10 +480,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// <param name="availableSize">The available size.</param>
         /// <returns>A sequence of values to create major tick marks for.
         /// </returns>
-        [OpenSilver.NotImplemented]
         protected override IEnumerable<IComparable> GetMajorTickMarkValues(Size availableSize)
         {
-            return Enumerable.Empty<IComparable>();
+            return GetMajorAxisValues(availableSize).CastWrapper<IComparable>();
         }
 
         /// <summary>
@@ -388,10 +490,9 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         /// </summary>
         /// <param name="availableSize">The available size.</param>
         /// <returns>A sequence of values to plot on the axis.</returns>
-        [OpenSilver.NotImplemented]
         protected override IEnumerable<IComparable> GetLabelValues(Size availableSize)
         {
-            return Enumerable.Empty<IComparable>();
+            return GetMajorAxisValues(availableSize).CastWrapper<IComparable>();
         }
 
         /// <summary>
@@ -600,6 +701,33 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
         }
 
         /// <summary>
+        /// Returns the value range given a plot area coordinate.
+        /// </summary>
+        /// <param name="value">The position.</param>
+        /// <returns>A range of values at that plot area coordinate.</returns>
+        protected override IComparable GetValueAtPosition(UnitValue value)
+        {
+            if (ActualRange.HasData && ActualLength != 0.0)
+            {
+                double coordinate = value.Value;
+                if (value.Unit == Unit.Pixels)
+                {
+                    double minimumAsDouble = ActualDateTimeRange.Minimum.ToOADate();
+                    double rangelength = ActualDateTimeRange.Maximum.ToOADate() - minimumAsDouble;
+                    DateTime output = DateTime.FromOADate((coordinate * (rangelength / ActualLength)) + minimumAsDouble);
+
+                    return output;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Recalculates a DateTime interval obtained from maximum and minimum.
         /// </summary>
         /// <param name="minimum">The minimum.</param>
@@ -802,6 +930,93 @@ namespace Windows.UI.Xaml.Controls.DataVisualization.Charting
 
             // Make a correction of the interval
             return Math.Floor(years / 5);
+        }
+
+        /// <summary>
+        /// Overrides the actual range to ensure that it is never set to an
+        /// empty range.
+        /// </summary>
+        /// <param name="range">The range to override.</param>
+        /// <returns>The overridden range.</returns>
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "This method is very difficult to break up cleanly.")]
+        protected override Range<IComparable> OverrideDataRange(Range<IComparable> range)
+        {
+            Range<IComparable> overriddenActualRange = range;
+
+            if (!overriddenActualRange.HasData)
+            {
+                int year = DateTime.Now.Year;
+                return new Range<IComparable>(new DateTime(year, 1, 1), new DateTime(year + 1, 1, 1));
+            }
+            else if (ValueHelper.Compare(overriddenActualRange.Minimum, overriddenActualRange.Maximum) == 0)
+            {
+                DateTime minimum = ValueHelper.ToDateTime(overriddenActualRange.Minimum);
+                DateTime midpoint = ((DateTime.MinValue == minimum) ? DateTime.Now : minimum).Date;
+                return new Range<IComparable>(midpoint.AddMonths(-6), midpoint.AddMonths(6));
+            }
+
+            // ActualLength of 1.0 or less maps all points to the same coordinate
+            if (range.HasData && this.ActualLength > 1.0)
+            {
+                IList<ValueMarginCoordinateAndOverlap> valueMargins = new List<ValueMarginCoordinateAndOverlap>();
+                foreach (ValueMargin valueMargin in
+                    this.RegisteredListeners
+                        .OfType<IValueMarginProvider>()
+                        .SelectMany(provider => provider.GetValueMargins(this)))
+                {
+                    valueMargins.Add(
+                        new ValueMarginCoordinateAndOverlap
+                        {
+                            ValueMargin = valueMargin,
+                        });
+                }
+
+                if (valueMargins.Count > 0)
+                {
+                    double maximumPixelMarginLength =
+                        valueMargins
+                        .Select(valueMargin => valueMargin.ValueMargin.LowMargin + valueMargin.ValueMargin.HighMargin)
+                        .MaxOrNullable().Value;
+
+                    // Requested margin is larger than the axis so give up
+                    // trying to find a range that will fit it.
+                    if (maximumPixelMarginLength > this.ActualLength)
+                    {
+                        return range;
+                    }
+
+                    Range<DateTime> currentRange = range.ToDateTimeRange();
+
+                    // Ensure range is not empty.
+                    if (currentRange.Minimum == currentRange.Maximum)
+                    {
+                        int year = DateTime.Now.Year;
+                        currentRange = new Range<DateTime>(new DateTime(year, 1, 1), new DateTime(year + 1, 1, 1));
+                    }
+
+                    // priming the loop
+                    double actualLength = this.ActualLength;
+                    ValueMarginCoordinateAndOverlap maxLeftOverlapValueMargin;
+                    ValueMarginCoordinateAndOverlap maxRightOverlapValueMargin;
+                    UpdateValueMargins(valueMargins, currentRange.ToComparableRange());
+                    GetMaxLeftAndRightOverlap(valueMargins, out maxLeftOverlapValueMargin, out maxRightOverlapValueMargin);
+
+                    while (maxLeftOverlapValueMargin.LeftOverlap > 0 || maxRightOverlapValueMargin.RightOverlap > 0)
+                    {
+                        long unitOverPixels = currentRange.GetLength().Value.Ticks / ((long) actualLength);
+                        DateTime newMinimum = new DateTime(currentRange.Minimum.Ticks - (long)((maxLeftOverlapValueMargin.LeftOverlap + 0.5) * unitOverPixels));
+                        DateTime newMaximum = new DateTime(currentRange.Maximum.Ticks + (long)((maxRightOverlapValueMargin.RightOverlap + 0.5) * unitOverPixels));
+
+                        currentRange = new Range<DateTime>(newMinimum, newMaximum);
+                        UpdateValueMargins(valueMargins, currentRange.ToComparableRange());
+                        GetMaxLeftAndRightOverlap(valueMargins, out maxLeftOverlapValueMargin, out maxRightOverlapValueMargin);
+                    }
+
+                    return currentRange.ToComparableRange();
+                }
+            }
+
+            return range;
         }
     }
 }
