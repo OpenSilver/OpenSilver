@@ -35,7 +35,6 @@ namespace CSHTML5
     internal static class INTERNAL_InteropImplementation
     {
         private static bool _isInitialized;
-        private static readonly SynchronyzedStore<Delegate> _callbacksStore = new SynchronyzedStore<Delegate>();
         private static readonly SynchronyzedStore<string> _javascriptCallsStore = new SynchronyzedStore<string>();
         private static readonly ReferenceIDGenerator _refIdGenerator = new ReferenceIDGenerator();
 
@@ -45,6 +44,23 @@ namespace CSHTML5
             {
                 _isInitialized = false;
             };
+        }
+
+        private static void EnsureInitialized()
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                // Adding a property to the JavaScript "window" object:
+                dynamic jsWindow = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
+                jsWindow.SetProperty("onCallBack", new OnCallbackSimulator());
+            }
+
+            _isInitialized = true;
         }
 
 #if BRIDGE
@@ -64,27 +80,12 @@ namespace CSHTML5
 
             // Verify the arguments:
             if (noImpactOnPendingJSCode && runAsynchronously)
+            {
                 throw new ArgumentException("You cannot set both 'noImpactOnPendingJSCode' and 'runAsynchronously' to True. The 'noImpactOnPendingJSCode' only has meaning when running synchronously.");
+            }
 
             // Make sure the JS to C# interop is set up:
-            if (!_isInitialized)
-            {
-#if OPENSILVER
-                if (Interop.IsRunningInTheSimulator_WorkAround)
-                {
-#endif
-                    // Adding a property to the JavaScript "window" object:
-                    dynamic jsWindow = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
-                    jsWindow.SetProperty("onCallBack", new OnCallBack(_callbacksStore));
-#if OPENSILVER
-                }
-                else
-                {
-                    OnCallBack.SetCallbacksDictionary(_callbacksStore);
-                }
-#endif
-                _isInitialized = true;
-            }
+            EnsureInitialized();
 
             string unmodifiedJavascript = javascript;
 
@@ -145,7 +146,7 @@ namespace CSHTML5
                     Delegate callback = (Delegate)variable;
 
                     // Add the callback to the document:
-                    int callbackId = _callbacksStore.Add(callback);
+                    int callbackId = OnCallBackImpl.Instance.RegisterCallBack(callback);
 
                     var isVoid = callback.Method.ReturnType == typeof(void);
 
