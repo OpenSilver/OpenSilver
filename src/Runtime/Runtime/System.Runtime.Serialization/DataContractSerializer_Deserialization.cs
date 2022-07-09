@@ -480,7 +480,7 @@ namespace System.Runtime.Serialization
                 }
 
                 // Populate the values of the properties/members of the class:
-                HashSet2<string> membersForWhichWeSuccessfullSetTheValue = new HashSet2<string>();
+                HashSet<string> membersForWhichWeSuccessfullSetTheValue = new HashSet<string>();
                 foreach (XNode node in content)
                 {
                     if (node is XElement) // Normally an object property was serialized as an XElement.

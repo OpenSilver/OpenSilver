@@ -49,14 +49,14 @@ namespace Windows.UI.Xaml.Media
         public static readonly DependencyProperty OpacityProperty =
             DependencyProperty.Register("Opacity", typeof(double), typeof(Brush), new PropertyMetadata(1d));
 
-        private HashSet2<KeyValuePair<DependencyObject, DependencyProperty>> _propertiesWhereUsed;
-        public HashSet2<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
+        private HashSet<KeyValuePair<DependencyObject, DependencyProperty>> _propertiesWhereUsed;
+        public HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
         {
             get
             {
                 if(_propertiesWhereUsed == null)
                 {
-                    _propertiesWhereUsed = new HashSet2<KeyValuePair<DependencyObject, DependencyProperty>>();
+                    _propertiesWhereUsed = new HashSet<KeyValuePair<DependencyObject, DependencyProperty>>();
                 }
                 return _propertiesWhereUsed;
             }
@@ -66,7 +66,7 @@ namespace Windows.UI.Xaml.Media
         {
             List<CSSEquivalent> result = new List<CSSEquivalent>();
             //We copy brush.PropertiesWhereUsed in a local variable because we need to modify it in the foreach:
-            HashSet2<KeyValuePair<DependencyObject, DependencyProperty>> propertiesWhereUsed = new HashSet2<KeyValuePair<DependencyObject, DependencyProperty>>();
+            HashSet<KeyValuePair<DependencyObject, DependencyProperty>> propertiesWhereUsed = new HashSet<KeyValuePair<DependencyObject, DependencyProperty>>();
             foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in brush.PropertiesWhereUsed)
             {
                 propertiesWhereUsed.Add(tuple);

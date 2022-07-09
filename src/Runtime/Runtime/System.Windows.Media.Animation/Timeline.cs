@@ -204,12 +204,12 @@ namespace Windows.UI.Xaml.Media.Animation
                 Completed(this, new EventArgs());
         }
 
-        internal HashSet2<Guid> CompletedGuids = new HashSet2<Guid>();
+        internal HashSet<Guid> CompletedGuids = new HashSet<Guid>();
         internal void INTERNAL_RaiseCompletedEvent(Guid guid)
         {
             if (CompletedGuids == null)
             {
-                CompletedGuids = new HashSet2<Guid>();
+                CompletedGuids = new HashSet<Guid>();
             }
             if (!CompletedGuids.Contains(guid))
             {

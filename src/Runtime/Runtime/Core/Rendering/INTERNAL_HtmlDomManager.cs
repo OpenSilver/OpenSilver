@@ -1299,7 +1299,7 @@ parentElement.appendChild(child);";
             return Interop.IsNull(jsObject) || Interop.IsUndefined(jsObject);
         }
 
-        static HashSet2<Type> NumericTypes;
+        static HashSet<Type> NumericTypes;
 
 #if !BRIDGE
         [JSIgnore]
@@ -1310,7 +1310,7 @@ parentElement.appendChild(child);";
         {
             if (NumericTypes == null)
             {
-                NumericTypes = new HashSet2<Type>
+                NumericTypes = new HashSet<Type>
                     {
                         typeof(Byte),
                         typeof(SByte),

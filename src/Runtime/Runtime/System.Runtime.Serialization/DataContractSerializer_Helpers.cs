@@ -52,15 +52,15 @@ namespace System.Runtime.Serialization
         internal const string ATTRIBUTE_TO_REMOVE_FROM_XMLSERIALIZATION_VALUE = "Remove this from the XMLSerialization";// Note: this one whould be alright since the thing we want in the Interop needs quotation marks (referring to the note above).
         
 
-        private static HashSet2<Type> _typesWithOmittedSerializableAttribute;//Note: this HashSet is here because we cannot add the SerializableAttribute to certain types because of JSIL limitations (for example structs attributes are ignored).
+        private static HashSet<Type> _typesWithOmittedSerializableAttribute;//Note: this HashSet is here because we cannot add the SerializableAttribute to certain types because of JSIL limitations (for example structs attributes are ignored).
         //I also do not know how to add it properly to a class declared directly in JS (what I tried didn't work on Tuple).
-        internal static HashSet2<Type> INTERNAL_TypesWithOmittedSerializableAttribute
+        internal static HashSet<Type> INTERNAL_TypesWithOmittedSerializableAttribute
         {
             get
             {
                 if (_typesWithOmittedSerializableAttribute == null)
                 {
-                    _typesWithOmittedSerializableAttribute = new HashSet2<Type>()
+                    _typesWithOmittedSerializableAttribute = new HashSet<Type>()
                     {
                         typeof(KeyValuePair<,>),
                         typeof(Tuple<>),
