@@ -13,7 +13,7 @@
 
 using System;
 using System.Threading.Tasks;
-using DotNetForHtml5.Core;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -27,6 +27,13 @@ namespace Windows.UI.Xaml
     /// </summary>
     public static class Clipboard
     {
+        private static readonly IAsyncClipboard _impl;
+
+        static Clipboard()
+        {
+            _impl = ClipboardProvider.GetClipboard();
+        }
+
         /// <summary>
         /// Sets Unicode text data to store on the clipboard, for later access with <see cref="GetText"/>.
         /// </summary>
@@ -36,9 +43,15 @@ namespace Windows.UI.Xaml
         /// <exception cref="ArgumentNullException">
         /// text is null.
         /// </exception>
+        [Obsolete("Use SetTextAsync(string) instead.")]
         public static void SetText(string text)
         {
-            _ = SetTextAsync(text);
+            if (text is null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            _impl.SetText(text);
         }
 
         /// <summary>
@@ -57,31 +70,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(text));
             }
 
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                INTERNAL_Simulator.ClipboardHandler.SetText(text);
-                return Task.CompletedTask;
-            }
-            else
-            {
-                var tcs = new TaskCompletionSource<object>();
-
-                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.writeText($0).then($1());",
-                    text,
-                    new Action(() =>
-                    {
-                        try
-                        {
-                            tcs.SetResult(null);
-                        }
-                        catch (Exception ex)
-                        {
-                            tcs.SetException(ex);
-                        }
-                    }));
-
-                return tcs.Task;
-            }
+            return _impl.SetTextAsync(text);
         }
 
         /// <summary>
@@ -92,16 +81,7 @@ namespace Windows.UI.Xaml
         /// Always returns <see cref="string.Empty"/> in the browser.
         /// </returns>
         [Obsolete("Use GetTextAsync() instead.")]
-        [OpenSilver.NotImplemented]
-        public static string GetText()
-        {
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                return INTERNAL_Simulator.ClipboardHandler.GetText();
-            }
-
-            return string.Empty;
-        }
+        public static string GetText() => _impl.GetText();
 
         /// <summary>
         /// Retrieves Unicode text data from the system clipboard, if Unicode text data exists.
@@ -110,32 +90,7 @@ namespace Windows.UI.Xaml
         /// If Unicode text data is present on the system clipboard, returns a string that
         /// contains the Unicode text data. Otherwise, returns an empty string.
         /// </returns>
-        public static Task<string> GetTextAsync()
-        {
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                return Task.FromResult<string>(INTERNAL_Simulator.ClipboardHandler.GetText());
-            }
-            else
-            {
-                var tcs = new TaskCompletionSource<string>();
-
-                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.readText().then(text => $0(text));",
-                    new Action<string>(content =>
-                    {
-                        try
-                        {
-                            tcs.SetResult(content);
-                        }
-                        catch (Exception ex)
-                        {
-                            tcs.SetException(ex);
-                        }
-                    }));
-
-                return tcs.Task;
-            }
-        }
+        public static Task<string> GetTextAsync() => _impl.GetTextAsync();
 
         /// <summary>
         /// Queries the clipboard for the presence of data in the UnicodeText format.
@@ -145,16 +100,7 @@ namespace Windows.UI.Xaml
         /// Always return false in the browser.
         /// </returns>
         [Obsolete("Use ContainsTextAsync() instead.")]
-        [OpenSilver.NotImplemented]
-        public static bool ContainsText()
-        {
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                return INTERNAL_Simulator.ClipboardHandler.ContainsText();
-            }
-
-            return false;
-        }
+        public static bool ContainsText() => _impl.ContainsText();
 
         /// <summary>
         /// Queries the clipboard for the presence of data in the UnicodeText format.
@@ -162,31 +108,6 @@ namespace Windows.UI.Xaml
         /// <returns>
         /// true if the system clipboard contains Unicode text data; otherwise, false.
         /// </returns>
-        public static Task<bool> ContainsTextAsync()
-        {
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                return Task.FromResult<bool>(INTERNAL_Simulator.ClipboardHandler.ContainsText());
-            }
-            else
-            {
-                var tcs = new TaskCompletionSource<bool>();
-
-                OpenSilver.Interop.ExecuteJavaScript("navigator.clipboard.readText().then(text => $0(!!text))",
-                    new Action<bool>(b =>
-                    {
-                        try
-                        {
-                            tcs.SetResult(b);
-                        }
-                        catch (Exception ex)
-                        {
-                            tcs.SetException(ex);
-                        }
-                    }));
-
-                return tcs.Task;
-            }
-        }
+        public static Task<bool> ContainsTextAsync() => _impl.ContainsTextAsync();
     }
 }
