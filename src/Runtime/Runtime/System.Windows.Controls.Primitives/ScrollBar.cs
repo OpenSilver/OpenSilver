@@ -296,7 +296,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private void OnScroll(double value, ScrollEventType scrollEventType)
         {
             TimeSpan debounce = Debounce;
-            if (debounce > TimeSpan.Zero)
+            if (debounce > TimeSpan.Zero && scrollEventType != ScrollEventType.EndScroll)
             {
                 if (_debounceDispatcher == null)
                 {
