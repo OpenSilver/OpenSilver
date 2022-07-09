@@ -121,6 +121,17 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void XamlContext_RegisterName(XamlContext context, string name, object scopedElement)
+        {
+            Debug.Assert(context != null && context.ExternalNameScope != null);
+
+            if (scopedElement is DependencyObject)
+            {
+                context.ExternalNameScope.RegisterName(name, scopedElement);
+            }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
         {
             element.TemplatedParent = templatedParent;

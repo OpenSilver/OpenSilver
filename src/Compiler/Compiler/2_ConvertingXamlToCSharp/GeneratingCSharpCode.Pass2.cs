@@ -30,17 +30,10 @@ namespace DotNetForHtml5.Compiler
         {
             private abstract class GeneratorScope
             {
-                private readonly Dictionary<string, string> _namescope;
-
-                protected GeneratorScope(string rootElement, bool createNameScope)
+                protected GeneratorScope(string rootElement)
                 {
                     Root = rootElement;
                     XamlContext = GeneratingUniqueNames.GenerateUniqueNameFromString("xamlContext");
-                    
-                    if (createNameScope)
-                    {
-                        _namescope = new Dictionary<string, string>();
-                    }
                 }
 
                 public string Root { get; }
@@ -49,18 +42,46 @@ namespace DotNetForHtml5.Compiler
 
                 public StringBuilder StringBuilder { get; } = new StringBuilder();
 
+                public abstract void RegisterName(string name, string scopedElement);
+                
                 protected abstract string ToStringCore();
+                
+                public sealed override string ToString() => ToStringCore();
+            }
 
-                public void RegisterName(string name, string scopedElement)
+            private class RootScope : GeneratorScope
+            {
+                private readonly Dictionary<string, string> _namescope;
+
+                public RootScope(string rootElementName, bool createNameScope) 
+                    : base(rootElementName) 
                 {
-                    if (_namescope == null) return;
-                    
-                    _namescope.Add(name, scopedElement);
+                    StringBuilder.AppendLine($"var {XamlContext} = {RuntimeHelperClass}.Create_XamlContext();");
+                    if (createNameScope)
+                    {
+                        _namescope = new Dictionary<string, string>();
+                    }
                 }
 
-                public sealed override string ToString() => ToStringCore();
+                public override void RegisterName(string name, string scopedElement)
+                {
+                    if (_namescope != null)
+                    {
+                        _namescope.Add(name, scopedElement);
+                    }
+                }
 
-                private protected void AppendNamescope(StringBuilder builder)
+                protected override string ToStringCore()
+                {
+                    StringBuilder builder = new StringBuilder();
+
+                    builder.Append(StringBuilder.ToString());
+                    AppendNamescope(builder);
+
+                    return builder.ToString();
+                }
+
+                private void AppendNamescope(StringBuilder builder)
                 {
                     if (_namescope == null) return;
 
@@ -73,31 +94,12 @@ namespace DotNetForHtml5.Compiler
                 }
             }
 
-            private class RootScope : GeneratorScope
-            {
-                public RootScope(string rootElementName, bool createNameScope) 
-                    : base(rootElementName, createNameScope) 
-                {
-                    StringBuilder.AppendLine($"var {XamlContext} = {RuntimeHelperClass}.Create_XamlContext();");
-                }
-
-                protected override string ToStringCore()
-                {
-                    StringBuilder builder = new StringBuilder();
-
-                    builder.Append(StringBuilder.ToString());
-                    AppendNamescope(builder);
-
-                    return builder.ToString();
-                }
-            }
-
             private class FrameworkTemplateScope : GeneratorScope
             {
                 private readonly IMetadata _metadata;
 
                 public FrameworkTemplateScope(string templateName, string templateRoot, IMetadata metadata)
-                    : base(templateRoot, true)
+                    : base(templateRoot)
                 {
                     _metadata = metadata;
                     Name = templateName;
@@ -111,6 +113,11 @@ namespace DotNetForHtml5.Compiler
 
                 public string MethodName { get; }
 
+                public override void RegisterName(string name, string scopedElement)
+                {
+                    StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_RegisterName({XamlContext}, {EscapeString(name)}, {scopedElement});");
+                }
+
                 protected override string ToStringCore()
                 {
                     StringBuilder builder = new StringBuilder();
@@ -118,7 +125,6 @@ namespace DotNetForHtml5.Compiler
                     builder.AppendLine($"private static global::{_metadata.SystemWindowsNS}.FrameworkElement {MethodName}(global::{_metadata.SystemWindowsNS}.FrameworkElement {TemplateOwner}, {XamlContextClass} {XamlContext})")
                         .AppendLine("{")
                         .Append(StringBuilder.ToString());
-                    AppendNamescope(builder);
                     builder.AppendLine($"return {Root};")
                         .AppendLine("}");
 
