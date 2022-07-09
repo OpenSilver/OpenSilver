@@ -28,10 +28,12 @@ namespace OpenSilver.Internal.Xaml.Context
     {
         private readonly XamlContextStack _stack;
         private object _rootInstance;
+        private Lazy<INameResolver> _nameResolver;
 
         internal XamlContext()
         {
             _stack = new XamlContextStack();
+            SavedDepth = 0;
         }
 
         internal XamlContext(XamlContext ctx)
@@ -42,6 +44,7 @@ namespace OpenSilver.Internal.Xaml.Context
             }
 
             _stack = ctx._stack.DeepCopy();
+            SavedDepth = _stack.Depth;
         }
 
         internal void PushScope() => _stack.PushScope();
@@ -70,7 +73,44 @@ namespace OpenSilver.Internal.Xaml.Context
             }
         }
 
+        internal INameResolver NameResolver
+        {
+            get
+            {
+                if (_nameResolver == null)
+                {
+                    _nameResolver = new Lazy<INameResolver>(() =>
+                    {
+                        if (SavedDepth > 0)
+                        {
+                            return new TemplateNameResolver((FrameworkElement)_stack.GetFrame(SavedDepth + 1).Instance);
+                        }
+                        else if (RootInstance is FrameworkElement rootObject)
+                        {
+                            return new XamlNameResolver(rootObject);
+                        }
+
+                        return null;
+                    });
+                }
+
+                return _nameResolver.Value;
+            }
+        }
+
         internal INameScope ExternalNameScope { get; set; }
+
+        /// <summary>
+        /// Total depth of the stack SavedDepth+LiveDepth
+        /// </summary>
+        internal int Depth => _stack.Depth;
+
+        internal int SavedDepth { get; }
+
+        /// <summary>
+        /// The Depth of the Stack above the Saved (template) part
+        /// </summary>
+        internal int LiveDepth => Depth - SavedDepth;
 
         private XamlObjectFrame GetTopFrame()
         {
@@ -79,12 +119,7 @@ namespace OpenSilver.Internal.Xaml.Context
                 return null;
             }
 
-            XamlObjectFrame frame = _stack.CurrentFrame;
-            while (frame.Depth > 1)
-            {
-                frame = frame.Previous;
-            }
-            return frame;
+            return _stack.GetFrame(1);
         }
 
         internal IEnumerable<object> ServiceProvider_GetAllAmbientValues()

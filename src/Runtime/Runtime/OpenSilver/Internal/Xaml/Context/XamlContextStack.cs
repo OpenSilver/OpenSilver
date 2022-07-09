@@ -10,6 +10,8 @@
 *  
 \*====================================================================================*/
 
+using System.Diagnostics;
+
 namespace OpenSilver.Internal.Xaml.Context
 {
     internal class XamlContextStack
@@ -35,6 +37,17 @@ namespace OpenSilver.Internal.Xaml.Context
         {
             Depth--;
             CurrentFrame = CurrentFrame.Previous;
+        }
+
+        public XamlObjectFrame GetFrame(int depth)
+        {
+            XamlObjectFrame frame = CurrentFrame;
+            Debug.Assert(frame != null);
+            while (frame.Depth > depth)
+            {
+                frame = frame.Previous;
+            }
+            return frame;
         }
 
         //allocate a new frame as the new currentFrame;

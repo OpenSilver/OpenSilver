@@ -454,6 +454,11 @@ namespace DotNetForHtml5.Compiler
                     }
                 }
 
+                if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsMediaAnimationNS, "Timeline", element.Name.NamespaceName, element.Name.LocalName))
+                {
+                    parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword});");
+                }
+
                 // Add the attributes:
                 foreach (XAttribute attribute in element.Attributes())
                 {

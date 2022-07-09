@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -38,6 +35,8 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public abstract partial class Timeline : DependencyObject
     {
+        internal INameResolver NameResolver { get; set; }
+
         internal DependencyProperty GetProperty(DependencyObject target, PropertyPath propertyPath)
         {
             if (propertyPath.DependencyProperty != null)

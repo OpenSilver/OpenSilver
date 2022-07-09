@@ -15,12 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Markup;
-
-#if MIGRATION
-using System.Windows.Threading;
-#else
-using Windows.UI.Core;
-#endif
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -440,9 +435,10 @@ namespace Windows.UI.Xaml.Media.Animation
                     //  containing object.
                     if (currentObjectName != null)
                     {
-                        FrameworkElement mentor = FrameworkElement.FindMentor(containingObject);
-
-                        targetObject = ResolveTargetName(currentObjectName, mentor);
+                        targetObject = ResolveTargetName(
+                            currentObjectName,
+                            FrameworkElement.FindMentor(containingObject),
+                            currentTimeline.NameResolver);
                     }
                     else
                     {
@@ -483,12 +479,16 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        private static DependencyObject ResolveTargetName(string targetName, FrameworkElement fe)
+        private static DependencyObject ResolveTargetName(string targetName, FrameworkElement fe, INameResolver nameResolver)
         {
             object namedObject;
             DependencyObject targetObject;
 
-            if (fe != null)
+            if (nameResolver != null)
+            {
+                namedObject = nameResolver.Resolve(targetName);
+            }
+            else if (fe != null)
             {
                 namedObject = fe.FindName(targetName);
             }
@@ -500,8 +500,8 @@ namespace Windows.UI.Xaml.Media.Animation
             if (namedObject == null)
             {
                 throw new InvalidOperationException(
-                    string.Format("'{0}' name cannot be found in the name scope of '{1}'.", 
-                        targetName, 
+                    string.Format("'{0}' name cannot be found in the name scope of '{1}'.",
+                        targetName,
                         fe.GetType().ToString()));
             }
 
