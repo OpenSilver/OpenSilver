@@ -13,8 +13,12 @@
 \*====================================================================================*/
 
 
+using System.ComponentModel;
+
 namespace System.Collections.Generic
 {
+    [Obsolete("Use System.Collections.Generic.ISet instead.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface ISet2<T> : ICollection<T>
     {
         new bool Add(T item);

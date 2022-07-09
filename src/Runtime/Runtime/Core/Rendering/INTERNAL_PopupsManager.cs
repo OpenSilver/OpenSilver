@@ -53,7 +53,7 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
             // In other words, the parents of a popup that has StayOpen=True will always stay open
             // regardless of the value of their "StayOpen" property.
 
-            HashSet2<Popup> listOfPopupThatMustBeClosed = new HashSet2<Popup>();
+            HashSet<Popup> listOfPopupThatMustBeClosed = new HashSet<Popup>();
             List<PopupRoot> popupRootList = new List<PopupRoot>();
 
             foreach (object obj in GetAllRootUIElements())

@@ -44,8 +44,8 @@ namespace CSHTML5.Internal
     internal static class INTERNAL_VisibilityChangedNotifier
     {
         // Those two dictionaries are one the inverse of the other. They are kept in sync.
-        static Dictionary<DependencyObject, HashSet2<DependencyObject>> ElementsToListeners = new Dictionary<DependencyObject, HashSet2<DependencyObject>>();
-        static Dictionary<DependencyObject, HashSet2<DependencyObject>> ElementsToListened = new Dictionary<DependencyObject, HashSet2<DependencyObject>>();
+        static Dictionary<DependencyObject, HashSet<DependencyObject>> ElementsToListeners = new Dictionary<DependencyObject, HashSet<DependencyObject>>();
+        static Dictionary<DependencyObject, HashSet<DependencyObject>> ElementsToListened = new Dictionary<DependencyObject, HashSet<DependencyObject>>();
         static Dictionary<DependencyObject, Action> ListenersToCallbacks = new Dictionary<DependencyObject, Action>();
 
         public static void StartListeningToAncestorsVisibilityChanged(UIElement listeningElement, Action onAncestorVisibilityChanged)
@@ -73,7 +73,7 @@ namespace CSHTML5.Internal
         public static void StopListeningToAncestorsVisibilityChanged(DependencyObject listeningElement)
         {
             // Get the list of elements that the element was listening to:
-            HashSet2<DependencyObject> listenedElements = null;
+            HashSet<DependencyObject> listenedElements = null;
             if (ElementsToListened.ContainsKey(listeningElement))
             {
                 listenedElements = ElementsToListened[listeningElement];
@@ -119,25 +119,25 @@ namespace CSHTML5.Internal
             }
         }
 
-        static void AddToDictionaryIfNotAlreadyThere(Dictionary<DependencyObject, HashSet2<DependencyObject>> dictionary, DependencyObject key, DependencyObject value)
+        static void AddToDictionaryIfNotAlreadyThere(Dictionary<DependencyObject, HashSet<DependencyObject>> dictionary, DependencyObject key, DependencyObject value)
         {
-            HashSet2<DependencyObject> list;
+            HashSet<DependencyObject> list;
             if (dictionary.ContainsKey(key))
                 list = dictionary[key];
             else
             {
-                list = new HashSet2<DependencyObject>();
+                list = new HashSet<DependencyObject>();
                 dictionary[key] = list;
             }
             if (!list.Contains(value))
                 list.Add(value);
         }
 
-        static void RemoveFromDictionaryIfFound(Dictionary<DependencyObject, HashSet2<DependencyObject>> dictionary, DependencyObject key, DependencyObject value)
+        static void RemoveFromDictionaryIfFound(Dictionary<DependencyObject, HashSet<DependencyObject>> dictionary, DependencyObject key, DependencyObject value)
         {
             if (dictionary.ContainsKey(key))
             {
-                HashSet2<DependencyObject> list = dictionary[key];
+                HashSet<DependencyObject> list = dictionary[key];
                 if (list.Contains(value))
                     list.Remove(value);
             }

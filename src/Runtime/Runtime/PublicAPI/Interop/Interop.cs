@@ -121,7 +121,7 @@ namespace OpenSilver
             return t.Task;
         }
 
-        private static HashSet2<string> _jsScriptFileKeys = new HashSet2<string>(); //todo: This is probably redundant with the _pendingJSFile and _loadedFiles in INTERNAL_InteropImplementation so remove this?
+        private static HashSet<string> _jsScriptFileKeys = new HashSet<string>(); //todo: This is probably redundant with the _pendingJSFile and _loadedFiles in INTERNAL_InteropImplementation so remove this?
         
         public static Task<object> LoadJavaScriptFile(ResourceFile resourceFile)
         {
@@ -212,7 +212,7 @@ namespace OpenSilver
             return t.Task;
         }
 
-        static HashSet2<string> _cssFileKeys = new HashSet2<string>();
+        static HashSet<string> _cssFileKeys = new HashSet<string>();
         public static Task<object> LoadCssFile(ResourceFile resourceFile)
         {
             if (!_cssFileKeys.Contains(resourceFile.Key))
