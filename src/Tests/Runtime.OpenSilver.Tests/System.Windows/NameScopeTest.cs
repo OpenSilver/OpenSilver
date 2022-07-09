@@ -302,9 +302,8 @@ namespace Windows.UI.Xaml.Tests
                                     TemplatedParent = owner,
                                 };
                                 name4.Child = name5;
-                                RuntimeHelpers.InitializeNameScope(name4);
-                                RuntimeHelpers.RegisterName(name4, "name4", name4);
-                                RuntimeHelpers.RegisterName(name4, "name5", name5);
+                                RuntimeHelpers.XamlContext_RegisterName(context, "name4", name4);
+                                RuntimeHelpers.XamlContext_RegisterName(context, "name5", name5);
                                 return name4;
                             }),
                     }
@@ -352,10 +351,9 @@ namespace Windows.UI.Xaml.Tests
                                 name9.Children.Add(name10);
                                 name8.Child = name9;
 
-                                RuntimeHelpers.InitializeNameScope(name8);
-                                RuntimeHelpers.RegisterName(name8, "name8", name8);
-                                RuntimeHelpers.RegisterName(name8, "name9", name9);
-                                RuntimeHelpers.RegisterName(name8, "name10", name10);
+                                RuntimeHelpers.XamlContext_RegisterName(context, "name8", name8);
+                                RuntimeHelpers.XamlContext_RegisterName(context, "name9", name9);
+                                RuntimeHelpers.XamlContext_RegisterName(context, "name10", name10);
 
                                 return name8;
                             })
@@ -377,8 +375,7 @@ namespace Windows.UI.Xaml.Tests
                                 TemplatedParent = owner,
                             };
 
-                            RuntimeHelpers.InitializeNameScope(border);
-                            RuntimeHelpers.RegisterName(border, "border", border);
+                            RuntimeHelpers.XamlContext_RegisterName(context, "border", border);
 
                             return border;
                         })

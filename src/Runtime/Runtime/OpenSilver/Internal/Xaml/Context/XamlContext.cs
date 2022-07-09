@@ -16,8 +16,10 @@ using System.Collections.Generic;
 
 #if MIGRATION
 using System.Windows;
+using System.Windows.Markup;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Markup;
 #endif
 
 namespace OpenSilver.Internal.Xaml.Context
@@ -67,6 +69,8 @@ namespace OpenSilver.Internal.Xaml.Context
                 return _rootInstance;
             }
         }
+
+        internal INameScope ExternalNameScope { get; set; }
 
         private XamlObjectFrame GetTopFrame()
         {

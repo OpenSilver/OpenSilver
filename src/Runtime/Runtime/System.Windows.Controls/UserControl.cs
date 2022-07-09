@@ -57,22 +57,6 @@ namespace Windows.UI.Xaml.Controls
 
 #region Constructors
 
-        static UserControl()
-        {
-            // UseContentTemplate
-            ControlTemplate template = new ControlTemplate
-            {
-                Template = new TemplateContent(
-                    new XamlContext(),
-                    (owner, context) => ((UserControl)owner).Content as FrameworkElement
-                )
-            };
-
-            template.Seal();
-
-            UseContentTemplate = template;
-        }
-
         public UserControl()
         {
             IsTabStop = false; //we want to avoid stopping on this element's div when pressing tab.
@@ -126,18 +110,29 @@ namespace Windows.UI.Xaml.Controls
 
         internal override FrameworkTemplate TemplateCache
         {
-            get { return UseContentTemplate; }
+            get { return DefaultTemplate; }
             set { }
         }
 
         internal override FrameworkTemplate TemplateInternal
         {
-            get { return UseContentTemplate; }
+            get { return DefaultTemplate; }
         }
 
-        private static ControlTemplate UseContentTemplate
+        private static UseContentTemplate DefaultTemplate { get; } = new UseContentTemplate();
+
+        private class UseContentTemplate : FrameworkTemplate
         {
-            get;
+            public UseContentTemplate()
+            {
+                Seal();
+            }
+
+            internal override bool BuildVisualTree(FrameworkElement container)
+            {
+                container.TemplateChild = ((UserControl)container).Content as FrameworkElement;
+                return false;
+            }
         }
     }
 }

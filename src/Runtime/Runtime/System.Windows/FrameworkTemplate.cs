@@ -15,7 +15,12 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml.Context;
+
+#if !MIGRATION
+using Windows.UI.Xaml.Markup;
+#endif
 
 #if MIGRATION
 namespace System.Windows
@@ -129,6 +134,33 @@ namespace Windows.UI.Xaml
                 throw new InvalidOperationException($"Cannot modify a sealed '{GetType().Name}'. Please create a new one instead.");
             }
         }
+
+        internal static readonly DependencyProperty TemplateNameScopeProperty =
+            DependencyProperty.RegisterAttached(
+                "TemplateNameScope",
+                typeof(INameScope),
+                typeof(FrameworkTemplate),
+                null);
+
+        internal static INameScope GetTemplateNameScope(FrameworkElement fe)
+        {
+            if (fe is null)
+            {
+                throw new ArgumentNullException(nameof(fe));
+            }
+
+            return (INameScope)fe.GetValue(TemplateNameScopeProperty);
+        }
+
+        internal static void SetTemplateNameScope(FrameworkElement fe, INameScope namescope)
+        {
+            if (fe is null)
+            {
+                throw new ArgumentNullException(nameof(fe));
+            }
+            
+            fe.SetValue(TemplateNameScopeProperty, namescope);
+        }
     }
 
     internal class TemplateContent
@@ -149,7 +181,26 @@ namespace Windows.UI.Xaml
 
         internal FrameworkElement LoadContent(FrameworkElement owner)
         {
-            return _factory(owner, new XamlContext(_xamlContext));
+            XamlContext context = new XamlContext(_xamlContext)
+            {
+                ExternalNameScope = new NameScope(),
+            };
+
+            FrameworkElement rootElement = _factory(owner, context);
+            
+            if (owner == null)
+            {
+                if (NameScope.GetNameScope(rootElement) == null)
+                {
+                    NameScope.SetNameScope(rootElement, context.ExternalNameScope);
+                }
+            }
+            else
+            {
+                FrameworkTemplate.SetTemplateNameScope(owner, context.ExternalNameScope);
+            }
+
+            return rootElement;
         }
     }
 }

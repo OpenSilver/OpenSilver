@@ -645,6 +645,7 @@ namespace Windows.UI.Xaml
             // Update the template cache
             fe.TemplateCache = newTemplate;
 
+            fe.ClearValue(FrameworkTemplate.TemplateNameScopeProperty);
             fe.TemplateChild = null;
         }
 
@@ -871,6 +872,11 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(name));
             }
 
+            if (TemplatedParent != null)
+            {
+                return (TemplatedParent as FrameworkElement)?.GetTemplateChild(name);
+            }
+
             INameScope nameScope = FindScope(this);
             if (nameScope != null)
             {
@@ -882,45 +888,18 @@ namespace Windows.UI.Xaml
 
         internal static INameScope FindScope(FrameworkElement fe)
         {
-            if (fe.TemplatedParent != null)
-            {
-                FrameworkElement namescopeRoot = (fe.TemplatedParent as FrameworkElement)?.TemplateChild;
-                if (namescopeRoot != null)
-                {
-                    return NameScope.GetNameScope(namescopeRoot);
-                }
-
-                return null;
-            }
-
-            return FindScopeImpl(fe);
-        }
-
-        private static INameScope FindScopeImpl(FrameworkElement fe)
-        {
-            for (; fe != null; fe = GetNextNameScopeOwner(fe))
+            while (fe != null)
             {
                 INameScope nameScope = NameScope.GetNameScope(fe);
                 if (nameScope != null)
                 {
                     return nameScope;
                 }
+
+                fe = (fe.TemplatedParent ?? fe.Parent ?? VisualTreeHelper.GetParent(fe)) as FrameworkElement;
             }
 
             return null;
-        }
-
-        private static FrameworkElement GetNextNameScopeOwner(FrameworkElement fe)
-        {
-            FrameworkElement next = (fe.Parent ?? VisualTreeHelper.GetParent(fe)) as FrameworkElement;
-
-            // Skip external templates.
-            while (next?.TemplatedParent != null)
-            {
-                next = next.TemplatedParent as FrameworkElement;
-            }
-
-            return next;
         }
 
         /// <summary>
@@ -931,11 +910,12 @@ namespace Windows.UI.Xaml
         /// <returns>The Named element.  Null if no element has this Name.</returns>
         internal DependencyObject GetTemplateChild(string childName)
         {
-            if (TemplateChild != null)
+            INameScope namescope = FrameworkTemplate.GetTemplateNameScope(this);
+            if (namescope != null)
             {
-                return NameScope.GetNameScope(TemplateChild)?.FindName(childName) as DependencyObject;
+                return namescope.FindName(childName) as DependencyObject;
             }
-            
+
             return null;
         }
 
