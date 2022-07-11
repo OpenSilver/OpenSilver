@@ -65,4 +65,4 @@ jobs:
 #           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/index.json
       - name: Upload packages to MyGet
         run: |
-           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_TOKEN }} -s ${{ secrets.MYGET_PRIVATE_FEED }}
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_PRIVATE_FEED_TOKEN }} -s ${{ secrets.MYGET_PRIVATE_FEED }}
