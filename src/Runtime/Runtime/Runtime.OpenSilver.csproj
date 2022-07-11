@@ -515,7 +515,6 @@
 		<Compile Include="Core\Events\HtmlEventProxy.cs" />
 		<Compile Include="Core\Events\INTERNAL_EventManager.cs" />
 		<Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
-		<Compile Include="Core\Main\DelegateUtility.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
 		<Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
 		<Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
@@ -552,11 +551,8 @@
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomStyleReference.cs" />
-		<Compile Include="Core\Rendering\INTERNAL_ObjectTreeHelper.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_PopupsManager.cs" />
-		<Compile Include="Core\Rendering\INTERNAL_SimulatorJSExpression.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_SimulatorPerformanceOptimizer.cs" />
-		<Compile Include="Core\Rendering\INTERNAL_VisibilityChangedNotifier.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_VisualChildInformation.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_VisualTreeManager.cs" />
 		<Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />

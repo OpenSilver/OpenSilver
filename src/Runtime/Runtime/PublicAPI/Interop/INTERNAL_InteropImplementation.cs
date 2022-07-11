@@ -129,15 +129,6 @@ namespace CSHTML5
                     string id = ((INTERNAL_HtmlDomElementReference)variable).UniqueIdentifier;
                     javascript = javascript.Replace("$" + i.ToString(), $@"document.getElementByIdSafe(""{id}"")");
                 }
-                else if (variable is INTERNAL_SimulatorJSExpression)
-                {
-                    //------------------------
-                    // JS Expression (simulator only)
-                    //------------------------
-
-                    string expression = ((INTERNAL_SimulatorJSExpression)variable).Expression;
-                    javascript = javascript.Replace("$" + i.ToString(), expression);
-                }
                 else if (variable is Delegate)
                 {
                     //-----------

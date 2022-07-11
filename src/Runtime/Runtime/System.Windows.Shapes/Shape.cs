@@ -45,11 +45,6 @@ namespace Windows.UI.Xaml.Shapes
         internal protected object _canvasDomElement;
         internal protected Point _marginOffsets; // This is for the case where we have negative positions in the shapes.
 
-        // This is for the case where the HTML canvas is hidden when we want to draw 
-        // (due to a "Display:none" on one of the ancestors), so we need to wait for 
-        // the HTML canvas to become visible in order to draw.
-        private bool _isListeningToAncestorsVisibilityChanged;
-
         private bool _redrawPending = false;
 
         private bool _redrawWhenBecomeVisible = true;
@@ -435,16 +430,6 @@ namespace Windows.UI.Xaml.Shapes
                 context.lineWidth = StrokeThickness.ToInvariantString();
                 ScheduleRedraw();
             }
-        }
-
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            // Stop listening to the ancestors' Visibility_Changed event, if it was listening:
-            if (_isListeningToAncestorsVisibilityChanged)
-                INTERNAL_VisibilityChangedNotifier.StopListeningToAncestorsVisibilityChanged(this);
-            _isListeningToAncestorsVisibilityChanged = false;
-
-            base.INTERNAL_OnDetachedFromVisualTree();
         }
 
         #endregion
