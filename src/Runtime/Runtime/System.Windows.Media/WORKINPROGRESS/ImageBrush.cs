@@ -2,6 +2,7 @@ using System.Windows;
 using System;
 using System.Collections.Generic;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media.Imaging;
@@ -41,33 +42,33 @@ namespace Windows.UI.Xaml.Media
 
         internal List<object> INTERNAL_ToHtmlString(DependencyObject parent)
         {
-            List<object> returnValues = new List<object>();
-            if (ImageSource != null)
+            if (ImageSource is BitmapImage bitmapImage)
             {
-                if (ImageSource is BitmapImage)
+                string url = null;
+                if (bitmapImage.UriSource != null)
                 {
+                    Uri sourceUri = bitmapImage.UriSource;
+                    url = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, parent as UIElement);
+                }
+                else if (bitmapImage.INTERNAL_StreamSource != null)
+                {
+                    url = "data:image/png;base64," + bitmapImage.INTERNAL_StreamAsBase64String;
+                }
+                else if (!string.IsNullOrEmpty(bitmapImage.INTERNAL_DataURL))
+                {
+                    url = bitmapImage.INTERNAL_DataURL;
+                }
 
-                    BitmapImage sourceAsBitmapImage = (BitmapImage)ImageSource;
-                    if (sourceAsBitmapImage.UriSource != null)
+                if (url != null)
+                {
+                    return new List<object>(1)
                     {
-                        Uri sourceUri = null;
-                        sourceUri = ((BitmapImage)ImageSource).UriSource;
-                        string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, parent as UIElement);
-                        returnValues.Add("url('" + html5Path + "')");
-                    }
-                    else if (sourceAsBitmapImage.INTERNAL_StreamSource != null)
-                    {
-                        string dataUrl = "data:image/png;base64," + sourceAsBitmapImage.INTERNAL_StreamAsBase64String;
-                        returnValues.Add("url(" + dataUrl + ")");
-                    }
-                    else if (!string.IsNullOrEmpty(sourceAsBitmapImage.INTERNAL_DataURL))
-                    {
-                        string dataUrl = sourceAsBitmapImage.INTERNAL_DataURL;
-                        returnValues.Add("url(" + dataUrl + ")");
-                    }
+                        $"linear-gradient(to right,rgba(255,255,255,{(1.0 - Opacity).ToInvariantString()}) 0 100%),url({url})",
+                    };
                 }
             }
-            return returnValues;
+
+            return new List<object>();
         }
 
 	}
