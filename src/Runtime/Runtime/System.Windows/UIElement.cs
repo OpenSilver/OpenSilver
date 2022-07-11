@@ -785,9 +785,6 @@ namespace Windows.UI.Xaml
                     }
                 }
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
-
-                // Notify any listeners that the visibility has changed (this can be useful for example to redraw the Path control when it becomes visible, due to the fact that drawing on a hidden HTML canvas is not persisted):
-                INTERNAL_VisibilityChangedNotifier.NotifyListenersThatVisibilityHasChanged(uiElement);
             }
         }
 
