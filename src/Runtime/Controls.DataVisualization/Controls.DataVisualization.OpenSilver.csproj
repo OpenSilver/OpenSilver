@@ -11,6 +11,7 @@
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <OpenSilverVersion>1.0.0</OpenSilverVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Optimize>true</Optimize>
     <DefineTrace>true</DefineTrace>
     <DefineConstants>$(DefineConstants);SILVERLIGHT</DefineConstants>
