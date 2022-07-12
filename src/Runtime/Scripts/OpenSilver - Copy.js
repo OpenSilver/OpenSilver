@@ -42,7 +42,7 @@
     'libs/ResizeSensor.js',
     'libs/ResizeObserver.js',    
     'libs/quill.min.js',
-    'libs/html2canvas.js']));
+    'libs/html2canvas.min.js']));
 
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";
