@@ -12,6 +12,7 @@
     <IntermediateOutputPath>obj\OpenSilver\$(Configuration)\</IntermediateOutputPath>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <OpenSilverVersion>1.0.0</OpenSilverVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>

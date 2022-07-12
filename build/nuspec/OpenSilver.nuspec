@@ -28,29 +28,41 @@
     <!-- OpenSilver runtime -->
     <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.dll" target="lib/netstandard2.0/OpenSilver.Xaml.dll" />
     <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.pdb" target="lib/netstandard2.0/OpenSilver.Xaml.pdb" />
+    <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.xml" target="lib/netstandard2.0/OpenSilver.Xaml.xml" />
     <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.dll" target="lib/netstandard2.0/OpenSilver.dll" />
     <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.pdb" target="lib/netstandard2.0/OpenSilver.pdb" />
+    <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.xml" target="lib/netstandard2.0/OpenSilver.xml" />
     <file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.dll" />
     <file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.pdb" />
+    <file src="../../src/Runtime/DataForm.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.xml" target="lib/netstandard2.0/OpenSilver.Controls.Data.DataForm.Toolkit.xml" />
     <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.dll" />
     <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.pdb" />
+    <file src="../../src/Runtime/Controls.Data.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.Input.xml" target="lib/netstandard2.0/OpenSilver.Controls.Data.Input.xml" />
     <file src="../../src/Runtime/Controls.DataVisualization/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.DataVisualization.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.DataVisualization.Toolkit.dll" />
     <file src="../../src/Runtime/Controls.DataVisualization/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.DataVisualization.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.DataVisualization.Toolkit.pdb" />
+    <file src="../../src/Runtime/Controls.DataVisualization/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.DataVisualization.Toolkit.xml" target="lib/netstandard2.0/OpenSilver.Controls.DataVisualization.Toolkit.xml" />
     <file src="../../src/Runtime/Controls.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Input.dll" target="lib/netstandard2.0/OpenSilver.Controls.Input.dll" />
     <file src="../../src/Runtime/Controls.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Input.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Input.pdb" />
+    <file src="../../src/Runtime/Controls.Input/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Input.xml" target="lib/netstandard2.0/OpenSilver.Controls.Input.xml" />
     <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.dll" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.dll" />
     <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.pdb" />
+    <file src="../../src/Runtime/Controls.Navigation/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Navigation.xml" target="lib/netstandard2.0/OpenSilver.Controls.Navigation.xml" />
     <file src="../../src/Runtime/Controls.Layout.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Layout.Toolkit.dll" target="lib/netstandard2.0/OpenSilver.Controls.Layout.Toolkit.dll" />
     <file src="../../src/Runtime/Controls.Layout.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Layout.Toolkit.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Layout.Toolkit.pdb" />
+    <file src="../../src/Runtime/Controls.Layout.Toolkit/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Layout.Toolkit.xml" target="lib/netstandard2.0/OpenSilver.Controls.Layout.Toolkit.xml" />
     <file src="../../src/Runtime/Blend/Interactivity/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Interactivity.dll" target="lib/netstandard2.0/OpenSilver.Interactivity.dll" />
     <file src="../../src/Runtime/Blend/Interactivity/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Interactivity.pdb" target="lib/netstandard2.0/OpenSilver.Interactivity.pdb" />
+    <file src="../../src/Runtime/Blend/Interactivity/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Interactivity.xml" target="lib/netstandard2.0/OpenSilver.Interactivity.xml" />
     <file src="../../src/Runtime/Blend/Interactions/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Interactions.dll" target="lib/netstandard2.0/OpenSilver.Expression.Interactions.dll" />
     <file src="../../src/Runtime/Blend/Interactions/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Interactions.pdb" target="lib/netstandard2.0/OpenSilver.Expression.Interactions.pdb" />
+    <file src="../../src/Runtime/Blend/Interactions/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Interactions.xml" target="lib/netstandard2.0/OpenSilver.Expression.Interactions.xml" />
     <file src="../../src/Runtime/Blend/Effects/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Effects.dll" target="lib/netstandard2.0/OpenSilver.Expression.Effects.dll" />
     <file src="../../src/Runtime/Blend/Effects/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Effects.pdb" target="lib/netstandard2.0/OpenSilver.Expression.Effects.pdb" />
+    <file src="../../src/Runtime/Blend/Effects/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Expression.Effects.xml" target="lib/netstandard2.0/OpenSilver.Expression.Effects.xml" />
 
     <file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.dll" target="lib/netstandard2.0/OpenSilver.Controls.Data.dll" />
     <file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.pdb" target="lib/netstandard2.0/OpenSilver.Controls.Data.pdb" />
+    <file src="../../src/Runtime/Controls.Data/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.Controls.Data.xml" target="lib/netstandard2.0/OpenSilver.Controls.Data.xml" />
 
     <!-- OpenSilver targets -->
     <file src="../../src/Targets/$Target$.targets" target="build/$PackageId$.targets" />
