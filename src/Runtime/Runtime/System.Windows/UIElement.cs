@@ -19,6 +19,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Media.Effects;
 using System.Diagnostics;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -717,23 +718,26 @@ namespace Windows.UI.Xaml
 
         private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var uiElement = (UIElement)d;
+            UIElement uie = (UIElement)d;
             Visibility newValue = (Visibility)e.NewValue;
 
             // Finish loading the element if it was not loaded yet because it was Collapsed (and optimization was enabled in the Settings):
-            if (uiElement.INTERNAL_DeferredLoadingWhenControlBecomesVisible != null
+            if (uie.INTERNAL_DeferredLoadingWhenControlBecomesVisible != null
                 && newValue != Visibility.Collapsed)
             {
-                Action deferredLoadingWhenControlBecomesVisible = uiElement.INTERNAL_DeferredLoadingWhenControlBecomesVisible;
-                uiElement.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
+                Action deferredLoadingWhenControlBecomesVisible = uie.INTERNAL_DeferredLoadingWhenControlBecomesVisible;
+                uie.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
                 deferredLoadingWhenControlBecomesVisible();
             }
 
             // Make the CSS changes required to apply the visibility at the DOM level:
-            INTERNAL_ApplyVisibility(uiElement, newValue);
+            INTERNAL_ApplyVisibility(uie, newValue);
 
-            // Update the "IsVisible" property (which is inherited using the "coerce" method):
-            d.SetValue(IsVisibleProperty, newValue != Visibility.Collapsed);
+            // The IsVisible property depends on this property.
+            uie.UpdateIsVisible();
+
+            uie.InvalidateParentMeasure();
+            uie.InvalidateParentArrange();
         }
 
         internal static void INTERNAL_ApplyVisibility(UIElement uiElement, Visibility newValue)
@@ -787,87 +791,94 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+        #endregion
 
-#region IsVisible
-
-        public bool IsVisible
-        {
-            get { return (bool)GetValue(IsVisibleProperty); }
-        }
+        #region IsVisible
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.IsVisible"/> dependency 
-        /// property.
+        /// A property indicating if this element is visible or not.
         /// </summary>
-        public static readonly DependencyProperty IsVisibleProperty =
+        public bool IsVisible => (bool)GetValue(IsVisibleProperty);
+
+        /// <summary>
+        /// Identifies the <see cref="IsVisible"/> dependency property.
+        /// </summary>
+        private static readonly DependencyProperty IsVisibleProperty =
             DependencyProperty.Register(
                 nameof(IsVisible),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(true, OnIsVisiblePropertyChanged, CoerceIsVisibleProperty));
+                new PropertyMetadata(false, OnIsVisibleChanged, CoerceIsVisible));
 
-        private static void OnIsVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var uiElement = (UIElement)d;
+            UIElement uie = (UIElement)d;
 
             if ((bool)e.NewValue)
             {
-                Action deferredLoadingWhenControlBecomesVisible = uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible;
+                Action deferredLoadingWhenControlBecomesVisible = uie.INTERNAL_DeferredRenderingWhenControlBecomesVisible;
                 if (deferredLoadingWhenControlBecomesVisible != null)
                 {
-                    uiElement.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
+                    uie.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
                     deferredLoadingWhenControlBecomesVisible();
                 }
             }
 
             // Invalidate the children so that they will inherit the new value.
-            uiElement.InvalidateForceInheritPropertyOnChildren(e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
-            if (uiElement.IsVisibleChanged != null)
-            {    
-                uiElement.IsVisibleChanged(d, e);
-            }
-
-            uiElement.InvalidateParentMeasure();
-            uiElement.InvalidateParentArrange();
+            uie.IsVisibleChanged?.Invoke(d, e);
         }
 
-        private static object CoerceIsVisibleProperty(DependencyObject d, object baseValue)
+        private static object CoerceIsVisible(DependencyObject d, object baseValue)
         {
-            UIElement @this = (UIElement)d;
+            UIElement uie = (UIElement)d;
 
-            if (!(baseValue is bool)) //todo: this is a temporary workaround - cf. comment in "CoerceIsEnabledProperty"
-                return true;
+            // IsVisible is a read-only property.  It derives its "base" value
+            // from the Visibility property.
+            bool isVisible = uie.Visibility == Visibility.Visible;
 
             // We must be false if our parent is false, but we can be
             // either true or false if our parent is true.
             //
             // Another way of saying this is that we can only be true
             // if our parent is true, but we can always be false.
-            if ((bool)baseValue)
+            if (isVisible)
             {
-                DependencyObject parent = @this.INTERNAL_VisualParent;
-                if (parent == null || (bool)parent.GetValue(IsVisibleProperty))
+                bool constraintAllowsVisible = false;
+
+                // Our parent can constrain us.
+                if (VisualTreeHelper.GetParent(uie) is UIElement parent)
                 {
-                    return true;
+                    constraintAllowsVisible = parent.IsVisible;
                 }
                 else
                 {
-                    return false;
+                    if (VisualTreeHelper.IsRoot(uie))
+                    {
+                        constraintAllowsVisible = true;
+                    }
+                }
+
+                if (!constraintAllowsVisible)
+                {
+                    isVisible = false;
                 }
             }
-            else
-            {
-                return false;
-            }
+
+            return isVisible;
         }
 
         public event DependencyPropertyChangedEventHandler IsVisibleChanged;
 
-#endregion
+        internal void UpdateIsVisible()
+        {
+            CoerceValue(IsVisibleProperty);
+        }
 
-#region Opacity
+        #endregion
+
+        #region Opacity
 
         /// <summary>
         /// Gets or sets the degree of the object's opacity.
@@ -1432,24 +1443,21 @@ document.ondblclick = null;
 
 #region ForceInherit property support
 
-        internal static void SynchronizeForceInheritProperties(UIElement uiE, DependencyObject parent)
+        internal static void SynchronizeForceInheritProperties(UIElement uie, DependencyObject parent)
         {
-            // IsEnabledProperty
             if (!(bool)parent.GetValue(FrameworkElement.IsEnabledProperty))
             {
-                uiE.CoerceValue(FrameworkElement.IsEnabledProperty);
+                uie.CoerceValue(FrameworkElement.IsEnabledProperty);
             }
 
-            // IsHitTestVisibleProperty
             if (!(bool)parent.GetValue(IsHitTestVisibleProperty))
             {
-                uiE.CoerceValue(IsHitTestVisibleProperty);
+                uie.CoerceValue(IsHitTestVisibleProperty);
             }
 
-            // IsVisibleProperty
-            if (!(bool)parent.GetValue(IsVisibleProperty))
+            if ((bool)parent.GetValue(IsVisibleProperty))
             {
-                uiE.CoerceValue(IsVisibleProperty);
+                uie.UpdateIsVisible();
             }
         }
 
@@ -1458,7 +1466,7 @@ document.ondblclick = null;
             int cChildren = this.VisualChildrenCount;
             for (int i = 0; i < cChildren; i++)
             {
-                DependencyObject child = this.GetVisualChild(i);
+                UIElement child = this.GetVisualChild(i);
                 if (child != null)
                 {
                     child.CoerceValue(property);

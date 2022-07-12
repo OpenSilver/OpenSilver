@@ -355,7 +355,7 @@ $1.removeChild(popupRoot);
                 return false;
 
             // Then, check whether the element is visible in the DOM tree, regardless of elements that may cover it. This can be false if at least one of the parents has "Visibility=Collapsed".
-            if (!INTERNAL_VisibilityChangedNotifier.IsElementVisible(element))
+            if (!element.IsVisible)
                 return false;
 
             // Verify that the size of the element can be read:
