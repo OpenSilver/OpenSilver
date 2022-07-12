@@ -30,6 +30,7 @@
     <!-- OpenSilver.Simulator libs -->
     <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.dll" target="lib/net461" />
     <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.pdb" target="lib/net461" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.xml" target="lib/net461" />
 
     <!-- OpenSilver targets -->
     <file src="../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
