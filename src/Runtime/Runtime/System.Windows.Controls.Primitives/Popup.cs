@@ -591,6 +591,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 var popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(parentWindow);
                 _popupRoot = popupRoot;
                 _popupRoot.INTERNAL_LinkedPopup = this;
+                _popupRoot.UpdateIsVisible();
 
                 // Set CustomLayout of the popup root:
                 if (this.CustomLayout)

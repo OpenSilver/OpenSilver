@@ -484,7 +484,7 @@ namespace Windows.UI.Xaml.Shapes
                         // We check whether the Shape is visible in the HTML DOM tree, because if the HTML canvas is hidden 
                         // (due to a "Dispay:none" on one of the ancestors), we cannot draw on it 
                         // (this can be seen by hiding a canvas, drawing, and then showing it: it will appear empty):
-                        if (INTERNAL_VisibilityChangedNotifier.IsElementVisible(this))
+                        if (IsVisible)
                         {
                             Redraw();
                         }
