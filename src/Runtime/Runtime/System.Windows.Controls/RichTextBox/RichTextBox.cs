@@ -45,10 +45,10 @@ namespace Windows.UI.Xaml.Controls
 		/// </summary>
 		public RichTextBox()
         {
-			//this.DefaultStyleKey = typeof(RichTextBox);
 			this.Blocks = new BlockCollection(this, false);
 			_presenter = new QuillJsPresenter(this);
             this.Loaded += OnLoaded;
+            this.IsEnabledChanged += OnIsEnabledChanged;
         }
 
         #endregion Constructor
@@ -58,7 +58,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Occurs when the content changes in a <see cref="RichTextBox"/>.
         /// </summary>
-		public event ContentChangedEventHandler ContentChanged;
+        public event ContentChangedEventHandler ContentChanged;
 
 		/// <summary>
 		/// Occurs when the text selection has changed.
@@ -71,6 +71,7 @@ namespace Windows.UI.Xaml.Controls
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			_presenter.Init();
+			SetContentsFromBlocks();
 		}
 		#endregion
 
@@ -183,20 +184,18 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="RichTextBox.IsReadOnly"/> dependency property.
         /// </summary>
-        [OpenSilver.NotImplemented]
 		public static readonly DependencyProperty IsReadOnlyProperty =
 			DependencyProperty.Register(
-				"IsReadOnly",
+				nameof(IsReadOnly),
 				typeof(bool),
 				typeof(RichTextBox),
-				new PropertyMetadata(false));
+				new PropertyMetadata(false, IsReadOnlyChanged));
 
 		/// <summary>
 		/// Gets or sets a value that determines whether the user can change the text in
 		/// the <see cref="RichTextBox"/>.
 		/// The default is false.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public bool IsReadOnly
 		{
 			get { return (bool)GetValue(IsReadOnlyProperty); }
@@ -358,25 +357,35 @@ namespace Windows.UI.Xaml.Controls
             set { this.SetValue(TextWrappingProperty, value); }
         }
 
-        #endregion Dependency Properties
+		private static void IsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			((RichTextBox)d).SetReadOnly((bool)e.NewValue);
+		}
 
-        #endregion Public Properties
+		private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			_presenter.SetEnable((bool)e.NewValue);
+		}
 
-        #region Public Methods
+		#endregion Dependency Properties
 
-        /// <summary>
-        /// Returns a <see cref="TextPointer"/> that indicates the closest insertion
-        /// position for the specified point.
-        /// </summary>
-        /// <param name="point">
-        /// A point in the coordinate space of the <see cref="RichTextBox"/> for
-        /// which the closest insertion position is retrieved.
-        /// </param>
-        /// <returns>
-        /// A <see cref="TextPointer"/> that indicates the closest insertion position
-        /// for the specified point.
-        /// </returns>
-        [OpenSilver.NotImplemented]
+		#endregion Public Properties
+
+		#region Public Methods
+
+		/// <summary>
+		/// Returns a <see cref="TextPointer"/> that indicates the closest insertion
+		/// position for the specified point.
+		/// </summary>
+		/// <param name="point">
+		/// A point in the coordinate space of the <see cref="RichTextBox"/> for
+		/// which the closest insertion position is retrieved.
+		/// </param>
+		/// <returns>
+		/// A <see cref="TextPointer"/> that indicates the closest insertion position
+		/// for the specified point.
+		/// </returns>
+		[OpenSilver.NotImplemented]
 		public TextPointer GetPositionFromPoint(Point point)
 		{
 			return null;
@@ -610,7 +619,7 @@ namespace Windows.UI.Xaml.Controls
 
 		#endregion Protected Methods
 
-		#region Internal Methods
+		#region Internal/Private Methods
 		internal void RaiseContentChanged()
 		{
 			ContentChanged?.Invoke(this, new ContentChangedEventArgs());
@@ -628,13 +637,30 @@ namespace Windows.UI.Xaml.Controls
 
 		internal string GetRawText()
         {
-			return _presenter.GetAllText();
+			return _presenter.GetText();
         }
 
 		internal void InsertText(string text)
         {
-
+			_presenter.InsertText(text);
         }
-		#endregion
-	}
+
+		private void SetReadOnly(bool value)
+        {
+			Console.WriteLine("Here " + value);
+			_presenter.SetReadOnly(value);
+        }
+
+		private void SetContentsFromBlocks()
+        {
+			string contents = "";
+			foreach(var block in this.Blocks)
+            {
+				contents += block.GetContainerText();
+            }
+
+			_presenter.SetText(contents);
+        }
+        #endregion
+    }
 }

@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml.Documents
                 string text = "";
                 foreach(var block in Section.Blocks)
                 {
-                    text += block.GetContainerText();
+                    text += block.GetContainerText() + "\\n";
                 }
 
                 return text;

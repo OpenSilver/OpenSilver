@@ -19,7 +19,6 @@ namespace Windows.UI.Xaml.Controls
 
         protected override void OnTextAddedOverride(TextElement textElement)
         {
-            Console.WriteLine("here");
             if(textElement is Paragraph paragraph)
             {
                 string text = "";

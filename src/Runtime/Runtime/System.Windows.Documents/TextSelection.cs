@@ -63,8 +63,17 @@ namespace Windows.UI.Xaml.Documents
 		//     A System.String that is a XAML representation of the current selection. This
 		//     XAML representation is the same XAML that is applied to the clipboard for a copy
 		//     operation.
-		[OpenSilver.NotImplemented]
-		public string Xaml { get; set; }
+		public string Xaml 
+		{
+            get
+            {
+				return _presenter.GetContents(_start, _length);
+            }
+            set
+            {
+				//TODO: implement
+            }
+		}
 
 		//
 		// Summary:

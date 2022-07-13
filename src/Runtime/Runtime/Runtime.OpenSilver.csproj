@@ -406,7 +406,7 @@
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Hyperlink.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\LogicalDirection.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Paragraph.cs" />
+		<Compile Include="System.Windows.Documents\Paragraph.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Section.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\TextPointer.cs" />
 		<Compile Include="System.Windows.Documents\TextSelection.cs" />

@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Controls
         public void Init()
         {
             LoadExtensions();
-            _instance = OpenSilver.Interop.ExecuteJavaScript("new Quill($0, {})", "#" + _parent.GetEditorId());
+            CreateInstance();
             RegisterEvents();
         }
 
@@ -65,7 +65,7 @@ namespace Windows.UI.Xaml.Controls
             return result?.ToString();
         }
 
-        public string GetAllText()
+        public string GetText()
         {
             if (_instance == null)
                 return string.Empty;
@@ -85,6 +85,15 @@ namespace Windows.UI.Xaml.Controls
 
             string script = $"$0.deleteText({start}, {length}, 'api');"
                 + $"$0.insertText({start}, '{text}');";
+            OpenSilver.Interop.ExecuteJavaScript(script, _instance);
+        }
+
+        public void SetText(string text)
+        {
+            if (_instance == null)
+                return;
+
+            string script = $"$0.setText('{text}', 'api')";
             OpenSilver.Interop.ExecuteJavaScript(script, _instance);
         }
 
@@ -227,49 +236,39 @@ namespace Windows.UI.Xaml.Controls
         public string GetContents()
         {
             var content = OpenSilver.Interop.ExecuteJavaScript("JSON.stringify($0.getContents())", _instance);
-            if (content == null)
-                return null;
+            return GetXamlContents(content?.ToString());
+        }
 
-            var deltas = JsonSerializer.Deserialize<QuillDeltas>(content.ToString());
-            if (deltas == null)
-                return null;
-
-            var xaml = new XmlDocument();
-            xaml.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Paragraph/></Section>");
-            var paragraph = xaml.DocumentElement.FirstChild;
-
-            foreach (var delta in deltas.Operations)
-            {
-                var run = xaml.CreateElement("Run", xaml.DocumentElement.NamespaceURI);
-                run.InnerText = delta.Text;
-
-                if (delta.Attributes != null)
-                {
-                    if (delta.Attributes.Bold)
-                        run.SetAttribute("FontWeight", "Bold");
-                    if (delta.Attributes.Italic)
-                        run.SetAttribute("FontStyle", "Italic");
-                    if (delta.Attributes.Underline)
-                        run.SetAttribute("TextDecorations", "Underline");
-                    if (!string.IsNullOrEmpty(delta.Attributes.FontName))
-                        run.SetAttribute("FontFamily", GetFontName(delta.Attributes.FontName));
-                    if (!string.IsNullOrEmpty(delta.Attributes.FontSize))
-                        run.SetAttribute("FontSize", delta.Attributes.FontSize.Replace("px", ""));
-                    if (delta.Attributes.Color != null)
-                    {
-                        run.SetAttribute("Foreground", delta.Attributes.Color.ToString());
-                    }
-                }
-
-                paragraph.AppendChild(run);
-            }
-
-            return xaml.OuterXml;
+        public string GetContents(int start, int length)
+        {
+            var content = OpenSilver.Interop.ExecuteJavaScript($"JSON.stringify($0.getContents({start}, {length}))", _instance);
+            return GetXamlContents(content?.ToString());
         }
 
         public void Clear()
         {
             string script = "$0.setText('','api');";
+            OpenSilver.Interop.ExecuteJavaScript(script, _instance);
+        }
+
+        public void SetReadOnly(bool value)
+        {
+            if (_instance == null)
+                return;
+
+            string val = value ? "false" : "true";
+            string script = $"$0.root.setAttribute('contenteditable', '{val}')";
+            Console.WriteLine(script);
+            OpenSilver.Interop.ExecuteJavaScript(script, _instance);
+        }
+
+        public void SetEnable(bool value)
+        {
+            if (_instance == null)
+                return;
+
+            string val = value ? "true" : "false";
+            string script = $"$0.enable({val})";
             OpenSilver.Interop.ExecuteJavaScript(script, _instance);
         }
 
@@ -345,6 +344,57 @@ namespace Windows.UI.Xaml.Controls
         {
             var names = fontName.Split('-');
             return string.Join(" ", names);
+        }
+
+        private string GetXamlContents(string content)
+        {
+            if (string.IsNullOrEmpty(content))
+                return null;
+
+            var deltas = JsonSerializer.Deserialize<QuillDeltas>(content.ToString());
+            if (deltas == null)
+                return null;
+
+            var xaml = new XmlDocument();
+            xaml.LoadXml("<Section xml:space=\"preserve\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Paragraph/></Section>");
+            var paragraph = xaml.DocumentElement.FirstChild;
+
+            foreach (var delta in deltas.Operations)
+            {
+                var run = xaml.CreateElement("Run", xaml.DocumentElement.NamespaceURI);
+                run.InnerText = delta.Text;
+
+                if (delta.Attributes != null)
+                {
+                    if (delta.Attributes.Bold)
+                        run.SetAttribute("FontWeight", "Bold");
+                    if (delta.Attributes.Italic)
+                        run.SetAttribute("FontStyle", "Italic");
+                    if (delta.Attributes.Underline)
+                        run.SetAttribute("TextDecorations", "Underline");
+                    if (!string.IsNullOrEmpty(delta.Attributes.FontName))
+                        run.SetAttribute("FontFamily", GetFontName(delta.Attributes.FontName));
+                    if (!string.IsNullOrEmpty(delta.Attributes.FontSize))
+                        run.SetAttribute("FontSize", delta.Attributes.FontSize.Replace("px", ""));
+                    if (delta.Attributes.Color != null)
+                    {
+                        run.SetAttribute("Foreground", delta.Attributes.Color.ToString());
+                    }
+                }
+
+                paragraph.AppendChild(run);
+            }
+
+            return xaml.OuterXml;
+        }
+
+        private void CreateInstance()
+        {
+            string script = "let options = {"
+                + $"readOnly: {(_parent.IsReadOnly ? "true" : "false")},"
+                + "};"
+                + "new Quill($0, options);";
+            _instance = OpenSilver.Interop.ExecuteJavaScript(script, "#" + _parent.GetEditorId());
         }
     }
 }

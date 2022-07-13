@@ -24,13 +24,11 @@ namespace Windows.UI.Xaml.Documents
 	/// Provides a block-level content element that is used to group content into a paragraph.
 	/// </summary>
 	[ContentProperty("Inlines")]
-    [OpenSilver.NotImplemented]
 	public sealed class Paragraph : Block
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Paragraph"/> class.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public Paragraph()
 		{
 			this.Inlines = new InlineCollection(this);
@@ -40,7 +38,6 @@ namespace Windows.UI.Xaml.Documents
 		/// Gets an <see cref="InlineCollection"/> containing the top-level <see cref="Inline"/>
 		/// elements that include the contents of the <see cref="Paragraph"/>.
 		/// </summary>
-        [OpenSilver.NotImplemented]
 		public InlineCollection Inlines { get; }
 
 		protected internal override void INTERNAL_OnAttachedToVisualTree()
