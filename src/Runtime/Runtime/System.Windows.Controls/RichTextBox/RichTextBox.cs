@@ -647,7 +647,6 @@ namespace Windows.UI.Xaml.Controls
 
 		private void SetReadOnly(bool value)
         {
-			Console.WriteLine("Here " + value);
 			_presenter.SetReadOnly(value);
         }
 

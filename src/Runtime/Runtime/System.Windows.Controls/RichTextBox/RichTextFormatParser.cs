@@ -8,6 +8,14 @@ using System.Xml;
 
 namespace System.Windows.Controls
 #else
+using DotNetForHtml5.Core;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Xml;
+using Windows.UI.Xaml.Documents;
+
 namespace Windows.UI.Xaml.Controls
 #endif
 {

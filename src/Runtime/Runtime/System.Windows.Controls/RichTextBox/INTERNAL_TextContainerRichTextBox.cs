@@ -1,8 +1,10 @@
-﻿using System.Windows.Documents;
+﻿#if MIGRATION
+using System.Windows.Documents;
 
-#if MIGRATION
 namespace System.Windows.Controls
 #else
+using Windows.UI.Xaml.Documents;
+
 namespace Windows.UI.Xaml.Controls
 #endif
 {

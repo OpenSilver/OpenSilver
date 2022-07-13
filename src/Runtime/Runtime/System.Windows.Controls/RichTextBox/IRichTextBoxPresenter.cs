@@ -3,6 +3,7 @@ using System.Windows.Documents;
 
 namespace System.Windows.Controls
 #else
+using Windows.UI.Xaml.Documents;
 namespace Windows.UI.Xaml.Controls
 #endif
 {

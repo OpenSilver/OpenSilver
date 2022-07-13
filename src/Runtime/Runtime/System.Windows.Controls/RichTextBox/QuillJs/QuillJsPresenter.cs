@@ -8,6 +8,14 @@ using System.Xml;
 
 namespace System.Windows.Controls
 #else
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Xml;
+using Windows.UI.Text;
+using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Media;
+
 namespace Windows.UI.Xaml.Controls
 #endif
 {
@@ -126,11 +134,19 @@ namespace Windows.UI.Xaml.Controls
             }
             else if (prop == Control.FontStyleProperty)
             {
+#if MIGRATION
                 return format.Italic ? FontStyles.Italic : FontStyles.Normal;
+#else
+                return format.Italic ? FontStyle.Italic : FontStyle.Normal;
+#endif
             }
             else if (prop == Inline.TextDecorationsProperty)
             {
+#if MIGRATION
                 return format.Underline ? TextDecorations.Underline : null;
+#else
+                return format.Underline ? TextDecorations.Underline : TextDecorations.None;
+#endif
             }
             else if (prop == Control.FontFamilyProperty)
             {
@@ -187,12 +203,17 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (value is FontStyle fontStyle)
                 {
+#if MIGRATION
                     bool isItalic = fontStyle == FontStyles.Italic;
+#else
+                    bool isItalic = fontStyle == FontStyle.Italic;
+#endif
                     OpenSilver.Interop.ExecuteJavaScript("$0.formatText($1,$2,'italic',$3)", _instance, start, length, isItalic);
                 }
             }
             else if (prop == Inline.TextDecorationsProperty)
             {
+#if MIGRATION
                 if (value is TextDecorationCollection textDecoration)
                 {
                     string format = "";
@@ -208,6 +229,7 @@ namespace Windows.UI.Xaml.Controls
                     OpenSilver.Interop.ExecuteJavaScript("$0.formatText($1,$2,'underline',false)", _instance, start, length);
                     OpenSilver.Interop.ExecuteJavaScript("$0.formatText($1,$2,'strike',false)", _instance, start, length);
                 }
+#endif
             }
             else if (prop == Control.FontFamilyProperty)
             {
@@ -258,7 +280,6 @@ namespace Windows.UI.Xaml.Controls
 
             string val = value ? "false" : "true";
             string script = $"$0.root.setAttribute('contenteditable', '{val}')";
-            Console.WriteLine(script);
             OpenSilver.Interop.ExecuteJavaScript(script, _instance);
         }
 
