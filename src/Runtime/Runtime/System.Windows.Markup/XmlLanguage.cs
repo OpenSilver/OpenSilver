@@ -108,7 +108,7 @@ namespace System.Windows.Markup
         /// </returns>
         public static bool operator ==(XmlLanguage xmlLanguage1, XmlLanguage xmlLanguage2)
         {
-            if (ReferenceEquals(xmlLanguage1, xmlLanguage1))
+            if (ReferenceEquals(xmlLanguage1, xmlLanguage2))
             {
                 return true;
             }
