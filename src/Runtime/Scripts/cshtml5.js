@@ -361,13 +361,21 @@ document._attachEventListeners = function (element, handler, isFocusable) {
 
     const store = view._eventsStore = {};
     store.isFocusable = isFocusable;
+    const isTouchSupportedDevice = isTouchDevice();
 
     view.addEventListener('mousedown', store['mousedown'] = bubblingEventHandler);
-    view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
+    if (isTouchSupportedDevice) {
+        view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
+    }
     view.addEventListener('mouseup', store['mouseup'] = bubblingEventHandler);
-    view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
+    if (isTouchSupportedDevice) {
+        view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
+    }
     view.addEventListener('mousemove', store['mousemove'] = bubblingEventHandler);
-    view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
+    if (isTouchSupportedDevice) {
+        view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
+    }
+    
     view.addEventListener('wheel', store['wheel'] = bubblingEventHandler, { passive: true });
     view.addEventListener('mouseenter', store['mouseenter'] = handler);
     view.addEventListener('mouseleave', store['mouseleave'] = handler);
@@ -1295,4 +1303,13 @@ window.elementsFromPointOpensilver = function (x, y, element) {
 
 function PerformHitTest(x, y, rect) {
     return rect.x <= x && x <= rect.x + rect.width && rect.y <= y && y <= rect.y + rect.height;
+}
+
+//------------------------------
+// Just to check if client browser support touch
+//------------------------------
+const isTouchDevice = () => {
+    return (('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0));
 }
