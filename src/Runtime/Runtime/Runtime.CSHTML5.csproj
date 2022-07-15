@@ -102,6 +102,7 @@
     <Compile Include="OpenSilver\Internal\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
+    <Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContext.cs" />
@@ -477,7 +478,6 @@
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomStyleReference.cs" />
-    <Compile Include="Core\Rendering\INTERNAL_HtmlDomUniqueIdentifiers.cs" />
     <Compile Include="Core\Rendering\INTERNAL_ObjectTreeHelper.cs" />
     <Compile Include="Core\Rendering\INTERNAL_PopupsManager.cs" />
     <Compile Include="Core\Rendering\INTERNAL_SimulatorJSExpression.cs" />

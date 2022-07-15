@@ -53,16 +53,14 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         //------
         // All JavaScript functions (called through dynamic objects) for manipulating the DOM should go here.
         //------
-#if !BRIDGE
-        [JSIgnore]
-#endif
-        internal static Dictionary<string, UIElement> INTERNAL_idsToUIElements;
+        private static readonly Dictionary<string, UIElement> _store;
+        private static readonly ReferenceIDGenerator _idGenerator = new ReferenceIDGenerator();
 
         static INTERNAL_HtmlDomManager()
         {
             if (!IsRunningInJavaScript())
             {
-                INTERNAL_idsToUIElements = new Dictionary<string, UIElement>();
+                _store = new Dictionary<string, UIElement>(2048);
             }
         }
 
@@ -539,9 +537,7 @@ element.remove({1});
 
 #if CSHTML5NETSTANDARD
         public static INTERNAL_HtmlDomStyleReference GetDomElementStyleForModification(object domElementRef)
-        {
-            return INTERNAL_HtmlDomStyleReference.GetInstance(((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier);
-        }
+            => ((INTERNAL_HtmlDomElementReference)domElementRef).Style;
 #else
         //[JSReplacement("$domElementRef.style")] // Commented because of a JSIL bug: the attribute is not taken into account: the method is ignored.
         public static dynamic GetDomElementStyleForModification(dynamic domElementRef)
@@ -552,16 +548,14 @@ element.remove({1});
             }
             else
             {
-                return INTERNAL_HtmlDomStyleReference.GetInstance(((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier);
+                return ((INTERNAL_HtmlDomElementReference)domElementRef).Style;
             }
         }
 #endif
 
 #if CSHTML5NETSTANDARD
         public static INTERNAL_Html2dContextReference Get2dCanvasContext(object domElementRef)
-        {
-            return INTERNAL_Html2dContextReference.GetInstance(((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier);
-        }
+            => ((INTERNAL_HtmlDomElementReference)domElementRef).Context2d;
 #else
         //[JSReplacement("$domElementRef.getContext('2d')")] // Commented because of a JSIL bug: the attribute is not taken into account: the method is ignored.
         public static dynamic Get2dCanvasContext(dynamic domElementRef)
@@ -572,7 +566,7 @@ element.remove({1});
             }
             else
             {
-                return INTERNAL_Html2dContextReference.GetInstance(((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier);
+                return ((INTERNAL_HtmlDomElementReference)domElementRef).Context2d;
             }
         }
 #endif
@@ -918,7 +912,7 @@ function(){
             // document.getElementByIdSafe().
             //------------------
 
-            string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
+            string uniqueIdentifier = _idGenerator.NewId().ToString();
 
             INTERNAL_HtmlDomElementReference parent = null;
             if (parentRef is INTERNAL_HtmlDomElementReference)
@@ -931,7 +925,7 @@ function(){
                 Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
             }
             
-            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
+            _store.Add(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
         }
@@ -950,7 +944,7 @@ function(){
             // document.getElementByIdSafe().
             //------------------
 
-            string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
+            string uniqueIdentifier = _idGenerator.NewId().ToString();
             string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
             string javaScriptToExecute = $@"
 var newElement = document.createElement(""{domElementTag}"");
@@ -959,7 +953,7 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
     parentElement.children[{insertionIndex}].insertAdjacentElement(""{relativePosition}"", newElement);";
 
             ExecuteJavaScript(javaScriptToExecute);
-            INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
+            _store.Add(uniqueIdentifier, associatedUIElement);
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
         }
 
@@ -981,7 +975,7 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
             else
             {
 #endif
-                string uniqueIdentifier = INTERNAL_HtmlDomUniqueIdentifiers.CreateNew();
+                string uniqueIdentifier = _idGenerator.NewId().ToString();
                 string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
                 // Create a temporary parent div to which we can write the innerHTML, then extract the contents:
                 string javaScriptToExecute = $@"
@@ -993,7 +987,7 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
 parentElement.appendChild(newElement);";
 
                 ExecuteJavaScript(javaScriptToExecute);
-                INTERNAL_idsToUIElements.Add(uniqueIdentifier, associatedUIElement);
+                _store.Add(uniqueIdentifier, associatedUIElement);
                 return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, ((INTERNAL_HtmlDomElementReference)parentRef).Parent);
                 //todo-perfs: check if there is a better solution in terms of performance (while still remaining compatible with all browsers).
 #if !CSHTML5NETSTANDARD
@@ -1013,9 +1007,9 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
 parentElement.appendChild(child);";
 
             ExecuteJavaScript(javaScriptToExecute);
-            if (INTERNAL_idsToUIElements.ContainsKey(parentUniqueIdentifier))
+            if (_store.TryGetValue(parentUniqueIdentifier, out UIElement parent))
             {
-                INTERNAL_idsToUIElements[childUniqueIdentifier] = INTERNAL_idsToUIElements[parentUniqueIdentifier];
+                _store[childUniqueIdentifier] = parent;
             }
         }
 
@@ -1237,7 +1231,7 @@ parentElement.appendChild(child);";
 
             for (int i = elements.Length - 1; i >= 0; i--)
             {
-                if (INTERNAL_idsToUIElements.TryGetValue(elements[i], out UIElement uie))
+                if (_store.TryGetValue(elements[i], out UIElement uie))
                 {
                     yield return uie;
                 }
@@ -1268,9 +1262,9 @@ parentElement.appendChild(child);";
                     if (!IsNullOrUndefined(jsId))
                     {
                         string id = Convert.ToString(jsId);
-                        if (INTERNAL_HtmlDomManager.INTERNAL_idsToUIElements.ContainsKey(id))
+                        if (_store.TryGetValue(id, out UIElement uie))
                         {
-                            result = INTERNAL_HtmlDomManager.INTERNAL_idsToUIElements[id];
+                            result = uie;
                             break;
                         }
                     }

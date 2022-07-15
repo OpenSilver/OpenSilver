@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.Threading;
+using OpenSilver.Internal;
 
 #if OPENSILVER
 using System.Text.Json;
@@ -404,19 +405,6 @@ img.src = $0;", html5Path, callback);
             return DotNetForHtml5.Core.INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround;
         }
 #endif
-    }
-
-    /// <summary>
-    /// This class has a method that generates IDs in sequence (0, 1, 2, 3...)
-    /// </summary>
-#if BRIDGE
-    [Bridge.External]
-#endif
-    internal class ReferenceIDGenerator
-    {
-        private int _id = 0;
-
-        internal int NewId() => Interlocked.Increment(ref _id);
     }
 
     internal class SynchronyzedStore<T>
