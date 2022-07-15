@@ -52,27 +52,17 @@ namespace CSHTML5.Internal
         static Dictionary<string, int> NumberOfTimesEachDynamicMemberIsCalled = new Dictionary<string, int>();
 #endif
 
-        static Dictionary<string, INTERNAL_HtmlDomStyleReference> IdToInstance = new Dictionary<string, INTERNAL_HtmlDomStyleReference>();
-
-        public static INTERNAL_HtmlDomStyleReference GetInstance(string elementId)
-        {
-            if (IdToInstance.ContainsKey(elementId))
-                return IdToInstance[elementId];
-            else
-            {
-                var newInstance = new INTERNAL_HtmlDomStyleReference(elementId);
-                IdToInstance[elementId] = newInstance;
-                return newInstance;
-            }
-        }
-
         internal string Uid { get; }
 
         // Note: It's important that the constructor stays Private because we need to recycle the instances that correspond to the same ID using the "GetInstance" public static method, so thateach ID always corresponds to the same instance. This is useful to ensure that private fields such as "_display" work propertly.
-        private INTERNAL_HtmlDomStyleReference(string elementId)
+        internal INTERNAL_HtmlDomStyleReference(string elementId)
         {
             Uid = elementId;
         }
+
+        [Obsolete("This method is not meant to be used outside of OpenSilver.")]
+        public static INTERNAL_HtmlDomStyleReference GetInstance(string elementId)
+            => new INTERNAL_HtmlDomStyleReference(elementId);
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
