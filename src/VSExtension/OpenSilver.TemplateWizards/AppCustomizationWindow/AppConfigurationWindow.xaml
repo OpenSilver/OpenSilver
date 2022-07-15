@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel Width="200" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -23,8 +24,12 @@
                 </ComboBox>
             </StackPanel>
         </StackPanel>
+        
+        <TextBlock Grid.Row="1" Margin="10,0"
+            Text="Note: if you want to build your project with Visual Studio 2019, you will only be able to do so with the option &quot;.NET 6&quot;, with .NET 6.0.4 or lower installed."
+                   TextWrapping="Wrap" Foreground="Gray"/>
 
-        <Grid Margin="20" Grid.Row="1">
+        <Grid Margin="20" Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
