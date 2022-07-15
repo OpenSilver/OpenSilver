@@ -43,7 +43,6 @@ namespace CSHTML5.Internal
 
         public DOMEventManager(Func<object> domElementProvider, string[] domEventsNamesToListenTo, Action<object> actionOnEvent, bool sync = false)
         {
-
             //-----------------------------------
             // Alternatively, when multiple DOM event types correspond to the same behavior,
             // we can call this constructor alternative to pass a list of DOM event types to
