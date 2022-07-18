@@ -1,6 +1,7 @@
 name: OpenSilver Build
 env:
   next-release-version: '1.1.0'
+  suffix: 'rc'
 on:
   push:
     branches:
@@ -42,7 +43,7 @@ jobs:
         run: echo "::set-output name=suffix::$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}"
       - name: Format Package Version
         id: format-version
-        run: echo "::set-output name=version::${{ env.next-release-version }}-rc-${{ steps.format-suffix.outputs.suffix }}"
+        run: echo "::set-output name=version::${{ env.next-release-version }}-${{env.suffix}}-${{ steps.format-suffix.outputs.suffix }}"
       - name: Build Simulator
         working-directory: build
         run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly
@@ -60,9 +61,15 @@ jobs:
         with:
           name: OpenSilver
           path: "build/output/OpenSilver"
-#      - name: Upload packages
-#        run: |
-#           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/index.json
+      - name: Upload packages
+        run: |
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/index.json
+        if: github.ref == 'refs/heads/develop'
       - name: Upload packages to MyGet
         run: |
-           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_PRIVATE_FEED_TOKEN }} -s ${{ secrets.MYGET_PRIVATE_FEED }}
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_TOKEN }} -s https://www.myget.org/F/opensilver/api/v2/package
+        if: github.ref == 'refs/heads/develop'
+      - name: Upload packages to MyGet RC
+        run: |
+           dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_PRIVATE_RC_FEED_TOKEN }} -s ${{ secrets.MYGET_PRIVATE_RC_FEED }}
+        if: github.ref == 'refs/heads/releases/OpenSilver/1.1.0'
