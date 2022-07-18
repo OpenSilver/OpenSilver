@@ -167,6 +167,12 @@ namespace Windows.UI.Xaml.Controls
                 tb._textViewHost.View.OnTextChanged((string)e.NewValue);
             }
 
+            if (tb._selectionIdxCache != null)
+            {
+                tb._textViewHost.View.NEW_SET_SELECTION(tb._selectionIdxCache.Value, tb._selectionIdxCache.Value);
+                tb._selectionIdxCache = null;
+            }
+
             tb.OnTextChanged(new TextChangedEventArgs() { OriginalSource = tb });
         }
 
@@ -422,6 +428,7 @@ namespace Windows.UI.Xaml.Controls
             tb.UpdateVisualStates();
         }
 
+        private int? _selectionIdxCache = null;
         public string SelectedText
         {
             get
@@ -442,8 +449,9 @@ namespace Windows.UI.Xaml.Controls
                 {
                     _textViewHost.View.NEW_GET_SELECTION(out selectionStartIndex, out selectionLength);
                     string text = this.Text.Substring(0, selectionStartIndex) + value + this.Text.Substring(selectionStartIndex + selectionLength);
+                    _selectionIdxCache = selectionStartIndex + value.Length;
                     this.Text = text;
-                    _textViewHost.View.NEW_SET_SELECTION(selectionStartIndex + value.Length, selectionStartIndex + value.Length);
+                    _selectionIdxCache = null;
                 }
             }
         }
