@@ -14,6 +14,7 @@
 
 
 using CSHTML5.Internal;
+using CSHTML5.Types;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
@@ -125,7 +126,7 @@ namespace Windows.UI.Xaml.Controls
                 string minWidthString = minSize.ToInvariantString() + "px";
                 return "minmax(" + minWidthString + ", auto)";
             }
-            else if(gridLength.IsAuto)
+            else if (gridLength.IsAuto)
             {
                 return "auto";
             }
@@ -134,7 +135,7 @@ namespace Windows.UI.Xaml.Controls
                 bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
                 if (isCSSGrid)
                 {
-                    string minWidthString = (double.IsNaN(minSize) || double.IsInfinity(minSize) ? 
+                    string minWidthString = (double.IsNaN(minSize) || double.IsInfinity(minSize) ?
                         "0px" : minSize.ToInvariantString() + "px");
                     return "minmax(" + minWidthString + ", " + gridLength.Value.ToInvariantString() + signUsedForPercentage + ")";
                 }
@@ -186,7 +187,7 @@ namespace Windows.UI.Xaml.Controls
                         var td = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("td", tr, grid);
                         var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
                         tdStyle.display = (columnDefinition.Visibility == Visibility.Visible) ? "table-cell" : "none";
-                        
+
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "rowspan", currentCell.RowSpan);
                         INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "colspan", currentCell.ColumnSpan);
 
@@ -453,15 +454,23 @@ namespace Windows.UI.Xaml.Controls
                     Grid_InternalHelpers.NormalizeWidthAndHeightPercentages(grid, null, grid._rowDefinitionsOrNull, out normalizedColumnDefinitions, out normalizedRowDefinitions);
                 }
 
+                var parentDomElement = grid.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth as INTERNAL_HtmlDomElementReference;
+                var hasAutoHeightAncestor = (bool)(OpenSilver.Interop.ExecuteJavaScript("document.DoesElementHasAutoHeightAncestor($0)", parentDomElement.UniqueIdentifier) as INTERNAL_JSObjectReference);
+
                 bool hadStarRow = false;
 
+                GridLength rowDefHeight;
                 // Concatenate the string that defines the CSS "gridTemplateRows" property:
                 foreach (RowDefinition rowDefinition in normalizedRowDefinitions)
                 {
+                    rowDefHeight = rowDefinition.Height;
+                    if (rowDefinition.Height.IsStar && hasAutoHeightAncestor)
+                        rowDefHeight = GridLength.Auto;
+
                     if (!hadStarRow && rowDefinition.Height.IsStar)
                         hadStarRow = true;
 
-                    rowsAsString = rowsAsString + (!isFirstRow ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(rowDefinition.Height, rowDefinition.MinHeight, signUsedForPercentage: "fr");
+                    rowsAsString = rowsAsString + (!isFirstRow ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(rowDefHeight, rowDefinition.MinHeight, signUsedForPercentage: "fr");
                     isFirstRow = false;
                 }
                 if (!hadStarRow) //We add a "star" row if there was none explicitely defined, since absolutely sized rows and columns are exactly their size.
@@ -753,19 +762,29 @@ namespace Windows.UI.Xaml.Controls
                     Grid_InternalHelpers.NormalizeWidthAndHeightPercentages(grid, grid._columnDefinitionsOrNull, null, out normalizedColumnDefinitions, out normalizedRowDefinitions);
                 }
 
+                var parentDomElement =  grid.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth as INTERNAL_HtmlDomElementReference;
+                var hasAutoWidthAncestor = (bool)(OpenSilver.Interop.ExecuteJavaScript("document.DoesElementHasAutoWidthAncestor($0)", parentDomElement.UniqueIdentifier) as INTERNAL_JSObjectReference);
+
                 bool hasStarColumn = false;
                 //int indexToLastColumn = normalizedColumnDefinitions.Count;
                 var collapsedColumns = new List<int>();
                 int currentIndex = 0;
+
                 // Concatenate the string that defines the CSS "gridTemplateColumns" property:
+                GridLength colDefWidth;
                 foreach (ColumnDefinition columnDefinition in normalizedColumnDefinitions)
                 {
+                    colDefWidth = columnDefinition.Width;
+
+                    if (columnDefinition.Width.IsStar && hasAutoWidthAncestor)
+                        colDefWidth = GridLength.Auto;
+
                     if (!hasStarColumn && columnDefinition.Width.IsStar)
                         hasStarColumn = true;
 
                     if (columnDefinition.Visibility == Visibility.Visible)
                     {
-                        columnsAsString = columnsAsString + (!isFirstColumn ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(columnDefinition.Width, columnDefinition.MinWidth, signUsedForPercentage: "fr");
+                        columnsAsString = columnsAsString + (!isFirstColumn ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(colDefWidth, columnDefinition.MinWidth, signUsedForPercentage: "fr");
                     }
                     else
                     {

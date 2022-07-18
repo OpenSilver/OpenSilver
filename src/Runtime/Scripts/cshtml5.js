@@ -111,6 +111,32 @@ document.getAppParams = function () {
     );
 }
 
+document.DoesElementHasAutoWidthAncestor = function(divId) {
+    var ele = document.getElementById(divId);     
+
+    while (ele) {
+        if (ele.style.width == 'auto') {
+            return true;
+        }
+        ele = ele.parentElement;
+    }
+
+    return false;
+}
+
+document.DoesElementHasAutoHeightAncestor = function(divId) {
+    var ele = document.getElementById(divId);
+
+    while (ele) {
+        if (ele.style.height == 'auto') {
+            return true;
+        }
+        ele = ele.parentElement;
+    }
+
+    return false;
+}
+
 document.ResXFiles = {};
 
 document.modifiersPressed = 0;
