@@ -124,7 +124,7 @@ namespace Windows.UI.Xaml.Controls
             // keep the DataContext in sync with Content
             if (ctrl._templateIsCurrent && ctrl.Template != UIElementContentTemplate)
             {
-                ctrl.DataContext = e.NewValue;
+                ctrl.UpdateDataContext();
             }
 
             if (ctrl.IsConnectedToLiveTree)
@@ -260,21 +260,26 @@ namespace Windows.UI.Xaml.Controls
                     Template = null;
                 }
 
-                if (newTemplate != UIElementContentTemplate)
-                {
-                    // set data context to the content, so that the template can bind to
-                    // properties of the content.
-                    DataContext = Content;
-                }
-                else
-                {
-                    // If we're using the content directly, clear the data context.
-                    // The content expects to inherit.
-                    ClearValue(DataContextProperty);
-                }
+                UpdateDataContext();
             }
 
             Template = newTemplate;
+        }
+
+        private void UpdateDataContext()
+        {
+            if (!(Content is UIElement))
+            {
+                // set data context to the content, so that the template can bind to
+                // properties of the content.
+                DataContext = Content;
+            }
+            else
+            {
+                // If we're using the content directly, clear the data context.
+                // The content expects to inherit.
+                ClearValue(DataContextProperty);
+            }
         }
 
         /// <summary>
