@@ -111,8 +111,8 @@ document.getAppParams = function () {
     );
 }
 
-document.DoesElementHasAutoWidthAncestor = function(divId) {
-    var ele = document.getElementById(divId);     
+document.DoesElementHasAutoWidthAncestor = function(id) {
+    var ele = document.getElementById(id);     
 
     while (ele) {
         if (ele.style.width == 'auto') {
@@ -124,8 +124,8 @@ document.DoesElementHasAutoWidthAncestor = function(divId) {
     return false;
 }
 
-document.DoesElementHasAutoHeightAncestor = function(divId) {
-    var ele = document.getElementById(divId);
+document.DoesElementHasAutoHeightAncestor = function(id) {
+    var ele = document.getElementById(id);
 
     while (ele) {
         if (ele.style.height == 'auto') {
