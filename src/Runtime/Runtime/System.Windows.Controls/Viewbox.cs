@@ -181,7 +181,10 @@ namespace Windows.UI.Xaml.Controls
             Debug.Assert(RootCanvas != null, "The required template part RootCanvas was not found!");
 
             // Create the transformation to scale the container
-            ChildElement.RenderTransform = Scale = new ScaleTransform();
+            if (ChildElement != null)
+            {
+                ChildElement.RenderTransform = Scale = new ScaleTransform();
+            }
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
