@@ -165,7 +165,7 @@ namespace Windows.UI.Xaml.Controls
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
             if (_contentPresenter != null)
             {
-                if (_contentPresenter.IsHitTestVisible)
+                if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
                 {
                     _contentPresenter.IsHitTestVisible = false;
                 }
