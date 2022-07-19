@@ -312,16 +312,6 @@ namespace Windows.UI.Xaml.Controls
                     //-----------------------------
                     // Show the Popup
                     //-----------------------------
-
-                    // Empty the ContentPresenter so that, in case it is needed, the same item can be placed in the popup:
-                    if (comboBox._contentPresenter != null)
-                    {
-                        comboBox._contentPresenter.Content = null;
-                        comboBox.SelectionBoxItem = null;
-                        comboBox.SelectionBoxItemTemplate = null;
-                    }
-
-                    // Show the popup:
                     if (comboBox._popup != null)
                     {
                         // add removed 
