@@ -49,6 +49,7 @@ namespace Windows.UI.Xaml.Controls
     public partial class TextBox : Control
     {
         private bool _isProcessingInput;
+        private int? _selectionIdxCache;
         private FrameworkElement _contentElement;
         private ITextBoxViewHost<TextBoxView> _textViewHost;
 
@@ -167,7 +168,7 @@ namespace Windows.UI.Xaml.Controls
                 tb._textViewHost.View.OnTextChanged((string)e.NewValue);
             }
 
-            if (tb._selectionIdxCache != null)
+            if (tb._selectionIdxCache.HasValue)
             {
                 tb._textViewHost.View.NEW_SET_SELECTION(tb._selectionIdxCache.Value, tb._selectionIdxCache.Value);
                 tb._selectionIdxCache = null;
@@ -427,8 +428,7 @@ namespace Windows.UI.Xaml.Controls
 
             tb.UpdateVisualStates();
         }
-
-        private int? _selectionIdxCache = null;
+        
         public string SelectedText
         {
             get
