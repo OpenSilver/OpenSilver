@@ -525,7 +525,7 @@ namespace Windows.UI.Xaml.Shapes
         protected virtual bool IsStillInDOM()
         {
             // Check if the canvas element is still present
-            return _canvasDomElement !=  null && Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.getContext !== undefined", _canvasDomElement));
+            return _canvasDomElement !=  null && Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext !== undefined"));
         }
 
         #endregion
@@ -658,10 +658,10 @@ namespace Windows.UI.Xaml.Shapes
                 CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = ''");
             }
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.lineJoin = $1;", context, shape.StrokeLineJoin.ToString().ToLower());
+            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineJoin = '{shape.StrokeLineJoin.ToString().ToLower()}';");
             if (shape.StrokeLineJoin == PenLineJoin.Miter)
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.miterLimit = $1", context, shape.StrokeMiterLimit);
+                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.miterLimit = {shape.StrokeMiterLimit.ToInvariantString()}");
             }
 
             if (shape.Fill != null)
