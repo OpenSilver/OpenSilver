@@ -39,9 +39,9 @@ namespace DotNetForHtml5.Compiler
 
         public static bool Execute(int targetCompilerBuildNumber, ILogger logger)
         {
-            if(Version.CompilerBuildNumber < targetCompilerBuildNumber) //if this is true, then it means msbuild is using an outdated version of the compiler compared to what should be used by the OpenSilver/CSHTML5 package.
+            if (Version.CompilerBuildNumber < targetCompilerBuildNumber) //if this is true, then it means msbuild is using an outdated version of the compiler compared to what should be used by the OpenSilver/CSHTML5 package.
             {
-                logger.WriteError("Compiler initialization error. Please restart Visual Studio or manually kill the Msbuild process, then recompile the solution to fix this error.");
+                logger.WriteError($"The loaded OpenSilver compiler may be outdated. Compiler assembly version build number detected is '{Version.CompilerBuildNumber}' but the target build number is '{targetCompilerBuildNumber}'. Please restart Visual Studio and rebuild the solution to fix this error.");
                 return false;
             }
             return true;
