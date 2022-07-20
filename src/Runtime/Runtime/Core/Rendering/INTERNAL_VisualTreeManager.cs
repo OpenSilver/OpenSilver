@@ -165,10 +165,19 @@ namespace CSHTML5.Internal
                 }
                 else
                 {
-                    throw new Exception(
-                        string.Format("Cannot detach the element '{0}' because it is not a child of the element '{1}'.",
-                                      child.GetType().ToString(),
-                                      parent.GetType().ToString()));
+                    // In some rare cases child element is removed from DOM tree
+                    // even though IsElementInVisualTree is true.
+                    var el = OpenSilver.Interop.ExecuteJavaScript(@"
+var el = document.getElementById('$0');
+if (el) { true; } else { false; }
+", ((INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement).UniqueIdentifier);
+                    if (Convert.ToBoolean(el))
+                    {
+                        throw new Exception(
+                            string.Format("Cannot detach the element '{0}' because it is not a child of the element '{1}'.",
+                                          child.GetType().ToString(),
+                                          parent.GetType().ToString()));
+                    }
                 }
             }
 #if PERFSTAT
