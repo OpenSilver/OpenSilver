@@ -24,8 +24,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents a collection of <see cref="ColorKeyFrame" /> objects 
     /// that can be individually accessed by index. 
     /// </summary>
-    [OpenSilver.NotImplemented]
-    public sealed partial class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
+    public sealed class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
     {
         public ColorKeyFrameCollection()
             : base(false)
