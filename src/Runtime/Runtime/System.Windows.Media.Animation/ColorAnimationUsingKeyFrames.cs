@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -36,28 +37,20 @@ namespace Windows.UI.Xaml.Media.Animation
     public partial class ColorAnimationUsingKeyFrames : AnimationTimeline
     {
         private ColorKeyFrameCollection _keyFrames;
-        // Summary:
-        //     Gets the collection of System.Windows.Media.Animation.ColorKeyFrame objects
-        //     that define the animation.
-        //
-        // Returns:
-        //     The collection of System.Windows.Media.Animation.ColorKeyFrame objects that
-        //     define the animation. The default is an empty collection.
+
+        /// <summary>
+        /// Gets the collection of <see cref="ColorKeyFrame"/> objects
+        /// that define the animation.
+        /// </summary>
+        /// <returns>
+        /// The collection of <see cref="ColorKeyFrame"/> objects that
+        /// define the animation. The default is an empty collection.
+        /// </returns>
         public ColorKeyFrameCollection KeyFrames
         {
-            get
-            {
-                if (_keyFrames == null)
-                {
-                    _keyFrames = new ColorKeyFrameCollection();
-                }
-                return _keyFrames;
-            }
-
-            set
-            {
-                _keyFrames = value;
-            }
+            get => _keyFrames ?? (_keyFrames = new ColorKeyFrameCollection(this));
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            set => _keyFrames = value;
         }
 
 

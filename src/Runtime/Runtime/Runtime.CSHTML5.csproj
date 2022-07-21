@@ -105,6 +105,8 @@
     <Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
+    <Compile Include="OpenSilver\Internal\VisualStateGroupCollection.cs" />
+    <Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContext.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContextStack.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlObjectFrame.cs" />

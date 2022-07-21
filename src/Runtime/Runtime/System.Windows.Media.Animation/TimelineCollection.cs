@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -22,12 +23,22 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Represents a collection of <see cref="Timeline"/> objects.
     /// </summary>
-    public sealed partial class TimelineCollection : PresentationFrameworkCollection<Timeline>
+    public sealed class TimelineCollection : PresentationFrameworkCollection<Timeline>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TimelineCollection"/> class.
         /// </summary>
-        public TimelineCollection() : base(false) { }
+        public TimelineCollection()
+            : base(false)
+        {
+        }
+
+        internal TimelineCollection(Storyboard owner)
+            : base(false)
+        {
+            Debug.Assert(owner != null);
+            owner.ProvideSelfAsInheritanceContext(this, null);
+        }
 
         internal override void AddOverride(Timeline value) => AddDependencyObjectInternal(value);
 

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -21,8 +22,16 @@ namespace Windows.UI.Xaml.Media.Animation
 {
     public sealed partial class DoubleKeyFrameCollection : PresentationFrameworkCollection<DoubleKeyFrame>
     {
-        public DoubleKeyFrameCollection() : base(false)
+        public DoubleKeyFrameCollection()
+            : base(false)
         {
+        }
+
+        internal DoubleKeyFrameCollection(DoubleAnimationUsingKeyFrames owner)
+            : base(false)
+        {
+            Debug.Assert(owner != null);
+            owner.ProvideSelfAsInheritanceContext(this, null);
         }
 
         internal override void AddOverride(DoubleKeyFrame keyFrame)
