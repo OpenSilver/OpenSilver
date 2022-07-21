@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml
     /// state.
     /// </summary>
     [ContentProperty("Storyboard")]
-    public sealed partial class VisualState : DependencyObject
+    public sealed class VisualState : DependencyObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="VisualState"/> class.
@@ -82,11 +82,6 @@ namespace Windows.UI.Xaml
             {
                 Storyboard.Begin(frameworkElement);
                 propertiesChanged = Storyboard.GetPropertiesChanged();
-
-                //foreach (Timeline timeLine in Storyboard.Children)
-                //{
-                //    timeLine.Apply(frameworkElement, useTransitions, INTERNAL_Group.Name); //note: the "true" has no meaning, it's only here because hashsets do not work yet.
-                //}
             }
             return propertiesChanged;
         }
@@ -98,7 +93,5 @@ namespace Windows.UI.Xaml
                 Storyboard.Stop(frameworkElement);
             }
         }
-
-        internal VisualStateGroup INTERNAL_Group = null;
     }
 }

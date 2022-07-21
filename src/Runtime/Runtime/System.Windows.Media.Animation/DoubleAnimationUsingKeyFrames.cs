@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -54,18 +55,9 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public DoubleKeyFrameCollection KeyFrames
         {
-            get
-            {
-                if (_keyFrames == null)
-                {
-                    _keyFrames = new DoubleKeyFrameCollection();
-                }
-                return _keyFrames;
-            }
-            set
-            {
-                _keyFrames = value;
-            }
+            get => _keyFrames ?? (_keyFrames = new DoubleKeyFrameCollection(this));
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            set => _keyFrames = value;
         }
 
         /// <summary>

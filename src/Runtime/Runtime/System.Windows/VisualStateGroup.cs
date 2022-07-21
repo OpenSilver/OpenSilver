@@ -15,8 +15,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Markup;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml
     /// that are used to go from one state to another.
     /// </summary>
     [ContentProperty("States")]
-    public sealed partial class VisualStateGroup : DependencyObject
+    public sealed class VisualStateGroup : DependencyObject
     {
         private Collection<VisualState> _states;
 
@@ -131,55 +131,5 @@ namespace Windows.UI.Xaml
         ///     Raised when transition ends and new state storyboard begins.
         /// </summary>
         public event EventHandler<VisualStateChangedEventArgs> CurrentStateChanging;
-    }
-
-    internal class VisualStatesCollection : PresentationFrameworkCollection<VisualState>
-    {
-        private readonly VisualStateGroup _group;
-
-        internal VisualStatesCollection(VisualStateGroup group) : base(false)
-        {
-            Debug.Assert(group != null, "group should not be null !"); 
-            this._group = group;
-        }
-
-        internal override void AddOverride(VisualState value)
-        {
-            value.INTERNAL_Group = this._group;
-            this.AddDependencyObjectInternal(value);
-        }
-
-        internal override void ClearOverride()
-        {
-            foreach (VisualState state in this)
-            {
-                state.INTERNAL_Group = null;
-            }
-
-            this.ClearDependencyObjectInternal();
-        }
-
-        internal override VisualState GetItemOverride(int index)
-        {
-            return this.GetItemInternal(index);
-        }
-
-        internal override void InsertOverride(int index, VisualState value)
-        {
-            value.INTERNAL_Group = this._group;
-            this.InsertDependencyObjectInternal(index, value);
-        }
-
-        internal override void RemoveAtOverride(int index)
-        {
-            this.GetItemInternal(index).INTERNAL_Group = null;
-            this.RemoveAtDependencyObjectInternal(index);
-        }
-
-        internal override void SetItemOverride(int index, VisualState value)
-        {
-            this.GetItemInternal(index).INTERNAL_Group = null;
-            this.SetItemDependencyObjectInternal(index, value);
-        }
     }
 }

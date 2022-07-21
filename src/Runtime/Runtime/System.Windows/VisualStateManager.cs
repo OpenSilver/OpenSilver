@@ -18,6 +18,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -38,7 +39,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Manages states and the logic for transitioning between states for controls.
     /// </summary>
-    public partial class VisualStateManager : DependencyObject
+    public class VisualStateManager : DependencyObject
     {
         /// <summary>
         ///     Transitions a control's state.
@@ -183,6 +184,7 @@ namespace Windows.UI.Xaml
         /// or any other method that manipulate dependency properties can lead to some 
         /// unexpected behavior.
         /// </remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty VisualStateGroupsProperty =
             DependencyProperty.RegisterAttached(
                 "VisualStateGroups",
@@ -212,13 +214,14 @@ namespace Windows.UI.Xaml
             {
                 throw new ArgumentNullException("obj");
             }
+
             IList value = (IList)obj.GetValue(VisualStateGroupsProperty);
             if (value == null)
             {
-                // Note: In Silverlight, VisualStateGroups is not an ObservableCollection               
-                value = new ObservableCollection<VisualStateGroup>();
+                value = new Collection<VisualStateGroup>(new VisualStateGroupCollection(obj));
                 obj.SetValue(VisualStateGroupsProperty, value);
             }
+
             return value;
         }
 
