@@ -897,8 +897,8 @@
     <Compile Include="System.Windows.Media.Animation\AnimationTimeline.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\BackEase.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ClockState.cs" />
-    <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
-    <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
+    <Compile Include="System.Windows.Media.Animation\ColorKeyFrame.cs" />
+    <Compile Include="System.Windows.Media.Animation\ColorKeyFrameCollection.cs" />
     <Compile Include="System.Windows.Media.Animation\DoubleAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\DoubleKeyFrame.cs" />
     <Compile Include="System.Windows.Media.Animation\DoubleKeyFrameCollection.cs" />
