@@ -158,6 +158,7 @@ namespace Windows.UI.Xaml.Controls
                 if (this.CustomLayout)
                 {
                     _popup.CustomLayout = true;
+                    _popup.MaxHeight = this.MaxDropDownHeight;
                 }
             }
 
