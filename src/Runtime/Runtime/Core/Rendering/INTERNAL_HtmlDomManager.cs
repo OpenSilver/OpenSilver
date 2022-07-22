@@ -898,6 +898,8 @@ function(){
             }
         }
 
+        private static string NewId() => "id" + _idGenerator.NewId().ToString();
+
 #if !BRIDGE
         [JSReplacement("null")]
 #else
@@ -912,7 +914,7 @@ function(){
             // document.getElementByIdSafe().
             //------------------
 
-            string uniqueIdentifier = _idGenerator.NewId().ToString();
+            string uniqueIdentifier = NewId();
 
             INTERNAL_HtmlDomElementReference parent = null;
             if (parentRef is INTERNAL_HtmlDomElementReference)
@@ -944,7 +946,7 @@ function(){
             // document.getElementByIdSafe().
             //------------------
 
-            string uniqueIdentifier = _idGenerator.NewId().ToString();
+            string uniqueIdentifier = NewId();
             string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
             string javaScriptToExecute = $@"
 var newElement = document.createElement(""{domElementTag}"");
@@ -975,7 +977,7 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
             else
             {
 #endif
-                string uniqueIdentifier = _idGenerator.NewId().ToString();
+                string uniqueIdentifier = NewId();
                 string parentUniqueIdentifier = ((INTERNAL_HtmlDomElementReference)parentRef).UniqueIdentifier;
                 // Create a temporary parent div to which we can write the innerHTML, then extract the contents:
                 string javaScriptToExecute = $@"
