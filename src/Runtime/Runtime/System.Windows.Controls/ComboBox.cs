@@ -163,6 +163,14 @@ namespace Windows.UI.Xaml.Controls
 
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
+            if (_contentPresenter != null)
+            {
+                if (_contentPresenter.HasDefaultValue(IsHitTestVisibleProperty))
+                {
+                    _contentPresenter.IsHitTestVisible = false;
+                }
+            }
+
             //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
             _popup.PlacementTarget = _dropDownToggle;
             _popup.Placement = PlacementMode.Bottom;
