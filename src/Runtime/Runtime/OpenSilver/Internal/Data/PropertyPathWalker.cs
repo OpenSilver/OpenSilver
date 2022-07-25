@@ -79,7 +79,7 @@ namespace OpenSilver.Internal.Data
             head = null;
             tail = null;
 
-            var parser = new PropertyPathParser(path);
+            var parser = new PropertyPathParser(path, true);
             PropertyNodeType type;
 
             while ((type = parser.Step(out string typeName, out string propertyName, out string index)) != PropertyNodeType.None)
