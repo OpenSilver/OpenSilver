@@ -49,9 +49,10 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(Name = "Valid", GroupName = "ValidationStates")]
     public class ComboBox : Selector
     {
-        Popup _popup;
-        ToggleButton _dropDownToggle;
-        ContentPresenter _contentPresenter;
+        private Popup _popup;
+        private ToggleButton _dropDownToggle;
+        private ContentPresenter _contentPresenter;
+        private FrameworkElement _emptyContent;
 
         [Obsolete("ComboBox does not support Native ComboBox. Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
@@ -91,50 +92,52 @@ namespace Windows.UI.Xaml.Controls
             return comboBoxItem;
         }
 
-        private void UpdateContentPresenter()
+        private void UpdatePresenter()
         {
-            if (this._contentPresenter == null)
-            {
-                return;
-            }
-
             object content;
             DataTemplate template;
+            object selectionBoxItem;
+            DataTemplate selectionBoxItemTemplate;
 
-            object item = this.SelectedItem;
-            if (item == null)
+            int index = SelectedIndex;
+            if (index == -1 || (IsDropDownOpen && SelectedItem is FrameworkElement))
             {
-                content = null;
-                template = null;
+                content = _emptyContent;
+                selectionBoxItem = null;
+                template = selectionBoxItemTemplate = null;
             }
             else
             {
-                ComboBoxItem cbi = item as ComboBoxItem;
+                ComboBoxItem cbi = (ItemContainerGenerator.ContainerFromIndex(index) ?? Items[index]) as ComboBoxItem;
                 if (cbi != null)
                 {
-                    content = cbi.Content;
-                    template = cbi.ContentTemplate;
+                    content = selectionBoxItem = cbi.Content;
+                    template = selectionBoxItemTemplate = cbi.ContentTemplate;
                 }
                 else
                 {
-                    content = item;
+                    object item = Items[index];
+                    content = selectionBoxItem = item;
                     if (item is UIElement)
                     {
-                        template = null;
+                        template = selectionBoxItemTemplate = null;
                     }
                     else
                     {
-                        template = this.ItemTemplate ?? ItemsControl.GetDataTemplateForDisplayMemberPath(this.DisplayMemberPath);
+                        template = selectionBoxItemTemplate = ItemTemplate ?? GetDataTemplateForDisplayMemberPath(DisplayMemberPath);
                     }
                 }
             }
 
-            this._contentPresenter.Content = content;
-            this._contentPresenter.ContentTemplate = template;
+            if (_contentPresenter != null)
+            {
+                _contentPresenter.Content = content;
+                _contentPresenter.ContentTemplate = template;
+            }
 
             // Update the SelectionBoxItem and SelectionBoxItemTemplate properties
-            this.SelectionBoxItem = content;
-            this.SelectionBoxItemTemplate = template;
+            SelectionBoxItem = selectionBoxItem;
+            SelectionBoxItemTemplate = selectionBoxItemTemplate;
         }
 
 #if MIGRATION
@@ -169,6 +172,8 @@ namespace Windows.UI.Xaml.Controls
                 {
                     _contentPresenter.IsHitTestVisible = false;
                 }
+
+                _emptyContent = _contentPresenter.Content as FrameworkElement;
             }
 
             //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
@@ -188,28 +193,21 @@ namespace Windows.UI.Xaml.Controls
                 _popup.StayOpen = false;
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
             }
-
-            if (!IsDropDownOpen)
-            {
-                UpdateContentPresenter();
-            }
+            
+            UpdatePresenter();
         }
 
         /// <inheritdoc />
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);
-
-            if (!IsDropDownOpen)
-            {
-                UpdateContentPresenter();
-            }
+            UpdatePresenter();
         }
 
         internal void NotifyComboBoxItemMouseUp(ComboBoxItem comboBoxItem)
         {
             object item = ItemContainerGenerator.ItemFromContainer(comboBoxItem);
-            if (item != null && item != DependencyProperty.UnsetValue)
+            if (item != DependencyProperty.UnsetValue)
             {
                 SelectionChange.SelectJustThisItem(NewItemInfo(item, comboBoxItem), true /* assumeInItemsCollection */);
             }
@@ -313,14 +311,6 @@ namespace Windows.UI.Xaml.Controls
                     // Show the Popup
                     //-----------------------------
 
-                    // Empty the ContentPresenter so that, in case it is needed, the same item can be placed in the popup:
-                    if (comboBox._contentPresenter != null)
-                    {
-                        comboBox._contentPresenter.Content = null;
-                        comboBox.SelectionBoxItem = null;
-                        comboBox.SelectionBoxItemTemplate = null;
-                    }
-
                     // Show the popup:
                     if (comboBox._popup != null)
                     {
@@ -342,6 +332,8 @@ namespace Windows.UI.Xaml.Controls
                         comboBox._dropDownToggle.IsChecked = true;
                     }
 
+                    comboBox.UpdatePresenter();
+
                     // Raise the Opened event:
 #if MIGRATION
                     comboBox.OnDropDownOpened(new EventArgs());
@@ -361,13 +353,13 @@ namespace Windows.UI.Xaml.Controls
                     if (comboBox._popup != null)
                         comboBox._popup.IsOpen = false;
 
-                    comboBox.UpdateContentPresenter();
-
                     // Ensure that the toggle button is unchecked:
                     if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
                     {
                         comboBox._dropDownToggle.IsChecked = false;
                     }
+
+                    comboBox.UpdatePresenter();
 
                     // Raise the Closed event:
 #if MIGRATION
