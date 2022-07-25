@@ -6,6 +6,7 @@
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
+        <TextBlock>Not implemented yet.</TextBlock>
         <!--<TextBlock Text="Testing GRID WITHOUT COLUMNS/ROWS:"/>
             <Grid Width="200" Height="300" Background="#DDDDDD">
                 <Border Background="#FFFFFFAA" VerticalAlignment="Center" HorizontalAlignment="Left">

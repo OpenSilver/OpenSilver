@@ -50,5 +50,6 @@
                 </Border>
             </StackPanel>
         </Border>
+        <TextBlock Foreground="Red">The test doesn't work. IsolatedStorage cannot be verified at the moment.</TextBlock>
     </StackPanel>
 </sdk:Page>
