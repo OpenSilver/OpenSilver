@@ -50,6 +50,7 @@ namespace Windows.UI.Xaml.Controls
                         throw new InvalidOperationException(string.Format("VisualTree of ItemsPanelTemplate must contain a Panel. '{0}' is not a Panel.", value.GetType()));
                     }
                     panel.IsItemsHost = true;
+                    _owner.Panel = panel;
                 }
 
                 base.TemplateChild = value;

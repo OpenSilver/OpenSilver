@@ -129,7 +129,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="index">
         /// The index position of the item that is generated and made visible.
         /// </param>
-        protected virtual void BringIndexIntoView(int @index)
+        protected internal virtual void BringIndexIntoView(int @index)
         {
         }
 

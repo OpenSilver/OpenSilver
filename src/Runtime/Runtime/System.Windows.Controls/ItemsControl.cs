@@ -56,6 +56,8 @@ namespace Windows.UI.Xaml.Controls
         // in which items will be rendered.
         internal ItemsPresenter _itemsPresenter;
 
+        internal Panel Panel { get; set; }
+
         private ItemCollection _items;
 
         #endregion Data
