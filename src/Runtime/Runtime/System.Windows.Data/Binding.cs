@@ -94,7 +94,7 @@ namespace Windows.UI.Xaml.Data
         private bool _validatesOnExceptions;
         private bool _notifyOnValidationError;
         private bool _bindsDirectlyToSource;
-        private bool _validatesOnNotifyDataErrors;
+        private bool _validatesOnNotifyDataErrors = true;
         private bool _validatesOnDataErrors;
 
         /// <summary>

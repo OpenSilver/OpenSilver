@@ -471,8 +471,9 @@ namespace Windows.UI.Xaml.Data
                         return;                    
                 }
 
-                node.SetValue(convertedValue);
+                // clearing invalid stuff first as node.SetValue triggers the INotifyDataErrorInfo.ErrorsChanged event
                 Validation.ClearInvalid(this);
+                node.SetValue(convertedValue);
             }
             catch (Exception e)
             {
