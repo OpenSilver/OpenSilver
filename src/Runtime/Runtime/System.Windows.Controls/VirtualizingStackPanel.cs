@@ -558,7 +558,7 @@ namespace Windows.UI.Xaml.Controls
         /// Generates the item at the specified index and calls BringIntoView on it.
         /// </summary>
         /// <param name="index">Specify the item index that should become visible. This is the index into ItemsControl.Items collection</param>
-        protected internal override void BringIndexIntoView(int index)
+        protected override void BringIndexIntoView(int index)
         {
             if (Orientation == Orientation.Horizontal)
                 SetHorizontalOffset(index);

@@ -613,7 +613,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(IsItemsHost),
                 typeof(bool),
                 typeof(Panel),
-                new PropertyMetadata(false));
+                new PropertyMetadata(false, OnIsItemsHostChanged));
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="Panel"/> is a container
@@ -623,6 +623,16 @@ namespace Windows.UI.Xaml.Controls
         {
             get { return (bool)this.GetValue(IsItemsHostProperty); }
             internal set { this.SetValue(IsItemsHostProperty, value); }
+        }
+
+        private static void OnIsItemsHostChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Panel panel = (Panel)d;
+            ItemsControl itemsControl = ItemsControl.GetItemsOwner(panel);
+            if (itemsControl != null)
+            {
+                itemsControl.ItemsHost = panel;
+            }
         }
     }
 }

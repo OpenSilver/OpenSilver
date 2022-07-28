@@ -125,30 +125,22 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         public void ScrollIntoView(object item)
         {
-            if (Panel is VirtualizingPanel itemsHost)
+            int index = Items.IndexOf(item);
+            if (index > -1)
             {
-                int index = -1;
-                if (ItemsSource != null)
+                if (ItemsHost is VirtualizingPanel vp)
                 {
-                    int i = 0;
-                    foreach (var element in ItemsSource)
-                    {
-                        if (EqualsEx(element, item))
-                        {
-                            index = i;
-                            break;
-                        }
-                        i++;
-                    }
+                    vp.BringIndexIntoViewInternal(index);
                 }
-                itemsHost.BringIndexIntoView(index);
-            }
-            else
-            {
-                ListBoxItem container = ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
-                if (container != null && container.INTERNAL_OuterDomElement != null)
+                else
                 {
-                    OpenSilver.Interop.ExecuteJavaScript("$0.scrollIntoView({ block: 'nearest'})", container.INTERNAL_OuterDomElement);
+                    if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
+                        && container.INTERNAL_OuterDomElement != null)
+                    {
+                        OpenSilver.Interop.ExecuteJavaScript(
+                            "$0.scrollIntoView({ block: 'nearest'})",
+                            container.INTERNAL_OuterDomElement);
+                    }
                 }
             }
         }
