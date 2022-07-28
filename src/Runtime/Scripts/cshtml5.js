@@ -361,24 +361,19 @@ document._attachEventListeners = function (element, handler, isFocusable) {
 
     const store = view._eventsStore = {};
     store.isFocusable = isFocusable;
-    const isTouchSupportedDevice = isTouchDevice();
+    store.enableTouch = isTouchDevice();
 
     view.addEventListener('mousedown', store['mousedown'] = bubblingEventHandler);
-    if (isTouchSupportedDevice) {
-        view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
-    }
     view.addEventListener('mouseup', store['mouseup'] = bubblingEventHandler);
-    if (isTouchSupportedDevice) {
-        view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
-    }
     view.addEventListener('mousemove', store['mousemove'] = bubblingEventHandler);
-    if (isTouchSupportedDevice) {
-        view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
-    }
-    
     view.addEventListener('wheel', store['wheel'] = bubblingEventHandler, { passive: true });
     view.addEventListener('mouseenter', store['mouseenter'] = handler);
     view.addEventListener('mouseleave', store['mouseleave'] = handler);
+    if (store.enableTouch) {
+        view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
+        view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
+        view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
+    }
     if (isFocusable) {
         view.addEventListener('keypress', store['keypress'] = bubblingEventHandler);
         view.addEventListener('input', store['input'] = bubblingEventHandler);
@@ -395,14 +390,16 @@ document._removeEventListeners = function (element) {
 
     const store = view._eventsStore;
     view.removeEventListener('mousedown', store['mousedown']);
-    view.removeEventListener('touchstart', store['touchstart']);
     view.removeEventListener('mouseup', store['mouseup']);
-    view.removeEventListener('touchend', store['touchend']);
     view.removeEventListener('mousemove', store['mousemove']);
-    view.removeEventListener('touchmove', store['touchmove']);
     view.removeEventListener('wheel', store['wheel']);
     view.removeEventListener('mouseenter', store['mouseenter']);
     view.removeEventListener('mouseleave', store['mouseleave']);
+    if (store.enableTouch) {
+        view.removeEventListener('touchstart', store['touchstart']);
+        view.removeEventListener('touchend', store['touchend']);
+        view.removeEventListener('touchmove', store['touchmove']);
+    }
     if (store.isFocusable) {
         view.removeEventListener('keypress', store['keypress']);
         view.removeEventListener('input', store['input']);
