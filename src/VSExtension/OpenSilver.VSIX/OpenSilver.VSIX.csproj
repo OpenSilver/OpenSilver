@@ -103,6 +103,30 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="ItemTemplates\VisualBasic\OpenSilver %28Silverlight Compatible%29\ChildWindow.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\VisualBasic\OpenSilver %28Silverlight Compatible%29\Class.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\VisualBasic\OpenSilver %28Silverlight Compatible%29\Page.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\VisualBasic\OpenSilver %28Silverlight Compatible%29\Resource.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\VisualBasic\OpenSilver %28Silverlight Compatible%29\UserControl.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\VisualBasic\OpenSilver %28Silverlight Compatible%29\XamlResourceDictionary.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Nuget.Config">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -141,6 +165,20 @@
     <ProjectReference Include="..\OpenSilverUwpClassLibraryTemplate\OpenSilverUwpClassLibraryTemplate.csproj">
       <Project>{EDA8EF8D-2EF0-4C9A-BB83-63E577F2CD12}</Project>
       <Name>OpenSilverUwpClassLibraryTemplate</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilverVBApplicationTemplate\OpenSilverVBApplicationTemplate.csproj">
+      <Project>{229629ac-c4e0-4848-9cfa-31064c9d83a3}</Project>
+      <Name>OpenSilverVBApplicationTemplate</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSilverVBClassLibraryTemplate\OpenSilverVBClassLibraryTemplate.csproj">
+      <Project>{77155280-90DB-41B5-A285-760DA09F0A4C}</Project>
+      <Name>OpenSilverVBClassLibraryTemplate</Name>
       <VSIXSubPath>ProjectTemplates</VSIXSubPath>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
