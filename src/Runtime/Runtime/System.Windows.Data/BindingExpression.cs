@@ -15,6 +15,7 @@ using System;
 using System.Diagnostics;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -283,7 +284,61 @@ namespace Windows.UI.Xaml.Data
             Target = null;
         }
 
-        internal void ValueChanged() => Refresh();
+        private INotifyDataErrorInfo _dataErrorInfo;
+
+        internal void ValueChanged()
+        {
+            // TODO: double check this part
+            if (_dataErrorInfo != null)
+            {
+                _dataErrorInfo.ErrorsChanged -= NotifyDataErrorInfo_ErrorsChanged;
+                _dataErrorInfo = null;
+            }
+
+            if (!_propertyPathWalker.IsPathBroken)
+            {
+                _dataErrorInfo = _propertyPathWalker.FinalNode.Value as INotifyDataErrorInfo;
+                if (_dataErrorInfo != null)
+                {
+                    _dataErrorInfo.ErrorsChanged += NotifyDataErrorInfo_ErrorsChanged;
+
+                    // TODO: check if we need to check for errors immediately
+                }
+            }
+
+            Refresh();
+        }
+
+        private void NotifyDataErrorInfo_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            var notifyDataErrorInfo = sender as INotifyDataErrorInfo;
+            if (notifyDataErrorInfo != null)
+            {
+                string propertyName = _propertyPathWalker.FinalNode.PropertyName;
+
+                if (e.PropertyName == propertyName)
+                {
+                    if (notifyDataErrorInfo.HasErrors)
+                    {
+                        var errors = notifyDataErrorInfo.GetErrors(propertyName);
+                        if (errors != null)
+                        {
+                            foreach (var error in errors)
+                            {
+                                if (error != null)
+                                {
+                                    Validation.MarkInvalid(this, new ValidationError(this) { ErrorContent = error.ToString() });
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Validation.ClearInvalid(this);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// The element that is the binding target object of this binding expression.

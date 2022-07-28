@@ -37,11 +37,6 @@ namespace OpenSilver.Internal.Data
 
             FirstNode = head;
             FinalNode = tail;
-
-            if (FinalNode is StandardPropertyPathNode finalNode)
-            {
-                finalNode.EnableNotifyDataErrorChanges = true;
-            }
         }
 
         internal bool ListenForChanges { get; }
@@ -94,7 +89,7 @@ namespace OpenSilver.Internal.Data
                 {
                     case PropertyNodeType.AttachedProperty:
                     case PropertyNodeType.Property:
-                        node = new StandardPropertyPathNode(_expr, this, typeName, propertyName);
+                        node = new StandardPropertyPathNode(this, typeName, propertyName);
                         break;
                     case PropertyNodeType.Indexed:
                         node = new IndexedPropertyPathNode(this, index);

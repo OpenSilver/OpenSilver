@@ -25,6 +25,8 @@ namespace OpenSilver.Internal.Data
 
         Type Type { get; }
 
+        string PropertyName { get; }
+
         IPropertyPathNode Next { get; set; }
 
         void SetValue(object value);

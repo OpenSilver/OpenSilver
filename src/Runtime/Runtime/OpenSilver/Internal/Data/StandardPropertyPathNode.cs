@@ -20,12 +20,8 @@ using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Controls;
 #else
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Controls;
 #endif
 
 namespace OpenSilver.Internal.Data
@@ -34,17 +30,15 @@ namespace OpenSilver.Internal.Data
     {
         private readonly Type _resolvedType;
         private readonly string _propertyName;
-        private readonly BindingExpression _expression;
 
         private IPropertyChangedListener _dpListener;
         private DependencyProperty _dp;
         private PropertyInfo _prop;
-        private FieldInfo _field;        
+        private FieldInfo _field;
 
-        internal StandardPropertyPathNode(BindingExpression expression, PropertyPathWalker listener, string typeName, string propertyName)
+        internal StandardPropertyPathNode(PropertyPathWalker listener, string typeName, string propertyName)
             : base(listener)
         {
-            _expression = expression;
             _resolvedType = typeName != null ? Type.GetType(typeName) : null;
             _propertyName = propertyName;
         }
@@ -71,6 +65,8 @@ namespace OpenSilver.Internal.Data
                 return null;
             }
         }
+
+        public override string PropertyName => _propertyName;
 
         public override bool IsBound => _dp != null || _prop != null;
 
@@ -142,8 +138,6 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        internal bool EnableNotifyDataErrorChanges { get; set; } = false;
-
         internal override void OnSourceChanged(object oldValue, object newValue)
         {
             if (Listener.ListenForChanges && oldValue is INotifyPropertyChanged inpc)
@@ -161,8 +155,6 @@ namespace OpenSilver.Internal.Data
             _dp = null;
             _prop = null;
             _field = null;
-
-            UpdateBindingForNotifyDataErrorInfo(oldValue, false);
 
             if (Source == null)
                 return;
@@ -214,8 +206,6 @@ namespace OpenSilver.Internal.Data
                     _field = sourceType.GetField(_propertyName);
                 }
             }
-
-            UpdateBindingForNotifyDataErrorInfo(newValue, true);
         }
 
         private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -259,53 +249,6 @@ namespace OpenSilver.Internal.Data
         private bool CheckIsBroken()
         {
             return Source == null || (_prop == null && _field == null && _dp == null);
-        }
-
-        private void UpdateBindingForNotifyDataErrorInfo(object source, bool attach)
-        {
-            if (!_expression.ParentBinding.NotifyOnValidationError || !EnableNotifyDataErrorChanges) return;
-
-            var ndei = source as INotifyDataErrorInfo;
-            if (ndei != null)
-            {
-                if (attach)
-                {
-                    ndei.ErrorsChanged += NotifyDataErrorInfo_ErrorsChanged;
-                }
-                else
-                {
-                    ndei.ErrorsChanged -= NotifyDataErrorInfo_ErrorsChanged;
-                }
-            }
-        }
-
-        private void NotifyDataErrorInfo_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
-        {
-            var notifyDataErrorInfo = sender as INotifyDataErrorInfo;
-            if (notifyDataErrorInfo != null)
-            {
-                if (e.PropertyName == _propertyName)
-                {
-                    if (notifyDataErrorInfo.HasErrors)
-                    {
-                        var errors = notifyDataErrorInfo.GetErrors(_propertyName);
-                        if (errors != null)
-                        {
-                            foreach (var error in errors)
-                            {
-                                if (error != null)
-                                {
-                                    Validation.MarkInvalid(_expression, new ValidationError(_expression) { ErrorContent = error.ToString() });
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Validation.ClearInvalid(_expression);
-                    }
-                }
-            }
         }
     }
 }
