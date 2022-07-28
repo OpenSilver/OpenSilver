@@ -265,6 +265,9 @@
     <Compile Include="Tests\OpenFileDialogTest.xaml.cs">
       <DependentUpon>OpenFileDialogTest.xaml</DependentUpon>
     </Compile>
+	<Compile Include="Tests\PopupZIndexTest.xaml.cs">
+      <DependentUpon>PopupZIndexTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\Paths\PathChangeTest.xaml.cs">
       <DependentUpon>PathChangeTest.xaml</DependentUpon>
     </Compile>
@@ -273,6 +276,9 @@
     </Compile>
     <Compile Include="Tests\PrintingTest.xaml.cs">
       <DependentUpon>PrintingTest.xaml</DependentUpon>
+    </Compile>
+	<Compile Include="Tests\PrintDocumentTest.xaml.cs">
+      <DependentUpon>PrintDocumentTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\RadioButtonTest.xaml.cs">
       <DependentUpon>RadioButtonTest.xaml</DependentUpon>
@@ -581,6 +587,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+	<Page Include="Tests\PopupZIndexTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Tests\Paths\PathChangeTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -590,6 +600,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\PrintingTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+	<Page Include="Tests\PrintDocumentTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

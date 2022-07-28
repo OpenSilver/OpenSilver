@@ -6,6 +6,7 @@
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
+        <TextBlock>Not implemented yet.</TextBlock>
         <!--SLDISABLED-->
         <!--<StackPanel Orientation="Vertical" Background="White">
                 <Button Content="Normal call of async method" BorderThickness="5" BorderBrush="Red" FontWeight="600"  Background="White" Click="Button_Click"/>

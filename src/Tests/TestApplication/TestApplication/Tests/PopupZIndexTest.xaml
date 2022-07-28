@@ -1,11 +1,12 @@
-﻿<Page
+﻿<sdk:Page
     x:Class="TestApplication.OpenSilver.Tests.PopupZIndexTest"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
     xmlns:local="clr-namespace:TestApplication.OpenSilver.Tests" Canvas.ZIndex="100">
 
     <StackPanel x:Name="myStackPanel" Orientation="Vertical" Canvas.ZIndex="100">
-        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Height="200">
+        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Height="20">
             <ComboBoxItem Content="Red"></ComboBoxItem>
             <ComboBoxItem Content="Black"></ComboBoxItem>
             <ComboBoxItem Content="Purple"></ComboBoxItem>
@@ -14,4 +15,4 @@
             <ComboBoxItem Content="Orange"></ComboBoxItem>
         </ComboBox>
     </StackPanel>
-</Page>
+</sdk:Page>
