@@ -138,10 +138,10 @@ namespace Windows.UI.Xaml.Controls
         private bool _enableProgressiveRendering;
         public bool EnableProgressiveRendering
         {
-            get { return this._enableProgressiveRendering || INTERNAL_ApplicationWideEnableProgressiveRendering; }
+            get { return this._enableProgressiveRendering || Children.Count >= INTERNAL_ApplicationWideProgressiveRenderingMinChildrenCount; }
             set { this._enableProgressiveRendering = value; }
         }
-        internal static bool INTERNAL_ApplicationWideEnableProgressiveRendering;
+        internal static int INTERNAL_ApplicationWideProgressiveRenderingMinChildrenCount;
 
         private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -574,17 +574,21 @@ namespace Windows.UI.Xaml.Controls
 
         private async void ProgressivelyAttachChildren(IList<UIElement> newChildren)
         {
+            var sw = Stopwatch.StartNew();
             for (int i = 0; i < newChildren.Count; ++i)
             {
                 await Task.Delay(1);
                 if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
                     //this can happen if the Panel is detached during the delay.
+                    Trace.WriteLine($"ProgressivelyAttachChildren is not in visual tree {this}");
                     break;
                 }
                 INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this);
                 INTERNAL_OnChildProgressivelyLoaded();
             }
+            sw.Stop();
+            Trace.WriteLine($"ProgressivelyAttachChildren end {this} {newChildren.Count} {sw.ElapsedMilliseconds}ms");
         }
 
         protected virtual void INTERNAL_OnChildProgressivelyLoaded()
