@@ -586,8 +586,9 @@ namespace Windows.UI.Xaml.Controls
             {
                 chunk = 1;
             }
+
             int from = 0;
-            int to = chunk;
+            int to = (chunk * 2 > newChildren.Count) ? newChildren.Count : chunk; // do not process less number of items than chunk
             while (true)
             {
                 await Task.Delay(1);
@@ -610,7 +611,7 @@ namespace Windows.UI.Xaml.Controls
                 else
                 {
                     from = to;
-                    to += Math.Min(chunk, remaining);
+                    to += (chunk * 2 > remaining) ? remaining : chunk;
                 }
             }
         }
