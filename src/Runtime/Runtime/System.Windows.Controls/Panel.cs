@@ -135,13 +135,20 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private bool _progressiveRenderingIsNotDefault;
         private bool _enableProgressiveRendering;
         public bool EnableProgressiveRendering
         {
-            get { return this._enableProgressiveRendering || Children.Count >= INTERNAL_ApplicationWideProgressiveRenderingMinChildrenCount; }
-            set { this._enableProgressiveRendering = value; }
+            // if user set the value, do not consider application wide setting
+            get => this._progressiveRenderingIsNotDefault ? this._enableProgressiveRendering
+                    : INTERNAL_ApplicationWideProgressiveRenderingChunk > 0 && Children.Count > INTERNAL_ApplicationWideProgressiveRenderingChunk;
+            set
+            {
+                this._enableProgressiveRendering = value;
+                this._progressiveRenderingIsNotDefault = true;
+            }
         }
-        internal static int INTERNAL_ApplicationWideProgressiveRenderingMinChildrenCount;
+        internal static int INTERNAL_ApplicationWideProgressiveRenderingChunk;
 
         private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -574,27 +581,39 @@ namespace Windows.UI.Xaml.Controls
 
         private async void ProgressivelyAttachChildren(IList<UIElement> newChildren)
         {
-            var sw = Stopwatch.StartNew();
-            for (int i = 0; i < newChildren.Count; ++i)
+            int chunk = INTERNAL_ApplicationWideProgressiveRenderingChunk;
+            if (chunk <= 0 || chunk > newChildren.Count) // can be if EnableProgressiveRendering or INTERNAL_EnableProgressiveLoading is true
+            {
+                chunk = 1;
+            }
+            int from = 0;
+            int to = chunk;
+            while (true)
             {
                 await Task.Delay(1);
                 if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
                     //this can happen if the Panel is detached during the delay.
-                    Trace.WriteLine($"ProgressivelyAttachChildren is not in visual tree {this}");
                     break;
                 }
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this);
-                INTERNAL_OnChildProgressivelyLoaded();
+
+                for (int i = from; i < to; ++i)
+                {
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this, i);
+                }
+
+                int remaining = newChildren.Count - to;
+                if (remaining == 0)
+                {
+                    break;
+                }
+                else
+                {
+                    from = to;
+                    to += Math.Min(chunk, remaining);
+                }
             }
-            sw.Stop();
-            Trace.WriteLine($"ProgressivelyAttachChildren end {this} {newChildren.Count} {sw.ElapsedMilliseconds}ms");
         }
-
-        protected virtual void INTERNAL_OnChildProgressivelyLoaded()
-        {
-        }
-
 
         /// <summary>
         /// Retrieves the named element in the instantiated ControlTemplate visual tree.

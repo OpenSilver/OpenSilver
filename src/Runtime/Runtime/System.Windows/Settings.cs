@@ -53,7 +53,6 @@ namespace System
             EnableBindingErrorsThrowing = false;
             EnableInvalidPropertyMetadataDefaultValueExceptions = true;
             ScrollDebounce = TimeSpan.Zero;
-            ProgressiveRenderingMinChildrenCount = int.MaxValue; // disable progressive rendering
         }
 
         public TimeSpan ScrollDebounce { get; set; }
@@ -119,14 +118,15 @@ namespace System
         }
 
         /// <summary>
-        /// Gets or sets the minimum number of children in a Panel to apply progressive loading.
-        /// Setting this option can improve performance, but value close to 0 can break UI in some cases.
+        /// Gets or sets the number of children in a Panel to render progressively in a batch.
+        /// Setting this option can improve performance.
+        /// Value with 0 or less than 0 means disabled progressive loading. Value close to 1 can break UI in some cases.
         /// Progressive loading is disabled by default.
         /// </summary>
-        public int ProgressiveRenderingMinChildrenCount
+        public int ProgressiveRenderingChunk
         {
-            get { return Panel.INTERNAL_ApplicationWideProgressiveRenderingMinChildrenCount; }
-            set { Panel.INTERNAL_ApplicationWideProgressiveRenderingMinChildrenCount = value; }
+            get { return Panel.INTERNAL_ApplicationWideProgressiveRenderingChunk; }
+            set { Panel.INTERNAL_ApplicationWideProgressiveRenderingChunk = value; }
         }
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
