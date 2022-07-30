@@ -5,6 +5,7 @@ env:
 on:
   push:
     branches:
+      - develop
       - releases/OpenSilver/1.1.0
 jobs:
   OpenSilver-Build:
@@ -57,10 +58,6 @@ jobs:
         run: |
           echo "OpenSilver.Simulator ${{ steps.format-version.outputs.version }}" > temp/Version.txt
           nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver"  -BasePath ".\" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
-      - uses: actions/upload-artifact@v2
-        with:
-          name: OpenSilver
-          path: "build/output/OpenSilver"
       - name: Upload packages
         run: |
            dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/index.json
@@ -73,3 +70,19 @@ jobs:
         run: |
            dotnet nuget push "build\output\OpenSilver\*.nupkg" -k ${{ secrets.MYGET_PRIVATE_RC_FEED_TOKEN }} -s ${{ secrets.MYGET_PRIVATE_RC_FEED }}
         if: github.ref == 'refs/heads/releases/OpenSilver/1.1.0'
+      - name: Pack OpenSilver Final Release
+        working-directory: build
+        run: |
+          rm temp/*; rmdir temp; mkdir temp; echo "OpenSilver ${{ env.next-release-version }}" > temp/Version.txt
+          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=${{ env.next-release-version }};Configuration=SL;Target=OpenSilver;RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
+        if: github.ref == 'refs/heads/releases/OpenSilver/1.1.0'
+      - name: Pack Simulator Final Release
+        working-directory: build
+        run: |
+          echo "OpenSilver.Simulator ${{ env.next-release-version }}" > temp/Version.txt
+          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -OutputDirectory "output/OpenSilver"  -BasePath ".\" -Properties "PackageVersion=${{ env.next-release-version }};RepositoryUrl=https://github.com/${{ env.GITHUB_REPOSITORY_OWNER_PART }}/${{ env.GITHUB_REPOSITORY_NAME_PART }}"
+        if: github.ref == 'refs/heads/releases/OpenSilver/1.1.0'
+      - uses: actions/upload-artifact@v2
+        with:
+          name: OpenSilver
+          path: "build/output/OpenSilver"
