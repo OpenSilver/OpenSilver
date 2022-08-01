@@ -383,7 +383,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 if (Double.IsNaN(targetWidth))
                 {
                     // NaN has the same meaning as autosize, which in this context means the desired size
-                    targetWidth = ContentSite.DesiredSize.Width;
+                    targetWidth = ContentSite.ActualWidth;
                 }
 
                 Width = Percentage * targetWidth;
@@ -395,7 +395,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 if (Double.IsNaN(targetHeight))
                 {
                     // NaN has the same meaning as autosize, which in this context means the desired size
-                    targetHeight = ContentSite.DesiredSize.Height;
+                    targetHeight = ContentSite.ActualHeight;
                 }
 
                 Height = Percentage * targetHeight;
