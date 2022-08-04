@@ -243,5 +243,12 @@ namespace System
         /// </returns>
         [OpenSilver.NotImplemented]
         public int MaxFrameRate { get; set; }
+
+        /// <summary>
+        /// Global settings for rows progressive loading (NOTE: DataGrid.ProgressiveLoadingRowChunkSize overrides the global settings)
+        ///  null or <= 0: diables progressive loading
+        ///  > 0 : enables progressive loading with this chunk size
+        /// </summary>
+        public int? DataGridProgressiveLoadingChunkSize { get; set; }
     }
 }

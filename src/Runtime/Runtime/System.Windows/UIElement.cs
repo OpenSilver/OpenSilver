@@ -347,6 +347,8 @@ namespace Windows.UI.Xaml
             }
         }
 
+        public bool KeepHiddenInFirstRender { get; set; } = false;
+
         public UIElement()
         {
             DesiredSize = new Size();
