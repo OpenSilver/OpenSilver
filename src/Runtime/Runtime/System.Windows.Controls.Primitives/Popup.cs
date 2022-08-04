@@ -319,7 +319,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     {
                         popup.OnOpened();
 
-                        Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
+                        popup._controlToWatch = Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
                         popup.ShowPopupRootIfNotAlreadyVisible();
 
                         //We calculate the position at which the popup will be:
