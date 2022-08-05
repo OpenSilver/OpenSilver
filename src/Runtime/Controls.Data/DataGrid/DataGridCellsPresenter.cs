@@ -239,7 +239,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                     // If we're not using star sizing or the current column can't be resized,
                     // then just set the display width according to the column's desired width
-                    if (!this.OwningGrid.UsesStarSizing || (!column.ActualCanUserResize && !column.Width.IsStar))
+                    /*if (!this.OwningGrid.UsesStarSizing || (!column.ActualCanUserResize && !column.Width.IsStar))
                     {
                         // In the edge-case where we're given infinite width and we have star columns, the 
                         // star columns grow to their predefined limit of 10,000 (or their MaxWidth)
@@ -247,16 +247,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
                             Math.Min(column.ActualMaxWidth, DataGrid.DATAGRID_maximumStarColumnWidth) :
                             Math.Max(column.ActualMinWidth, Math.Min(column.ActualMaxWidth, column.Width.DesiredValue));
                         column.SetWidthDisplayValue(newDisplayWidth);
-                    }
+                    }*/
 
                     // If we're auto-growing the column based on the cell content, we want to measure it at its maximum value
-                    if (autoGrowWidth)
+                    if (autoGrowWidth || (!this.OwningGrid.UsesStarSizing && column.Width.IsStar))
                     {
                         cell.Measure(new Size(column.ActualMaxWidth, measureHeight));
                         this.OwningGrid.AutoSizeColumn(column, cell.DesiredSize.Width);
                         column.ComputeLayoutRoundedWidth(totalDisplayWidth);
                     }
-                    else if (!this.OwningGrid.UsesStarSizing)
+                    else
                     {
                         column.ComputeLayoutRoundedWidth(scrollingLeftEdge);
                         cell.Measure(new Size(column.LayoutRoundedWidth, measureHeight));

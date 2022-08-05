@@ -2454,6 +2454,12 @@ namespace Windows.UI.Xaml.Controls
             private set;
         }
 
+        internal Size DataGridAvailableSize
+        {
+            get;
+            private set;
+        }
+
         internal Size? RowsPresenterAvailableSize
         {
             get
@@ -2518,7 +2524,7 @@ namespace Windows.UI.Xaml.Controls
                 if (this.ColumnsInternal != null)
                 {
                     return this.ColumnsInternal.VisibleStarColumnCount > 0 &&
-                        (!this.RowsPresenterAvailableSize.HasValue || !double.IsPositiveInfinity(this.RowsPresenterAvailableSize.Value.Width));
+                        (!double.IsPositiveInfinity(this.DataGridAvailableSize.Width));
                 }
                 return false;
             }
@@ -2830,6 +2836,8 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         protected override Size MeasureOverride(Size availableSize)
         {
+            this.DataGridAvailableSize = availableSize;
+
             // Delay layout until after the initial measure to avoid invalid calculations when the 
             // DataGrid is not part of the visual tree
             if (!_measured)
