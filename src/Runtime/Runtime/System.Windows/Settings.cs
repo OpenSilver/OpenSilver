@@ -123,7 +123,7 @@ namespace System
         /// Value with 0 or less than 0 means disabled progressive loading. Value close to 1 can break UI in some cases.
         /// Progressive loading is disabled by default.
         /// </summary>
-        public int ProgressiveRenderingChunk
+        public int ProgressiveRenderingChunkSize
         {
             get { return Panel.INTERNAL_ApplicationWideProgressiveRenderingChunk; }
             set { Panel.INTERNAL_ApplicationWideProgressiveRenderingChunk = value; }
