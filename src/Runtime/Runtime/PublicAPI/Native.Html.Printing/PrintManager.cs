@@ -187,13 +187,6 @@ namespace CSHTML5.Native.Html.Printing
                     // Listen to the "Loaded" event of the container, so that we are notified when the element becomes visible:
                     container.Loaded += (s2, e2) =>
                     {
-                        // Print the element:
-                        PrintManager.Print(element);
-
-                        // Revert to the previous print area:
-                        RestorePreviousPrintArea(previousPrintArea);
-
-                        // Close the temporary popup:
 #if MIGRATION
                         Dispatcher
 #else
@@ -201,6 +194,13 @@ namespace CSHTML5.Native.Html.Printing
 #endif
                         .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
                         {
+                            // Print the element:
+                            PrintManager.Print(element);
+
+                            // Revert to the previous print area:
+                            RestorePreviousPrintArea(previousPrintArea);
+
+                            // Close the temporary popup:
                             temporaryPopup.IsOpen = false;
                         });
                     };
