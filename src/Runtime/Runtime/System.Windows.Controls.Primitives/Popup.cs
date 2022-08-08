@@ -319,7 +319,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     {
                         popup.OnOpened();
 
-                        Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
+                        popup._controlToWatch = Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
                         popup.ShowPopupRootIfNotAlreadyVisible();
 
                         //We calculate the position at which the popup will be:
@@ -345,6 +345,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     {
                         popup.OnClosed();
                         Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(popup._controlToWatch);
+                        popup._controlToWatch = null;
                         popup.HidePopupRootIfVisible();
                     }
                 }
@@ -357,6 +358,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (PlacementTarget != null && !INTERNAL_VisualTreeManager.IsElementInVisualTree(PlacementTarget))
             {
                 Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(_controlToWatch);
+                _controlToWatch = null;
                 HidePopupRootIfVisible();
             }
             else if (PlacementTarget != null)
