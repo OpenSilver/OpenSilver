@@ -120,13 +120,24 @@ namespace System
         /// <summary>
         /// Gets or sets the number of children in a Panel to render progressively in a batch.
         /// Setting this option can improve performance.
-        /// Value with 0 or less than 0 means disabled progressive loading. Value close to 1 can break UI in some cases.
-        /// Progressive loading is disabled by default.
+        /// Value of 0 or less means progressive rendering is disabled.
+        /// The default value is 0.
         /// </summary>
+        /// <remarks>
+        /// A value close to 1 can break UI in some cases.
+        /// </remarks>
         public int ProgressiveRenderingChunkSize
         {
-            get { return Panel.INTERNAL_ApplicationWideProgressiveRenderingChunk; }
-            set { Panel.INTERNAL_ApplicationWideProgressiveRenderingChunk = value; }
+            get { return Panel.GlobalProgressiveRenderingChunkSize; }
+            set { Panel.GlobalProgressiveRenderingChunkSize = value; }
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use ProgressiveRenderingChunkSize instead.")]
+        public bool EnableProgressiveRendering
+        {
+            get => Panel.GlobalProgressiveRenderingChunkSize > 0;
+            set => Panel.GlobalProgressiveRenderingChunkSize = 1;
         }
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }

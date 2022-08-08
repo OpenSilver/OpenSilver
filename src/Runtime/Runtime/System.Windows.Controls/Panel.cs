@@ -15,6 +15,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -135,23 +136,34 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private int? _progressiveRenderingChunkSize;
+        private int _progressiveRenderingChunkSize;
 
         /// <summary>
         /// Gets or sets local value of chunk size to render progressively in a batch.
         /// Setting this option can improve performance.
-        /// Value with 0 or less than 0 means disabled progressive loading. Value close to 1 can break UI in some cases.
-        /// Default value is null, so <see cref="Settings.ProgressiveRenderingChunkSize"/> is used.
+        /// Value lower than 0 means progressive rendering is disabled.
+        /// Value of 0 means it uses the size defined at the application level, see
+        /// <see cref="Settings.ProgressiveRenderingChunkSize"/>.
+        /// Default value is 0.
         /// </summary>
-        public int? ProgressiveRenderingChunkSize
+        /// <remarks>
+        /// A value close to 1 can break UI in some cases.
+        /// </remarks>
+        public int ProgressiveRenderingChunkSize
         {
-            get => _progressiveRenderingChunkSize.HasValue ? _progressiveRenderingChunkSize.Value : INTERNAL_ApplicationWideProgressiveRenderingChunk;
-            set
-            {
-                this._progressiveRenderingChunkSize = value;
-            }
+            get => _progressiveRenderingChunkSize == 0 ? GlobalProgressiveRenderingChunkSize : _progressiveRenderingChunkSize;
+            set => _progressiveRenderingChunkSize = value;
         }
-        internal static int INTERNAL_ApplicationWideProgressiveRenderingChunk;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use ProgressiveRenderingChunkSize instead.")]
+        public bool EnableProgressiveRendering
+        {
+            get => ProgressiveRenderingChunkSize > 0;
+            set => ProgressiveRenderingChunkSize = 1;
+        }
+
+        internal static int GlobalProgressiveRenderingChunkSize;
 
         private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -194,7 +206,8 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            var enableProgressiveRendering = ProgressiveRenderingChunkSize.HasValue && ProgressiveRenderingChunkSize.Value > 0 && Children.Count > ProgressiveRenderingChunkSize.Value;
+            int chunkSize = ProgressiveRenderingChunkSize;
+            var enableProgressiveRendering = chunkSize > 0 && Children.Count > chunkSize;
             if (enableProgressiveRendering)
             {
                 this.ProgressivelyAttachChildren(this.Children);
@@ -585,7 +598,7 @@ namespace Windows.UI.Xaml.Controls
 
         private async void ProgressivelyAttachChildren(IList<UIElement> newChildren)
         {
-            int chunkSize = ProgressiveRenderingChunkSize.Value;
+            int chunkSize = ProgressiveRenderingChunkSize;
             int from = 0;
             int to = (chunkSize * 2 > newChildren.Count) ? newChildren.Count : chunkSize; // do not process less number of items than chunk size
             
@@ -608,11 +621,9 @@ namespace Windows.UI.Xaml.Controls
                 {
                     break;
                 }
-                else
-                {
-                    from = to;
-                    to += (chunkSize * 2 > remaining) ? remaining : chunkSize;
-                }
+                
+                from = to;
+                to += (chunkSize * 2 > remaining) ? remaining : chunkSize;
             }
         }
 
