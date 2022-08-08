@@ -172,7 +172,7 @@ namespace Windows.UI.Xaml.Media
 
             foreach (var root in popupRoots)
             {
-                if (root.INTERNAL_ParentWindow == window && (root.INTERNAL_LinkedPopup?.IsOpen ?? false)
+                if (root.INTERNAL_ParentWindow == window && root.INTERNAL_LinkedPopup.IsOpen
                                                          && root.INTERNAL_LinkedPopup.Child != null)
                 {
                     result.Add(root.INTERNAL_LinkedPopup);
