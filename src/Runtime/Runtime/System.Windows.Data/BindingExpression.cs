@@ -284,25 +284,38 @@ namespace Windows.UI.Xaml.Data
             Target = null;
         }
 
-        private INotifyDataErrorInfo _dataErrorInfo;
+        private INotifyDataErrorInfo _dataErrorInfoForSource;
+        private INotifyDataErrorInfo _dataErrorInfoForValue;
 
         internal void ValueChanged()
         {
-            // TODO: double check this part
-            if (_dataErrorInfo != null)
+            if (_dataErrorInfoForSource != null)
             {
-                _dataErrorInfo.ErrorsChanged -= NotifyDataErrorInfo_ErrorsChanged;
-                _dataErrorInfo = null;
+                _dataErrorInfoForSource.ErrorsChanged -= NotifyDataErrorInfo_ErrorsChanged;
+                _dataErrorInfoForSource = null;
             }
 
             if (!_propertyPathWalker.IsPathBroken)
             {
-                _dataErrorInfo = _propertyPathWalker.FinalNode.Value as INotifyDataErrorInfo;
-                if (_dataErrorInfo != null)
+                _dataErrorInfoForSource = _propertyPathWalker.FinalNode.Source as INotifyDataErrorInfo;
+                if (_dataErrorInfoForSource != null)
                 {
-                    _dataErrorInfo.ErrorsChanged += NotifyDataErrorInfo_ErrorsChanged;
+                    _dataErrorInfoForSource.ErrorsChanged += NotifyDataErrorInfo_ErrorsChanged;
+                }
+            }
 
-                    // TODO: check if we need to check for errors immediately
+            if (_dataErrorInfoForValue != null)
+            {
+                _dataErrorInfoForValue.ErrorsChanged -= NotifyDataErrorInfo_ErrorsChanged;
+                _dataErrorInfoForValue = null;
+            }
+
+            if (!_propertyPathWalker.IsPathBroken)
+            {
+                _dataErrorInfoForValue = _propertyPathWalker.FinalNode.Value as INotifyDataErrorInfo;
+                if (_dataErrorInfoForValue != null)
+                {
+                    _dataErrorInfoForValue.ErrorsChanged += NotifyDataErrorInfo_ErrorsChanged;
                 }
             }
 
