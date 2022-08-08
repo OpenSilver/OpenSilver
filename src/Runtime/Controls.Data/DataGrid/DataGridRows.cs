@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -897,6 +898,11 @@ namespace Windows.UI.Xaml.Controls
             while (chunkSlots < totalSlots)
             {
                 await Task.Delay(1);
+                if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                {
+                    //this can happen if the DataGrid is detached during the delay.
+                    return;
+                }
                 chunkSlots = Math.Min(SlotIsDisplayed(slot) ? chunkSlots + chunkSize : totalSlots, totalSlots);
                 AddSlotsInChunk(ref addedfRows, ref slot, ref nextGroupSlot, chunkSlots, groupSlots);
             }
