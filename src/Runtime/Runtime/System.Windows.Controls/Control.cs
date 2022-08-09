@@ -1166,20 +1166,19 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         }
         protected override Size MeasureOverride(Size availableSize)
         {
-            Size extent = new Size(0.0, 0.0);
-            var anyChild = false;
-            // ... enumerate only once
-            foreach (DependencyObject child in VisualTreeHelper.GetVisualChildren(this)) {
-                anyChild = true;
-                if (child as FrameworkElement == null)
-                    continue;
+            int count = VisualChildrenCount;
 
-                FrameworkElement childElement = child as FrameworkElement; 
-                childElement.Measure(availableSize);
-                extent.Width += childElement.DesiredSize.Width;
-                extent.Height += childElement.DesiredSize.Height;
+            if (count > 0)
+            {
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Measure(availableSize);
+                    return child.DesiredSize;
+                }
             }
-            return anyChild ? extent : new Size();
+
+            return new Size(0.0, 0.0);
         }
 
     }

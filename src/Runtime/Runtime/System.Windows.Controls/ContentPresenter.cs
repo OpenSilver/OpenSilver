@@ -559,11 +559,16 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            // ... enumerate one element only
-            if (VisualTreeHelper.GetVisualChildren(this).FirstOrDefault() is UIElement firstChild)
+            int count = VisualChildrenCount;
+
+            if (count > 0)
             {
-                firstChild.Measure(availableSize);
-                return firstChild.DesiredSize;
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Measure(availableSize);
+                    return child.DesiredSize;
+                }
             }
 
             if (Content == null)
@@ -571,16 +576,6 @@ namespace Windows.UI.Xaml.Controls
 
             Size actualSize = new Size(double.IsNaN(Width) ? ActualWidth : Width, double.IsNaN(Height) ? ActualHeight : Height);
             return actualSize;
-        }
-
-        protected override Size ArrangeOverride(Size finalSize) {
-            // ... enumerate one element only
-            if (VisualTreeHelper.GetVisualChildren(this).FirstOrDefault() is UIElement firstChild)
-            {
-                firstChild.Arrange(new Rect(finalSize));
-            }
-
-            return finalSize;
         }
     }
 }

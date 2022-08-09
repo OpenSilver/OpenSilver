@@ -1275,13 +1275,16 @@ namespace Windows.UI.Xaml
         //     The actual size that is used after the element is arranged in layout.
         protected virtual Size ArrangeOverride(Size finalSize)
         {
-            // ... enumerate one element only
-            if (VisualTreeHelper.GetVisualChildren(this).FirstOrDefault() is UIElement firstChild)
-            {
-                firstChild.Arrange(new Rect(finalSize));
-                return finalSize;
-            }
+            int count = VisualChildrenCount;
 
+            if (count > 0)
+            {
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Arrange(new Rect(finalSize));
+                }
+            }
             return finalSize;
         }
 
