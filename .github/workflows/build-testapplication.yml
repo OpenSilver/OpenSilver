@@ -21,7 +21,7 @@ jobs:
           echo "vdir=${{ env.virtual-directory }}" >> $env:GITHUB_ENV
           echo "apath=${{ env.app-path }}" >> $env:GITHUB_ENV
       - name: Set directory environment variables
-        if: "${{ github.ref == 'refs/heads/releases/OpenSilver/1.1.0_test' }}"
+        if: "${{ github.ref == 'refs/heads/releases/OpenSilver/1.1.0' }}"
         run: |
           echo "vdir=${{ env.virtual-directory-release }}" >> $env:GITHUB_ENV
           echo "apath=${{ env.app-path-release }}" >> $env:GITHUB_ENV
