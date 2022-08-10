@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <EnableAdditionalMetadataAttributes>true</EnableAdditionalMetadataAttributes>
+  </PropertyGroup>
+</Project>
