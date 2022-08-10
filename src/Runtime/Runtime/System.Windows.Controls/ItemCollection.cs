@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Windows.Controls.Primitives;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -71,7 +72,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 this.ClearModelParent(item);
             }
-            
+
             this.ClearInternal();
         }
 
@@ -242,7 +243,7 @@ namespace Windows.UI.Xaml.Controls
             this._isUsingItemsSource = true;
 
             this.TrySubscribeToCollectionChangedEvent(value);
-            
+
             this.InitializeSourceList(value);
 
             this.UpdateCountProperty();
@@ -362,6 +363,14 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this._modelParent != null)
             {
+                if (this._modelParent is Selector)
+                {
+                    Selector selectorParent = ((Selector)this._modelParent);
+                    if (selectorParent.SelectedItem == item)
+                    {
+                        selectorParent.SelectedItem = null;
+                    }
+                }
                 this._modelParent.RemoveLogicalChild(item);
             }
         }
