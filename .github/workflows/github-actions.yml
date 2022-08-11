@@ -1,6 +1,7 @@
 name: OpenSilver Build
 env:
   next-release-version: '1.1.0'
+  current-release-version: '1.0.0'
 on:
   push:
     branches:
@@ -16,7 +17,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.202'
+          dotnet-version: '6.0.203'
       - name: Clone OpenSilver repo
         uses: actions/checkout@v2
         with:
@@ -33,7 +34,11 @@ jobs:
       - name: Build Compiler
         run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=SL -clp:ErrorsOnly -restore
       - name: Copy Compiler Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.1.0.0/tools/;
+        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
+      - name: Copy Targets
+        run: |
+          cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
+          cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
       - name: Build OpenSilver
         working-directory: build
         run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
