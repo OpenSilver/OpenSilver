@@ -18,6 +18,7 @@
 using DotNetBrowser.WPF;
 using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -52,12 +53,16 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
 
         internal static void ShowExceptionStatic(Exception exception)
         {
-            // Display error message:
-            MessageBox.Show(MainWindow.TipToCopyToClipboard
-                + Environment.NewLine + Environment.NewLine
-                + "The following unhandled exception was raised by the application:"
-                + Environment.NewLine + Environment.NewLine
-                + exception.ToString());
+            // john.torjo when debugger attached, message boxes are a huge nuissance, lets write to the debug window
+            if (Debugger.IsAttached)
+                Debug.WriteLine($"SIMULATOR-caught exception: {exception.ToString()}");
+            else
+                // Display error message:
+                MessageBox.Show(MainWindow.TipToCopyToClipboard
+                                + Environment.NewLine + Environment.NewLine
+                                + "The following unhandled exception was raised by the application:"
+                                + Environment.NewLine + Environment.NewLine
+                                + exception.ToString());
         }
 
         //Do not remove this method: called via reflection.

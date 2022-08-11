@@ -481,6 +481,8 @@ namespace Windows.UI.Xaml.Controls
             set { this._itemsPresenter = value; }
         }
 
+        internal Panel ItemsHost { get; set; }
+
         internal bool HasItems
         {
             get { return this._items != null && this._items.CountInternal > 0; }

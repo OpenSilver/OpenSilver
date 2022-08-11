@@ -6,6 +6,7 @@
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
+        <TextBlock>Not implemented yet.</TextBlock>
         <!--<sdk:DataGrid x:Name="DataGrid1" Width="150"/>
         <Button Content="Items.Add" Click="ButtonTestDataGrid_ItemsAdd_Click"/>
         <Button Content="Items.Add String" Click="ButtonTestDataGrid_ItemsAddString_Click"/>

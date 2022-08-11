@@ -17,6 +17,7 @@
     <Compile Include="Converters\BooleanVisibilityConverter.cs" />
     <Compile Include="HintBehavior.cs" />
     <Compile Include="LinqSamples.cs" />
+    <Compile Include="Tests\AccordionTest.xaml.cs" />
     <Compile Include="Tests\Events\TextInputTest.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -308,6 +309,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="Tests\AsyncAwaitTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Tests\AccordionTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>

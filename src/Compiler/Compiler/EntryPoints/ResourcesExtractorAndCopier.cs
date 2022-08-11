@@ -19,8 +19,10 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -77,6 +79,9 @@ namespace DotNetForHtml5.Compiler
 
         public static bool Execute(string sourceAssembly, string outputRootPath, string outputResourcesPath, string assembliesToIgnore, string supportedExtensions, ILogger logger, bool isBridgeBasedVersion, string typeForwardingAssemblyPath, string nameOfAssembliesThatDoNotContainUserCode, string coreAssemblyFiles, out List<string> listOfCopiedResXFiles)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             string operationName = "C#/XAML for HTML5: ResourcesExtractorAndCopier";
             try
             {

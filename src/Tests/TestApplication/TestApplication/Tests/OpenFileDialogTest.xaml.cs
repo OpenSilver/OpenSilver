@@ -2,7 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+#if OPENSILVER
 using OpenFileDialog = OpenSilver.Controls.OpenFileDialog;
+#endif
 
 namespace TestApplication.OpenSilver.Tests
 {

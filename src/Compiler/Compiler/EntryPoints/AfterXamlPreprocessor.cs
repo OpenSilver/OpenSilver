@@ -18,9 +18,11 @@ using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -41,6 +43,9 @@ namespace DotNetForHtml5.Compiler
 
         public static bool Execute(bool isSecondPass, string flagsString, ILogger logger)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             string passNumber = (isSecondPass ? "2" : "1");
             string operationName = string.Format("C#/XAML for HTML5: AfterXamlPreprocessor (pass {0})", passNumber);
             try

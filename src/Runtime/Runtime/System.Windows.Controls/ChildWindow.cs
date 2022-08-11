@@ -315,7 +315,8 @@ namespace Windows.UI.Xaml.Controls
 
 
 
-        #region public bool IsModal
+         #region public bool IsModal
+
         /// <summary>
         /// Gets or sets a value indicating whether the ChildWindow is modal.
         /// </summary>
@@ -324,17 +325,42 @@ namespace Windows.UI.Xaml.Controls
             get { return (bool)GetValue(IsModalProperty); }
             set { SetValue(IsModalProperty, value); }
         }
+
         /// <summary>
-        /// Idetifies the ChildWindow.IsModal dependency property.
+        /// Idetifies the <see cref="IsModal"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsModalProperty =
-            DependencyProperty.Register("IsModal", typeof(bool), typeof(ChildWindow), new PropertyMetadata(true, IsModal_Changed));
+            DependencyProperty.Register(
+                nameof(IsModal),
+                typeof(bool),
+                typeof(ChildWindow),
+                new PropertyMetadata(true, IsModal_Changed));
 
         private static void IsModal_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((ChildWindow)d).UpdateIsModalVisualState();
+            var childWindow = (ChildWindow)d;
+
+            if ((bool)e.NewValue)
+            {
+                childWindow.GotFocus -= childWindow.ChildWindow_GotFocus;
+            }
+            else
+            {
+                childWindow.GotFocus += childWindow.ChildWindow_GotFocus;
+            }
+
+            childWindow.UpdateIsModalVisualState();
         }
-        void UpdateIsModalVisualState()
+
+        private void ChildWindow_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.ChildWindowPopup != null)
+            {
+                ChildWindowPopup.PutPopupInFront();
+            }
+        }
+
+        private void UpdateIsModalVisualState()
         {
             if (IsModal)
             {
@@ -345,6 +371,7 @@ namespace Windows.UI.Xaml.Controls
                 VisualStateManager.GoToState(this, "NotModal", false);
             }
         }
+
         #endregion
 
 
@@ -469,16 +496,6 @@ namespace Windows.UI.Xaml.Controls
             // Set default style:
             this.DefaultStyleKey = typeof(ChildWindow);
 #endif
-            this.GotFocus += ChildWindow_GotFocus;
-        }
-
-        
-        private void ChildWindow_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (this.ChildWindowPopup != null)
-            {
-                ChildWindowPopup.PutPopupInFront();
-            }
         }
 
         #endregion Constructors

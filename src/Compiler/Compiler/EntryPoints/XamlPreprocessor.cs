@@ -18,9 +18,11 @@ using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -96,6 +98,9 @@ namespace DotNetForHtml5.Compiler
 
         public static bool Execute(string sourceFile, string outputFile, string fileNameWithPathRelativeToProjectRoot, string assemblyNameWithoutExtension, string coreAssemblyFiles, bool isSecondPass, bool isSLMigration, ILogger logger, string activationAppPath, string cSharpXamlForHtml5OutputType, bool overrideOutputOnlyIfSourceHasChanged, string outputRootPath, string outputAppFilesPath, string outputLibrariesPath, string outputResourcesPath, string flagsString, bool isBridgeBasedVersion, string nameOfAssembliesThatDoNotContainUserCode)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             string passNumber = (isSecondPass ? "2" : "1");
             string operationName = string.Format("C#/XAML for HTML5: XamlPreprocessor (pass {0})", passNumber);
             try

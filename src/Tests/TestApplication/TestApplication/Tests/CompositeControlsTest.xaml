@@ -6,6 +6,7 @@
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
+        <TextBlock>Not implemented yet.</TextBlock>
         <!--SLDISABLED-->
         <!--<local:SampleHeaderedContainer Header="This is the Header">
                 <local:SampleHeaderedContainer.Body>

@@ -133,6 +133,11 @@ namespace Windows.UI.Xaml.Controls
         {
         }
 
+        internal void BringIndexIntoViewInternal(int index)
+        {
+            BringIndexIntoView(index);
+        }
+
         internal override void GenerateChildren()
         {
             if (!IsCustomLayoutRoot && !IsUnderCustomLayout)

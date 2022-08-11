@@ -15,6 +15,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -135,13 +136,34 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private bool _enableProgressiveRendering;
+        private int _progressiveRenderingChunkSize;
+
+        /// <summary>
+        /// Gets or sets local value of chunk size to render progressively in a batch.
+        /// Setting this option can improve performance.
+        /// Value lower than 0 means progressive rendering is disabled.
+        /// Value of 0 means it uses the size defined at the application level, see
+        /// <see cref="Settings.ProgressiveRenderingChunkSize"/>.
+        /// Default value is 0.
+        /// </summary>
+        /// <remarks>
+        /// A value close to 1 can break UI in some cases.
+        /// </remarks>
+        public int ProgressiveRenderingChunkSize
+        {
+            get => _progressiveRenderingChunkSize == 0 ? GlobalProgressiveRenderingChunkSize : _progressiveRenderingChunkSize;
+            set => _progressiveRenderingChunkSize = value;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use ProgressiveRenderingChunkSize instead.")]
         public bool EnableProgressiveRendering
         {
-            get { return this._enableProgressiveRendering || INTERNAL_ApplicationWideEnableProgressiveRendering; }
-            set { this._enableProgressiveRendering = value; }
+            get => ProgressiveRenderingChunkSize > 0;
+            set => ProgressiveRenderingChunkSize = 1;
         }
-        internal static bool INTERNAL_ApplicationWideEnableProgressiveRendering;
+
+        internal static int GlobalProgressiveRenderingChunkSize;
 
         private void OnChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -184,7 +206,9 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            if (this.EnableProgressiveRendering || this.INTERNAL_EnableProgressiveLoading)
+            int chunkSize = ProgressiveRenderingChunkSize;
+            var enableProgressiveRendering = chunkSize > 0 && Children.Count > chunkSize;
+            if (enableProgressiveRendering)
             {
                 this.ProgressivelyAttachChildren(this.Children);
             }
@@ -574,7 +598,11 @@ namespace Windows.UI.Xaml.Controls
 
         private async void ProgressivelyAttachChildren(IList<UIElement> newChildren)
         {
-            for (int i = 0; i < newChildren.Count; ++i)
+            int chunkSize = ProgressiveRenderingChunkSize;
+            int from = 0;
+            int to = (chunkSize * 2 > newChildren.Count) ? newChildren.Count : chunkSize; // do not process less number of items than chunk size
+            
+            while (true)
             {
                 await Task.Delay(1);
                 if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
@@ -582,15 +610,22 @@ namespace Windows.UI.Xaml.Controls
                     //this can happen if the Panel is detached during the delay.
                     break;
                 }
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this);
-                INTERNAL_OnChildProgressivelyLoaded();
+
+                for (int i = from; i < to; ++i)
+                {
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this, i);
+                }
+
+                int remaining = newChildren.Count - to;
+                if (remaining == 0)
+                {
+                    break;
+                }
+                
+                from = to;
+                to += (chunkSize * 2 > remaining) ? remaining : chunkSize;
             }
         }
-
-        protected virtual void INTERNAL_OnChildProgressivelyLoaded()
-        {
-        }
-
 
         /// <summary>
         /// Retrieves the named element in the instantiated ControlTemplate visual tree.
@@ -613,7 +648,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(IsItemsHost),
                 typeof(bool),
                 typeof(Panel),
-                new PropertyMetadata(false));
+                new PropertyMetadata(false, OnIsItemsHostChanged));
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="Panel"/> is a container
@@ -623,6 +658,16 @@ namespace Windows.UI.Xaml.Controls
         {
             get { return (bool)this.GetValue(IsItemsHostProperty); }
             internal set { this.SetValue(IsItemsHostProperty, value); }
+        }
+
+        private static void OnIsItemsHostChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Panel panel = (Panel)d;
+            ItemsControl itemsControl = ItemsControl.GetItemsOwner(panel);
+            if (itemsControl != null)
+            {
+                itemsControl.ItemsHost = panel;
+            }
         }
     }
 }

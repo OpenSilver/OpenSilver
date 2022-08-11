@@ -22,5 +22,6 @@
                 <TextBlock x:Name="ResultTextBlock" Text="Result"/>
             </StackPanel>
         </Border>
+        <TextBlock Foreground="Red">The test doesn't work. FileInfo cannot be verified at the moment.</TextBlock>
     </StackPanel>
 </sdk:Page>

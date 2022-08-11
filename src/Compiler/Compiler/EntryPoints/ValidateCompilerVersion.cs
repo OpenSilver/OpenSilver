@@ -18,8 +18,10 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -39,7 +41,10 @@ namespace DotNetForHtml5.Compiler
 
         public static bool Execute(int targetCompilerBuildNumber, ILogger logger)
         {
-            if(Version.CompilerBuildNumber < targetCompilerBuildNumber) //if this is true, then it means msbuild is using an outdated version of the compiler compared to what should be used by the OpenSilver/CSHTML5 package.
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
+            if (Version.CompilerBuildNumber < targetCompilerBuildNumber) //if this is true, then it means msbuild is using an outdated version of the compiler compared to what should be used by the OpenSilver/CSHTML5 package.
             {
                 logger.WriteError("Compiler initialization error. Please restart Visual Studio or manually kill the Msbuild process, then recompile the solution to fix this error.");
                 return false;

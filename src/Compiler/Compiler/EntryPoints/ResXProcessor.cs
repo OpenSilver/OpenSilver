@@ -19,10 +19,12 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
 using System.Text;
+using System.Threading;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -49,6 +51,8 @@ namespace DotNetForHtml5.Compiler
 
         public static bool Execute(string sourceFile, string outputFile, string sourceFileRelativePath, string rootNamespace, ILogger logger)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             string operationName = "C#/XAML for HTML5: ResXProcessor";
             Console.WriteLine(operationName + " started.");
