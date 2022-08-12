@@ -338,7 +338,7 @@ namespace CSHTML5.Internal
                 effectiveValue = newValue;
                 effectiveValueKind = oldBaseValueSource;
 
-                newEntry = new EffectiveValueEntry(oldEntry.FullValueSource);
+                newEntry = new EffectiveValueEntry(oldEntry.BaseValueSourceInternal);
                 if (!oldEntry.HasModifiers)
                 {
                     newEntry.Value = oldEntry.Value;
@@ -346,12 +346,16 @@ namespace CSHTML5.Internal
                 else
                 {
                     ModifiedValue modifiedValue = oldEntry.ModifiedValue;
-                    newEntry.Value = new ModifiedValue
+                    object baseValue = modifiedValue.BaseValue;
+                    newEntry.Value = baseValue;
+                    if (oldEntry.IsExpression)
                     {
-                        BaseValue = modifiedValue.BaseValue,
-                        ExpressionValue = modifiedValue.ExpressionValue,
-                        CoercedValue = modifiedValue.CoercedValue,
-                    };
+                        newEntry.SetExpressionValue(modifiedValue.ExpressionValue, baseValue);
+                    }
+                    else if (oldEntry.IsExpressionFromStyle)
+                    {
+                        newEntry.SetExpressionFromStyleValue(modifiedValue.ExpressionValue, baseValue);
+                    }
                 }
             }
             else
