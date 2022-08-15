@@ -158,8 +158,8 @@ namespace Windows.UI.Xaml.Controls
                 if (this.CustomLayout)
                 {
                     _popup.CustomLayout = true;
-                    _popup.MaxHeight = this.MaxDropDownHeight;
                 }
+                _popup.MaxHeight = this.MaxDropDownHeight;
             }
 
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
