@@ -301,6 +301,7 @@ namespace Windows.UI.Xaml.Data
                 if (_dataErrorInfoForSource != null)
                 {
                     _dataErrorInfoForSource.ErrorsChanged += NotifyDataErrorInfo_ErrorsChanged;
+                    UpdateValidationErrors(_dataErrorInfoForSource, _propertyPathWalker.FinalNode.PropertyName);
                 }
             }
 
@@ -316,6 +317,7 @@ namespace Windows.UI.Xaml.Data
                 if (_dataErrorInfoForValue != null)
                 {
                     _dataErrorInfoForValue.ErrorsChanged += NotifyDataErrorInfo_ErrorsChanged;
+                    UpdateValidationErrors(_dataErrorInfoForValue, _propertyPathWalker.FinalNode.PropertyName);
                 }
             }
 
@@ -324,32 +326,30 @@ namespace Windows.UI.Xaml.Data
 
         private void NotifyDataErrorInfo_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            var notifyDataErrorInfo = sender as INotifyDataErrorInfo;
-            if (notifyDataErrorInfo != null)
-            {
-                string propertyName = _propertyPathWalker.FinalNode.PropertyName;
+            UpdateValidationErrors(sender as INotifyDataErrorInfo, e.PropertyName);
+        }
 
-                if (e.PropertyName == propertyName)
+        private void UpdateValidationErrors(INotifyDataErrorInfo notifyDataErrorInfo, string propertyName)
+        {
+            if (notifyDataErrorInfo == null || propertyName != _propertyPathWalker.FinalNode.PropertyName) return;
+
+            if (notifyDataErrorInfo.HasErrors)
+            {
+                var errors = notifyDataErrorInfo.GetErrors(propertyName);
+                if (errors != null)
                 {
-                    if (notifyDataErrorInfo.HasErrors)
+                    foreach (var error in errors)
                     {
-                        var errors = notifyDataErrorInfo.GetErrors(propertyName);
-                        if (errors != null)
+                        if (error != null)
                         {
-                            foreach (var error in errors)
-                            {
-                                if (error != null)
-                                {
-                                    Validation.MarkInvalid(this, new ValidationError(this) { ErrorContent = error.ToString() });
-                                }
-                            }
+                            Validation.MarkInvalid(this, new ValidationError(this) { ErrorContent = error.ToString() });
                         }
                     }
-                    else
-                    {
-                        Validation.ClearInvalid(this);
-                    }
                 }
+            }
+            else
+            {
+                Validation.ClearInvalid(this);
             }
         }
 
