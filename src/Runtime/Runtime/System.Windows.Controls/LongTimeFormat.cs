@@ -1,15 +1,7 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,64 +12,88 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+    /// <summary>
+    /// Represents the long time format used for parsing and formatting.
+    /// </summary>
     public sealed class LongTimeFormat : ITimeFormat
     {
         /// <summary>
         /// Gets the format to use to display a DateTime as a time value.
         /// </summary>
         /// <param name="culture">The culture.</param>
-        /// <returns>A format to use during display of a DateTime.</returns>
+        /// <returns>
+        /// A format to use during display of a DateTime.
+        /// </returns>
         public string GetTimeDisplayFormat(CultureInfo culture)
         {
-            return culture.DateTimeFormat.LongTimePattern;
+            DateTimeFormatInfo info = culture.DateTimeFormat;
+            return info.LongTimePattern;
         }
 
         /// <summary>
         /// Gets the formats to use to parse a string to a DateTime.
         /// </summary>
         /// <param name="culture">Culture used to determine formats.</param>
-        /// <returns>An array of formats to be used during parsing.</returns>
+        /// <returns>
+        /// An array of formats to be used during parsing.
+        /// </returns>
         public string[] GetTimeParseFormats(CultureInfo culture)
         {
-            List<string> stringList = new List<string>(6);
-            DateTimeFormatInfo dateTimeFormat = culture.DateTimeFormat;
-            if (dateTimeFormat != null)
+            List<string> formats = new List<string>(6);
+
+            DateTimeFormatInfo info = culture.DateTimeFormat;
+            if (info != null)
             {
-                stringList.Add(dateTimeFormat.LongTimePattern);
-                stringList.Add(dateTimeFormat.ShortTimePattern);
+                formats.Add(info.LongTimePattern);
+                formats.Add(info.ShortTimePattern);
             }
-            return stringList.ToArray();
+            return formats.ToArray();
         }
 
+        #region Equals and hashcode.
         /// <summary>
-        /// Determines whether the specified <see cref="T:System.Object" /> is
-        /// equal to the current <see cref="T:System.Object" />.
+        /// Determines whether the specified <see cref="T:System.Object"/> is 
+        /// equal to the current <see cref="T:System.Object"/>.
         /// </summary>
-        /// <param name="obj">The <see cref="T:System.Object" /> to compare
-        /// with the current <see cref="T:System.Object" />.</param>
+        /// <param name="obj">The <see cref="T:System.Object"/> to compare 
+        /// with the current <see cref="T:System.Object"/>.</param>
         /// <returns>
-        /// True if the specified <see cref="T:System.Object" /> is equal
-        /// to the current <see cref="T:System.Object" />; otherwise, false.
+        /// True if the specified <see cref="T:System.Object"/> is equal 
+        /// to the current <see cref="T:System.Object"/>; otherwise, false.
         /// </returns>
         /// <exception cref="T:System.NullReferenceException">
-        /// The <paramref name="obj" /> parameter is null.
+        /// The <paramref name="obj"/> parameter is null.
         /// </exception>
         public override bool Equals(object obj)
         {
-            LongTimeFormat longTimeFormat = obj as LongTimeFormat;
-            return longTimeFormat != (LongTimeFormat)null && longTimeFormat == this;
+            LongTimeFormat comparison = obj as LongTimeFormat;
+            return comparison != null && comparison == this;
         }
 
-        /// <summary>Implements the operator ==.</summary>
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
         /// <param name="left">The left instance to compare.</param>
         /// <param name="right">The right instance to compare.</param>
         /// <returns>The result of the operator.</returns>
         public static bool operator ==(LongTimeFormat left, LongTimeFormat right)
         {
-            return (object)left == null && (object)right == null || (object)left != null && (object)right != null;
+            if ((object)left == null && (object)right == null)
+            {
+                return true;
+            }
+
+            if ((object)left == null || (object)right == null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
-        /// <summary>Implements the operator !=.</summary>
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
         /// <param name="left">The left instance to compare.</param>
         /// <param name="right">The right instance to compare.</param>
         /// <returns>The result of the operator.</returns>
@@ -86,13 +102,16 @@ namespace Windows.UI.Xaml.Controls
             return !(left == right);
         }
 
-        /// <summary>Serves as a hash function for a particular type.</summary>
+        /// <summary>
+        /// Serves as a hash function for a particular type.
+        /// </summary>
         /// <returns>
-        /// A hash code for the current <see cref="T:System.Object" />.
+        /// A hash code for the current <see cref="T:System.Object"/>.
         /// </returns>
         public override int GetHashCode()
         {
-            return this.GetType().Name.GetHashCode();
+            return GetType().Name.GetHashCode();
         }
+        #endregion
     }
 }

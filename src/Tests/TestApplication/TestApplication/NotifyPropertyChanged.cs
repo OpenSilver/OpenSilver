@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TestApplication.OpenSilver
 {
-    public class NotifyPropertyChanged : INotifyPropertyChanged
+    public abstract class NotifyPropertyChanged : INotifyPropertyChanged
     {
         protected bool Set<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
         {
@@ -19,12 +19,10 @@ namespace TestApplication.OpenSilver
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        
         protected void RaisePropertyChanged([CallerMemberName] string propertyName = "")
         {
-            var changed = PropertyChanged;
-            if (changed == null) return;
-
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

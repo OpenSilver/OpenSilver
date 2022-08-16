@@ -1,16 +1,7 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System.Collections.Generic;
 using System.Globalization;
@@ -70,9 +61,9 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public string[] GetTimeParseFormats(CultureInfo culture)
         {
-            var formats = new List<string>(7) { Format };
+            List<string> formats = new List<string>(7) { Format };
 
-            var info = culture.DateTimeFormat;
+            DateTimeFormatInfo info = culture.DateTimeFormat;
             if (info != null)
             {
                 formats.Add(info.ShortTimePattern);
@@ -80,5 +71,69 @@ namespace Windows.UI.Xaml.Controls
             }
             return formats.ToArray();
         }
+
+        #region Equals and hashcode.
+        /// <summary>
+        /// Determines whether the specified <see cref="T:System.Object"/> is 
+        /// equal to the current <see cref="T:System.Object"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="T:System.Object"/> to compare 
+        /// with the current <see cref="T:System.Object"/>.</param>
+        /// <returns>
+        /// True if the specified <see cref="T:System.Object"/> is equal 
+        /// to the current <see cref="T:System.Object"/>; otherwise, false.
+        /// </returns>
+        /// <exception cref="T:System.NullReferenceException">
+        /// The <paramref name="obj"/> parameter is null.
+        /// </exception>
+        public override bool Equals(object obj)
+        {
+            CustomTimeFormat comparison = obj as CustomTimeFormat;
+            return comparison != null && comparison == this;
+        }
+
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
+        /// <param name="left">The left instance to compare.</param>
+        /// <param name="right">The right instance to compare.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator ==(CustomTimeFormat left, CustomTimeFormat right)
+        {
+            if ((object)left == null && (object)right == null)
+            {
+                return true;
+            }
+
+            if ((object)left == null || (object)right == null)
+            {
+                return false;
+            }
+
+            return left.Format == right.Format;
+        }
+
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
+        /// <param name="left">The left instance to compare.</param>
+        /// <param name="right">The right instance to compare.</param>
+        /// <returns>The result of the operator.</returns>
+        public static bool operator !=(CustomTimeFormat left, CustomTimeFormat right)
+        {
+            return !(left == right);
+        }
+
+        /// <summary>
+        /// Serves as a hash function for a particular type.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="T:System.Object"/>.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return Format.GetHashCode();
+        }
+        #endregion
     }
 }

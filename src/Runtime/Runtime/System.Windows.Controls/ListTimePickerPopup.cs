@@ -1,32 +1,29 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
-
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Automation;
 #else
 using Windows.System;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Automation;
+using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
+using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
 #endif
 
 #if MIGRATION
@@ -40,186 +37,224 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     /// <remarks>Can also be used independently.</remarks>
     /// <QualityBand>Preview</QualityBand>
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StatePressed, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+
+    [TemplateVisualState(Name = ContainedStateName, GroupName = ContainedByPickerGroupName)]
+    [TemplateVisualState(Name = NotContainedStateName, GroupName = ContainedByPickerGroupName)]
+
+    [TemplateVisualState(Name = AllowSecondsAndDesignatorsSelectionStateName, GroupName = PopupModeGroupName)]
+    [TemplateVisualState(Name = AllowTimeDesignatorsSelectionStateName, GroupName = PopupModeGroupName)]
+    [TemplateVisualState(Name = AllowSecondsSelectionStateName, GroupName = PopupModeGroupName)]
+    [TemplateVisualState(Name = HoursAndMinutesOnlyStateName, GroupName = PopupModeGroupName)]
+
+    [TemplatePart(Name = ListBoxPartName, Type = typeof(ListBox))]
+
     [StyleTypedProperty(Property = "ListBoxStyle", StyleTargetType = typeof(ListBox))]
     [StyleTypedProperty(Property = "ListBoxItemStyle", StyleTargetType = typeof(ListBoxItem))]
-    [TemplateVisualState(GroupName = "FocusStates", Name = "Unfocused")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Normal")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "MouseOver")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Pressed")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Disabled")]
-    [TemplateVisualState(GroupName = "FocusStates", Name = "Focused")]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "AllowSecondsAndDesignatorsSelection")]
-    [TemplateVisualState(GroupName = "ContainedByPickerStates", Name = "Contained")]
-    [TemplateVisualState(GroupName = "ContainedByPickerStates", Name = "NotContained")]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "AllowSecondsSelection")]
-    [TemplatePart(Name = "ListBox", Type = typeof(ListBox))]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "AllowTimeDesignatorsSelection")]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "HoursAndMinutesOnly")]
     public class ListTimePickerPopup : TimePickerPopup
     {
-        /// <summary>Identifies the ListBoxStyle dependency property.</summary>
-        public static readonly DependencyProperty ListBoxStyleProperty = DependencyProperty.Register(nameof(ListBoxStyle), typeof(Style), typeof(ListTimePickerPopup), new PropertyMetadata(new PropertyChangedCallback(ListTimePickerPopup.OnListBoxStylePropertyChanged)));
-        /// <summary>Identifies the ListBoxItemStyle dependency property.</summary>
-        public static readonly DependencyProperty ListBoxItemStyleProperty = DependencyProperty.Register(nameof(ListBoxItemStyle), typeof(Style), typeof(ListTimePickerPopup), new PropertyMetadata((object)null, new PropertyChangedCallback(ListTimePickerPopup.OnListBoxItemStylePropertyChanged)));
+#region Template Part Names
         /// <summary>
-        /// Identifies the TimeItemsSelection dependency property.
+        /// The name of the ListBox TemplatePart.
         /// </summary>
-        public static readonly DependencyProperty TimeItemsSelectionProperty = DependencyProperty.Register(nameof(TimeItemsSelection), typeof(ItemSelectionHelper<KeyValuePair<string, DateTime?>>), typeof(ListTimePickerPopup), new PropertyMetadata((object)null, new PropertyChangedCallback(ListTimePickerPopup.OnTimeItemsSelectionPropertyChanged)));
-        /// <summary>The name of the ListBox TemplatePart.</summary>
         internal const string ListBoxPartName = "ListBox";
-        /// <summary>BackingField for ListBoxPart.</summary>
+#endregion Template Part Names
+
+#region TemplateParts
+
+        /// <summary>
+        /// Gets the ListBox part.
+        /// </summary>
+        internal ListBox ListBoxPart
+        {
+            get { return _listBoxPart; }
+            private set
+            {
+                if (_listBoxPart != null)
+                {
+#if MIGRATION
+                    _listBoxPart.MouseLeftButtonUp -= ItemSelectedByMouse;
+#else
+                    _listBoxPart.PointerReleased -= ItemSelectedByMouse;
+#endif
+                    _listBoxPart.SelectionChanged -= RaiseAutomationPeerSelectionChanged;
+                }
+
+                _listBoxPart = value;
+
+                if (_listBoxPart != null)
+                {
+#if MIGRATION
+                    _listBoxPart.MouseLeftButtonUp += ItemSelectedByMouse;
+#else
+                    _listBoxPart.PointerReleased += ItemSelectedByMouse;
+#endif
+                    _listBoxPart.SelectionChanged += RaiseAutomationPeerSelectionChanged;
+                }
+            }
+        }
+
+        /// <summary>
+        /// BackingField for ListBoxPart.
+        /// </summary>
         private ListBox _listBoxPart;
+#endregion TemplateParts
+
         /// <summary>
         /// Determines whether the value changed because SelectedItem in the
         /// ListBox was changed.
         /// </summary>
         private bool _isValueChangeCausedBySelection;
+
+#region public Style ListBoxStyle
+        /// <summary>
+        /// Gets or sets the Style applied to the ListBox portion the 
+        /// ListTimePickerPopup control.
+        /// </summary>
+        public Style ListBoxStyle
+        {
+            get { return GetValue(ListBoxStyleProperty) as Style; }
+            set { SetValue(ListBoxStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the ListBoxStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ListBoxStyleProperty =
+            DependencyProperty.Register(
+                "ListBoxStyle",
+                typeof(Style),
+                typeof(ListTimePickerPopup),
+                new PropertyMetadata(OnListBoxStylePropertyChanged));
+
+        /// <summary>
+        /// ListBoxStyleProperty property changed handler.
+        /// </summary>
+        /// <param name="d">ListTimePickerPopup that changed its ListBoxStyle.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnListBoxStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+#endregion public Style ListBoxStyle
+
+#region public Style ListBoxItemStyle
+        /// <summary>
+        /// Gets or sets the Style applied to the ListBoxItems in the 
+        /// ListTimePickerPopup control.
+        /// </summary>
+        public Style ListBoxItemStyle
+        {
+            get { return GetValue(ListBoxItemStyleProperty) as Style; }
+            set { SetValue(ListBoxItemStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the ListBoxItemStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ListBoxItemStyleProperty =
+            DependencyProperty.Register(
+                "ListBoxItemStyle",
+                typeof(Style),
+                typeof(ListTimePickerPopup),
+                new PropertyMetadata(null, OnListBoxItemStylePropertyChanged));
+
+        /// <summary>
+        /// ListBoxItemStyleProperty property changed handler.
+        /// </summary>
+        /// <param name="d">ListTimePickerPopup that changed its ListBoxItemStyle.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnListBoxItemStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+#endregion public Style ListBoxItemStyle
+
+#region public ItemSelectionHelper<KeyValuePair<string, DateTime?>> TimeItemsSelection
         /// <summary>
         /// Indicates whether it is allowed to set the TimeItemsSelection property.
         /// </summary>
         private bool _allowWritingTimeItemsSelection;
 
-        /// <summary>Gets the ListBox part.</summary>
-        internal ListBox ListBoxPart
-        {
-            get
-            {
-                return this._listBoxPart;
-            }
-            private set
-            {
-                if (this._listBoxPart != null)
-                {
-#if MIGRATION
-                    this._listBoxPart.MouseLeftButtonUp -= this.ItemSelectedByMouse;
-#else
-                    this._listBoxPart.PointerReleased -= this.ItemSelectedByMouse;
-#endif
-                }
-                this._listBoxPart = value;
-                if (this._listBoxPart == null)
-                    return;
-
-#if MIGRATION
-                this._listBoxPart.MouseLeftButtonUp += this.ItemSelectedByMouse;
-#else
-                this._listBoxPart.PointerReleased += this.ItemSelectedByMouse;
-#endif
-            }
-        }
-
         /// <summary>
-        /// Gets or sets the Style applied to the ListBox portion the
-        /// ListTimePickerPopup control.
-        /// </summary>
-        public Style ListBoxStyle
-        {
-            get
-            {
-                return this.GetValue(ListTimePickerPopup.ListBoxStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(ListTimePickerPopup.ListBoxStyleProperty, (object)value);
-            }
-        }
-
-        /// <summary>ListBoxStyleProperty property changed handler.</summary>
-        /// <param name="d">ListTimePickerPopup that changed its ListBoxStyle.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnListBoxStylePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
-        {
-        }
-
-        /// <summary>
-        /// Gets or sets the Style applied to the ListBoxItems in the
-        /// ListTimePickerPopup control.
-        /// </summary>
-        public Style ListBoxItemStyle
-        {
-            get
-            {
-                return this.GetValue(ListTimePickerPopup.ListBoxItemStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(ListTimePickerPopup.ListBoxItemStyleProperty, (object)value);
-            }
-        }
-
-        /// <summary>ListBoxItemStyleProperty property changed handler.</summary>
-        /// <param name="d">ListTimePickerPopup that changed its ListBoxItemStyle.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnListBoxItemStylePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
-        {
-        }
-
-        /// <summary>
-        /// Gets the collection of times used in the ListBox portion of the
+        /// Gets the collection of times used in the ListBox portion of the 
         /// ListTimePickerPopup control.
         /// </summary>
         /// <value>The time items selection.</value>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Value is a nullable DateTime.")]
         public ItemSelectionHelper<KeyValuePair<string, DateTime?>> TimeItemsSelection
         {
-            get
-            {
-                return (ItemSelectionHelper<KeyValuePair<string, DateTime?>>)this.GetValue(ListTimePickerPopup.TimeItemsSelectionProperty);
-            }
+            get { return (ItemSelectionHelper<KeyValuePair<string, DateTime?>>)GetValue(TimeItemsSelectionProperty); }
             private set
             {
-                this._allowWritingTimeItemsSelection = true;
-                this.SetValue(ListTimePickerPopup.TimeItemsSelectionProperty, (object)value);
-                this._allowWritingTimeItemsSelection = false;
+                _allowWritingTimeItemsSelection = true;
+                SetValue(TimeItemsSelectionProperty, value);
+                _allowWritingTimeItemsSelection = false;
             }
-        }
-
-        /// <summary>TimeItemsSelectionProperty property changed handler.</summary>
-        /// <param name="d">ListTimePickerPopup that changed its TimeItemsSelection.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnTimeItemsSelectionPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
-        {
-            ListTimePickerPopup listTimePickerPopup = (ListTimePickerPopup)d;
-            ItemSelectionHelper<KeyValuePair<string, DateTime?>> oldValue = e.OldValue as ItemSelectionHelper<KeyValuePair<string, DateTime?>>;
-            ItemSelectionHelper<KeyValuePair<string, DateTime?>> newValue = e.NewValue as ItemSelectionHelper<KeyValuePair<string, DateTime?>>;
-            if (!listTimePickerPopup._allowWritingTimeItemsSelection)
-            {
-                listTimePickerPopup.TimeItemsSelection = oldValue;
-                throw new ArgumentException("Items Read Only");
-            }
-            listTimePickerPopup.TimeItemsSelectionPropertyChanged((INotifyPropertyChanged)oldValue, (INotifyPropertyChanged)newValue);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Windows.Controls.ListTimePickerPopup" /> class.
+        /// Identifies the TimeItemsSelection dependency property.
         /// </summary>
-        public ListTimePickerPopup()
-        {            
-            this.TimeItemsSelection = new ItemSelectionHelper<KeyValuePair<string, DateTime?>>()
+        public static readonly DependencyProperty TimeItemsSelectionProperty =
+            DependencyProperty.Register(
+                "TimeItemsSelection",
+                typeof(ItemSelectionHelper<KeyValuePair<string, DateTime?>>),
+                typeof(ListTimePickerPopup),
+                new PropertyMetadata(null, OnTimeItemsSelectionPropertyChanged));
+
+        /// <summary>
+        /// TimeItemsSelectionProperty property changed handler.
+        /// </summary>
+        /// <param name="d">ListTimePickerPopup that changed its TimeItemsSelection.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnTimeItemsSelectionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ListTimePickerPopup source = (ListTimePickerPopup)d;
+            ItemSelectionHelper<KeyValuePair<string, DateTime?>> oldValue = e.OldValue as ItemSelectionHelper<KeyValuePair<string, DateTime?>>;
+            ItemSelectionHelper<KeyValuePair<string, DateTime?>> newValue = e.NewValue as ItemSelectionHelper<KeyValuePair<string, DateTime?>>;
+
+            if (!source._allowWritingTimeItemsSelection)
+            {
+                // set back original value
+                source.TimeItemsSelection = oldValue;
+
+                throw new ArgumentException("Cannot set read-only property TimeItemsSelection.");
+            }
+
+            source.TimeItemsSelectionPropertyChanged(oldValue, newValue);
+        }
+#endregion public ItemSelectionHelper<KeyValuePair<string, DateTime?>> TimeItemsSelection
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ListTimePickerPopup"/> class.
+        /// </summary>
+        public ListTimePickerPopup() : base()
+        {
+            TimeItemsSelection = new ItemSelectionHelper<KeyValuePair<string, DateTime?>>
             {
                 Items = new ObservableCollection<KeyValuePair<string, DateTime?>>()
             };
-            this.DefaultStyleKey = (object)typeof(ListTimePickerPopup);
+
+            DefaultStyleKey = typeof(ListTimePickerPopup);
         }
 
         /// <summary>
-        /// Builds the visual tree for the ListTimePickerPopup control when a new
+        /// Builds the visual tree for the ListTimePickerPopup control when a new 
         /// template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
-        {
 #else
         protected override void OnApplyTemplate()
-        {
 #endif
+        {
             base.OnApplyTemplate();
-            this.ListBoxPart = this.GetTemplateChild("ListBox") as ListBox;
+
+            ListBoxPart = GetTemplateChild(ListBoxPartName) as ListBox;
         }
 
         /// <summary>
@@ -230,311 +265,351 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnValueChanged(e);
 
-            if (this.TimeItemsSelection.Items.Count == 0)
+            if ((e.OldValue.HasValue && e.NewValue.HasValue && e.OldValue.Value.Date != e.NewValue.Value.Date) ||
+                (!e.OldValue.HasValue && e.NewValue.HasValue))
             {
-                this.RegenerateTimeItems();
+                // generate a list based on the new datepart of this value.
+                RegenerateTimeItems();
             }
 
-            if (this.TimePickerParent != null || this._isValueChangeCausedBySelection)
+            // only select and scroll when not contained within TimePicker.
+            // TimePicker will call the OnOpened method where initialization can 
+            // be performed.
+            if (TimePickerParent == null && !_isValueChangeCausedBySelection)
             {
-                return;
+                SelectValue();
+                ScrollToSelectedValue();
             }
-
-            this.SelectValue();
-            this.ScrollToSelectedValue();
         }
 
-        /// <summary>Called when the Minimum property value has changed.</summary>
+        /// <summary>
+        /// Called when the Minimum property value has changed.
+        /// </summary>
         /// <param name="oldValue">Old value of the Minimum property.</param>
         /// <param name="newValue">New value of the Minimum property.</param>
         protected override void OnMinimumChanged(DateTime? oldValue, DateTime? newValue)
         {
             base.OnMinimumChanged(oldValue, newValue);
-            this.RegenerateTimeItems();
+
+            RegenerateTimeItems();
         }
 
-        /// <summary>Called when the Maximum property value has changed.</summary>
+        /// <summary>
+        /// Called when the Maximum property value has changed.
+        /// </summary>
         /// <param name="oldValue">Old value of the Maximum property.</param>
         /// <param name="newValue">New value of the Maximum property.</param>
         protected override void OnMaximumChanged(DateTime? oldValue, DateTime? newValue)
         {
             base.OnMaximumChanged(oldValue, newValue);
-            this.RegenerateTimeItems();
+
+            RegenerateTimeItems();
         }
 
-        /// <summary>Called when the culture changed.</summary>
+        /// <summary>
+        /// Called when the culture changed.
+        /// </summary>
         /// <param name="oldValue">The old value.</param>
         /// <param name="newValue">The new value.</param>
         protected override void OnCultureChanged(CultureInfo oldValue, CultureInfo newValue)
         {
             base.OnCultureChanged(oldValue, newValue);
-            this.RegenerateTimeItems();
+
+            RegenerateTimeItems();
         }
 
-        /// <summary>Called when format changed.</summary>
+        /// <summary>
+        /// Called when format changed.
+        /// </summary>
         /// <param name="oldValue">The old format.</param>
         /// <param name="newValue">The new format.</param>
         protected override void OnFormatChanged(ITimeFormat oldValue, ITimeFormat newValue)
         {
             base.OnFormatChanged(oldValue, newValue);
-            this.RegenerateTimeItems();
+
+            RegenerateTimeItems();
         }
 
-        /// <summary>Called when the popup minutes interval changed.</summary>
+        /// <summary>
+        /// Called when the popup minutes interval changed.
+        /// </summary>
         /// <param name="oldValue">The old value.</param>
         /// <param name="newValue">The new value.</param>
         protected override void OnPopupMinutesIntervalChanged(int oldValue, int newValue)
         {
             base.OnPopupMinutesIntervalChanged(oldValue, newValue);
-            this.RegenerateTimeItems();
+
+            RegenerateTimeItems();
         }
 
-        /// <summary>Called when the popup seconds interval changed.</summary>
+        /// <summary>
+        /// Called when the popup seconds interval changed.
+        /// </summary>
         /// <param name="oldValue">The old value.</param>
         /// <param name="newValue">The new value.</param>
         protected override void OnPopupSecondsIntervalChanged(int oldValue, int newValue)
         {
             base.OnPopupSecondsIntervalChanged(oldValue, newValue);
-            this.RegenerateTimeItems();
+
+            RegenerateTimeItems();
         }
 
-        /// <summary>Called when the time selection mode is changed.</summary>
+        /// <summary>
+        /// Called when the time selection mode is changed.
+        /// </summary>
         /// <param name="oldValue">The old value.</param>
         /// <param name="newValue">The new value.</param>
-        protected override void OnPopupTimeSelectionModeChanged(
-          PopupTimeSelectionMode oldValue,
-          PopupTimeSelectionMode newValue)
+        protected override void OnPopupTimeSelectionModeChanged(PopupTimeSelectionMode oldValue, PopupTimeSelectionMode newValue)
         {
             base.OnPopupTimeSelectionModeChanged(oldValue, newValue);
+
             if (newValue != PopupTimeSelectionMode.HoursAndMinutesOnly)
             {
-                this.SetValue(TimePickerPopup.PopupTimeSelectionModeProperty, (object)oldValue);
-                throw new ArgumentOutOfRangeException(nameof(newValue), string.Format((IFormatProvider)CultureInfo.InvariantCulture, "Invalid {0}", (object)newValue));
-            }
-        }
+                // revert to old value
+                SetValue(PopupTimeSelectionModeProperty, oldValue);
 
-        /// <summary>Regenerates the time items.</summary>
-        private void RegenerateTimeItems()
-        {
-            this.TimeItemsSelection.Items.Clear();
-            if (this.PopupMinutesInterval == 0)
-                return;
-            DateTime dateTime1;
-            DateTime dateTime2;
-            if (!this.Value.HasValue)
-            {
-                dateTime2 = new DateTime(1900, 1, 1);
-            }
-            else
-            {
-                dateTime1 = this.Value.Value;
-                dateTime2 = dateTime1.Date;
-            }
-            DateTime dateTime3 = dateTime2;
-            DateTime? nullable = this.Minimum;
-            DateTime dateTime4;
-            if (!nullable.HasValue)
-            {
-                dateTime4 = dateTime3;
-            }
-            else
-            {
-                ref DateTime local = ref dateTime3;
-                nullable = this.Minimum;
-                dateTime1 = nullable.Value;
-                TimeSpan timeOfDay = dateTime1.TimeOfDay;
-                dateTime4 = local.Add(timeOfDay);
-            }
-            DateTime dateTime5 = dateTime4;
-            nullable = this.Maximum;
-            DateTime dateTime6;
-            if (!nullable.HasValue)
-            {
-                dateTime1 = dateTime3.AddDays(1.0);
-                dateTime6 = dateTime1.Subtract(TimeSpan.FromMilliseconds(1.0));
-            }
-            else
-            {
-                ref DateTime local = ref dateTime3;
-                nullable = this.Maximum;
-                dateTime1 = nullable.Value;
-                TimeSpan timeOfDay = dateTime1.TimeOfDay;
-                dateTime6 = local.Add(timeOfDay);
-            }
-            DateTime dateTime7 = dateTime6;
-            TimeSpan timeSpan = new TimeSpan(0, 0, this.PopupMinutesInterval, 0);
-            while (dateTime3 <= dateTime7)
-            {
-                if (dateTime3 >= dateTime5)
-                    this.TimeItemsSelection.Items.Add(new KeyValuePair<string, DateTime?>(this.ActualTimeGlobalizationInfo.FormatTime(new DateTime?(dateTime3), this.ActualFormat), new DateTime?(dateTime3)));
-                dateTime3 += timeSpan;
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Invalid PopupTimeSelectionMode for this popup, value '{0}'.",
+                    newValue);
+
+                throw new ArgumentOutOfRangeException("newValue", message);
             }
         }
 
         /// <summary>
-        /// Select a value based on the current value. This will 'snap' the
+        /// Regenerates the time items.
+        /// </summary>
+        private void RegenerateTimeItems()
+        {
+            TimeItemsSelection.Items.Clear();
+
+            // validate
+            if (PopupMinutesInterval == 0)
+            {
+                // do not allow a zero interval.
+                return;
+            }
+
+            DateTime runningTime = Value.HasValue ? Value.Value.Date : new DateTime(1900, 1, 1);
+            DateTime startTime = Minimum.HasValue
+                                     ? runningTime.Add(Minimum.Value.TimeOfDay)
+                                     : runningTime;
+
+            DateTime endTime = Maximum.HasValue
+                                   ? runningTime.Add(Maximum.Value.TimeOfDay)
+                                   : runningTime.AddDays(1).Subtract(TimeSpan.FromMilliseconds(1));
+
+            // ListTimePickerPopup will disregard seconds.
+            TimeSpan increment = new TimeSpan(0, 0, PopupMinutesInterval, 0);
+
+            while (runningTime <= endTime)
+            {
+                if (runningTime >= startTime)
+                {
+                    TimeItemsSelection.Items.Add(new KeyValuePair<string, DateTime?>(ActualTimeGlobalizationInfo.FormatTime(runningTime, ActualFormat), runningTime));
+                }
+                runningTime += increment;
+            }
+        }
+
+        /// <summary>
+        /// Select a value based on the current value. This will 'snap' the 
         /// Value to the closest possible Time based on the interval.
         /// </summary>
         private void SelectValue()
         {
-            if (!this.Value.HasValue)
-                return;
-            this.TimeItemsSelection.SelectedItem = this.TimeItemsSelection.Items.Where<KeyValuePair<string, DateTime?>>((Func<KeyValuePair<string, DateTime?>, bool>)(item =>
+            if (Value.HasValue)
             {
-                DateTime dateTime = item.Value.Value;
-                TimeSpan timeOfDay1 = dateTime.TimeOfDay;
-                dateTime = this.Value.Value;
-                TimeSpan timeOfDay2 = dateTime.TimeOfDay;
-                return timeOfDay1 <= timeOfDay2;
-            })).OrderByDescending<KeyValuePair<string, DateTime?>, TimeSpan>((Func<KeyValuePair<string, DateTime?>, TimeSpan>)(item => item.Value.Value.TimeOfDay)).FirstOrDefault<KeyValuePair<string, DateTime?>>();
+                // select the item, or the closest to that item
+                KeyValuePair<string, DateTime?> scrollToItem = (from item in TimeItemsSelection.Items
+                                                                where
+                                                                    item.Value.Value.TimeOfDay <=
+                                                                    Value.Value.TimeOfDay
+                                                                orderby item.Value.Value.TimeOfDay descending
+                                                                select item).FirstOrDefault();
+                // select this item.
+                TimeItemsSelection.SelectedItem = scrollToItem;
+            }
         }
 
-        /// <summary>Scrolls to a value in the list, or closest.</summary>
+        /// <summary>
+        /// Scrolls to a value in the list, or closest.
+        /// </summary>
         private void ScrollToSelectedValue()
         {
-            if (this.ListBoxPart == null || !this.ListBoxPart.Items.Contains((object)this.TimeItemsSelection.SelectedItem))
+            if (ListBoxPart == null)
+            {
                 return;
-            this.ListBoxPart.UpdateLayout();
-            this.ListBoxPart.ScrollIntoView(this.ListBoxPart.Items[this.ListBoxPart.Items.Count - 1]);
-            this.ListBoxPart.UpdateLayout();
-            this.ListBoxPart.ScrollIntoView((object)this.TimeItemsSelection.SelectedItem);
+            }
+
+            if (ListBoxPart.Items.Contains(TimeItemsSelection.SelectedItem))
+            {
+                // scroll to last item
+                ListBoxPart.UpdateLayout();
+                ListBoxPart.ScrollIntoView(ListBoxPart.Items[ListBoxPart.Items.Count - 1]);
+
+                // scroll to that item
+                // because we've already scrolled to the last item, 
+                // this scroll will put the item at the top of the ListBox
+                ListBoxPart.UpdateLayout();
+                ListBoxPart.ScrollIntoView(TimeItemsSelection.SelectedItem);
+            }
         }
 
-        /// <summary>Called when the TimeItems object is set.</summary>
+        /// <summary>
+        /// Called when the TimeItems object is set.
+        /// </summary>
         /// <param name="oldValue">The old value.</param>
         /// <param name="newValue">The new value.</param>
-        private void TimeItemsSelectionPropertyChanged(
-          INotifyPropertyChanged oldValue,
-          INotifyPropertyChanged newValue)
+        private void TimeItemsSelectionPropertyChanged(INotifyPropertyChanged oldValue, INotifyPropertyChanged newValue)
         {
             if (oldValue != null)
-                oldValue.PropertyChanged -= new PropertyChangedEventHandler(this.TimeItemsPropertyChanged);
-            if (newValue == null)
-                return;
-            newValue.PropertyChanged += new PropertyChangedEventHandler(this.TimeItemsPropertyChanged);
+            {
+                oldValue.PropertyChanged -= TimeItemsPropertyChanged;
+            }
+
+            if (newValue != null)
+            {
+                newValue.PropertyChanged += TimeItemsPropertyChanged;
+            }
         }
 
         /// <summary>
         /// Called by any property change on the TimeItems object.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="T:System.ComponentModel.PropertyChangedEventArgs" /> instance containing the event data.</param>
+        /// <param name="e">The <see cref="PropertyChangedEventArgs"/> instance containing the event data.</param>
         private void TimeItemsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!(e.PropertyName == "SelectedItem") || !this.TimeItemsSelection.Items.Contains(this.TimeItemsSelection.SelectedItem))
-                return;
-            this._isValueChangeCausedBySelection = true;
-            try
+            if (e.PropertyName == ItemSelectionHelper<KeyValuePair<string, DateTime?>>.SelectedItemName)
             {
-                this.Value = this.TimeItemsSelection.SelectedItem.Value;
-            }
-            finally
-            {
-                this._isValueChangeCausedBySelection = false;
+                if (TimeItemsSelection.Items.Contains(TimeItemsSelection.SelectedItem))
+                {
+                    _isValueChangeCausedBySelection = true;
+                    try
+                    {
+                        Value = TimeItemsSelection.SelectedItem.Value;
+                    }
+                    finally
+                    {
+                        _isValueChangeCausedBySelection = false;
+                    }
+                }
             }
         }
 
-        /// <summary>Called when TimePicker opened the popup.</summary>
+        /// <summary>
+        /// Called when TimePicker opened the popup.
+        /// </summary>
         /// <remarks>Called before the TimePicker reacts to value changes.
         /// This is done so that the Popup can 'snap' to a specific value without
         /// changing the selected value in the TimePicker.</remarks>
         public override void OnOpened()
         {
             base.OnOpened();
-            this.UpdateLayout();
 
-            if (TimeItemsSelection.Items.Count == 0)
-            {
-                this.RegenerateTimeItems();
-            }
-
-            this.SelectValue();
-            this.ScrollToSelectedValue();
+            UpdateLayout();
+            RegenerateTimeItems();
+            SelectValue();
+            ScrollToSelectedValue();
         }
 
         /// <summary>
         /// Handles the MouseLeftButtonUp event of the ListBoxPart control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="T:System.Windows.Input.MouseButtonEventArgs" /> instance containing the event data.</param>
-        private void ItemSelectedByMouse(object sender,
-#if MIGRATION
-            MouseButtonEventArgs e)
-#else
-            PointerRoutedEventArgs e)
-#endif
+        /// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
+        private void ItemSelectedByMouse(object sender, MouseButtonEventArgs e)
         {
-            if (this.TimePickerParent != null)
+            // there is a scenario where timepickerParent has never received the 
+            // valuechanged event: when the picker has a value that is not
+            // in the list and the user is selecting the first value in the list
+            // which was pre-selected.
+            // scenario: 4:15 was entered, popup opened and preselected
+            // 4:00 (closest). User picks 4:00.
+            if (TimePickerParent != null)
             {
-                DateTime? nullable = this.TimePickerParent.Value;
-                int num;
-                if (nullable.HasValue)
+                if (TimePickerParent.Value.HasValue == false ||
+                    (TimePickerParent.Value.HasValue && TimePickerParent.Value.Value.TimeOfDay != Value.Value.TimeOfDay))
                 {
-                    nullable = this.TimePickerParent.Value;
-                    if (nullable.HasValue)
-                    {
-                        nullable = this.TimePickerParent.Value;
-                        DateTime dateTime = nullable.Value;
-                        TimeSpan timeOfDay1 = dateTime.TimeOfDay;
-                        nullable = this.Value;
-                        dateTime = nullable.Value;
-                        TimeSpan timeOfDay2 = dateTime.TimeOfDay;
-                        num = !(timeOfDay1 != timeOfDay2) ? 1 : 0;
-                    }
-                    else
-                        num = 1;
+                    TimePickerParent.Value = Value;
                 }
-                else
-                    num = 0;
-                if (num == 0)
-                    this.TimePickerParent.Value = this.Value;
             }
-            this.DoCommit();
+
+            DoCommit();
         }
 
-        /// <summary>Provides handling for the KeyDown event.</summary>
+        /// <summary>
+        /// Provides handling for the KeyDown event.
+        /// </summary>
         /// <param name="e">The data for the event.</param>
-#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
-#else
-        protected override void OnKeyDown(KeyRoutedEventArgs e)
-#endif
         {
             base.OnKeyDown(e);
+
+            switch (e.Key)
+            {
 #if MIGRATION
-            switch (e.Key)
-            {
                 case Key.Enter:
-                    this.DoCommit();
-                    break;
-                case Key.Escape:
-                    this.DoCancel();
-                    break;
-            }
 #else
-            switch (e.Key)
-            {
                 case VirtualKey.Enter:
-                    this.DoCommit();
-                    break;
+#endif
+                    {
+                        DoCommit();
+                        break;
+                    }
+#if MIGRATION
+                case Key.Escape:
+#else
                 case VirtualKey.Escape:
-                    this.DoCancel();
+#endif
+                    {
+                        DoCancel();
+                        break;
+                    }
+                default:
                     break;
             }
-#endif
         }
 
-        /// <summary>Gets the valid popup time selection modes.</summary>
+        /// <summary>
+        /// Gets the valid popup time selection modes.
+        /// </summary>
         /// <returns>
         /// An array of PopupTimeSelectionModes that are supported by
         /// the Popup.
         /// </returns>
         internal override PopupTimeSelectionMode[] GetValidPopupTimeSelectionModes()
         {
-            return new PopupTimeSelectionMode[1]
+            return new[] { PopupTimeSelectionMode.HoursAndMinutesOnly };
+        }
+
+        /// <summary>
+        /// Creates the automation peer.
+        /// </summary>
+        /// <returns>The ListTimePickerPopupAutomationPeer for this instance.</returns>
+        protected override TimePickerPopupAutomationPeer CreateAutomationPeer()
+        {
+            return new ListTimePickerPopupAutomationPeer(this);
+        }
+
+        /// <summary>
+        /// Raises the automation peer selection changed event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="SelectionChangedEventArgs"/> instance containing the event data.</param>
+        private void RaiseAutomationPeerSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // the selection has changed, let automation know
+            AutomationPeer peer = FrameworkElementAutomationPeer.CreatePeerForElement(this);
+            if (peer != null)
             {
-        PopupTimeSelectionMode.HoursAndMinutesOnly
-            };
+                // we are single select
+                object oldValue = e.RemovedItems.Count == 1 ? e.RemovedItems[0] : String.Empty;
+                object newValue = e.AddedItems.Count == 1 ? e.AddedItems[0] : String.Empty;
+                peer.RaisePropertyChangedEvent(SelectionPatternIdentifiers.SelectionProperty, oldValue, newValue);
+            }
         }
     }
 }

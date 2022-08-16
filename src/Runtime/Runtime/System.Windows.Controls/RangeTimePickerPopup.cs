@@ -1,370 +1,497 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
+using System;
+using System.Linq;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-
-namespace System.Windows.Controls
 #else
-using System;
-using Windows.Foundation;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+#endif
 
+#if MIGRATION
+namespace System.Windows.Controls
+#else
 namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Represents a time picker popup that allows choosing time through 3
+    /// Represents a time picker popup that allows choosing time through 3 
     /// sliders: Hours, Minutes and seconds.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [StyleTypedProperty(Property = "TimeButtonStyle", StyleTargetType = typeof(Button))]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StatePressed, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+
+    [TemplateVisualState(Name = ContainedStateName, GroupName = ContainedByPickerGroupName)]
+    [TemplateVisualState(Name = NotContainedStateName, GroupName = ContainedByPickerGroupName)]
+
+    [TemplateVisualState(Name = AllowSecondsAndDesignatorsSelectionStateName, GroupName = PopupModeGroupName)]
+    [TemplateVisualState(Name = AllowTimeDesignatorsSelectionStateName, GroupName = PopupModeGroupName)]
+    [TemplateVisualState(Name = AllowSecondsSelectionStateName, GroupName = PopupModeGroupName)]
+    [TemplateVisualState(Name = HoursAndMinutesOnlyStateName, GroupName = PopupModeGroupName)]
+
+    [TemplatePart(Name = CommitButtonPartName, Type = typeof(ButtonBase))]
+    [TemplatePart(Name = CancelButtonPartName, Type = typeof(ButtonBase))]
+
+    [TemplatePart(Name = HoursContainerPartName, Type = typeof(Panel))]
+    [TemplatePart(Name = MinutesContainerPartName, Type = typeof(Panel))]
+    [TemplatePart(Name = SecondsContainerPartName, Type = typeof(Panel))]
+    [TemplatePart(Name = HoursSliderPartName, Type = typeof(RangeBase))]
+    [TemplatePart(Name = MinutesSliderPartName, Type = typeof(RangeBase))]
+    [TemplatePart(Name = SecondsSliderPartName, Type = typeof(RangeBase))]
     [StyleTypedProperty(Property = "SliderStyle", StyleTargetType = typeof(RangeBase))]
-    [TemplatePart(Name = "SecondsSlider", Type = typeof(RangeBase))]
-    [TemplateVisualState(GroupName = "ContainedByPickerStates", Name = "NotContained")]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "AllowSecondsAndDesignatorsSelection")]
-    [TemplatePart(Name = "SecondsPanel", Type = typeof(Panel))]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Normal")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "MouseOver")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Pressed")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Disabled")]
-    [TemplateVisualState(GroupName = "FocusStates", Name = "Focused")]
-    [TemplateVisualState(GroupName = "FocusStates", Name = "Unfocused")]
-    [TemplateVisualState(GroupName = "ContainedByPickerStates", Name = "Contained")]
-    [TemplatePart(Name = "HoursSlider", Type = typeof(RangeBase))]
-    [TemplatePart(Name = "MinutesSlider", Type = typeof(RangeBase))]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "AllowTimeDesignatorsSelection")]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "AllowSecondsSelection")]
-    [TemplateVisualState(GroupName = "PopupModeStates", Name = "HoursAndMinutesOnly")]
-    [TemplatePart(Name = "Commit", Type = typeof(ButtonBase))]
-    [TemplatePart(Name = "Cancel", Type = typeof(ButtonBase))]
-    [TemplatePart(Name = "HoursPanel", Type = typeof(Panel))]
-    [TemplatePart(Name = "MinutesPanel", Type = typeof(Panel))]
+    [StyleTypedProperty(Property = "TimeButtonStyle", StyleTargetType = typeof(Button))]
     public class RangeTimePickerPopup : TimePickerPopup
     {
-        /// <summary>Identifies the SliderStyle dependency property.</summary>
-        public static readonly DependencyProperty SliderStyleProperty = DependencyProperty.Register(nameof(SliderStyle), typeof(Style), typeof(RangeTimePickerPopup), new PropertyMetadata((object)null, new PropertyChangedCallback(RangeTimePickerPopup.OnSliderStylePropertyChanged)));
-        /// <summary>Identifies the TimeButtonStyle dependency property.</summary>
-        public static readonly DependencyProperty TimeButtonStyleProperty = DependencyProperty.Register(nameof(TimeButtonStyle), typeof(Style), typeof(RangeTimePickerPopup), new PropertyMetadata((object)null, new PropertyChangedCallback(RangeTimePickerPopup.OnTimeButtonStylePropertyChanged)));
-        /// <summary>The HoursSliderPartName.</summary>
-        private const string HoursSliderPartName = "HoursSlider";
-        /// <summary>The MinutesSliderPartName.</summary>
-        private const string MinutesSliderPartName = "MinutesSlider";
-        /// <summary>The SecondsSliderPartName.</summary>
-        private const string SecondsSliderPartName = "SecondsSlider";
-        /// <summary>The HoursLabelsPartName.</summary>
-        private const string HoursContainerPartName = "HoursPanel";
-        /// <summary>The MinutesLabelsPartName.</summary>
-        private const string MinutesContainerPartName = "MinutesPanel";
-        /// <summary>The SecondsLabelsPartName.</summary>
-        private const string SecondsContainerPartName = "SecondsPanel";
-        /// <summary>The name of the CommitButton TemplatePart.</summary>
-        private const string CommitButtonPartName = "Commit";
-        /// <summary>The name of the CancelButton TemplatePart.</summary>
-        private const string CancelButtonPartName = "Cancel";
-        /// <summary>BackingField for the SecondsSlider.</summary>
-        private RangeBase _secondsSlider;
-        /// <summary>BackingField for the MinutesSlider.</summary>
-        private RangeBase _minutesSlider;
-        /// <summary>BackingField for the HoursSlider.</summary>
-        private RangeBase _hoursSlider;
-        /// <summary>BackingField for CancelButtonPart.</summary>
-        private ButtonBase _cancelButtonPart;
-        /// <summary>BackingField for CommitButtonPart.</summary>
-        private ButtonBase _commitButtonPart;
-        /// <summary>Is set when opened or closed by a container.</summary>
-        private bool _isOpenedByContainer;
+#region TemplatePartNames
         /// <summary>
-        /// Determines whether the control should ignore the changes in its
-        /// sliders.
+        /// The HoursSliderPartName.
         /// </summary>
-        private bool _ignoreSliderChange;
+        private const string HoursSliderPartName = "HoursSlider";
 
-        /// <summary>Gets or sets the seconds slider Part.</summary>
+        /// <summary>
+        /// The MinutesSliderPartName.
+        /// </summary>
+        private const string MinutesSliderPartName = "MinutesSlider";
+
+        /// <summary>
+        /// The SecondsSliderPartName.
+        /// </summary>
+        private const string SecondsSliderPartName = "SecondsSlider";
+
+        /// <summary>
+        /// The HoursLabelsPartName.
+        /// </summary>
+        private const string HoursContainerPartName = "HoursPanel";
+
+        /// <summary>
+        /// The MinutesLabelsPartName.
+        /// </summary>
+        private const string MinutesContainerPartName = "MinutesPanel";
+
+        /// <summary>
+        /// The SecondsLabelsPartName.
+        /// </summary>
+        private const string SecondsContainerPartName = "SecondsPanel";
+
+        /// <summary>
+        /// The name of the CommitButton TemplatePart.
+        /// </summary>
+        private const string CommitButtonPartName = "Commit";
+
+        /// <summary>
+        /// The name of the CancelButton TemplatePart.
+        /// </summary>
+        private const string CancelButtonPartName = "Cancel";
+#endregion
+
+#region TemplateParts
+
+        /// <summary>
+        /// Gets or sets the seconds slider Part.
+        /// </summary>
         private RangeBase SecondsSlider
         {
-            get
-            {
-                return this._secondsSlider;
-            }
+            get { return _secondsSlider; }
             set
             {
-                if (this._secondsSlider != null)
+                if (_secondsSlider != null)
                 {
-                    this._secondsSlider.ValueChanged -= this.SecondsChanged;
-                    this._secondsSlider.SizeChanged -= this.SliderSizeChange;
+                    _secondsSlider.ValueChanged -= SecondsChanged;
+                    _secondsSlider.SizeChanged -= SliderSizeChange;
                 }
-                this._secondsSlider = value;
-                if (this._secondsSlider == null)
-                    return;
-                this._secondsSlider.ValueChanged += this.SecondsChanged;
-                this._secondsSlider.SizeChanged += this.SliderSizeChange;
+
+                _secondsSlider = value;
+
+                if (_secondsSlider != null)
+                {
+                    _secondsSlider.ValueChanged += SecondsChanged;
+                    _secondsSlider.SizeChanged += SliderSizeChange;
+                }
             }
         }
 
-        /// <summary>Gets or sets the minutes slider.</summary>
+        /// <summary>
+        /// BackingField for the SecondsSlider.
+        /// </summary>
+        private RangeBase _secondsSlider;
+
+        /// <summary>
+        /// Gets or sets the minutes slider.
+        /// </summary>
         private RangeBase MinutesSlider
         {
-            get
-            {
-                return this._minutesSlider;
-            }
+            get { return _minutesSlider; }
             set
             {
-                if (this._minutesSlider != null)
+                if (_minutesSlider != null)
                 {
-                    this._minutesSlider.ValueChanged -= this.MinutesChanged;
-                    this._minutesSlider.SizeChanged -= this.SliderSizeChange;
+                    _minutesSlider.ValueChanged -= MinutesChanged;
+                    _minutesSlider.SizeChanged -= SliderSizeChange;
                 }
-                this._minutesSlider = value;
-                if (this._minutesSlider == null)
-                    return;
-                this._minutesSlider.ValueChanged += this.MinutesChanged;
-                this._minutesSlider.SizeChanged += this.SliderSizeChange;
+
+                _minutesSlider = value;
+
+                if (_minutesSlider != null)
+                {
+                    _minutesSlider.ValueChanged += MinutesChanged;
+                    _minutesSlider.SizeChanged += SliderSizeChange;
+                }
             }
         }
 
-        /// <summary>Gets or sets the HoursSlider.</summary>
+        /// <summary>
+        /// BackingField for the MinutesSlider.
+        /// </summary>
+        private RangeBase _minutesSlider;
+
+        /// <summary>
+        /// Gets or sets the HoursSlider.
+        /// </summary>
         private RangeBase HoursSlider
         {
-            get
-            {
-                return this._hoursSlider;
-            }
+            get { return _hoursSlider; }
             set
             {
-                if (this._hoursSlider != null)
+                if (_hoursSlider != null)
                 {
-                    this._hoursSlider.ValueChanged -= this.HoursChanged;
-                    this._hoursSlider.SizeChanged -= this.SliderSizeChange;
+                    _hoursSlider.ValueChanged -= HoursChanged;
+                    _hoursSlider.SizeChanged -= SliderSizeChange;
                 }
-                this._hoursSlider = value;
-                if (this._hoursSlider == null)
-                    return;
-                this._hoursSlider.ValueChanged += this.HoursChanged;
-                this._hoursSlider.SizeChanged += this.SliderSizeChange;
+
+                _hoursSlider = value;
+
+                if (_hoursSlider != null)
+                {
+                    _hoursSlider.ValueChanged += HoursChanged;
+                    _hoursSlider.SizeChanged += SliderSizeChange;
+                }
             }
         }
 
-        /// <summary>Gets or sets the hours labels.</summary>
+        /// <summary>
+        /// BackingField for the HoursSlider.
+        /// </summary>
+        private RangeBase _hoursSlider;
+
+        /// <summary>
+        /// Gets or sets the hours labels.
+        /// </summary>
         /// <value>The hours labels.</value>
         private Panel HoursContainer { get; set; }
 
-        /// <summary>Gets or sets the minute labels.</summary>
+        /// <summary>
+        /// Gets or sets the minute labels.
+        /// </summary>
         /// <value>The minute labels.</value>
         private Panel MinutesContainer { get; set; }
 
-        /// <summary>Gets or sets the second labels.</summary>
+        /// <summary>
+        /// Gets or sets the second labels.
+        /// </summary>
         /// <value>The second labels.</value>
         private Panel SecondsContainer { get; set; }
 
-        /// <summary>Gets or sets the cancel button part.</summary>
+        /// <summary>
+        /// Gets or sets the cancel button part.
+        /// </summary>
         /// <value>The cancel button part.</value>
         private ButtonBase CancelButtonPart
         {
-            get
-            {
-                return this._cancelButtonPart;
-            }
+            get { return _cancelButtonPart; }
             set
             {
-                if (this._cancelButtonPart != null)
-                    this._cancelButtonPart.Click -= new RoutedEventHandler(this.OnCancel);
-                this._cancelButtonPart = value;
-                if (this._cancelButtonPart == null)
-                    return;
-                this._cancelButtonPart.Click += new RoutedEventHandler(this.OnCancel);
+                if (_cancelButtonPart != null)
+                {
+                    _cancelButtonPart.Click -= OnCancel;
+                }
+                _cancelButtonPart = value;
+                if (_cancelButtonPart != null)
+                {
+                    _cancelButtonPart.Click += OnCancel;
+                }
             }
         }
 
-        /// <summary>Gets or sets the commit button part.</summary>
+        /// <summary>
+        /// BackingField for CancelButtonPart.
+        /// </summary>
+        private ButtonBase _cancelButtonPart;
+
+        /// <summary>
+        /// Gets or sets the commit button part.
+        /// </summary>
         private ButtonBase CommitButtonPart
         {
-            get
-            {
-                return this._commitButtonPart;
-            }
+            get { return _commitButtonPart; }
             set
             {
-                if (this._commitButtonPart != null)
-                    this._commitButtonPart.Click -= new RoutedEventHandler(this.OnCommit);
-                this._commitButtonPart = value;
-                if (this._commitButtonPart == null)
-                    return;
-                this._commitButtonPart.Click += new RoutedEventHandler(this.OnCommit);
+                if (_commitButtonPart != null)
+                {
+                    _commitButtonPart.Click -= OnCommit;
+                }
+                _commitButtonPart = value;
+                if (_commitButtonPart != null)
+                {
+                    _commitButtonPart.Click += OnCommit;
+                }
             }
         }
+
+        /// <summary>
+        /// BackingField for CommitButtonPart.
+        /// </summary>
+        private ButtonBase _commitButtonPart;
+#endregion
 
         /// <summary>
         /// Gets a value indicating whether this instance is currently open.
         /// </summary>
-        /// <value><c>True</c> if this instance is currently open;
+        /// <value><c>True</c> if this instance is currently open; 
         /// otherwise, <c>false</c>.</value>
         private bool IsCurrentlyOpen
         {
             get
             {
-                return this.TimePickerParent == null || this._isOpenedByContainer;
+                if (TimePickerParent == null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return _isOpenedByContainer;
+                }
             }
         }
 
         /// <summary>
-        /// Gets or sets the Style applied to the sliders in the
+        /// Is set when opened or closed by a container.
+        /// </summary>
+        private bool _isOpenedByContainer;
+
+        /// <summary>
+        /// Determines whether the control should ignore the changes in its 
+        /// sliders.
+        /// </summary>
+        private bool _ignoreSliderChange;
+
+#region public Style SliderStyle
+        /// <summary>
+        /// Gets or sets the Style applied to the sliders in the 
         /// RangeTimePickerPopup control.
         /// </summary>
         public Style SliderStyle
         {
-            get
-            {
-                return this.GetValue(RangeTimePickerPopup.SliderStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(RangeTimePickerPopup.SliderStyleProperty, (object)value);
-            }
+            get { return GetValue(SliderStyleProperty) as Style; }
+            set { SetValue(SliderStyleProperty, value); }
         }
 
-        /// <summary>SliderStyleProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the SliderStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SliderStyleProperty =
+            DependencyProperty.Register(
+                "SliderStyle",
+                typeof(Style),
+                typeof(RangeTimePickerPopup),
+                new PropertyMetadata(null, OnSliderStylePropertyChanged));
+
+        /// <summary>
+        /// SliderStyleProperty property changed handler.
+        /// </summary>
         /// <param name="d">RangeTimePickerPopup that changed its SliderStyle.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnSliderStylePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnSliderStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
         }
+#endregion public Style SliderStyle
 
+#region public Style TimeButtonStyle
         /// <summary>
         /// Gets or sets the Style applied to the buttons that represent
         /// hours, minutes and seconds.
         /// </summary>
         public Style TimeButtonStyle
         {
-            get
-            {
-                return this.GetValue(RangeTimePickerPopup.TimeButtonStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(RangeTimePickerPopup.TimeButtonStyleProperty, (object)value);
-            }
-        }
-
-        /// <summary>TimeButtonStyleProperty property changed handler.</summary>
-        /// <param name="d">RangeTimePickerPopup that changed its TimeButtonStyle.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnTimeButtonStylePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
-        {
+            get { return GetValue(TimeButtonStyleProperty) as Style; }
+            set { SetValue(TimeButtonStyleProperty, value); }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Windows.Controls.RangeTimePickerPopup" /> class.
+        /// Identifies the TimeButtonStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TimeButtonStyleProperty =
+            DependencyProperty.Register(
+                "TimeButtonStyle",
+                typeof(Style),
+                typeof(RangeTimePickerPopup),
+                new PropertyMetadata(null, OnTimeButtonStylePropertyChanged));
+
+        /// <summary>
+        /// TimeButtonStyleProperty property changed handler.
+        /// </summary>
+        /// <param name="d">RangeTimePickerPopup that changed its TimeButtonStyle.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnTimeButtonStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+#endregion public Style TimeButtonStyle
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RangeTimePickerPopup"/> class.
         /// </summary>
         public RangeTimePickerPopup()
         {
-            this.DefaultStyleKey = (object)typeof(RangeTimePickerPopup);
+            DefaultStyleKey = typeof(RangeTimePickerPopup);
         }
 
         /// <summary>
-        /// Builds the visual tree for the RangeTimePickerPopup control when a
+        /// Builds the visual tree for the RangeTimePickerPopup control when a 
         /// new template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
-        {
 #else
         protected override void OnApplyTemplate()
-        {
 #endif
+        {
             base.OnApplyTemplate();
-            this.HoursSlider = this.GetTemplateChild("HoursSlider") as RangeBase;
-            this.MinutesSlider = this.GetTemplateChild("MinutesSlider") as RangeBase;
-            this.SecondsSlider = this.GetTemplateChild("SecondsSlider") as RangeBase;
-            this.HoursContainer = this.GetTemplateChild("HoursPanel") as Panel;
-            this.MinutesContainer = this.GetTemplateChild("MinutesPanel") as Panel;
-            this.SecondsContainer = this.GetTemplateChild("SecondsPanel") as Panel;
-            this.CommitButtonPart = this.GetTemplateChild("Commit") as ButtonBase;
-            this.CancelButtonPart = this.GetTemplateChild("Cancel") as ButtonBase;
-            this.GenerateLabels();
+
+            HoursSlider = GetTemplateChild(HoursSliderPartName) as RangeBase;
+            MinutesSlider = GetTemplateChild(MinutesSliderPartName) as RangeBase;
+            SecondsSlider = GetTemplateChild(SecondsSliderPartName) as RangeBase;
+
+            HoursContainer = GetTemplateChild(HoursContainerPartName) as Panel;
+            MinutesContainer = GetTemplateChild(MinutesContainerPartName) as Panel;
+            SecondsContainer = GetTemplateChild(SecondsContainerPartName) as Panel;
+
+            CommitButtonPart = GetTemplateChild(CommitButtonPartName) as ButtonBase;
+            CancelButtonPart = GetTemplateChild(CancelButtonPartName) as ButtonBase;
+
+            GenerateLabels();
         }
 
-        /// <summary>Called when a slider changes size.</summary>
+#region Reactive
+        /// <summary>
+        /// Called when a slider changes size.
+        /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="T:System.Windows.SizeChangedEventArgs" />
+        /// <param name="e">The <see cref="System.Windows.SizeChangedEventArgs"/> 
         /// instance containing the event data.</param>
         private void SliderSizeChange(object sender, SizeChangedEventArgs e)
         {
-            this.LayoutLabels();
+            LayoutLabels();
         }
 
-        /// <summary>Reacts to a change in the Seconds Slider.</summary>
+        /// <summary>
+        /// Reacts to a change in the Seconds Slider.
+        /// </summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
-        private void SecondsChanged(object sender,
 #if MIGRATION
-            RoutedPropertyChangedEventArgs<double> e)
+        private void SecondsChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 #else
-            RangeBaseValueChangedEventArgs e)
+        private void SecondsChanged(object sender, RangeBaseValueChangedEventArgs e)
 #endif
         {
-            if (this._ignoreSliderChange)
+            if (_ignoreSliderChange)
+            {
                 return;
-            DateTime valueFromSliders = this.GetValueFromSliders();
-            this._ignoreSliderChange = true;
-            this.SecondsSlider.Value = e.OldValue;
-            this._ignoreSliderChange = false;
-            this.Value = new DateTime?(this.GetCoercedValue(new DateTime(valueFromSliders.Year, valueFromSliders.Month, valueFromSliders.Day, valueFromSliders.Hour, valueFromSliders.Minute, RangeTimePickerPopup.GetSnappedValue(e.NewValue, 0, 59, Math.Max(1, this.PopupSecondsInterval)))));
+            }
+
+            DateTime sliderValue = GetValueFromSliders();
+
+            // restore the old value (snapping behavior)
+            _ignoreSliderChange = true;
+            SecondsSlider.Value = e.OldValue;
+            _ignoreSliderChange = false;
+
+            // setting value to the snapped time will set sliders accordingly.
+            Value = GetCoercedValue(new DateTime(
+                                        sliderValue.Year,
+                                        sliderValue.Month,
+                                        sliderValue.Day,
+                                        sliderValue.Hour,
+                                        sliderValue.Minute,
+                                        GetSnappedValue(e.NewValue, 0, 59, Math.Max(1, PopupSecondsInterval))));
         }
 
-        /// <summary>Reacts to a change in the Minutes Slider.</summary>
+        /// <summary>
+        /// Reacts to a change in the Minutes Slider.
+        /// </summary>
         /// <param name="sender">The Slider that changed its value.</param>
-        /// <param name="e">The instance containing the event data.</param>
-        private void MinutesChanged(object sender,
+        /// <param name="e">The instance containing the event data.</param>        
 #if MIGRATION
-            RoutedPropertyChangedEventArgs<double> e)
+        private void MinutesChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 #else
-            RangeBaseValueChangedEventArgs e)
+        private void MinutesChanged(object sender, RangeBaseValueChangedEventArgs e)
 #endif
         {
-            if (this._ignoreSliderChange)
+            if (_ignoreSliderChange)
+            {
                 return;
-            DateTime valueFromSliders = this.GetValueFromSliders();
-            this._ignoreSliderChange = true;
-            this.MinutesSlider.Value = e.OldValue;
-            this._ignoreSliderChange = false;
-            this.Value = new DateTime?(this.GetCoercedValue(new DateTime(valueFromSliders.Year, valueFromSliders.Month, valueFromSliders.Day, valueFromSliders.Hour, RangeTimePickerPopup.GetSnappedValue(e.NewValue, 0, 59, Math.Max(1, this.PopupMinutesInterval)), valueFromSliders.Second)));
+            }
+
+            DateTime sliderValue = GetValueFromSliders();
+
+            // restore the old value (snapping behavior)
+            _ignoreSliderChange = true;
+            MinutesSlider.Value = e.OldValue;
+            _ignoreSliderChange = false;
+
+            // setting value to the snapped time will set sliders accordingly.
+            Value = GetCoercedValue(new DateTime(
+                                        sliderValue.Year,
+                                        sliderValue.Month,
+                                        sliderValue.Day,
+                                        sliderValue.Hour,
+                                        GetSnappedValue(e.NewValue, 0, 59, Math.Max(1, PopupMinutesInterval)),
+                                        sliderValue.Second));
         }
 
-        /// <summary>Reacts to a change in the Hours Slider.</summary>
+        /// <summary>
+        /// Reacts to a change in the Hours Slider.
+        /// </summary>
         /// <param name="sender">The Slider that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
-        private void HoursChanged(object sender,
 #if MIGRATION
-            RoutedPropertyChangedEventArgs<double> e)
+        private void HoursChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 #else
-            RangeBaseValueChangedEventArgs e)
+        private void HoursChanged(object sender, RangeBaseValueChangedEventArgs e)
 #endif
         {
-            if (this._ignoreSliderChange)
+            if (_ignoreSliderChange)
+            {
                 return;
-            DateTime valueFromSliders = this.GetValueFromSliders();
-            this._ignoreSliderChange = true;
-            this.HoursSlider.Value = e.OldValue;
-            this._ignoreSliderChange = false;
-            this.Value = new DateTime?(this.GetCoercedValue(new DateTime(valueFromSliders.Year, valueFromSliders.Month, valueFromSliders.Day, RangeTimePickerPopup.GetSnappedValue(e.NewValue, 0, 23, 1), valueFromSliders.Minute, valueFromSliders.Second)));
+            }
+
+            DateTime sliderValue = GetValueFromSliders();
+
+            // restore the old value (snapping behavior)
+            _ignoreSliderChange = true;
+            HoursSlider.Value = e.OldValue;
+            _ignoreSliderChange = false;
+
+            // setting value to the snapped time will set sliders accordingly.
+            Value = GetCoercedValue(new DateTime(
+                                        sliderValue.Year,
+                                        sliderValue.Month,
+                                        sliderValue.Day,
+                                        GetSnappedValue(e.NewValue, 0, 23, 1),
+                                        sliderValue.Minute,
+                                        sliderValue.Second));
         }
 
         /// <summary>
@@ -374,14 +501,17 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnValueChanged(RoutedPropertyChangedEventArgs<DateTime?> e)
         {
             base.OnValueChanged(e);
-            if (!this.IsCurrentlyOpen)
+
+            if (!IsCurrentlyOpen)
+            {
                 return;
-            DateTime? newValue = e.NewValue;
-            if (!newValue.HasValue)
-                return;
-            newValue = e.NewValue;
-            this.SetSlidersToValue(newValue.Value);
-            this.SetEnabledStatusOnLabels();
+            }
+
+            if (e.NewValue != null)
+            {
+                SetSlidersToValue(e.NewValue.Value);
+                SetEnabledStatusOnLabels();
+            }
         }
 
         /// <summary>
@@ -393,11 +523,15 @@ namespace Windows.UI.Xaml.Controls
         public override void OnOpened()
         {
             base.OnOpened();
-            this._isOpenedByContainer = true;
-            this.GenerateLabels();
-            if (!this.Value.HasValue)
-                return;
-            this.SetSlidersToValue(this.Value.Value);
+
+            _isOpenedByContainer = true;
+
+            GenerateLabels();
+
+            if (Value.HasValue)
+            {
+                SetSlidersToValue(Value.Value);
+            }
         }
 
         /// <summary>
@@ -406,146 +540,223 @@ namespace Windows.UI.Xaml.Controls
         public override void OnClosed()
         {
             base.OnClosed();
-            this._isOpenedByContainer = false;
+
+            _isOpenedByContainer = false;
         }
 
-        /// <summary>Called by the commit button.</summary>
+        /// <summary>
+        /// Called by the commit button.
+        /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="T:System.Windows.RoutedEventArgs" /> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
         private void OnCommit(object sender, RoutedEventArgs e)
         {
-            this.DoCommit();
+            DoCommit();
         }
 
-        /// <summary>Called by the cancel button.</summary>
+        /// <summary>
+        /// Called by the cancel button.
+        /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="T:System.Windows.RoutedEventArgs" /> instance
+        /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance 
         /// containing the event data.</param>
         private void OnCancel(object sender, RoutedEventArgs e)
         {
-            this.DoCancel();
+            DoCancel();
         }
+#endregion
 
-        /// <summary>Calculates the value based on the sliders.</summary>
-        /// <returns>The DateTime as represented by the current values in the
+#region Proactive
+        /// <summary>
+        /// Calculates the value based on the sliders.
+        /// </summary>
+        /// <returns>The DateTime as represented by the current values in the 
         /// Sliders.</returns>
         private DateTime GetValueFromSliders()
         {
-            DateTime dateTime = this.Value.HasValue ? this.Value.Value.Date : DateTime.Today.Date;
-            return this.HoursSlider == null || this.MinutesSlider == null || this.SecondsSlider == null ? dateTime : new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, (int)this.HoursSlider.Value, (int)this.MinutesSlider.Value, (int)this.SecondsSlider.Value);
+            DateTime returnTime = Value.HasValue ? Value.Value.Date : DateTime.Today.Date;
+
+            if (HoursSlider == null || MinutesSlider == null || SecondsSlider == null)
+            {
+                return returnTime;
+            }
+
+            return new DateTime(
+                returnTime.Year,
+                returnTime.Month,
+                returnTime.Day,
+                (int)HoursSlider.Value,
+                (int)MinutesSlider.Value,
+                (int)SecondsSlider.Value);
         }
 
-        /// <summary>Sets the sliders to value.</summary>
+        /// <summary>
+        /// Sets the sliders to value.
+        /// </summary>
         /// <param name="value">The DateTime that needs to be reflected by
         /// the three sliders.</param>
         private void SetSlidersToValue(DateTime value)
         {
-            this._ignoreSliderChange = true;
+            _ignoreSliderChange = true;
             try
             {
-                if (this.HoursSlider != null)
-                    this.HoursSlider.Value = (double)value.Hour;
-                if (this.MinutesSlider != null)
-                    this.MinutesSlider.Value = (double)value.Minute;
-                if (this.SecondsSlider == null)
-                    return;
-                this.SecondsSlider.Value = (double)value.Second;
+                if (HoursSlider != null)
+                {
+                    HoursSlider.Value = value.Hour;
+                }
+                if (MinutesSlider != null)
+                {
+                    MinutesSlider.Value = value.Minute;
+                }
+                if (SecondsSlider != null)
+                {
+                    SecondsSlider.Value = value.Second;
+                }
             }
             finally
             {
-                this._ignoreSliderChange = false;
+                _ignoreSliderChange = false;
             }
         }
+#endregion
 
-        /// <summary>Generates the labels.</summary>
+#region label layout
+        /// <summary>
+        /// Generates the labels.
+        /// </summary>
         private void GenerateLabels()
         {
-            Action<UIElement> action = (Action<UIElement>)(element =>
+            Action<UIElement> removeHandler = element =>
+                                                  {
+                                                      Button b = element as Button;
+                                                      if (b != null)
+                                                      {
+                                                          b.Click -= OnLabelClicked;
+                                                      }
+                                                  };
+
+            // create the hour labels. These are not based on interval.
+            if (HoursContainer != null)
             {
-                if (!(element is Button button))
-                    return;
-                button.Click -= new RoutedEventHandler(this.OnLabelClicked);
-            });
-            if (this.HoursContainer != null)
-            {
-                this.HoursContainer.Children.ForEach<UIElement>(action);
-                this.HoursContainer.Children.Clear();
-                EnumerableExtensions.Range(22, 0, 2).ForEach<int>((Action<int>)(hour => this.HoursContainer.Children.Add((UIElement)this.CreateLabelElement(this.ActualTimeGlobalizationInfo.FormatTime(new DateTime?(DateTime.MinValue.AddHours((double)hour)), this.ActualFormat, 'h', 'H', 't', ' '), TimeSpan.FromHours((double)hour)))));
+                HoursContainer.Children.ForEach(removeHandler);
+                HoursContainer.Children.Clear();
+                EnumerableExtensions.Range(22, 0, 2)
+                    .ForEach(hour => HoursContainer.Children.Add(
+                        CreateLabelElement(
+                        ActualTimeGlobalizationInfo.FormatTime(
+                                DateTime.MinValue.AddHours(hour),
+                                ActualFormat,
+                                'h',
+                                'H',
+                                't',
+                                ' '),
+                                TimeSpan.FromHours(hour))));
             }
-            if (this.MinutesContainer != null)
+
+            // create the hour labels. These are not based on interval.
+            if (MinutesContainer != null)
             {
-                this.MinutesContainer.Children.ForEach<UIElement>(action);
-                this.MinutesContainer.Children.Clear();
-                EnumerableExtensions.Range(55, 0, 5).ForEach<int>((Action<int>)(minute => this.MinutesContainer.Children.Add((UIElement)this.CreateLabelElement(this.ActualTimeGlobalizationInfo.FormatTime(new DateTime?(DateTime.MinValue.AddMinutes((double)minute)), (ITimeFormat)new CustomTimeFormat("mm")), TimeSpan.FromMinutes((double)minute)))));
+                MinutesContainer.Children.ForEach(removeHandler);
+                MinutesContainer.Children.Clear();
+                EnumerableExtensions.Range(55, 0, 5)
+                    .ForEach(minute => MinutesContainer.Children.Add(
+                        CreateLabelElement(
+                            ActualTimeGlobalizationInfo.FormatTime(
+                            DateTime.MinValue.AddMinutes(minute),
+                            new CustomTimeFormat("mm")),
+                             TimeSpan.FromMinutes(minute))));
             }
-            if (this.SecondsContainer != null)
+
+            // create the hour labels. These are not based on interval.
+            if (SecondsContainer != null)
             {
-                this.SecondsContainer.Children.ForEach<UIElement>(action);
-                this.SecondsContainer.Children.Clear();
-                EnumerableExtensions.Range(55, 0, 5).ForEach<int>((Action<int>)(second => this.SecondsContainer.Children.Add((UIElement)this.CreateLabelElement(this.ActualTimeGlobalizationInfo.FormatTime(new DateTime?(DateTime.MinValue.AddSeconds((double)second)), (ITimeFormat)new CustomTimeFormat("ss")), TimeSpan.FromSeconds((double)second)))));
+                SecondsContainer.Children.ForEach(removeHandler);
+                SecondsContainer.Children.Clear();
+                EnumerableExtensions.Range(55, 0, 5)
+                    .ForEach(second => SecondsContainer.Children.Add(
+                        CreateLabelElement(
+                            ActualTimeGlobalizationInfo.FormatTime(
+                            DateTime.MinValue.AddSeconds(second),
+                            new CustomTimeFormat("ss")),
+                            TimeSpan.FromSeconds(second))));
             }
-            this.UpdateLayout();
-            this.LayoutLabels();
-            this.SetEnabledStatusOnLabels();
+
+            UpdateLayout();
+            LayoutLabels();
+            SetEnabledStatusOnLabels();
         }
 
-        /// <summary>Sets the enabled status on the labels.</summary>
+        /// <summary>
+        /// Sets the enabled status on the labels.
+        /// </summary>
         private void SetEnabledStatusOnLabels()
         {
-            Func<DateTime, bool> func = (Func<DateTime, bool>)(time =>
+            Func<DateTime, bool> CalculateEnabledStatus = time =>
+                                                              {
+                                                                  if (Minimum.HasValue && time.TimeOfDay < Minimum.Value.TimeOfDay)
+                                                                  {
+                                                                      return false;
+                                                                  }
+                                                                  if (Maximum.HasValue && time.TimeOfDay > Maximum.Value.TimeOfDay)
+                                                                  {
+                                                                      return false;
+                                                                  }
+                                                                  return true;
+                                                              };
+
+            if (HoursSlider == null || MinutesSlider == null || SecondsSlider == null)
             {
-                DateTime dateTime;
-                int num1;
-                if (this.Minimum.HasValue)
-                {
-                    TimeSpan timeOfDay1 = time.TimeOfDay;
-                    dateTime = this.Minimum.Value;
-                    TimeSpan timeOfDay2 = dateTime.TimeOfDay;
-                    num1 = !(timeOfDay1 < timeOfDay2) ? 1 : 0;
-                }
-                else
-                    num1 = 1;
-                if (num1 == 0)
-                    return false;
-                DateTime? maximum = this.Maximum;
-                int num2;
-                if (maximum.HasValue)
-                {
-                    TimeSpan timeOfDay1 = time.TimeOfDay;
-                    maximum = this.Maximum;
-                    dateTime = maximum.Value;
-                    TimeSpan timeOfDay2 = dateTime.TimeOfDay;
-                    num2 = !(timeOfDay1 > timeOfDay2) ? 1 : 0;
-                }
-                else
-                    num2 = 1;
-                return num2 != 0;
-            });
-            if (this.HoursSlider == null || this.MinutesSlider == null || this.SecondsSlider == null)
+                // if there is no slider, there wouldn't be labels.
                 return;
-            DateTime dateTime1;
-            if (this.HoursContainer != null)
+            }
+
+            if (HoursContainer != null)
             {
-                foreach (Button child in (PresentationFrameworkCollection<UIElement>)this.HoursContainer.Children)
+                foreach (Button button in HoursContainer.Children)
                 {
-                    dateTime1 = new DateTime(1900, 1, 1, ((TimeSpan)child.Tag).Hours, (int)this.MinutesSlider.Value, (int)this.SecondsSlider.Value);
-                    child.IsEnabled = func(dateTime1);
+                    TimeSpan ts = (TimeSpan)button.Tag;
+                    DateTime dt = new DateTime(
+                        1900,
+                        1,
+                        1,
+                        ts.Hours,
+                        (int)MinutesSlider.Value,
+                        (int)SecondsSlider.Value);
+
+                    button.IsEnabled = CalculateEnabledStatus(dt);
                 }
             }
-            if (this.MinutesContainer != null)
+            if (MinutesContainer != null)
             {
-                foreach (Button child in (PresentationFrameworkCollection<UIElement>)this.MinutesContainer.Children)
+                foreach (Button button in MinutesContainer.Children)
                 {
-                    dateTime1 = new DateTime(1900, 1, 1, (int)this.HoursSlider.Value, ((TimeSpan)child.Tag).Minutes, (int)this.SecondsSlider.Value);
-                    child.IsEnabled = func(dateTime1);
+                    TimeSpan ts = (TimeSpan)button.Tag;
+                    DateTime dt = new DateTime(
+                        1900,
+                        1,
+                        1,
+                        (int)HoursSlider.Value,
+                        ts.Minutes,
+                        (int)SecondsSlider.Value);
+
+                    button.IsEnabled = CalculateEnabledStatus(dt);
                 }
             }
-            if (this.SecondsContainer == null)
-                return;
-            foreach (Button child in (PresentationFrameworkCollection<UIElement>)this.SecondsContainer.Children)
+            if (SecondsContainer != null)
             {
-                dateTime1 = new DateTime(1900, 1, 1, (int)this.HoursSlider.Value, (int)this.MinutesSlider.Value, ((TimeSpan)child.Tag).Seconds);
-                child.IsEnabled = func(dateTime1);
+                foreach (Button button in SecondsContainer.Children)
+                {
+                    TimeSpan ts = (TimeSpan)button.Tag;
+                    DateTime dt = new DateTime(
+                        1900,
+                        1,
+                        1,
+                        (int)HoursSlider.Value,
+                        (int)MinutesSlider.Value,
+                        ts.Seconds);
+
+                    button.IsEnabled = CalculateEnabledStatus(dt);
+                }
             }
         }
 
@@ -555,88 +766,94 @@ namespace Windows.UI.Xaml.Controls
         /// <remarks>Uses a canvas to layout labels vertically.</remarks>
         protected virtual void LayoutLabels()
         {
-            Action<double, Panel, Func<TimeSpan, double>> action = (Action<double, Panel, Func<TimeSpan, double>>)((height, canvas, calc) =>
+            // some magic numbers going on to layout the labels in such a way
+            // that it looks good to human eyes.
+
+            // the positioning here is done with a canvas which doesn't
+            // report back a correct size. In the future, this should be
+            // refactored into a custom panel or a better solution.
+
+            Action<double, Panel, Func<TimeSpan, double>> PositionItems = (height, canvas, calc) =>
             {
                 int count = canvas.Children.Count;
-                double num1 = height / (double)count / 3.0;
-                for (int index = 0; index < count; ++index)
+                double heightPerItem = height / count;
+                double offset = heightPerItem / 3;
+
+                for (int i = 0; i < count; i++)
                 {
-                    if (canvas.Children[index] is FrameworkElement child && child.Tag is TimeSpan)
+                    FrameworkElement item = canvas.Children[i] as FrameworkElement;
+                    if (item != null && item.Tag is TimeSpan)
                     {
-                        TimeSpan tag = (TimeSpan)child.Tag;
-                        double num2 = calc(tag);
-                        child.Margin = new Thickness(0.0, height * num2 - num1 * num2 - num1, 0.0, 0.0);
+                        TimeSpan ts = (TimeSpan)item.Tag;
+                        double percentage = calc(ts);
+                        item.Margin = new Thickness(0, height * percentage - offset * percentage - offset, 0, 0);
                     }
                 }
-            });
-            if (this.HoursSlider != null && this.HoursContainer != null && this.HoursContainer.Children.Count > 0)
-                action(this.HoursSlider.ActualHeight, this.HoursContainer, (Func<TimeSpan, double>)(span => (double)(23 - span.Hours) / 23.0));
-            if (this.MinutesSlider != null && this.MinutesContainer != null && this.MinutesContainer.Children.Count > 0)
-                action(this.MinutesSlider.ActualHeight, this.MinutesContainer, (Func<TimeSpan, double>)(span => (double)(59 - span.Minutes) / 59.0));
-            if (this.SecondsSlider == null || this.SecondsContainer == null || this.SecondsContainer.Children.Count <= 0)
-                return;
-            action(this.SecondsSlider.ActualHeight, this.SecondsContainer, (Func<TimeSpan, double>)(span => (double)(59 - span.Seconds) / 59.0));
+            };
+
+            if (HoursSlider != null && HoursContainer != null && HoursContainer.Children.Count > 0)
+            {
+                PositionItems(HoursSlider.ActualHeight, HoursContainer, span => (23 - span.Hours) / 23.0);
+            }
+            if (MinutesSlider != null && MinutesContainer != null && MinutesContainer.Children.Count > 0)
+            {
+                PositionItems(MinutesSlider.ActualHeight, MinutesContainer, span => (59 - span.Minutes) / 59.0);
+            }
+            if (SecondsSlider != null && SecondsContainer != null && SecondsContainer.Children.Count > 0)
+            {
+                PositionItems(SecondsSlider.ActualHeight, SecondsContainer, span => (59 - span.Seconds) / 59.0);
+            }
         }
 
-        /// <summary>Called when a label is clicked.</summary>
+        /// <summary>
+        /// Called when a label is clicked.
+        /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="T:System.Windows.RoutedEventArgs" /> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
         private void OnLabelClicked(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
-            TimeSpan tag = (TimeSpan)button.Tag;
-            DateTime valueFromSliders = this.GetValueFromSliders();
-            if (this.HoursContainer != null && this.HoursContainer.Children.Contains((UIElement)button))
-                this.Value = new DateTime?(new DateTime(valueFromSliders.Year, valueFromSliders.Month, valueFromSliders.Day, tag.Hours, valueFromSliders.Minute, valueFromSliders.Second));
-            else if (this.MinutesContainer != null && this.MinutesContainer.Children.Contains((UIElement)button))
+            Button b = sender as Button;
+
+            TimeSpan ts = (TimeSpan)b.Tag;
+            DateTime dt = GetValueFromSliders();
+
+            if (HoursContainer != null && HoursContainer.Children.Contains(b))
             {
-                this.Value = new DateTime?(new DateTime(valueFromSliders.Year, valueFromSliders.Month, valueFromSliders.Day, valueFromSliders.Hour, tag.Minutes, valueFromSliders.Second));
+                Value = new DateTime(dt.Year, dt.Month, dt.Day, ts.Hours, dt.Minute, dt.Second);
             }
-            else
+            else if (MinutesContainer != null && MinutesContainer.Children.Contains(b))
             {
-                if (this.SecondsContainer == null || !this.SecondsContainer.Children.Contains((UIElement)button))
-                    return;
-                this.Value = new DateTime?(new DateTime(valueFromSliders.Year, valueFromSliders.Month, valueFromSliders.Day, valueFromSliders.Hour, valueFromSliders.Minute, tag.Seconds));
+                Value = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, ts.Minutes, dt.Second);
+            }
+            else if (SecondsContainer != null && SecondsContainer.Children.Contains(b))
+            {
+                Value = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, ts.Seconds);
             }
         }
+#endregion
 
-        /// <summary>Gets the value after Minimum and Maximum coercion.</summary>
+#region Helpers
+        /// <summary>
+        /// Gets the value after Minimum and Maximum coercion.
+        /// </summary>
         /// <param name="time">The input.</param>
         /// <returns>Time between Minimum and Maximum.</returns>
         /// <remarks>Done to avoid coercion in containing controls.</remarks>
         private DateTime GetCoercedValue(DateTime time)
         {
-            DateTime dateTime;
-            int num1;
-            if (this.Minimum.HasValue)
+            if (Minimum.HasValue && time.TimeOfDay < Minimum.Value.TimeOfDay)
             {
-                TimeSpan timeOfDay1 = time.TimeOfDay;
-                dateTime = this.Minimum.Value;
-                TimeSpan timeOfDay2 = dateTime.TimeOfDay;
-                num1 = !(timeOfDay1 < timeOfDay2) ? 1 : 0;
+                return Minimum.Value;
+            }
+            else if (Maximum.HasValue && time.TimeOfDay > Maximum.Value.TimeOfDay)
+            {
+                return Maximum.Value;
             }
             else
-                num1 = 1;
-            if (num1 == 0)
-                return this.Minimum.Value;
-            DateTime? maximum = this.Maximum;
-            int num2;
-            if (maximum.HasValue)
             {
-                TimeSpan timeOfDay1 = time.TimeOfDay;
-                maximum = this.Maximum;
-                dateTime = maximum.Value;
-                TimeSpan timeOfDay2 = dateTime.TimeOfDay;
-                num2 = !(timeOfDay1 > timeOfDay2) ? 1 : 0;
-            }
-            else
-                num2 = 1;
-            if (num2 != 0)
                 return time;
-            maximum = this.Maximum;
-            return maximum.Value;
+            }
         }
-
 
         /// <summary>
         /// Gets the coerced value, using interval and a minimum and maximum.
@@ -648,46 +865,73 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>A value that is within range and snapped to an interval.</returns>
         private static int GetSnappedValue(double value, int minimum, int maximum, int interval)
         {
-            if (value < (double)minimum)
+            if (value < minimum)
+            {
                 return minimum;
-            if (value > (double)maximum)
+            }
+            if (value > maximum)
+            {
                 return maximum;
-            int val1 = (int)value / interval * interval;
-            double num = (double)(val1 + interval / 2);
-            return value > num ? Math.Min(val1 + interval, maximum) : Math.Max(val1, minimum);
+            }
+
+            // rounded
+            int tick = (int)value / interval;
+
+            int start = tick * interval;
+            double halfpoint = start + interval / 2;
+
+            return value > halfpoint ? Math.Min(start + interval, maximum) : Math.Max(start, minimum);
         }
 
-        /// <summary>Creates the element for a label.</summary>
+        /// <summary>
+        /// Creates the element for a label.
+        /// </summary>
         /// <param name="text">The text that is set as content.</param>
         /// <param name="timespan">The TimeSpan that is represented by the Button.</param>
         /// <returns>A Button representing the label.</returns>
         private Button CreateLabelElement(string text, TimeSpan timespan)
         {
-            Button button = new Button();
-            button.SetBinding(FrameworkElement.StyleProperty, new Binding()
-            {
-                Path = new PropertyPath("TimeButtonStyle", new object[0]),
-                Source = (object)this
-            });
-            button.VerticalAlignment = VerticalAlignment.Top;
-            button.Tag = (object)timespan;
-            button.Content = (object)text;
-            button.Click += new RoutedEventHandler(this.OnLabelClicked);
-            return button;
+            Button c = new Button();
+            c.SetBinding(
+                StyleProperty,
+                new Binding()
+                {
+                    Path = new PropertyPath("TimeButtonStyle"),
+                    Source = this
+                });
+            c.VerticalAlignment = VerticalAlignment.Top;
+            // the easiest way to pass a value. Since we manage this element
+            // there is no interference possible.
+            c.Tag = timespan;
+            c.Content = text;
+            c.Click += OnLabelClicked;
+            return c;
         }
+#endregion
 
-        /// <summary>Gets the valid popup time selection modes.</summary>
+        /// <summary>
+        /// Gets the valid popup time selection modes.
+        /// </summary>
         /// <returns>
         /// An array of PopupTimeSelectionModes that are supported by
         /// the Popup.
         /// </returns>
         internal override PopupTimeSelectionMode[] GetValidPopupTimeSelectionModes()
         {
-            return new PopupTimeSelectionMode[2]
-            {
-        PopupTimeSelectionMode.HoursAndMinutesOnly,
-        PopupTimeSelectionMode.AllowSecondsSelection
-            };
+            return new[]
+                       {
+                           PopupTimeSelectionMode.HoursAndMinutesOnly,
+                           PopupTimeSelectionMode.AllowSecondsSelection
+                       };
+        }
+
+        /// <summary>
+        /// Creates the automation peer.
+        /// </summary>
+        /// <returns>The RangeTimePickerPopupAutomationPeer for this instance.</returns>
+        protected override TimePickerPopupAutomationPeer CreateAutomationPeer()
+        {
+            return new RangeTimePickerPopupAutomationPeer(this);
         }
     }
 }

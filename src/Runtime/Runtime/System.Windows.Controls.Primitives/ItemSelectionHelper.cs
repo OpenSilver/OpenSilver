@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
@@ -11,57 +14,73 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
     /// <summary>
-    /// Exposes an ObservableCollection of T and
+    /// Exposes an ObservableCollection of T and 
     /// a SelectedItem property for binding purposes.
     /// </summary>
     /// <typeparam name="T">The type of items.</typeparam>
     /// <QualityBand>Preview</QualityBand>
     public class ItemSelectionHelper<T> : INotifyPropertyChanged
     {
-        /// <summary>Name used for the SelectedItem property.</summary>
+        /// <summary>
+        /// Name used for the SelectedItem property.
+        /// </summary>
         internal const string SelectedItemName = "SelectedItem";
-        /// <summary>Name used for the Items property.</summary>
-        internal const string ItemsName = "Items";
-        /// <summary>BackingField for the selected item.</summary>
-        private T _selectedItem;
-        /// <summary>BackingField for Items.</summary>
-        private ObservableCollection<T> _items;
 
-        /// <summary>Gets or sets the selected item.</summary>
+        /// <summary>
+        /// Name used for the Items property.
+        /// </summary>
+        internal const string ItemsName = "Items";
+
+        /// <summary>
+        /// Gets or sets the selected item.
+        /// </summary>
         /// <value>The selected item.</value>
         public T SelectedItem
         {
-            get
-            {
-                return this._selectedItem;
-            }
+            get { return _selectedItem; }
             set
             {
-                this._selectedItem = value;
-                if (this.PropertyChanged == null)
-                    return;
-                this.PropertyChanged((object)this, new PropertyChangedEventArgs(nameof(SelectedItem)));
+                _selectedItem = value;
+
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(SelectedItemName));
+                }
             }
         }
 
-        /// <summary>Gets or sets the items.</summary>
+        /// <summary>
+        /// BackingField for the selected item.
+        /// </summary>
+        private T _selectedItem;
+
+        /// <summary>
+        /// Gets or sets the items.
+        /// </summary>
         /// <value>The items.</value>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Allowing the collection to be set from Xaml.")]
         public ObservableCollection<T> Items
         {
-            get
-            {
-                return this._items;
-            }
+            get { return _items; }
             set
             {
-                this._items = value;
-                if (this.PropertyChanged == null)
-                    return;
-                this.PropertyChanged((object)this, new PropertyChangedEventArgs(nameof(Items)));
+                _items = value;
+
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(ItemsName));
+                }
             }
         }
 
-        /// <summary>Occurs when a property value changes.</summary>
+        /// <summary>
+        /// BackingField for Items.
+        /// </summary>
+        private ObservableCollection<T> _items;
+
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }

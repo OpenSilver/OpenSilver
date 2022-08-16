@@ -1,0 +1,55 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+  xmlns:inputToolkit="clr-namespace:System.Windows.Controls">
+
+  <Style TargetType="inputToolkit:Picker">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="inputToolkit:Picker">
+          <Grid x:Name="RootElement">
+            <vsm:VisualStateManager.VisualStateGroups>
+              <!-- Popup states -->
+              <VisualStateGroup x:Name="PopupStates">
+                <VisualStateGroup.Transitions>
+                  <VisualTransition GeneratedDuration="0:0:0.1" To="PopupOpened" />
+                  <VisualTransition GeneratedDuration="0:0:0.2" To="PopupClosed" />
+                </VisualStateGroup.Transitions>
+                <VisualState x:Name="PopupOpened">
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="PopupRoot" Storyboard.TargetProperty="Opacity" To="1.0" />
+                  </Storyboard>
+                </VisualState>
+                <VisualState x:Name="PopupClosed">
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="PopupRoot" Storyboard.TargetProperty="Opacity" To="0.0" />
+                  </Storyboard>
+                </VisualState>
+              </VisualStateGroup>
+            </vsm:VisualStateManager.VisualStateGroups>
+            
+            <ToggleButton x:Name="DropDownToggle" Content="Toggle popup" />
+            
+            <Popup x:Name="Popup">
+              <Border x:Name="PopupRoot" 
+                HorizontalAlignment="Stretch" 
+                BorderThickness="0" 
+                CornerRadius="3">
+                <!-- place content here. -->
+              </Border>
+            </Popup>
+            
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

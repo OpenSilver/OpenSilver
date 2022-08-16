@@ -234,5 +234,8 @@ namespace Windows.UI.Xaml.Automation.Peers
 
         [OpenSilver.NotImplemented]
 		public string GetAutomationId() => this.GetAutomationIdCore();
+
+		[OpenSilver.NotImplemented]
+		public AutomationControlType GetAutomationControlType() => this.GetAutomationControlTypeCore();
 	}
 }

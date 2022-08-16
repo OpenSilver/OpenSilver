@@ -1,27 +1,22 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
-#else 
+using System.Windows.Automation.Peers;
+using System.Windows.Automation;
+#else
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Automation;
 #endif
 
 #if MIGRATION
@@ -37,79 +32,146 @@ namespace Windows.UI.Xaml.Controls
     /// 'h', 'm', 's', 'H', 't'. All other characters are filtered out:
     /// 'd', 'f', 'F', 'g', 'K', 'M', 'y', 'z'.</remarks>
     /// <QualityBand>Preview</QualityBand>
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Normal")]
-    [TemplateVisualState(GroupName = "FocusStates", Name = "Unfocused")]
-    [TemplatePart(Name = "TimeUpDown", Type = typeof(TimeUpDown))]
-    [StyleTypedProperty(Property = "SpinnerStyle", StyleTargetType = typeof(ButtonSpinner))]
-    [TemplateVisualState(GroupName = "PopupStates", Name = "PopupClosed")]
-    [TemplateVisualState(GroupName = "PopupStates", Name = "PopupOpened")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "MouseOver")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Pressed")]
-    [TemplateVisualState(GroupName = "CommonStates", Name = "Disabled")]
-    [TemplateVisualState(GroupName = "FocusStates", Name = "Focused")]
-    [TemplatePart(Name = "Popup", Type = typeof(Popup))]
-    [TemplatePart(Name = "DropDownToggle", Type = typeof(ToggleButton))]
-    [TemplatePart(Name = "PopupPlaceHolder", Type = typeof(ContentControl))]
-    [StyleTypedProperty(Property = "TimeUpDownStyle", StyleTargetType = typeof(TimeUpDown))]
+    [TemplateVisualState(Name = VisualStates.StatePopupClosed, GroupName = VisualStates.GroupPopup)]
+    [TemplateVisualState(Name = VisualStates.StatePopupOpened, GroupName = VisualStates.GroupPopup)]
+
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StatePressed, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+
+    [TemplatePart(Name = ElementTimeUpDownName, Type = typeof(TimeUpDown))]
+    [TemplatePart(Name = ElementPopupName, Type = typeof(Popup))]
+    [TemplatePart(Name = ElementDropDownToggleName, Type = typeof(ToggleButton))]
+    [TemplatePart(Name = ElementPopupPlaceHolderPartName, Type = typeof(ContentControl))]
+    [StyleTypedProperty(Property = TimeUpDownStyleName, StyleTargetType = typeof(TimeUpDown))]
+    [StyleTypedProperty(Property = UpDownBase.SpinnerStyleName, StyleTargetType = typeof(ButtonSpinner))]
     public class TimePicker : Picker, ITimeInput
     {
-        /// <summary>Identifies the Value dependency property.</summary>
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(DateTime?), typeof(TimePicker), new PropertyMetadata((object)new DateTime?(), new PropertyChangedCallback(TimePicker.OnValuePropertyChanged)));
-        /// <summary>Identifies the Minimum dependency property.</summary>
-        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(DateTime?), typeof(TimePicker), new PropertyMetadata((object)null, new PropertyChangedCallback(TimePicker.OnMinimumPropertyChanged)));
-        /// <summary>Identifies the Maximum dependency property.</summary>
-        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(DateTime?), typeof(TimePicker), new PropertyMetadata((object)null, new PropertyChangedCallback(TimePicker.OnMaximumPropertyChanged)));
-        /// <summary>Identifies the TimeUpDownStyle dependency property.</summary>
-        public static readonly DependencyProperty TimeUpDownStyleProperty = DependencyProperty.Register(nameof(TimeUpDownStyle), typeof(Style), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnTimeUpDownStylePropertyChanged)));
-        /// <summary>Identifies the SpinnerStyle dependency property.</summary>
-        public static readonly DependencyProperty SpinnerStyleProperty = DependencyProperty.Register(nameof(SpinnerStyle), typeof(Style), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnSpinnerStylePropertyChanged)));
-        /// <summary>Identifies the TimeParsers dependency property.</summary>
-        public static readonly DependencyProperty TimeParsersProperty = DependencyProperty.Register(nameof(TimeParsers), typeof(TimeParserCollection), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnTimeParsersPropertyChanged)));
-        /// <summary>Identifies the Format dependency property.</summary>
-        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register(nameof(Format), typeof(ITimeFormat), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnFormatPropertyChanged)));
-        /// <summary>Identifies the Culture dependency property.</summary>
-        public static readonly DependencyProperty CultureProperty = DependencyProperty.Register(nameof(Culture), typeof(CultureInfo), typeof(TimePicker), new PropertyMetadata((object)null, new PropertyChangedCallback(TimePicker.OnCulturePropertyChanged)));
+#region Name constants
         /// <summary>
-        /// Identifies the TimeGlobalizationInfo dependency property.
+        /// The name for the TimeUpDown element.
         /// </summary>
-        public static readonly DependencyProperty TimeGlobalizationInfoProperty = DependencyProperty.Register(nameof(TimeGlobalizationInfo), typeof(TimeGlobalizationInfo), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnTimeGlobalizationInfoPropertyChanged)));
-        /// <summary>Identifies the Popup dependency property.</summary>
-        public static readonly DependencyProperty PopupProperty = DependencyProperty.Register(nameof(Popup), typeof(TimePickerPopup), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnPopupPropertyChanged)));
-        /// <summary>Identifies the PopupTemplate dependency property.</summary>
-        public static readonly DependencyProperty PopupTemplateProperty = DependencyProperty.Register(nameof(PopupTemplate), typeof(TimePickerPopupTemplate), typeof(TimePicker), new PropertyMetadata((object)null, new PropertyChangedCallback(TimePicker.OnPopupTemplatePropertyChanged)));
-        /// <summary>
-        /// Identifies the PopupSecondsInterval dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PopupSecondsIntervalProperty = DependencyProperty.Register(nameof(PopupSecondsInterval), typeof(int), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnPopupSecondsIntervalPropertyChanged)));
-        /// <summary>
-        /// Identifies the PopupMinutesInterval dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PopupMinutesIntervalProperty = DependencyProperty.Register(nameof(PopupMinutesInterval), typeof(int), typeof(TimePicker), new PropertyMetadata(new PropertyChangedCallback(TimePicker.OnPopupMinutesIntervalPropertyChanged)));
-        /// <summary>
-        /// Identifies the PopupTimeSelectionMode dependency property.
-        /// </summary>
-        public static readonly DependencyProperty PopupTimeSelectionModeProperty = DependencyProperty.Register(nameof(PopupTimeSelectionMode), typeof(PopupTimeSelectionMode), typeof(TimePicker), new PropertyMetadata((object)PopupTimeSelectionMode.HoursAndMinutesOnly, new PropertyChangedCallback(TimePicker.OnPopupTimeSelectionModePropertyChanged)));
-        /// <summary>The name for the TimeUpDown element.</summary>
         private const string ElementTimeUpDownName = "TimeUpDown";
-        /// <summary>The name for the TimeUpDownStyle element.</summary>
-        private const string TimeUpDownStyleName = "TimeUpDownStyle";
-        /// <summary>The name for the PopupPlaceHolder element.</summary>
-        private const string ElementPopupPlaceHolderPartName = "PopupPlaceHolder";
-        /// <summary>BackingField for TimeUpDownPart.</summary>
-        private TimeUpDown _timeUpDownPart;
-        /// <summary>BackingField for PopupPlaceHolderPart.</summary>
-        private ContentControl _popupPlaceHolderPart;
+
         /// <summary>
-        /// Helper class that centralizes the coercion logic across all
+        /// The name for the TimeUpDownStyle element.
+        /// </summary>
+        private const string TimeUpDownStyleName = "TimeUpDownStyle";
+
+        /// <summary>
+        /// The name for the PopupPlaceHolder element.
+        /// </summary>
+        private const string ElementPopupPlaceHolderPartName = "PopupPlaceHolder";
+#endregion Name constants
+
+#region TemplateParts
+        /// <summary>
+        /// Gets or sets the time up down part.
+        /// </summary>
+        /// <value>The time up down part.</value>
+        private TimeUpDown TimeUpDownPart
+        {
+            get { return _timeUpDownPart; }
+            set
+            {
+                if (_timeUpDownPart != null)
+                {
+                    _timeUpDownPart.ValueChanged -= TimeUpDownValueChanged;
+                    _timeUpDownPart.Parsing -= TimeUpDownParsing;
+                    _timeUpDownPart.ParseError -= TimeUpDownParseError;
+                }
+                _timeUpDownPart = value;
+                if (_timeUpDownPart != null)
+                {
+                    _timeUpDownPart.ValueChanged += TimeUpDownValueChanged;
+                    _timeUpDownPart.Parsing += TimeUpDownParsing;
+                    _timeUpDownPart.ParseError += TimeUpDownParseError;
+
+                    PropagateNewValue();
+                }
+            }
+        }
+
+        /// <summary>
+        /// BackingField for TimeUpDownPart.
+        /// </summary>
+        private TimeUpDown _timeUpDownPart;
+
+        /// <summary>
+        /// Gets or sets the popup place holder part.
+        /// </summary>
+        /// <remarks>This is the ContentControl that is used to display
+        /// Popups.</remarks>
+        private ContentControl PopupPlaceHolderPart
+        {
+            get { return _popupPlaceHolderPart; }
+            set
+            {
+                if (_popupPlaceHolderPart != null)
+                {
+                    _popupPlaceHolderPart.Content = null;
+                    _popupPlaceHolderPart.ContentTemplate = null;
+                }
+
+                _popupPlaceHolderPart = value;
+
+                if (_popupPlaceHolderPart != null)
+                {
+                    if (ActualTimePickerPopup != null)
+                    {
+                        _popupPlaceHolderPart.Content = ActualTimePickerPopup;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// BackingField for PopupPlaceHolderPart.
+        /// </summary>
+        private ContentControl _popupPlaceHolderPart;
+#endregion TemplateParts
+
+        /// <summary>
+        /// Helper class that centralizes the coercion logic across all 
         /// TimeInput controls.
         /// </summary>
         private readonly TimeCoercionHelper _timeCoercionHelper;
-        /// <summary>Cache of the value before we open a popup.</summary>
+
+        /// <summary>
+        /// Cache of the value before we open a popup.
+        /// </summary>
         private DateTime? _popupSessionValueCache;
+
         /// <summary>
         /// Indicates that the control has finished initialization.
         /// </summary>
         private bool _isInitialized;
+
+#region public DateTime? Value
+        /// <summary>
+        /// Gets or sets the currently selected time.
+        /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods", Justification = "Property is named Value in UpDown hierarchy.")]
+        [TypeConverter(typeof(TimeTypeConverter))]
+        public virtual DateTime? Value
+        {
+            get { return (DateTime?)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the Value dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register(
+                "Value",
+                typeof(DateTime?),
+                typeof(TimePicker),
+                new PropertyMetadata(default(DateTime?), OnValuePropertyChanged));
+
         /// <summary>
         /// A value indicating whether a dependency property change handler
         /// should ignore the next change notification.  This is used to reset
@@ -117,278 +179,266 @@ namespace Windows.UI.Xaml.Controls
         /// their change handlers.
         /// </summary>
         private bool _ignoreValueChange;
-        /// <summary>BackingField for ActualFormat.</summary>
-        private ITimeFormat _actualFormat;
-        /// <summary>BackingField for ActualTimeGlobalizationInfo.</summary>
-        private TimeGlobalizationInfo _actualTimeGlobalizationInfo;
-        /// <summary>BackingField for InstantiatedPopupFromTemplate.</summary>
-        private TimePickerPopup _instantiatedPopupFromTemplate;
-        /// <summary>Determines whether PopupSeconds has been changed.</summary>
-        private bool _isPopupSecondsInitialized;
-        /// <summary>Determines whether PopupMinutes has been changed.</summary>
-        private bool _isPopupMinutesInitialized;
 
-        /// <summary>Gets or sets the time up down part.</summary>
-        /// <value>The time up down part.</value>
-        private TimeUpDown TimeUpDownPart
-        {
-            get
-            {
-                return this._timeUpDownPart;
-            }
-            set
-            {
-                if (this._timeUpDownPart != null)
-                {
-                    this._timeUpDownPart.ValueChanged -= new RoutedPropertyChangedEventHandler<DateTime?>(this.TimeUpDownValueChanged);
-                    this._timeUpDownPart.Parsing -= new EventHandler<UpDownParsingEventArgs<DateTime?>>(this.TimeUpDownParsing);
-                    this._timeUpDownPart.ParseError -= new EventHandler<UpDownParseErrorEventArgs>(this.TimeUpDownParseError);
-                }
-                this._timeUpDownPart = value;
-                if (this._timeUpDownPart == null)
-                    return;
-                this._timeUpDownPart.ValueChanged += new RoutedPropertyChangedEventHandler<DateTime?>(this.TimeUpDownValueChanged);
-                this._timeUpDownPart.Parsing += new EventHandler<UpDownParsingEventArgs<DateTime?>>(this.TimeUpDownParsing);
-                this._timeUpDownPart.ParseError += new EventHandler<UpDownParseErrorEventArgs>(this.TimeUpDownParseError);
-                this.PropagateNewValue();
-            }
-        }
-
-        /// <summary>Gets or sets the popup place holder part.</summary>
-        /// <remarks>This is the ContentControl that is used to display
-        /// Popups.</remarks>
-        private ContentControl PopupPlaceHolderPart
-        {
-            get
-            {
-                return this._popupPlaceHolderPart;
-            }
-            set
-            {
-                if (this._popupPlaceHolderPart != null)
-                {
-                    this._popupPlaceHolderPart.Content = (object)null;
-                    this._popupPlaceHolderPart.ContentTemplate = (DataTemplate)null;
-                }
-                this._popupPlaceHolderPart = value;
-                if (this._popupPlaceHolderPart == null || this.ActualTimePickerPopup == null)
-                    return;
-                this._popupPlaceHolderPart.Content = (object)this.ActualTimePickerPopup;
-            }
-        }
-
-        /// <summary>Gets or sets the currently selected time.</summary>
-        [TypeConverter(typeof(TimeTypeConverter))]
-        public virtual DateTime? Value
-        {
-            get
-            {
-                return (DateTime?)this.GetValue(TimePicker.ValueProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.ValueProperty, (object)value);
-            }
-        }
-
-        /// <summary>ValueProperty property changed handler.</summary>
+        /// <summary>
+        /// ValueProperty property changed handler.
+        /// </summary>
         /// <param name="d">UpDownBase whose Value changed.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnValuePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
-            if (timePicker._ignoreValueChange)
+            TimePicker source = (TimePicker)d;
+
+            // Ignore the change if requested
+            if (source._ignoreValueChange)
             {
-                timePicker.OnValueChanged(new RoutedPropertyChangedEventArgs<DateTime?>(e.OldValue as DateTime?, e.NewValue as DateTime?));
+                // we do want to raise the event, but won't react to anything.
+                source.OnValueChanged(new RoutedPropertyChangedEventArgs<DateTime?>(e.OldValue as DateTime?, e.NewValue as DateTime?));
+
+                return;
+            }
+
+            DateTime? oldValue = (DateTime?)e.OldValue;
+            DateTime? newValue = (DateTime?)e.NewValue;
+
+            // simulate pre and post events
+            // The Value has already been changed when this function is called. 
+            // So if user's chaning event handler check Value, it will be the changed value.
+            // This is confusing, because we are simulating pre event on the platform that doesn't natively support it.
+            RoutedPropertyChangingEventArgs<DateTime?> changingArgs = new RoutedPropertyChangingEventArgs<DateTime?>(e.Property, oldValue, newValue, true);
+            source.OnValueChanging(changingArgs);
+
+            // hack: work around the class hierarchy for value coercion in NumericUpDown
+            if (changingArgs.InCoercion)
+            {
+            }
+            else if (!changingArgs.Cancel)
+            {
+                newValue = changingArgs.NewValue;
+                RoutedPropertyChangedEventArgs<DateTime?> changedArgs = new RoutedPropertyChangedEventArgs<DateTime?>(oldValue, newValue);
+                source.OnValueChanged(changedArgs);
+
+                source.PropagateNewValue();
+
+                TimePickerAutomationPeer peer = FrameworkElementAutomationPeer.FromElement(source) as TimePickerAutomationPeer;
+                if (peer != null)
+                {
+                    peer.RaiseValueAutomationEvent(oldValue, newValue);
+                }
             }
             else
             {
-                DateTime? oldValue = (DateTime?)e.OldValue;
-                DateTime? newValue1 = (DateTime?)e.NewValue;
-                RoutedPropertyChangingEventArgs<DateTime?> e1 = new RoutedPropertyChangingEventArgs<DateTime?>(e.Property, oldValue, newValue1, true);
-                timePicker.OnValueChanging(e1);
-                if (e1.InCoercion)
-                    return;
-                if (!e1.Cancel)
-                {
-                    DateTime? newValue2 = e1.NewValue;
-                    RoutedPropertyChangedEventArgs<DateTime?> e2 = new RoutedPropertyChangedEventArgs<DateTime?>(oldValue, newValue2);
-                    timePicker.OnValueChanged(e2);
-                    timePicker.PropagateNewValue();
-                }
-                else
-                {
-                    timePicker._ignoreValueChange = true;
-                    timePicker.Value = oldValue;
-                    timePicker._ignoreValueChange = false;
-                }
+                // revert back to old value if an event handler canceled the changing event.
+                source._ignoreValueChange = true;
+                source.Value = oldValue;
+                source._ignoreValueChange = false;
             }
         }
+#endregion public T Value
 
+#region public DateTime? Minimum
         /// <summary>
         /// Gets or sets the minimum time considered valid by the control.
         /// </summary>
-        /// <remarks>Setting the minimum property is applicable for the following
-        /// features: Selecting a value through a popup, Parsing a new value from
+        /// <remarks>Setting the minimum property is applicable for the following 
+        /// features: Selecting a value through a popup, Parsing a new value from 
         /// the textbox, spinning a new value and programmatically specifying a value.</remarks>
         [TypeConverter(typeof(TimeTypeConverter))]
         public DateTime? Minimum
         {
-            get
-            {
-                return (DateTime?)this.GetValue(TimePicker.MinimumProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.MinimumProperty, (object)value);
-            }
+            get { return (DateTime?)GetValue(MinimumProperty); }
+            set { SetValue(MinimumProperty, value); }
         }
 
-        /// <summary>MinimumProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the Minimum dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MinimumProperty =
+            DependencyProperty.Register(
+                "Minimum",
+                typeof(DateTime?),
+                typeof(TimePicker),
+                new PropertyMetadata(null, OnMinimumPropertyChanged));
+
+        /// <summary>
+        /// MinimumProperty property changed handler.
+        /// </summary>
         /// <param name="d">TimeUpDown that changed its Minimum.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnMinimumPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnMinimumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
+            TimePicker source = (TimePicker)d;
             DateTime? oldValue = (DateTime?)e.OldValue;
             DateTime? newValue = (DateTime?)e.NewValue;
-            timePicker._ignoreValueChange = true;
-            timePicker._timeCoercionHelper.ProcessMinimumChange(newValue);
-            timePicker._ignoreValueChange = false;
-            timePicker.OnMinimumChanged(oldValue, newValue);
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.Minimum = newValue;
+
+            source._ignoreValueChange = true;
+            source._timeCoercionHelper.ProcessMinimumChange(newValue);
+            source._ignoreValueChange = false;
+
+            source.OnMinimumChanged(oldValue, newValue);
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.Minimum = newValue;
+            }
         }
 
-        /// <summary>Called when the Minimum property value has changed.</summary>
+        /// <summary>
+        /// Called when the Minimum property value has changed.
+        /// </summary>
         /// <param name="oldValue">Old value of the Minimum property.</param>
         /// <param name="newValue">New value of the Minimum property.</param>
         protected virtual void OnMinimumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
+#endregion public DateTime? Minimum
 
+#region public DateTime? Maximum
         /// <summary>
         /// Gets or sets the maximum time considered valid by the control.
         /// </summary>
-        /// <remarks>Setting the Maximum property is applicable for the following
-        /// features: Selecting a value through a popup, Parsing a new value
-        /// from the textbox, spinning a new value and programmatically specifying
+        /// <remarks>Setting the Maximum property is applicable for the following 
+        /// features: Selecting a value through a popup, Parsing a new value 
+        /// from the textbox, spinning a new value and programmatically specifying 
         /// a value. </remarks>
         [TypeConverter(typeof(TimeTypeConverter))]
         public DateTime? Maximum
         {
-            get
-            {
-                return (DateTime?)this.GetValue(TimePicker.MaximumProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.MaximumProperty, (object)value);
-            }
+            get { return (DateTime?)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, value); }
         }
 
-        /// <summary>MaximumProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the Maximum dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register(
+                "Maximum",
+                typeof(DateTime?),
+                typeof(TimePicker),
+                new PropertyMetadata(null, OnMaximumPropertyChanged));
+
+        /// <summary>
+        /// MaximumProperty property changed handler.
+        /// </summary>
         /// <param name="d">TimeUpDown that changed its Maximum.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnMaximumPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnMaximumPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
+            TimePicker source = (TimePicker)d;
             DateTime? oldValue = (DateTime?)e.OldValue;
             DateTime? newValue = (DateTime?)e.NewValue;
-            timePicker._ignoreValueChange = true;
-            timePicker._timeCoercionHelper.ProcessMaximumChange(newValue);
-            timePicker._ignoreValueChange = false;
-            timePicker.OnMaximumChanged(oldValue, newValue);
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.Maximum = newValue;
+
+            source._ignoreValueChange = true;
+            source._timeCoercionHelper.ProcessMaximumChange(newValue);
+            source._ignoreValueChange = false;
+
+            source.OnMaximumChanged(oldValue, newValue);
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.Maximum = newValue;
+            }
         }
 
-        /// <summary>Called when the Maximum property value has changed.</summary>
+        /// <summary>
+        /// Called when the Maximum property value has changed.
+        /// </summary>
         /// <param name="oldValue">Old value of the Maximum property.</param>
         /// <param name="newValue">New value of the Maximum property.</param>
         protected virtual void OnMaximumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
+#endregion public DateTime? Maximum
 
+#region public Style TimeUpDownStyle
         /// <summary>
-        /// Gets or sets the Style applied to the TimeUpDown portion of the TimePicker
+        /// Gets or sets the Style applied to the TimeUpDown portion of the TimePicker 
         /// control.
         /// </summary>
         public Style TimeUpDownStyle
         {
-            get
-            {
-                return this.GetValue(TimePicker.TimeUpDownStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(TimePicker.TimeUpDownStyleProperty, (object)value);
-            }
+            get { return GetValue(TimeUpDownStyleProperty) as Style; }
+            set { SetValue(TimeUpDownStyleProperty, value); }
         }
 
-        /// <summary>TimeUpDownStyleProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the TimeUpDownStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TimeUpDownStyleProperty =
+            DependencyProperty.Register(
+                "TimeUpDownStyle",
+                typeof(Style),
+                typeof(TimePicker),
+                new PropertyMetadata(OnTimeUpDownStylePropertyChanged));
+
+        /// <summary>
+        /// TimeUpDownStyleProperty property changed handler.
+        /// </summary>
         /// <param name="d">TimePicker that changed its TimeUpDownStyle.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnTimeUpDownStylePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnTimeUpDownStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
         }
+#endregion public Style TimeUpDownStyle
 
+#region public Style SpinnerStyle
         /// <summary>
         /// Gets or sets the Style that is applied to the spinner.
         /// </summary>
         public Style SpinnerStyle
         {
-            get
-            {
-                return this.GetValue(TimePicker.SpinnerStyleProperty) as Style;
-            }
-            set
-            {
-                this.SetValue(TimePicker.SpinnerStyleProperty, (object)value);
-            }
-        }
-
-        /// <summary>SpinnerStyleProperty property changed handler.</summary>
-        /// <param name="d">TimePicker that changed its SpinnerStyle.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnSpinnerStylePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
-        {
+            get { return GetValue(SpinnerStyleProperty) as Style; }
+            set { SetValue(SpinnerStyleProperty, value); }
         }
 
         /// <summary>
-        /// Gets or sets a collection of TimeParsers that are used when parsing
+        /// Identifies the SpinnerStyle dependency property.
+        /// </summary>
+        public static readonly DependencyProperty SpinnerStyleProperty =
+            DependencyProperty.Register(
+                "SpinnerStyle",
+                typeof(Style),
+                typeof(TimePicker),
+                new PropertyMetadata(OnSpinnerStylePropertyChanged));
+
+        /// <summary>
+        /// SpinnerStyleProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimePicker that changed its SpinnerStyle.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnSpinnerStylePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+#endregion public Style SpinnerStyle
+
+#region public TimeParserCollection TimeParsers
+        /// <summary>
+        /// Gets or sets a collection of TimeParsers that are used when parsing 
         /// text to time.
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Can be set from xaml.")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Can be set from xaml.")]
         public TimeParserCollection TimeParsers
         {
-            get
-            {
-                return this.GetValue(TimePicker.TimeParsersProperty) as TimeParserCollection;
-            }
-            set
-            {
-                this.SetValue(TimePicker.TimeParsersProperty, (object)value);
-            }
+            get { return GetValue(TimeParsersProperty) as TimeParserCollection; }
+            set { SetValue(TimeParsersProperty, value); }
         }
 
-        /// <summary>TimeParsersProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the TimeParsers dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TimeParsersProperty =
+            DependencyProperty.Register(
+                "TimeParsers",
+                typeof(TimeParserCollection),
+                typeof(TimePicker),
+                new PropertyMetadata(OnTimeParsersPropertyChanged));
+
+        /// <summary>
+        /// TimeParsersProperty property changed handler.
+        /// </summary>
         /// <param name="d">TimeUpDown that changed its TimeParsers.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnTimeParsersPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnTimeParsersPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
         }
 
@@ -396,51 +446,64 @@ namespace Windows.UI.Xaml.Controls
         /// Gets the actual TimeParsers that will be used for parsing by the control.
         /// </summary>
         /// <remarks>Includes the TimeParsers introduced in the TimeGlobalizationInfo.</remarks>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Can be set from xaml.")]
         public TimeParserCollection ActualTimeParsers
         {
             get
             {
-                return new TimeParserCollection(this.ActualTimeGlobalizationInfo.GetActualTimeParsers(this.TimeParsers == null ? (IEnumerable<TimeParser>)null : (IEnumerable<TimeParser>)this.TimeParsers.ToList<TimeParser>()));
+                return new TimeParserCollection(ActualTimeGlobalizationInfo.GetActualTimeParsers(TimeParsers == null ? null : TimeParsers.ToList()));
             }
         }
+#endregion public TimeParserCollection TimeParsers
 
+#region public ITimeFormat Format
         /// <summary>
-        /// Gets or sets the Format used by the control. From XAML Use either
-        /// "Short", "Long" or a custom format.
-        /// Custom formats can only contain "H", "h", "m", "s" or "t".
+        /// Gets or sets the Format used by the control. From XAML Use either 
+        /// "Short", "Long" or a custom format. 
+        /// Custom formats can only contain "H", "h", "m", "s" or "t". 
         /// For example: use 'hh:mm:ss' is used to format time as "13:45:30".
         /// </summary>
         [TypeConverter(typeof(TimeFormatConverter))]
         public ITimeFormat Format
         {
-            get
-            {
-                return this.GetValue(TimePicker.FormatProperty) as ITimeFormat;
-            }
-            set
-            {
-                this.SetValue(TimePicker.FormatProperty, (object)value);
-            }
-        }
-
-        /// <summary>FormatProperty property changed handler.</summary>
-        /// <param name="d">TimePicker that changed its Format.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnFormatPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
-        {
-            TimePicker timePicker = (TimePicker)d;
-            ITimeFormat newValue = e.NewValue as ITimeFormat;
-            if (e.NewValue != null)
-                timePicker._actualFormat = (ITimeFormat)null;
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.Format = newValue;
+            get { return GetValue(FormatProperty) as ITimeFormat; }
+            set { SetValue(FormatProperty, value); }
         }
 
         /// <summary>
-        /// Gets the actual format that will be used to display Time in the
+        /// Identifies the Format dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FormatProperty =
+            DependencyProperty.Register(
+                "Format",
+                typeof(ITimeFormat),
+                typeof(TimePicker),
+                new PropertyMetadata(OnFormatPropertyChanged));
+
+        /// <summary>
+        /// FormatProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimePicker that changed its Format.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnFormatPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePicker source = (TimePicker)d;
+            ITimeFormat newValue = e.NewValue as ITimeFormat;
+
+            if (e.NewValue != null)
+            {
+                // no need for cache any more.
+                source._actualFormat = null;
+            }
+
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.Format = newValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets the actual format that will be used to display Time in the 
         /// TimePicker. If no format is specified, ShortTimeFormat is used.
         /// </summary>
         /// <value>The actual display format.</value>
@@ -448,42 +511,62 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (this.Format != null)
-                    return this.Format;
-                if (this._actualFormat == null)
-                    this._actualFormat = (ITimeFormat)new ShortTimeFormat();
-                return this._actualFormat;
+                if (Format == null)
+                {
+                    if (_actualFormat == null)
+                    {
+                        _actualFormat = new ShortTimeFormat();
+                    }
+                    return _actualFormat;
+                }
+                else
+                {
+                    return Format;
+                }
             }
         }
 
         /// <summary>
-        /// Gets or sets the culture that will be used by the control for
+        /// BackingField for ActualFormat.
+        /// </summary>
+        private ITimeFormat _actualFormat;
+#endregion public ITimeFormat Format
+
+#region public CultureInfo Culture
+        /// <summary>
+        /// Gets or sets the culture that will be used by the control for 
         /// parsing and formatting.
         /// </summary>
         public CultureInfo Culture
         {
-            get
-            {
-                return (CultureInfo)this.GetValue(TimePicker.CultureProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.CultureProperty, (object)value);
-            }
+            get { return (CultureInfo)GetValue(CultureProperty); }
+            set { SetValue(CultureProperty, value); }
         }
 
-        /// <summary>CultureProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the Culture dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CultureProperty =
+            DependencyProperty.Register(
+                "Culture",
+                typeof(CultureInfo),
+                typeof(TimePicker),
+                new PropertyMetadata(null, OnCulturePropertyChanged));
+
+        /// <summary>
+        /// CultureProperty property changed handler.
+        /// </summary>
         /// <param name="d">TimeUpDown that changed its Culture.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnCulturePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnCulturePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
-            timePicker.ActualTimeGlobalizationInfo.Culture = e.NewValue as CultureInfo;
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.Culture = e.NewValue as CultureInfo;
+            TimePicker source = (TimePicker)d;
+            source.ActualTimeGlobalizationInfo.Culture = e.NewValue as CultureInfo;
+
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.Culture = e.NewValue as CultureInfo;
+            }
         }
 
         /// <summary>
@@ -493,65 +576,85 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                return this.ActualTimeGlobalizationInfo.ActualCulture;
+                return ActualTimeGlobalizationInfo.ActualCulture;
             }
         }
+#endregion public CultureInfo Culture
 
+#region public TimeGlobalizationInfo TimeGlobalizationInfo
         /// <summary>
-        /// Gets or sets the strategy object that determines how the control
-        /// interacts with DateTime and CultureInfo.
+        /// Gets or sets the strategy object that determines how the control 
+        /// interacts with DateTime and CultureInfo. 
         /// </summary>
         public TimeGlobalizationInfo TimeGlobalizationInfo
         {
-            get
-            {
-                return (TimeGlobalizationInfo)this.GetValue(TimePicker.TimeGlobalizationInfoProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.TimeGlobalizationInfoProperty, (object)value);
-            }
+            get { return (TimeGlobalizationInfo)GetValue(TimeGlobalizationInfoProperty); }
+            set { SetValue(TimeGlobalizationInfoProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the TimeGlobalizationInfo dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TimeGlobalizationInfoProperty =
+            DependencyProperty.Register(
+                "TimeGlobalizationInfo",
+                typeof(TimeGlobalizationInfo),
+                typeof(TimePicker),
+                new PropertyMetadata(OnTimeGlobalizationInfoPropertyChanged));
 
         /// <summary>
         /// TimeGlobalizationInfoProperty property changed handler.
         /// </summary>
         /// <param name="d">TimeUpDown that changed its TimeGlobalizationInfo.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnTimeGlobalizationInfoPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnTimeGlobalizationInfoPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
-            TimeGlobalizationInfo newValue = null;
-            if (e.NewValue is TimeGlobalizationInfo)
+            TimePicker source = (TimePicker)d;
+            TimeGlobalizationInfo newValue = e.NewValue as TimeGlobalizationInfo;
+            if (newValue != null)
             {
-                newValue = e.NewValue as TimeGlobalizationInfo;
-                newValue.Culture = timePicker.Culture;
-                timePicker._actualTimeGlobalizationInfo = (TimeGlobalizationInfo)null;
+                newValue.Culture = source.Culture;
+                source._actualTimeGlobalizationInfo = null; // no need for default any more.
             }
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.TimeGlobalizationInfo = newValue;
+
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.TimeGlobalizationInfo = newValue;
+            }
         }
 
         /// <summary>
         /// Gets the actual TimeGlobalization info used by the control.
         /// </summary>
-        /// <remarks>If TimeGlobalizationInfo is not set, will return
+        /// <remarks>If TimeGlobalizationInfo is not set, will return 
         /// default TimeGlobalizationInfo instance.</remarks>
         public TimeGlobalizationInfo ActualTimeGlobalizationInfo
         {
             get
             {
-                TimeGlobalizationInfo globalizationInfo = this.TimeGlobalizationInfo;
-                if (globalizationInfo != null)
-                    return globalizationInfo;
-                if (this._actualTimeGlobalizationInfo == null)
-                    this._actualTimeGlobalizationInfo = new TimeGlobalizationInfo();
-                return this._actualTimeGlobalizationInfo;
+                TimeGlobalizationInfo info = TimeGlobalizationInfo;
+
+                if (info == null)
+                {
+                    if (_actualTimeGlobalizationInfo == null)
+                    {
+                        // set the default strategy object
+                        _actualTimeGlobalizationInfo = new TimeGlobalizationInfo();
+                    }
+                    return _actualTimeGlobalizationInfo;
+                }
+                else
+                {
+                    return info;
+                }
             }
         }
+
+        /// <summary>
+        /// BackingField for ActualTimeGlobalizationInfo.
+        /// </summary>
+        private TimeGlobalizationInfo _actualTimeGlobalizationInfo;
+#endregion public TimeGlobalizationInfo TimeGlobalizationInfo
 
         /// <summary>
         /// Gets the TimePickerPopup that is used by the TimePicker. This
@@ -563,198 +666,321 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                return this.Popup != null ? this.Popup : this._instantiatedPopupFromTemplate;
+                if (Popup != null)
+                {
+                    return Popup;
+                }
+                else
+                {
+                    return _instantiatedPopupFromTemplate;
+                }
             }
         }
 
+#region public TimePickerPopup Popup
         /// <summary>
-        /// Gets or sets the TimePickerPopup that will be shown to the user by the
-        /// TimePicker control. This property may not be styled. To style a
+        /// Gets or sets the TimePickerPopup that will be shown to the user by the 
+        /// TimePicker control. This property may not be styled. To style a 
         /// TimePicker with a Popup, please use the PopupTemplate property.
         /// When both PopupTemplate and Popup are set, Popup will be used.
         /// </summary>
         /// <remark>This property might be null, since a template can be used.</remark>
         public TimePickerPopup Popup
         {
-            get
-            {
-                return this.GetValue(TimePicker.PopupProperty) as TimePickerPopup;
-            }
-            set
-            {
-                this.SetValue(TimePicker.PopupProperty, (object)value);
-            }
+            get { return GetValue(PopupProperty) as TimePickerPopup; }
+            set { SetValue(PopupProperty, value); }
         }
 
-        /// <summary>PopupProperty property changed handler.</summary>
+        /// <summary>
+        /// Identifies the Popup dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupProperty =
+            DependencyProperty.Register(
+                "Popup",
+                typeof(TimePickerPopup),
+                typeof(TimePicker),
+                new PropertyMetadata(OnPopupPropertyChanged));
+
+        /// <summary>
+        /// PopupProperty property changed handler.
+        /// </summary>
         /// <param name="d">TimePicker that changed its Popup.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnPopupPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnPopupPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
-            if (timePicker.Style != null && timePicker.Style.Setters.Where<SetterBase>((Func<SetterBase, bool>)(setterbase => setterbase is Setter setter && setter.Property == TimePicker.PopupProperty)).Count<SetterBase>() > 0)
-                throw new ArgumentException("Time Picker Popup Style Not Set");
+            TimePicker source = (TimePicker)d;
+
+            // a style may never set the popup property.
+            if (source.Style != null)
+            {
+                if (source.Style.Setters.Where(setterbase =>
+                                                   {
+                                                       Setter setter = setterbase as Setter;
+                                                       return (setter != null && setter.Property == PopupProperty);
+                                                   })
+                                         .Count() > 0)
+                {
+                    throw new ArgumentException("Cannot set the PopupProperty in a style. Please use PopupTemplate.");
+                }
+            }
+
             TimePickerPopup oldValue = e.OldValue as TimePickerPopup;
             TimePickerPopup newValue = e.NewValue as TimePickerPopup;
-            if (timePicker.PopupPlaceHolderPart != null)
-                timePicker.PopupPlaceHolderPart.ContentTemplate = (DataTemplate)null;
-            timePicker.UnregisterPopup(oldValue);
-            timePicker.RegisterPopup(newValue);
-            if (newValue == null)
-                timePicker.InstantiatePopupFromTemplate();
-            else
-                timePicker._instantiatedPopupFromTemplate = (TimePickerPopup)null;
-        }
 
+            if (source.PopupPlaceHolderPart != null)
+            {
+                source.PopupPlaceHolderPart.ContentTemplate = null;
+            }
+
+            // release references to oldPopup 
+            source.UnregisterPopup(oldValue);
+
+            // register newPopup
+            source.RegisterPopup(newValue);
+
+            if (newValue == null)
+            {
+                // possibly re-use a template.
+                // will register as well
+                source.InstantiatePopupFromTemplate();
+            }
+            else
+            {
+                // clear out any instantiated popup from a template.
+                source._instantiatedPopupFromTemplate = null;
+            }
+        }
+#endregion public TimePickerPopup Popup
+
+#region public TimePickerPopupTemplate PopupTemplate
         /// <summary>
         /// Gets or sets the template used as Popup. A Popup can also be set
         /// directly on the Popup property. When both PopupTemplate and Popup
-        /// are set, Popup will be used.
+        /// are set, Popup will be used. 
         /// </summary>
         public TimePickerPopupTemplate PopupTemplate
         {
-            get
-            {
-                return this.GetValue(TimePicker.PopupTemplateProperty) as TimePickerPopupTemplate;
-            }
-            set
-            {
-                this.SetValue(TimePicker.PopupTemplateProperty, (object)value);
-            }
-        }
-
-        /// <summary>PopupTemplateProperty property changed handler.</summary>
-        /// <param name="d">TimePicker that changed its PopupTemplate.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void OnPopupTemplatePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
-        {
-            ((TimePicker)d).InstantiatePopupFromTemplate();
+            get { return GetValue(PopupTemplateProperty) as TimePickerPopupTemplate; }
+            set { SetValue(PopupTemplateProperty, value); }
         }
 
         /// <summary>
-        /// Gets or sets the seconds interval between time values allowed by
+        /// Identifies the PopupTemplate dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupTemplateProperty =
+            DependencyProperty.Register(
+                "PopupTemplate",
+                typeof(TimePickerPopupTemplate),
+                typeof(TimePicker),
+                new PropertyMetadata(null, OnPopupTemplatePropertyChanged));
+
+        /// <summary>
+        /// PopupTemplateProperty property changed handler.
+        /// </summary>
+        /// <param name="d">TimePicker that changed its PopupTemplate.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnPopupTemplatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TimePicker source = (TimePicker)d;
+            source.InstantiatePopupFromTemplate();
+        }
+
+        /// <summary>
+        /// BackingField for InstantiatedPopupFromTemplate.
+        /// </summary>
+        private TimePickerPopup _instantiatedPopupFromTemplate;
+#endregion public TimePickerPopupTemplate PopupTemplate
+
+#region public int PopupSecondsInterval
+        /// <summary>
+        /// Gets or sets the seconds interval between time values allowed by 
         /// the TimePickerPopup.
         /// </summary>
         public int PopupSecondsInterval
         {
-            get
-            {
-                return (int)this.GetValue(TimePicker.PopupSecondsIntervalProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.PopupSecondsIntervalProperty, (object)value);
-            }
+            get { return (int)GetValue(PopupSecondsIntervalProperty); }
+            set { SetValue(PopupSecondsIntervalProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the PopupSecondsInterval dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupSecondsIntervalProperty =
+            DependencyProperty.Register(
+                "PopupSecondsInterval",
+                typeof(int),
+                typeof(TimePicker),
+                new PropertyMetadata(OnPopupSecondsIntervalPropertyChanged));
 
         /// <summary>
         /// PopupSecondsIntervalProperty property changed handler.
         /// </summary>
         /// <param name="d">TimePicker that changed its PopupSecondsInterval.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnPopupSecondsIntervalPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnPopupSecondsIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
-            int newValue = (int)e.NewValue;
-            if (newValue < 0 || newValue > 59)
+            TimePicker source = (TimePicker)d;
+            int value = (int)e.NewValue;
+
+            if (value < 0 || value > 59)
             {
-                timePicker.SetValue(TimePicker.PopupSecondsIntervalProperty, e.OldValue);
-                throw new ArgumentOutOfRangeException(nameof(e), string.Format((IFormatProvider)CultureInfo.InvariantCulture, "Invalid {0}", (object)newValue));
+                // revert to old value
+                source.SetValue(PopupSecondsIntervalProperty, e.OldValue);
+
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Invalid PopupSecondsInterval '{0}'.The interval can be set to 0 (no interval) to and including 59.",
+                    value);
+
+                throw new ArgumentOutOfRangeException("e", message);
             }
-            timePicker._isPopupSecondsInitialized = true;
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.PopupSecondsInterval = newValue;
+
+            source._isPopupSecondsInitialized = true;
+
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.PopupSecondsInterval = value;
+            }
         }
 
         /// <summary>
-        /// Gets or sets the minutes interval between time values allowed by the
+        /// Determines whether PopupSeconds has been changed.
+        /// </summary>
+        private bool _isPopupSecondsInitialized;
+#endregion public int PopupSecondsInterval
+
+#region public int PopupMinutesInterval
+        /// <summary>
+        /// Gets or sets the minutes interval between time values allowed by the 
         /// TimePickerPopup.
         /// </summary>
         public int PopupMinutesInterval
         {
-            get
-            {
-                return (int)this.GetValue(TimePicker.PopupMinutesIntervalProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.PopupMinutesIntervalProperty, (object)value);
-            }
+            get { return (int)GetValue(PopupMinutesIntervalProperty); }
+            set { SetValue(PopupMinutesIntervalProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the PopupMinutesInterval dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupMinutesIntervalProperty =
+            DependencyProperty.Register(
+                "PopupMinutesInterval",
+                typeof(int),
+                typeof(TimePicker),
+                new PropertyMetadata(OnPopupMinutesIntervalPropertyChanged));
 
         /// <summary>
         /// PopupMinutesIntervalProperty property changed handler.
         /// </summary>
         /// <param name="d">TimePicker that changed its PopupMinutesInterval.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnPopupMinutesIntervalPropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnPopupMinutesIntervalPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
-            int newValue = (int)e.NewValue;
-            if (newValue < 0 || newValue > 59)
+            TimePicker source = (TimePicker)d;
+            int value = (int)e.NewValue;
+
+            if (value < 0 || value > 59)
             {
-                timePicker.SetValue(TimePicker.PopupMinutesIntervalProperty, e.OldValue);
-                throw new ArgumentOutOfRangeException(nameof(e), string.Format((IFormatProvider)CultureInfo.InvariantCulture, "Invalid {0}", (object)newValue));
+                // revert to old value
+                source.SetValue(PopupMinutesIntervalProperty, e.OldValue);
+
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Invalid PopupMinutesInterval '{0}'. The interval can be set to 0 (no interval) to and including 59.",
+                    value);
+
+                throw new ArgumentOutOfRangeException("e", message);
             }
-            timePicker._isPopupMinutesInitialized = true;
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.PopupMinutesInterval = newValue;
+
+            source._isPopupMinutesInitialized = true;
+
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.PopupMinutesInterval = value;
+            }
         }
 
         /// <summary>
-        /// Gets or sets the whether the TimePickerPopup supports selecting
+        /// Determines whether PopupMinutes has been changed.
+        /// </summary>
+        private bool _isPopupMinutesInitialized;
+#endregion public int PopupMinutesInterval
+
+#region public PopupTimeSelectionMode PopupTimeSelectionMode
+        /// <summary>
+        /// Gets or sets the whether the TimePickerPopup supports selecting 
         /// designators and/or seconds.
         /// </summary>
         public PopupTimeSelectionMode PopupTimeSelectionMode
         {
-            get
-            {
-                return (PopupTimeSelectionMode)this.GetValue(TimePicker.PopupTimeSelectionModeProperty);
-            }
-            set
-            {
-                this.SetValue(TimePicker.PopupTimeSelectionModeProperty, (object)value);
-            }
+            get { return (PopupTimeSelectionMode)GetValue(PopupTimeSelectionModeProperty); }
+            set { SetValue(PopupTimeSelectionModeProperty, value); }
         }
+
+        /// <summary>
+        /// Identifies the PopupTimeSelectionMode dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PopupTimeSelectionModeProperty =
+            DependencyProperty.Register(
+                "PopupTimeSelectionMode",
+                typeof(PopupTimeSelectionMode),
+                typeof(TimePicker),
+                new PropertyMetadata(PopupTimeSelectionMode.HoursAndMinutesOnly, OnPopupTimeSelectionModePropertyChanged));
 
         /// <summary>
         /// PopupTimeSelectionModeProperty property changed handler.
         /// </summary>
         /// <param name="d">TimePicker that changed its PopupTimeSelectionMode.</param>
         /// <param name="e">Event arguments.</param>
-        private static void OnPopupTimeSelectionModePropertyChanged(
-          DependencyObject d,
-          DependencyPropertyChangedEventArgs e)
+        private static void OnPopupTimeSelectionModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TimePicker timePicker = (TimePicker)d;
-            PopupTimeSelectionMode newValue = (PopupTimeSelectionMode)e.NewValue;
-            bool flag = newValue == PopupTimeSelectionMode.HoursAndMinutesOnly || newValue == PopupTimeSelectionMode.AllowSecondsSelection;
-            if (timePicker.ActualTimePickerPopup != null)
-                flag = ((IEnumerable<PopupTimeSelectionMode>)timePicker.ActualTimePickerPopup.GetValidPopupTimeSelectionModes()).Contains<PopupTimeSelectionMode>(newValue);
-            if (!flag)
-            {
-                timePicker.SetValue(TimePicker.PopupTimeSelectionModeProperty, e.OldValue);
-                throw new ArgumentOutOfRangeException(nameof(e), string.Format((IFormatProvider)CultureInfo.InvariantCulture, "Invalid {0}", (object)newValue));
-            }
-            if (timePicker.ActualTimePickerPopup == null)
-                return;
-            timePicker.ActualTimePickerPopup.PopupTimeSelectionMode = newValue;
-        }
+            TimePicker source = (TimePicker)d;
+            PopupTimeSelectionMode value = (PopupTimeSelectionMode)e.NewValue;
 
-        /// <summary>Occurs when Value property is changing.</summary>
+            // todo: the enum values that are commented out will be included after mix.
+            bool valid = (// value == PopupTimeSelectionMode.AllowTimeDesignatorsSelection ||
+                         value == PopupTimeSelectionMode.HoursAndMinutesOnly ||
+                         // value == PopupTimeSelectionMode.AllowSecondsAndDesignatorsSelection ||
+                         value == PopupTimeSelectionMode.AllowSecondsSelection);
+
+            // the possibilities are limited to the popup that is used.
+            // if there is a popup, question it
+            if (source.ActualTimePickerPopup != null)
+            {
+                valid = source.ActualTimePickerPopup.GetValidPopupTimeSelectionModes().Contains(value);
+            }
+
+            if (!valid)
+            {
+                // revert to old value
+                source.SetValue(PopupTimeSelectionModeProperty, e.OldValue);
+
+                // todo: move to resource
+                string message = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Invalid PopupTimeSelectionMode for this popup, value '{0}'.",
+                        value);
+
+                throw new ArgumentOutOfRangeException("e", message);
+            }
+
+            if (source.ActualTimePickerPopup != null)
+            {
+                source.ActualTimePickerPopup.PopupTimeSelectionMode = value;
+            }
+        }
+#endregion public PopupTimeSelectionMode PopupTimeSelectionMode
+
+#region public events
+        /// <summary>
+        /// Occurs when Value property is changing.
+        /// </summary>
         public event RoutedPropertyChangingEventHandler<DateTime?> ValueChanging;
 
-        /// <summary>Occurs when Value property has changed.</summary>
+        /// <summary>
+        /// Occurs when Value property has changed.
+        /// </summary>
         public event RoutedPropertyChangedEventHandler<DateTime?> ValueChanged;
 
         /// <summary>
@@ -766,22 +992,20 @@ namespace Windows.UI.Xaml.Controls
         /// Occurs when there is an error in parsing user input and allows adding parsing logic.
         /// </summary>
         public event EventHandler<UpDownParseErrorEventArgs> ParseError;
+#endregion
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Windows.Controls.TimePicker" />
+        /// Initializes a new instance of the <see cref="TimePicker"/> 
         /// class.
         /// </summary>
         public TimePicker()
         {
-            this.DefaultStyleKey = (object)typeof(TimePicker);
-            this._timeCoercionHelper = new TimeCoercionHelper((ITimeInput)this);
-
-            // We would want to show popup even if text-box is focused
-            PopupButtonMode = ClickMode.Press;
+            DefaultStyleKey = typeof(TimePicker);
+            _timeCoercionHelper = new TimeCoercionHelper(this);
         }
 
         /// <summary>
-        /// Builds the visual tree for the TimePicker control when a new
+        /// Builds the visual tree for the TimePicker control when a new 
         /// template is applied.
         /// </summary>
 #if MIGRATION
@@ -791,84 +1015,111 @@ namespace Windows.UI.Xaml.Controls
 #endif
         {
             base.OnApplyTemplate();
-            this.TimeUpDownPart = this.GetTemplateChild("TimeUpDown") as TimeUpDown;
-            this.PopupPlaceHolderPart = this.GetTemplateChild("PopupPlaceHolder") as ContentControl;
-            this._isInitialized = true;
-            this.InstantiatePopupFromTemplate();
+
+            TimeUpDownPart = GetTemplateChild(ElementTimeUpDownName) as TimeUpDown;
+
+            PopupPlaceHolderPart = GetTemplateChild(ElementPopupPlaceHolderPartName) as ContentControl;
+
+            _isInitialized = true;
+
+            // after inititialization has occured, possibly use template.
+            InstantiatePopupFromTemplate();
         }
 
-        /// <summary>Gets the selected time  represented in the control.</summary>
+        /// <summary>
+        /// Gets the selected time  represented in the control.
+        /// </summary>
         /// <returns>The value that is picked.</returns>
         public override object GetSelectedValue()
         {
-            return (object)this.Value;
+            return Value;
         }
 
         /// <summary>
         /// Raises the ValueChanging event when Value property is changing.
         /// </summary>
         /// <param name="e">Event args.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Forced by UpDown.")]
         protected virtual void OnValueChanging(RoutedPropertyChangingEventArgs<DateTime?> e)
         {
-            if (this._timeCoercionHelper.CoerceValue(e.OldValue, e.NewValue))
+            // change is from value itself.
+            bool success = _timeCoercionHelper.CoerceValue(e.OldValue, e.NewValue);
+
+            if (success)
             {
                 e.InCoercion = false;
-                e.NewValue = this.Value;
-                RoutedPropertyChangingEventHandler<DateTime?> valueChanging = this.ValueChanging;
-                if (valueChanging == null)
-                    return;
-                valueChanging((object)this, e);
+                e.NewValue = Value;
+                RoutedPropertyChangingEventHandler<DateTime?> handler = ValueChanging;
+                if (handler != null)
+                {
+                    handler(this, e);
+                }
             }
             else
+            {
                 e.InCoercion = true;
+            }
         }
 
         /// <summary>
         /// Raises the ValueChanged event when Value property has changed.
         /// </summary>
         /// <param name="e">Event args.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Forced by UpDown.")]
         protected virtual void OnValueChanged(RoutedPropertyChangedEventArgs<DateTime?> e)
         {
-            RoutedPropertyChangedEventHandler<DateTime?> valueChanged = this.ValueChanged;
-            if (valueChanged == null)
-                return;
-            valueChanged((object)this, e);
+            RoutedPropertyChangedEventHandler<DateTime?> handler = ValueChanged;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
         }
 
-        /// <summary>Reacts to a change in value in TimeUpDown.</summary>
+#region TimeUpDown handling
+        /// <summary>
+        /// Reacts to a change in value in TimeUpDown.
+        /// </summary>
         /// <param name="sender">The TimeUpDown that changed its value.</param>
         /// <param name="e">The instance containing the event data.</param>
         private void TimeUpDownValueChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
         {
-            this.Value = e.NewValue;
+            Value = e.NewValue;
         }
 
-        /// <summary>Raised when TimeUpDown raises this event.</summary>
+        /// <summary>
+        /// Raised when TimeUpDown raises this event.
+        /// </summary>
         /// <param name="sender">The TimeUpDown instance raising this event.</param>
         /// <param name="e">The instance containing the event data.</param>
         /// <remarks>Here to make it easier to access
         /// these events.</remarks>
         private void TimeUpDownParseError(object sender, UpDownParseErrorEventArgs e)
         {
-            EventHandler<UpDownParseErrorEventArgs> parseError = this.ParseError;
-            if (parseError == null)
-                return;
-            parseError((object)this, e);
+            EventHandler<UpDownParseErrorEventArgs> handler = ParseError;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
         }
 
-        /// <summary>Raised when TimeUpDown raises this event.</summary>
+        /// <summary>
+        /// Raised when TimeUpDown raises this event.
+        /// </summary>
         /// <param name="sender">The TimeUpDown instance raising this event.</param>
         /// <param name="e">The instance containing the event data.</param>
         /// <remarks>Here to make it easier to access
         /// these events.</remarks>
         private void TimeUpDownParsing(object sender, UpDownParsingEventArgs<DateTime?> e)
         {
-            EventHandler<UpDownParsingEventArgs<DateTime?>> parsing = this.Parsing;
-            if (parsing == null)
-                return;
-            parsing((object)this, e);
+            EventHandler<UpDownParsingEventArgs<DateTime?>> handler = Parsing;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
         }
+#endregion TimeUpDown handling
 
+#region Popup handling
         /// <summary>
         /// Raises an DropDownOpened event when the IsDropDownOpen property
         /// changed from false to true.
@@ -877,30 +1128,65 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnDropDownOpened(RoutedPropertyChangedEventArgs<bool> e)
         {
             base.OnDropDownOpened(e);
-            this._popupSessionValueCache = this.Value;
-            TimePickerPopup popup = this.ActualTimePickerPopup;
-            if (popup == null)
-                return;
-            popup.Minimum = this.Minimum;
-            popup.Maximum = this.Maximum;
-            popup.Value = this.Value;
-            popup.Culture = this.Culture;
-            popup.TimeGlobalizationInfo = this.TimeGlobalizationInfo;
-            popup.PopupTimeSelectionMode = this.PopupTimeSelectionMode;
-            popup.Format = this.Format;
-            popup.OnOpened();
-            popup.ValueChanged += new RoutedPropertyChangedEventHandler<DateTime?>(this.PopupValueChanged);
-            popup.Cancel += new RoutedEventHandler(this.PopupCanceled);
-            popup.Commit += new RoutedEventHandler(this.PopupCommitted);
-            if (this._isPopupSecondsInitialized)
-                popup.PopupSecondsInterval = this.PopupSecondsInterval;
-            else
-                this.PopupSecondsInterval = popup.PopupSecondsInterval;
-            if (this._isPopupMinutesInitialized)
-                popup.PopupMinutesInterval = this.PopupMinutesInterval;
-            else
-                this.PopupMinutesInterval = popup.PopupMinutesInterval;
-            this.Dispatcher.BeginInvoke((Action)(() => popup.Focus()));
+
+            _popupSessionValueCache = Value;
+
+            TimePickerPopup popup = ActualTimePickerPopup;
+            if (popup != null)
+            {
+                // initialize with current values
+                popup.Minimum = Minimum;
+                popup.Maximum = Maximum;
+                popup.Value = Value;
+
+                popup.Culture = Culture;
+                popup.TimeGlobalizationInfo = TimeGlobalizationInfo;
+                popup.PopupTimeSelectionMode = PopupTimeSelectionMode;
+                popup.Format = Format;
+
+                // be mindful that this call could change the value of the picker
+                // because some popups 'snap' to closest value in their available
+                // options. Since we have not yet subscribed to the valuechanged
+                // event, we are able to ignore that event.
+                popup.OnOpened();
+
+                popup.ValueChanged += PopupValueChanged;
+                popup.Cancel += PopupCanceled;
+                popup.Commit += PopupCommitted;
+
+                // updatelayout is called by popup.OnOpened so we know styles and 
+                // templates have been applied.
+                // this is necessary for values on Popup that we might want to use.
+
+                // potentially overwrite our values with defaults from the popup
+                // only do this if our own values have not been set.
+                // SL does not support DependencyProperty.UnsetValue to enough
+                // extent to know if the current value is the default or not.
+                if (_isPopupSecondsInitialized)
+                {
+                    // push our value to Popup.
+                    popup.PopupSecondsInterval = PopupSecondsInterval;
+                }
+                else
+                {
+                    // not initialized explicitly, use default from Popup.
+                    PopupSecondsInterval = popup.PopupSecondsInterval;
+                }
+
+                if (_isPopupMinutesInitialized)
+                {
+                    // push our value to Popup.
+                    popup.PopupMinutesInterval = PopupMinutesInterval;
+                }
+                else
+                {
+                    // not initialized explicitly, use default from Popup.
+                    PopupMinutesInterval = popup.PopupMinutesInterval;
+                }
+
+                // set focus to the Popup.
+                Dispatcher.BeginInvoke(() => popup.Focus());
+            }
         }
 
         /// <summary>
@@ -911,38 +1197,52 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnDropDownClosed(RoutedPropertyChangedEventArgs<bool> e)
         {
             base.OnDropDownClosed(e);
-            TimePickerPopup actualTimePickerPopup = this.ActualTimePickerPopup;
-            if (actualTimePickerPopup != null)
+
+            TimePickerPopup popup = ActualTimePickerPopup as TimePickerPopup;
+            if (popup != null)
             {
-                actualTimePickerPopup.OnClosed();
-                actualTimePickerPopup.ValueChanged -= new RoutedPropertyChangedEventHandler<DateTime?>(this.PopupValueChanged);
-                actualTimePickerPopup.Cancel -= new RoutedEventHandler(this.PopupCanceled);
-                actualTimePickerPopup.Commit -= new RoutedEventHandler(this.PopupCommitted);
+                popup.OnClosed();
+                popup.ValueChanged -= PopupValueChanged;
+                popup.Cancel -= PopupCanceled;
+                popup.Commit -= PopupCommitted;
             }
-            if (!this._isInitialized)
-                return;
-            this.Dispatcher.BeginInvoke((Action)(() =>
+
+            // only set focus to the Button if this close was initiated
+            // after initialization.
+            if (_isInitialized)
             {
-                if (this.DropDownToggleButton == null)
-                    return;
-                this.DropDownToggleButton.Focus();
-            }));
+                Dispatcher.BeginInvoke(() =>
+                                           {
+                                               if (DropDownToggleButton != null)
+                                               {
+                                                   DropDownToggleButton.Focus();
+                                               }
+                                           });
+            }
         }
 
-        /// <summary>Reacts to a Value change in a popup.</summary>
+        /// <summary>
+        /// Reacts to a Value change in a popup.
+        /// </summary>
         /// <param name="sender">The Popup that raised a ValueChange.</param>
         /// <param name="e">The  instance containing the event data.</param>
         private void PopupValueChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
         {
-            this.Value = e.NewValue;
+            Value = e.NewValue;
         }
 
-        /// <summary>The Popup has been committed. Will close the popup.</summary>
+        /// <summary>
+        /// The Popup has been committed. Will close the popup.
+        /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="T:System.Windows.RoutedEventArgs" /> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
         private void PopupCommitted(object sender, RoutedEventArgs e)
         {
-            this.IsDropDownOpen = false;
+            // no work needs to be done.
+            // usage for this control will update value
+            // during the picking of a time.
+
+            IsDropDownOpen = false;
         }
 
         /// <summary>
@@ -950,98 +1250,136 @@ namespace Windows.UI.Xaml.Controls
         /// and set the value back to its initial value.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="T:System.Windows.RoutedEventArgs" /> instance containing the event data.</param>
+        /// <param name="e">The <see cref="System.Windows.RoutedEventArgs"/> instance containing the event data.</param>
         private void PopupCanceled(object sender, RoutedEventArgs e)
         {
-            this.IsDropDownOpen = false;
-            this.Value = this._popupSessionValueCache;
+            IsDropDownOpen = false;
+            // push back the 
+            Value = _popupSessionValueCache;
         }
 
-        /// <summary>Called when a new Popup is set.</summary>
+        /// <summary>
+        /// Called when a new Popup is set.
+        /// </summary>
         /// <param name="popup">The new value.</param>
         private void RegisterPopup(TimePickerPopup popup)
         {
-            if (popup == null)
-                return;
-            if (this.PopupPlaceHolderPart != null)
-                this.PopupPlaceHolderPart.Content = (object)popup;
-            popup.TimePickerParent = this;
-            if (!((IEnumerable<PopupTimeSelectionMode>)popup.GetValidPopupTimeSelectionModes()).Contains<PopupTimeSelectionMode>(this.PopupTimeSelectionMode))
-                this.PopupTimeSelectionMode = popup.PopupTimeSelectionMode;
+            if (popup != null)
+            {
+                if (PopupPlaceHolderPart != null)
+                {
+                    PopupPlaceHolderPart.Content = popup;
+                }
+
+                popup.TimePickerParent = this;
+
+                if (!popup.GetValidPopupTimeSelectionModes().Contains(PopupTimeSelectionMode))
+                {
+                    // silently coerce
+                    PopupTimeSelectionMode = popup.PopupTimeSelectionMode;
+                }
+            }
         }
 
-        /// <summary>Unregisters the popup.</summary>
+        /// <summary>
+        /// Unregisters the popup.
+        /// </summary>
         /// <param name="popup">The old value.</param>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Symmetry with RegisterPopup.")]
         private void UnregisterPopup(TimePickerPopup popup)
         {
-            if (popup == null)
-                return;
-            popup.TimePickerParent = (TimePicker)null;
+            if (popup != null)
+            {
+                popup.TimePickerParent = null;
+            }
         }
 
-        /// <summary>Instantiates the template.</summary>
+        /// <summary>
+        /// Instantiates the template.
+        /// </summary>
         /// <remarks>Will only use template if Popup is not set.</remarks>
         private void InstantiatePopupFromTemplate()
         {
-            if (!this._isInitialized || this.Popup != null || this.PopupTemplate == null)
-                return;
-            this.UnregisterPopup(this.ActualTimePickerPopup);
-            if (this.PopupTemplate.LoadContent() is TimePickerPopup timePickerPopup)
+            // template will only be used when no Popup is set.
+
+            if (_isInitialized && Popup == null && PopupTemplate != null)
             {
-                this._instantiatedPopupFromTemplate = timePickerPopup;
-                this.RegisterPopup(this.ActualTimePickerPopup);
+                // unregister oldPopup
+                UnregisterPopup(ActualTimePickerPopup);
+
+                // instantiate template
+                TimePickerPopup popup = PopupTemplate.LoadContent() as TimePickerPopup;
+
+                if (popup != null)
+                {
+                    _instantiatedPopupFromTemplate = popup;
+
+                    // register
+                    RegisterPopup(ActualTimePickerPopup);
+                }
             }
         }
+#endregion Popup handling
 
         /// <summary>
         /// Propagates the new value to components that are part of
         /// our template.
         /// </summary>
-        /// <remarks>Workaround for SL2 inability to do twoway
+        /// <remarks>Workaround for SL2 inability to do twoway 
         /// templatebinding. Should remove in SL3.</remarks>
         private void PropagateNewValue()
         {
-            if (this.ActualTimePickerPopup != null)
-                this.ActualTimePickerPopup.Value = this.Value;
-            if (this.TimeUpDownPart == null)
-                return;
-            this.TimeUpDownPart.Value = this.Value;
+            if (ActualTimePickerPopup != null)
+            {
+                ActualTimePickerPopup.Value = Value;
+            }
+
+            if (TimeUpDownPart != null)
+            {
+                TimeUpDownPart.Value = Value;
+            }
         }
 
+        /// <summary>
+        /// Returns a PickerAutomationPeer for use by the Silverlight 
+        /// automation infrastructure.
+        /// </summary>
+        /// <returns>A PickerAutomationPeer for the Picker object.</returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new TimePickerAutomationPeer(this);
+        }
+
+#region ITimeInput Members
+        /// <summary>
+        /// Gets or sets the Value property.
+        /// </summary>
+        /// <value></value>
         DateTime? ITimeInput.Value
         {
-            get
-            {
-                return this.Value;
-            }
-            set
-            {
-                this.Value = value;
-            }
+            get { return Value; }
+            set { Value = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the minimum time.
+        /// </summary>
+        /// <value>The minimum time.</value>
         DateTime? ITimeInput.Minimum
         {
-            get
-            {
-                return this.Minimum;
-            }
-            set
-            {
-                this.Minimum = value;
-            }
+            get { return Minimum; }
+            set { Minimum = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the maximum time.
+        /// </summary>
+        /// <value>The maximum time.</value>
         DateTime? ITimeInput.Maximum
         {
-            get
-            {
-                return this.Maximum;
-            }
-            set
-            {
-                this.Maximum = value;
-            }
+            get { return Maximum; }
+            set { Maximum = value; }
         }
+#endregion
     }
 }

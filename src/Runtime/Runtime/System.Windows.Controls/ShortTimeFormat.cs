@@ -1,15 +1,7 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System.Collections.Generic;
 using System.Globalization;
@@ -23,17 +15,31 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents the short time format used for parsing and formatting.
     /// </summary>
-    public class ShortTimeFormat : ITimeFormat
+    public sealed class ShortTimeFormat : ITimeFormat
     {
+        /// <summary>
+        /// Gets the format to use to display a DateTime as a time value.
+        /// </summary>
+        /// <param name="culture">The culture.</param>
+        /// <returns>
+        /// A format to use during display of a DateTime.
+        /// </returns>
         public string GetTimeDisplayFormat(CultureInfo culture)
         {
             DateTimeFormatInfo info = culture.DateTimeFormat;
             return info.ShortTimePattern;
         }
 
+        /// <summary>
+        /// Gets the formats to use to parse a string to a DateTime.
+        /// </summary>
+        /// <param name="culture">Culture used to determine formats.</param>
+        /// <returns>
+        /// An array of formats to be used during parsing.
+        /// </returns>
         public string[] GetTimeParseFormats(CultureInfo culture)
         {
-            var formats = new List<string>(6);
+            List<string> formats = new List<string>(6);
 
             DateTimeFormatInfo info = culture.DateTimeFormat;
             if (info != null)
@@ -44,7 +50,7 @@ namespace Windows.UI.Xaml.Controls
             return formats.ToArray();
         }
 
-#region Equals and hashcode.
+        #region Equals and hashcode.
         /// <summary>
         /// Determines whether the specified <see cref="T:System.Object"/> is 
         /// equal to the current <see cref="T:System.Object"/>.
@@ -106,6 +112,6 @@ namespace Windows.UI.Xaml.Controls
         {
             return GetType().Name.GetHashCode();
         }
-#endregion
+        #endregion
     }
 }
