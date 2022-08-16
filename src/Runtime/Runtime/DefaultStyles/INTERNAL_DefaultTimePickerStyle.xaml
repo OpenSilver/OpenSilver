@@ -27,10 +27,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TimePicker">
-                    <Grid x:Name="RootElement">
+                    <Grid x:Name="RootElement" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}" >
                         <Grid.Resources>
                             <ControlTemplate x:Key="PopupButtonTemplate" TargetType="ToggleButton">
-                                <Grid FlowDirection="LeftToRight" Height="20" Width="20">
+                                <Grid FlowDirection="LeftToRight" Height="20" Width="20" VerticalAlignment="Center">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroup x:Name="CommonStates">
                                             <VisualStateGroup.Transitions>
@@ -238,10 +238,10 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <TimeUpDown x:Name="TimeUpDown" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}"
-                                    Culture="{TemplateBinding Culture}" Grid.Column="0" Format="{TemplateBinding Format}" Height="20" Width="20" Maximum="{TemplateBinding Maximum}" 
+                                    Culture="{TemplateBinding Culture}" Grid.Column="0" Format="{TemplateBinding Format}" Height="20" Maximum="{TemplateBinding Maximum}" 
                                     Minimum="{TemplateBinding Minimum}" Padding="{TemplateBinding Padding}" Style="{TemplateBinding TimeUpDownStyle}" SpinnerStyle="{TemplateBinding SpinnerStyle}"
-                                    TimeParsers="{TemplateBinding TimeParsers}" TimeGlobalizationInfo="{TemplateBinding TimeGlobalizationInfo}"/>
-                        <ToggleButton x:Name="DropDownToggle" Grid.Column="1" HorizontalAlignment="Center" Margin="3,0,0,0" Template="{StaticResource PopupButtonTemplate}" VerticalAlignment="Center"/>
+                                    TimeParsers="{TemplateBinding TimeParsers}" TimeGlobalizationInfo="{TemplateBinding TimeGlobalizationInfo}" VerticalAlignment="Center"/>
+                        <ToggleButton x:Name="DropDownToggle" Grid.Column="1" Margin="3,0,0,0" Template="{StaticResource PopupButtonTemplate}" VerticalAlignment="Center"/>
                         <Popup x:Name="Popup" CustomLayout="True">
                             <Border x:Name="PopupRoot" BorderBrush="#FF8d8b8b" BorderThickness="1">
                                 <ContentControl x:Name="PopupPlaceHolder" HorizontalContentAlignment="Stretch" IsTabStop="False" VerticalContentAlignment="Stretch"/>
