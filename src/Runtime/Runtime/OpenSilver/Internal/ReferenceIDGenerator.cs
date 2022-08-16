@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,17 @@
 *  
 \*====================================================================================*/
 
+using System.Threading;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CSHTML5.Internal
+namespace OpenSilver.Internal
 {
-    internal static class INTERNAL_HtmlDomUniqueIdentifiers
+    /// <summary>
+    /// This class has a method that generates IDs in sequence (0, 1, 2, 3...)
+    /// </summary>
+    internal class ReferenceIDGenerator
     {
-        static int CurrentIndentifier = 0;
+        private int _id = 0;
 
-        public static string CreateNew()
-        {
-            CurrentIndentifier++;
-            return "id" + CurrentIndentifier.ToString();
-        }
+        internal int NewId() => Interlocked.Increment(ref _id);
     }
 }

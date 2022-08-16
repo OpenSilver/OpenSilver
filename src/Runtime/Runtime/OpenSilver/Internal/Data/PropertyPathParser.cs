@@ -24,20 +24,22 @@ namespace OpenSilver.Internal.Data
     }
 
     //Property path syntax: http://msdn.microsoft.com/en-us/library/cc645024(v=vs.95).aspx
-    internal class PropertyPathParser
+    internal struct PropertyPathParser
     {
-        string Path;
+        private string _path;
+        private readonly bool _isParsingBinding;
 
-        internal PropertyPathParser(string path)
+        internal PropertyPathParser(string path, bool isParsingBinding)
         {
-            this.Path = path;
+            _path = path;
+            _isParsingBinding = isParsingBinding;
         }
 
         internal PropertyNodeType Step(out string typeName, out string propertyName, out string index)
         {
             var type = PropertyNodeType.None;
-            var path = this.Path;
-            if (path.Length == 0 || path == ".")
+            var path = _path;
+            if (string.IsNullOrEmpty(path) || path == ".")
             {
                 typeName = null;
                 propertyName = null;
@@ -58,12 +60,21 @@ namespace OpenSilver.Internal.Data
                 int typeEnd = path.LastIndexOf('.', end);
                 if (typeEnd == -1)
                 {
-                    throw new Exception($"Invalid property path : '{path}'.");
-                }
+                    if (_isParsingBinding)
+                    {
+                        throw new Exception($"Invalid property path : '{path}'.");
+                    }
 
-                typeName = path.Substring(1, typeEnd - 1);
-                propertyName = path.Substring(typeEnd + 1, end - typeEnd - 1);
-                index = null;
+                    typeName = null;
+                    propertyName = path.Substring(1, end - 1);
+                    index = null;
+                }
+                else
+                {
+                    typeName = path.Substring(1, typeEnd - 1);
+                    propertyName = path.Substring(typeEnd + 1, end - typeEnd - 1);
+                    index = null;
+                }
 
                 if (path.Length > (end + 1) && path[end + 1] == '.')
                 {
@@ -106,7 +117,8 @@ namespace OpenSilver.Internal.Data
                 typeName = null;
                 index = null;
             }
-            Path = path;
+
+            _path = path;
 
             return type;
         }

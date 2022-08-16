@@ -60,9 +60,12 @@
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
 		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
+		<Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
+		<Compile Include="OpenSilver\Internal\VisualStateGroupCollection.cs" />
+		<Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
-    <Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
+		<Compile Include="OpenSilver\Internal\Data\DefaultValueConverter.cs" />
 		<Compile Include="OpenSilver\Internal\Data\DynamicValueConverter.cs" />
 		<Compile Include="OpenSilver\Internal\Data\IPropertyPathNode.cs" />
 		<Compile Include="OpenSilver\Internal\Data\SourcePropertyNode.cs" />
@@ -515,7 +518,6 @@
 		<Compile Include="Core\Events\HtmlEventProxy.cs" />
 		<Compile Include="Core\Events\INTERNAL_EventManager.cs" />
 		<Compile Include="Core\Events\INTERNAL_EventsHelper.cs" />
-		<Compile Include="Core\Main\DelegateUtility.cs" />
 		<Compile Include="Core\Main\INameScope.cs" />
 		<Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
 		<Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
@@ -552,12 +554,8 @@
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomStyleReference.cs" />
-		<Compile Include="Core\Rendering\INTERNAL_HtmlDomUniqueIdentifiers.cs" />
-		<Compile Include="Core\Rendering\INTERNAL_ObjectTreeHelper.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_PopupsManager.cs" />
-		<Compile Include="Core\Rendering\INTERNAL_SimulatorJSExpression.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_SimulatorPerformanceOptimizer.cs" />
-		<Compile Include="Core\Rendering\INTERNAL_VisibilityChangedNotifier.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_VisualChildInformation.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_VisualTreeManager.cs" />
 		<Compile Include="Core\WebRequestHelper\INTERNAL_WebRequestHelper_JSOnly.cs" />
@@ -922,8 +920,8 @@
 		<Compile Include="System.Windows.Media.Animation\TransitionCollection.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\BackEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\ColorAnimationUsingKeyFrames.cs" />
-		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
-		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
+		<Compile Include="System.Windows.Media.Animation\ColorKeyFrame.cs" />
+		<Compile Include="System.Windows.Media.Animation\ColorKeyFrameCollection.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\KeySpline.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplineColorKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplineDoubleKeyFrame.cs" />

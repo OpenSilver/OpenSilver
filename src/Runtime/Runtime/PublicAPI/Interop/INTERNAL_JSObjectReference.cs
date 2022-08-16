@@ -12,6 +12,7 @@
 *
 \*====================================================================================*/
 
+using CSHTML5.Internal;
 
 #if BRIDGE
 using Bridge;
@@ -74,6 +75,12 @@ namespace CSHTML5.Types
             ReferenceId = referenceId;
             IsArray = true;
             ArrayIndex = arrayIndex;
+        }
+
+        ~INTERNAL_JSObjectReference()
+        {
+            // Removing itself from JS dict used for C# to JS Interops, otherwise dict keeps growing. Needs more testing
+            INTERNAL_HtmlDomManager.ExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
         }
 
 #if BRIDGE

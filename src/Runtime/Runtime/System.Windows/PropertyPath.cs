@@ -132,7 +132,7 @@ namespace Windows.UI.Xaml
         private static SourceValueInfo[] ParsePath(string path)
         {
             List<SourceValueInfo> steps = new List<SourceValueInfo>();
-            var parser = new PropertyPathParser(path);
+            var parser = new PropertyPathParser(path, false);
             while (true)
             {
                 switch (parser.Step(out _, out string property, out string index))
@@ -161,9 +161,7 @@ namespace Windows.UI.Xaml
             }
 
         exit:
-            SourceValueInfo[] res = new SourceValueInfo[steps.Count];
-            steps.CopyTo(res);
-            return res;
+            return steps.ToArray();
         }
 
         private IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> accessVisualStateProperty(DependencyObject rootTargetObjectInstance)
@@ -183,7 +181,7 @@ namespace Windows.UI.Xaml
                     case PropertyNodeType.Indexed:
                         IList list = currentTarget as IList;
                         if (!(currentTarget is IList))
-                            {
+                        {
                             throw new InvalidOperationException($"'{currentTarget}' must implement IList.");
                         }
                         int index = -1;

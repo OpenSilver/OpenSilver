@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -25,8 +26,16 @@ namespace Windows.UI.Xaml.Media.Animation
     /// </summary>
     public sealed partial class ObjectKeyFrameCollection : PresentationFrameworkCollection<ObjectKeyFrame>
     {
-        public ObjectKeyFrameCollection() : base(false)
+        public ObjectKeyFrameCollection()
+            : base(false)
         {
+        }
+
+        internal ObjectKeyFrameCollection(ObjectAnimationUsingKeyFrames owner)
+            : base(false)
+        {
+            Debug.Assert(owner != null);
+            owner.ProvideSelfAsInheritanceContext(this, null);
         }
 
         internal override void AddOverride(ObjectKeyFrame keyFrame)

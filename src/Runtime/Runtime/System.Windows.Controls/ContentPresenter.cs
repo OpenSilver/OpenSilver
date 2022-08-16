@@ -124,7 +124,7 @@ namespace Windows.UI.Xaml.Controls
             // keep the DataContext in sync with Content
             if (ctrl._templateIsCurrent && ctrl.Template != UIElementContentTemplate)
             {
-                ctrl.DataContext = e.NewValue;
+                ctrl.UpdateDataContext();
             }
 
             if (ctrl.IsConnectedToLiveTree)
@@ -260,21 +260,26 @@ namespace Windows.UI.Xaml.Controls
                     Template = null;
                 }
 
-                if (newTemplate != UIElementContentTemplate)
-                {
-                    // set data context to the content, so that the template can bind to
-                    // properties of the content.
-                    DataContext = Content;
-                }
-                else
-                {
-                    // If we're using the content directly, clear the data context.
-                    // The content expects to inherit.
-                    ClearValue(DataContextProperty);
-                }
+                UpdateDataContext();
             }
 
             Template = newTemplate;
+        }
+
+        private void UpdateDataContext()
+        {
+            if (!(Content is UIElement))
+            {
+                // set data context to the content, so that the template can bind to
+                // properties of the content.
+                DataContext = Content;
+            }
+            else
+            {
+                // If we're using the content directly, clear the data context.
+                // The content expects to inherit.
+                ClearValue(DataContextProperty);
+            }
         }
 
         /// <summary>
@@ -554,12 +559,16 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
-            if (childElements.Count() > 0)
+            int count = VisualChildrenCount;
+
+            if (count > 0)
             {
-                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
-                elementChild.Measure(availableSize);
-                return elementChild.DesiredSize;
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Measure(availableSize);
+                    return child.DesiredSize;
+                }
             }
 
             if (Content == null)
@@ -567,18 +576,6 @@ namespace Windows.UI.Xaml.Controls
 
             Size actualSize = new Size(double.IsNaN(Width) ? ActualWidth : Width, double.IsNaN(Height) ? ActualHeight : Height);
             return actualSize;
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            IEnumerable<DependencyObject> childElements = VisualTreeHelper.GetVisualChildren(this);
-            if (childElements.Count() > 0)
-            {
-                UIElement elementChild = ((UIElement)childElements.ElementAt(0));
-                elementChild.Arrange(new Rect(finalSize));
-            }
-
-            return finalSize;
         }
     }
 }

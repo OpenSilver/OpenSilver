@@ -34,15 +34,18 @@ namespace CSHTML5.Internal
 #endif
     public class INTERNAL_HtmlDomElementReference
     {
+        private INTERNAL_HtmlDomElementReference _parent;
+        private INTERNAL_HtmlDomStyleReference _style;
+        private INTERNAL_Html2dContextReference _context2d;
+
         public INTERNAL_HtmlDomElementReference(string uniqueIdentifier, INTERNAL_HtmlDomElementReference parent)
         {
-            this.UniqueIdentifier = uniqueIdentifier;
-            this.Parent = parent;
+            UniqueIdentifier = uniqueIdentifier;
+            Parent = parent;
         }
 
-        public string UniqueIdentifier { get; private set; }
-
-        private INTERNAL_HtmlDomElementReference _parent;
+        public string UniqueIdentifier { get; }
+        
         public INTERNAL_HtmlDomElementReference Parent
         {
             get { return _parent; }
@@ -58,5 +61,9 @@ namespace CSHTML5.Internal
         }
 
         public INTERNAL_HtmlDomElementReference FirstChild { get; internal set; }
+        
+        internal INTERNAL_HtmlDomStyleReference Style => _style ?? (_style = new INTERNAL_HtmlDomStyleReference(UniqueIdentifier));
+
+        internal INTERNAL_Html2dContextReference Context2d => _context2d ?? (_context2d = new INTERNAL_Html2dContextReference(UniqueIdentifier));
     }
 }

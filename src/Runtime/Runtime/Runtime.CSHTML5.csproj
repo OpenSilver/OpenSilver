@@ -102,8 +102,11 @@
     <Compile Include="OpenSilver\Internal\NameScope.cs" />
     <Compile Include="OpenSilver\Internal\ObjectExtensions.cs" />
     <Compile Include="OpenSilver\Internal\Parsers.cs" />
+    <Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
     <Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
     <Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
+    <Compile Include="OpenSilver\Internal\VisualStateGroupCollection.cs" />
+    <Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContext.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlContextStack.cs" />
     <Compile Include="OpenSilver\Internal\Xaml\Context\XamlObjectFrame.cs" />
@@ -373,7 +376,6 @@
     <Compile Include="ToBeReviewed\GroupedEnumerable_4.cs" />
     <Compile Include="ToBeReviewed\Grouping_2.cs" />
     <Compile Include="ToBeReviewed\OrderedEnumerable.cs" />
-    <Compile Include="Core\Main\DelegateUtility.cs" />
     <Compile Include="Core\Main\INameScope.cs" />
     <Compile Include="Core\Main\INTERNAL_ListsHelper.cs" />
     <Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
@@ -477,12 +479,8 @@
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomElementReference.cs" />
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.cs" />
     <Compile Include="Core\Rendering\INTERNAL_HtmlDomStyleReference.cs" />
-    <Compile Include="Core\Rendering\INTERNAL_HtmlDomUniqueIdentifiers.cs" />
-    <Compile Include="Core\Rendering\INTERNAL_ObjectTreeHelper.cs" />
     <Compile Include="Core\Rendering\INTERNAL_PopupsManager.cs" />
-    <Compile Include="Core\Rendering\INTERNAL_SimulatorJSExpression.cs" />
     <Compile Include="Core\Rendering\INTERNAL_SimulatorPerformanceOptimizer.cs" />
-    <Compile Include="Core\Rendering\INTERNAL_VisibilityChangedNotifier.cs" />
     <Compile Include="Core\Rendering\INTERNAL_VisualChildInformation.cs" />
     <Compile Include="Core\Rendering\INTERNAL_VisualTreeManager.cs" />
     <Compile Include="Core\Other\SilverlightAndWpfNamespaces.cs" />
@@ -899,8 +897,8 @@
     <Compile Include="System.Windows.Media.Animation\AnimationTimeline.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\BackEase.cs" />
     <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ClockState.cs" />
-    <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrame.cs" />
-    <Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ColorKeyFrameCollection.cs" />
+    <Compile Include="System.Windows.Media.Animation\ColorKeyFrame.cs" />
+    <Compile Include="System.Windows.Media.Animation\ColorKeyFrameCollection.cs" />
     <Compile Include="System.Windows.Media.Animation\DoubleAnimationUsingKeyFrames.cs" />
     <Compile Include="System.Windows.Media.Animation\DoubleKeyFrame.cs" />
     <Compile Include="System.Windows.Media.Animation\DoubleKeyFrameCollection.cs" />

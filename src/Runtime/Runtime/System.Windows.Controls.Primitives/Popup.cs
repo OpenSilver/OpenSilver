@@ -319,7 +319,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     {
                         popup.OnOpened();
 
-                        Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
+                        popup._controlToWatch = Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
                         popup.ShowPopupRootIfNotAlreadyVisible();
 
                         //We calculate the position at which the popup will be:
@@ -345,6 +345,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     {
                         popup.OnClosed();
                         Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(popup._controlToWatch);
+                        popup._controlToWatch = null;
                         popup.HidePopupRootIfVisible();
                     }
                 }
@@ -357,6 +358,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (PlacementTarget != null && !INTERNAL_VisualTreeManager.IsElementInVisualTree(PlacementTarget))
             {
                 Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(_controlToWatch);
+                _controlToWatch = null;
                 HidePopupRootIfVisible();
             }
             else if (PlacementTarget != null)
@@ -591,6 +593,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 var popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(parentWindow);
                 _popupRoot = popupRoot;
                 _popupRoot.INTERNAL_LinkedPopup = this;
+                _popupRoot.UpdateIsVisible();
 
                 // Set CustomLayout of the popup root:
                 if (this.CustomLayout)
@@ -622,6 +625,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 Binding b2 = new Binding("Height") { Source = this };
                 _outerBorder.SetBinding(Border.HeightProperty, b2);
 
+                Binding b3 = new Binding("MaxHeight") { Source = this };
+                _outerBorder.SetBinding(Border.MaxHeightProperty, b3);
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
                 _outerBorder.Loaded += (s, e) => { popupRoot.INTERNAL_RaiseLoadedEvent(); };
 

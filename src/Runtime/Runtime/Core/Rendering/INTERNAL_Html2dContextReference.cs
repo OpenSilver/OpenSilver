@@ -35,27 +35,17 @@ namespace CSHTML5.Internal
     internal class INTERNAL_Html2dContextReference : DynamicObject
 #endif
     {
-        static Dictionary<string, INTERNAL_Html2dContextReference> IdToInstance = new Dictionary<string, INTERNAL_Html2dContextReference>();
-
-        public static INTERNAL_Html2dContextReference GetInstance(string elementId)
-        {
-            if (IdToInstance.ContainsKey(elementId))
-                return IdToInstance[elementId];
-            else
-            {
-                var newInstance = new INTERNAL_Html2dContextReference(elementId);
-                IdToInstance[elementId] = newInstance;
-                return newInstance;
-            }
-        }
-
-        string _domElementUniqueIdentifier;
+        private readonly string _id;
 
         // Note: It's important that the constructor stays Private because we need to recycle the instances that correspond to the same ID using the "GetInstance" public static method, so that each ID always corresponds to the same instance. This is useful to ensure that private fields such as "_display" work propertly.
-        private INTERNAL_Html2dContextReference(string elementId)
+        internal INTERNAL_Html2dContextReference(string elementId)
         {
-            _domElementUniqueIdentifier = elementId;
+            _id = elementId;
         }
+
+        [Obsolete("This method is not meant to be used outside of OpenSilver.")]
+        public static INTERNAL_Html2dContextReference GetInstance(string elementId)
+            => new INTERNAL_Html2dContextReference(elementId);
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
@@ -74,7 +64,7 @@ namespace CSHTML5.Internal
 
         void SetPropertyValue(string propertyName, string propertyValue)
         {
-            string javaScriptCodeToExecute = "document.set2dContextProperty(\"" + _domElementUniqueIdentifier + "\",\"" + propertyName + "\",\"" + propertyValue + "\")";
+            string javaScriptCodeToExecute = $"document.set2dContextProperty(\"{_id}\",\"{propertyName}\",\"{propertyValue}\")";
             //INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode(javaScriptCodeToExecute);
             INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
@@ -122,7 +112,7 @@ namespace CSHTML5.Internal
 
         object InvokeMethodImpl(string methodName, string args)
         {
-            return OpenSilver.Interop.ExecuteJavaScriptAsync($"document.invoke2dContextMethod(\"{_domElementUniqueIdentifier}\", \"{methodName}\", \"{args}\")");
+            return OpenSilver.Interop.ExecuteJavaScriptAsync($"document.invoke2dContextMethod(\"{_id}\", \"{methodName}\", \"{args}\")");
         }
 
         public string fillStyle { set { SetPropertyValue("fillStyle", value); } }

@@ -6,6 +6,7 @@
            mc:Ignorable="d"
            xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <StackPanel Orientation="Vertical">
+        <TextBlock>Not implemented yet.</TextBlock>
         <StackPanel Orientation="Vertical" Background="White">
             <!--
                 <TextBlock Text="FontWeight = Thin" FontWeight="Thin" FontFamily="Segoe UI" FontSize="30"/>

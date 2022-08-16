@@ -19,7 +19,9 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Threading;
 
 namespace DotNetForHtml5.Compiler
 {
@@ -43,6 +45,9 @@ namespace DotNetForHtml5.Compiler
 
         public static bool Execute(ITaskItem item, string outputFile, ILogger logger)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             string sourceFile = item.ItemSpec;
             string operationName = "C#/XAML for HTML5: ServiceReferenceFixer";
             try

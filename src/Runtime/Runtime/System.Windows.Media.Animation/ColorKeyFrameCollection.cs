@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -23,11 +24,18 @@ namespace Windows.UI.Xaml.Media.Animation
     /// Represents a collection of <see cref="ColorKeyFrame" /> objects 
     /// that can be individually accessed by index. 
     /// </summary>
-    [OpenSilver.NotImplemented]
-    public sealed partial class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
+    public sealed class ColorKeyFrameCollection : PresentationFrameworkCollection<ColorKeyFrame>
     {
-        public ColorKeyFrameCollection() : base(false)
+        public ColorKeyFrameCollection()
+            : base(false)
         {
+        }
+
+        internal ColorKeyFrameCollection(ColorAnimationUsingKeyFrames owner)
+            : base(false)
+        {
+            Debug.Assert(owner != null);
+            owner.ProvideSelfAsInheritanceContext(this, null);
         }
 
         internal override void AddOverride(ColorKeyFrame keyFrame)

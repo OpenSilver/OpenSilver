@@ -63,6 +63,7 @@
     <Reference Include="System.Windows.Controls.Data.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.Windows.Controls.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Controls.Input.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Controls.Navigation, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Controls.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Interactivity">
@@ -92,6 +93,9 @@
     </Compile>
     <Compile Include="TestingChildWindow\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tests\AccordionTest.xaml.cs">
+      <DependentUpon>AccordionTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\Alignments\BottomRightTest.xaml.cs">
       <DependentUpon>BottomRightTest.xaml</DependentUpon>
@@ -265,6 +269,9 @@
     <Compile Include="Tests\OpenFileDialogTest.xaml.cs">
       <DependentUpon>OpenFileDialogTest.xaml</DependentUpon>
     </Compile>
+	<Compile Include="Tests\PopupZIndexTest.xaml.cs">
+      <DependentUpon>PopupZIndexTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\Paths\PathChangeTest.xaml.cs">
       <DependentUpon>PathChangeTest.xaml</DependentUpon>
     </Compile>
@@ -273,6 +280,9 @@
     </Compile>
     <Compile Include="Tests\PrintingTest.xaml.cs">
       <DependentUpon>PrintingTest.xaml</DependentUpon>
+    </Compile>
+	<Compile Include="Tests\PrintDocumentTest.xaml.cs">
+      <DependentUpon>PrintDocumentTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tests\RadioButtonTest.xaml.cs">
       <DependentUpon>RadioButtonTest.xaml</DependentUpon>
@@ -352,6 +362,10 @@
     <Page Include="MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\AccordionTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tests\Alignments\BottomRightTest.xaml">
       <SubType>Designer</SubType>
@@ -581,6 +595,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+	<Page Include="Tests\PopupZIndexTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Tests\Paths\PathChangeTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -590,6 +608,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\PrintingTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+	<Page Include="Tests\PrintDocumentTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

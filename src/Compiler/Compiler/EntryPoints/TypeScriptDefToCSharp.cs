@@ -19,8 +19,10 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using TypeScriptDefToCSharp;
 
 namespace DotNetForHtml5.Compiler
@@ -39,6 +41,9 @@ namespace DotNetForHtml5.Compiler
 
         public override bool Execute()
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             if (InputFiles == null)
                 return true;
             ILogger logger = new LoggerThatUsesTaskOutput(this);
