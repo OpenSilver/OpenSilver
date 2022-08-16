@@ -17,6 +17,7 @@
     <Compile Include="Converters\BooleanVisibilityConverter.cs" />
     <Compile Include="HintBehavior.cs" />
     <Compile Include="LinqSamples.cs" />
+    <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="Tests\AccordionTest.xaml.cs" />
     <Compile Include="Tests\Events\TextInputTest.xaml.cs">
       <SubType>Code</SubType>
@@ -248,6 +249,7 @@
     <Compile Include="Tests\TextPropertiesTest.xaml.cs">
       <DependentUpon>TextPropertiesTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\TimePickerTest.xaml.cs" />
     <Compile Include="Tests\ToolTipTest.xaml.cs">
       <DependentUpon>ToolTipTest.xaml</DependentUpon>
     </Compile>
@@ -627,6 +629,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\PopupZIndexTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\TimePickerTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\ValidationSummaryTest.xaml">

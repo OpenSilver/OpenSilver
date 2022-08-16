@@ -22,16 +22,14 @@ using System.Threading.Tasks;
 
 
 #if MIGRATION
+using System.Windows;
 using System.Windows.Controls;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 #endif
 
-#if MIGRATION
-namespace System.Windows.Controls
-#else
-namespace Windows.UI.Xaml.Controls
-#endif
+namespace OpenSilver.Controls
 {
     public partial class Clock : INTERNAL_CalendarOrClockBase
     {

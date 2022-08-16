@@ -1,0 +1,582 @@
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vsm="clr-namespace:System.Windows;assembly=System.Windows"
+  xmlns:input="clr-namespace:System.Windows.Controls">
+  <Style
+    TargetType="input:TimePicker">
+    <Setter
+      Property="IsTabStop"
+      Value="False" />
+    <Setter
+      Property="MinWidth"
+      Value="125" />
+    <Setter
+      Property="Height"
+      Value="22" />
+    <Setter
+      Property="BorderThickness"
+      Value="1" />
+    <Setter
+      Property="Background"
+      Value="Transparent" />
+    <Setter
+      Property="BorderBrush">
+      <Setter.Value>
+        <LinearGradientBrush
+          EndPoint="0.5,1"
+          StartPoint="0.5,0">
+          <GradientStop
+            Color="#FFA3AEB9"
+            Offset="0" />
+          <GradientStop
+            Color="#FF8399A9"
+            Offset="0.375" />
+          <GradientStop
+            Color="#FF718597"
+            Offset="0.375" />
+          <GradientStop
+            Color="#FF617584"
+            Offset="1" />
+        </LinearGradientBrush>
+      </Setter.Value>
+    </Setter>
+    <Setter
+      Property="PopupTemplate">
+      <Setter.Value>
+        <input:TimePickerPopupTemplate>
+          <input:ListTimePickerPopup />
+        </input:TimePickerPopupTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter
+      Property="Template">
+      <Setter.Value>
+        <ControlTemplate
+          TargetType="input:TimePicker">
+          <Grid
+            x:Name="RootElement">
+            <vsm:VisualStateManager.VisualStateGroups>
+              <!-- common states -->
+              <VisualStateGroup
+                x:Name="CommonStates">
+                <VisualState
+                  x:Name="Normal" />
+                <VisualState
+                  x:Name="MouseOver" />
+                <VisualState
+                  x:Name="Disabled" />
+                <VisualState
+                  x:Name="Pressed" />
+              </VisualStateGroup>
+              <!-- focus states -->
+              <VisualStateGroup
+                x:Name="FocusStates">
+                <VisualState
+                  x:Name="Focused" />
+                <VisualState
+                  x:Name="Unfocused" />
+              </VisualStateGroup>
+              <!-- Popup states -->
+              <VisualStateGroup
+                x:Name="PopupStates">
+                <VisualStateGroup.Transitions>
+                  <VisualTransition
+                    GeneratedDuration="0:0:0.1"
+                    To="PopupOpened" />
+                  <VisualTransition
+                    GeneratedDuration="0:0:0.2"
+                    To="PopupClosed" />
+                </VisualStateGroup.Transitions>
+                <VisualState
+                  x:Name="PopupOpened">
+                  <Storyboard>
+                    <DoubleAnimation
+                      Storyboard.TargetName="PopupRoot"
+                      Storyboard.TargetProperty="Opacity"
+                      To="1.0" />
+                  </Storyboard>
+                </VisualState>
+                <VisualState
+                  x:Name="PopupClosed">
+                  <Storyboard>
+                    <DoubleAnimation
+                      Storyboard.TargetName="PopupRoot"
+                      Storyboard.TargetProperty="Opacity"
+                      To="0.0" />
+                  </Storyboard>
+                </VisualState>
+              </VisualStateGroup>
+            </vsm:VisualStateManager.VisualStateGroups>
+            <Grid.Resources>
+              <ControlTemplate
+                x:Key="PopupButtonTemplate"
+                TargetType="ToggleButton">
+                <!-- clock icon -->
+                <Grid
+                  FlowDirection="LeftToRight"
+                  Height="20"
+                  Width="20">
+                  <vsm:VisualStateManager.VisualStateGroups>
+                    <vsm:VisualStateGroup
+                      x:Name="CommonStates">
+                      <vsm:VisualStateGroup.Transitions>
+                        <vsm:VisualTransition
+                          GeneratedDuration="00:00:00.1000000" />
+                      </vsm:VisualStateGroup.Transitions>
+                      <vsm:VisualState
+                        x:Name="Normal" />
+                      <vsm:VisualState
+                        x:Name="MouseOver">
+                        <Storyboard>
+                          <DoubleAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="Highlight"
+                            Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <SplineDoubleKeyFrame
+                              KeyTime="00:00:00"
+                              Value="0.6" />
+                          </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                      </vsm:VisualState>
+                      <vsm:VisualState
+                        x:Name="Pressed">
+                        <Storyboard>
+                          <DoubleAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="Highlight"
+                            Storyboard.TargetProperty="(UIElement.Opacity)">
+                            <SplineDoubleKeyFrame
+                              KeyTime="00:00:00"
+                              Value="0.8" />
+                          </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                      </vsm:VisualState>
+                      <vsm:VisualState
+                        x:Name="Disabled">
+                        <Storyboard>
+                          <DoubleAnimationUsingKeyFrames
+                            Storyboard.TargetName="DisabledVisualElement"
+                            Storyboard.TargetProperty="Opacity">
+                            <SplineDoubleKeyFrame
+                              KeyTime="0"
+                              Value=".55" />
+                          </DoubleAnimationUsingKeyFrames>
+                        </Storyboard>
+                      </vsm:VisualState>
+                    </vsm:VisualStateGroup>
+                    <vsm:VisualStateGroup
+                      x:Name="CheckStates">
+                      <vsm:VisualState
+                        x:Name="Checked">
+                        <Storyboard>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.StartPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="1.016,0.377" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.EndPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="-0.01,0.687" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse"
+                            Storyboard.TargetProperty="(Shape.Fill).(LinearGradientBrush.EndPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="0.556,0.035" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse"
+                            Storyboard.TargetProperty="(Shape.Fill).(LinearGradientBrush.StartPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="0.441,0.979" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse1"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.StartPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="0.984,0.328" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse1"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.EndPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="0.031,0.719" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse2"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.EndPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="-0.047,0.516" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse2"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.StartPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="1.016,0.422" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse3"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.StartPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="1.062,0.375" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse3"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.EndPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="0.031,0.688" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse4"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.StartPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="1.031,0.281" />
+                          </PointAnimationUsingKeyFrames>
+                          <PointAnimationUsingKeyFrames
+                            BeginTime="00:00:00"
+                            Duration="00:00:00.0010000"
+                            Storyboard.TargetName="ellipse4"
+                            Storyboard.TargetProperty="(Shape.Stroke).(LinearGradientBrush.EndPoint)">
+                            <SplinePointKeyFrame
+                              KeyTime="00:00:00"
+                              Value="-0.188,0.656" />
+                          </PointAnimationUsingKeyFrames>
+                        </Storyboard>
+                      </vsm:VisualState>
+                      <vsm:VisualState
+                        x:Name="Unchecked" />
+                    </vsm:VisualStateGroup>
+                    <vsm:VisualStateGroup
+                      x:Name="FocusStates">
+                      <vsm:VisualState
+                        x:Name="Focused"></vsm:VisualState>
+                      <vsm:VisualState
+                        x:Name="Unfocused" />
+                    </vsm:VisualStateGroup>
+                  </vsm:VisualStateManager.VisualStateGroups>
+                  <Grid>
+                    <Grid.Resources>
+                      <LinearGradientBrush
+                        x:Key="Dot"
+                        EndPoint="1.025,0.434"
+                        StartPoint="-0.025,0.566">
+                        <GradientStop
+                          Color="#FFC8C8C8" />
+                        <GradientStop
+                          Color="#FF19191A"
+                          Offset="1" />
+                      </LinearGradientBrush>
+                    </Grid.Resources>
+                    <Ellipse
+                      Margin="0,0,0,0"
+                      Stroke="#FF0052CA"
+                      StrokeThickness="1"
+                      x:Name="Highlight"
+                      Opacity="0" />
+                    <Ellipse
+                      Margin="1,1,1,1"
+                      Stroke="{StaticResource Dot}"
+                      StrokeThickness="0.75"
+                      x:Name="ellipse">
+                      <Ellipse.Fill>
+                        <LinearGradientBrush
+                          EndPoint="0.5,1"
+                          StartPoint="0.5,0">
+                          <GradientStop
+                            Color="#FFFFFFFF" />
+                          <GradientStop
+                            Color="#FFD7E3EC"
+                            Offset="0.80400002002716064" />
+                          <GradientStop
+                            Color="#FFFBFBFB"
+                            Offset="0.37099999189376831" />
+                        </LinearGradientBrush>
+                      </Ellipse.Fill>
+                    </Ellipse>
+                    <Ellipse
+                      Stroke="{StaticResource Dot}"
+                      Height="2"
+                      Margin="8,2,8,0"
+                      VerticalAlignment="Top"
+                      Width="2"
+                      x:Name="ellipse1">
+                      <Ellipse.Fill>
+                        <RadialGradientBrush>
+                          <RadialGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                              <ScaleTransform
+                                CenterX="0.5"
+                                CenterY="0.5"
+                                ScaleX="2.381"
+                                ScaleY="1.817" />
+                              <SkewTransform
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <RotateTransform
+                                Angle="0.966"
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <TranslateTransform
+                                X="-0.2"
+                                Y="0.087" />
+                            </TransformGroup>
+                          </RadialGradientBrush.RelativeTransform>
+                          <GradientStop
+                            Color="#FF000000" />
+                          <GradientStop
+                            Color="#FFFB6A05"
+                            Offset="1" />
+                          <GradientStop
+                            Color="#FF4E4E4F"
+                            Offset="0.446" />
+                        </RadialGradientBrush>
+                      </Ellipse.Fill>
+                    </Ellipse>
+                    <Ellipse
+                      Height="2"
+                      Margin="8,0,8,2"
+                      VerticalAlignment="Bottom"
+                      Stroke="{StaticResource Dot}"
+                      Width="2"
+                      x:Name="ellipse2">
+                      <Ellipse.Fill>
+                        <RadialGradientBrush>
+                          <RadialGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                              <ScaleTransform
+                                CenterX="0.5"
+                                CenterY="0.5"
+                                ScaleX="2.381"
+                                ScaleY="1.817" />
+                              <SkewTransform
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <RotateTransform
+                                Angle="0.966"
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <TranslateTransform
+                                X="-0.2"
+                                Y="0.087" />
+                            </TransformGroup>
+                          </RadialGradientBrush.RelativeTransform>
+                          <GradientStop
+                            Color="#FF000000" />
+                          <GradientStop
+                            Color="#FFFB6A05"
+                            Offset="1" />
+                          <GradientStop
+                            Color="#FF4E4E4F"
+                            Offset="0.446" />
+                        </RadialGradientBrush>
+                      </Ellipse.Fill>
+                    </Ellipse>
+                    <Ellipse
+                      HorizontalAlignment="Left"
+                      Margin="2,10,0,0"
+                      Width="1"
+                      Stroke="{StaticResource Dot}"
+                      VerticalAlignment="Top"
+                      Height="1"
+                      x:Name="ellipse3">
+                      <Ellipse.Fill>
+                        <RadialGradientBrush>
+                          <RadialGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                              <ScaleTransform
+                                CenterX="0.5"
+                                CenterY="0.5"
+                                ScaleX="2.381"
+                                ScaleY="1.817" />
+                              <SkewTransform
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <RotateTransform
+                                Angle="0.966"
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <TranslateTransform
+                                X="-0.2"
+                                Y="0.087" />
+                            </TransformGroup>
+                          </RadialGradientBrush.RelativeTransform>
+                          <GradientStop
+                            Color="#FF000000" />
+                          <GradientStop
+                            Color="#FFFB6A05"
+                            Offset="1" />
+                          <GradientStop
+                            Color="#FF4E4E4F"
+                            Offset="0.446" />
+                        </RadialGradientBrush>
+                      </Ellipse.Fill>
+                    </Ellipse>
+                    <Ellipse
+                      HorizontalAlignment="Right"
+                      Margin="0,10,2,0"
+                      Width="1.05"
+                      Stroke="{StaticResource Dot}"
+                      VerticalAlignment="Top"
+                      Height="1.421"
+                      x:Name="ellipse4">
+                      <Ellipse.Fill>
+                        <RadialGradientBrush>
+                          <RadialGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                              <ScaleTransform
+                                CenterX="0.5"
+                                CenterY="0.5"
+                                ScaleX="2.381"
+                                ScaleY="1.817" />
+                              <SkewTransform
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <RotateTransform
+                                Angle="0.966"
+                                CenterX="0.5"
+                                CenterY="0.5" />
+                              <TranslateTransform
+                                X="-0.2"
+                                Y="0.087" />
+                            </TransformGroup>
+                          </RadialGradientBrush.RelativeTransform>
+                          <GradientStop
+                            Color="#FF000000" />
+                          <GradientStop
+                            Color="#FFFB6A05"
+                            Offset="1" />
+                          <GradientStop
+                            Color="#FF4E4E4F"
+                            Offset="0.446" />
+                        </RadialGradientBrush>
+                      </Ellipse.Fill>
+                    </Ellipse>
+                    <Path
+                      Fill="{x:Null}"
+                      Height="8.258"
+                      Margin="9,6,5,0"
+                      VerticalAlignment="Top"
+                      Stretch="Fill"
+                      Data="M10.108397,6.5404582 L10.108397,10.415268 L13.538931,13.738435"
+                      HorizontalAlignment="Left">
+                      <Path.Stroke>
+                        <LinearGradientBrush
+                          EndPoint="0.5,1"
+                          StartPoint="0.5,0">
+                          <GradientStop
+                            Color="#FF5B91D2" />
+                          <GradientStop
+                            Color="#FFC1570E"
+                            Offset="0.996" />
+                        </LinearGradientBrush>
+                      </Path.Stroke>
+                    </Path>
+                    <!-- disabled visual -->
+                    <Rectangle
+                      x:Name="DisabledVisualElement"
+                      IsHitTestVisible="false"
+                      Opacity="0"
+                      Fill="#FFFFFFFF"
+                      RadiusX="3"
+                      RadiusY="3" />
+                  </Grid>
+                </Grid>
+              </ControlTemplate>
+            </Grid.Resources>
+            
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition
+                Width="*" />
+              <ColumnDefinition
+                Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- Value is being synched in code, because of inability to do TwoWay TemplateBinding -->
+            <input:TimeUpDown
+              x:Name="TimeUpDown"
+              Height="Auto"
+              Background="{TemplateBinding Background}"
+              BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}"
+              Padding="{TemplateBinding Padding}"
+              Style="{TemplateBinding TimeUpDownStyle}"
+              SpinnerStyle="{TemplateBinding SpinnerStyle}"
+              Minimum="{TemplateBinding Minimum}"
+              Maximum="{TemplateBinding Maximum}"
+              TimeParsers="{TemplateBinding TimeParsers}"
+              Format="{TemplateBinding Format}"
+              Culture="{TemplateBinding Culture}"
+              TimeGlobalizationInfo="{TemplateBinding TimeGlobalizationInfo}"
+              Grid.Column="0" />
+            <ToggleButton
+              x:Name="DropDownToggle"
+              Template="{StaticResource PopupButtonTemplate}"
+              Margin="3,0,0,0"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              Grid.Column="1" />
+            <!-- Value is being synched in code, because of inability to do TwoWay TemplateBinding -->
+            <Popup
+              x:Name="Popup">
+              <Border
+                x:Name="PopupRoot"
+                BorderBrush="#FF8d8b8b"
+                BorderThickness="1">
+                <ContentControl
+                  x:Name="PopupPlaceHolder"
+                  IsTabStop="False"
+                  HorizontalContentAlignment="Stretch"
+                  VerticalContentAlignment="Stretch" />
+              </Border>
+            </Popup>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

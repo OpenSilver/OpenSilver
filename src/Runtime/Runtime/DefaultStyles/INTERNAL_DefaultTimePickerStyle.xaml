@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="using:Windows.UI.Xaml.Controls">
+                    xmlns:opensilverControls="clr-namespace:OpenSilver.Controls">
 
     <ControlTemplate x:Key="PopupButtonTemplate"
                      TargetType="ToggleButton">
@@ -203,14 +203,14 @@
         </Grid>
     </ControlTemplate>
 
-    <Style TargetType="TimePicker">
+    <Style TargetType="opensilverControls:TimePicker">
         <Setter Property="BorderBrush"
                 Value="Gray" />
         <Setter Property="BorderThickness"
                 Value="1" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="TimePicker">
+                <ControlTemplate TargetType="opensilverControls:TimePicker">
                     <Grid x:Name="Root">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />

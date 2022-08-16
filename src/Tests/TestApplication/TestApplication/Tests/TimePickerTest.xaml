@@ -1,0 +1,14 @@
+﻿<sdk:Page
+    x:Class="TestApplication.OpenSilver.Tests.TimePickerTest"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    xmlns:local="clr-namespace:TestApplication.OpenSilver.Tests">
+
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TimePicker x:Name="TimePicker1" Value="{Binding SelectedDate, Mode=TwoWay}"/>
+            <TimePicker x:Name="TimePicker2" Value="{Binding SelectedDate, Mode=TwoWay}"/>
+        </StackPanel>
+    </Grid>
+</sdk:Page>

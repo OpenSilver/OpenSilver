@@ -15,10 +15,14 @@
 using System;
 
 #if MIGRATION
-namespace System.Windows.Controls
+using System.Windows;
+using System.Windows.Controls;
 #else
-namespace Windows.UI.Xaml.Controls
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 #endif
+
+namespace OpenSilver.Controls
 {
     /// <summary>
     /// Represents a control that allows the user to select a time.
@@ -33,7 +37,7 @@ namespace Windows.UI.Xaml.Controls
         public event RoutedPropertyChangedEventHandler<DateTime?> ValueChanged;
 #endif
 
-        #region public DateTime? Minimum
+#region public DateTime? Minimum
         /// <summary>
         /// Gets or sets the minimum time considered valid by the control.
         /// </summary>
@@ -77,9 +81,9 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnMinimumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
-        #endregion public DateTime? Minimum
+#endregion public DateTime? Minimum
 
-        #region public DateTime? Maximum
+#region public DateTime? Maximum
         /// <summary>
         /// Gets or sets the maximum time considered valid by the control.
         /// </summary>
@@ -124,9 +128,9 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnMaximumChanged(DateTime? oldValue, DateTime? newValue)
         {
         }
-        #endregion public DateTime? Maximum
+#endregion public DateTime? Maximum
 
-        #region public ITimeFormat Format
+#region public ITimeFormat Format
         /// <summary>
         /// Gets or sets the Format used by the control. From XAML Use either
         /// "Short", "Long" or a custom format.
@@ -165,9 +169,9 @@ namespace Windows.UI.Xaml.Controls
         /// BackingField for ActualFormat.
         /// </summary>
         private ITimeFormat _actualFormat;
-        #endregion public ITimeFormat Format
+#endregion public ITimeFormat Format
 
-        #region public TimePickerPopup Popup
+#region public TimePickerPopup Popup
         /// <summary>
         /// Gets or sets the TimePickerPopup that will be shown to the user by the
         /// TimePicker control. This property may not be styled. To style a
@@ -207,9 +211,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnPopupPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
         }
-        #endregion public TimePickerPopup Popup
+#endregion public TimePickerPopup Popup
 
-        #region public TimePickerPopupTemplate PopupTemplate
+#region public TimePickerPopupTemplate PopupTemplate
         /// <summary>
         /// Gets or sets the template used as Popup. A Popup can also be set
         /// directly on the Popup property. When both PopupTemplate and Popup
@@ -246,9 +250,9 @@ namespace Windows.UI.Xaml.Controls
         /// BackingField for InstantiatedPopupFromTemplate.
         /// </summary>
         private TimePickerPopup _instantiatedPopupFromTemplate;
-        #endregion public TimePickerPopupTemplate PopupTemplate
+#endregion public TimePickerPopupTemplate PopupTemplate
 
-        #region public PopupTimeSelectionMode PopupTimeSelectionMode
+#region public PopupTimeSelectionMode PopupTimeSelectionMode
         /// <summary>
         /// Gets or sets the whether the TimePickerPopup supports selecting
         /// designators and/or seconds.
@@ -280,9 +284,9 @@ namespace Windows.UI.Xaml.Controls
         {
             throw new NotImplementedException();
         }
-        #endregion public PopupTimeSelectionMode PopupTimeSelectionMode
+#endregion public PopupTimeSelectionMode PopupTimeSelectionMode
 
-        #region public ClickMode PopupButtonMode
+#region public ClickMode PopupButtonMode
         /// <summary>
         /// Gets or sets the button event that causes the popup portion of the
         /// Picker control to open.
@@ -302,7 +306,7 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 "PopupButtonMode",
                 typeof(ClickMode),
-                typeof(Picker),
+                typeof(TimePicker),
                 new PropertyMetadata(ClickMode.Release, OnPopupButtonModePropertyChanged));
 
         /// <summary>
@@ -313,6 +317,6 @@ namespace Windows.UI.Xaml.Controls
         private static void OnPopupButtonModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
         }
-        #endregion public ClickMode PopupButtonMode
+#endregion public ClickMode PopupButtonMode
     }
 }

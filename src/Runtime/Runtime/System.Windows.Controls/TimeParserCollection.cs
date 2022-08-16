@@ -1,16 +1,7 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -26,13 +17,12 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a collection of TimeParser objects.
     /// </summary>
-    [OpenSilver.NotImplemented]
+    /// <QualityBand>Preview</QualityBand>
     public class TimeParserCollection : Collection<TimeParser>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TimeParserCollection"/> class.
         /// </summary>
-        [OpenSilver.NotImplemented]
         public TimeParserCollection()
         {
         }
@@ -42,7 +32,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="parsers">A sequence of TimeParser objects that will
         /// be copied into this collection.</param>
-        [OpenSilver.NotImplemented]
         public TimeParserCollection(IEnumerable<TimeParser> parsers)
         {
             if (parsers != null)
@@ -61,7 +50,6 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="culture">The culture being used.</param>
         /// <param name="result">The parsed DateTime.</param>
         /// <returns>True if the parse was successful, false if it was not.</returns>
-        [OpenSilver.NotImplemented]
         public virtual bool TryParse(string text, CultureInfo culture, out DateTime? result)
         {
             result = null;
