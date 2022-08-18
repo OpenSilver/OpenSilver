@@ -243,6 +243,7 @@
     <Compile Include="Tests\TemplatedTextBoxTest.xaml.cs">
       <DependentUpon>TemplatedTextBoxTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\TextBlockTest.xaml.cs" />
     <Compile Include="Tests\TextBoxPropertiesTest.xaml.cs">
       <DependentUpon>TextBoxPropertiesTest.xaml</DependentUpon>
     </Compile>
@@ -629,6 +630,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\PopupZIndexTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\TextBlockTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\TimePickerTest.xaml">

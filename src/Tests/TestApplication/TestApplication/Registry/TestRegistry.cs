@@ -127,6 +127,7 @@ namespace TestApplication
             Tests.Add(new Test("(De)Serialization", "DeSerialization"));
             Tests.Add(new Test("Two TextBoxes Horizontally", "TwoTextBoxesHorizontally"));
             Tests.Add(new Test("TextBox Properties", "TextBoxProperties"));
+            Tests.Add(new Test("TextBlock", "TextBlock"));
 
 			TestCategory shapes = new TestCategory("Shapes");
 			shapes.Add(new Test("Polygon", "Shapes/Polygon"));
