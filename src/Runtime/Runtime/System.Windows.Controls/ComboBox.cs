@@ -19,8 +19,10 @@ using System.Threading.Tasks;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -261,6 +263,23 @@ namespace Windows.UI.Xaml.Controls
         {
             if (DropDownOpened != null)
                 DropDownOpened(this, e);
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
+        {
+            IsDropDownOpen = !IsDropDownOpen;
+
+            e.Handled = true;
+
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
         }
 
         /// <summary>
