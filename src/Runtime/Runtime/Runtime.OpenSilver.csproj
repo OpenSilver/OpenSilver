@@ -455,7 +455,7 @@
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\AutomationEvents.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\AutomationOrientation.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\AutomationPeer.cs" />
-		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ButtonAutomationPeer.cs" />
+		<Compile Include="System.Windows.Automation.Peers\ButtonAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ButtonBaseAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\FrameworkElementAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\WORKINPROGRESS\ItemAutomationPeer.cs" />
