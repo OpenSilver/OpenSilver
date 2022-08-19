@@ -546,14 +546,29 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 // Calculate current width and height of this control:
                 Size actualSize;
-                if (this.Orientation == Orientation.Vertical)
+                if (this.IsUnderCustomLayout)
                 {
-                    actualSize = _verticalRoot.INTERNAL_GetActualWidthAndHeight();
+                    if (this.Orientation == Orientation.Vertical)
+                    {
+                        actualSize = _verticalRoot.VisualBounds.Size;
+                    }
+                    else
+                    {
+                        actualSize = _horizontalRoot.VisualBounds.Size;
+                    }
                 }
                 else
                 {
-                    actualSize = _horizontalRoot.INTERNAL_GetActualWidthAndHeight();
+                    if (this.Orientation == Orientation.Vertical)
+                    {
+                        actualSize = _verticalRoot.INTERNAL_GetActualWidthAndHeight();
+                    }
+                    else
+                    {
+                        actualSize = _horizontalRoot.INTERNAL_GetActualWidthAndHeight();
+                    }
                 }
+                
                 double width = !double.IsNaN(actualSize.Width) ? actualSize.Width : this.Width;
                 double height = !double.IsNaN(actualSize.Height) ? actualSize.Height : this.Height;
 
