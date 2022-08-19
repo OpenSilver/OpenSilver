@@ -161,9 +161,10 @@ namespace Windows.UI.Xaml
                 return;
             }
 
-            if (child._parent != null)
+            if (child._parent != null && this != child._parent)
             {
-                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+                // throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+                (child._parent as UIElement).RemoveVisualChild(child);
             }
 
             HasVisualChildren = true;

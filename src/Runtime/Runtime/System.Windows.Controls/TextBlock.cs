@@ -362,6 +362,10 @@ namespace Windows.UI.Xaml.Controls
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
+            if (!double.IsNaN(this.Width) && !double.IsNaN(this.Height))
+            {
+                return new Size(this.Width, this.Height);
+            }
             //Size actualSize = this.INTERNAL_GetActualWidthAndHeight();
             //return actualSize;
             Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
