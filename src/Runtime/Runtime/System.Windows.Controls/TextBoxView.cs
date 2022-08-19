@@ -1013,6 +1013,8 @@ var range,selection;
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
             Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.TextWrapping, Margin, availableSize.Width);
+            if (String.IsNullOrEmpty(Host.Text))
+                TextSize.Width = 1;
             return TextSize;
         }
     }

@@ -161,9 +161,10 @@ namespace Windows.UI.Xaml
                 return;
             }
 
-            if (child._parent != null)
+            if (child._parent != null && this != child._parent)
             {
-                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+                // throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+                (child._parent as UIElement).RemoveVisualChild(child);
             }
 
             HasVisualChildren = true;
@@ -1772,17 +1773,23 @@ document.ondblclick = null;
         private void BeginUpdateCustomLayout()
         {
             Size savedLastSize = layoutLastSize;
-            layoutMeasuredSize = layoutLastSize;
+            Size availableSize = layoutLastSize;
             FrameworkElement fe = this as FrameworkElement;
             if (fe != null)
             {
                 if (fe.IsAutoWidthOnCustomLayout)
-                    layoutMeasuredSize.Width = double.PositiveInfinity;
+                    availableSize.Width = double.PositiveInfinity;
                 if (fe.IsAutoHeightOnCustomLayout)
-                    layoutMeasuredSize.Height = double.PositiveInfinity;
+                    availableSize.Height = double.PositiveInfinity;
             }
-
-            Measure(layoutMeasuredSize);
+            if (layoutMeasuredSize == availableSize)
+            {
+                layoutProcessing = false;
+                return;
+            }
+            
+            Measure(availableSize);
+            layoutMeasuredSize = availableSize;
 
             if (savedLastSize != layoutLastSize)
             {
@@ -1792,13 +1799,13 @@ document.ondblclick = null;
             if (fe != null)
             {
                 if (fe.IsAutoWidthOnCustomLayout)
-                    layoutMeasuredSize.Width = this.DesiredSize.Width;
+                    availableSize.Width = this.DesiredSize.Width;
 
                 if (fe.IsAutoHeightOnCustomLayout)
-                    layoutMeasuredSize.Height = this.DesiredSize.Height;
+                    availableSize.Height = this.DesiredSize.Height;
             }
 
-            Arrange(new Rect(layoutMeasuredSize));
+            Arrange(new Rect(availableSize));
             if (savedLastSize != layoutLastSize)
             {
                 BeginUpdateCustomLayout();
