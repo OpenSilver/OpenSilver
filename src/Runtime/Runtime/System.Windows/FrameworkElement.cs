@@ -896,7 +896,7 @@ namespace Windows.UI.Xaml
                     return nameScope;
                 }
 
-                fe = (fe.TemplatedParent ?? fe.Parent ?? VisualTreeHelper.GetParent(fe)) as FrameworkElement;
+                fe = (fe.TemplatedParent ?? fe.Parent ?? VisualTreeHelper.GetParent(fe) ?? fe.InheritanceContext) as FrameworkElement;
             }
 
             return null;
