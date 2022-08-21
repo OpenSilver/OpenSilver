@@ -628,7 +628,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 Binding b3 = new Binding("MaxHeight") { Source = this };
                 _outerBorder.SetBinding(Border.MaxHeightProperty, b3);
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
-                _outerBorder.Loaded += (s, e) => { popupRoot.INTERNAL_RaiseLoadedEvent(); };
+                _outerBorder.Loaded += (s, e) =>
+                {
+                    popupRoot.RaiseLoadedEvent();
+                    popupRoot.InvalidateMeasure();
+                };
 
                 popupRoot.Content = _outerBorder;
                 _isVisible = true;

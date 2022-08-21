@@ -189,6 +189,11 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
             Dispatcher.BeginInvoke(() => // (This fixes the issue in the MatrixView in the STAR application, where the Viewbox scale was incorrect until the window was resized. Note that when doing step-by-step debugging it worked properly)
                 {
                     if (Content is FrameworkElement)

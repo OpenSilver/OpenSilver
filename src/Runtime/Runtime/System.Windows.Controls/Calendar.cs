@@ -86,6 +86,11 @@ namespace Windows.UI.Xaml.Controls
 
         private void DatePicker_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
             DateTime defaultDate = SelectedValue == null ? DateTime.Today : SelectedValue.Value;
 
             isLoaded = true;

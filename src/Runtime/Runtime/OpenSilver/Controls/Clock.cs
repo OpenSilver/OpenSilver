@@ -60,6 +60,11 @@ namespace OpenSilver.Controls
 
         private void TimePicker_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
             DateTime defaultDate = SelectedValue == null ? DateTime.Now : SelectedValue.Value;
 
             // Get a reference to the HTML DOM representation of the control (must be in the Visual Tree):
