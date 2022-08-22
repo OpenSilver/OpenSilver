@@ -141,7 +141,7 @@ namespace Windows.UI.Xaml.Media
             var list = new List<UIElement>();
             foreach (UIElement uie in INTERNAL_HtmlDomManager.FindElementsInHostCoordinates(intersectingPoint, subtree))
             {
-                if (UIElement.EnablePointerEventsBase(uie))
+                if (uie.EnablePointerEvents)
                 {
                     list.Add(uie);
                 }
