@@ -699,12 +699,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal void CloseFromAnOutsideClick()
         {
-            if (ClosedDueToOutsideClick != null)
-                ClosedDueToOutsideClick(this, new EventArgs());
+            ClosedDueToOutsideClick?.Invoke(this, EventArgs.Empty);
 
             if (IsOpen)
                 this.IsOpen = false;
         }
+
+        internal event EventHandler<OutsideClickEventArgs> OutsideClick;
+
+        internal void OnOutsideClick(OutsideClickEventArgs args) => OutsideClick?.Invoke(this, args);
 
         private bool _stayOpen = true;
         public bool StayOpen
@@ -798,5 +801,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this, forcedWidth, forcedHeight);
         }
+    }
+
+    internal class OutsideClickEventArgs : EventArgs
+    {
+        public bool Handled { get; set; }
     }
 }
