@@ -777,6 +777,29 @@ namespace Windows.UI.Xaml
 #endif
             if (fe.IsCustomLayoutRoot || fe.IsUnderCustomLayout)
             {
+                if (fe is Documents.Run)
+                {
+                    var wrapperElement = fe.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny ?? fe.INTERNAL_AdditionalOutsideDivForMargins;
+                    var styleOfWrapperElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(wrapperElement);
+
+                    switch (newVerticalAlignment)
+                    {
+                        case VerticalAlignment.Top:
+                            styleOfWrapperElement.verticalAlign = "top";
+                            break;
+                        case VerticalAlignment.Center:
+                            styleOfWrapperElement.verticalAlign = "middle";
+                            break;
+                        case VerticalAlignment.Bottom:
+                            styleOfWrapperElement.verticalAlign = "bottom";
+                            break;
+                        case VerticalAlignment.Stretch:
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                }
+
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
                     && fe.Visibility != Visibility.Collapsed
                     && !double.IsNaN(fe.Height))
