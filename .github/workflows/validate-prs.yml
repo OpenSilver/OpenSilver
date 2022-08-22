@@ -55,6 +55,8 @@ jobs:
         run: dotnet test src/Tests/Runtime.OpenSilver.Tests/bin/SL/net472/Runtime.OpenSilver.Tests.dll
       - name: Run Analyzers Tests Configuration
         run: dotnet test src/Analyzers/NotImplemented.Tests/bin/Debug/net472/OpenSilver.Analyzers.Tests.dll
+      - name: Verify Building of TestApplication
+        run: msbuild src/Tests/TestApplication/TestApplication.OpenSilver.sln -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Drop all bin and obj folders
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash

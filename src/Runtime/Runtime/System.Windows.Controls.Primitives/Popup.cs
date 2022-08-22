@@ -625,8 +625,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 Binding b2 = new Binding("Height") { Source = this };
                 _outerBorder.SetBinding(Border.HeightProperty, b2);
 
+                Binding b3 = new Binding("MaxHeight") { Source = this };
+                _outerBorder.SetBinding(Border.MaxHeightProperty, b3);
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
-                _outerBorder.Loaded += (s, e) => { popupRoot.INTERNAL_RaiseLoadedEvent(); };
+                _outerBorder.Loaded += (s, e) =>
+                {
+                    popupRoot.RaiseLoadedEvent();
+                    popupRoot.InvalidateMeasure();
+                };
 
                 popupRoot.Content = _outerBorder;
                 _isVisible = true;
@@ -697,12 +703,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal void CloseFromAnOutsideClick()
         {
-            if (ClosedDueToOutsideClick != null)
-                ClosedDueToOutsideClick(this, new EventArgs());
+            ClosedDueToOutsideClick?.Invoke(this, EventArgs.Empty);
 
             if (IsOpen)
                 this.IsOpen = false;
         }
+
+        internal event EventHandler<OutsideClickEventArgs> OutsideClick;
+
+        internal void OnOutsideClick(OutsideClickEventArgs args) => OutsideClick?.Invoke(this, args);
 
         private bool _stayOpen = true;
         public bool StayOpen
@@ -796,5 +805,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this, forcedWidth, forcedHeight);
         }
+    }
+
+    internal class OutsideClickEventArgs : EventArgs
+    {
+        public bool Handled { get; set; }
     }
 }

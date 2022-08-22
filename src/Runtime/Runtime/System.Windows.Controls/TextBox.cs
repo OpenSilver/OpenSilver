@@ -855,7 +855,12 @@ namespace Windows.UI.Xaml.Controls
         }
 
         private void OnViewLoaded(object sender, RoutedEventArgs e) 
-        { 
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
             UpdateTabIndex(IsTabStop, TabIndex);
         }
 

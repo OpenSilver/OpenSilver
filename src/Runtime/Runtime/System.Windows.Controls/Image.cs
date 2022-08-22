@@ -194,7 +194,12 @@ namespace Windows.UI.Xaml.Controls
 
         void Image_Loaded(object sender, RoutedEventArgs e)
         {
-            Loaded -= Image_Loaded;
+            if (!IsLoaded)
+            {
+                return;
+            }
+
+            Loaded -= Image_Loaded;            
             //once the image is loaded, we get the size of the parent of this element and fit the size of the image to it.
             //This will allow us to PARTIALLY fix the problems that come with the fact that display:table is unable to limit the size of its content.
 

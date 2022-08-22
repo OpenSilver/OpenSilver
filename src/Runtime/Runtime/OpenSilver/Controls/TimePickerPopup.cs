@@ -15,10 +15,14 @@
 using System;
 
 #if MIGRATION
-namespace System.Windows.Controls
+using System.Windows;
+using System.Windows.Controls;
 #else
-namespace Windows.UI.Xaml.Controls
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 #endif
+
+namespace OpenSilver.Controls
 {
     /// <summary>
     /// Base class for a control that can be used as the popup portion in a TimePicker.

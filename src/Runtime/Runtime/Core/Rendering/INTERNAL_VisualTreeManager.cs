@@ -210,15 +210,16 @@ namespace CSHTML5.Internal
 
             // Call the "Unloaded" event: (note: in XAML, the "unloaded" event of the parent is called before the "unloaded" event of the children)
             element._isLoaded = false;
-            if (element is FrameworkElement)
+            if (element is FrameworkElement fe)
             {
                 // Detach resizeSensor
-                ((FrameworkElement)element).DetachResizeSensorFromDomElement();
+                fe.DetachResizeSensorFromDomElement();
 
                 // Initialize measure & arrange status
-                ((FrameworkElement)element).ClearMeasureAndArrangeValidation();
+                fe.ClearMeasureAndArrangeValidation();
 
-                ((FrameworkElement)element).INTERNAL_RaiseUnloadedEvent();
+                fe.RaiseUnloadedEvent();
+                fe.UnloadResources();
             }
 
             // Reset all visual-tree related information:
@@ -683,6 +684,11 @@ if(nextSibling != undefined) {
             // SET "ISLOADED" PROPERTY AND CALL "ONATTACHED" EVENT:
             //--------------------------------------------------------
 
+            if (child is FrameworkElement)
+            {
+                ((FrameworkElement)child).LoadResources();
+            }
+
             // Tell the control that it is now present into the visual tree:
             child._isLoaded = true;
 
@@ -777,9 +783,10 @@ if(nextSibling != undefined) {
 #endif
 
             // Raise the "Loaded" event: (note: in XAML, the "loaded" event of the children is called before the "loaded" event of the parent)
-            if (child is FrameworkElement)
+            if (child is FrameworkElement fe)
             {
-                ((FrameworkElement)child).INTERNAL_RaiseLoadedEvent();
+                fe.RaiseLoadedEvent();
+                fe.InvalidateMeasure();
             }
 
 #if PERFSTAT

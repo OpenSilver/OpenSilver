@@ -57,6 +57,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
         }
 
+        internal void AutomationButtonBaseClick()
+        {
+            OnClick();
+        }
+
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             try

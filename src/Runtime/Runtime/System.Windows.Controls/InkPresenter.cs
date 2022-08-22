@@ -50,6 +50,11 @@ namespace Windows.UI.Xaml.Controls
 
         private void InkPresenter_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
             ResetCanvas();
         }
 

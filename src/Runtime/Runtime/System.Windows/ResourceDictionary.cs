@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using CSHTML5.Internal;
 
 #if OPENSILVER
@@ -274,10 +275,22 @@ namespace Windows.UI.Xaml
                 // this dictionary
                 this.RemoveInheritanceContextFromValues();
 
-                this._baseDictionary.Clear();
+                Dictionary<object, object> oldDictionary = this._baseDictionary;
+
+                this._baseDictionary = new Dictionary<object, object>();
 
                 // Notify owners of the change and fire invalidate if already initialized
                 this.NotifyOwners(ResourcesChangeInfo.CatastrophicDictionaryChangeInfo);
+
+                if (this.IsLoaded())
+                {
+                    foreach (object resource in oldDictionary.Values)
+                    {
+                        UnloadResource(resource);
+                    }
+                }
+
+                oldDictionary.Clear();
             }
         }
 
@@ -404,7 +417,12 @@ namespace Windows.UI.Xaml
 
                 // Notify owners of the change and fire invalidate if already initialized
                 this.NotifyOwners(new ResourcesChangeInfo(key));
-            }            
+
+                if (this.IsLoaded())
+                {
+                    UnloadResource(resource);
+                }
+            }
         }
 
         /// <summary>
@@ -1157,6 +1175,11 @@ namespace Windows.UI.Xaml
 
                 // Notify owners of the change and fire invalidate if already initialized
                 this.NotifyOwners(new ResourcesChangeInfo(key));
+
+                if (this.IsLoaded())
+                {
+                    UnloadResource(oldItem);
+                }
             }
         }
 
@@ -1178,6 +1201,62 @@ namespace Windows.UI.Xaml
 
             // Notify owners of the change and fire invalidate if already initialized
             this.NotifyOwners(new ResourcesChangeInfo(key));
+        }
+
+        internal void LoadResources()
+        {
+            if (_mergedDictionaries != null)
+            {
+                foreach (ResourceDictionary rd in _mergedDictionaries)
+                {
+                    rd.LoadResources();
+                }
+            }
+
+            foreach (object resource in _baseDictionary.Values)
+            {
+                LoadResource(resource);
+            }
+        }
+
+        internal void UnloadResources()
+        {
+            if (_mergedDictionaries != null)
+            {
+                foreach (ResourceDictionary rd in _mergedDictionaries)
+                {
+                    rd.UnloadResources();
+                }
+            }
+
+            foreach (object resource in _baseDictionary.Values)
+            {
+                UnloadResource(resource);
+            }
+        }
+
+        private bool IsLoaded()
+            => this.InheritanceContext is FrameworkElement feOwner && feOwner.IsLoaded;
+
+        private void LoadResource(object resource)
+        {
+            if (resource is FrameworkElement feResource
+                && !feResource.IsLoaded && !feResource.IsLoadedInResourceDictionary)
+            {
+                feResource.IsLoadedInResourceDictionary = true;
+                feResource.LoadResources();
+                feResource.RaiseLoadedEvent();
+            }
+        }
+
+        private static void UnloadResource(object resource)
+        {
+            if (resource is FrameworkElement feResource && feResource.IsLoadedInResourceDictionary)
+            {
+                feResource.IsLoadedInResourceDictionary = false;
+                feResource.RaiseUnloadedEvent();
+                feResource.UnloadResources();
+            }
         }
 
         // Sets the HasImplicitStyles flag if the given key is of type Type.

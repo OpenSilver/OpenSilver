@@ -28,6 +28,56 @@
             <TextBlock Text="SelectedItem:"/>
             <TextBlock Margin="5,0,0,0" Text="{Binding ElementName=ComboBox1, Path=SelectedItem}"/>
         </StackPanel>
+
+        <TextBlock Text="ComboBox styled to not have a ToggleButton (still shows DropDown in Silverlight):"/>
+        <ComboBox x:Name="ComboBoxWithoutToggleButton" Width="150">
+            <ComboBox.Style>
+                <Style TargetType="ComboBox" x:Name="ComboBoxStyle">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ComboBox">
+                                <Grid>
+                                    <Border x:Name="ContentPresenterBorder" CornerRadius="2">
+                                        <Grid Margin="0,0,7,0">
+                                            <Border x:Name="Border" CornerRadius="2" Opacity="1"
+                                            Background="{TemplateBinding Background}">
+                                                <Grid Margin="0">
+                                                    <ToggleButton x:Name="DropDownToggle"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
+                                                            Margin="0"
+                                                            VerticalAlignment="Stretch" Background="#001F3B53" Visibility="Collapsed"/>
+                                                    <ContentPresenter x:Name="ContentPresenter"
+                                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                Margin="{TemplateBinding Padding}">
+                                                        <TextBlock Text=" " />
+                                                    </ContentPresenter>
+                                                </Grid>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                    <Popup x:Name="Popup">
+                                        <Border x:Name="PopupBorder" HorizontalAlignment="Stretch" 
+                                        Padding="0,2,0,3" Background="Transparent">
+                                            <ScrollViewer x:Name="ScrollViewer"
+                                                    MaxHeight="324"
+                                                    HorizontalScrollBarVisibility="Disabled">
+                                                <ItemsPresenter Margin="0,0,7,0" />
+                                            </ScrollViewer>
+                                        </Border>
+                                    </Popup>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ComboBox.Style>
+            <ComboBoxItem>First item</ComboBoxItem>
+            <ComboBoxItem>Second item</ComboBoxItem>
+            <ComboBoxItem>Third item</ComboBoxItem>
+        </ComboBox>
     </StackPanel>
     
 </sdk:Page>

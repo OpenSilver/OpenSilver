@@ -15,224 +15,226 @@ namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
     [OpenSilver.NotImplemented]
-	public abstract partial class AutomationPeer : DependencyObject
-	{
+    public abstract partial class AutomationPeer : DependencyObject
+    {
         [OpenSilver.NotImplemented]
-		public static bool ListenerExists(AutomationEvents eventId)
-		{
-			return false;
-		}
+        public static bool ListenerExists(AutomationEvents eventId)
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public AutomationPeer EventsSource
-		{
-			get;
-			set;
-		}
+        public AutomationPeer EventsSource
+        {
+            get;
+            set;
+        }
 
         [OpenSilver.NotImplemented]
-		public void RaiseAutomationEvent(AutomationEvents eventId)
-		{
-		}
+        public void RaiseAutomationEvent(AutomationEvents eventId)
+        {
+        }
 
         [OpenSilver.NotImplemented]
-		public abstract object GetPattern(PatternInterface patternInterface);
+        public abstract object GetPattern(PatternInterface patternInterface);
         [OpenSilver.NotImplemented]
-		protected abstract List<AutomationPeer> GetChildrenCore();
+        protected abstract List<AutomationPeer> GetChildrenCore();
         [OpenSilver.NotImplemented]
-		protected abstract AutomationControlType GetAutomationControlTypeCore();
+        protected abstract AutomationControlType GetAutomationControlTypeCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetClassNameCore();
+        protected abstract string GetClassNameCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetHelpTextCore();
+        protected abstract string GetHelpTextCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetLocalizedControlTypeCore();
+        protected abstract string GetLocalizedControlTypeCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetItemStatusCore();
+        protected abstract string GetItemStatusCore();
         [OpenSilver.NotImplemented]
-		protected abstract AutomationOrientation GetOrientationCore();
+        protected abstract AutomationOrientation GetOrientationCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool IsControlElementCore();
+        protected abstract bool IsControlElementCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetNameCore();
+        protected abstract string GetNameCore();
         [OpenSilver.NotImplemented]
-		protected abstract Point GetClickablePointCore();
+        protected abstract Point GetClickablePointCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetAutomationIdCore();
+        protected abstract string GetAutomationIdCore();
         [OpenSilver.NotImplemented]
-		protected abstract AutomationPeer GetLabeledByCore();
+        protected abstract AutomationPeer GetLabeledByCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetItemTypeCore();
+        protected abstract string GetItemTypeCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool IsContentElementCore();
+        protected abstract bool IsContentElementCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetAccessKeyCore();
+        protected abstract string GetAccessKeyCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool IsKeyboardFocusableCore();
+        protected abstract bool IsKeyboardFocusableCore();
         [OpenSilver.NotImplemented]
-		protected abstract string GetAcceleratorKeyCore();
+        protected abstract string GetAcceleratorKeyCore();
         [OpenSilver.NotImplemented]
-		protected abstract Rect GetBoundingRectangleCore();
+        protected abstract Rect GetBoundingRectangleCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool HasKeyboardFocusCore();
+        protected abstract bool HasKeyboardFocusCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool IsEnabledCore();
+        protected abstract bool IsEnabledCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool IsOffscreenCore();
+        protected abstract bool IsOffscreenCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool IsPasswordCore();
+        protected abstract bool IsPasswordCore();
         [OpenSilver.NotImplemented]
-		protected abstract bool IsRequiredForFormCore();
+        protected abstract bool IsRequiredForFormCore();
         [OpenSilver.NotImplemented]
-		protected abstract void SetFocusCore();
+        protected abstract void SetFocusCore();
         [OpenSilver.NotImplemented]
-		public string GetAcceleratorKey()
-		{
-			return null;
-		}
+        public string GetAcceleratorKey()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public string GetAccessKey()
-		{
-			return null;
-		}
+        public string GetAccessKey()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public Rect GetBoundingRectangle()
-		{
-			return new Rect();
-		}
+        public Rect GetBoundingRectangle()
+        {
+            return new Rect();
+        }
 
         [OpenSilver.NotImplemented]
-		public string GetLocalizedControlType()
-		{
-			return null;
-		}
+        public string GetLocalizedControlType()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public Point GetClickablePoint()
-		{
-			return new Point();
-		}
+        public Point GetClickablePoint()
+        {
+            return new Point();
+        }
 
         [OpenSilver.NotImplemented]
-		public string GetItemType()
-		{
-			return null;
-		}
+        public string GetItemType()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public AutomationPeer GetLabeledBy()
-		{
-			return null;
-		}
+        public AutomationPeer GetLabeledBy()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public bool HasKeyboardFocus()
-		{
-			return false;
-		}
+        public bool HasKeyboardFocus()
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public bool IsContentElement()
-		{
-			return false;
-		}
+        public bool IsContentElement()
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public bool IsControlElement()
-		{
-			return false;
-		}
+        public bool IsControlElement()
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public bool IsKeyboardFocusable()
-		{
-			return false;
-		}
+        public bool IsKeyboardFocusable()
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public bool IsOffscreen()
-		{
-			return false;
-		}
+        public bool IsOffscreen()
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public bool IsPassword()
-		{
-			return false;
-		}
+        public bool IsPassword()
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public bool IsRequiredForForm()
-		{
-			return false;
-		}
+        public bool IsRequiredForForm()
+        {
+            return false;
+        }
 
         [OpenSilver.NotImplemented]
-		public void SetFocus()
-		{
-		}
+        public void SetFocus()
+        {
+        }
 
         [OpenSilver.NotImplemented]
-		public string GetItemStatus()
-		{
-			return null;
-		}
+        public string GetItemStatus()
+        {
+            return null;
+        }
+
+        public bool IsEnabled()
+        {
+            return IsEnabledCore();
+        }
 
         [OpenSilver.NotImplemented]
-		public bool IsEnabled()
-		{
-			return false;
-		}
+        public string GetName()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public string GetName()
-		{
-			return null;
-		}
+        public AutomationOrientation GetOrientation()
+        {
+            return AutomationOrientation.None;
+        }
 
         [OpenSilver.NotImplemented]
-		public AutomationOrientation GetOrientation()
-		{
-			return AutomationOrientation.None;
-		}
+        public AutomationPeer GetParent()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public AutomationPeer GetParent()
-		{
-			return null;
-		}
+        public List<AutomationPeer> GetChildren()
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		public List<AutomationPeer> GetChildren()
-		{
-			return null;
-		}
+        public void RaisePropertyChangedEvent(AutomationProperty property, object oldValue, object newValue)
+        {
+        }
 
         [OpenSilver.NotImplemented]
-		public void RaisePropertyChangedEvent(AutomationProperty property, object oldValue, object newValue)
-		{
-		}
+        protected IRawElementProviderSimple ProviderFromPeer(AutomationPeer peer)
+        {
+            return null;
+        }
 
         [OpenSilver.NotImplemented]
-		protected IRawElementProviderSimple ProviderFromPeer(AutomationPeer peer)
-		{
-			return null;
-		}
+        public void InvalidatePeer()
+        {
+        }
 
         [OpenSilver.NotImplemented]
-		public void InvalidatePeer()
-		{
-		}
+        public string GetClassName() => this.GetClassNameCore();
 
         [OpenSilver.NotImplemented]
-		public string GetClassName() => this.GetClassNameCore();
+        public string GetHelpText() => this.GetHelpTextCore();
 
         [OpenSilver.NotImplemented]
-		public string GetHelpText() => this.GetHelpTextCore();
+        public string GetAutomationId() => this.GetAutomationIdCore();
 
         [OpenSilver.NotImplemented]
-		public string GetAutomationId() => this.GetAutomationIdCore();
-	}
+        public AutomationControlType GetAutomationControlType() => this.GetAutomationControlTypeCore();
+    }
 }

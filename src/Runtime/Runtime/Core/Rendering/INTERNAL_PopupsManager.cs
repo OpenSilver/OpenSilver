@@ -97,7 +97,12 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
 
             foreach (Popup popup in listOfPopupThatMustBeClosed)
             {
-                popup.CloseFromAnOutsideClick();
+                var args = new OutsideClickEventArgs();
+                popup.OnOutsideClick(args);
+                if (!args.Handled)
+                {
+                    popup.CloseFromAnOutsideClick();
+                }
             }
 
         }
