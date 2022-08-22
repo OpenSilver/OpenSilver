@@ -153,7 +153,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     try
                     {
-                        _horizontalOffset = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("$0[$1]", this.INTERNAL_OuterDomElement, "scrollLeft"));
+                        _horizontalOffset = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript_GetElementAttributeByIdOrRef((this.INTERNAL_OuterDomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier, null, "scrollLeft"));
                     }
                     catch (InvalidCastException)
                     {
@@ -479,7 +479,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     try
                     {
-                        _verticalOffset = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("$0[$1]", this.INTERNAL_OuterDomElement, "scrollTop"));
+                        _verticalOffset = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript_GetElementAttributeByIdOrRef((this.INTERNAL_OuterDomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier, null, "scrollTop"));
                     }
                     catch (InvalidCastException)
                     {

@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CSHTML5;
+using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Controls;
 #else
@@ -369,7 +370,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                 if (cssEquivalent.DomElement != null)
                                 {
                                     cssEquivalentExists = true;
-                                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                    OpenSilver.Interop.ExecuteJavaScript_StopVelocity((cssEquivalent.DomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier, specificGroupName);
                                 }
                             }
                         }
@@ -383,7 +384,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
                             {
                                 cssEquivalentExists = true;
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                                OpenSilver.Interop.ExecuteJavaScript_StopVelocity((equivalent.DomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier, specificGroupName);
                             }
                         }
                     }

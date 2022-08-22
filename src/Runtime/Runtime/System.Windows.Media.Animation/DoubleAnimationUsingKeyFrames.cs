@@ -264,7 +264,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             }
                             if (cssEquivalent.DomElement != null)
                             {
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                OpenSilver.Interop.ExecuteJavaScript_StopVelocity((cssEquivalent.DomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier, specificGroupName);
                             }
                         }
                     }
@@ -276,7 +276,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     {
                         if (equivalent.DomElement != null)
                         {
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                            OpenSilver.Interop.ExecuteJavaScript_StopVelocity((equivalent.DomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier, specificGroupName);
                         }
                     }
                 }

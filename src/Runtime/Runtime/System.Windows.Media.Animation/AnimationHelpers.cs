@@ -13,11 +13,14 @@
 \*====================================================================================*/
 
 
+using CSHTML5.Internal;
+using CSHTML5.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 #if BRIDGE
 using Bridge;
 #endif
@@ -36,6 +39,8 @@ namespace Windows.UI.Xaml.Media.Animation
     {
         internal static void CallVelocity(object domElement, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, Action callbackForWhenfinished, object jsFromToValues)
         {
+            var options = new Dictionary<string, string>();
+
             string easingFunctionAsString = "linear";
             if (easingFunction != null)
             {
@@ -48,42 +53,20 @@ namespace Windows.UI.Xaml.Media.Animation
                 ++duration;
             }
 
-            object options = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
-            if (callbackForWhenfinished == null)
-            {
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.easing = $1;
-$0.duration = $2;
-$0.queue = false;
-$0.queue = $3;
-", options, easingFunctionAsString, duration, visualStateGroupName);
-            }
-            else
-            {
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.easing = $1;
-$0.duration = $2;
-$0.queue = false;
-$0.queue = $3;
-$0.complete = $4;
-", options, easingFunctionAsString, duration, visualStateGroupName, callbackForWhenfinished);
-            }
+            options.Add("easing", easingFunctionAsString);
+            options.Add("duration", duration.ToString());
 
             if (easingFunction != null)
             {
-                Dictionary<string, object> additionalOptions = easingFunction.GetAdditionalOptionsForVelocityCall();
-                if (additionalOptions != null)
-                {
-                    foreach (string key in additionalOptions.Keys)
-                    {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", options, key, additionalOptions[key]);
-                    }
-                }
+                Dictionary<string, string> additionalOptions = easingFunction.GetAdditionalOptionsForVelocityCall();
+                additionalOptions.ForEach(o => options.Add(o.Key, o.Value));
             }
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, $1, $2);
-                                                     Velocity.Utilities.dequeue($0, $3);",
-                                                     domElement, jsFromToValues, options, visualStateGroupName);
+            OpenSilver.Interop.ExecuteJavaScript_CallVelocity((domElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier,
+                                                                (jsFromToValues as INTERNAL_JSObjectReference).ReferenceId,
+                                                                null,
+                                                                string.Join("|", options.Select(o => $"{o.Key}:{o.Value}")),
+                                                                visualStateGroupName, callbackForWhenfinished);
         }
 
         internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value)

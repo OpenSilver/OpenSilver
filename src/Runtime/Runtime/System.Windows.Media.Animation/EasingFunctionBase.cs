@@ -75,6 +75,6 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Returns a Dictionary of the values to add in the options section of the Velocity Call. Implemented in inheriting classes that define their own easing function (see ExponentialEase)
         /// </summary>
         /// <returns></returns>
-        internal virtual Dictionary<string, object> GetAdditionalOptionsForVelocityCall() { return null; }
+        internal virtual Dictionary<string, string> GetAdditionalOptionsForVelocityCall() { return null; }
     }
 }

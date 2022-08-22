@@ -41,6 +41,7 @@ namespace CSHTML5
 
         static INTERNAL_InteropImplementation()
         {
+            EnsureInitialized();
             Application.INTERNAL_Reloaded += (sender, e) =>
             {
                 _isInitialized = false;
@@ -209,6 +210,155 @@ namespace CSHTML5
             return new INTERNAL_JSObjectReference(value, referenceId);
         }
 
+        internal static void ExecuteJavaScript_SetElementAttributeByIdOrRef(string id, string referenceId, string attributeName, string attributeValue)
+        {
+            Func<string, string> prepArg = (arg) => arg != null ? $"'{arg}'" : "null";
+            var javascript = $"document.setElementAttributeByIdOrRef({prepArg(id)}, {prepArg(referenceId)}, '{attributeName}', '{attributeValue}', $errorId)";
+            
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+            
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
+        }
+
+        internal static object ExecuteJavaScript_GetElementAttributeByIdOrRef(string id, string referenceId, string attributeName)
+        {
+            Func<string, string> prepArg = (arg) => arg != null ? $"'{arg}'" : "null";
+
+            var javascript = $"document.getElementAttributeByIdOrRef({prepArg(id)}, {prepArg(referenceId)}, '{attributeName}', $errorId)";
+            
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            return new INTERNAL_JSObjectReference(INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript), "");
+        }
+
+        internal static void ExecuteJavaScript_CreateElementSafe(string domElementTag, string id, string parentId, string parentRef, int index)
+        {
+            string referenceId = _refIdGenerator.NewId().ToString();
+            Func<string, string> prepArg = (arg) => arg != null ? $"'{arg}'" : "null";
+
+            var javascript = $"document.createElementSafe('{domElementTag}', '{id}', {prepArg(parentId)}, {prepArg(parentRef)}, '{index}', '{referenceId}', '$errorId')";
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
+        }
+
+        internal static string ExecuteJavaScript_GetActualWidthAndHeight(string elementId)
+        {
+            string referenceId = _refIdGenerator.NewId().ToString();
+            var javascript = $"document.getActualWidthAndHeight('{elementId}', '{referenceId}', '$errorId')";
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            return INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript).ToString();
+        }
+
+        internal static void ExecuteJavaScript_AttachEventListener(string elementId, Delegate handler, bool isFocusable)
+        {
+            //string referenceId = _refIdGenerator.NewId().ToString();
+
+            // Add the callback to the document:
+            int callbackId = OnCallBackImpl.Instance.RegisterCallBack(handler);
+            var isVoid = handler.Method.ReturnType == typeof(void);
+
+            //var javascript = $"document._attachEventListeners1('{elementId}', {callbackId}, '{(!isVoid).ToString().ToLower()}', {isFocusable.ToString().ToLower()}, '{referenceId}', '$errorCallBackId')";
+            var javascript = $"document._attachEventListeners('{elementId}', {callbackId}, '{(!isVoid).ToString().ToLower()}', {isFocusable.ToString().ToLower()}, '$errorCallBackId')";
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorCallBackId", errorCallBackId);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
+        }
+
+        internal static object ExecuteJavaScript_MeasureTextBlock(string elementId, string textWrapping, string padding, string width, string maxWidth)
+        {
+            string referenceId = _refIdGenerator.NewId().ToString();
+            var javascript = $"document.measureTextBlock('{elementId}', '{textWrapping}', '{padding}', '{width}', '{maxWidth}', '$errorId')";
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            return INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript).ToString();
+        }
+
+        internal static void ExecuteJavaScript_CallVelocity(string elementId, string propsRefId, string props, string options, string visualStateGroupName, Delegate callback)
+        {
+            // Add the callback to the document:
+            object callbackId = null;
+            bool isVoid = false;
+            if (callback != null)
+            {
+                callbackId = OnCallBackImpl.Instance.RegisterCallBack(callback);
+                isVoid = callback.Method.ReturnType == typeof(void);
+            }
+
+            Func<string, string> prepArg = (arg) => arg != null ? $"'{arg}'" : "null";
+
+            var javascript = $"document.callVelocity('{elementId}', {prepArg(propsRefId)}, {prepArg(props)}, {prepArg(options)}, {prepArg(visualStateGroupName)}, {callbackId ?? "null"}, '{(!isVoid).ToString().ToLower()}', '$errorId')";
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript).ToString();
+        }
+
+        internal static void ExecuteJavaScript_StopVelocity(string elementId, string visualStateGroupName)
+        {
+            var javascript = $"document.stopVelocity('{elementId}', '{visualStateGroupName}', '$errorId')";
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript).ToString();
+        }
+
+        internal static void ExecuteJavaScript_DisableFocus(string elementId)
+        {
+            var javascript = $"document.disableFocus('{elementId}', '$errorId')";
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript).ToString();
+        }
+
+        internal static void ExecuteJavaScript_EnableFocus(string elementId)
+        {
+            var javascript = $"document.enableFocus('{elementId}', '$errorId')";
+
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorId", errorCallBackId);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript).ToString();
+        }
+
+        internal static void ExecuteJavaScript_CallbackAsyncFromJS(Delegate handler)
+        {
+            // Add the callback to the document:
+            int callbackId = OnCallBackImpl.Instance.RegisterCallBack(handler);
+
+            var javascript = $"document.callbackAsyncFromJS({callbackId}, false, '$errorCallBackId')";
+            
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            javascript = javascript.Replace("$errorCallBackId", errorCallBackId);
+
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
+        }
+
         internal static void ResetLoadedFilesDictionaries()
         {
             _pendingJSFile.Clear();
@@ -345,7 +495,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
             string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url);
 
             CSHTML5.Interop.ExecuteJavaScript(
-@"// Add the link tag to the head
+    @"// Add the link tag to the head
 var head = document.getElementsByTagName('head')[0];
 var link = document.createElement('link');
 link.rel  = 'stylesheet';

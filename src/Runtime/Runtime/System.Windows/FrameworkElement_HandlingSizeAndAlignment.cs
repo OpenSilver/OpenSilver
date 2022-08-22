@@ -1644,9 +1644,9 @@ namespace Windows.UI.Xaml
                         return new Size(this.Width, this.Height);
                     try
                     {
-                        // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string concatenated = CSHTML5.Interop.ExecuteJavaScript("document.getActualWidthAndHeight($0)", this.INTERNAL_OuterDomElement).ToString();
-                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                    // Hack to improve the Simulator performance by making only one interop call rather than two:
+                    string concatenated = OpenSilver.Interop.ExecuteJavaScript_GetActualWidthAndHeight((this.INTERNAL_OuterDomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier);
+                    int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
                         if (sepIndex > -1)
                         {
                             string actualWidthAsString = concatenated.Substring(0, sepIndex);

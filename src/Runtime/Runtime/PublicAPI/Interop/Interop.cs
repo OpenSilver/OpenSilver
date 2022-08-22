@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -30,6 +31,61 @@ namespace OpenSilver
     /// </summary>
     public static class Interop
     {
+        internal static void ExecuteJavaScript_SetElementAttributeByIdOrRef(string id, string referenceId, string attributeName, string attributeValue)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SetElementAttributeByIdOrRef(id, referenceId, attributeName, attributeValue);
+        }
+
+        internal static object ExecuteJavaScript_GetElementAttributeByIdOrRef(string id, string referenceId, string attributeName)
+        {
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_GetElementAttributeByIdOrRef(id, referenceId, attributeName);
+        }
+
+        internal static void ExecuteJavaScript_CreateElementSafe(string domElementTag, string elementId, string parentId, string parentRef, int index)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_CreateElementSafe(domElementTag, elementId, parentId, parentRef, index);
+        }
+
+        internal static string ExecuteJavaScript_GetActualWidthAndHeight(string elementId)
+        {
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_GetActualWidthAndHeight(elementId);
+        }
+
+        internal static void ExecuteJavaScript_AttachEventListener(string elementId, Delegate handler, bool isFocusable)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_AttachEventListener(elementId, handler, isFocusable);
+        }
+
+        internal static object ExecuteJavaScript_MeasureTextBlock(string elementId, string textWrapping, string padding, string width, string maxWidth)
+        {
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_MeasureTextBlock(elementId, textWrapping, padding, width, maxWidth);
+        }
+
+        internal static void ExecuteJavaScript_CallVelocity(string elementId, string propsRefId, string props, string options, string visualStateGroupName, Delegate callback)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_CallVelocity(elementId, propsRefId, props, options, visualStateGroupName, callback);
+        }
+
+        internal static void ExecuteJavaScript_StopVelocity(string elementId, string visualStateGroupName)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_StopVelocity(elementId, visualStateGroupName);
+        }
+
+        internal static void ExecuteJavaScript_DisableFocus(string elementId)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_DisableFocus(elementId);
+        }
+
+        internal static void ExecuteJavaScript_EnableFocus(string elementId)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_EnableFocus(elementId);
+        }
+
+        internal static void ExecuteJavaScript_CallbackAsyncFromJS(Delegate handler)
+        {
+            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_CallbackAsyncFromJS(handler);
+        }
+
         /// <summary>
         /// Allows calling JavaScript code from within C#.
         /// </summary>
@@ -107,22 +163,22 @@ namespace OpenSilver
             //that is executed immediately after the one where the URI is defined! Be careful
             //when moving the following line of code.
 #if NETSTANDARD
-	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #elif BRIDGE
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
 
             var t = new TaskCompletionSource<object>();
             CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFile(
-                url, 
-                callerAssemblyName, 
+                url,
+                callerAssemblyName,
                 () => t.SetResult(null), () => t.SetException(new Exception("Could not load file: \"" + url + "\"."))
             );
             return t.Task;
         }
 
         private static HashSet<string> _jsScriptFileKeys = new HashSet<string>(); //todo: This is probably redundant with the _pendingJSFile and _loadedFiles in INTERNAL_InteropImplementation so remove this?
-        
+
         public static Task<object> LoadJavaScriptFile(ResourceFile resourceFile)
         {
             if (!_jsScriptFileKeys.Contains(resourceFile.Key))
@@ -132,7 +188,7 @@ namespace OpenSilver
                 // that is executed immediately after the one where the URI is defined! Be careful
                 // when moving the following line of code.
 #if NETSTANDARD
-	            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+                string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #elif BRIDGE
                 string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -168,7 +224,7 @@ namespace OpenSilver
             // that is executed immediately after the one where the URI is defined! Be careful
             // when moving the following line of code.
 #if NETSTANDARD
-	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #else
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -183,7 +239,7 @@ namespace OpenSilver
             // that is executed immediately after the one where the URI is defined! Be careful
             // when moving the following line of code.
 #if NETSTANDARD
-	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #elif BRIDGE
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -191,7 +247,7 @@ namespace OpenSilver
             foreach (var resourceFile in resourceFiles)
             {
                 //add the key to the dictionary and add the url to the list:
-                if(!_jsScriptFileKeys.Contains(resourceFile.Key))
+                if (!_jsScriptFileKeys.Contains(resourceFile.Key))
                 {
                     _jsScriptFileKeys.Add(resourceFile.Key);
                     urlsAsList.Add(resourceFile.Url);
@@ -282,7 +338,7 @@ namespace OpenSilver
             get
             {
 #if OPENSILVER
-	            return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
+                return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
 #elif BRIDGE
                 return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator();
 #endif
@@ -291,7 +347,7 @@ namespace OpenSilver
 
 #if CSHTML5BLAZOR
         // For backwards compatibility
-        
+
         /// <summary>
         /// Returns True is the app is running inside the Simulator, and False otherwise.
         /// </summary>

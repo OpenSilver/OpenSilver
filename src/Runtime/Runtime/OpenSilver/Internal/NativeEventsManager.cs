@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
 using System;
 
 #if MIGRATION
@@ -54,7 +55,7 @@ namespace OpenSilver.Internal
 
         public void AttachEvents()
         {
-            Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", _owner.INTERNAL_OuterDomElement, _handler, _isFocusable);
+            OpenSilver.Interop.ExecuteJavaScript_AttachEventListener((_owner.INTERNAL_OuterDomElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier, _handler, _isFocusable);
         }
 
         public void DetachEvents()
