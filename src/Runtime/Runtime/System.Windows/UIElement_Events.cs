@@ -995,7 +995,7 @@ namespace Windows.UI.Xaml
             object target = GetFocusTarget();
             if (target != null)
             {
-                OpenSilver.Interop.ExecuteJavaScript("document.enableFocus($0)", ((INTERNAL_HtmlDomElementReference)target).UniqueIdentifier);
+                OpenSilver.Interop.ExecuteJavaScript_EnableFocus((target as INTERNAL_HtmlDomElementReference).UniqueIdentifier);
             }
         }
 
@@ -1004,7 +1004,7 @@ namespace Windows.UI.Xaml
             object target = GetFocusTarget();
             if (target != null)
             {
-                OpenSilver.Interop.ExecuteJavaScript("document.disableFocus($0)", ((INTERNAL_HtmlDomElementReference)target).UniqueIdentifier);
+                OpenSilver.Interop.ExecuteJavaScript_DisableFocus((target as INTERNAL_HtmlDomElementReference).UniqueIdentifier);
             }
         }
 

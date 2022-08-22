@@ -150,32 +150,14 @@ namespace CSHTML5.Internal
                     if (!_isDispatcherPending)
                     {
                         _isDispatcherPending = true;
-
 #if OPTIMIZATION_LOG
                         Console.WriteLine("[OPTIMIZATION] Calling setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
-                        CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(
-                            javascript: "setTimeout($0, 1)",
-                            runAsynchronously: false,
-                            noImpactOnPendingJSCode: true,
-                            variables: new object[]
-                            {
-                                (Action)(() =>
-                                {
-#if OPTIMIZATION_LOG
-                                    Console.WriteLine("[OPTIMIZATION] Executing setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
-#endif
-                                    if (_isDispatcherPending) // We check again, because in the meantime the dispatcher can be cancelled in case of a forced execution of the pending JS code, for example when making a JavaScript execution that "returns a value".
-                                    {
-                                        ExecutePendingJavaScriptCode("SETTIMEOUT COMPLETED");
-                                    }
-                                })
-                            }
-                        );
+                        OpenSilver.Interop.ExecuteJavaScript_CallbackAsyncFromJS((Action)(() => ExecutePendingJavaScriptCode("SETTIMEOUT COMPLETED")));
                     }
                 }
 #endif
-                                }
+            }
             else
             {
 #if OPTIMIZATION_LOG
@@ -290,7 +272,7 @@ namespace CSHTML5.Internal
         public static void RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(Action action)
         {
             try
-            { 
+            {
                 if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
                 {
                     //-----------------------------

@@ -255,7 +255,7 @@ namespace Windows.UI.Xaml
 
             string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
 #if OPENSILVER
-            string strTextSize = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(javaScriptCodeToExecute));
+            string strTextSize = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript_MeasureTextBlock(uid, strTextWrapping, strPadding, strWidth, strMaxWidth));
 #elif BRIDGE
             string strTextSize = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("eval($0)", javaScriptCodeToExecute));
 #endif

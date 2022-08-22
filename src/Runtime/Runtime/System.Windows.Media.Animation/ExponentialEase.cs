@@ -57,10 +57,10 @@ namespace Windows.UI.Xaml.Media.Animation
 //    return 0.5 - Math.cos( p * Math.PI ) / 2;
 //};
 
-        internal override Dictionary<string, object> GetAdditionalOptionsForVelocityCall()
+        internal override Dictionary<string, string> GetAdditionalOptionsForVelocityCall()
         {
-            Dictionary<string, object> additionalOptions = new Dictionary<string, object>();
-            additionalOptions.Add("exponent", Exponent);
+            Dictionary<string, string> additionalOptions = new Dictionary<string, string>();
+            additionalOptions.Add("exponent", Exponent.ToString());
             return additionalOptions;
         }
 
