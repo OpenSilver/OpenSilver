@@ -18,11 +18,8 @@ namespace TestApplication
             Tests.Add(new Test("ItemsControl", "ItemsControl"));
             Tests.Add(new Test("ComboBox", "ComboBox"));
             Tests.Add(new Test("AutoCompleteBox", "AutoCompleteBox"));
-<<<<<<< HEAD
             Tests.Add(new Test("TimePicker", "TimePicker"));
-=======
             Tests.Add(new Test("Accordion", "Accordion"));
->>>>>>> develop
             Tests.Add(new Test("Negative Margin", "Negative Margin"));
             Tests.Add(new Test("LinQ", "LinQ"));
             Tests.Add(new Test("Opacity", "IsHitTestVisible Opacity"));
