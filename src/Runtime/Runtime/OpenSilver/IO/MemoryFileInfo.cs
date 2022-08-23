@@ -24,6 +24,31 @@ namespace OpenSilver.IO
     /// </summary>
     public class MemoryFileInfo
     {
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        string _extension = null;
+        public string Extension
+        {
+            get
+            {
+                if (_extension == null)
+                    _extension = Path.GetExtension(Name);
+                return _extension;
+            }
+        }
+
+        [OpenSilver.NotImplemented]
+        public bool Exists { get; }
+
+        [OpenSilver.NotImplemented]
+        public FileAttributes Attributes { get; set; }
+
+        [OpenSilver.NotImplemented]
+        public virtual string FullName { get { return Name; } }
+
         private byte[] _content;
 
         public MemoryFileInfo(string filename, byte[] content)

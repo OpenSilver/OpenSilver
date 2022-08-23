@@ -205,6 +205,20 @@ namespace OpenSilver.Controls
         }
 
         /// <summary>
+        /// Gets or sets the index of the selected item in the <see cref="OpenFileDialog"/>
+        /// filter drop-down list.
+        /// </summary>
+        /// <returns>
+        /// The index of the selected item in the <see cref="OpenFileDialog"/>
+        /// filter drop-down list. The default is 1.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The filter index is less than 1.
+        /// </exception>
+        [NotImplemented]
+        public int FilterIndex { get; set; }
+
+        /// <summary>
         /// Gets a <see cref="MemoryFileInfo"/> object for the selected file. If multiple files are
         /// selected, returns the first selected file.
         /// </summary>
