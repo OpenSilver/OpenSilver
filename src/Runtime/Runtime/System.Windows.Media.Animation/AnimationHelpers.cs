@@ -27,6 +27,7 @@ using Bridge;
 #if !MIGRATION
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Controls;
 #endif
 
 #if MIGRATION

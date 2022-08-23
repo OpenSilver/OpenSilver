@@ -33,6 +33,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CSHTML5;
 using DotNetForHtml5.Core;
+using CSHTML5.Types;
 
 #if !CSHTML5NETSTANDARD
 using DotNetBrowser;
@@ -40,7 +41,6 @@ using DotNetBrowser;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-using CSHTML5.Types;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml;
