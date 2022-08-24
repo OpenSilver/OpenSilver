@@ -39,12 +39,13 @@ using System.Xml.Linq;
 using System.Xml;
 using CSHTML5.Internal;
 using static System.ServiceModel.INTERNAL_WebMethodsCaller;
-
-#if MIGRATION
-using System.Windows;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
+
+#if MIGRATION
+using System.Windows;
+
 #else
 using Windows.UI.Xaml;
 #endif
