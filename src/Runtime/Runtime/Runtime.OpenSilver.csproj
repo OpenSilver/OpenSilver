@@ -121,6 +121,7 @@
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\PollingDuplexHttpSecurityMode.cs" />
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\CSHTML5_DuplexClientBase.cs" />
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\InstanceContext.cs" />
+		<Compile Include="System.ServiceModel\WORKINPROGRESS\XMLDictionaries.cs" />
 		<Compile Include="System.Windows.Automation.Peers\CalendarDayButtonAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ListBoxAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ListBoxItemAutomationPeer.cs" />

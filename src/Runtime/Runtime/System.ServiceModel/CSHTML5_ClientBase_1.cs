@@ -42,6 +42,9 @@ using static System.ServiceModel.INTERNAL_WebMethodsCaller;
 
 #if MIGRATION
 using System.Windows;
+using System.IO.Compression;
+using System.Net.Http;
+using System.Net.Http.Headers;
 #else
 using Windows.UI.Xaml;
 #endif
@@ -1453,7 +1456,7 @@ namespace System.ServiceModel
                                          attr.Name == name.LocalName :
                                          type.Name == name.LocalName;
 
-                            if(nameMatch)
+                            if (nameMatch)
                             {
                                 bool namespaceMatch = attr.IsNamespaceSetExplicitly ?
                                     attr.Namespace == name.NamespaceName :
@@ -1820,6 +1823,270 @@ namespace System.ServiceModel
                 {
                     throw new CommunicationException("The remote server returned an error. To debug, look at the browser Console output, or use a tool such as Fiddler.");
                 }
+            }
+
+
+            private static byte[] Stream2ByteArray(Stream input)
+            {
+                MemoryStream ms = new MemoryStream();
+                input.CopyTo(ms);
+                return ms.ToArray();
+            }
+
+            private static byte[] GzipDecompress(byte[] data)
+            {
+                using (var compressedStream = new MemoryStream(data))
+                using (var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+                using (var resultStream = new MemoryStream())
+                {
+                    try
+                    {
+                        zipStream.CopyTo(resultStream);
+                    }
+                    catch (Exception)
+                    {
+                        //compressedStream.CopyTo(resultStream);
+                        return new byte[] { };
+                    }
+
+                    return resultStream.ToArray();
+                }
+            }
+
+            public async Task<object> CallWebMethodWithBinaryEncoding(
+                string webMethodName,
+                Type interfaceType,
+                IEnumerable<MessageHeader> outgoingMessageHeaders,
+                IDictionary<string, object> originalRequestObject,
+                string soapVersion,
+                Dictionary<string, string> httpHeaders = null,
+                string cookies = "",
+                bool gzipRequest = true
+                )
+            {
+                //WCF MESSAGE BODY
+                string interfaceTypeName = interfaceType.Name; // default value
+                string interfaceTypeNamespace = "http://tempuri.org/"; // default value
+                var actionName = $"{interfaceTypeNamespace}{interfaceTypeName}/{webMethodName}";
+
+                var types = new List<Type>();
+                types.AddRange(interfaceType.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true).Select(o => ((ServiceKnownTypeAttribute)o).Type));
+                var ds = new DataContractSerializerCustom(originalRequestObject.GetType(), types);
+                var xdoc = ds.SerializeToXDocument(originalRequestObject);
+                var methodNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(webMethodName));
+                var method = ResolveMethod(interfaceType, webMethodName, "Begin" + webMethodName);
+                var parameterInfos = method.GetParameters();
+                var paramNameElement = new XElement(XNamespace.Get(interfaceTypeNamespace).GetName(parameterInfos[0].Name));
+                methodNameElement.Add(paramNameElement);
+                foreach (var currentNode in xdoc.Root.Nodes())
+                {
+                    paramNameElement.Add(currentNode);
+                }
+                foreach (var currentAttribute in xdoc.Root.Attributes())
+                {
+                    if (currentAttribute.Name.LocalName != "xmlns")
+                    {
+                        paramNameElement.Add(currentAttribute);
+                    }
+                }
+
+                //WCF MESSAGE
+                var messageVersion = MessageVersion.Soap12WSAddressing10;
+                if (soapVersion == "1.1")
+                {
+                    messageVersion = MessageVersion.Soap11;
+                }
+                var wcfMessage = Message.CreateMessage(messageVersion, actionName, methodNameElement);
+
+                //WCF MESSAGE HEADERS
+                wcfMessage.Headers.Add(MessageHeader.CreateHeader("DoesNotHandleFault", "", true));
+
+                foreach (var header in outgoingMessageHeaders)
+                {
+                    wcfMessage.Headers.Add(header);
+                }
+
+                //HTTP REQUEST
+                HttpClient httpClient;
+
+                if (!string.IsNullOrEmpty(cookies))
+                {
+                    var cookieElems = cookies.Split(';').Select(x => new KeyValuePair<string, string>(x.Split('=')[0], x.Split('=')[1]));
+
+                    if (OpenSilver.Interop.IsRunningInTheSimulator)
+                    {
+                        var handler = new HttpClientHandler()
+                        {
+                            UseCookies = true,
+                            CookieContainer = new CookieContainer()
+                        };
+                        foreach (var cookie in cookieElems)
+                        {
+                            handler.CookieContainer.SetCookies(new Uri(_addressOfService), $"{cookie.Key}={cookie.Value}");
+                        }
+                        httpClient = new HttpClient(handler);
+                    }
+                    else
+                    {
+                        foreach (var cookie in cookieElems)
+                        {
+                            OpenSilver.Interop.ExecuteJavaScript($"document.cookie='{cookie.Key}={cookie.Value}'");
+                        }
+
+                        var handler = new HttpClientHandler()
+                        {
+                            AllowAutoRedirect = true
+                        };
+                        httpClient = new HttpClient(handler);
+                    }
+                }
+                else
+                {
+                    var handler = new HttpClientHandler()
+                    {
+                        AllowAutoRedirect = true
+                    };
+                    httpClient = new HttpClient(handler);
+                }
+
+                //HTTP HEADERS
+                const string wcfContentType = "application/soap+msbin1";
+
+                if (httpHeaders != null)
+                {
+                    foreach (var header in httpHeaders)
+                    {
+                        httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
+                    }
+                }
+
+                if (gzipRequest)
+                {
+                    httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
+                }
+                httpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en-DE;q=0.7,en;q=0.3");
+                httpClient.DefaultRequestHeaders.Add("Pragma", "no-cache");
+
+                var userAgent = "Mozilla/5.0";
+                ProductInfoHeaderValue pUserAgent;
+                ProductInfoHeaderValue.TryParse(userAgent, out pUserAgent);
+                httpClient.DefaultRequestHeaders.UserAgent.Add(pUserAgent);
+
+                var accept = "*/*";
+                MediaTypeWithQualityHeaderValue pAccept;
+                MediaTypeWithQualityHeaderValue.TryParse(accept, out pAccept);
+                httpClient.DefaultRequestHeaders.Accept.Add(pAccept);
+
+                httpClient.DefaultRequestHeaders.Expect.Clear();
+
+                //HTTP BODY
+                var requestDataBytes = new byte[] { };
+
+                //ENCODE THE WCF MESSAGE INTO BINARY WITH XML DICTIONARY
+                using (var binaryOutput = new MemoryStream())
+                {
+                    using (var binaryWriter = XmlDictionaryWriter.CreateBinaryWriter(binaryOutput, XMLDictionaries.WcfDictonary, null, false))
+                    {
+                        wcfMessage.WriteMessage(binaryWriter);
+                        binaryWriter.Flush();
+                        binaryOutput.Flush();
+                        requestDataBytes = binaryOutput.ToArray();
+                    }
+                }
+
+                //GET HTTP RESPONSE
+                var requestHttpContent = new ByteArrayContent(requestDataBytes);
+                requestHttpContent.Headers.Add("Content-Type", wcfContentType);
+                var requestHttp = new HttpRequestMessage(HttpMethod.Post, _addressOfService);
+                requestHttp.Content = requestHttpContent;
+                var response = await httpClient.SendAsync(requestHttp, HttpCompletionOption.ResponseContentRead);
+
+                //HANDLE REDIRECTED RESPONSES UNTIL SUCCESS RESPONSE
+                while (response.StatusCode == HttpStatusCode.Redirect)
+                {
+                    requestHttp.RequestUri = response.Headers.Location;
+                    response = await httpClient.SendAsync(requestHttp, HttpCompletionOption.ResponseContentRead);
+                }
+
+                var compressedChunkedDirtyBytes = (await response.Content.ReadAsByteArrayAsync()).ToList();
+
+                var headerBytes = new List<byte>();
+                var bodyBytes = new List<byte>();
+                var bodyByteCount = 0;
+                bool headerSwitch = false;
+                var unzippedBodyBytes = new byte[] { };
+
+                var isChunked = compressedChunkedDirtyBytes.FindIndex(x => x == 13) < 6;
+                if (isChunked)
+                {
+                    //UNCHUNK(CONCAT CHUNKED DATA)
+                    for (int i = 0; i < compressedChunkedDirtyBytes.Count; i++)
+                    {
+                        var b = compressedChunkedDirtyBytes[i];
+                        if (headerSwitch)
+                        {
+                            headerBytes.Add(b);
+                            if (headerBytes.Count > 2 && headerBytes[headerBytes.Count - 1] == 10 && headerBytes[headerBytes.Count - 2] == 13)
+                            {
+                                headerSwitch = false;
+                                headerBytes.RemoveAll(x => x == 13 || x == 10);
+                                bodyByteCount = (int)Convert.ToInt64(new string(headerBytes.Select(x => Convert.ToChar(x)).ToArray()), 16);
+                            }
+                        }
+                        else
+                        {
+                            bodyBytes.Add(b);
+                            --bodyByteCount;
+                            if (bodyByteCount <= 0)
+                            {
+                                headerSwitch = true;
+                                headerBytes.Clear();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    bodyBytes = compressedChunkedDirtyBytes;
+                }
+
+                //REMOVE THE DIRTY BYTES UNTIL A REASONABLE DECOMPRESSION IS POSSIBLE
+                if (OpenSilver.Interop.IsRunningInTheSimulator)
+                {
+                    while (bodyBytes.Count > 0)
+                    {
+                        unzippedBodyBytes = GzipDecompress(bodyBytes.ToArray());
+                        if (unzippedBodyBytes.Length > 0)
+                        {
+                            break;
+                        }
+                        bodyBytes.RemoveAt(bodyBytes.Count - 1);
+                    }
+                }
+                else
+                {
+                    unzippedBodyBytes = bodyBytes.ToArray();
+                }
+
+                //DECODE THE BYTES WITH XML DICTIONARY TO SOAP XML STRING
+                var responseWcfMessageString = "";
+                using (var binaryInput = new MemoryStream(unzippedBodyBytes))
+                {
+                    // parse bytestream into the XML DOM
+                    using (var binaryReader = XmlDictionaryReader.CreateBinaryReader(binaryInput, XMLDictionaries.WcfDictonary, XmlDictionaryReaderQuotas.Max))
+                    {
+                        var wcfResponseXmlDoc = new XmlDocument();
+                        wcfResponseXmlDoc.Load(binaryReader);
+                        responseWcfMessageString = wcfResponseXmlDoc.InnerXml;
+                    }
+                }
+
+                //EXTRACT RESULT IN XML FORMAT CONVERT WTIH WEB METHOD CALLERS INTO OBJECT
+                var endMethod = ResolveMethod(interfaceType, webMethodName, "End" + webMethodName);
+                var endMethodType = endMethod.ReturnType;
+                var responseWcf = EndCallWebMethod(webMethodName, interfaceType, endMethodType, responseWcfMessageString, "1.2");
+
+                return responseWcf;
             }
 
         }
