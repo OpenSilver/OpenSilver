@@ -245,6 +245,9 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
+                if (dp._textBox == null)
+                    dp.ApplyTemplate();
+
                 if (dp._textBox != null)
                 {
                     dp._textBox.Text = newText;
