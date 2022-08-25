@@ -82,14 +82,12 @@ if (div.style.display == "grid") {
 // DEFINE OTHER SCRIPTS
 //------------------------------
 
-document.getXamlRoot = function()
-{
-	let xamlRoot = document.getElementById("opensilver-root");
-	if (!xamlRoot)
-	{
-		xamlRoot = document.getElementById("cshtml5-root");
-	}
-	return xamlRoot;
+document.getXamlRoot = function () {
+    let xamlRoot = document.getElementById("opensilver-root");
+    if (!xamlRoot) {
+        xamlRoot = document.getElementById("cshtml5-root");
+    }
+    return xamlRoot;
 }
 
 document.clearXamlRoot = function () {
@@ -230,10 +228,10 @@ document.setGridCollapsedDuetoHiddenColumn = function (id) {
     if (!element)
         return;
 
-	if (element.getAttribute('data-isCollapsedDueToHiddenColumn' == true)){
-		element.style.overflow = 'visible';
-		element.setAttribute('data-isCollapsedDueToHiddenColumn', false);
-	}
+    if (element.getAttribute('data-isCollapsedDueToHiddenColumn' == true)) {
+        element.style.overflow = 'visible';
+        element.setAttribute('data-isCollapsedDueToHiddenColumn', false);
+    }
 }
 
 document.setDisplayTableCell = function (id) {
@@ -245,13 +243,13 @@ document.setDisplayTableCell = function (id) {
 }
 
 document.getActualWidthAndHeight = function (element) {
-	return (typeof element === 'undefined' || element === null) ? '0|0' : element['offsetWidth'].toFixed(3) + '|' + element['offsetHeight'].toFixed(3);
+    return (typeof element === 'undefined' || element === null) ? '0|0' : element['offsetWidth'].toFixed(3) + '|' + element['offsetHeight'].toFixed(3);
 }
 
 document.createElementSafe = function (tagName, id, parentElement, index) {
-	const newElement = document.createElement(tagName);
+    const newElement = document.createElement(tagName);
 
-	newElement.setAttribute("id", id);
+    newElement.setAttribute("id", id);
 
     if (typeof parentElement == 'string') {
         parentElement = document.getElementById(parentElement);
@@ -262,13 +260,13 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
         return;
     }
 
-	if(index < 0 || index >= parentElement.children.length)	{
-		parentElement.appendChild(newElement);
-	}
-	else {
-		var nextSibling = parentElement.children[index];
-		parentElement.insertBefore(newElement, nextSibling);
-	}
+    if (index < 0 || index >= parentElement.children.length) {
+        parentElement.appendChild(newElement);
+    }
+    else {
+        var nextSibling = parentElement.children[index];
+        parentElement.insertBefore(newElement, nextSibling);
+    }
 }
 
 document.set2dContextProperty = function (id, propertyName, propertyValue) {
@@ -329,9 +327,9 @@ document.removeEventListenerSafe = function (element, method, func) {
     if (typeof element == 'string') {
         element = document.getElementById(element);
     }
-	if (element){
-		element.removeEventListener(method, func);
-	}
+    if (element) {
+        element.removeEventListener(method, func);
+    }
 }
 
 document.addEventListenerSafe = function (element, method, func) {
@@ -361,19 +359,16 @@ document._attachEventListeners = function (element, handler, isFocusable) {
 
     const store = view._eventsStore = {};
     store.isFocusable = isFocusable;
-    store.enableTouch = isTouchDevice();
 
     view.addEventListener('mousedown', store['mousedown'] = bubblingEventHandler);
+    view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
     view.addEventListener('mouseup', store['mouseup'] = bubblingEventHandler);
+    view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
     view.addEventListener('mousemove', store['mousemove'] = bubblingEventHandler);
+    view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
     view.addEventListener('wheel', store['wheel'] = bubblingEventHandler, { passive: true });
     view.addEventListener('mouseenter', store['mouseenter'] = handler);
     view.addEventListener('mouseleave', store['mouseleave'] = handler);
-    if (store.enableTouch) {
-        view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
-        view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
-        view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
-    }
     if (isFocusable) {
         view.addEventListener('keypress', store['keypress'] = bubblingEventHandler);
         view.addEventListener('input', store['input'] = bubblingEventHandler);
@@ -390,16 +385,14 @@ document._removeEventListeners = function (element) {
 
     const store = view._eventsStore;
     view.removeEventListener('mousedown', store['mousedown']);
+    view.removeEventListener('touchstart', store['touchstart']);
     view.removeEventListener('mouseup', store['mouseup']);
+    view.removeEventListener('touchend', store['touchend']);
     view.removeEventListener('mousemove', store['mousemove']);
+    view.removeEventListener('touchmove', store['touchmove']);
     view.removeEventListener('wheel', store['wheel']);
     view.removeEventListener('mouseenter', store['mouseenter']);
     view.removeEventListener('mouseleave', store['mouseleave']);
-    if (store.enableTouch) {
-        view.removeEventListener('touchstart', store['touchstart']);
-        view.removeEventListener('touchend', store['touchend']);
-        view.removeEventListener('touchmove', store['touchmove']);
-    }
     if (store.isFocusable) {
         view.removeEventListener('keypress', store['keypress']);
         view.removeEventListener('input', store['input']);
@@ -413,106 +406,99 @@ document._removeEventListeners = function (element) {
 }
 
 document.eventCallback = function (callbackId, arguments, sync) {
-	const argsArray = arguments;
-	const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
-	document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
-	if (sync) {
-		return window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, true);
-	} else {
-		setTimeout(
-			function()
-			{{
-				window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, false);
-			}}
-			, 1);
-	}
+    const argsArray = arguments;
+    const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+    document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
+    if (sync) {
+        return window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, true);
+    } else {
+        setTimeout(
+            function () {
+                {
+                    window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, false);
+                }
+            }
+            , 1);
+    }
 }
 
 document.callScriptSafe = function (referenceId, javaScriptToExecute, errorCallBackId) {
     try {
-        document.jsObjRef[referenceId] = eval(javaScriptToExecute); 
+        document.jsObjRef[referenceId] = eval(javaScriptToExecute);
         return document.jsObjRef[referenceId];
     } catch (error) {
-        document.errorCallback(error, errorCallBackId); 
+        document.errorCallback(error, errorCallBackId);
     }
 }
 
 document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
-	const idWhereErrorCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
-	const argsArr = [];
-	argsArr[0] = error.message;
-	argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
-	document.jsObjRef[idWhereErrorCallbackArgsAreStored] = argsArr;
-	window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
+    const idWhereErrorCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
+    const argsArr = [];
+    argsArr[0] = error.message;
+    argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
+    document.jsObjRef[idWhereErrorCallbackArgsAreStored] = argsArr;
+    window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
 }
 
 document.rerouteMouseEvents = function (id) {
-    document.onmouseup = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.onmouseup = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
             }
         }
     }
-    document.onmouseover = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.onmouseover = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
             }
         }
     }
-    document.onmousedown = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.onmousedown = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
             }
         }
     }
-    document.onmouseout = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.onmouseout = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
             }
         }
     }
-    document.onmousemove = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.onmousemove = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
             }
         }
     }
-    document.onclick = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.onclick = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
             }
         }
     }
-    document.oncontextmenu = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.oncontextmenu = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
             }
         }
     }
-    document.ondblclick = function(e) {
-        if(e.doNotReroute == undefined)
-        {
+    document.ondblclick = function (e) {
+        if (e.doNotReroute == undefined) {
             var element = document.getElementById(id);
             if (element) {
                 document.reroute(e, element);
@@ -521,15 +507,14 @@ document.rerouteMouseEvents = function (id) {
     }
 }
 
-document.setVisualBounds = function(id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
+document.setVisualBounds = function (id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
     var element = document.getElementById(id);
-    if (element)
-    {
+    if (element) {
         element.style.left = left + "px";
         element.style.top = top + "px";
         element.style.width = width + "px";
         element.style.height = height + "px";
-        
+
         if (bSetAbsolutePosition) {
             element.style.position = "absolute";
         }
@@ -542,13 +527,12 @@ document.setVisualBounds = function(id, left, top, width, height, bSetAbsolutePo
     }
 }
 
-document.setPosition = function(id, left, top, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
+document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
     var element = document.getElementById(id);
-    if (element)
-    {
+    if (element) {
         element.style.left = left + "px";
         element.style.top = top + "px";
-        
+
         if (bSetAbsolutePosition) {
             element.style.position = "absolute";
         }
@@ -561,12 +545,11 @@ document.setPosition = function(id, left, top, bSetAbsolutePosition, bSetZeroMar
     }
 }
 
-document.measureTextBlock = function(uid, textWrapping, padding, width, maxWidth) {
+document.measureTextBlock = function (uid, textWrapping, padding, width, maxWidth) {
     var element = document.measureTextBlockElement;
-	var elToMeasure = document.getElementById(uid);
-    if (element && elToMeasure)
-    {
-		var computedStyle = getComputedStyle(elToMeasure);
+    var elToMeasure = document.getElementById(uid);
+    if (element && elToMeasure) {
+        var computedStyle = getComputedStyle(elToMeasure);
 
         var runElement = element.firstElementChild;
         if (runElement != null) {
@@ -584,7 +567,7 @@ document.measureTextBlock = function(uid, textWrapping, padding, width, maxWidth
         element.style.fontSize = computedStyle.fontSize;
         element.style.fontWeight = computedStyle.fontWeight;
         element.style.fontFamily = computedStyle.fontFamily;
-		element.style.fontStyle = computedStyle.fontStyle;
+        element.style.fontStyle = computedStyle.fontStyle;
 
         if (textWrapping.length > 0) {
             element.style.whiteSpace = textWrapping;
@@ -603,10 +586,9 @@ document.measureTextBlock = function(uid, textWrapping, padding, width, maxWidth
     return "0|0";
 }
 
-document.setContentString = function(id, text, removeTextWrapping) {
+document.setContentString = function (id, text, removeTextWrapping) {
     var el = document.getElementById(id);
-    if (el)
-    {
+    if (el) {
         el.innerText = text;
         if (removeTextWrapping)
             el.style.whiteSpace = "nowrap";
@@ -996,12 +978,10 @@ document.getTextLengthIncludingNewLineCompensation = function (instance) {
     }
     var correctionDueToNewLines = text.split("\n").length;
     --correctionDueToNewLines; //for n lines, we have n-1 ""\r\n""
-    if(window.chrome && correctionDueToNewLines != 0)
-    {
+    if (window.chrome && correctionDueToNewLines != 0) {
         --correctionDueToNewLines; //on chrome, we have a \n right at the end for some reason.
     }
-    else if (window.IE_VERSION)
-    {
+    else if (window.IE_VERSION) {
         correctionDueToNewLines *= 2; //IE already has 2 characters for new lines but they are doubled: we have ""\r\n\r\n"" instead of ""\r\n"".
     }
     return text.length + correctionDueToNewLines;
@@ -1133,16 +1113,16 @@ if (!Array.from) {
 // See license and copyright at the URL above.
 //------------------------------
 
-(function() {
+(function () {
 
     function createShiftArr(step) {
 
         var space = '    ';
 
-        if ( isNaN(parseInt(step)) ) {  // argument is string
+        if (isNaN(parseInt(step))) {  // argument is string
             space = step;
         } else { // argument is integer
-            switch(step) {
+            switch (step) {
                 case 1: space = ' '; break;
                 case 2: space = '  '; break;
                 case 3: space = '   '; break;
@@ -1159,24 +1139,24 @@ if (!Array.from) {
         }
 
         var shift = ['\n']; // array of shifts
-        for(var ix=0;ix<100;ix++){
-            shift.push(shift[ix]+space); 
+        for (var ix = 0; ix < 100; ix++) {
+            shift.push(shift[ix] + space);
         }
         return shift;
     }
 
-    function vkbeautify(){
+    function vkbeautify() {
         this.step = '    '; // 4 spaces
         this.shift = createShiftArr(this.step);
     }
 
-    vkbeautify.prototype.xml = function(text,step) {
+    vkbeautify.prototype.xml = function (text, step) {
 
-        var ar = text.replace(/>\s*</g,"><")
-                     .replace(/</g,"~::~<")
-                     .replace(/\s*xmlns:/g,"~::~xmlns:")
-                     .replace(/\s*xmlns=/g,"~::~xmlns=")
-                     .split('~::~'),
+        var ar = text.replace(/>\s*</g, "><")
+            .replace(/</g, "~::~<")
+            .replace(/\s*xmlns:/g, "~::~xmlns:")
+            .replace(/\s*xmlns=/g, "~::~xmlns=")
+            .split('~::~'),
             len = ar.length,
             inComment = false,
             deep = 0,
@@ -1185,67 +1165,67 @@ if (!Array.from) {
             shift = step ? createShiftArr(step) : this.shift,
             withNamespace = 0;
 
-        for(ix=0;ix<len;ix++) {
+        for (ix = 0; ix < len; ix++) {
             // start comment or <![CDATA[...]]> or <!DOCTYPE //
-            if(ar[ix].search(/<!/) > -1) { 
-                str += shift[deep]+ar[ix];
-                inComment = true; 
+            if (ar[ix].search(/<!/) > -1) {
+                str += shift[deep] + ar[ix];
+                inComment = true;
                 // end comment  or <![CDATA[...]]> //
-                if(ar[ix].search(/-->/) > -1 || ar[ix].search(/]>/) > -1 || ar[ix].search(/!DOCTYPE/) > -1 ) {
-                    inComment = false; 
+                if (ar[ix].search(/-->/) > -1 || ar[ix].search(/]>/) > -1 || ar[ix].search(/!DOCTYPE/) > -1) {
+                    inComment = false;
                 }
-            } else 
+            } else
                 // end comment  or <![CDATA[...]]> //
-                if(ar[ix].search(/-->/) > -1 || ar[ix].search(/]>/) > -1) {
+                if (ar[ix].search(/-->/) > -1 || ar[ix].search(/]>/) > -1) {
                     str += ar[ix];
-                    inComment = false; 
-                } else 
+                    inComment = false;
+                } else
                     // <elm></elm> //
-                    if( /^<\w/.exec(ar[ix-1]) && /^<\/\w/.exec(ar[ix]) &&
+                    if (/^<\w/.exec(ar[ix - 1]) && /^<\/\w/.exec(ar[ix]) &&
                         // This comparison will eventually compare an array with a single string item to another string
                         // so we voluntarily use '=='
-                        /^<[\w:\-\.,]+/.exec(ar[ix-1]) == /^<\/[\w:\-\.,]+/.exec(ar[ix])[0].replace('/','')) { // jshint ignore:line
+                        /^<[\w:\-\.,]+/.exec(ar[ix - 1]) == /^<\/[\w:\-\.,]+/.exec(ar[ix])[0].replace('/', '')) { // jshint ignore:line
                         str += ar[ix];
-                        if(!inComment) {
+                        if (!inComment) {
                             deep--;
                         }
                     } else
                         // <elm> //
-                        if(ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) === -1 && ar[ix].search(/\/>/) === -1 ) {
-                            str = !inComment ? str += shift[deep++]+ar[ix] : str += ar[ix];
-                        } else 
+                        if (ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) === -1 && ar[ix].search(/\/>/) === -1) {
+                            str = !inComment ? str += shift[deep++] + ar[ix] : str += ar[ix];
+                        } else
                             // <elm>...</elm> //
-                            if(ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) > -1) {
-                                str = !inComment ? str += shift[deep]+ar[ix] : str += ar[ix];
-                            } else 
+                            if (ar[ix].search(/<\w/) > -1 && ar[ix].search(/<\//) > -1) {
+                                str = !inComment ? str += shift[deep] + ar[ix] : str += ar[ix];
+                            } else
                                 // </elm> //
-                                if(ar[ix].search(/<\//) > -1) { 
+                                if (ar[ix].search(/<\//) > -1) {
                                     --deep;
-                                    str = !inComment && !withNamespace? str += shift[deep] + ar[ix] : str += ar[ix];
-                                } else 
+                                    str = !inComment && !withNamespace ? str += shift[deep] + ar[ix] : str += ar[ix];
+                                } else
                                     // <elm/> //
-                                    if(ar[ix].search(/\/>/) > -1 ) { 
-                                        str = !inComment ? str += shift[deep]+ar[ix] : str += ar[ix];
-                                        if (ar[ix].search(/xmlns\:/) > -1  || ar[ix].search(/xmlns\=/) > -1)
-                                        deep--;
-                                    } else 
+                                    if (ar[ix].search(/\/>/) > -1) {
+                                        str = !inComment ? str += shift[deep] + ar[ix] : str += ar[ix];
+                                        if (ar[ix].search(/xmlns\:/) > -1 || ar[ix].search(/xmlns\=/) > -1)
+                                            deep--;
+                                    } else
                                         // <? xml ... ?> //
-                                        if(ar[ix].search(/<\?/) > -1) { 
-                                            str += shift[deep]+ar[ix];
-                                        } else 
+                                        if (ar[ix].search(/<\?/) > -1) {
+                                            str += shift[deep] + ar[ix];
+                                        } else
                                             // xmlns //
-                                            if( ar[ix].search(/xmlns:/) > -1  || ar[ix].search(/xmlns=/) > -1) {
-                                                str += shift[deep]+ar[ix];
+                                            if (ar[ix].search(/xmlns:/) > -1 || ar[ix].search(/xmlns=/) > -1) {
+                                                str += shift[deep] + ar[ix];
                                                 withNamespace = 2;
                                             }
                                             else {
                                                 str += ar[ix];
                                             }
-                                            if (withNamespace)
-                                                withNamespace--;
+            if (withNamespace)
+                withNamespace--;
         }
 
-        return  (str.charAt(0) === '\n') ? str.slice(1) : str;
+        return (str.charAt(0) === '\n') ? str.slice(1) : str;
     };
 
     window.vkbeautify = new vkbeautify();
@@ -1273,7 +1253,7 @@ var jsilConfig = {
     showProgressBar: true,
     localStorage: true,
     manifests: [
-      "index"
+        "index"
     ]
 };
 
@@ -1300,13 +1280,4 @@ window.elementsFromPointOpensilver = function (x, y, element) {
 
 function PerformHitTest(x, y, rect) {
     return rect.x <= x && x <= rect.x + rect.width && rect.y <= y && y <= rect.y + rect.height;
-}
-
-//------------------------------
-// Just to check if client browser support touch
-//------------------------------
-const isTouchDevice = () => {
-    return (('ontouchstart' in window) ||
-        (navigator.maxTouchPoints > 0) ||
-        (navigator.msMaxTouchPoints > 0));
 }

@@ -1,20 +1,20 @@
- /**
-  * The throttle pattern is more suitable for events that are triggered many times in a short period of time. 
-  * This technique is normally used to control scrolling, resizing and mouse-related events. 
-  * By using throttle, we can filter repeated executions of an event handler, enforcing a minimum wait time between calls.
-  * 
-  * @param {Function} callback 
-  * @param {Number} interval 
+/**
+ * The throttle pattern is more suitable for events that are triggered many times in a short period of time. 
+ * This technique is normally used to control scrolling, resizing and mouse-related events. 
+ * By using throttle, we can filter repeated executions of an event handler, enforcing a minimum wait time between calls.
+ * 
+ * @param {Function} callback 
+ * @param {Number} interval 
 */
 function throttle(callback, interval) {
     let enableCall = true;
 
-    return function(...args) {
-      if (!enableCall) return;
+    return function (...args) {
+        if (!enableCall) return;
 
-      enableCall = false;
-      callback.apply(this, args);
-      setTimeout(() => enableCall = true, interval);
+        enableCall = false;
+        callback.apply(this, args);
+        setTimeout(() => enableCall = true, interval);
     }
 }
 
@@ -26,12 +26,12 @@ function throttle(callback, interval) {
  * @param {Function} callback 
  * @param {Number} interval 
  */
- function debounce(callback, interval) {
+function debounce(callback, interval) {
     let debounceTimeoutId;
 
-    return function(...args) {
-      clearTimeout(debounceTimeoutId);
-      debounceTimeoutId = setTimeout(() => callback.apply(this, args), interval);
+    return function (...args) {
+        clearTimeout(debounceTimeoutId);
+        debounceTimeoutId = setTimeout(() => callback.apply(this, args), interval);
     };
 }
 
