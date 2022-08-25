@@ -93,11 +93,6 @@ namespace CSHTML5.Internal
                 }
             }
 
-            //double offset = shape.StrokeThickness;
-            //if (shape is Line && offset == 0)
-            //{
-            //    offset = 1;
-            //}
             double offset = shape.StrokeThickness > 0 ? shape.StrokeThickness : 1;
             //todo: (?) for the line below, replace the "+ 1" with the StrokeThickness/LineWidth
             Size sizeToApply = new Size(Math.Max(sizeX + offset, 0), Math.Max(sizeY + offset, 0)); //example: a vertical line still needs 1 pixel width
@@ -185,9 +180,6 @@ namespace CSHTML5.Internal
                     }
                 }
             }
-
-            //var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-            //context.translate(0.5, 0.5); //makes is less blurry for some reason.
         }
 
         /// <summary>
