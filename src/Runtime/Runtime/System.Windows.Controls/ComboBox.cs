@@ -304,23 +304,6 @@ namespace Windows.UI.Xaml.Controls
                 DropDownOpened(this, e);
         }
 
-#if MIGRATION
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
-        {
-            IsDropDownOpen = !IsDropDownOpen;
-
-            e.Handled = true;
-
-#if MIGRATION
-            base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
-        }
-
         /// <summary>
         /// Occurs when the drop-down portion of the ComboBox closes.
         /// </summary>
