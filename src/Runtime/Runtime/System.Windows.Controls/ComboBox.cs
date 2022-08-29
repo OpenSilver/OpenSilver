@@ -18,11 +18,9 @@ using System;
 using System.Threading.Tasks;
 
 #if MIGRATION
-using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 #else
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 #endif
