@@ -148,11 +148,14 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
+
             if (_popup != null)
                 _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick; // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
 
+
+            _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _popup = GetTemplateChild("Popup") as Popup;
-          
+
             //this will enable virtualization in combo box without templating the whole style
             if (_popup != null)
             {
@@ -162,9 +165,17 @@ namespace Windows.UI.Xaml.Controls
                 {
                     _popup.CustomLayout = true;
                 }
-            }
 
-            _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
+                //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
+                _popup.PlacementTarget = _dropDownToggle;
+                _popup.Placement = PlacementMode.Bottom;
+                _popup.INTERNAL_PopupMoved += _popup_INTERNAL_PopupMoved;
+
+                // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
+                _popup.StayOpen = false;
+                _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
+            }
+  
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
             if (_contentPresenter != null)
             {
@@ -176,25 +187,10 @@ namespace Windows.UI.Xaml.Controls
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
             }
 
-            //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
-            if (_popup != null)
-            {
-                _popup.PlacementTarget = _dropDownToggle;
-                _popup.Placement = PlacementMode.Bottom;
-                _popup.INTERNAL_PopupMoved += _popup_INTERNAL_PopupMoved;
-            }
-
             if (_dropDownToggle != null)
             {
                 _dropDownToggle.Checked += DropDownToggle_Checked;
                 _dropDownToggle.Unchecked += DropDownToggle_Unchecked;
-            }
-
-            // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
-            if (_popup != null)
-            {
-                _popup.StayOpen = false;
-                _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
             }
             
             UpdatePresenter();
