@@ -23,10 +23,12 @@ using System.Windows.Input;
 
 #if MIGRATION
 using System.Windows;
+using System.Windows.Automation.Provider;
 using System.Windows.Threading;
 #else
 using Windows.UI.Xaml.Input;
 using Windows.Foundation;
+using Windows.UI.Xaml.Automation.Provider;
 #endif
 
 #if MIGRATION
@@ -55,11 +57,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.PointerPressed += (s, e) => { }; // Note: even though the logic for PointerPressed is located in the overridden method "OnPointerPressed" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM "mousedown" event (cf. see the "Add" accessor of the "PointerPressed" event definition).
             base.PointerReleased += (s, e) => { }; // Note: even though the logic for PointerReleased is located in the overridden method "OnPointerPressed" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM "mouseup" event (cf. see the "Add" accessor of the "PointerReleased" event definition).
 #endif
-        }
-
-        internal void AutomationButtonBaseClick()
-        {
-            OnClick();
         }
 
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -242,6 +239,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
 
             ExecuteCommand();
+        }
+
+        /// <summary>
+        /// This method is called when button is clicked via <see cref="IInvokeProvider"/>.
+        /// </summary>
+        internal void AutomationButtonBaseClick()
+        {
+            OnClick();
         }
 
 #if MIGRATION

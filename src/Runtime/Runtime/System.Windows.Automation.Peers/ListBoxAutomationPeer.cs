@@ -28,7 +28,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// <summary>
     /// Exposes <see cref="ListBox" /> types to UI automation.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public class ListBoxAutomationPeer : SelectorAutomationPeer
     {
         /// <summary>
@@ -51,9 +50,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// A value of the enumeration.
         /// </returns>
         protected override AutomationControlType GetAutomationControlTypeCore()
-        {
-            return AutomationControlType.List;
-        }
+            => AutomationControlType.List;
 
         /// <summary>
         /// Creates a new instance of the <see cref="ItemAutomationPeer" /> for a data item. 
@@ -68,9 +65,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// the owner <see cref="ListBox" />.
         /// </returns>
         protected override ItemAutomationPeer CreateItemAutomationPeer(object item)
-        {
-            return new ListBoxItemAutomationPeer(item, this);
-        }
+            => new ListBoxItemAutomationPeer(item, this);
 
         /// <summary>
         /// Gets the class name of the class that is associated with this 
@@ -81,8 +76,6 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// The associated class name.
         /// </returns>
         protected override string GetClassNameCore()
-        {
-            return nameof(ListBox);
-        }
+            => nameof(ListBox);
     }
 }

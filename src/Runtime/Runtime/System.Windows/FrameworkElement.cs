@@ -667,7 +667,12 @@ namespace Windows.UI.Xaml
             return BindingOperations.GetBindingExpression(this, dp);
         }
 
-#region Cursor
+        /// <summary>
+        /// Return the text that represents this object, from the User's perspective.
+        /// </summary>
+        internal virtual string GetPlainText() => string.Empty;
+
+        #region Cursor
 
         // Returns:
         //     The cursor to display. The default value is defined as null per this dependency

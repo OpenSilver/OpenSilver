@@ -23,7 +23,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// Exposes TimePicker types to UI Automation.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
     public sealed class TimePickerAutomationPeer : PickerAutomationPeer, IValueProvider
     {
         /// <summary>

@@ -201,7 +201,24 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion Internal Methods
+        internal override string GetPlainText() => ContentObjectToString(Content);
+
+        internal static string ContentObjectToString(object content)
+        {
+            if (content != null)
+            {
+                if (content is FrameworkElement feContent)
+                {
+                    return feContent.GetPlainText();
+                }
+
+                return content.ToString();
+            }
+
+            return string.Empty;
+        }
+
+        #endregion Internal Methods
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {

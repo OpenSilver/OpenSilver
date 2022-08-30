@@ -18,9 +18,11 @@ using System;
 using System.Threading.Tasks;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 #endif
@@ -240,6 +242,16 @@ namespace Windows.UI.Xaml.Controls
             base.OnSelectionChanged(e);
             UpdatePresenter();
         }
+
+        /// <summary>
+        /// Returns a <see cref="ComboBoxAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ComboBoxAutomationPeer"/> for the <see cref="ComboBox"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ComboBoxAutomationPeer(this);
 
         internal void NotifyComboBoxItemMouseUp(ComboBoxItem comboBoxItem)
         {

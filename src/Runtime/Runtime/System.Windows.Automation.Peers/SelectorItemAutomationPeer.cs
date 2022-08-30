@@ -32,7 +32,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// <summary>
     /// Exposes the items in a <see cref="Selector" /> to UI automation.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public abstract class SelectorItemAutomationPeer : ItemAutomationPeer, ISelectionItemProvider
     {
         /// <summary>
@@ -58,7 +57,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// <see cref="ItemsControl.Items" /> collection.
         /// </param>
         protected SelectorItemAutomationPeer(object owner, SelectorAutomationPeer selectorAutomationPeer)
-          : base(owner, selectorAutomationPeer)
+            : base(owner, selectorAutomationPeer)
         {
         }
 
@@ -79,6 +78,7 @@ namespace Windows.UI.Xaml.Automation.Peers
             {
                 return this;
             }
+
             return base.GetPattern(patternInterface);
         }
 
@@ -89,9 +89,11 @@ namespace Windows.UI.Xaml.Automation.Peers
         void ISelectionItemProvider.Select()
         {
             if (!IsEnabled())
+            {
                 throw new ElementNotEnabledException();
+            }
 
-            Selector parentSelector = (Selector)(ItemsControlAutomationPeer.Owner);
+            Selector parentSelector = (Selector)ItemsControlAutomationPeer.Owner;
             if (parentSelector == null)
             {
                 throw new InvalidOperationException("Cannot perform operation.");
@@ -107,7 +109,9 @@ namespace Windows.UI.Xaml.Automation.Peers
         void ISelectionItemProvider.AddToSelection()
         {
             if (!IsEnabled())
+            {
                 throw new ElementNotEnabledException();
+            }
 
             Selector parentSelector = (Selector)(ItemsControlAutomationPeer.Owner);
             if ((parentSelector == null) || (!parentSelector.CanSelectMultiple && parentSelector.SelectedItem != null && parentSelector.SelectedItem != Item))
@@ -129,9 +133,11 @@ namespace Windows.UI.Xaml.Automation.Peers
         void ISelectionItemProvider.RemoveFromSelection()
         {
             if (!IsEnabled())
+            {
                 throw new ElementNotEnabledException();
+            }
 
-            Selector parentSelector = (Selector)(ItemsControlAutomationPeer.Owner);
+            Selector parentSelector = (Selector)ItemsControlAutomationPeer.Owner;
 
             parentSelector.SelectionChange.Begin();
             parentSelector.SelectionChange.Unselect(parentSelector.NewItemInfo(Item));
@@ -147,7 +153,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         {
             get
             {
-                Selector parentSelector = (Selector)(ItemsControlAutomationPeer.Owner);
+                Selector parentSelector = (Selector)ItemsControlAutomationPeer.Owner;
                 return parentSelector.SelectedItemsInternal.Contains(parentSelector.NewItemInfo(Item));
             }
         }
@@ -158,11 +164,6 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// </summary>
         /// <value>returns an IRawElementProviderSimple</value>
         IRawElementProviderSimple ISelectionItemProvider.SelectionContainer
-        {
-            get
-            {
-                return ProviderFromPeer(ItemsControlAutomationPeer);
-            }
-        }
+            => ProviderFromPeer(ItemsControlAutomationPeer);
     }
 }

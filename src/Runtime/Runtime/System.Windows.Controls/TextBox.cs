@@ -19,11 +19,13 @@ using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Media;
 using System.Windows.Input;
 #else
 using Windows.Foundation;
 using Windows.UI.Text;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
 #endif
@@ -594,6 +596,16 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
             Focus();
         }
+
+        /// <summary>
+        /// Returns a <see cref="TextBoxAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TextBoxAutomationPeer"/> for the <see cref="TextBox"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new TextBoxAutomationPeer(this);
 
 #if MIGRATION
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)

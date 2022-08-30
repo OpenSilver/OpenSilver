@@ -12,9 +12,11 @@
 \*====================================================================================*/
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 #endif
@@ -79,6 +81,16 @@ namespace Windows.UI.Xaml.Controls
             base.OnApplyTemplate();
             this.UpdateVisualStates();
         }
+
+        /// <summary>
+        /// Returns a <see cref="ListBoxItemAutomationPeer"/> for the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ListBoxItemAutomationPeer"/> for the <see cref="ListBoxItem"/>.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ListBoxItemAutomationPeer(this);
 
 #if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

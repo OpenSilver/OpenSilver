@@ -22,7 +22,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// <summary>
     /// Exposes TimePickerPopup types to UI Automation.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public abstract class TimePickerPopupAutomationPeer : FrameworkElementAutomationPeer, IValueProvider
     {
         /// <summary>

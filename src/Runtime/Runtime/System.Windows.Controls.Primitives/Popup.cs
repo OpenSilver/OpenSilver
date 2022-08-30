@@ -23,10 +23,12 @@ using System.Collections;
 using System.Diagnostics;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Media;
 using System.Windows.Data;
 #else
 using Windows.Foundation;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Data;
 #endif
@@ -156,6 +158,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             this.HidePopupRootIfVisible();
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new PopupRootAutomationPeer(this);
 
         /// <summary>
         /// Returns enumerator to logical children.

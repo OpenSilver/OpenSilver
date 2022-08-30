@@ -12,19 +12,22 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Shapes;
 using System.Windows.Input;
-
-namespace System.Windows.Controls
+using System.Windows.Automation.Peers;
 #else
 using System;
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Shapes;
+using Windows.UI.Xaml.Automation.Peers;
+#endif
 
+#if MIGRATION
+namespace System.Windows.Controls
+#else
 namespace Windows.UI.Xaml.Controls
 #endif
 {
@@ -80,6 +83,16 @@ namespace Windows.UI.Xaml.Controls
         {
             _controlWasProperlyDrawn = false;
         }
+
+        /// <summary>
+        /// Returns a <see cref="SliderAutomationPeer"/> object for use by the automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="SliderAutomationPeer"/> object for use by the slider control.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new SliderAutomationPeer(this);
 
 #if MIGRATION
         public override void OnApplyTemplate()

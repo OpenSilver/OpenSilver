@@ -21,9 +21,11 @@ using System.Windows.Markup;
 using OpenSilver.Internal;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 #else
 using Windows.Foundation;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Documents;
 #endif
 
@@ -72,6 +74,9 @@ namespace Windows.UI.Xaml.Controls
             this.Inlines = new InlineCollection(this);
         }
 
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new TextBlockAutomationPeer(this);
+
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
@@ -88,6 +93,8 @@ namespace Windows.UI.Xaml.Controls
         {
             return new NativeEventsManager(this, this, this, false);
         }
+
+        internal override string GetPlainText() => Text;
 
         internal override bool EnablePointerEventsCore
         {

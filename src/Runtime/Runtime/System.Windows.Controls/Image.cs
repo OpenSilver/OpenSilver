@@ -30,9 +30,11 @@ using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Automation.Peers;
 #else
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Automation.Peers;
 #endif
 
 #if MIGRATION
@@ -550,5 +552,8 @@ $0.addEventListener('error', function(e) {
                 return _imageDiv;
             }
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ImageAutomationPeer(this);
     }
 }

@@ -16,9 +16,11 @@ using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Media;
 #else
 using Windows.Foundation;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -246,6 +248,9 @@ namespace Windows.UI.Xaml.Controls
 
             UpdateTabIndex(IsTabStop, TabIndex);
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new PasswordBoxAutomationPeer(this);
 
         /// <summary>
         /// Selects all the character in the PasswordBox.

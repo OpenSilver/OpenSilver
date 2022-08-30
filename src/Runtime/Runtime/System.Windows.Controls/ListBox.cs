@@ -17,10 +17,12 @@ using System.Collections.Specialized;
 using System.Windows.Input;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using ModifierKeys = System.Windows.Input.ModifierKeys;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using Windows.System;
@@ -187,6 +189,16 @@ namespace Windows.UI.Xaml.Controls
         {
             return item is ListBoxItem;
         }
+
+        /// <summary>
+        /// Returns a <see cref="ListBoxAutomationPeer"/> for the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ListBoxAutomationPeer"/> for the <see cref="ListBox"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ListBoxAutomationPeer(this);
 
         /// <summary>
         /// Adjust ItemInfos when the Items property changes.

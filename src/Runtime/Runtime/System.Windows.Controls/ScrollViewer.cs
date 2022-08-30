@@ -19,9 +19,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 
@@ -1593,5 +1595,8 @@ namespace Windows.UI.Xaml.Controls
                 e.Handled = true;
             }
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ScrollViewerAutomationPeer(this);
     }
 }

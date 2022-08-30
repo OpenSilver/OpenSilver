@@ -20,9 +20,11 @@ using System.Text;
 using System.Threading.Tasks;
 #if MIGRATION
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
@@ -51,7 +53,17 @@ namespace Windows.UI.Xaml.Controls
     {
         public Button()
         {
-            this.DefaultStyleKey = typeof(Button);
+            DefaultStyleKey = typeof(Button);
         }
+
+        /// <summary>
+        /// Returns a <see cref="ButtonAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// <see cref="ButtonAutomationPeer"/> for the <see cref="Button"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ButtonAutomationPeer(this);
     }
 }

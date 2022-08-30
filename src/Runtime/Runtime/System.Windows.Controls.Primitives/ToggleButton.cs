@@ -18,8 +18,10 @@ using System;
 using System.Collections.ObjectModel;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Input;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -193,20 +195,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.OnContentChanged(oldContent, newContent);
         }
 
-#if false
         /// <summary>
-        /// Returns a <see cref="ToggleButtonAutomationPeer"/> for use
-        /// by the Silverlight automation infrastructure.
+        /// Returns a <see cref="ToggleButtonAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
         /// </summary>
         /// <returns>
-        /// A <see cref="ToggleButtonAutomationPeer"/> for the <see cref="ToggleButton"/>
-        /// object.
+        /// A <see cref="ToggleButtonAutomationPeer"/> for the <see cref="ToggleButton"/> object.
         /// </returns>
         protected override AutomationPeer OnCreateAutomationPeer()
-        {
-            return new ToggleButtonAutomationPeer(this);
-        }
-#endif
+            => new ToggleButtonAutomationPeer(this);
 
         /// <summary>
         /// Called by the <see cref="ToggleButton.OnClick"/> method

@@ -50,6 +50,14 @@ namespace Windows.UI.Xaml.Automation.Peers
         }
 
         /// <summary>
+        /// Special constructor for <see cref="ItemAutomationPeer"/>.
+        /// </summary>
+        internal FrameworkElementAutomationPeer(object item)
+        {
+            Owner = item as UIElement;
+        }
+
+        /// <summary>
         /// Gets the <see cref="UIElement" /> that is associated with this <see cref="FrameworkElementAutomationPeer" />.
         /// </summary>
         /// <returns>
