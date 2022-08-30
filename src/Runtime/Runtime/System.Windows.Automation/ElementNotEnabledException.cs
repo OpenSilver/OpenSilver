@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -14,27 +14,20 @@
 using System;
 
 #if MIGRATION
-using System.Windows.Controls;
+namespace System.Windows.Automation
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
+namespace Windows.UI.Xaml.Automation
 #endif
-
-namespace System.Windows.Input
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// The exception that is thrown when an attempt is made through UI automation to
+    /// manipulate a control that is not enabled.
     /// </summary>
-    public static class Keyboard
-    {
+	public class ElementNotEnabledException : Exception
+	{
         /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
+        /// Initializes a new instance of the <see cref="ElementNotEnabledException"/> class.
         /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
-
-        internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+        public ElementNotEnabledException() { }
     }
 }

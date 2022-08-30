@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenSilver;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -24,15 +25,10 @@ namespace Windows.UI.Xaml.Input.Tests
         [TestMethod]
         public void GetFocusedElement()
         {
-            var window = new Window();
-            Window.Current = window;
-
             var element = new Control();
+            FocusManager.SetFocusedElement(Window.Current, element);
 
-            FocusManager.SetFocusedElement(window, element);
-
-            var focusedElement = FocusManager.GetFocusedElement();
-            focusedElement.Should().BeSameAs(element);
+            FocusManager.GetFocusedElement().Should().BeSameAs(element);
         }
 
         [TestMethod]
@@ -61,77 +57,71 @@ namespace Windows.UI.Xaml.Input.Tests
         [TestMethod]
         public void GetFocusedElement_WithNonWindowScope_ShouldReturnNull()
         {
-            var scope = new Control();
-
-            var focusedElement = FocusManager.GetFocusedElement(scope);
-            focusedElement.Should().BeNull();
+            FocusManager.GetFocusedElement(new TextBlock()).Should().BeNull();
         }
 
         [TestMethod]
         public void GetFocusedElement_WithNoCurrentWindow_ShouldReturnNull()
         {
+            var window = Window.Current;
             Window.Current = null;
-            var focusedElement = FocusManager.GetFocusedElement();
-            focusedElement.Should().BeNull();
+            
+            try
+            {
+                FocusManager.GetFocusedElement().Should().BeNull();
+            }
+            finally
+            {
+                Window.Current = window;
+            }
         }
 
         [TestMethod]
         public void GetFocusedElement_WithNoFocusedElement_ShouldReturnNull()
         {
-            var window = new Window();
-            Window.Current = window;
-            
-            var focusedElement = FocusManager.GetFocusedElement();
-            focusedElement.Should().BeNull();
+            var window = Window.Current;
+            Window.Current = new Window();
+
+            try
+            {
+                FocusManager.GetFocusedElement().Should().BeNull();
+            }
+            finally
+            {
+                Window.Current = window;
+            }
         }
 
         [TestMethod]
         public void GetFocusedElement_ControlFocus()
         {
-            var window = new Window();
-            Window.Current = window;
-
-            var element = CreateNewFocusableControl();
-
-            element.INTERNAL_ParentWindow = window;
-
-            element.Focus();
-
-            var focusedElement = FocusManager.GetFocusedElement();
-            focusedElement.Should().Be(element);
+            using (var element = new FocusableControlWrapper<Control>(new Control()))
+            {
+                element.Control.Focus();
+                FocusManager.GetFocusedElement().Should().Be(element.Control);
+            }
         }
 
         [TestMethod]
         public void GetFocusedElement_TwoControls_ControlFocus()
         {
-            var window = new Window();
-            Window.Current = window;
+            var firstElement = new FocusableControlWrapper<Control>(new Control());
+            var secondElement = new FocusableControlWrapper<Control>(new Control());
 
-            var firstElement = CreateNewFocusableControl();
-            firstElement.INTERNAL_ParentWindow = window;
-
-            var secondElement = CreateNewFocusableControl();
-            secondElement.INTERNAL_ParentWindow = window;
-
-            firstElement.Focus();
-
-            var focusedElement = FocusManager.GetFocusedElement();
-            focusedElement.Should().Be(firstElement);
-
-            secondElement.Focus();
-            focusedElement = FocusManager.GetFocusedElement();
-            focusedElement.Should().NotBe(firstElement);
-            focusedElement.Should().Be(secondElement);
-        }
-
-        private Control CreateNewFocusableControl()
-        {
-            return new Control
+            try
             {
-                Visibility = Visibility.Visible,
-                IsEnabled = true,
-                IsConnectedToLiveTree = true
-            };
+                firstElement.Control.Focus();
+                FocusManager.GetFocusedElement().Should().Be(firstElement.Control);
+
+                secondElement.Control.Focus();
+                FocusManager.GetFocusedElement().Should().NotBe(firstElement.Control);
+                FocusManager.GetFocusedElement().Should().Be(secondElement.Control);
+            }
+            finally
+            {
+                firstElement.Dispose();
+                firstElement.Dispose();
+            }
         }
     }
 }

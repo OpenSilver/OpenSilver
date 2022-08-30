@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,30 +11,22 @@
 *  
 \*====================================================================================*/
 
-using System;
-
 #if MIGRATION
-using System.Windows.Controls;
+namespace System.Windows.Automation.Provider
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
+namespace Windows.UI.Xaml.Automation.Provider
 #endif
-
-namespace System.Windows.Input
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// Exposes methods and properties to support access by UI automation client to 
+    /// individual child controls of containers that implement <see cref="IScrollProvider" />.
     /// </summary>
-    public static class Keyboard
+    public interface IScrollItemProvider
     {
         /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
+        /// Scrolls the content area of a container object in order to display the control 
+        /// within the visible region (viewport) of the container.
         /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
-
-        internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+        void ScrollIntoView();
     }
 }

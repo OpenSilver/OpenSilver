@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,30 +11,29 @@
 *  
 \*====================================================================================*/
 
-using System;
-
 #if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
-#endif
 
-namespace System.Windows.Input
+namespace System.Runtime.InteropServices.Automation
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// Provides data for the <see cref="AutomationEvent.EventRaised"/> event.
     /// </summary>
-    public static class Keyboard
+    [OpenSilver.NotImplemented]
+    public sealed class AutomationEventArgs : EventArgs
     {
-        /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
-        /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
+        internal AutomationEventArgs(object[] args)
+        {
+            Arguments = args;
+        }
 
-        internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+        /// <summary>
+        /// Gets the event arguments from the Automation event.
+        /// </summary>
+        /// <returns>
+        /// The event arguments from the Automation event.
+        /// </returns>
+        public object[] Arguments { get; }
     }
 }
+
+#endif

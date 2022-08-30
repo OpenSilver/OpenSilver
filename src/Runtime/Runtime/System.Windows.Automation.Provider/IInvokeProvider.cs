@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,30 +11,21 @@
 *  
 \*====================================================================================*/
 
-using System;
-
 #if MIGRATION
-using System.Windows.Controls;
+namespace System.Windows.Automation.Provider
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
+namespace Windows.UI.Xaml.Automation.Provider
 #endif
-
-namespace System.Windows.Input
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// Exposes a method to support UI automation access to controls that initiate or perform 
+    /// a single, unambiguous action and do not maintain state when activated. 
     /// </summary>
-    public static class Keyboard
+    public interface IInvokeProvider
     {
         /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
+        /// Sends a request to activate a control and initiate its single, unambiguous action.
         /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
-
-        internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+        void Invoke();
     }
 }

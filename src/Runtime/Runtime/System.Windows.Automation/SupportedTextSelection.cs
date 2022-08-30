@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -14,27 +14,29 @@
 using System;
 
 #if MIGRATION
-using System.Windows.Controls;
+namespace System.Windows.Automation
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
+namespace Windows.UI.Xaml.Automation
 #endif
-
-namespace System.Windows.Input
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// Contains values that specify whether a text provider supports selection and, if so, 
+    /// whether it supports a single, continuous selection or multiple, disjoint selections.
     /// </summary>
-    public static class Keyboard
+    [Flags]
+    public enum SupportedTextSelection
     {
         /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
+        /// Does not support text selections.
         /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
-
-        internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+        None = 0,
+        /// <summary>
+        /// Supports a single, continuous text selection.
+        /// </summary>
+        Single = 1,
+        /// <summary>
+        /// Supports multiple, disjoint text selections.
+        /// </summary>
+        Multiple = 2,
     }
 }

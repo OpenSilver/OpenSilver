@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,30 +11,28 @@
 *  
 \*====================================================================================*/
 
-using System;
-
 #if MIGRATION
-using System.Windows.Controls;
+namespace System.Windows.Automation
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
+namespace Windows.UI.Xaml.Automation
 #endif
-
-namespace System.Windows.Input
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// Contains values that specify the <see cref="ToggleState" /> of a UI automation element.
     /// </summary>
-    public static class Keyboard
+    public enum ToggleState
     {
         /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
+        /// The UI automation element is not selected, checked, marked, or otherwise activated.
         /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
-
-        internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+        Off,
+        /// <summary>
+        /// The UI automation element  is selected, checked, marked, or otherwise activated.
+        /// </summary>
+        On,
+        /// <summary>
+        /// The UI automation element is in an indeterminate state.
+        /// </summary>
+        Indeterminate,
     }
 }

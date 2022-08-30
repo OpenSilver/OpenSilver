@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,30 +11,29 @@
 *  
 \*====================================================================================*/
 
-using System;
-
 #if MIGRATION
-using System.Windows.Controls;
+namespace System.Windows.Automation.Provider
 #else
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using ModifierKeys = Windows.System.VirtualKeyModifiers;
+namespace Windows.UI.Xaml.Automation.Provider
 #endif
-
-namespace System.Windows.Input
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// Exposes methods and properties to support UI automation client access to controls 
+    /// that can cycle through a set of states and maintain a particular state.
     /// </summary>
-    public static class Keyboard
+    public interface IToggleProvider
     {
         /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
+        /// Cycles through the toggle states of a control.
         /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
+        void Toggle();
 
-        internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+        /// <summary>
+        /// Gets the toggle state of the control.
+        /// </summary>
+        /// <returns>
+        /// The toggle state of the control, as a value of the enumeration.
+        /// </returns>
+        ToggleState ToggleState { get; }
     }
 }

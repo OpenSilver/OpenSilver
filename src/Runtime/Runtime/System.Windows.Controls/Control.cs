@@ -18,10 +18,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Input;
 
 #if MIGRATION
 using System.Windows.Media;
-using System.Windows.Input;
 using System.Windows.Data;
 using System.Windows.Controls.Primitives;
 #else
@@ -775,10 +775,7 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool Focus()
         {
-            if (Visibility == Visibility.Visible &&
-                IsTabStop &&
-                IsEnabled &&
-                IsConnectedToLiveTree)
+            if (Keyboard.IsFocusable(this))
             {
                 INTERNAL_HtmlDomManager.SetFocus(this);
                 
