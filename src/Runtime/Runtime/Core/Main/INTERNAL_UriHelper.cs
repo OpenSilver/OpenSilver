@@ -33,9 +33,11 @@ using System.Windows.Browser;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media;
 #endif
 
 namespace CSHTML5.Internal
@@ -303,7 +305,7 @@ namespace CSHTML5.Internal
                 }
                 else
                 {
-                    current = current.INTERNAL_VisualParent as UIElement ?? (current as PopupRoot)?.INTERNAL_LinkedPopup;
+                    current = VisualTreeHelper.GetParent(current) as UIElement ?? (current as FrameworkElement)?.Parent as Popup;
                 }
             }
             xamlSourcePath = null;

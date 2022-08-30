@@ -224,20 +224,5 @@ namespace Windows.UI.Xaml.Media
         {
             return null;
         }
-
-        internal static bool IsRoot(UIElement uie)
-        {
-            if (uie is Window)
-            {
-                return uie._isLoaded;
-            }
-
-            if (uie is PopupRoot popupRoot)
-            {
-                return popupRoot.INTERNAL_LinkedPopup?.IsOpen ?? false;
-            }
-
-            return false;
-        }
     }
 }

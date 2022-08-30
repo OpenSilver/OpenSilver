@@ -156,6 +156,7 @@ namespace Windows.UI.Xaml
 
             // Set the window as "loaded":
             this._isLoaded = true;
+            this.IsConnectedToLiveTree = true;
             this.UpdateIsVisible();
 
             // Attach the window content, if any:

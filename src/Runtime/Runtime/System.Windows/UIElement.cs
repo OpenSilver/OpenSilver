@@ -842,7 +842,7 @@ namespace Windows.UI.Xaml
             // if our parent is true, but we can always be false.
             if (isVisible)
             {
-                bool constraintAllowsVisible = false;
+                bool constraintAllowsVisible;
 
                 // Our parent can constrain us.
                 if (VisualTreeHelper.GetParent(uie) is UIElement parent)
@@ -851,10 +851,7 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    if (VisualTreeHelper.IsRoot(uie))
-                    {
-                        constraintAllowsVisible = true;
-                    }
+                    constraintAllowsVisible = uie.IsConnectedToLiveTree;
                 }
 
                 if (!constraintAllowsVisible)
