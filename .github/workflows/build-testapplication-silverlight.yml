@@ -16,6 +16,8 @@ on:
 
 jobs:
   TestApplicationBuild:
+    #We should not run these steps on the forks by default.
+    if: github.repository_owner == 'OpenSilver'
     runs-on: windows-2019
     steps:
       - name: Set directory environment variables
