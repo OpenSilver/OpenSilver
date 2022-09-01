@@ -751,7 +751,10 @@ namespace Windows.UI.Xaml.Controls
                     }
                     else
                     {
-                        innerDivStyle.height = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
+                        if (this.VerticalAlignment == VerticalAlignment.Stretch)
+                            innerDivStyle.height = "100%";
+                        else
+                            innerDivStyle.height = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
                         innerDivStyle.minHeight = "100%"; // This fixes an issue where the background of the "InputProject" test project is correct only at the top of the page.
                     }
                 }
