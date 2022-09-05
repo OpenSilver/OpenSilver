@@ -376,7 +376,7 @@ document._attachEventListeners = function (elementId, callbackId, sync, isFocusa
         var element = document.getElementByIdSafe(elementId);
         const view = typeof element === 'string' ? document.getElementById(element) : element;
         if (!view || view._eventsStore) return;
-        var handler = function (e) { document.eventCallback(callbackId, arguments, sync); };
+        var handler = function () { document.eventCallback(callbackId, Array.prototype.slice.call(arguments), sync); };
         //var handler = eval(`(function() { return document.eventCallback(${callbackId}, arguments, ${sync});})`);
 
         function bubblingEventHandler(e) {
@@ -442,8 +442,8 @@ document._removeEventListeners = function (element) {
     delete view._eventsStore;
 }
 
-document.eventCallback = function (callbackId, arguments, sync) {
-    const argsArray = arguments;
+document.eventCallback = function (callbackId, callerArgs, sync) {
+    const argsArray = callerArgs;
     const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
     document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
     if (sync) {
@@ -1373,7 +1373,7 @@ document.callVelocity = function (elementId, propsRefId, propsStr, optionsStr, v
         if (visualStateGroupName)
             options.queue = visualStateGroupName;
         if (callbackId)
-            options.complete = function (e) { document.eventCallback(callbackId, arguments, sync); };
+            options.complete = function () { document.eventCallback(callbackId, Array.prototype.slice.call(arguments), sync); };
         //options.complete = eval(`(function() { return document.eventCallback(${callbackId}, arguments, ${sync});})`);
 
         var propsObj;
@@ -1416,7 +1416,8 @@ document.getElementAttributeByIdOrRef = function (elementId, elementRef, attribu
 
 document.callbackAsyncFromJS = function (callbackId, sync, errorCallBackId) {
     try {
-        setTimeout(document.eventCallback(callbackId, arguments, sync), 1);
+        setTimeout(document.eventCallback(callbackId, [], sync), 1);
+        //setTimeout(document.eventCallback(callbackId, Array.prototype.slice.call(arguments), sync), 1);
         //eval(`(function() { setTimeout(document.eventCallback(${callbackId}, arguments, ${sync}), 1);})`);
     }
     catch (error) {
