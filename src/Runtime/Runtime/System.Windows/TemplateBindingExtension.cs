@@ -11,9 +11,10 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Windows.Markup;
+using System.ComponentModel;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -30,20 +31,28 @@ namespace Windows.UI.Xaml
     [ContentProperty(nameof(Path))]
     public class TemplateBindingExtension : MarkupExtension
     {
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public string Path { get; set; }
+
+        public string DependencyPropertyName { get; set; }
+
+        public Type DependencyPropertyOwnerType { get; set; }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            var provider = (ServiceProvider)serviceProvider.GetService(typeof(ServiceProvider));
-            if (provider != null)
+            if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget provider)
             {
-                var dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
-                    provider.TargetObject?.GetType(), Path);
-                var source = provider.TargetObject as Control;
-
-                if (dp != null && source != null)
+                if (provider.TargetObject is Control source)
                 {
-                    return new TemplateBindingExpression(source, dp);
+                    string propertyName = DependencyPropertyName ?? Path;
+                    Type type = DependencyPropertyOwnerType ?? source.GetType();
+                    DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
+                        type, propertyName);
+
+                    if (dp != null)
+                    {
+                        return new TemplateBindingExpression(source, dp);
+                    }
                 }
             }
 
