@@ -38,8 +38,7 @@ namespace Windows.UI.Xaml.Automation
             lock (_idTable)
             {
                 // See if instance already exists...
-                AutomationProperty autoid = _idTable[id];
-                if (autoid != null)
+                if (_idTable.TryGetValue(id, out AutomationProperty autoid))
                 {
                     return autoid;
                 }
@@ -56,7 +55,12 @@ namespace Windows.UI.Xaml.Automation
         {
             lock (_idTable)
             {
-                return _idTable[id];
+                if (_idTable.TryGetValue(id, out AutomationProperty autoid))
+                {
+                    return autoid;
+                }
+
+                return null;
             }
         }
 
