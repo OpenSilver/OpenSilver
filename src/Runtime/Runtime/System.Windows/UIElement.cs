@@ -1380,7 +1380,6 @@ document.ondblclick = null;
             }
         }
 
-
         /// <summary>
         /// Returns a transform object that can be used to transform coordinates from
         /// the UIElement to the specified object.
@@ -1395,12 +1394,36 @@ document.ondblclick = null;
         /// </returns>
         public GeneralTransform TransformToVisual(UIElement visual)
         {
-            var outerDivOfThisControl = this.INTERNAL_OuterDomElement;
+            if (!IsConnectedToLiveTree)
+            {
+                throw new ArgumentException();
+            }
+
+            var outerDivOfThisControl = INTERNAL_OuterDomElement;
 
             // If no "visual" was specified, we use the Window root instead.
-            // Note: This is useful for example when calculating the position of popups, which are defined in absolute coordinates, at the same level as the Window root.
-            var outerDivOfReferenceVisual =
-                (visual != null) ? visual.INTERNAL_OuterDomElement : this.INTERNAL_ParentWindow.INTERNAL_OuterDomElement;
+            // Note: This is useful for example when calculating the position of popups, which
+            // are defined in absolute coordinates, at the same level as the Window root.
+            object outerDivOfReferenceVisual;
+            if (visual != null)
+            {
+                if (!visual.IsConnectedToLiveTree)
+                {
+                    throw new ArgumentException(nameof(visual));
+                }
+
+                outerDivOfReferenceVisual = visual.INTERNAL_OuterDomElement;
+            }
+            else
+            {
+                UIElement rootVisual = Application.Current?.RootVisual;
+                if (rootVisual == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                outerDivOfReferenceVisual = rootVisual.INTERNAL_OuterDomElement;
+            }
 
             double offsetLeft, offsetTop;
             if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
@@ -1418,8 +1441,8 @@ document.ondblclick = null;
                 // ------- SIMULATOR -------
 
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
-                                                                        outerDivOfThisControl, outerDivOfReferenceVisual));
+                string concatenated = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
+                    outerDivOfThisControl, outerDivOfReferenceVisual));
                 int sepIndex = concatenated.IndexOf('|');
                 string offsetLeftAsString = concatenated.Substring(0, sepIndex);
                 string offsetTopAsString = concatenated.Substring(sepIndex + 1);
