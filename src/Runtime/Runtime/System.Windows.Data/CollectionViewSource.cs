@@ -380,7 +380,7 @@ namespace Windows.UI.Xaml.Data
                     // bring view up to date with the CollectionViewSource
                     if (_version != viewRecord.Version)
                     {
-                        //ApplyPropertiesToView(view);
+                        ApplyPropertiesToView(view);
                         viewRecord.Version = _version;
                     }
                 }
