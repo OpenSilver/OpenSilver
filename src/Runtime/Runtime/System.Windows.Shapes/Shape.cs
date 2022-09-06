@@ -963,6 +963,10 @@ context.translate($6, 0);
                     }
                 }
             }
+            else if (brush is ImageBrush) 
+            {
+                returnValue = ((ImageBrush)brush).INTERNAL_ToHtmlString(shape);
+            }
             else
             {
                 throw new NotSupportedException("The specified brush is not supported.");
