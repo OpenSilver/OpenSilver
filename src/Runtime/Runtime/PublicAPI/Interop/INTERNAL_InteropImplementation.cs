@@ -309,7 +309,7 @@ namespace CSHTML5
             string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
             javascript = javascript.Replace("$errorCallBackId", errorCallBackId);
 
-            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript).ToString();
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
         }
 
         internal static void ExecuteJavaScript_StopVelocity(string elementId, string visualStateGroupName)
@@ -320,7 +320,7 @@ namespace CSHTML5
             string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
             javascript = javascript.Replace("$errorCallBackId", errorCallBackId);
 
-            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript).ToString();
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
         }
 
         internal static void ExecuteJavaScript_DisableFocus(string elementId)
@@ -331,7 +331,7 @@ namespace CSHTML5
             string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
             javascript = javascript.Replace("$errorCallBackId", errorCallBackId);
 
-            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript).ToString();
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
         }
 
         internal static void ExecuteJavaScript_EnableFocus(string elementId)
@@ -342,7 +342,7 @@ namespace CSHTML5
             string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
             javascript = javascript.Replace("$errorCallBackId", errorCallBackId);
 
-            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript).ToString();
+            INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
         }
 
         internal static void ExecuteJavaScript_CallbackAsyncFromJS(Delegate handler)
