@@ -258,6 +258,7 @@
 		<Compile Include="System.Windows\FontStyleConverter.cs" />
 		<Compile Include="System.Windows\FontWeightConverter.cs" />
 		<Compile Include="System.Windows.Media\GeometryConverter.cs" />
+		<Compile Include="System.Windows\FrameworkElement.Styles.cs" />
 		<Compile Include="System.Windows\GridLengthConverter.cs" />
 		<Compile Include="System.ComponentModel\IItemProperties.cs" />
 		<Compile Include="System.Windows.Media\ImageSourceConverter.cs" />
@@ -272,6 +273,7 @@
 		<Compile Include="System.Windows\RoutedEventHandlerInfo.cs" />
 		<Compile Include="System.Windows\RouteItem.cs" />
 		<Compile Include="System.Windows\SizeConverter.cs" />
+		<Compile Include="System.Windows\StyleHelper.cs" />
 		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
 		<Compile Include="System.Windows\ThicknessConverter.cs" />
 		<Compile Include="System.Windows.Media\TransformConverter.cs" />

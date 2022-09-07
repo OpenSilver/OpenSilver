@@ -421,15 +421,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal void SetImplicitReferenceValue(DependencyProperty dp, object value)
-        {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
-            {
-                INTERNAL_PropertyStore.SetImplicitReferenceValue(storage, value);
-            }
-        }
-
         internal void SetThemeStyleValue(DependencyProperty dp, object value)
         {
             INTERNAL_PropertyStorage storage;

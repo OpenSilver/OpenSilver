@@ -285,11 +285,6 @@ namespace CSHTML5.Internal
                 effectiveValue = storage.AnimatedValue;
                 kind = BaseValueSourceInternal.Animated;
             }
-            else if (storage.ImplicitReferenceValue != DependencyProperty.UnsetValue)
-            {
-                effectiveValue = storage.ImplicitReferenceValue;
-                kind = BaseValueSourceInternal.ImplicitReference;
-            }
             else if (storage.LocalStyleValue != DependencyProperty.UnsetValue)
             {
                 effectiveValue = storage.LocalStyleValue;
@@ -718,19 +713,6 @@ namespace CSHTML5.Internal
             UpdateEffectiveValue(storage,
                                  newValue,
                                  BaseValueSourceInternal.LocalStyle,
-                                 false, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 newValue == DependencyProperty.UnsetValue, // clearValue
-                                 true); // propagateChanges
-        }
-
-        internal static void SetImplicitReferenceValue(INTERNAL_PropertyStorage storage, object newValue)
-        {
-            storage.ImplicitReferenceValue = newValue;
-
-            UpdateEffectiveValue(storage,
-                                 newValue,
-                                 BaseValueSourceInternal.ImplicitReference,
                                  false, // coerceWithCurrentValue
                                  false, // coerceValue
                                  newValue == DependencyProperty.UnsetValue, // clearValue

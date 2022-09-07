@@ -1,4 +1,5 @@
-﻿/*===================================================================================
+﻿
+/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -15,6 +16,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections;
 using System.Collections.ObjectModel;
+using OpenSilver;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -33,107 +35,8 @@ namespace Windows.UI.Xaml.Tests
 #endif
 {
     [TestClass]
-    public class FrameworkElementTest
+    public partial class FrameworkElementTest
     {
-        #region FrameworkElement.Style
-
-        [TestMethod]
-        public void FE_Set_Style_Invalid_TargetType()
-        {
-            var fe = new TestFE1();
-
-            var style = new Style(typeof(Button));
-
-            Assert.ThrowsException<InvalidOperationException>(() => fe.Style = style);
-        }
-
-        [TestMethod]
-        public void FE_Set_Style_Check_IsSealed()
-        {
-            var fe = new TestFE1();
-
-            var style = new Style(typeof(TestFE1));
-
-            style.IsSealed.Should().BeFalse();
-
-            fe.Style = style;
-
-            style.IsSealed.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public void FE_Set_Style_Not_Null()
-        {
-            var fe = TestFeWithStyle();
-
-            fe.Prop1.Should().Be(55d);
-            fe.Prop2.Should().BeNull();
-        }
-
-        [TestMethod]
-        public void FE_Set_Style_Null()
-        {
-            var fe = TestFeWithStyle();
-
-            fe.Style = null;
-
-            fe.Prop1.Should().Be((double)TestFE1.Prop1Property.GetMetadata(fe.GetType()).DefaultValue);
-            fe.Prop2.Should().Be((Brush)TestFE1.Prop2Property.GetMetadata(fe.GetType()).DefaultValue);
-        }
-
-        [TestMethod]
-        public void FE_Set_Style_Not_Null_From_Not_Null()
-        {
-            var fe = TestFeWithStyle();
-
-            var style = new Style(typeof(TestFE1));
-            style.Setters.Add(new Setter(TestFE1.Prop1Property, 1d));
-            style.Setters.Add(new Setter(FrameworkElement.MarginProperty, new Thickness(-10d)));
-
-            fe.Style = style;
-
-            fe.Prop1.Should().Be(1d);
-            fe.Prop2.Should().Be((Brush)TestFE1.Prop2Property.GetMetadata(fe.GetType()).DefaultValue);
-            fe.Margin.Should().Be(new Thickness(-10d));
-        }
-
-        [TestMethod]
-        public void FE_Set_Style_When_Setter_Value_Is_Binding()
-        {
-            var fe = new TestFE1();
-            fe.DataContext = 100d;
-
-            var style = new Style(typeof(TestFE1));
-            style.Setters.Add(new Setter(TestFE1.Prop1Property, new Binding()));
-
-            fe.Style = style;
-
-            fe.Prop1.Should().Be(100d);
-        }
-
-        [TestMethod]
-        public void FE_Set_Style_When_Setter_Value_Is_Binding_And_Share_Style()
-        {
-            var fe1 = new TestFE1();
-            fe1.DataContext = 100d;
-
-            var fe2 = new TestFE1();
-            fe2.DataContext = 200d;
-
-            var style = new Style(typeof(TestFE1));
-            style.Setters.Add(new Setter(TestFE1.Prop1Property, new Binding()));
-
-            fe1.Style = style;
-
-            fe1.Prop1.Should().Be(100d);
-
-            fe2.Style = style;
-
-            fe2.Prop1.Should().Be(200d);
-        }
-
-        #endregion FrameworkElement.Style
-
         #region Logical Tree
 
         [TestMethod]
