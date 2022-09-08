@@ -856,165 +856,220 @@ function(){
             }
         }
 
-        public static object CreateTextBlockDomElementAndAppendIt(object parentRef, UIElement associatedUIElement, string whiteSpace, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        internal static object CreateTextBlockDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement,
+            string whiteSpace)
         {
 #if PERFSTAT
             Performance.Counter("CreateTextBlockDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createTextBlockElement($0, $1, $2, $3)", uniqueIdentifier, parent.UniqueIdentifier, whiteSpace, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createTextBlockElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier,
+                    whiteSpace);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createTextBlockElement($0, $1, $2, $3)", uniqueIdentifier, parentRef, whiteSpace, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createTextBlockElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parentRef,
+                    whiteSpace);
             }
 
             _store.Add(uniqueIdentifier, associatedUIElement);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        public static object CreateCanvasDomElementAndAppendIt(object parentRef, UIElement associatedUIElement, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        internal static object CreateCanvasDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
         {
 #if PERFSTAT
             Performance.Counter("CreateCanvasDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createCanvasElement($0, $1, $2)", uniqueIdentifier, parent.UniqueIdentifier, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createCanvasElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createCanvasElement($0, $1, $2)", uniqueIdentifier, parentRef, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createCanvasElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
             }
 
             _store.Add(uniqueIdentifier, associatedUIElement);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        public static object CreateImageDomElementAndAppendIt(object parentRef, UIElement associatedUIElement, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        internal static object CreateImageDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
         {
 #if PERFSTAT
             Performance.Counter("CreateImageDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createImageElement($0, $1, $2)", uniqueIdentifier, parent.UniqueIdentifier, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createImageElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createImageElement($0, $1, $2)", uniqueIdentifier, parentRef, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createImageElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
             }
 
             _store.Add(uniqueIdentifier, associatedUIElement);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        public static object CreateFrameworkDomElementAndAppendIt(object parentRef, UIElement associatedUIElement, bool enablePointerEvents, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        internal static object CreateFrameworkDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement,
+            bool enablePointerEvents)
         {
 #if PERFSTAT
             Performance.Counter("CreateFrameworkDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createFrameworkElement($0, $1, $2, $3)", uniqueIdentifier, parent.UniqueIdentifier, enablePointerEvents, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createFrameworkElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier,
+                    enablePointerEvents);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createFrameworkElement($0, $1, $2, $3)", uniqueIdentifier, parentRef, enablePointerEvents, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createFrameworkElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parentRef,
+                    enablePointerEvents);
             }
 
             _store.Add(uniqueIdentifier, associatedUIElement);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        public static object CreateRunDomElementAndAppendIt(object parentRef, UIElement associatedUIElement, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        internal static object CreateRunDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
         {
 #if PERFSTAT
             Performance.Counter("CreateRunDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createRunElement($0, $1, $2)", uniqueIdentifier, parent.UniqueIdentifier, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createRunElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createRunElement($0, $1, $2)", uniqueIdentifier, parentRef, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createRunElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
             }
 
             _store.Add(uniqueIdentifier, associatedUIElement);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        public static object CreateShapeOuterDomElementAndAppendIt(object parentRef, UIElement associatedUIElement, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        internal static object CreateShapeOuterDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
         {
 #if PERFSTAT
             Performance.Counter("CreateShapeOuterDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createShapeOuterElement($0, $1, $2)", uniqueIdentifier, parent.UniqueIdentifier, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeOuterElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createShapeOuterElement($0, $1, $2)", uniqueIdentifier, parentRef, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeOuterElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
             }
 
             _store.Add(uniqueIdentifier, associatedUIElement);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        public static object CreateShapeInnerDomElementAndAppendIt(object parentRef, UIElement associatedUIElement, int index = -1) //associatedUIElement is the UIElement of which the current dom element is a part.
+        internal static object CreateShapeInnerDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
         {
 #if PERFSTAT
             Performance.Counter("CreateShapeInnerDomElementAndAppendIt", t0);
 #endif
             string uniqueIdentifier = NewId();
 
-            INTERNAL_HtmlDomElementReference parent = null;
-            if (parentRef is INTERNAL_HtmlDomElementReference)
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
             {
-                parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createShapeInnerElement($0, $1, $2)", uniqueIdentifier, parent.UniqueIdentifier, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeInnerElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createShapeInnerElement($0, $1, $2)", uniqueIdentifier, parentRef, index);
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeInnerElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
             }
 
             _store.Add(uniqueIdentifier, associatedUIElement);
 
-            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
         public static object CreateDomElementAndInsertIt(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition) //associatedUIElement is the UIElement of which the current dom element is a part.

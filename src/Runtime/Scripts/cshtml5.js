@@ -270,8 +270,8 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
     return newElement;
 }
 
-document.createTextBlockElement = function (id, parentElement, whiteSpace, index) {
-    const newElement = document.createElementSafe('div', id, parentElement, index);
+document.createTextBlockElement = function (id, parentElement, whiteSpace) {
+    const newElement = document.createElementSafe('div', id, parentElement, -1);
 
     if (newElement) {
         newElement.style['whiteSpace'] = whiteSpace;
@@ -281,8 +281,8 @@ document.createTextBlockElement = function (id, parentElement, whiteSpace, index
     }
 }
 
-document.createCanvasElement = function (id, parentElement, index) {
-    const newElement = document.createElementSafe('div', id, parentElement, index);
+document.createCanvasElement = function (id, parentElement) {
+    const newElement = document.createElementSafe('div', id, parentElement, -1);
 
     if (newElement) {
         newElement.style['overflow'] = 'display';
@@ -290,16 +290,22 @@ document.createCanvasElement = function (id, parentElement, index) {
     }
 }
 
-document.createImageElement = function (id, parentElement, index) {
-    const newElement = document.createElementSafe('img', id, parentElement, index);
+document.createImageElement = function (id, parentElement) {
+    const newElement = document.createElementSafe('img', id, parentElement, -1);
 
     if (newElement) {
         newElement.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
-        newElement.setAttribute('alt', ' ');       // the text displayed when the image cannot be found. We set it as an empty string since there is nothing in Xaml
+        // the text displayed when the image cannot be found.
+        // We set it as an empty string since there is nothing in Xaml
+        newElement.setAttribute('alt', ' ');
 
-        newElement.style['display'] = 'block'; //this is to avoid a random few pixels wide gap below the image.
-        newElement.style['width'] = '0';       // Defaulting to 0 because if there is no source set, we want the 1x1 transparent placeholder image to be sure to take no space. If the source is set, it will then be set to "inherit"
-        newElement.style['height'] = '0';      // Same as above.
+        // this is to avoid a random few pixels wide gap below the image.
+        newElement.style['display'] = 'block';
+        // Defaulting to 0 because if there is no source set, we want the 
+        // 1x1 transparent placeholder image to be sure to take no space.
+        // If the source is set, it will then be set to "inherit"
+        newElement.style['width'] = '0';
+        newElement.style['height'] = '0';
         newElement.style['objectPosition'] = 'center top';
 
         newElement.addEventListener('mousedown', function (e) {
@@ -312,29 +318,30 @@ document.createImageElement = function (id, parentElement, index) {
         });
     }
 }
-document.createFrameworkElement = function (id, parentElement, enablePointerEvents, index) {
-    const newElement = document.createElementSafe('div', id, parentElement, index);
+
+document.createFrameworkElement = function (id, parentElement, enablePointerEvents) {
+    const newElement = document.createElementSafe('div', id, parentElement, -1);
 
     if (newElement) {
         newElement.style['width'] = '100%';
         newElement.style['height'] = '100%';
 
         if (enablePointerEvents) {
-            newElement.style['pointerEvents'] = 'all'; 
+            newElement.style['pointerEvents'] = 'all';
         }
     }
 }
 
-document.createRunElement = function (id, parentElement, index) {
-    const newElement = document.createElementSafe('span', id, parentElement, index);
+document.createRunElement = function (id, parentElement) {
+    const newElement = document.createElementSafe('span', id, parentElement, -1);
 
     if (newElement) {
         newElement.style['textDecoration'] = 'inherit';
     }
 }
 
-document.createShapeOuterElement = function (id, parentElement, index) {
-    const newElement = document.createElementSafe('div', id, parentElement, index);
+document.createShapeOuterElement = function (id, parentElement) {
+    const newElement = document.createElementSafe('div', id, parentElement, -1);
 
     if (newElement) {
         newElement.style['lineHeight'] = '0';     // Line height is not needed in shapes because it causes layout issues.
@@ -342,8 +349,8 @@ document.createShapeOuterElement = function (id, parentElement, index) {
     }
 }
 
-document.createShapeInnerElement = function (id, parentElement, index) {
-    const newElement = document.createElementSafe('canvas', id, parentElement, index);
+document.createShapeInnerElement = function (id, parentElement) {
+    const newElement = document.createElementSafe('canvas', id, parentElement, -1);
 
     if (newElement) {
         newElement.style['width'] = '0';

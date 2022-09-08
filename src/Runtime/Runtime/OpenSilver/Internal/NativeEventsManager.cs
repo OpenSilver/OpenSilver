@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows;
@@ -54,9 +55,9 @@ namespace OpenSilver.Internal
 
         public void AttachEvents()
         {
-            if (_owner.INTERNAL_OuterDomElement is CSHTML5.Internal.INTERNAL_HtmlDomElementReference)
+            if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
             {
-                Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", ((CSHTML5.Internal.INTERNAL_HtmlDomElementReference)_owner.INTERNAL_OuterDomElement).UniqueIdentifier, _handler, _isFocusable);
+                Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", domRef.UniqueIdentifier, _handler, _isFocusable);
             }
             else
             {
@@ -66,9 +67,9 @@ namespace OpenSilver.Internal
 
         public void DetachEvents()
         {
-            if (_owner.INTERNAL_OuterDomElement is CSHTML5.Internal.INTERNAL_HtmlDomElementReference)
+            if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
             {
-                Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", ((CSHTML5.Internal.INTERNAL_HtmlDomElementReference)_owner.INTERNAL_OuterDomElement).UniqueIdentifier);
+                Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", domRef.UniqueIdentifier);
             }
             else
             {

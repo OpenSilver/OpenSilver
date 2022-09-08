@@ -35,10 +35,6 @@ namespace CSHTML5.Internal
         {
             domElementWhereToPlaceChildren = null;
             var div = INTERNAL_HtmlDomManager.CreateShapeOuterDomElementAndAppendIt(parentRef, associatedUIElement);
-            //var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-            //divStyle.overflow = "hidden";
-            //divStyle.width = "100%";
-            //divStyle.height = "100%";
             canvasDomElement = INTERNAL_HtmlDomManager.CreateShapeInnerDomElementAndAppendIt(div, associatedUIElement);
             return div;
         }
