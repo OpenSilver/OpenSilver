@@ -54,12 +54,26 @@ namespace OpenSilver.Internal
 
         public void AttachEvents()
         {
-            Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", _owner.INTERNAL_OuterDomElement, _handler, _isFocusable);
+            if (_owner.INTERNAL_OuterDomElement is CSHTML5.Internal.INTERNAL_HtmlDomElementReference)
+            {
+                Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", ((CSHTML5.Internal.INTERNAL_HtmlDomElementReference)_owner.INTERNAL_OuterDomElement).UniqueIdentifier, _handler, _isFocusable);
+            }
+            else
+            {
+                Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", _owner.INTERNAL_OuterDomElement, _handler, _isFocusable);
+            }
         }
 
         public void DetachEvents()
         {
-            Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", _owner.INTERNAL_OuterDomElement);
+            if (_owner.INTERNAL_OuterDomElement is CSHTML5.Internal.INTERNAL_HtmlDomElementReference)
+            {
+                Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", ((CSHTML5.Internal.INTERNAL_HtmlDomElementReference)_owner.INTERNAL_OuterDomElement).UniqueIdentifier);
+            }
+            else
+            {
+                Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", _owner.INTERNAL_OuterDomElement);
+            }
         }
 
         private void NativeEventCallback(object jsEventArg)

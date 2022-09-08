@@ -1527,6 +1527,11 @@ namespace Windows.UI.Xaml
                     else
                     {
 #endif
+                        if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                        {
+                            return this.VisualBounds.Width;
+                        }
+                            
                         try
                         {
                             return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetWidth"));
@@ -1562,6 +1567,11 @@ namespace Windows.UI.Xaml
                     else
                     {
 #endif
+                        if (this.IsCustomLayoutRoot || this.IsUnderCustomLayout)
+                        {
+                            return this.VisualBounds.Height;
+                        }
+
                         try
                         {
                             return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(this.INTERNAL_OuterDomElement, "offsetHeight"));

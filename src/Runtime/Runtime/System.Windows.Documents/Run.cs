@@ -64,9 +64,7 @@ namespace Windows.UI.Xaml.Documents
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var span = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("span", parentRef, this);
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(span);
-            style.textDecoration = "inherit";
+            var span = INTERNAL_HtmlDomManager.CreateRunDomElementAndAppendIt(parentRef, this);
             domElementWhereToPlaceChildren = span;
             return span;
         }
