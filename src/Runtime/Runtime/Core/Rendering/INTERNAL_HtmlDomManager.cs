@@ -856,6 +856,222 @@ function(){
             }
         }
 
+        internal static object CreateTextBlockDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement,
+            string whiteSpace)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateTextBlockDomElementAndAppendIt", t0);
+#endif
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createTextBlockElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier,
+                    whiteSpace);
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createTextBlockElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parentRef,
+                    whiteSpace);
+            }
+
+            _store.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
+        internal static object CreateCanvasDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateCanvasDomElementAndAppendIt", t0);
+#endif
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createCanvasElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createCanvasElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
+            }
+
+            _store.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
+        internal static object CreateImageDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateImageDomElementAndAppendIt", t0);
+#endif
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createImageElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createImageElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
+            }
+
+            _store.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
+        internal static object CreateFrameworkDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement,
+            bool enablePointerEvents)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateFrameworkDomElementAndAppendIt", t0);
+#endif
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createFrameworkElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier,
+                    enablePointerEvents);
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createFrameworkElement($0, $1, $2)",
+                    uniqueIdentifier,
+                    parentRef,
+                    enablePointerEvents);
+            }
+
+            _store.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
+        internal static object CreateRunDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateRunDomElementAndAppendIt", t0);
+#endif
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createRunElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createRunElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
+            }
+
+            _store.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
+        internal static object CreateShapeOuterDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateShapeOuterDomElementAndAppendIt", t0);
+#endif
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeOuterElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeOuterElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
+            }
+
+            _store.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
+        internal static object CreateShapeInnerDomElementAndAppendIt(
+            object parentRef,
+            UIElement associatedUIElement)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateShapeInnerDomElementAndAppendIt", t0);
+#endif
+            string uniqueIdentifier = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeInnerElement($0, $1)",
+                    uniqueIdentifier,
+                    parent.UniqueIdentifier);
+            }
+            else
+            {
+                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    @"document.createShapeInnerElement($0, $1)",
+                    uniqueIdentifier,
+                    parentRef);
+            }
+
+            _store.Add(uniqueIdentifier, associatedUIElement);
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
         public static object CreateDomElementAndInsertIt(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition) //associatedUIElement is the UIElement of which the current dom element is a part.
         {
 #if PERFSTAT

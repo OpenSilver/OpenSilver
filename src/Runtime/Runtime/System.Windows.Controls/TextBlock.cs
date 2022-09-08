@@ -79,12 +79,7 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-            divStyle.whiteSpace = TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap";
-            divStyle.overflow = "hidden"; //keeps the text from overflowing despite the TextBlock's size limitations.
-            divStyle.textAlign = "left"; // this is the default value.
-            divStyle.boxSizing = "border-box";
+            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap");
             domElementWhereToPlaceChildren = div;
             return div;
         }

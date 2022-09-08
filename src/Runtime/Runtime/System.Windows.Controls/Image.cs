@@ -519,27 +519,7 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             var intermediaryDomStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
             intermediaryDomStyle.lineHeight = "0px"; //this one is to fix in Firefox the few pixels gap that appears below the image whith certain displays (table, table-cell and possibly some others)
 
-            var img = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("img", div, this);
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(img, "src", TransparentGifOnePixel);
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(img, "alt", " "); //the text displayed when the image cannot be found. We set it as an empty string since there is nothing in Xaml
-
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(img);
-            style.display = "block"; //this is to avoid a random few pixels wide gap below the image.
-            style.width = "0"; // Defaulting to 0 because if there is no source set, we want the 1x1 transparent placeholder image to be sure to take no space. If the source is set, it will then be set to "inherit"
-            style.height = "0"; // Same as above.
-            style.objectPosition = "center top";
-
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.addEventListener('mousedown', function(e) {
-    e.preventDefault();
-}, false);
-$0.addEventListener('error', function(e) {
-    this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    this.style.width = 0;
-    this.style.height = 0;
-});
-", img);
-
+            var img = INTERNAL_HtmlDomManager.CreateImageDomElementAndAppendIt(div, this);
             _imageDiv = img;
             domElementWhereToPlaceChildren = null;
             return div;

@@ -498,12 +498,7 @@ namespace Windows.UI.Xaml
             var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
             if (!this.IsUnderCustomLayout || INTERNAL_ForceEnableAllPointerEvents)
             {
-                object div2;
-                var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
-                div2style.width = "100%";
-                div2style.height = "100%";
-                if (INTERNAL_ForceEnableAllPointerEvents)
-                    div2style.pointerEvents = "all";
+                object div2 = INTERNAL_HtmlDomManager.CreateFrameworkDomElementAndAppendIt(div1, this, INTERNAL_ForceEnableAllPointerEvents);
                 domElementWhereToPlaceChildren = div2;
 
                 if (this.IsCustomLayoutRoot)
