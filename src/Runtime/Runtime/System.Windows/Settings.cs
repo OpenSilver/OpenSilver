@@ -87,7 +87,7 @@ namespace System
         /// <summary>
         /// When True, do not apply the CSS properties of the UI elements that are not visible.
         /// Those property are applied later, when the control becomes visible.
-        /// Enabling this option results in improved performance.
+        /// Enabling this option results in improved performance. It is enabled by default.
         /// </summary>
         public bool EnableOptimizationWhereCollapsedControlsAreNotRendered
         {
