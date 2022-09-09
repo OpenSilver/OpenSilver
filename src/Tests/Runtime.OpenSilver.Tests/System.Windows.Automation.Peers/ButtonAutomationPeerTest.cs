@@ -11,6 +11,8 @@
 *
 \*====================================================================================*/
 
+using FluentAssertions;
+
 #if MIGRATION
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
@@ -43,7 +45,10 @@ namespace Windows.UI.Xaml.Automation.Peers.Tests
             //Some projects use the following approach to click on button
             var buttonAutoPeer = new ButtonAutomationPeer(button);
             var invokeProvider = buttonAutoPeer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-            invokeProvider?.Invoke();
+            
+            invokeProvider.Should().NotBeNull();
+            
+            invokeProvider.Invoke();
 
             Assert.IsTrue(buttonClicked);
         }

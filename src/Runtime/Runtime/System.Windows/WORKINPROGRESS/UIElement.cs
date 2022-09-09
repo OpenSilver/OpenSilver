@@ -103,21 +103,5 @@ namespace Windows.UI.Xaml
                                         typeof(Projection), 
                                         typeof(UIElement), 
                                         null);
-
-#if OPENSILVER
-        //
-        // Summary:
-        //     When implemented in a derived class, returns class-specific System.Windows.Automation.Peers.AutomationPeer
-        //     implementations for the Silverlight automation infrastructure.
-        //
-        // Returns:
-        //     The class-specific System.Windows.Automation.Peers.AutomationPeer subclass to
-        //     return.
-        [OpenSilver.NotImplemented]
-		protected virtual AutomationPeer OnCreateAutomationPeer()
-		{
-			return default(AutomationPeer);
-		}
-#endif
     }
 }

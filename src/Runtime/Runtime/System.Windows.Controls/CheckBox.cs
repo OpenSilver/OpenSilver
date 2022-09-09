@@ -20,8 +20,10 @@ using CSHTML5.Internal;
 using System;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
@@ -70,17 +72,17 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public CheckBox()
         {
-            this.DefaultStyleKey = typeof(CheckBox);
+            DefaultStyleKey = typeof(CheckBox);
         }
 
-#if false
         /// <summary>
-        /// Creates AutomationPeer (<see cref="UIElement.OnCreateAutomationPeer"/>)
+        /// Returns a <see cref="CheckBoxAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
         /// </summary>
+        /// <returns>
+        /// A <see cref="CheckBoxAutomationPeer"/> for the <see cref="CheckBox"/> object.
+        /// </returns>
         protected override AutomationPeer OnCreateAutomationPeer()
-        {
-            return new CheckBoxAutomationPeer(this);
-        }
-#endif
+            => new CheckBoxAutomationPeer(this);
     }
 }

@@ -1,0 +1,59 @@
+name: TestApplication Silverlight Build
+
+env:
+  virtual-directory: '/testapplication/develop/silverlight/'
+  app-path: 'opensilverdemos/testapplication/develop/silverlight/'
+  virtual-directory-release: '/testapplication/release/silverlight/'
+  app-path-release: 'opensilverdemos/testapplication/release/silverlight/'
+  deploy-service-url: 'opensilverdemos.scm.azurewebsites.net:443'
+  next-release-version: '1.1.0'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+jobs:
+  TestApplicationBuild:
+    #We should not run these steps on the forks by default.
+    if: github.repository_owner == 'OpenSilver'
+    runs-on: windows-2019
+    steps:
+      - name: Set directory environment variables
+        if: "${{ github.ref == 'refs/heads/develop' }}"
+        run: |
+          echo "vdir=${{ env.virtual-directory }}" >> $env:GITHUB_ENV
+          echo "apath=${{ env.app-path }}" >> $env:GITHUB_ENV
+      - name: Set directory environment variables
+        if: "${{ github.ref == 'refs/heads/releases/OpenSilver/1.1.0' }}"
+        run: |
+          echo "vdir=${{ env.virtual-directory-release }}" >> $env:GITHUB_ENV
+          echo "apath=${{ env.app-path-release }}" >> $env:GITHUB_ENV
+      - uses: microsoft/setup-msbuild@v1.1
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - name: Clone OpenSilver repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Clone Silverlight dlls
+        run: |
+          git clone git@github.com:OpenSilver/SilverlightDlls.git ./src/Tests/TestApplication/dll
+      - name: Replace UserName
+        working-directory: src\Tests\TestApplication
+        run: |
+          sed -i 's\USERNAME\${{ secrets.OPENSILVERDEMOSUSERNAME }}\g' TestApplication.Silverlight.Web\Properties\PublishProfiles\web_deploy.pubxml
+      - name: Add required properties
+        working-directory: src\Tests\TestApplication
+        run: |
+          sed -i 's?$(MSBuildExtensionsPath32)\\\\Microsoft\\\\Silverlight\\\\$(SilverlightVersion)?..\\\\dll?g' TestApplication\TestApplication.Silverlight.csproj
+          sed -i '\?<TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>?i <TargetFrameworkDirectory>..\\\\dll\\\\</TargetFrameworkDirectory>' TestApplication\TestApplication.Silverlight.csproj
+          sed -i '\?<TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>?i <SilverlightRuntimeVersion>5.0</SilverlightRuntimeVersion>' TestApplication\TestApplication.Silverlight.csproj
+      - name: Build and deploy
+        working-directory: src\Tests\TestApplication
+        run: |
+          msbuild TestApplication.Silverlight.sln /p:ReferencePath="..\dll" /p:DeployOnBuild=true /p:PublishProfile="web_deploy.pubxml" /p:Password=${{ secrets.OPENSILVERDEMOSUSERPWD }} /p:DeployIisAppPath=${{ env.apath }} /p:MSDeployServiceURL=${{ env.deploy-service-url }}

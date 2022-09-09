@@ -62,7 +62,16 @@ namespace Windows.UI.Xaml.Controls
             base.OnApplyTemplate();
 
             if (_popup != null)
+            {
+                _popup.IsOpen = false;
+                _popup.Child = null;
                 _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick;
+            }
+
+            if (_dropDownButton != null)
+            {
+                _dropDownButton.Click -= new RoutedEventHandler(DropDownButton_Click);
+            }
 
             _root = this.GetTemplateChild(ElementRoot) as FrameworkElement;
             _textBox = GetTemplateChild(ElementTextBox) as TextBox;
@@ -70,7 +79,9 @@ namespace Windows.UI.Xaml.Controls
             _popup = this.GetTemplateChild(ElementPopup) as Popup;
 
             if (_dropDownButton != null)
+            {
                 _dropDownButton.Click += new RoutedEventHandler(DropDownButton_Click);
+            }
 
             if (_popup != null)
             {
@@ -245,6 +256,9 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
+                if (dp._textBox == null)
+                    dp.ApplyTemplate();
+
                 if (dp._textBox != null)
                 {
                     dp._textBox.Text = newText;

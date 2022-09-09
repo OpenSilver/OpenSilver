@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows;
@@ -54,12 +55,26 @@ namespace OpenSilver.Internal
 
         public void AttachEvents()
         {
-            Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", _owner.INTERNAL_OuterDomElement, _handler, _isFocusable);
+            if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
+            {
+                Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", domRef.UniqueIdentifier, _handler, _isFocusable);
+            }
+            else
+            {
+                Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", _owner.INTERNAL_OuterDomElement, _handler, _isFocusable);
+            }
         }
 
         public void DetachEvents()
         {
-            Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", _owner.INTERNAL_OuterDomElement);
+            if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
+            {
+                Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", domRef.UniqueIdentifier);
+            }
+            else
+            {
+                Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", _owner.INTERNAL_OuterDomElement);
+            }
         }
 
         private void NativeEventCallback(object jsEventArg)

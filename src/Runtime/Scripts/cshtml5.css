@@ -61,8 +61,8 @@ body {
     background-color: #DDDDDD;
     z-index: 9999;
     position: relative;
-    margin-left:auto;
-    margin-right:auto;
+    margin-left: auto;
+    margin-right: auto;
     width: 200px;
     height: 3px;
 }
@@ -75,24 +75,26 @@ body {
 }
 
 #splashScreen {
-    margin-left:auto;
-    margin-right:auto;
-    position:relative;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
 }
+
 #splashScreenContainer {
-    display:table-cell;
-    margin-left:auto;
-    margin-right:auto;
-    position:relative;
-    vertical-align:middle;
+    display: table-cell;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    vertical-align: middle;
 }
+
 #splashScreenContainerContainer {
-    display:table;
-    top:0;
-    width:100%;
-    height:100%;
-    position:fixed;
-    vertical-align:middle;
+    display: table;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    vertical-align: middle;
 }
 
 #progressText {
@@ -101,20 +103,23 @@ body {
 
 /* Media query used for printing (cf. "CSHTML5.Native.Html.Printing.PrintManager") */
 @media print {
-  body {
-      -webkit-print-color-adjust: exact;
-  }
-  body * {
-      visibility: hidden;
+    body {
+        -webkit-print-color-adjust: exact;
     }
+
+        body * {
+            visibility: hidden;
+        }
+
     .section-to-print, .section-to-print * {
-      visibility: visible;
+        visibility: visible;
     }
+
     .section-to-print {
-      position: fixed;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
     }
 }

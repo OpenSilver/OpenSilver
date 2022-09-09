@@ -34,17 +34,8 @@ namespace CSHTML5.Internal
         internal static object CreateDomElementForPathAndSimilar(UIElement associatedUIElement, object parentRef, out object canvasDomElement, out object domElementWhereToPlaceChildren)
         {
             domElementWhereToPlaceChildren = null;
-            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, associatedUIElement);
-            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-            //divStyle.overflow = "hidden";
-            divStyle.lineHeight = "0"; // Line height is not needed in shapes because it causes layout issues.
-            //divStyle.width = "100%";
-            //divStyle.height = "100%";
-            divStyle.fontSize = "0px"; //this allows this div to be as small as we want (for some reason in Firefox, what contains a canvas has a height of at least about (1 + 1/3) * fontSize)
-            canvasDomElement = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("canvas", div, associatedUIElement);
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(canvasDomElement);
-            style.width = "0px";
-            style.height = "0px";
+            var div = INTERNAL_HtmlDomManager.CreateShapeOuterDomElementAndAppendIt(parentRef, associatedUIElement);
+            canvasDomElement = INTERNAL_HtmlDomManager.CreateShapeInnerDomElementAndAppendIt(div, associatedUIElement);
             return div;
         }
 
@@ -180,9 +171,6 @@ namespace CSHTML5.Internal
                     }
                 }
             }
-
-            var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(canvasDomElement);
-            context.translate(0.5, 0.5); //makes is less blurry for some reason.
         }
 
         /// <summary>

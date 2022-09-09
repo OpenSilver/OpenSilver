@@ -122,8 +122,14 @@ namespace System.Windows
         [OpenSilver.NotImplemented]
         public OutOfBrowserSettings OutOfBrowserSettings { get; private set; }
 
+        /// <summary>
+        /// Gets a collection of assembly parts that are included in the deployment.
+        /// </summary>
+        /// <returns>
+        /// The collection of assembly parts. The default is an empty collection.
+        /// </returns>
         [OpenSilver.NotImplemented]
-        public AssemblyPartCollection Parts { get; private set; }
+        public AssemblyPartCollection Parts { get; } = new AssemblyPartCollection();
 
 #region not implemented
 

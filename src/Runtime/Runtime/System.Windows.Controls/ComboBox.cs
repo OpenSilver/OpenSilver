@@ -18,11 +18,11 @@ using System;
 using System.Threading.Tasks;
 
 #if MIGRATION
-using System.Windows.Input;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 #else
-using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 #endif
@@ -172,9 +172,18 @@ namespace Windows.UI.Xaml.Controls
                     _popup.CustomLayout = true;
                 }
                 _popup.MaxHeight = this.MaxDropDownHeight;
+                
+                //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
+                _popup.PlacementTarget = this;
+                _popup.Placement = PlacementMode.Bottom;
+                _popup.INTERNAL_PopupMoved += _popup_INTERNAL_PopupMoved;
+
+                // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
+                _popup.StayOpen = false;
+                _popup.OutsideClick += OnOutsideClick;
+                _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
             }
 
-            _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
             if (_contentPresenter != null)
             {
@@ -186,25 +195,13 @@ namespace Windows.UI.Xaml.Controls
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
             }
 
-            //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
-            _popup.PlacementTarget = this;
-            _popup.Placement = PlacementMode.Bottom;
-            _popup.INTERNAL_PopupMoved += _popup_INTERNAL_PopupMoved;
-
+            _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             if (_dropDownToggle != null)
             {
                 _dropDownToggle.Checked += DropDownToggle_Checked;
                 _dropDownToggle.Unchecked += DropDownToggle_Unchecked;
             }
 
-            // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
-            if (_popup != null)
-            {
-                _popup.StayOpen = false;
-                _popup.OutsideClick += OnOutsideClick;
-                _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
-            }
-            
             UpdatePresenter();
         }
 
@@ -245,6 +242,16 @@ namespace Windows.UI.Xaml.Controls
             base.OnSelectionChanged(e);
             UpdatePresenter();
         }
+
+        /// <summary>
+        /// Returns a <see cref="ComboBoxAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ComboBoxAutomationPeer"/> for the <see cref="ComboBox"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ComboBoxAutomationPeer(this);
 
         internal void NotifyComboBoxItemMouseUp(ComboBoxItem comboBoxItem)
         {
@@ -302,23 +309,6 @@ namespace Windows.UI.Xaml.Controls
         {
             if (DropDownOpened != null)
                 DropDownOpened(this, e);
-        }
-
-#if MIGRATION
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
-        {
-            IsDropDownOpen = !IsDropDownOpen;
-
-            e.Handled = true;
-
-#if MIGRATION
-            base.OnMouseLeftButtonUp(e);
-#else
-            base.OnPointerReleased(e);
-#endif
         }
 
         /// <summary>

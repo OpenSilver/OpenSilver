@@ -21,9 +21,11 @@ using System;
 using System.Collections;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 #endif
@@ -241,20 +243,15 @@ namespace Windows.UI.Xaml.Controls
 
         #region Override methods
 
-#if false
         /// <summary>
-        /// Returns a <see cref="RadioButtonAutomationPeer"/> for use by
-        /// the Silverlight automation infrastructure.
+        /// Returns a <see cref="RadioButtonAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
         /// </summary>
         /// <returns>
-        /// An <see cref="RadioButtonAutomationPeer"/> for the radio button
-        /// object.
+        /// An <see cref="RadioButtonAutomationPeer"/> for the <see cref="RadioButton"/> object.
         /// </returns>
         protected override AutomationPeer OnCreateAutomationPeer()
-        {
-            return new RadioButtonAutomationPeer(this);
-        }
-#endif
+            => new RadioButtonAutomationPeer(this);
 
         /// <summary>
         ///     This method is invoked when the IsChecked becomes true.

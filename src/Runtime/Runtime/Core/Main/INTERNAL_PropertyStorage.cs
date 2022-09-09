@@ -30,11 +30,10 @@ namespace CSHTML5.Internal
 
         public INTERNAL_PropertyStorage(DependencyObject owner, DependencyProperty property, PropertyMetadata typeMetadata)
         {
-            this._values = new object[6] 
+            this._values = new object[5] 
             {
                 DependencyProperty.UnsetValue, //Local
                 DependencyProperty.UnsetValue, //Animated
-                DependencyProperty.UnsetValue, //ImplicitReference
                 DependencyProperty.UnsetValue, //LocalStyle
                 DependencyProperty.UnsetValue, //ThemeStyle
                 DependencyProperty.UnsetValue, //Inherited
@@ -60,28 +59,22 @@ namespace CSHTML5.Internal
 
         internal object LocalValue
         {
-            get { return this._values[5]; }
+            get { return this._values[4]; }
             set
             {
-                this._values[5] = value;
+                this._values[4] = value;
                 this.IsAnimatedOverLocal = (value == DependencyProperty.UnsetValue && this.AnimatedValue != DependencyProperty.UnsetValue);
             }
         }
 
         internal object AnimatedValue
         {
-            get { return this._values[4]; }
+            get { return this._values[3]; }
             set
             {
-                this._values[4] = value;
+                this._values[3] = value;
                 this.IsAnimatedOverLocal = (value != DependencyProperty.UnsetValue);
             }
-        }
-
-        internal object ImplicitReferenceValue
-        {
-            get { return this._values[3]; }
-            set { this._values[3] = value; }
         }
 
         internal object LocalStyleValue
@@ -156,8 +149,7 @@ namespace CSHTML5.Internal
         Inherited = 1,
         ThemeStyle = 2,
         LocalStyle = 3,
-        ImplicitReference = 4,
-        Animated = 5, // Note: in WPF, animated values are stored in the ModifiedValue
-        Local = 6,
+        Animated = 4, // Note: in WPF, animated values are stored in the ModifiedValue
+        Local = 5,
     }
 }

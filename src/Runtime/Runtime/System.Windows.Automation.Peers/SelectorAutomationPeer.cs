@@ -16,11 +16,9 @@ using System.Collections.Generic;
 
 #if MIGRATION
 using System.Windows.Automation.Provider;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Xaml.Automation.Provider;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
@@ -33,7 +31,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// <summary>
     /// Exposes <see cref="Selector" /> types to UI automation.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public abstract class SelectorAutomationPeer : ItemsControlAutomationPeer, ISelectionProvider
     {
         /// <summary>
@@ -55,9 +52,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// A value of the enumeration.
         /// </returns>
         protected override AutomationControlType GetAutomationControlTypeCore()
-        {
-            return AutomationControlType.List;
-        }
+            => AutomationControlType.List;
 
         /// <summary>
         /// Gets an object that supports the requested pattern, based on the 
@@ -93,7 +88,7 @@ namespace Windows.UI.Xaml.Automation.Peers
             Selector owner = (Selector)Owner;
 
             int count = owner.SelectedItemsInternal.Count;
-            int itemsCount = (owner as ItemsControl).Items.Count;
+            int itemsCount = owner.Items.Count;
 
             if (count > 0 && itemsCount > 0)
             {
@@ -101,9 +96,7 @@ namespace Windows.UI.Xaml.Automation.Peers
 
                 for (int i = 0; i < count; i++)
                 {
-                    //SelectorItemAutomationPeer peer = FindOrCreateItemAutomationPeer(owner.SelectedItemsInternal[i].Item) as SelectorItemAutomationPeer;
-                    SelectorItemAutomationPeer peer = null;
-                    if (peer != null)
+                    if (CreateItemAutomationPeerHelper(owner.SelectedItemsInternal[i].Item) is SelectorItemAutomationPeer peer)
                     {
                         selectedProviders.Add(ProviderFromPeer(peer));
                     }
@@ -113,22 +106,9 @@ namespace Windows.UI.Xaml.Automation.Peers
             return null;
         }
 
-        bool ISelectionProvider.CanSelectMultiple
-        {
-            get
-            {
-                Selector owner = (Selector)Owner;
-                return owner.CanSelectMultiple;
-            }
-        }
+        bool ISelectionProvider.CanSelectMultiple => ((Selector)Owner).CanSelectMultiple;
 
-        bool ISelectionProvider.IsSelectionRequired
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ISelectionProvider.IsSelectionRequired => false;
 
 #endregion
 

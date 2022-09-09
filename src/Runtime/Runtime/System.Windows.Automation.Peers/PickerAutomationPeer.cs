@@ -21,7 +21,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// Exposes Picker types to UI Automation.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
     public abstract class PickerAutomationPeer : FrameworkElementAutomationPeer, IExpandCollapseProvider
     {
         /// <summary>

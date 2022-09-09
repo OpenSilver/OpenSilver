@@ -28,9 +28,11 @@ using System.Threading.Tasks;
 using System.Windows.Browser;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 #endif
@@ -72,8 +74,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public HyperlinkButton()
         {
-            // Set default style:
-            this.DefaultStyleKey = typeof(HyperlinkButton);
+            DefaultStyleKey = typeof(HyperlinkButton);
         }
 
         protected override void OnClick()
@@ -85,6 +86,16 @@ namespace Windows.UI.Xaml.Controls
                 Navigate();
             }
         }
+
+        /// <summary>
+        /// Returns a <see cref="HyperlinkButtonAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="HyperlinkButtonAutomationPeer"/> for the hyperlink button object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new HyperlinkButtonAutomationPeer(this);
 
         /// <summary>
         /// Navigate to the Uri. 

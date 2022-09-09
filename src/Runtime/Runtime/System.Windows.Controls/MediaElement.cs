@@ -24,8 +24,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -575,6 +577,8 @@ namespace Windows.UI.Xaml.Controls
             ManageVolume_Changed();
         }
 
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new MediaElementAutomationPeer(this);
 
         #region non supported stuff
 

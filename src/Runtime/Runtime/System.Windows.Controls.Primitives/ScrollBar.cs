@@ -15,11 +15,12 @@ using System.ComponentModel;
 using OpenSilver.Internal;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Input;
-using System.Windows.Threading;
 #else
 using System;
 using Windows.Foundation;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -232,6 +233,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
             // Refresh the position of the thumb:
             UpdateThumbPositionAndSize();
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ScrollBarAutomationPeer(this);
 
         void LargeIncrease_Click(object sender, RoutedEventArgs e)
         {

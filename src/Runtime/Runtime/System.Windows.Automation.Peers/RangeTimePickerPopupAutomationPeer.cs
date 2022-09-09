@@ -19,7 +19,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// Exposes RangeTimePicker types to UI Automation.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
     public class RangeTimePickerPopupAutomationPeer : TimePickerPopupAutomationPeer
     {
         /// <summary>

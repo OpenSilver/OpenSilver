@@ -15,8 +15,10 @@
 
 using CSHTML5;
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Input;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -214,5 +216,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             get { return (bool)this.GetValue(IsFocusedProperty); }
             private set { this.SetValue(IsFocusedProperty, value); }
         }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ThumbAutomationPeer(this);
     }
 }

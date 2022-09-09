@@ -16,11 +16,13 @@
 using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Automation.Peers;
 #else
 using System;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Automation.Peers;
 #endif
 
 
@@ -110,6 +112,16 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
+
+        /// <summary>
+        /// Returns a <see cref="ProgressBarAutomationPeer"/> for use by the Silverlight automation 
+        /// infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ProgressBarAutomationPeer"/> for the <see cref="ProgressBar"/> object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ProgressBarAutomationPeer(this);
 
         private void OnTrackSizeChanged(object sender, SizeChangedEventArgs e)
         {

@@ -153,6 +153,7 @@ $1.appendChild(popupRoot);
             popupRoot.INTERNAL_OuterDomElement
                 = popupRoot.INTERNAL_InnerDomElement
                 = popupRootDiv;
+            popupRoot.IsConnectedToLiveTree = true;
 
             //--------------------------------------
             // Listen to clicks anywhere in the popup (this is used to close other popups that are not supposed to stay open):
@@ -199,6 +200,9 @@ $1.appendChild(popupRoot);
 var popupRoot = document.getElementByIdSafe($0);
 $1.removeChild(popupRoot);
 ", uniquePopupRootIdentifier, parentWindow.INTERNAL_RootDomElement);
+
+                popupRoot.INTERNAL_OuterDomElement = popupRoot.INTERNAL_InnerDomElement = null;
+                popupRoot.IsConnectedToLiveTree = false;
 
                 //--------------------------------------
                 // Remove from the list of popups:

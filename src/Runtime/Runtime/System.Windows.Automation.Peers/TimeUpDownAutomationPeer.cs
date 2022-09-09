@@ -21,7 +21,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// Exposes TimeUpDown types to UI Automation.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    [OpenSilver.NotImplemented]
     public class TimeUpDownAutomationPeer : UpDownBaseAutomationPeer<DateTime?>
     {
         /// <summary>

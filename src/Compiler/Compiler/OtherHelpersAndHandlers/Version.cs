@@ -8,6 +8,6 @@ namespace DotNetForHtml5.Compiler
 {
     internal static class Version
     {
-        public const int CompilerBuildNumber = 2;
+        public const int CompilerBuildNumber = 3;
     }
 }

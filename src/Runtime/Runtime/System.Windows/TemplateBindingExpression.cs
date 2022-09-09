@@ -29,21 +29,22 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+    /// <summary>
+    /// Supports template binding.
+    /// </summary>
     public class TemplateBindingExpression : Expression
     {
+        private readonly Control _source;
+        private readonly DependencyProperty _sourceProperty;
+        private DependencyObject _target;
+        private DependencyProperty _targetProperty;
         private IPropertyChangedListener _listener;
         private bool _skipTypeCheck;
 
-        internal Control Source { get; }
-        internal DependencyProperty SourceProperty { get; }
-        
-        internal DependencyObject Target { get; private set; }
-        internal DependencyProperty TargetProperty { get; private set; }
-
         internal TemplateBindingExpression(Control templatedParent, DependencyProperty sourceDP)
         {
-            Source = templatedParent ?? throw new ArgumentNullException(nameof(templatedParent));
-            SourceProperty = sourceDP ?? throw new ArgumentNullException(nameof(sourceDP));
+            _source = templatedParent ?? throw new ArgumentNullException(nameof(templatedParent));
+            _sourceProperty = sourceDP ?? throw new ArgumentNullException(nameof(sourceDP));
         }
 
         internal override bool CanSetValue(DependencyObject d, DependencyProperty dp)
@@ -53,14 +54,14 @@ namespace Windows.UI.Xaml
 
         internal override object GetValue(DependencyObject d, DependencyProperty dp)
         {
-            var value = Source.GetValue(SourceProperty);
+            var value = _source.GetValue(_sourceProperty);
             if (_skipTypeCheck || DependencyProperty.IsValueTypeValid(value, dp.PropertyType))
             {
                 return value;
             }
 
             // Note: consider caching the default value as we should always have d == Target.
-            return TargetProperty.GetMetadata(Target.GetType()).DefaultValue; 
+            return _targetProperty.GetMetadata(_target.GetType()).DefaultValue; 
         }
 
         internal override void OnAttach(DependencyObject d, DependencyProperty dp)
@@ -73,12 +74,12 @@ namespace Windows.UI.Xaml
 
             IsAttached = true;
 
-            Target = d;
-            TargetProperty = dp;
+            _target = d;
+            _targetProperty = dp;
 
-            _skipTypeCheck = TargetProperty.PropertyType.IsAssignableFrom(SourceProperty.PropertyType);
-            _listener = INTERNAL_PropertyStore.ListenToChanged(Source, SourceProperty, 
-                (o, args) => Target.ApplyExpression(TargetProperty, this, false));
+            _skipTypeCheck = _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
+            _listener = INTERNAL_PropertyStore.ListenToChanged(_source, _sourceProperty, 
+                (o, args) => _target.ApplyExpression(_targetProperty, this, false));
         }
 
         internal override void OnDetach(DependencyObject d, DependencyProperty dp)

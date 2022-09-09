@@ -31,7 +31,6 @@ namespace Windows.UI.Xaml.Automation.Peers
     /// Exposes the items in the <see cref="ItemsControl.Items" /> collection 
     /// of a <see cref="ListBox" /> to UI automation.
     /// </summary>
-    [OpenSilver.NotImplemented]
     public class ListBoxItemAutomationPeer : SelectorItemAutomationPeer, IScrollItemProvider
     {
         /// <summary>
@@ -69,9 +68,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// The class name.
         /// </returns>
         protected override string GetClassNameCore()
-        {
-            return nameof(ListBoxItem);
-        }
+            => nameof(ListBoxItem);
 
         /// <summary>
         /// Gets the control type for the element that is associated with this <see cref="ListBoxItemAutomationPeer" />.
@@ -81,9 +78,7 @@ namespace Windows.UI.Xaml.Automation.Peers
         /// A value of the enumeration.
         /// </returns>
         protected override AutomationControlType GetAutomationControlTypeCore()
-        {
-            return AutomationControlType.ListItem;
-        }
+            => AutomationControlType.ListItem;
 
         /// <summary>
         /// Gets an object that supports the requested pattern, based on the patterns supported by this 

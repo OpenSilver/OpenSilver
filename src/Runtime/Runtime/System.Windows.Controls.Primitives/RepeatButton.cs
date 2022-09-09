@@ -16,12 +16,14 @@
 using System;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Threading;
 #else
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
 #endif
-    
+
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
 #else
@@ -118,9 +120,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-#endregion Dependencies and Events
+        #endregion Dependencies and Events
 
-#region Private helpers
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new RepeatButtonAutomationPeer(this);
+
+        #region Private helpers
 
         private void StartTimer()
         {

@@ -351,18 +351,20 @@ namespace Windows.UI.Xaml.Input
                 //-----------------------------------
                 return origin;
             }
-            else
+            else if (relativeTo.IsConnectedToLiveTree)
             {
                 //-----------------------------------
                 // Returns the pointer coordinates relative to the "relativeTo" element:
                 //-----------------------------------
 
-                // Get the opposite of the absolute position of the "relativeTo" element:
-                GeneralTransform generalTransform = Window.Current.TransformToVisual(relativeTo);
-
-                // Get the pointer coordinates relative to "relativeTo" element: 
-                return generalTransform.TransformPoint(origin);
+                UIElement rootVisual = Application.Current?.RootVisual;
+                if (rootVisual != null)
+                {
+                    return rootVisual.TransformToVisual(relativeTo).Transform(origin);
+                }
             }
+
+            return new Point(0.0, 0.0);
         }
 
 #if MIGRATION
