@@ -54,7 +54,7 @@ namespace OpenSilver.Internal.Data
 
         private void SetSource(object source, bool sourceIsCurrentItem)
         {
-            var needToUpdateValue = source != _source;
+            var needToUpdateValue = source != _source || Value == DependencyProperty.UnsetValue;
             UpdateSource(source, sourceIsCurrentItem);
 
             if (needToUpdateValue)
