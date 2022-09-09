@@ -241,6 +241,18 @@ namespace Windows.UI.Xaml.Controls
             return new Size();
         }
 
+        internal override bool CheckIsAutoWidth(FrameworkElement child)
+        {
+            if (Double.IsNaN(child.Width) == false)
+                return false;
+            return true;
+        }
+        internal override bool CheckIsAutoHeight(FrameworkElement child)
+        {
+            if (Double.IsNaN(child.Height) == false)
+                return false;
+            return true;
+        }
         protected override Size ArrangeOverride(Size finalSize)
         {
             UIElement[] childrens = Children.ToArray();
