@@ -1600,8 +1600,8 @@ document.ondblclick = null;
 
         private void Render()
         {
-            if (this.INTERNAL_VisualParent != null && this.INTERNAL_VisualParent as Canvas != null)
-                return;
+            //if (this.INTERNAL_VisualParent != null && this.INTERNAL_VisualParent as Canvas != null)
+            //    return;
 
             if (IsCustomLayoutRoot)
             {
@@ -1774,6 +1774,13 @@ document.ondblclick = null;
             Size savedLastSize = layoutLastSize;
             layoutMeasuredSize = layoutLastSize;
             FrameworkElement fe = this as FrameworkElement;
+            if (isFirstRendering && fe.INTERNAL_VisualParent is FrameworkElement)
+            {
+                if (fe.IsAutoWidthOnCustomLayout == false)
+                    fe.IsAutoWidthOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoWidth(fe);
+                if (fe.IsAutoHeightOnCustomLayout == false)
+                    fe.IsAutoHeightOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoHeight(fe);
+            }
             if (fe != null)
             {
                 if (fe.IsAutoWidthOnCustomLayout)
@@ -1792,10 +1799,10 @@ document.ondblclick = null;
             if (fe != null)
             {
                 if (fe.IsAutoWidthOnCustomLayout)
-                    layoutMeasuredSize.Width = this.DesiredSize.Width;
+                    layoutMeasuredSize.Width = Math.Max(this.DesiredSize.Width, savedLastSize.Width);
 
                 if (fe.IsAutoHeightOnCustomLayout)
-                    layoutMeasuredSize.Height = this.DesiredSize.Height;
+                    layoutMeasuredSize.Height = Math.Max(this.DesiredSize.Height, savedLastSize.Height);
             }
 
             Arrange(new Rect(layoutMeasuredSize));

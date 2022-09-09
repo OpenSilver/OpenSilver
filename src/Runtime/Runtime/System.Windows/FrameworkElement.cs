@@ -611,6 +611,33 @@ namespace Windows.UI.Xaml
             
         }
 
+        internal virtual bool CheckIsAutoWidth(FrameworkElement child)
+        {
+            if (Double.IsNaN(child.Width) == false)
+                return false;
+
+            if (child.HorizontalAlignment != HorizontalAlignment.Stretch)
+                return true;
+
+            if (child.INTERNAL_VisualParent is FrameworkElement == false)
+                return false;
+
+            return (child.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoWidth(this);
+        }
+        internal virtual bool CheckIsAutoHeight(FrameworkElement child)
+        {
+            if (Double.IsNaN(child.Height) == false)
+                return false;
+
+            if (child.VerticalAlignment != VerticalAlignment.Stretch)
+                return true;
+
+            if (child.INTERNAL_VisualParent is FrameworkElement == false)
+                return false;
+
+            return (child.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoHeight(this);
+        }
+
         // Note: the returned Size is unused for now.
         internal override sealed Size MeasureCore()
         {

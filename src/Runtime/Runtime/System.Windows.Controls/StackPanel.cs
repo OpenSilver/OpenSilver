@@ -301,6 +301,39 @@ namespace Windows.UI.Xaml.Controls
                 new Rect(crossStart, mainStart, crossLength, mainLength);
         }
 
+        internal override bool CheckIsAutoWidth(FrameworkElement child)
+        {
+            if (Double.IsNaN(child.Width) == false)
+                return false;
+
+            if (Orientation == Orientation.Horizontal)
+                return true;
+
+            if (child.VerticalAlignment != VerticalAlignment.Stretch)
+                return true;
+
+            if (child.INTERNAL_VisualParent is FrameworkElement == false)
+                return false;
+
+            return (child.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoWidth(this);
+        }
+        internal override bool CheckIsAutoHeight(FrameworkElement child)
+        {
+            if (Double.IsNaN(child.Height) == false)
+                return false;
+
+            if (Orientation == Orientation.Vertical)
+                return true;
+
+            if (child.VerticalAlignment != VerticalAlignment.Stretch)
+                return true;
+
+            if (child.INTERNAL_VisualParent is FrameworkElement == false)
+                return false;
+
+            return (child.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoHeight(this);
+        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
             double availableCrossLength = GetCrossLength(availableSize);
