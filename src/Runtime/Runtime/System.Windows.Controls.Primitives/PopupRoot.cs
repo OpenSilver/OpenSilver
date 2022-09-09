@@ -60,6 +60,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal Popup INTERNAL_LinkedPopup { get; set; }
 
+        internal sealed override bool EnablePointerEventsCore
+            => !INTERNAL_LinkedPopup?.StayOpen ?? false;
+
         internal PopupRoot(string uniqueIdentifier, Window parentWindow)
         {
             INTERNAL_UniqueIndentifier = uniqueIdentifier;
