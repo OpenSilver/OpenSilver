@@ -134,10 +134,9 @@ namespace CSHTML5.Internal
             {
                 object newLocalValue = newValue;
 
-                if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
+                if (storage.Entry.IsExpression)
                 {
-                    var currentExpr = storage.LocalValue as Expression;
-                    if (currentExpr != null)
+                    if (storage.LocalValue is Expression currentExpr)
                     {
                         var newExpr = newValue as Expression;
                         if (currentExpr == newExpr)
@@ -158,6 +157,10 @@ namespace CSHTML5.Internal
                             newLocalValue = currentExpr;
                         }
                     }
+                }
+                else if (storage.Entry.IsExpressionFromStyle)
+                {
+                    ((Expression)storage.Entry.ModifiedValue.BaseValue).OnDetach(storage.Owner, storage.Property);
                 }
 
                 // Set the new local value
@@ -356,7 +359,7 @@ namespace CSHTML5.Internal
                 // Check for early exit if effective value is not impacted (if we are doing 
                 // a coerce operation, we have to go through the update process)
                 if (effectiveValueKind == oldBaseValueSource &&
-                    newValueSource < effectiveValueKind)
+                    (newValueSource < effectiveValueKind || clearValue))
                 {
                     // value source remains the same.
                     // Exit if the newly set value is of lower precedence than the effective value.
