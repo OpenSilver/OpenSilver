@@ -1609,13 +1609,14 @@ document.ondblclick = null;
                 IsRendered = true;
                 if (RenderedVisualBounds.Equals(VisualBounds) == false)
                 {
-                    RenderedVisualBounds = VisualBounds;
 
-                    if (fe.IsAutoWidthOnCustomLayout)
+                    if (RenderedVisualBounds.Width.Equals(VisualBounds.Width) == false)
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).width = VisualBounds.Width.ToInvariantString() + "px";
 
-                    if (fe.IsAutoHeightOnCustomLayout)
+                    if (RenderedVisualBounds.Height.Equals(VisualBounds.Height) == false)
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).height = VisualBounds.Height.ToInvariantString() + "px";
+
+                    RenderedVisualBounds = VisualBounds;
                 }
                 return;
             }
@@ -1772,24 +1773,31 @@ document.ondblclick = null;
         private void BeginUpdateCustomLayout()
         {
             Size savedLastSize = layoutLastSize;
-            layoutMeasuredSize = layoutLastSize;
+            Size availableSize = layoutLastSize;
             FrameworkElement fe = this as FrameworkElement;
-            if (isFirstRendering && fe.INTERNAL_VisualParent is FrameworkElement)
-            {
-                if (fe.IsAutoWidthOnCustomLayout == false)
-                    fe.IsAutoWidthOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoWidth(fe);
-                if (fe.IsAutoHeightOnCustomLayout == false)
-                    fe.IsAutoHeightOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoHeight(fe);
-            }
             if (fe != null)
             {
-                if (fe.IsAutoWidthOnCustomLayout)
-                    layoutMeasuredSize.Width = double.PositiveInfinity;
-                if (fe.IsAutoHeightOnCustomLayout)
-                    layoutMeasuredSize.Height = double.PositiveInfinity;
-            }
+                if (fe.INTERNAL_VisualParent is FrameworkElement)
+                {
+                    if (fe.IsAutoWidthOnCustomLayout == null)
+                        fe.IsAutoWidthOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoWidth(fe);
+                    if (fe.IsAutoHeightOnCustomLayout == null)
+                        fe.IsAutoHeightOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoHeight(fe);
+                }
 
-            Measure(layoutMeasuredSize);
+                if (fe.IsAutoWidthOnCustomLayout.GetValueOrDefault())
+                    availableSize.Width = double.PositiveInfinity;
+                if (fe.IsAutoHeightOnCustomLayout.GetValueOrDefault())
+                    availableSize.Height = double.PositiveInfinity;
+            }
+            if (layoutMeasuredSize == availableSize)
+            {
+                layoutProcessing = false;
+                return;
+            }
+            
+            Measure(availableSize);
+            layoutMeasuredSize = availableSize;
 
             if (savedLastSize != layoutLastSize)
             {
@@ -1798,14 +1806,14 @@ document.ondblclick = null;
             }
             if (fe != null)
             {
-                if (fe.IsAutoWidthOnCustomLayout)
-                    layoutMeasuredSize.Width = Math.Max(this.DesiredSize.Width, savedLastSize.Width);
+                if (fe.IsAutoWidthOnCustomLayout.GetValueOrDefault())
+                    availableSize.Width = Math.Max(this.DesiredSize.Width, savedLastSize.Width);
 
-                if (fe.IsAutoHeightOnCustomLayout)
-                    layoutMeasuredSize.Height = Math.Max(this.DesiredSize.Height, savedLastSize.Height);
+                if (fe.IsAutoHeightOnCustomLayout.GetValueOrDefault())
+                    availableSize.Height = Math.Max(this.DesiredSize.Height, savedLastSize.Height);
             }
 
-            Arrange(new Rect(layoutMeasuredSize));
+            Arrange(new Rect(availableSize));
             if (savedLastSize != layoutLastSize)
             {
                 BeginUpdateCustomLayout();
