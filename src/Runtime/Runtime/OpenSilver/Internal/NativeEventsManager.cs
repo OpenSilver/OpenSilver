@@ -22,10 +22,11 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal
 {
-    internal class NativeEventsManager
+    internal class NativeEventsManager : IDisposable
     {
-        private readonly Delegate _handler;
-        private readonly UIElement _owner;
+        private bool _disposed;
+        private JavascriptCallback _handler;
+        private UIElement _owner;
         private readonly bool _isFocusable;
 
         internal NativeEventsManager(UIElement uie, UIElement mouseEventTarget, UIElement keyboardEventTarget, bool isFocusable)
@@ -37,24 +38,29 @@ namespace OpenSilver.Internal
 
             if (Interop.IsRunningInTheSimulator)
             {
-                _handler = new Action<object>(NativeEventCallback);
+                _handler = JavascriptCallback.Create(new Action<object>(NativeEventCallback));
             }
             else
             {
-                _handler = new Func<object, string>(jsEventArg =>
+                _handler = JavascriptCallback.Create(new Func<object, string>(jsEventArg =>
                 {
                     NativeEventCallback(jsEventArg);
                     return string.Empty;
-                });
+                }));
             }
         }
 
-        internal UIElement MouseTarget { get; }
+        internal UIElement MouseTarget { get; private set; }
 
-        internal UIElement KeyboardTarget { get; }
+        internal UIElement KeyboardTarget { get; private set; }
 
         public void AttachEvents()
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException("NativeEventsManager");
+            }
+
             if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
             {
                 Interop.ExecuteJavaScriptAsync("document._attachEventListeners($0, $1, $2)", domRef.UniqueIdentifier, _handler, _isFocusable);
@@ -65,7 +71,7 @@ namespace OpenSilver.Internal
             }
         }
 
-        public void DetachEvents()
+        private void DetachEvents()
         {
             if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
             {
@@ -75,6 +81,17 @@ namespace OpenSilver.Internal
             {
                 Interop.ExecuteJavaScriptAsync("document._removeEventListeners($0)", _owner.INTERNAL_OuterDomElement);
             }
+        }
+
+        public void Dispose()
+        {
+            _disposed = true;
+            DetachEvents();
+            _handler.Dispose();
+            _handler = null;
+            _owner = null;
+            MouseTarget = null;
+            KeyboardTarget = null;
         }
 
         private void NativeEventCallback(object jsEventArg)
