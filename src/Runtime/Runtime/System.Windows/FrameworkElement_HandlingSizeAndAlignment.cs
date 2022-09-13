@@ -101,7 +101,7 @@ namespace Windows.UI.Xaml
                 nameof(IsAutoWidthOnCustomLayout),
                 typeof(bool?),
                 typeof(FrameworkElement),
-                new PropertyMetadata(null));
+                new PropertyMetadata((object)null));
 
         /// <summary>
         /// Gets or sets the Auto Height to the root of CustomLayout
@@ -117,7 +117,7 @@ namespace Windows.UI.Xaml
                 nameof(IsAutoHeightOnCustomLayout),
                 typeof(bool?),
                 typeof(FrameworkElement),
-                new PropertyMetadata(null));
+                new PropertyMetadata((object)null));
 
         /// <summary>
         /// Enable or disable measure/arrange layout system in a sub part

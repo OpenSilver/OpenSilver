@@ -1580,16 +1580,11 @@ document.ondblclick = null;
 
         private void Render()
         {
-            //if (this.INTERNAL_VisualParent != null && this.INTERNAL_VisualParent as Canvas != null)
-            //    return;
-
             if (IsCustomLayoutRoot)
             {
-                FrameworkElement fe = this as FrameworkElement;
                 IsRendered = true;
                 if (RenderedVisualBounds.Equals(VisualBounds) == false)
                 {
-
                     if (RenderedVisualBounds.Width.Equals(VisualBounds.Width) == false)
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).width = VisualBounds.Width.ToInvariantString() + "px";
 
@@ -1757,12 +1752,12 @@ document.ondblclick = null;
             FrameworkElement fe = this as FrameworkElement;
             if (fe != null)
             {
-                if (fe.INTERNAL_VisualParent is FrameworkElement)
+                if (VisualTreeHelper.GetParent(fe) is FrameworkElement parent)
                 {
                     if (fe.IsAutoWidthOnCustomLayout == null)
-                        fe.IsAutoWidthOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoWidth(fe);
+                        fe.IsAutoWidthOnCustomLayout = parent.CheckIsAutoWidth(fe);
                     if (fe.IsAutoHeightOnCustomLayout == null)
-                        fe.IsAutoHeightOnCustomLayout = (fe.INTERNAL_VisualParent as FrameworkElement).CheckIsAutoHeight(fe);
+                        fe.IsAutoHeightOnCustomLayout = parent.CheckIsAutoHeight(fe);
                 }
 
                 if (fe.IsAutoWidthOnCustomLayout.GetValueOrDefault())

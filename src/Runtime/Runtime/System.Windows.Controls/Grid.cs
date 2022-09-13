@@ -2607,14 +2607,10 @@ namespace Windows.UI.Xaml.Controls
 
         internal override bool CheckIsAutoWidth(FrameworkElement child)
         {
-            if (Double.IsNaN(child.Width) == false)
+            if (!double.IsNaN(child.Width) || ColumnDefinitions.Count == 0)
+            {
                 return false;
-
-            //if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            //    return true;
-
-            if (ColumnDefinitions.Count == 0)
-                return false;
+            }
 
             int columnSpan = GetColumnSpan(child);
             int childColumn = GetColumn(child);
@@ -2622,29 +2618,30 @@ namespace Windows.UI.Xaml.Controls
             {
                 return false;
             }
-            
+
             bool onAutoColumnDefinition = false;
-            for(int i = 0; i < columnSpan; i++)
+            for (int i = 0; i < columnSpan; i++)
             {
                 if (ColumnDefinitions[childColumn + i].Width.IsStar)
+                {
                     return false;
+                }
 
                 if (ColumnDefinitions[childColumn + i].Width.IsAuto)
+                {
                     onAutoColumnDefinition = true;
+                }
             }
 
             return onAutoColumnDefinition;
         }
+
         internal override bool CheckIsAutoHeight(FrameworkElement child)
         {
-            if (Double.IsNaN(child.Height) == false)
+            if (!double.IsNaN(child.Height) || RowDefinitions.Count == 0)
+            {
                 return false;
-
-            //if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            //    return true;
-
-            if (RowDefinitions.Count == 0)
-                return false;
+            }
 
             int rowSpan = GetRowSpan(child);
             int childRow = GetRow(child);
@@ -2657,10 +2654,14 @@ namespace Windows.UI.Xaml.Controls
             for (int i = 0; i < rowSpan; i++)
             {
                 if (RowDefinitions[childRow + i].Height.IsStar)
+                {
                     return false;
+                }
 
                 if (RowDefinitions[childRow + i].Height.IsAuto)
+                {
                     onAutoRowDefinition = true;
+                }
             }
 
             return onAutoRowDefinition;
