@@ -242,6 +242,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (newContent != null)
             {
                 popup.AddLogicalChild(newContent);
+                if (popup.CustomLayout && newContent is FrameworkElement feContent)
+                {
+                    feContent.CustomLayout = true;
+                }
             }
 
             if (popup._isVisible)
@@ -601,8 +605,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 _popupRoot.UpdateIsVisible();
 
                 // Set CustomLayout of the popup root:
-                if (this.CustomLayout)
+                if (CustomLayout)
+                {
                     _popupRoot.CustomLayout = true;
+                    if (Child is FrameworkElement childFe)
+                    {
+                        childFe.CustomLayout = true;
+                    }
+                }
 
                 UpdatePopupParent();
 
