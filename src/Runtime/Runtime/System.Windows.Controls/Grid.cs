@@ -2607,7 +2607,17 @@ namespace Windows.UI.Xaml.Controls
 
         internal override bool CheckIsAutoWidth(FrameworkElement child)
         {
-            if (!double.IsNaN(child.Width) || ColumnDefinitions.Count == 0)
+            if (!double.IsNaN(child.Width))
+            {
+                return false;
+            }
+
+            if (child.HorizontalAlignment != HorizontalAlignment.Stretch)
+            {
+                return true;
+            }
+
+            if (ColumnDefinitions.Count == 0)
             {
                 return false;
             }
@@ -2638,7 +2648,17 @@ namespace Windows.UI.Xaml.Controls
 
         internal override bool CheckIsAutoHeight(FrameworkElement child)
         {
-            if (!double.IsNaN(child.Height) || RowDefinitions.Count == 0)
+            if (!double.IsNaN(child.Height))
+            {
+                return false;
+            }
+
+            if (child.VerticalAlignment != VerticalAlignment.Stretch)
+            {
+                return true;
+            }
+
+            if (RowDefinitions.Count == 0)
             {
                 return false;
             }
