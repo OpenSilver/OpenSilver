@@ -1824,6 +1824,10 @@ namespace Windows.UI.Xaml
                     {
                         _layoutRootResizeObserver.Observe(this.INTERNAL_AdditionalOutsideDivForMargins, (Action<Size>)this.LayoutRootHandleSizeChanged);
                     }
+                    else
+                    {
+                        LayoutRootHandleSizeChanged(new Size(this.Width, this.Height));
+                    }
                 }
             }
         }
