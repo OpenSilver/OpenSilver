@@ -33,8 +33,23 @@ namespace CSHTML5.Internal
 {
     public static class INTERNAL_DispatcherHelpers
     {
-        static List<Action> _pendingActionsExecute = new List<Action>();
-        static bool _isDispatcherPending = false;
+        /* john.torjo - I fixed the following:
+         *
+         SIMULATOR-caught exception: System.ArgumentException: Destination array was not long enough. Check destIndex and length, and the array's lower bounds.
+           at System.Array.Copy(Array sourceArray, Int32 sourceIndex, Array destinationArray, Int32 destinationIndex, Int32 length, Boolean reliable)
+           at System.Collections.Generic.List`1.CopyTo(T[] array, Int32 arrayIndex)
+           at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+           at CSHTML5.Internal.INTERNAL_DispatcherHelpers.ExecutePendingActions()
+           at CSHTML5.Internal.INTERNAL_DispatcherHelpers.<>c.<QueueAction>b__3_0()
+           at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+           at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+
+        the only way I could see this happening (before my fix), was if the list was being added to, while the 'copy' was being constructed
+         *
+         */
+        private static object _lock = new object();
+        private static List<Action> _pendingActionsExecute = new List<Action>();
+        private static bool _isDispatcherPending = false;
 #if MIGRATION
         static Dispatcher _dispatcher = null;
 #else
@@ -49,43 +64,40 @@ namespace CSHTML5.Internal
         /// <param name="action">The action to queue.</param>
         public static void QueueAction(Action action)
         {
-            _pendingActionsExecute.Add(action);
-
-            if (!_isDispatcherPending)
-            {
+            lock (_lock) {
+                _pendingActionsExecute.Add(action);
+                if (_isDispatcherPending)
+                    return;
                 _isDispatcherPending = true;
-
-                if (_dispatcher == null)
-                {
-#if MIGRATION
-                    _dispatcher = Dispatcher.INTERNAL_GetCurrentDispatcher();
-#else
-                    _dispatcher = CoreDispatcher.INTERNAL_GetCurrentDispatcher();
-#endif
-                }
-
-                _dispatcher.BeginInvoke((Action)(() =>
-                    {
-                        if (_isDispatcherPending) // We check again in case it has been cancelled - not sure if useful though
-                        {
-                            ExecutePendingActions();
-                        }
-                    }));
             }
+
+            if (_dispatcher == null)
+            {
+#if MIGRATION
+                var dispatcher = Dispatcher.INTERNAL_GetCurrentDispatcher();
+#else
+                var dispatcher = CoreDispatcher.INTERNAL_GetCurrentDispatcher();
+#endif
+                lock (_lock)
+                    _dispatcher = dispatcher;
+            }
+
+            _dispatcher.BeginInvoke(ExecutePendingActions);
         }
 
-        static void ExecutePendingActions()
-        {
-            _isDispatcherPending = false;
+        static void ExecutePendingActions() {
+            List<Action> copy;
+            lock (_lock) {
+                if (!_isDispatcherPending)
+                    return;
 
-            List<Action> copy = new List<Action>(_pendingActionsExecute);
-
-            _pendingActionsExecute.Clear();
+                _isDispatcherPending = false;
+                copy = new List<Action>(_pendingActionsExecute);
+                _pendingActionsExecute.Clear();
+            }
 
             foreach (Action action in copy)
-            {
                 action();
-            }
         }
     }
 }
