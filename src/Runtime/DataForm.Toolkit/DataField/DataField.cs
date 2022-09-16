@@ -1247,6 +1247,7 @@ namespace Windows.UI.Xaml.Controls
 #if MIGRATION
             this.InternalLabel.SetBinding(System.Windows.Controls.Label.PropertyPathProperty, new Binding("PropertyPath") { Source = this });
             this.InternalLabel.SetBinding(System.Windows.Controls.Label.VisibilityProperty, new Binding("LabelVisibility") { Source = this });
+            this.InternalLabel.SetBinding(System.Windows.Controls.Label.ForegroundProperty, new Binding("Foreground") { Source = this });
 #else
             this.InternalLabel.SetBinding(Windows.UI.Xaml.Controls.Label.PropertyPathProperty, new Binding("PropertyPath") { Source = this });
             this.InternalLabel.SetBinding(Windows.UI.Xaml.Controls.Label.VisibilityProperty, new Binding("LabelVisibility") { Source = this });
@@ -1328,6 +1329,9 @@ namespace Windows.UI.Xaml.Controls
 
                 Grid.SetRow(this.Content, 1);
                 Grid.SetColumn(this.Content, 2);
+
+                if (this.Content is Control)
+                    ((Control)this.Content).SetBinding(System.Windows.Controls.Label.ForegroundProperty, new Binding("Foreground") { Source = this });
             }
 
             this.DescriptionViewer = new DescriptionViewer();
