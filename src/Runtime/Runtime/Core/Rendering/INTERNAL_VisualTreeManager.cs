@@ -719,20 +719,6 @@ if(nextSibling != undefined) {
             }
 
             //--------------------------------------------------------
-            // HANDLE BINDING:
-            //--------------------------------------------------------
-
-#if PERFSTAT
-            var t9 = Performance.now();
-#endif
-
-            child.INTERNAL_UpdateBindingsSource();
-
-#if PERFSTAT
-            Performance.Counter("VisualTreeManager: Handle binding", t9);
-#endif
-
-            //--------------------------------------------------------
             // HANDLE TABINDEX:
             //--------------------------------------------------------
 

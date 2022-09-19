@@ -725,6 +725,10 @@ namespace Windows.UI.Xaml.Data
                         TargetProperty == ContentPresenter.ContentProperty)
                     {
                         contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
+                        if (contextElement == null && !lastAttempt)
+                        {
+                            targetFE.Loaded += new RoutedEventHandler(OnMentorLoaded);
+                        }
                     }
 
                     source = contextElement;
