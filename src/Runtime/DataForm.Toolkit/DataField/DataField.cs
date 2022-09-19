@@ -1244,14 +1244,9 @@ namespace Windows.UI.Xaml.Controls
 
             Grid labelGrid = new Grid();
             this.InternalLabel = new Label();
-#if MIGRATION
-            this.InternalLabel.SetBinding(System.Windows.Controls.Label.PropertyPathProperty, new Binding("PropertyPath") { Source = this });
-            this.InternalLabel.SetBinding(System.Windows.Controls.Label.VisibilityProperty, new Binding("LabelVisibility") { Source = this });
-            this.InternalLabel.SetBinding(System.Windows.Controls.Label.ForegroundProperty, new Binding("Foreground") { Source = this });
-#else
-            this.InternalLabel.SetBinding(Windows.UI.Xaml.Controls.Label.PropertyPathProperty, new Binding("PropertyPath") { Source = this });
-            this.InternalLabel.SetBinding(Windows.UI.Xaml.Controls.Label.VisibilityProperty, new Binding("LabelVisibility") { Source = this });
-#endif
+            this.InternalLabel.SetBinding(Controls.Label.PropertyPathProperty, new Binding("PropertyPath") { Source = this });
+            this.InternalLabel.SetBinding(Controls.Label.VisibilityProperty, new Binding("LabelVisibility") { Source = this });
+            this.InternalLabel.SetBinding(Controls.Label.ForegroundProperty, new Binding("Foreground") { Source = this });
             this.SetLabelContent();
 
             this.SetIsReadOnlyIfNotOverridden();
@@ -1329,10 +1324,6 @@ namespace Windows.UI.Xaml.Controls
 
                 Grid.SetRow(this.Content, 1);
                 Grid.SetColumn(this.Content, 2);
-#if MIGRATION
-                if (this.Content is Control)
-                    ((Control)this.Content).SetBinding(ForegroundProperty, new Binding("Foreground") { Source = this });
-#endif
             }
 
             this.DescriptionViewer = new DescriptionViewer();
@@ -1898,6 +1889,7 @@ namespace Windows.UI.Xaml.Controls
                 this.SetBinding(DataField.DataFormLabelPositionProperty, new Binding("LabelPosition") { Source = parentDataForm });
                 this.SetBinding(DataField.DataFormDescriptionViewerPositionProperty, new Binding("DescriptionViewerPosition") { Source = parentDataForm });
                 this.SetBinding(DataField.StyleProperty, new Binding("DataFieldStyle") { Source = parentDataForm });
+                this.SetBinding(DataField.ForegroundProperty, new Binding("Foreground") { Source = parentDataForm });
                 parentDataForm.Fields.Add(this);
             }
         }
