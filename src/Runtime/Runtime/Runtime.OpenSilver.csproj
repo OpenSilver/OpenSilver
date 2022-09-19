@@ -108,6 +108,7 @@
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
+		<Compile Include="PublicAPI\Interop\JavascriptCallback.cs" />
 		<Compile Include="PublicAPI\Interop\OnCallBackImpl.cs" />
 		<Compile Include="PublicAPI\Interop\OnCallbackSimulator.cs" />
 		<Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
