@@ -553,28 +553,60 @@ $0.addEventListener('error', function(e) {
             {
                 return _imageDiv;
             }
-        }
+        }        
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new ImageAutomationPeer(this);
 
         protected override Size MeasureOverride(Size availableSize)
+            => MeasureArrangeHelper(availableSize);
+
+        protected override Size ArrangeOverride(Size finalSize)
+            => MeasureArrangeHelper(finalSize);
+
+        /// <summary>
+        /// Contains the code common for MeasureOverride and ArrangeOverride.
+        /// </summary>
+        /// <param name="inputSize">
+        /// input size is the parent-provided space that Image should use to "fit in", 
+        /// according to other properties.
+        /// </param>
+        /// <returns>Image's desired size.</returns>
+        private Size MeasureArrangeHelper(Size inputSize)
         {
-            var size = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("(function(element){ return  element.naturalWidth + '|' + element.naturalHeight})($0);", _imageDiv));
-            Size measuredSize;
-            int sepIndex = size != null ? size.IndexOf('|') : -1;
+            if (Source == null)
+            {
+                return new Size();
+            }
+
+            Size naturalSize = GetNaturalSize();
+
+            //get computed scale factor
+            Size scaleFactor = Viewbox.ComputeScaleFactor(inputSize,
+                naturalSize,
+                Stretch,
+                StretchDirection.Both);
+
+            // Returns our minimum size & sets DesiredSize.
+            return new Size(naturalSize.Width * scaleFactor.Width, naturalSize.Height * scaleFactor.Height);
+        }
+
+        private Size GetNaturalSize()
+        {
+            var size = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
+                "(function(img) { return img.naturalWidth + '|' + img.naturalHeight; })($0);",
+                _imageDiv));
+
+            int sepIndex = size.IndexOf('|');
             if (sepIndex > -1)
             {
                 double actualWidth = double.Parse(size.Substring(0, sepIndex), CultureInfo.InvariantCulture);
                 double actualHeight = double.Parse(size.Substring(sepIndex + 1), CultureInfo.InvariantCulture);
-                measuredSize = new Size(actualWidth + 1, actualHeight);
-            }
-            else
-            {
-                measuredSize = new Size(0, 0);
+                
+                return new Size(actualWidth, actualHeight);
             }
 
-            return measuredSize;
+            return new Size(0, 0);
         }
-
-        protected override AutomationPeer OnCreateAutomationPeer()
-            => new ImageAutomationPeer(this);
     }
 }
