@@ -28,6 +28,10 @@
   <PropertyGroup Condition="$(Optimize) != true">
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Runtime\Runtime.OpenSilver.csproj" />

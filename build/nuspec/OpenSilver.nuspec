@@ -4,11 +4,11 @@
     <id>$PackageId$</id>
     <version>$PackageVersion$</version>
     <authors>Userware</authors>
-    <projectUrl>http://www.opensilver.net</projectUrl>
+    <projectUrl>https://www.opensilver.net</projectUrl>
     <repository type="git" url="$RepositoryUrl$" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</description>
-    <copyright>Copyright (c) 2021, Userware. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2022, Userware. All rights reserved.</copyright>
     <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
     <!-- <iconUrl> is deprecated and replaced by <icon> -->
     <!--<iconUrl>https://opensilver.net/permalinks/images/OpenSilver_logo_128x128.png</iconUrl>-->
@@ -17,10 +17,11 @@
     <!--<releaseNotes>Summary of changes made in this release of the package.</releaseNotes>-->
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Microsoft.JSInterop" version="3.1.3" />
+        <dependency id="Microsoft.JSInterop" version="3.1.28" />
         <dependency id="Microsoft.CSharp" version="4.7.0" />
-        <dependency id="System.ComponentModel.Composition" version="4.7.0" />
-        <dependency id="System.ServiceModel.Primitives" version="4.6.0" />
+        <dependency id="System.ComponentModel.Composition" version="6.0.0" />
+        <dependency id="System.ServiceModel.Primitives" version="4.10.0" />
+        <dependency id="System.ComponentModel.Annotations" version="5.0.0" />
       </group>
     </dependencies>
   </metadata>

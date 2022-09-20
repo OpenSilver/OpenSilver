@@ -649,6 +649,15 @@ namespace Windows.UI.Xaml.Data
 
         private void OnMentorLoaded(object sender, RoutedEventArgs e)
         {
+            // Note: When the loaded event of this Binding's mentor is raised, a handler could
+            // clear this binding. In that case we would still run this handler, even if we
+            // detach it in 'OnDetach', so we need make sure the binding is still attached to
+            // prevent any unexpected errors.
+            if (!IsAttached)
+            {
+                return;
+            }
+
             ((FrameworkElement)sender).Loaded -= new RoutedEventHandler(OnMentorLoaded);
             OnSourceAvailable(true);
         }

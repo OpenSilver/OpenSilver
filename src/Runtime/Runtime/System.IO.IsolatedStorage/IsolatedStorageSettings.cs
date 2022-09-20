@@ -35,6 +35,11 @@ using System.Windows;
 #else
 using Windows.UI.Xaml;
 #endif
+#if OPENSILVER
+using OpenSilver;
+#else
+using CSHTML5;
+#endif
 
 namespace System.IO.IsolatedStorage
 {
@@ -84,6 +89,7 @@ namespace System.IO.IsolatedStorage
         //[JSIL.Meta.JSReplacement("window.localStorage")]
         dynamic GetLocalStorage()
         {
+#if !OPENSILVER
             if (IsRunningInJavascript())
             {
 #if !BRIDGE
@@ -117,10 +123,14 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
                 }
             }
             else
-            {
-                return INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window.localStorage");
-            }
-        }
+            { 
+#endif
+            //Note: The whole part in the #if !OPENSILVER above only serves to throw an exception when in IE or Edge if we are on a local file system (ie url starts with c:\ or similar). It should be useless in OpenSilver and can most definitely be simplified in Bridge.
+            return Interop.ExecuteJavaScript("window.localStorage");
+#if !OPENSILVER
+        } 
+#endif
+    }
 
         string GetKeysFirstPart()
         {
@@ -160,7 +170,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             get
             {
-                if (IsRunningInJavascript())
+                if (!Interop.IsRunningInTheSimulator)
                 {
                     dynamic localStorage = GetLocalStorage();
                     int length = localStorage.length;
@@ -191,7 +201,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             get
             {
-                if (IsRunningInJavascript())
+                if (!Interop.IsRunningInTheSimulator)
                 {
                     dynamic localStorage = GetLocalStorage();
                     List<string> keysList = new List<string>();
@@ -234,7 +244,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             get
             {
-                if (IsRunningInJavascript())
+                if (!Interop.IsRunningInTheSimulator)
                 {
                     dynamic localStorage = GetLocalStorage();
                     List<object> valuesList = new List<object>();
@@ -274,10 +284,10 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         {
             get
             {
-                if (IsRunningInJavascript())
+                if (!Interop.IsRunningInTheSimulator)
                 {
                     dynamic localStorage = GetLocalStorage();
-                    return localStorage[GetKeysFirstPart() + key];
+                    return Convert.ChangeType((Interop.ExecuteJavaScript("$0[$1]", localStorage, GetKeysFirstPart() + key)), typeof(object));
                 }
                 else
                 {
@@ -286,10 +296,11 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
             }
             set
             {
-                if (IsRunningInJavascript())
+                if (!Interop.IsRunningInTheSimulator)
                 {
                     dynamic localStorage = GetLocalStorage();
-                    localStorage[GetKeysFirstPart() + key] = value;
+                    string applicationSpecificKey = GetKeysFirstPart() + key;
+                    Interop.ExecuteJavaScript("$0[$1] = $2", localStorage, applicationSpecificKey, value);
                 }
                 else
                 {
@@ -305,7 +316,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         /// <param name="value">The value to be stored.</param>
         public void Add(string key, object value)
         {
-            if (IsRunningInJavascript())
+            if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
                 localStorage[GetKeysFirstPart() + key] = value;
@@ -323,7 +334,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         /// </summary>
         public void Clear()
         {
-            if (IsRunningInJavascript())
+            if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
                 List<string> keys = (List<string>)Keys;
@@ -346,7 +357,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         /// <returns>true if the dictionary contains the specified key; otherwise, false.</returns>
         public bool Contains(string key)
         {
-            if (IsRunningInJavascript())
+            if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
                 return (localStorage.getItem(GetKeysFirstPart() + key) != null);
@@ -364,15 +375,16 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         /// <returns>true if the specified key was removed; otherwise, false.</returns>
         public bool Remove(string key)
         {
-            if (IsRunningInJavascript())
+            if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
-                if ((localStorage.getItem(GetKeysFirstPart() + key) == null))
-                {
-                    return false;
-                }
-                localStorage.removeItem(GetKeysFirstPart() + key);
-                return true;
+                bool result = Convert.ToBoolean(Interop.ExecuteJavaScript(@"(function() {
+var res = $0.getItem($1) != null;
+$0.removeItem($1);
+return res;
+})()", localStorage, GetKeysFirstPart() + key)
+                    );
+                return result;
             }
             else
             {
@@ -406,18 +418,19 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
         /// <returns>true if the specified key is found; otherwise, false.</returns>
         public bool TryGetValue<T>(string key, out T value)
         {
-            if (IsRunningInJavascript())
+            if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
-                var temp = (localStorage.getItem(GetKeysFirstPart() + key));
-                if (temp == null)
+                var temp = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key);
+                
+                if (Convert.ToBoolean(Interop.ExecuteJavaScript("$0 == null",temp)))
                 {
                     value = default(T);
                     return false;
                 }
                 else
                 {
-                    value = temp;
+                    value = Convert.ChangeType(temp, typeof(T));
                     return true;
                 }
             }
@@ -448,7 +461,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
 
         IEnumerable<KeyValuePair<string, object>> EnumerateKeyValues()
         {
-            if (IsRunningInJavascript())
+            if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
                 List<string> keys = (List<string>)Keys;
