@@ -15,14 +15,17 @@
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenSilver.Internal.Xaml.Context;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Core;
 #endif
 
@@ -84,6 +87,35 @@ namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
                 var depObj = new DependencyObject();
                 _ = new MyFrameworkElement(tracker) { MyProperty = depObj };
                 return depObj;
+            }
+        }
+
+
+        [TestMethod]
+        public void FrameworkElement_Should_Release_TemplatedParent()
+        {
+            var c = new GarbageCollectorTracker();
+            var child = CreateFrameworkElementWithTemplateParent(c);
+            CollectGarbage();
+
+            Assert.IsTrue(c.IsCollected);
+
+            FrameworkElement CreateFrameworkElementWithTemplateParent(GarbageCollectorTracker tracker)
+            {
+                var templatedParent = new ControlWithTrackingComponent(tracker)
+                {
+                    Template = new ControlTemplate
+                    {
+                        TargetType = typeof(ControlWithTrackingComponent),
+                        Template = new TemplateContent(
+                        new XamlContext(),
+                        (owner, context) => new Border { TemplatedParent = owner }),
+                    }
+                };
+                templatedParent.ApplyTemplate();
+                var border = (Border)VisualTreeHelper.GetChild(templatedParent, 0);
+                templatedParent.Template = null;
+                return border;
             }
         }
 

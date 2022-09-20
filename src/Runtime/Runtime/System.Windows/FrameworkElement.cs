@@ -311,7 +311,25 @@ namespace Windows.UI.Xaml
 
         #endregion Logical Parent
 
-        internal DependencyObject TemplatedParent { get; set; }
+        private WeakReference<DependencyObject> _templatedParentRef;
+
+        internal DependencyObject TemplatedParent
+        {
+            get
+            {
+                if (_templatedParentRef?.TryGetTarget(out DependencyObject templatedParent) ?? false)
+                {
+                    return templatedParent;
+                }
+
+                return null;
+            }
+            set
+            {
+                Debug.Assert(_templatedParentRef is null);
+                _templatedParentRef = new WeakReference<DependencyObject>(value);
+            }
+        }
 
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
