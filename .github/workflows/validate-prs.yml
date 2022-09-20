@@ -1,6 +1,6 @@
 name: OpenSilver Validate PRs
 env:
-  actual-version: '1.0.0'
+  actual-version: '1.1.0'
 on:
   # Any pull request to develop
   pull_request:
@@ -30,9 +30,9 @@ jobs:
       - name: Build Compiler UWP Configuration
         run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=UWP -clp:ErrorsOnly -restore
       - name: Copy Compiler SL Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.1.0.0/tools/;
+        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.1.1.0/tools/;
       - name: Copy Compiler UWP Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/UWP/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.UWPCompatible.1.0.0/tools/;
+        run: cp src/Compiler/Compiler/bin/OpenSilver/UWP/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.UWPCompatible.1.1.0/tools/;
       # There is the TestApplication for SL version in the Solution, so we need to build the latest SL package
       - name: Build OpenSilver
         working-directory: build

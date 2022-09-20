@@ -6,7 +6,7 @@ env:
   virtual-directory-release: '/testapplication/release/opensilver/'
   app-path-release: 'opensilverdemos/testapplication/release/opensilver/'
   deploy-service-url: 'opensilverdemos.scm.azurewebsites.net:443'
-  next-release-version: '1.1.0'
+  next-release-version: '1.2.0'
 
 on:
   workflow_dispatch:
@@ -47,7 +47,7 @@ jobs:
       - name: Build Compiler
         run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=SL -clp:ErrorsOnly -restore
       - name: Copy Compiler Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.1.0.0/tools/;
+        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.1.1.0/tools/;
       - name: Build OpenSilver
         working-directory: build
         run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
