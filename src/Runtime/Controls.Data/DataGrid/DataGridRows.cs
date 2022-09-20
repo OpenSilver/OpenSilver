@@ -549,6 +549,11 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_measured)
             {
+                if (IsProgressiveLoadingInProgress)
+                {
+                    _pendingRefreshRowsArgs = new bool[] { recycleRows, clearRows };
+                    return;
+                }
                 // _desiredCurrentColumnIndex is used in MakeFirstDisplayedCellCurrentCell to set the
                 // column position back to what it was before the refresh
                 this._desiredCurrentColumnIndex = this.CurrentColumnIndex;
@@ -864,6 +869,7 @@ namespace Windows.UI.Xaml.Controls
         /// Indicates if progressive loading is running
         /// </summary>
         public bool IsProgressiveLoadingInProgress { get; private set; } = false;
+        private bool[] _pendingRefreshRowsArgs = null;
 
         private async void AddSlots(int totalSlots)
         {
@@ -898,11 +904,26 @@ namespace Windows.UI.Xaml.Controls
             while (chunkSlots < totalSlots)
             {
                 await Task.Delay(1);
+
+                // this can happen if the DataGrid is detached during the delay.
                 if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    //this can happen if the DataGrid is detached during the delay.
+                    IsProgressiveLoadingInProgress = false;                    
                     return;
                 }
+
+                // this can happen while refreshing rows while progressive loading rows
+                if (_pendingRefreshRowsArgs != null && _pendingRefreshRowsArgs.Length == 2)
+                {                    
+                    IsProgressiveLoadingInProgress = false;
+                    ProgressiveLoadingInProgressChanged?.Invoke(false);
+                    bool recycleRows = _pendingRefreshRowsArgs[0];
+                    bool clearRows = _pendingRefreshRowsArgs[1];
+                    _pendingRefreshRowsArgs = null;
+                    RefreshRows(recycleRows, clearRows);
+                    return;
+                }
+
                 chunkSlots = Math.Min(SlotIsDisplayed(slot) ? chunkSlots + chunkSize : totalSlots, totalSlots);
                 AddSlotsInChunk(ref addedfRows, ref slot, ref nextGroupSlot, chunkSlots, groupSlots);
             }
