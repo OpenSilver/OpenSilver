@@ -4,11 +4,11 @@
     <id>OpenSilver.Simulator</id>
     <version>$PackageVersion$</version>
     <authors>Userware</authors>
-    <projectUrl>http://www.opensilver.net</projectUrl>
+    <projectUrl>https://www.opensilver.net</projectUrl>
     <repository type="git" url="$RepositoryUrl$" />
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>OpenSilver is an open-source reimplementation of Silverlight that runs on current browsers via WebAssembly.</description>
-    <copyright>Copyright (c) 2021, Userware. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2022, Userware. All rights reserved.</copyright>
     <tags>silverlight webassembly csharp xaml wasm dotnet .net C# javascript html html5 blazor mono uwp</tags>
     <icon>images\OpenSilver_icon.png</icon>
     <licenseUrl>https://raw.githubusercontent.com/OpenSilver/OpenSilver/master/LICENSE.txt</licenseUrl>
