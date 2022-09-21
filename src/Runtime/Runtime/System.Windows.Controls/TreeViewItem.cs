@@ -1216,7 +1216,10 @@ namespace Windows.UI.Xaml.Controls
                 // clicked)
                 if (!e.Handled && IsEnabled)
                 {
-                    Focus();
+                    if (Focus())
+                    {
+                        e.Handled = true;
+                    }
 
                     // Expand the item when double clicked
                     if (Interaction.ClickCount % 2 == 0)
@@ -1224,6 +1227,8 @@ namespace Windows.UI.Xaml.Controls
                         bool opened = !IsExpanded;
                         UserInitiatedExpansion |= opened;
                         IsExpanded = opened;
+
+                        e.Handled = true;
                     }
                 }
 
@@ -1267,13 +1272,10 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentNullException("e");
             }
 
-            if (Pointer.INTERNAL_captured?.GetType() != typeof(ToggleButton))
+            TreeView parent;
+            if (!e.Handled && (parent = ParentTreeView) != null && parent.HandleMouseButtonDown())
             {
-#if MIGRATION
-                ReleaseMouseCapture();
-#else
-                ReleasePointerCapture();
-#endif
+                e.Handled = true;
             }
 
 #if MIGRATION
@@ -1281,23 +1283,6 @@ namespace Windows.UI.Xaml.Controls
 #else
             base.OnPointerPressed(e);
 #endif
-        }
-
-
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (!CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                // Prevent the selection of text while dragging
-                OpenSilver.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }",
-                    INTERNAL_OuterDomElement);
-            }
         }
 
         /// <summary>

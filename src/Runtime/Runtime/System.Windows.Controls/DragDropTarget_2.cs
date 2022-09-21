@@ -110,9 +110,9 @@ namespace Windows.UI.Xaml.Controls
         protected DragDropTarget()
         {
 #if MIGRATION
-            this.MouseLeftButtonDown += DragDropTarget_MouseLeftButtonDown;
+            AddHandler(MouseLeftButtonDownEvent, (MouseButtonEventHandler)DragDropTarget_MouseLeftButtonDown, true);
 #else
-            this.PointerPressed += DragDropTarget_PointerPressed;
+            AddHandler(PointerPressedEvent, (PointerEventHandler)DragDropTarget_PointerPressed, true);
 #endif
         }
 

@@ -1113,6 +1113,11 @@ namespace Windows.UI.Xaml.Controls
         {
             if (Interaction.AllowMouseLeftButtonDown(e))
             {
+                if (!e.Handled && HandleMouseButtonDown())
+                {
+                    e.Handled = true;
+                }
+
                 Interaction.OnMouseLeftButtonDownBase();
 #if MIGRATION
                 base.OnMouseLeftButtonDown(e);
