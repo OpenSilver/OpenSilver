@@ -30,15 +30,11 @@ namespace CSHTML5.Internal
 #endif
     internal class OnCallBackImpl
     {
-        private readonly SynchronyzedStore<Delegate> _store = new SynchronyzedStore<Delegate>();
-
         private OnCallBackImpl()
         {
         }
 
         public static OnCallBackImpl Instance { get; } = new OnCallBackImpl();
-
-        public int RegisterCallBack(Delegate callback) => _store.Add(callback);
 
         public void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
         {
@@ -75,7 +71,12 @@ namespace CSHTML5.Internal
             //----------------------------------
             // Get the C# callback from its ID:
             //----------------------------------
-            Delegate callback = _store.Get(callbackId);
+            var callback = JavascriptCallback.Get(callbackId)?.GetCallback();
+
+            if (callback == null)
+            {
+                return null;
+            }
 
             Type callbackType = callback.GetType();
             Type[] callbackGenericArgs = null;

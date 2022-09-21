@@ -10,6 +10,7 @@
 		<Configurations>SL;UWP</Configurations>
 		<Platforms>AnyCPU</Platforms>
 		<AssemblyName>OpenSilver</AssemblyName>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
@@ -18,7 +19,7 @@
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
-		<OpenSilverVersion>1.0.0</OpenSilverVersion>
+		<OpenSilverVersion>1.1.0</OpenSilverVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SL|AnyCPU' ">
@@ -35,11 +36,15 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.JSInterop" Version="3.1.3" />
-		<PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-		<PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
-		<PackageReference Include="System.ServiceModel.Primitives" Version="4.6.0" />
+		<PackageReference Include="Microsoft.JSInterop" Version="3.1.28" />
+		<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
+		<PackageReference Include="System.ServiceModel.Primitives" Version="4.10.0" />
 	</ItemGroup>
+  
+	<ItemGroup>
+		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
+	</ItemGroup>
+  
 	<ItemGroup>
 		<Compile Include="APP_SUPPORT\JavaScriptExecutionHandler.cs" />
 		<Compile Include="Core\Events\DOMEventManager.cs" />
@@ -108,6 +113,7 @@
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
+		<Compile Include="PublicAPI\Interop\JavascriptCallback.cs" />
 		<Compile Include="PublicAPI\Interop\OnCallBackImpl.cs" />
 		<Compile Include="PublicAPI\Interop\OnCallbackSimulator.cs" />
 		<Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
@@ -1290,9 +1296,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\OpenSilver.Xaml\OpenSilver.Xaml.csproj" />
 	</ItemGroup>
 
 	<!-- See ths comment on the first <Import> -->

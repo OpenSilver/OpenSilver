@@ -898,7 +898,6 @@
     
     <!-- ScrollViewer -->
     <Style TargetType="ScrollViewer">
-        <Setter Property="Foreground" Value="#FF000000" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />

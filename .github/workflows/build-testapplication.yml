@@ -1,4 +1,4 @@
-name: TestApplication OpenSilver Build
+name: TestApplication Build
 
 env:
   virtual-directory: '/testapplication/develop/opensilver/'
@@ -10,14 +10,9 @@ env:
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - develop
 
 jobs:
   TestApplicationBuild:
-    #We should not run these steps on the forks by default.
-    if: github.repository_owner == 'OpenSilver'
     runs-on: windows-latest
     steps:
       - name: Set directory environment variables
@@ -69,7 +64,7 @@ jobs:
       - name: Replace UserName
         working-directory: src\Tests\TestApplication
         run: |
-          sed -i 's\USERNAME\${{ secrets.OPENSILVERDEMOSUSERNAME }}\g' TestApplication.OpenSilver.Browser\Properties\PublishProfiles\web_deploy.pubxml
+          sed -i 's\USERNAME\${{ secrets.OPENSILVERDEMOSUSERNAME }}\g' TestApplication.OpenSilver.Browser\Properties\PublishProfiles\publish.pubxml
       - name: Use OpenSilver version
         working-directory: src\Tests\TestApplication
         run: |
@@ -78,4 +73,4 @@ jobs:
       - name: Build and Deploy
         working-directory: src\Tests\TestApplication
         run: |
-          msbuild TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj /p:DeployOnBuild=true /p:PublishProfile="TestApplication.OpenSilver.Browser\Properties\PublishProfiles\web_deploy.pubxml" /p:Password=${{ secrets.OPENSILVERDEMOSUSERPWD }} /p:DeployIisAppPath=${{ env.apath }} /p:MSDeployServiceURL=${{ env.deploy-service-url }}
+          msbuild TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj /p:DeployOnBuild=true /p:PublishProfile="TestApplication.OpenSilver.Browser\Properties\PublishProfiles\publish.pubxml" /p:Password=${{ secrets.OPENSILVERDEMOSUSERPWD }} /p:DeployIisAppPath=${{ env.apath }} /p:MSDeployServiceURL=${{ env.deploy-service-url }}

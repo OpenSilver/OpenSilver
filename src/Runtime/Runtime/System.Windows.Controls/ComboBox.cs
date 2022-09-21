@@ -240,7 +240,11 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);
-            UpdatePresenter();
+
+            if (!IsDropDownOpen)
+            {
+                UpdatePresenter();
+            }
         }
 
         /// <summary>

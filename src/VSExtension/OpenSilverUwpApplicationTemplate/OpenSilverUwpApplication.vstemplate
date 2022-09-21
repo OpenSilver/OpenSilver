@@ -13,12 +13,12 @@
     </TemplateData>
     <TemplateContent>
         <ProjectCollection>
-            <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">
-                OpenSilverUwpApplication\OpenSilverUwpApplication.vstemplate
-            </ProjectTemplateLink>
             <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Browser">
                 OpenSilverUwpApplication.Browser\OpenSilverUwpApplication.Browser.vstemplate
             </ProjectTemplateLink>
+			<ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$">
+				OpenSilverUwpApplication\OpenSilverUwpApplication.vstemplate
+			</ProjectTemplateLink>
             <ProjectTemplateLink CopyParameters="true" ProjectName="$safeprojectname$.Simulator">
                 OpenSilverUwpApplication.Simulator\OpenSilverUwpApplication.Simulator.vstemplate
             </ProjectTemplateLink>
