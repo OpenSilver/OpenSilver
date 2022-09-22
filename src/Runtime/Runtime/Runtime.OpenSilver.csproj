@@ -448,9 +448,6 @@
 		<Compile Include="System.ComponentModel\ICollectionViewFactory.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\ExportProvider.cs" />
 		<Compile Include="System.Reflection\ICustomTypeProvider.cs" />
-		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\CommunicationObject.cs" />
-		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\MessageState.cs" />
-		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\RequestContext.cs" />
 		<Compile Include="System.Windows\ApplicationServiceContext.cs" />
 		<Compile Include="System.Windows\DataFormats.cs" />
 		<Compile Include="System.Windows\DependencyObjectCollection_1.cs" />
