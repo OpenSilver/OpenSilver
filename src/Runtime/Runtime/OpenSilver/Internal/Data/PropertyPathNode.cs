@@ -48,6 +48,8 @@ namespace OpenSilver.Internal.Data
 
         public abstract Type Type { get; }
 
+        public abstract string PropertyName { get; }
+
         public abstract bool IsBound { get; }
 
         void IPropertyPathNode.SetValue(object value) => SetValue(value);

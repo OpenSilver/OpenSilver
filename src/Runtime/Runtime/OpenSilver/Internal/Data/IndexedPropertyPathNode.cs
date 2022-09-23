@@ -34,6 +34,8 @@ namespace OpenSilver.Internal.Data
 
         public override Type Type => _indexer?.PropertyType;
 
+        public override string PropertyName => $"{_indexer.Name}[{_index}]";
+
         public override bool IsBound => _indexer != null;
 
         private object Index
