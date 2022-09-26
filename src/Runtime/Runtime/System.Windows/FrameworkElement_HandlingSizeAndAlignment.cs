@@ -588,6 +588,12 @@ namespace Windows.UI.Xaml
                             if (!isParentAWrapPanelOrAHorizontalStackPanel)
                             {
                                 styleOfWrapperElement.width = "auto";
+                                
+                                if (fe is Grid) 
+                                { 
+                                    styleOfWrapperElement.marginLeft = "auto";
+                                }
+
                                 styleOfOuterDomElement.marginLeft = "auto";
                                 styleOfOuterDomElement.marginRight = "0px";
                                 if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
