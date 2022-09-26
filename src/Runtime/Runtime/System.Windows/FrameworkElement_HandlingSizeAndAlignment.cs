@@ -142,10 +142,15 @@ namespace Windows.UI.Xaml
         private static void CustomLayout_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement fe = d as FrameworkElement;
-            if ((bool)e.NewValue == true && fe.IsCustomLayoutRoot)
+            /*if ((bool)e.NewValue == true && fe.IsCustomLayoutRoot)
                 fe.LayoutRootSizeChanged += Element_SizeChanged;
             else
-                fe.LayoutRootSizeChanged -= Element_SizeChanged;
+                fe.LayoutRootSizeChanged -= Element_SizeChanged;*/
+
+            if ((bool)e.NewValue == true && fe.IsCustomLayoutRoot)
+                fe.SizeChanged += Element_SizeChanged;
+            else
+                fe.SizeChanged -= Element_SizeChanged;
         }
 
         private static void Element_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -155,10 +160,11 @@ namespace Windows.UI.Xaml
             if (fe.IsCustomLayoutRoot == false)
                 return;
 
-            double width = Math.Max(0, e.NewSize.Width - fe.Margin.Left - fe.Margin.Right);
+            /*double width = Math.Max(0, e.NewSize.Width - fe.Margin.Left - fe.Margin.Right);
             double height = Math.Max(0, e.NewSize.Height - fe.Margin.Top - fe.Margin.Bottom);
 
-            fe.UpdateCustomLayout(new Size(width, height));
+            fe.UpdateCustomLayout(new Size(width, height));*/
+            fe.UpdateCustomLayout(e.NewSize);
         }
 
         #region Height property
