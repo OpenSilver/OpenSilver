@@ -29,6 +29,13 @@ link.setAttribute('type', 'text/css');
 link.setAttribute('href', 'libs/flatpickr.css');
 document.getElementsByTagName('head')[0].appendChild(link);
 
+//new Element("link",   { rel:"stylesheet", src: "quill.core.css", type: "text/css" });
+var link = document.createElement('link');
+link.setAttribute('rel', 'stylesheet');
+link.setAttribute('type', 'text/css');
+link.setAttribute('href', 'libs/quill.core.css');
+document.getElementsByTagName('head')[0].appendChild(link);
+
 //new Element("script", { src: "cshtml5.js", type: "application/javascript" });
 var cshtml5Script = document.createElement('script');
 cshtml5Script.setAttribute('type', 'application/javascript');

@@ -60,6 +60,7 @@
     <file src="../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/net461/js_css" />
     <file src="../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/net461/js_css" />    
 	<file src="../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/net461/js_css" />
+	<file src="../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/net461/js_css" />
 	
     <!-- OpenSilver icon -->
     <file src="nuspec/OpenSilver_icon.png" target="images\OpenSilver_icon.png" />

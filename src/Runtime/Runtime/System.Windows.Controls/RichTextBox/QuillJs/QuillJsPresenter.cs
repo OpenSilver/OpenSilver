@@ -1,21 +1,17 @@
-﻿#if MIGRATION
+﻿using CSHTML5.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Web;
+using System.Xml;
+#if MIGRATION
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Xml;
-
 namespace System.Windows.Controls
 #else
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Xml;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
-
 namespace Windows.UI.Xaml.Controls
 #endif
 {
@@ -36,15 +32,20 @@ namespace Windows.UI.Xaml.Controls
                 if (_instance == null)
                     return null;
 
-                string script = @"let range = $0.getSelection(true);
+                string script = @"$0.focus();let range = $0.getSelection(true);
                                  if(range){
                                     JSON.stringify({
                                         start: range.index,
                                         length: range.length
                                     });
-                                 }";
+                                 }
+                                else{
+                                        JSON.stringify({
+                                        start: 0,
+                                        length: 0
+                                    });}";
                 var range = OpenSilver.Interop.ExecuteJavaScript(script, _instance);
-                if(range != null)
+                if(range != null && !OpenSilver.Interop.IsNull(range) && !OpenSilver.Interop.IsUndefined(range))
                 {
                     var quillRange = JsonSerializer.Deserialize<QuillRange>(range.ToString());
                     var selection = new TextSelection(this, quillRange.Start, quillRange.Length);
@@ -92,7 +93,7 @@ namespace Windows.UI.Xaml.Controls
                 return;
 
             string script = $"$0.deleteText({start}, {length}, 'api');"
-                + $"$0.insertText({start}, '{text}');";
+                + $"$0.insertText({start}, {HttpUtility.JavaScriptStringEncode(text, true)});";
             OpenSilver.Interop.ExecuteJavaScript(script, _instance);
         }
 
@@ -101,16 +102,25 @@ namespace Windows.UI.Xaml.Controls
             if (_instance == null)
                 return;
 
-            string script = $"$0.setText('{text}', 'api')";
+            string script = $"$0.setText({HttpUtility.JavaScriptStringEncode(text, true)}, 'api')";
             OpenSilver.Interop.ExecuteJavaScript(script, _instance);
         }
 
+        public void SetText(string text, IDictionary<string, object> formats)
+        {
+            if (_instance == null)
+                return;
+
+            string script = $"$0.insertText($0.getLength() - 1,{HttpUtility.JavaScriptStringEncode(text, true)},{JsonSerializer.Serialize(formats)}, 'api')";
+            OpenSilver.Interop.ExecuteJavaScript(script, _instance);
+        }
+        
         public void InsertText(string text)
         {
             if (_instance == null)
                 return;
 
-            string script = $"$0.insertText($0.getLength(), '{text}', 'api')";
+            string script = $"$0.insertText($0.getLength(), {HttpUtility.JavaScriptStringEncode(text, true)}, 'api')";
             OpenSilver.Interop.ExecuteJavaScript(script, _instance);
         }
 
@@ -257,8 +267,12 @@ namespace Windows.UI.Xaml.Controls
 
         public string GetContents()
         {
-            var content = OpenSilver.Interop.ExecuteJavaScript("JSON.stringify($0.getContents())", _instance);
-            return GetXamlContents(content?.ToString());
+            if (_instance != null)
+            {
+                var content = OpenSilver.Interop.ExecuteJavaScript("JSON.stringify($0.getContents())", _instance);
+                return GetXamlContents(content?.ToString());
+            }
+            return null;
         }
 
         public string GetContents(int start, int length)
@@ -269,6 +283,8 @@ namespace Windows.UI.Xaml.Controls
 
         public void Clear()
         {
+            if (_instance == null)
+                return;
             string script = "$0.setText('','api');";
             OpenSilver.Interop.ExecuteJavaScript(script, _instance);
         }
@@ -321,7 +337,7 @@ namespace Windows.UI.Xaml.Controls
 
             OpenSilver.Interop.ExecuteJavaScript("$0.on('text-change', function(delta, oldDelta, source){ if(source === 'user' || source === 'api'){$1();}})", _instance, onTextChange);
 #endif
-        }       
+        }
 
         private void LoadExtensions()
         {
@@ -357,7 +373,7 @@ namespace Windows.UI.Xaml.Controls
                 new FontFamily("Webdings"),
                 new FontFamily("Wingdings"),
             };
-                
+
             return string.Join(",", supportedFonts.Select(f => $"'{f.ToString().ToLower().Replace(" ", "-")}'"));
         }
 
@@ -383,7 +399,7 @@ namespace Windows.UI.Xaml.Controls
             foreach (var delta in deltas.Operations)
             {
                 var run = xaml.CreateElement("Run", xaml.DocumentElement.NamespaceURI);
-                run.InnerText = delta.Text;
+                run.InnerText = delta.Text.TrimEnd('\n');
 
                 if (delta.Attributes != null)
                 {
@@ -393,14 +409,19 @@ namespace Windows.UI.Xaml.Controls
                         run.SetAttribute("FontStyle", "Italic");
                     if (delta.Attributes.Underline)
                         run.SetAttribute("TextDecorations", "Underline");
-                    if (!string.IsNullOrEmpty(delta.Attributes.FontName))
-                        run.SetAttribute("FontFamily", GetFontName(delta.Attributes.FontName));
+                    //if (!string.IsNullOrEmpty(delta.Attributes.FontName))
+                    //    run.SetAttribute("FontFamily", GetFontName(delta.Attributes.FontName));
+
+                    run.SetAttribute("FontFamily", !string.IsNullOrEmpty(delta.Attributes.FontName) ? GetFontName(delta.Attributes.FontName) : INTERNAL_FontsHelper.DefaultCssFontFamily);
                     if (!string.IsNullOrEmpty(delta.Attributes.FontSize))
                         run.SetAttribute("FontSize", delta.Attributes.FontSize.Replace("px", ""));
                     if (delta.Attributes.Color != null)
                     {
                         run.SetAttribute("Foreground", delta.Attributes.Color.ToString());
                     }
+                }
+                else {
+                    run.SetAttribute("FontFamily", INTERNAL_FontsHelper.DefaultCssFontFamily);
                 }
 
                 paragraph.AppendChild(run);
@@ -412,10 +433,12 @@ namespace Windows.UI.Xaml.Controls
         private void CreateInstance()
         {
             string script = "let options = {"
-                + $"readOnly: {(_parent.IsReadOnly ? "true" : "false")},"
+                + $"readOnly: {(_parent.IsReadOnly ? "true" : "false")},modules: {{clipboard: {{matchVisual:false}}}}"
                 + "};"
                 + "new Quill($0, options);";
             _instance = OpenSilver.Interop.ExecuteJavaScript(script, "#" + _parent.GetEditorId());
         }
+
+       
     }
 }
