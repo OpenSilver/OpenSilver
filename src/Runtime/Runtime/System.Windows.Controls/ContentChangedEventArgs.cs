@@ -1,4 +1,4 @@
-﻿
+
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,22 +11,17 @@
 *  
 \*====================================================================================*/
 
-using System.Text.Json.Serialization;
-
-namespace OpenSilver.Internal.Controls
+#if MIGRATION
+namespace System.Windows.Controls
+#else
+namespace Windows.UI.Xaml.Controls
+#endif
 {
-    internal sealed class QuillDelta
-    {
-        [JsonPropertyName("insert")]
-        public string Text { get; set; }
-
-        [JsonPropertyName("attributes")]
-        public QuillRangeFormat Attributes { get; set; }
-    }
-
-    internal sealed class QuillDeltas
-    {
-        [JsonPropertyName("ops")]
-        public QuillDelta[] Operations { get; set; }
+    /// <summary>
+	/// Provides data for the <see cref="RichTextBox.ContentChanged"/> event.
+	/// </summary>
+	public sealed class ContentChangedEventArgs : RoutedEventArgs
+	{
+		internal ContentChangedEventArgs() { }
     }
 }

@@ -1,96 +1,47 @@
-﻿#if MIGRATION
-using DotNetForHtml5.Core;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Windows.Documents;
-using System.Xml;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
 
-namespace System.Windows.Controls
-#else
-using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Xml;
-using Windows.UI.Xaml.Documents;
+using DotNetForHtml5.Core;
 
+#if MIGRATION
+using System.Windows.Documents;
+#else
+using Windows.UI.Xaml.Documents;
+#endif
+
+#if MIGRATION
+namespace System.Windows.Controls
+#else
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class RichTextFormatParser
+    internal class RichTextXamlParser
     {
-        //public IEnumerable<Block> Parse(string xaml)
-        //{
-        //    List<Block> result = new List<Block>();
-        //    Paragraph _currentParagraph = null;
+        public static IEnumerable<Block> Parse(string xaml)
+        {
+            List<Block> result = new List<Block>();
+            XmlDocument document = new XmlDocument();
+            document.LoadXml(xaml);
+            XmlNode root = document.SelectSingleNode("*");
+            result.AddRange(ParseInternal(root));
+            return result;
+        }
 
-        //    using (var textReader = new StringReader(xaml))
-        //    using (XmlReader reader = XmlReader.Create(textReader))
-        //    {
-        //        while (reader.Read())
-        //        {
-        //            if (reader.NodeType == XmlNodeType.Element)
-        //            {
-        //                if (reader.Name == nameof(Section))
-        //                {                            
-        //                    continue;//Section is not supported in SilverLight
-        //                }
-        //                else if (reader.Name == nameof(Paragraph))
-        //                {
-        //                    if (reader.IsStartElement())
-        //                    {
-        //                        var paragraph = new Paragraph();
-        //                        if (reader.HasAttributes)
-        //                        {
-        //                            while (reader.MoveToNextAttribute())
-        //                            {
-        //                                SetProperty(paragraph, reader.Name, reader.Value);
-        //                            }
-
-        //                            reader.MoveToElement();
-        //                        }
-
-        //                        result.Add(paragraph);
-        //                        _currentParagraph = paragraph;
-        //                    }
-        //                    else
-        //                    {
-        //                        _currentParagraph = null;
-        //                        continue;
-        //                    }
-        //                }
-        //                else if (reader.Name == nameof(Run))
-        //                {
-        //                    if (_currentParagraph == null)//Run must belong to a paragraph
-        //                        continue;
-
-        //                    if (reader.IsStartElement())
-        //                    {
-        //                        var run = new Run();
-        //                        if (reader.HasAttributes)
-        //                        {
-        //                            while (reader.MoveToNextAttribute())
-        //                            {
-        //                                //SetProperty(run, reader.Name, reader.Value);
-        //                            }
-
-        //                            reader.MoveToElement();
-        //                        }
-
-        //                        reader.Read();//Read content
-        //                        run.Text = reader.Value;
-        //                        _currentParagraph.Inlines.Add(run);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return result;
-        //}
-        private IEnumerable<Block> ParseInternal(XmlNode node)
+        private static IEnumerable<Block> ParseInternal(XmlNode node)
         {
             List<Block> result = new List<Block>();
             if (node is XmlElement)
@@ -111,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
                         foreach (var item in node.ChildNodes)
                         {
                             ((Paragraph)currentNode).Inlines.Add(ProcessNodeInline((XmlNode)item));
-                        }                            
+                        }
                     }
                 }
                 if (node.NextSibling != null)
@@ -120,8 +71,7 @@ namespace Windows.UI.Xaml.Controls
             return result;
         }
 
-
-        private Block ProcessNode(XmlNode node)
+        private static Block ProcessNode(XmlNode node)
         {
             if (node.NodeType == XmlNodeType.Element)
             {
@@ -147,7 +97,7 @@ namespace Windows.UI.Xaml.Controls
             return null;
         }
 
-        private Inline ProcessNodeInline(XmlNode node)
+        private static Inline ProcessNodeInline(XmlNode node)
         {
             if (node.NodeType == XmlNodeType.Element)
             {
@@ -188,21 +138,11 @@ namespace Windows.UI.Xaml.Controls
                     }
                     return element;
                 }
-            } 
+            }
             return null;
         }
 
-        public IEnumerable<Block> Parse(string xaml)
-        {
-            List<Block> result = new List<Block>();
-            XmlDocument document = new XmlDocument();
-            document.LoadXml(xaml);
-            XmlNode root = document.SelectSingleNode("*");
-            result.AddRange(ParseInternal(root));
-            return result;
-        }
-
-        private void SetProperty(object obj, string propertyName, object value)
+        private static void SetProperty(object obj, string propertyName, object value)
         {
             var propInfo = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             if (propInfo != null)
@@ -212,10 +152,7 @@ namespace Windows.UI.Xaml.Controls
                     var val = value == null ? null : TypeFromStringConverters.ConvertFromInvariantString(propInfo.PropertyType, value.ToString());
                     propInfo.SetValue(obj, val);
                 }
-                catch (Exception ex)
-                {
-                    return;
-                }
+                catch { }
             }
         }
     }

@@ -166,11 +166,11 @@
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\INTERNAL_TextContainerRichTextBox.cs" />
-		<Compile Include="System.Windows.Controls\RichTextBox\IRichTextBoxPresenter.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
-		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillJsPresenter.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillRange.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillRangeFormat.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxAutomationPeer.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextFormatParser.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
@@ -375,7 +375,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Calendar.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarDateRange.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\ContentChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Grid.cs" />

@@ -11,23 +11,22 @@
 *  
 \*====================================================================================*/
 
-using System.Windows.Markup;
-using CSHTML5.Internal;
-using System.Collections.Generic;
-using System.Globalization;
-using OpenSilver.Internal;
 using System;
+using System.Windows.Markup;
+using System.Collections.Generic;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
+using System.Windows.Automation.Peers;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-
 #else
 using Windows.Foundation;
+using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Documents;
 #endif
 
 #if MIGRATION
@@ -39,26 +38,25 @@ namespace Windows.UI.Xaml.Controls
     [ContentProperty("Blocks")]
     public partial class RichTextBox : Control
     {
-        private IRichTextBoxPresenter _presenter;
-        private object _contentEditableDiv;
+        private const string ContentElementName = "ContentElement";
 
-        #region Constructor
+        private readonly TextSelection _selection;
+        private FrameworkElement _contentElement;
+        private ScrollViewer _scrollViewer;
+        private ITextBoxViewHost<RichTextBoxView> _textViewHost;
+        private ScrollBarVisibility _verticalScrollBarVisibility = ScrollBarVisibility.Auto;
+        private ScrollBarVisibility _horizontalScrollBarVisibility = ScrollBarVisibility.Hidden;        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RichTextBox"/> class.
         /// </summary>
         public RichTextBox()
         {
-            this.DefaultStyleKey = typeof(RichTextBox);
-            this.Blocks = new BlockCollection(this, false);
-            _presenter = new QuillJsPresenter(this);
-            this.Loaded += OnLoaded;
-            this.IsEnabledChanged += OnIsEnabledChanged;
+            DefaultStyleKey = typeof(RichTextBox);
+            Blocks = new BlockCollection(this, false);
+            _selection = new TextSelection(this);
+            IsEnabledChanged += (o, e) => _textViewHost?.View.SetEnable((bool)e.NewValue);
         }
-
-        #endregion Constructor
-
-        #region Public Events
 
         /// <summary>
         /// Occurs when the content changes in a <see cref="RichTextBox"/>.
@@ -70,66 +68,60 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event RoutedEventHandler SelectionChanged;
 
-        #endregion Public Events
-
-        #region Private Events
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            this.ApplyTemplate();
-            _presenter.Init();
-            var elem = GetTemplateChild("ContentElement") as UIElement;
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(elem.INTERNAL_OuterDomElement);
-            style.pointerEvents = "auto";
-            SetContentsFromBlocks();
-        }
-        #endregion
-
-        #region Public Properties
-
-        private ScrollBarVisibility _verticalScrollBarVisibility = ScrollBarVisibility.Auto;
         /// <summary>
         /// Gets or sets the visibility of the vertical scroll bar.
-        /// The default is <see cref="ScrollBarVisibility.Auto"/>.
         /// </summary>
-        [OpenSilver.NotImplemented]
+        /// <returns>
+        /// The visibility of the vertical scroll bar. The default is <see cref="ScrollBarVisibility.Auto"/>.
+        /// </returns>
         public ScrollBarVisibility VerticalScrollBarVisibility
         {
-            get { return this._verticalScrollBarVisibility; }
-            set { this._verticalScrollBarVisibility = value; }
+            get => _verticalScrollBarVisibility;
+            set
+            {
+                _verticalScrollBarVisibility = value;
+                if (_scrollViewer != null)
+                {
+                    _scrollViewer.VerticalScrollBarVisibility = value;
+                }
+            }
         }
 
-        private ScrollBarVisibility _horizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
         /// <summary>
         /// Gets or sets the visibility of the horizontal scroll bar.
         /// </summary>
         /// <returns>
         /// The visibility of the horizontal scroll bar. The default is <see cref="ScrollBarVisibility.Hidden"/>.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public ScrollBarVisibility HorizontalScrollBarVisibility
         {
-            get { return this._horizontalScrollBarVisibility; }
-            set { this._horizontalScrollBarVisibility = value; }
+            get => _horizontalScrollBarVisibility;
+            set
+            {
+                _horizontalScrollBarVisibility = value;
+                if (_scrollViewer != null)
+                {
+                    _scrollViewer.HorizontalScrollBarVisibility = value;
+                }
+            }
         }
 
         /// <summary>
         /// Gets or sets a XAML representation of the content in the <see cref="RichTextBox"/>.
         /// </summary>
         /// <returns>
-        /// A <see cref="String"/> object that is a XAML representation of the content in the <see cref="RichTextBox"/>.
+        /// A <see cref="string"/> object that is a XAML representation of the content in the <see cref="RichTextBox"/>.
         /// </returns>
         public string Xaml
         {
-            get => _presenter.GetContents();
+            get => _textViewHost?.View.GetContents();
             set
             {
-                this.Blocks.Clear();
-                _presenter.Clear();
-                var parser = new RichTextFormatParser();
-                var blocks = parser.Parse(value);
-                foreach (var block in blocks)
+                Blocks.Clear();
+                _textViewHost?.View.Clear();
+                foreach (var block in RichTextXamlParser.Parse(value))
                 {
-                    this.Blocks.Add(block);
+                    Blocks.Add(block);
                 }
                 SetContentsFromBlocks();
             }
@@ -145,7 +137,7 @@ namespace Windows.UI.Xaml.Controls
         /// is empty.
         /// </returns>
         [OpenSilver.NotImplemented]
-        public double BaselineOffset { get; }
+        public double BaselineOffset { get; }        
 
         /// <summary>
         /// Gets the <see cref="TextSelection"/> in the <see cref="RichTextBox"/>.
@@ -154,7 +146,19 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="TextSelection"/> that represents the selected text in
         /// the <see cref="RichTextBox"/>.
         /// </returns>
-        public TextSelection Selection => _presenter.Selection;
+        public TextSelection Selection
+        {
+            get
+            {
+                QuillRange range = _textViewHost?.View.GetSelection();
+                if (range != null)
+                {
+                    _selection.UpdateSelection(range.Start, range.Length);
+                }
+
+                return _selection;
+            }
+        }
 
         /// <summary>
         /// Gets a <see cref="TextPointer"/> that indicates the end of content
@@ -185,21 +189,17 @@ namespace Windows.UI.Xaml.Controls
         /// A <see cref="BlockCollection"/> that contains the contents of the
         /// <see cref="RichTextBox"/>.
         /// </returns>
-        public BlockCollection Blocks { get; }
-
-        internal override bool EnablePointerEventsCore => true;
-
-        #region Dependency Properties
+        public BlockCollection Blocks { get; }        
 
         /// <summary>
-        /// Identifies the <see cref="RichTextBox.IsReadOnly"/> dependency property.
+        /// Identifies the <see cref="IsReadOnly"/> dependency property.
         /// </summary>
 		public static readonly DependencyProperty IsReadOnlyProperty =
             DependencyProperty.Register(
                 nameof(IsReadOnly),
                 typeof(bool),
                 typeof(RichTextBox),
-                new PropertyMetadata(false, IsReadOnlyChanged));
+                new PropertyMetadata(false, OnIsReadOnlyChanged));
 
         /// <summary>
         /// Gets or sets a value that determines whether the user can change the text in
@@ -208,20 +208,25 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public bool IsReadOnly
         {
-            get { return (bool)GetValue(IsReadOnlyProperty); }
-            set { SetValue(IsReadOnlyProperty, value); }
+            get => (bool)GetValue(IsReadOnlyProperty);
+            set => SetValue(IsReadOnlyProperty, value);
+        }
+
+        private static void OnIsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((RichTextBox)d).SetReadOnly((bool)e.NewValue);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RichTextBox.LineHeight"/> dependency property.
+        /// Identifies the <see cref="LineHeight"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LineHeightProperty =
             DependencyProperty.Register(
-                "LineHeight",
+                nameof(LineHeight),
                 typeof(double),
                 typeof(RichTextBox),
-                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+                new PropertyMetadata(0d));
 
         /// <summary>
         /// Gets or sets the height of each line of content.
@@ -234,17 +239,17 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public double LineHeight
         {
-            get { return (double)this.GetValue(LineHeightProperty); }
-            set { this.SetValue(LineHeightProperty, value); }
+            get => (double)GetValue(LineHeightProperty);
+            set => SetValue(LineHeightProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RichTextBox.AcceptsReturn"/> dependency property.
+        /// Identifies the <see cref="AcceptsReturn"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty AcceptsReturnProperty =
             DependencyProperty.Register(
-                "AcceptsReturn",
+                nameof(AcceptsReturn),
                 typeof(bool),
                 typeof(RichTextBox),
                 new PropertyMetadata(false));
@@ -261,17 +266,17 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public bool AcceptsReturn
         {
-            get { return (bool)this.GetValue(AcceptsReturnProperty); }
-            set { this.SetValue(AcceptsReturnProperty, value); }
+            get => (bool)GetValue(AcceptsReturnProperty);
+            set => SetValue(AcceptsReturnProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RichTextBox.CaretBrush"/> dependency property.
+        /// Identifies the <see cref="CaretBrush"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CaretBrushProperty =
             DependencyProperty.Register(
-                "CaretBrush",
+                nameof(CaretBrush),
                 typeof(Brush),
                 typeof(RichTextBox),
                 new PropertyMetadata((object)null));
@@ -287,18 +292,18 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public Brush CaretBrush
         {
-            get { return (Brush)this.GetValue(CaretBrushProperty); }
-            set { this.SetValue(CaretBrushProperty, value); }
+            get => (Brush)GetValue(CaretBrushProperty);
+            set => SetValue(CaretBrushProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RichTextBox.LineStackingStrategy"/> dependency
+        /// Identifies the <see cref="LineStackingStrategy"/> dependency
         /// property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LineStackingStrategyProperty =
             DependencyProperty.Register(
-                "LineStackingStrategy",
+                nameof(LineStackingStrategy),
                 typeof(LineStackingStrategy),
                 typeof(RichTextBox),
                 new PropertyMetadata(LineStackingStrategy.MaxHeight));
@@ -314,22 +319,17 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public LineStackingStrategy LineStackingStrategy
         {
-            get { return (LineStackingStrategy)this.GetValue(LineStackingStrategyProperty); }
-            set { this.SetValue(LineStackingStrategyProperty, value); }
+            get => (LineStackingStrategy)GetValue(LineStackingStrategyProperty);
+            set => SetValue(LineStackingStrategyProperty, value);
         }
 
-        internal void RaiseEventInternal(object args)
-        {            
-            UIElement.NativeEventCallback(this, this, args);
-        }        
-
         /// <summary>
-        /// Identifies the <see cref="RichTextBox.TextAlignment"/> dependency property.
+        /// Identifies the <see cref="TextAlignment"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TextAlignmentProperty =
             DependencyProperty.Register(
-                "TextAlignment",
+                nameof(TextAlignment),
                 typeof(TextAlignment),
                 typeof(RichTextBox),
                 new PropertyMetadata(TextAlignment.Left));
@@ -343,17 +343,17 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public TextAlignment TextAlignment
         {
-            get { return (TextAlignment)this.GetValue(TextAlignmentProperty); }
-            set { this.SetValue(TextAlignmentProperty, value); }
+            get => (TextAlignment)GetValue(TextAlignmentProperty);
+            set => SetValue(TextAlignmentProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="RichTextBox.TextWrapping"/> dependency property.
+        /// Identifies the <see cref="TextWrapping"/> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register(
-                "TextWrapping",
+                nameof(TextWrapping),
                 typeof(TextWrapping),
                 typeof(RichTextBox),
                 new PropertyMetadata(TextWrapping.Wrap));
@@ -368,25 +368,9 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         public TextWrapping TextWrapping
         {
-            get { return (TextWrapping)this.GetValue(TextWrappingProperty); }
-            set { this.SetValue(TextWrappingProperty, value); }
+            get => (TextWrapping)GetValue(TextWrappingProperty);
+            set => SetValue(TextWrappingProperty, value);
         }
-
-        private static void IsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((RichTextBox)d).SetReadOnly((bool)e.NewValue);
-        }
-
-        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            _presenter.SetEnable((bool)e.NewValue);
-        }
-
-        #endregion Dependency Properties
-
-        #endregion Public Properties
-
-        #region Public Methods
 
         /// <summary>
         /// Returns a <see cref="TextPointer"/> that indicates the closest insertion
@@ -401,61 +385,88 @@ namespace Windows.UI.Xaml.Controls
         /// for the specified point.
         /// </returns>
         [OpenSilver.NotImplemented]
-        public TextPointer GetPositionFromPoint(Point point)
-        {
-            return null;
-        }
+        public TextPointer GetPositionFromPoint(Point point) => null;
 
         /// <summary>
         /// Selects the entire contents in the <see cref="RichTextBox"/>.
         /// </summary>
-        public void SelectAll()
-        {
-            _presenter.SelectAll();
-        }
+        public void SelectAll() => _textViewHost?.View.SelectAll();
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            object outerDiv;
-            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
-            //outerDivStyle.borderStyle = "solid";
-            //outerDivStyle.borderWidth = "1px";
-            //outerDivStyle.borderRadius = "2px";
-            //outerDivStyle.borderImageSlice = "1";
-            //outerDivStyle.borderImageSource = "linear-gradient(540deg, #A3AEB9 0%, #8399A9 37.5%, #718597 37.5%, #617584 100%)";
-
-            object contentEditable;
-            var editableContentStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out contentEditable);
-            editableContentStyle.backgroundColor = "transparent";
-            editableContentStyle.outline = "0px solid transparent";
-            editableContentStyle.overflow = "auto";
-            editableContentStyle.height = "100%";
-
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditable, "contentEditable", true);
-            domElementWhereToPlaceChildren = contentEditable;
-            _contentEditableDiv = contentEditable;
-            return outerDiv;
-        }
-
-        #endregion Public Methods
-
-        #region Protected Methods
-
-#if false
-		/// <summary>
-		/// Returns a <see cref="RichTextBoxAutomationPeer"/> for use by
-		/// the Silverlight automation infrastructure.
-		/// </summary>
-		/// <returns>
-		/// A <see cref="RichTextBoxAutomationPeer"/> for the <see cref="RichTextBox"/>
-		/// object.
-		/// </returns>
-        [OpenSilver.NotImplemented]
-		protected override AutomationPeer OnCreateAutomationPeer()
-        {
-			return null;
-        }
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
 #endif
+        {
+            base.OnApplyTemplate();
+
+            if (_contentElement != null)
+            {
+                ClearContentElement();
+                _contentElement = null;
+                _scrollViewer = null;
+            }
+
+            if (GetTemplateChild(ContentElementName) is FrameworkElement contentElement)
+            {
+                _contentElement = contentElement;
+                _scrollViewer = contentElement as ScrollViewer;
+                InitializeContentElement();
+            }
+        }
+
+        internal RichTextBoxView View => _textViewHost?.View;
+
+        private RichTextBoxView CreateView()
+        {
+            return new RichTextBoxView(this);
+        }
+
+        private void InitializeContentElement()
+        {
+            _textViewHost = TextBox.GetContentHost<RichTextBoxView>(_contentElement);
+
+            if (_textViewHost != null)
+            {
+                RichTextBoxView view = CreateView();
+                view.Loaded += new RoutedEventHandler(OnViewLoaded);
+
+                _textViewHost.AttachView(view);
+            }
+        }
+
+        private void ClearContentElement()
+        {
+            if (_textViewHost != null)
+            {
+                _textViewHost.View.Loaded -= new RoutedEventHandler(OnViewLoaded);
+
+                _textViewHost.DetachView();
+                _textViewHost = null;
+            }
+        }
+
+        private void OnViewLoaded(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
+            SetContentsFromBlocks();
+            UpdateTabIndex(IsTabStop, TabIndex);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="RichTextBoxAutomationPeer"/> for use by
+        /// the Silverlight automation infrastructure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="RichTextBoxAutomationPeer"/> for the <see cref="RichTextBox"/>
+        /// object.
+        /// </returns>
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => new RichTextBoxAutomationPeer(this);
 
         /// <summary>
         /// Called before the <see cref="UIElement.GotFocus"/> event occurs.
@@ -482,6 +493,7 @@ namespace Windows.UI.Xaml.Controls
 		protected override void OnKeyDown(KeyRoutedEventArgs e)
 #endif
         {
+            base.OnKeyDown(e);
         }
 
         /// <summary>
@@ -497,6 +509,7 @@ namespace Windows.UI.Xaml.Controls
 		protected override void OnKeyUp(KeyRoutedEventArgs e)
 #endif
         {
+            base.OnKeyUp(e);
         }
 
         /// <summary>
@@ -524,6 +537,11 @@ namespace Windows.UI.Xaml.Controls
 		protected override void OnPointerCaptureLost(PointerRoutedEventArgs e)
 #endif
         {
+#if MIGRATION
+            base.OnLostMouseCapture(e);
+#else
+            base.OnPointerCaptureLost(e);
+#endif
         }
 
         /// <summary>
@@ -539,6 +557,11 @@ namespace Windows.UI.Xaml.Controls
 		protected override void OnPointerEntered(PointerRoutedEventArgs e)
 #endif
         {
+#if MIGRATION
+            base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
         }
 
         /// <summary>
@@ -554,6 +577,11 @@ namespace Windows.UI.Xaml.Controls
 		protected internal override void OnPointerExited(PointerRoutedEventArgs e)
 #endif
         {
+#if MIGRATION
+            base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
         }
 
         /// <summary>
@@ -569,6 +597,11 @@ namespace Windows.UI.Xaml.Controls
 		protected override void OnPointerPressed(PointerRoutedEventArgs e)
 #endif
         {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
         }
 
         /// <summary>
@@ -584,6 +617,11 @@ namespace Windows.UI.Xaml.Controls
 		protected override void OnPointerReleased(PointerRoutedEventArgs e)
 #endif
         {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
         }
 
         /// <summary>
@@ -599,6 +637,11 @@ namespace Windows.UI.Xaml.Controls
 		protected override void OnPointerMoved(PointerRoutedEventArgs e)
 #endif
         {
+#if MIGRATION
+            base.OnMouseMove(e);
+#else
+            base.OnPointerMoved(e);
+#endif
         }
 
         /// <summary>
@@ -610,6 +653,7 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
+            base.OnTextInput(e);
         }
 
         /// <summary>
@@ -621,6 +665,7 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         protected override void OnTextInputStart(TextCompositionEventArgs e)
         {
+            base.OnTextInputStart(e);
         }
 
         /// <summary>
@@ -632,44 +677,32 @@ namespace Windows.UI.Xaml.Controls
         [OpenSilver.NotImplemented]
         protected override void OnTextInputUpdate(TextCompositionEventArgs e)
         {
+            base.OnTextInputUpdate(e);
         }
 
-        #endregion Protected Methods
-
-        #region Internal/Private Methods
         internal void RaiseContentChanged()
-        {
-            ContentChanged?.Invoke(this, new ContentChangedEventArgs());
-        }
+            => ContentChanged?.Invoke(this, new ContentChangedEventArgs());
 
         internal void RaiseSelectionChanged()
-        {
-            SelectionChanged?.Invoke(this, new RoutedEventArgs());
-        }
-
-        internal string GetEditorId()
-        {
-            return ((INTERNAL_HtmlDomElementReference)OpenSilver.Interop.GetDiv(GetTemplateChild("ContentElement") as UIElement)).UniqueIdentifier;
-        }
+            => SelectionChanged?.Invoke(this, new RoutedEventArgs());
 
         internal string GetRawText()
-        {
-            return _presenter.GetText();
-        }
+            => _textViewHost?.View.GetText() ?? string.Empty;
 
         internal void InsertText(string text)
-        {
-            _presenter.InsertText(text);
-        }
+            => _textViewHost?.View.InsertText(text);
 
         private void SetReadOnly(bool value)
-        {
-            _presenter.SetReadOnly(value);
-        }
+            => _textViewHost?.View.SetReadOnly(value);
 
-        private void SetContentsFromBlocks()
+        internal void SetContentsFromBlocks()
         {
-            foreach (var block in this.Blocks)
+            if (_textViewHost == null)
+            {
+                return;
+            }
+
+            foreach (var block in Blocks)
             {
                 ProcessBlock(block);
             }
@@ -677,77 +710,56 @@ namespace Windows.UI.Xaml.Controls
 
         private void ProcessInlines(Inline inline)
         {
-            if (inline is Run)
+            switch (inline)
             {
-                var format = new Dictionary<string, object>();
-                if (((Run)inline).FontSize > 0)
-                    format.Add("font-size", ((Run)inline).FontSize);
-                if (((Run)inline).FontFamily != null)
-                    format.Add("font-family", ((Run)inline).FontFamily.ToString());
-                if (((Run)inline).FontWeight != null)
-                    format.Add("bold", ((Run)inline).FontWeight.Weight > 500);
-                if (((Run)inline).Margin != null)
-                    format.Add("margin", ((Run)inline).Margin.ToString());
-                if (((Run)inline).Background != null)
-                {
-                    if (((Run)inline).Background is SolidColorBrush)
-                        format.Add("background", ((SolidColorBrush)((Run)inline).Background).ConvertToCSSValue());
-                }
-                if (((Run)inline).Foreground != null)
-                {
-                    if (((Run)inline).Foreground is SolidColorBrush)
-                        format.Add("color", ((SolidColorBrush)((Run)inline).Foreground).ConvertToCSSValue());
-                }
-                _presenter.SetText(((Run)inline).Text, format);
-            }
-            else if (inline is Span)
-            {
-                foreach (var innerSpanBlock in ((Span)inline).Inlines)
-                {
-                    ProcessInlines(innerSpanBlock);
-                }
-            }
-            else if (inline is LineBreak)
-            {
-                _presenter.SetText("\n");
+                case Run run:
+                    var format = new Dictionary<string, object>();
+                    if (run.FontSize > 0)
+                        format.Add("font-size", run.FontSize);
+                    if (run.FontFamily != null)
+                        format.Add("font-family", run.FontFamily.ToString());
+                    if (run.FontWeight != null)
+                        format.Add("bold", run.FontWeight.Weight > 500);
+                    if (run.Margin != null)
+                        format.Add("margin", run.Margin.ToString());
+                    if (run.Background is SolidColorBrush background)
+                        format.Add("background", background.ConvertToCSSValue());
+                    if (run.Foreground is SolidColorBrush foreground)
+                        format.Add("color", foreground.ConvertToCSSValue());
+                    _textViewHost.View.SetText(run.Text, format);
+                    break;
+
+                case Span span:
+                    foreach (var innerSpanBlock in span.Inlines)
+                    {
+                        ProcessInlines(innerSpanBlock);
+                    }
+                    break;
+
+                case LineBreak _:
+                    _textViewHost.View.SetText("\n");
+                    break;
             }
         }
+
         private void ProcessBlock(Block block)
         {
-            if (block is Section)
+            switch (block)
             {
-                foreach (var currentBlock in ((Section)block).Blocks)
-                {
-                    ProcessBlock(currentBlock);
-                }
-            }
-            else if (block is Paragraph)
-            {
-                foreach (var currentBlock in ((Paragraph)block).Inlines)
-                {
-                    ProcessInlines(currentBlock);
-                }
-            }
-        }
-        #endregion
+                case Section section:
+                    foreach (var currentBlock in section.Blocks)
+                    {
+                        ProcessBlock(currentBlock);
+                    }
+                    break;
 
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            var size = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("(function(element){ var size = element.getBoundingClientRect(); return  size.width + '|' + size.height;})($0);", this.INTERNAL_OuterDomElement));
-            Size measuredSize;
-            int sepIndex = size != null ? size.IndexOf('|') : -1;
-            if (sepIndex > -1)
-            {
-                double actualWidth = double.Parse(size.Substring(0, sepIndex), CultureInfo.InvariantCulture);
-                double actualHeight = double.Parse(size.Substring(sepIndex + 1), CultureInfo.InvariantCulture);
-                measuredSize = new Size(actualWidth + 1, actualHeight);
+                case Paragraph paragraph:
+                    foreach (var currentBlock in paragraph.Inlines)
+                    {
+                        ProcessInlines(currentBlock);
+                    }
+                    break;
             }
-            else
-            {
-                measuredSize = new Size(0, 0);
-            }
-
-            return measuredSize;
         }
     }
 }
