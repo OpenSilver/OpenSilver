@@ -165,6 +165,13 @@
 		<Compile Include="System.Windows.Controls\DragDecorator.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\INTERNAL_TextContainerRichTextBox.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxView.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillRange.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillRangeFormat.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBoxAutomationPeer.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\RichTextFormatParser.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewItemCheckBox.cs" />
@@ -368,7 +375,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Calendar.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarBlackoutDatesCollection.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\CalendarDateRange.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\ContentChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Grid.cs" />
@@ -399,10 +406,10 @@
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Hyperlink.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\LogicalDirection.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Paragraph.cs" />
+		<Compile Include="System.Windows.Documents\Paragraph.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Section.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\TextPointer.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\TextSelection.cs" />
+		<Compile Include="System.Windows.Documents\TextSelection.cs" />
 		<Compile Include="System.Windows.Media.Animation\BeginStoryboard.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\BounceEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\CircleEase.cs" />
@@ -512,7 +519,7 @@
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableMemberAttribute.cs" />
 		<Compile Include="System.Windows.Browser\WORKINPROGRESS\ScriptableTypeAttribute.cs" />
 		<Compile Include="System.Windows.Controls\OpenFileDialog.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBox.cs" />
+		<Compile Include="System.Windows.Controls\RichTextBox\RichTextBox.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SaveFileDialog.cs" />
 		<Compile Include="System.Windows.Controls\ScrollContentPresenter.cs" />
 		<Compile Include="System.Windows.Controls\VirtualizingPanel.cs" />
@@ -1268,6 +1275,9 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultTimePickerStyles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultRichTextBoxStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 	</ItemGroup>
   <ItemGroup>
 	  <None Include="System.Windows.Controls\ListTimePickerPopup.xaml">
@@ -1292,7 +1302,7 @@
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
 	</ItemGroup>
-
+  
 	<!-- See ths comment on the first <Import> -->
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 

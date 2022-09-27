@@ -63,7 +63,8 @@
     <file src="../../src/Runtime/Scripts/velocity.js" target="js_css/velocity.js" />
     <file src="../../src/Runtime/Scripts/ResizeSensor.js" target="js_css/ResizeSensor.js" />
     <file src="../../src/Runtime/Scripts/ResizeObserver.js" target="js_css/ResizeObserver.js" />
-
+	<file src="../../src/Runtime/Scripts/quill.min.js" target="js_css/quill.min.js" />
+	
     <!-- CSHTML5 install script -->
     <file src="install.ps1" target="tools/install.ps1" />
     
