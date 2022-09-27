@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,10 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+
 #if MIGRATION
 using System.Windows;
 #else
@@ -28,43 +25,69 @@ namespace CSHTML5.Internal
 {
     internal static class INTERNAL_TypeToStringsToDependencyProperties
     {
-        public static Dictionary<Type, Dictionary<string, DependencyProperty>> TypeToStringsToDependencyProperties = new Dictionary<Type, Dictionary<string, DependencyProperty>>();
+        private static readonly Dictionary<Type, Dictionary<string, DependencyProperty>> TypeToStringsToDependencyProperties = 
+            new Dictionary<Type, Dictionary<string, DependencyProperty>>();
 
-        internal static DependencyProperty GetPropertyInTypeOrItsBaseTypes(Type type, string propertyName)
+        internal static DependencyProperty GetPropertyInTypeOrItsBaseTypes(Type ownerType, string propertyName)
         {
-            Type currentType = type;
-            while(currentType != null &&
-                (!INTERNAL_TypeToStringsToDependencyProperties.TypeToStringsToDependencyProperties.ContainsKey(currentType)
-                || (INTERNAL_TypeToStringsToDependencyProperties.TypeToStringsToDependencyProperties[currentType] == null
-                    || !INTERNAL_TypeToStringsToDependencyProperties.TypeToStringsToDependencyProperties[currentType].ContainsKey(propertyName))))
+            if (propertyName is null)
             {
-                currentType = currentType.BaseType;
+                throw new ArgumentNullException(nameof(propertyName));
             }
-            if (currentType != null)
-            {
-                return INTERNAL_TypeToStringsToDependencyProperties.TypeToStringsToDependencyProperties[currentType][propertyName];
-            }
-            return null;
-        }
 
-        public static Dictionary<string, DependencyProperty> GetDictionaryForType(Type ownerType)
-        {
-            Dictionary<string, DependencyProperty> stringsToDependencyProperties;
-            if (TypeToStringsToDependencyProperties.ContainsKey(ownerType))
+            if (ownerType is null)
             {
-                stringsToDependencyProperties = TypeToStringsToDependencyProperties[ownerType];
-                if (stringsToDependencyProperties == null)
+                throw new ArgumentNullException(nameof(ownerType));
+            }
+
+            DependencyProperty dp = null;
+
+            do
+            {
+                RuntimeHelpers.RunClassConstructor(ownerType.TypeHandle);
+
+                if (!TypeToStringsToDependencyProperties.TryGetValue(ownerType, out var properties)
+                    || !properties.TryGetValue(propertyName, out dp))
                 {
-                    stringsToDependencyProperties = new Dictionary<string, DependencyProperty>();
-                    TypeToStringsToDependencyProperties[ownerType] = stringsToDependencyProperties;
+                    ownerType = ownerType.BaseType;
                 }
             }
-            else
+            while (dp == null && ownerType != null) ;
+
+            return dp;
+        }
+
+        internal static void Register(DependencyProperty dp)
+        {
+            if (dp is null)
             {
-                stringsToDependencyProperties = new Dictionary<string, DependencyProperty>();
-                TypeToStringsToDependencyProperties.Add(ownerType, stringsToDependencyProperties);
+                throw new ArgumentNullException(nameof(dp));
             }
-            return stringsToDependencyProperties;
+
+            Dictionary<string, DependencyProperty> properties = GetDictionaryForType(dp.OwnerType);
+
+#if !MIGRATION
+            if (properties.ContainsKey(dp.Name))
+            {
+                // THE FOLLOWING CHECK IS DISABLED IN THE SILVERLIGHT COMPATIBLE VERSION
+                // BECAUSE IT APPEARS THAT SILVERLIGHT IS TOLERANT TO DECLARING TWICE
+                // THE SAME DEPENDENCY PROPERTY OR ATTACHED PROPERTY.
+                throw new ArgumentException($"'{dp.Name}' property was already registered by '{dp.OwnerType.Name}'.");
+            }
+#endif
+
+            properties[dp.Name] = dp;
+        }
+
+        private static Dictionary<string, DependencyProperty> GetDictionaryForType(Type ownerType)
+        {
+            if (!TypeToStringsToDependencyProperties.TryGetValue(ownerType, out var properties))
+            {
+                properties = new Dictionary<string, DependencyProperty>();
+                TypeToStringsToDependencyProperties.Add(ownerType, properties);
+            }
+
+            return properties;
         }
     }
 }

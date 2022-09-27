@@ -220,8 +220,7 @@ namespace Windows.UI.Xaml
                 _defaultMetadata = defaultMetadata
             };
 
-            // Add the dependency property to the list of all the dependency properties of the object:
-            INTERNAL_TypeToDependencyProperties.Add(ownerType, newDependencyProperty);
+            INTERNAL_TypeToStringsToDependencyProperties.Register(newDependencyProperty);
 
             // Add the dependency property to the list that is used to know whether to always call "PropertyChanged" when the UI element is loaded into the Visual Tree:
             if (typeMetadata != null && typeMetadata.CallPropertyChangedWhenLoadedIntoVisualTree == WhenToCallPropertyChangedEnum.Always)
@@ -229,26 +228,6 @@ namespace Windows.UI.Xaml
                 INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.Add(ownerType, newDependencyProperty);
             }
 
-            //Add the dependencyProperty's name to the dictionary that allows to get the dependencyProperty from its name:
-            Dictionary<string, DependencyProperty> stringsToDependencyProperties = INTERNAL_TypeToStringsToDependencyProperties.GetDictionaryForType(ownerType);
-            if (stringsToDependencyProperties.ContainsKey(name))
-            {
-#if !MIGRATION
-                // THE FOLLOWING CHECK IS DISABLED IN THE SILVERLIGHT COMPATIBLE VERSION
-                // BECAUSE IT APPEARS THAT SILVERLIGHT IS TOLERANT TO DECLARING TWICE
-                // THE SAME DEPENDENCY PROPERTY OR ATTACHED PROPERTY. FOR AN EXAMPLE OF
-                // USE, SEE THE CLASS "RatingsView" IN THE CLIENT APPLICATION "STAR".
-                if (stringsToDependencyProperties[name] != null)
-                {
-                    throw new Exception("Cannot register multiple properties with the same PropertyName");
-                }
-#endif
-                stringsToDependencyProperties[name] = newDependencyProperty;
-            }
-            else
-            {
-                stringsToDependencyProperties.Add(name, newDependencyProperty);
-            }
 #if PERFSTAT
             Performance.Counter("DependencyProperty.Register", t);
 #endif

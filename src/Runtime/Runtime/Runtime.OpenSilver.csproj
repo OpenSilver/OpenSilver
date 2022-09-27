@@ -568,7 +568,6 @@
 		<Compile Include="Core\Main\INTERNAL_PropertyStore.cs" />
 		<Compile Include="Core\Main\INTERNAL_Simulator.cs" />
 		<Compile Include="Core\Main\INTERNAL_SimulatorExecuteJavaScript.cs" />
-		<Compile Include="Core\Main\INTERNAL_TypeToDependencyProperties.cs" />
 		<Compile Include="Core\Main\INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.cs" />
 		<Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
