@@ -1275,6 +1275,7 @@ namespace Windows.UI.Xaml
                 {
                     //todo: remove "string.Format" on the next line when JSIL will be able to compile without it (there is currently an issue with JSIL).
                     string javaScriptCodeToExecute = @"
+document.onselectstart = null;
 document.onmousedown = null;
 document.onmouseup = null;
 document.onmouseover = null;

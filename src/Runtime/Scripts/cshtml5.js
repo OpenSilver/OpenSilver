@@ -594,6 +594,7 @@ document.rerouteMouseEvents = function (id) {
             }
         }
     }
+    document.onselectstart = function (e) { return false; }
 }
 
 document.setVisualBounds = function (id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
