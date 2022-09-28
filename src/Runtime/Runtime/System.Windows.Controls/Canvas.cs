@@ -237,16 +237,6 @@ namespace Windows.UI.Xaml.Controls
             return new Size();
         }
 
-        internal override bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            return double.IsNaN(child.Width);
-        }
-
-        internal override bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            return double.IsNaN(child.Height);
-        }
-
         protected override Size ArrangeOverride(Size finalSize)
         {
             UIElement[] childrens = Children.ToArray();
@@ -260,5 +250,6 @@ namespace Windows.UI.Xaml.Controls
 
             return finalSize;
         }
+
     }
 }

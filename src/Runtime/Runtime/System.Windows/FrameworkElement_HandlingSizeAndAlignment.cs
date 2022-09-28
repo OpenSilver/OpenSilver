@@ -90,34 +90,34 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets or sets the Auto Width to the root of CustomLayout
         /// </summary>
-        public bool? IsAutoWidthOnCustomLayout
+        public bool IsAutoWidthOnCustomLayout
         {
-            get { return (bool?)GetValue(IsAutoWidthOnCustomLayoutProperty); }
+            get { return (bool)GetValue(IsAutoWidthOnCustomLayoutProperty); }
             set { SetValue(IsAutoWidthOnCustomLayoutProperty, value); }
         }
 
         public static readonly DependencyProperty IsAutoWidthOnCustomLayoutProperty =
             DependencyProperty.Register(
                 nameof(IsAutoWidthOnCustomLayout),
-                typeof(bool?),
+                typeof(bool),
                 typeof(FrameworkElement),
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Gets or sets the Auto Height to the root of CustomLayout
         /// </summary>
-        public bool? IsAutoHeightOnCustomLayout
+        public bool IsAutoHeightOnCustomLayout
         {
-            get { return (bool?)GetValue(IsAutoHeightOnCustomLayoutProperty); }
+            get { return (bool)GetValue(IsAutoHeightOnCustomLayoutProperty); }
             set { SetValue(IsAutoHeightOnCustomLayoutProperty, value); }
         }
 
         public static readonly DependencyProperty IsAutoHeightOnCustomLayoutProperty =
             DependencyProperty.Register(
                 nameof(IsAutoHeightOnCustomLayout),
-                typeof(bool?),
+                typeof(bool),
                 typeof(FrameworkElement),
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(false));
 
         /// <summary>
         /// Enable or disable measure/arrange layout system in a sub part
@@ -143,9 +143,9 @@ namespace Windows.UI.Xaml
         {
             FrameworkElement fe = d as FrameworkElement;
             if ((bool)e.NewValue == true && fe.IsCustomLayoutRoot)
-                fe.LayoutRootSizeChanged += Element_SizeChanged;
+                fe.SizeChanged += Element_SizeChanged;
             else
-                fe.LayoutRootSizeChanged -= Element_SizeChanged;
+                fe.SizeChanged -= Element_SizeChanged;
         }
 
         private static void Element_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -155,10 +155,7 @@ namespace Windows.UI.Xaml
             if (fe.IsCustomLayoutRoot == false)
                 return;
 
-            double width = Math.Max(0, e.NewSize.Width - fe.Margin.Left - fe.Margin.Right);
-            double height = Math.Max(0, e.NewSize.Height - fe.Margin.Top - fe.Margin.Bottom);
-
-            fe.UpdateCustomLayout(new Size(width, height));
+            fe.UpdateCustomLayout(e.NewSize);
         }
 
         #region Height property
@@ -1743,11 +1740,6 @@ namespace Windows.UI.Xaml
         private List<SizeChangedEventHandler> _sizeChangedEventHandlers;
         private readonly IResizeObserverAdapter _resizeObserver = ResizeObserverFactory.Create();
 
-        // Size changed event for the CustomLayout Root
-        internal Size _valueOfLayoutRootLastSizeChanged = new Size(0d, 0d);
-        internal List<SizeChangedEventHandler> _layoutRootSizeChangedEventHandlers;
-        internal readonly IResizeObserverAdapter _layoutRootResizeObserver = ResizeObserverFactory.Create();
-
         private void HandleSizeChanged(Size currentSize)
         {
             if (this._sizeChangedEventHandlers != null
@@ -1775,33 +1767,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal void LayoutRootHandleSizeChanged(Size currentSize)
-        {
-            if (this._layoutRootSizeChangedEventHandlers != null
-               && this._layoutRootSizeChangedEventHandlers.Count > 0
-               && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-               && this._isLoaded)
-            {
-                if (currentSize == Size.Empty)
-                {
-                    currentSize = this.VisualBounds.Size;
-                }
-
-                if (!Size.Equals(this._valueOfLayoutRootLastSizeChanged, currentSize))
-                {
-                    this._valueOfLayoutRootLastSizeChanged = currentSize;
-
-                    SizeChangedEventArgs e = new SizeChangedEventArgs(currentSize);
-
-                    // Raise the "LayoutRootSizeChanged" event of all the listeners:
-                    for (int i = 0; i < this._layoutRootSizeChangedEventHandlers.Count; i++)
-                    {
-                        this._layoutRootSizeChangedEventHandlers[i](this, e);
-                    }
-                }
-            }
-        }
-
         internal void INTERNAL_SizeChangedWhenAttachedToVisualTree() // Intended to be called by the "VisualTreeManager" when the FrameworkElement is attached to the visual tree.
         {
             // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
@@ -1822,32 +1787,11 @@ namespace Windows.UI.Xaml
                     }
                 }
             }
-
-            _valueOfLayoutRootLastSizeChanged = Size.Empty;
-            if (this.IsCustomLayoutRoot)
-            {
-                if (this._layoutRootSizeChangedEventHandlers != null &&
-                    this._layoutRootSizeChangedEventHandlers.Count > 0 &&
-                    !this._layoutRootResizeObserver.IsObserved)
-                {
-                    if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
-                    {
-                        _layoutRootResizeObserver.Observe(this.INTERNAL_AdditionalOutsideDivForMargins, (Action<Size>)this.LayoutRootHandleSizeChanged);
-                    }
-                    else
-                    {
-                        LayoutRootHandleSizeChanged(new Size(this.Width, this.Height));
-                    }
-                }
-            }
         }
 
         internal void DetachResizeSensorFromDomElement()
         {
             _resizeObserver.Unobserve(this.INTERNAL_OuterDomElement);
-
-            if (this._layoutRootResizeObserver.IsObserved)
-                _layoutRootResizeObserver.Unobserve(this.INTERNAL_AdditionalOutsideDivForMargins);
         }
 
         public event SizeChangedEventHandler SizeChanged
@@ -1869,7 +1813,7 @@ namespace Windows.UI.Xaml
                         } 
                         else
                         {
-                            HandleSizeChanged(new Size(this.Width, this.Height));
+                            HandleSizeChanged(Size.Empty);
                         }
                     }
                 }
@@ -1887,45 +1831,6 @@ namespace Windows.UI.Xaml
                     if (this._sizeChangedEventHandlers.Count == 0 && this._resizeObserver.IsObserved)
                     {
                         _resizeObserver.Unobserve(this.INTERNAL_OuterDomElement);
-                    }
-                }
-            }
-        }
-
-        internal event SizeChangedEventHandler LayoutRootSizeChanged
-        {
-            add
-            {
-                if (this._layoutRootSizeChangedEventHandlers == null)
-                {
-                    this._layoutRootSizeChangedEventHandlers = new List<SizeChangedEventHandler>();
-                }
-                if (!this._layoutRootResizeObserver.IsObserved && this.INTERNAL_AdditionalOutsideDivForMargins != null)
-                {
-                    if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
-                    {
-                        _valueOfLayoutRootLastSizeChanged = new Size(0d, 0d);
-                        _layoutRootResizeObserver.Observe(this.INTERNAL_AdditionalOutsideDivForMargins, (Action<Size>)this.LayoutRootHandleSizeChanged);
-                    }
-                    else
-                    {
-                        LayoutRootHandleSizeChanged(new Size(this.Width, this.Height));
-                    }
-                }
-                this._layoutRootSizeChangedEventHandlers.Add(value);
-            }
-            remove
-            {
-                if (this._layoutRootSizeChangedEventHandlers == null)
-                {
-                    return;
-                }
-
-                if (this._layoutRootSizeChangedEventHandlers.Remove(value))
-                {
-                    if (this._layoutRootSizeChangedEventHandlers.Count == 0 && this._layoutRootResizeObserver.IsObserved)
-                    {
-                        _layoutRootResizeObserver.Unobserve(this.INTERNAL_AdditionalOutsideDivForMargins);
                     }
                 }
             }

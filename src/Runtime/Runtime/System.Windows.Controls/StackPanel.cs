@@ -13,16 +13,13 @@
 \*====================================================================================*/
 
 
+using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CSHTML5.Internal;
 
-#if MIGRATION
-using System.Windows.Media;
-#else
+#if !MIGRATION
 using Windows.Foundation;
-using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -302,56 +299,6 @@ namespace Windows.UI.Xaml.Controls
             return orientation == Orientation.Horizontal ?
                 new Rect(mainStart, crossStart, mainLength, crossLength) :
                 new Rect(crossStart, mainStart, crossLength, mainLength);
-        }
-
-        internal override bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Width))
-            {
-                return false;
-            }
-
-            if (Orientation == Orientation.Horizontal)
-            {
-                return true;
-            }
-
-            if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoWidth(this);
-            }
-
-            return false;
-        }
-
-        internal override bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Height))
-            {
-                return false;
-            }
-
-            if (Orientation == Orientation.Vertical)
-            {
-                return true;
-            }
-
-            if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoHeight(this);
-            }
-
-            return false;
         }
 
         protected override Size MeasureOverride(Size availableSize)
