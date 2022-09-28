@@ -454,15 +454,26 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 bool hadStarRow = false;
-
+                int rowIndex = 0;
                 // Concatenate the string that defines the CSS "gridTemplateRows" property:
                 foreach (RowDefinition rowDefinition in normalizedRowDefinitions)
                 {
                     if (!hadStarRow && rowDefinition.Height.IsStar)
                         hadStarRow = true;
+                    //below code will check if there is any element in the current grid row visible, otherwise it'll set the height to auto
+                    //checking if any element is visible
+                    var isAnyChildVisible = grid.Children.Cast<UIElement>().Where(u => Grid.GetRow(u) == rowIndex).Any(v => v.Visibility == Visibility.Visible);
 
-                    rowsAsString = rowsAsString + (!isFirstRow ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(rowDefinition.Height, rowDefinition.MinHeight, signUsedForPercentage: "fr");
+                    if (isAnyChildVisible)
+                    {
+                        rowsAsString = rowsAsString + (!isFirstRow ? " " : "") + Grid_InternalHelpers.ConvertGridLengthToCssString(rowDefinition.Height, rowDefinition.MinHeight, signUsedForPercentage: "fr");
+                    }
+                    else
+                    {
+                        rowsAsString = rowsAsString + (!isFirstRow ? " " : "") + "auto";
+                    }
                     isFirstRow = false;
+                    rowIndex += 1;
                 }
                 if (!hadStarRow) //We add a "star" row if there was none explicitely defined, since absolutely sized rows and columns are exactly their size.
                 {
