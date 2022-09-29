@@ -42,9 +42,36 @@ namespace Windows.UI.Xaml.Controls
         object _iFrame;
         string _htmlString;
 
+#if MIGRATION
+        public WebBrowser()
+#else
+        public WebView()
+#endif
+        {
+            Unloaded += DisposeJsCallbacks;
+        }
+
         internal override bool EnablePointerEventsCore
         {
             get { return true; }
+        }
+
+        private JavascriptCallback _jsCallbackOnIframeLoaded;
+
+        internal protected override void INTERNAL_OnAttachedToVisualTree()
+        {
+            base.INTERNAL_OnAttachedToVisualTree();
+
+            _jsCallbackOnIframeLoaded?.Dispose();
+            _jsCallbackOnIframeLoaded = JavascriptCallback.Create((Action)OnIframeLoad);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.onload = $1", _iFrame, _jsCallbackOnIframeLoaded);
+        }
+
+        private void DisposeJsCallbacks(object sender, RoutedEventArgs e)
+        {
+            Unloaded -= DisposeJsCallbacks;
+            _jsCallbackOnIframeLoaded?.Dispose();
+            _jsCallbackOnIframeLoaded = null;
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -58,8 +85,6 @@ namespace Windows.UI.Xaml.Controls
             iFrameStyle.width = "100%";
             iFrameStyle.height = "100%";
             iFrameStyle.border = "none";
-
-            CSHTML5.Interop.ExecuteJavaScriptAsync("$0.onload = $1", _iFrame, (Action)OnIframeLoad);
 
 #if MIGRATION
             var source = this.SourceUri;
