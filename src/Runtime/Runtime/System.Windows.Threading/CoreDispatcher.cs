@@ -135,8 +135,9 @@ namespace Windows.UI.Core
                     return;
                 }
 
-                Task.Run(() =>
+                Task.Run(async () =>
                 {
+                    await Task.Delay(1);
                     try
                     {
                         method();
