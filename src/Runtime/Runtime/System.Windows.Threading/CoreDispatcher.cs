@@ -23,6 +23,7 @@ using CSHTML5.Internal;
 using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 #if !MIGRATION
 using Windows.Foundation;
 #endif
@@ -134,18 +135,19 @@ namespace Windows.UI.Core
                     return;
                 }
 
-                CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout($0, 1)",
-                    (Action)(() =>
+                Task.Run(async () =>
+                {
+                    await Task.Delay(1);
+                    try
                     {
-                        try
-                        {
-                            method();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.Error.WriteLine("DEBUG: CoreDispatcher: BeginIvokeInternal: Method excution failed: " + e);
-                        }
-                    }));
+                        method();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine("DEBUG: CoreDispatcher: BeginIvokeInternal: Method excution failed: " +
+                                                e);
+                    }
+                });
             }
             else
             {
