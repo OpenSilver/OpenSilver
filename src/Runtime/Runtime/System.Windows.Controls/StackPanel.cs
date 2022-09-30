@@ -316,7 +316,7 @@ namespace Windows.UI.Xaml.Controls
                 return true;
             }
 
-            if (child.VerticalAlignment != VerticalAlignment.Stretch)
+            if (child.HorizontalAlignment != HorizontalAlignment.Stretch)
             {
                 return true;
             }

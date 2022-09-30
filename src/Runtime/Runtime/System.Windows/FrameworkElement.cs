@@ -1336,11 +1336,8 @@ namespace Windows.UI.Xaml
             Size MaxSize = new Size(MaxWidth, MaxHeight);
             Size size = new Size(Width, Height);
 
-            if (!this.IsCustomLayoutRoot)
-            {
-                availableSize.Width = Math.Max(0, availableSize.Width - Margin.Left - Margin.Right);
-                availableSize.Height = Math.Max(0, availableSize.Height - Margin.Top - Margin.Bottom);
-            }
+            availableSize.Width = Math.Max(0, availableSize.Width - Margin.Left - Margin.Right);
+            availableSize.Height = Math.Max(0, availableSize.Height - Margin.Top - Margin.Bottom);
             
             availableSize = size.Combine(availableSize).Bounds(MinSize, MaxSize);
 
@@ -1351,11 +1348,8 @@ namespace Windows.UI.Xaml
             measuredSize = new Size(w, h);
             measuredSize = size.Combine(measuredSize).Bounds(MinSize, MaxSize);
 
-            if (!this.IsCustomLayoutRoot)
-            {
-                measuredSize.Width = Math.Max(0, measuredSize.Width + Margin.Left + Margin.Right);
-                measuredSize.Height = Math.Max(0, measuredSize.Height + Margin.Top + Margin.Bottom);
-            }
+            measuredSize.Width = Math.Max(0, measuredSize.Width + Margin.Left + Margin.Right);
+            measuredSize.Height = Math.Max(0, measuredSize.Height + Margin.Top + Margin.Bottom);
 
             return measuredSize;
         }

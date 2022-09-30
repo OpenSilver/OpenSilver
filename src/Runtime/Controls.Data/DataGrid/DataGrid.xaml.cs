@@ -322,7 +322,9 @@ namespace Windows.UI.Xaml.Controls
         [SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily", Justification = "_minRowHeight should be 0.")]
         public DataGrid()
         {
-            base.CustomLayout = true;
+            this.CustomLayout = true;
+            this.IsAutoWidthOnCustomLayout = null;
+            this.IsAutoHeightOnCustomLayout = null;
             this.TabNavigation = KeyboardNavigationMode.Once;
             this.KeyDown += new KeyEventHandler(DataGrid_KeyDown);
             this.KeyUp += new KeyEventHandler(DataGrid_KeyUp);
