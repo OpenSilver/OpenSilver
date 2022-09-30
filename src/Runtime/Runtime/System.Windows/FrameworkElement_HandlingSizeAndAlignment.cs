@@ -155,10 +155,21 @@ namespace Windows.UI.Xaml
             if (fe.IsCustomLayoutRoot == false)
                 return;
 
-            double width = Math.Max(0, e.NewSize.Width - fe.Margin.Left - fe.Margin.Right);
-            double height = Math.Max(0, e.NewSize.Height - fe.Margin.Top - fe.Margin.Bottom);
+#if OPENSILVER
+            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
+#elif BRIDGE
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+#endif
+            {
+                double width = Math.Max(0, e.NewSize.Width - fe.Margin.Left - fe.Margin.Right);
+                double height = Math.Max(0, e.NewSize.Height - fe.Margin.Top - fe.Margin.Bottom);
 
-            fe.UpdateCustomLayout(new Size(width, height));
+                fe.UpdateCustomLayout(new Size(width, height));
+            }
+            else
+            {
+                fe.UpdateCustomLayout(e.NewSize);
+            }
         }
 
         #region Height property

@@ -1606,10 +1606,12 @@ document.ondblclick = null;
                 IsRendered = true;
                 if (RenderedVisualBounds.Equals(VisualBounds) == false)
                 {
-                    if (RenderedVisualBounds.Width.Equals(VisualBounds.Width) == false)
+                    FrameworkElement fe = this as FrameworkElement;
+
+                    if (RenderedVisualBounds.Width.Equals(VisualBounds.Width) == false && fe.IsAutoWidthOnCustomLayout.GetValueOrDefault())
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).width = VisualBounds.Width.ToInvariantString() + "px";
 
-                    if (RenderedVisualBounds.Height.Equals(VisualBounds.Height) == false)
+                    if (RenderedVisualBounds.Height.Equals(VisualBounds.Height) == false && fe.IsAutoHeightOnCustomLayout.GetValueOrDefault())
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).height = VisualBounds.Height.ToInvariantString() + "px";
 
                     RenderedVisualBounds = VisualBounds;
@@ -1745,10 +1747,14 @@ document.ondblclick = null;
 
         internal void ClearMeasureAndArrangeValidation()
         {
+            if (!this.IsCustomLayoutRoot)
+            {
+                this.IsArrangeValid = false;
+                this.IsMeasureValid = false;
+            }
             this.IsRendered = false;
             this.RenderedVisualBounds = Rect.Empty;
-            this.IsArrangeValid = false;
-            this.IsMeasureValid = false;
+            this.previousDesiredSize = Size.Empty;
         }
 
         public void UpdateLayout()
@@ -1775,9 +1781,9 @@ document.ondblclick = null;
             {
                 if (VisualTreeHelper.GetParent(fe) is FrameworkElement parent)
                 {
-                    if (fe.IsAutoWidthOnCustomLayout == null)
+                    if (double.IsNaN(fe.Width) && fe.IsAutoWidthOnCustomLayout == null)
                         fe.IsAutoWidthOnCustomLayout = parent.CheckIsAutoWidth(fe);
-                    if (fe.IsAutoHeightOnCustomLayout == null)
+                    if (double.IsNaN(fe.Height) && fe.IsAutoHeightOnCustomLayout == null)
                         fe.IsAutoHeightOnCustomLayout = parent.CheckIsAutoHeight(fe);
                 }
 
