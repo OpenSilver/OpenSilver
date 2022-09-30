@@ -1609,8 +1609,9 @@ namespace Windows.UI.Xaml.Controls
                 this.Height = Application.Current.Host.Content.ActualHeight;
                 this.Width = Application.Current.Host.Content.ActualWidth;
 #endif
-                this.Overlay.Height = Window.Current.Bounds.Height;
-                this.Overlay.Width = Window.Current.Bounds.Width;
+                Rect bounds = Window.Current.Bounds;
+                this.Overlay.Height = bounds.Height;
+                this.Overlay.Width = bounds.Width;
 
                 if (this.ContentRoot == null) return;
 
