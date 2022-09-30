@@ -1606,16 +1606,17 @@ document.ondblclick = null;
 
             if (IsCustomLayoutRoot)
             {
-                FrameworkElement fe = this as FrameworkElement;
                 IsRendered = true;
                 if (RenderedVisualBounds.Equals(VisualBounds) == false)
                 {
+                    FrameworkElement fe = this as FrameworkElement;
+
                     RenderedVisualBounds = VisualBounds;
 
-                    if (fe.IsAutoWidthOnCustomLayout)
+                    if (fe.IsAutoWidthOnCustomLayoutInternal)
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).width = VisualBounds.Width.ToInvariantString() + "px";
 
-                    if (fe.IsAutoHeightOnCustomLayout)
+                    if (fe.IsAutoHeightOnCustomLayoutInternal)
                         INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).height = VisualBounds.Height.ToInvariantString() + "px";
                 }
                 return;
@@ -1777,9 +1778,9 @@ document.ondblclick = null;
             FrameworkElement fe = this as FrameworkElement;
             if (fe != null)
             {
-                if (fe.IsAutoWidthOnCustomLayout)
+                if (fe.IsAutoWidthOnCustomLayoutInternal)
                     layoutMeasuredSize.Width = double.PositiveInfinity;
-                if (fe.IsAutoHeightOnCustomLayout)
+                if (fe.IsAutoHeightOnCustomLayoutInternal)
                     layoutMeasuredSize.Height = double.PositiveInfinity;
             }
 
@@ -1792,10 +1793,10 @@ document.ondblclick = null;
             }
             if (fe != null)
             {
-                if (fe.IsAutoWidthOnCustomLayout)
+                if (fe.IsAutoWidthOnCustomLayoutInternal)
                     layoutMeasuredSize.Width = this.DesiredSize.Width;
 
-                if (fe.IsAutoHeightOnCustomLayout)
+                if (fe.IsAutoHeightOnCustomLayoutInternal)
                     layoutMeasuredSize.Height = this.DesiredSize.Height;
             }
 

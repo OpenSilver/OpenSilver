@@ -150,10 +150,10 @@ namespace Windows.UI.Xaml
                     FrameworkElement fe = element as FrameworkElement;
                     if (fe.IsCustomLayoutRoot)
                     {
-                        if (fe.IsAutoWidthOnCustomLayout)
+                        if (fe.IsAutoWidthOnCustomLayoutInternal)
                             previousRect.Width = fe.DesiredSize.Width;
 
-                        if (fe.IsAutoHeightOnCustomLayout)
+                        if (fe.IsAutoHeightOnCustomLayoutInternal)
                             previousRect.Height = fe.DesiredSize.Height;
                     }
                     element.Arrange(previousRect);
