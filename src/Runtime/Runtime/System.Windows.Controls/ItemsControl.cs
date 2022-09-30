@@ -749,6 +749,34 @@ namespace Windows.UI.Xaml.Controls
             this.OnItemsChanged(e);
         }
 
+        /// <summary>
+        /// Causes the object to scroll into view.
+        /// </summary>
+        /// <param name="item">
+        /// The object to scroll.
+        /// </param>
+        internal void ScrollIntoView(object item)
+        {
+            int index = Items.IndexOf(item);
+            if (index > -1)
+            {
+                if (ItemsHost is VirtualizingPanel vp)
+                {
+                    vp.BringIndexIntoViewInternal(index);
+                }
+                else
+                {
+                    if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
+                        && container.INTERNAL_OuterDomElement != null)
+                    {
+                        OpenSilver.Interop.ExecuteJavaScript(
+                            "$0.scrollIntoView({ block: 'nearest'})",
+                            container.INTERNAL_OuterDomElement);
+                    }
+                }
+            }
+        }
+
         #endregion Internal Methods
 
         /// <summary>

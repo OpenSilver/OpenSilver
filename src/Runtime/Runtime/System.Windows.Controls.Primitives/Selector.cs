@@ -19,9 +19,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Input;
 
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Threading;
 #else
 using Windows.UI.Xaml.Media;
 #endif
@@ -45,6 +47,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private ItemInfo PendingSelectionByValue;
         private bool _canSelectMultiple = false;
         private ChangeInfo _changeInfo;
+
+        private DispatcherTimer _searchTimeoutTimer;
+        private String _searchCriteria = String.Empty;
+        private TimeSpan _searchCriteriaTimeOut = TimeSpan.FromMilliseconds(500);
 
         // The selected items that we interact with.  Most of the time when SelectedItems
         // is in use, this is identical to the value of the SelectedItems property, but
@@ -1438,5 +1444,119 @@ namespace Windows.UI.Xaml.Controls.Primitives
         protected bool ChangingSelectionProgrammatically { get; set; }
 
         #endregion Obsolete
+
+        #region Search Logic
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            bool ctrl = GetCtrlKeyState();
+            if (!ctrl)
+            {
+                if (e.Key == Key.Back || e.Key == Key.Delete || e.Key == Key.Enter ||
+                    e.Key == Key.Escape || e.Key == Key.Tab)
+                {
+                    _searchCriteria = string.Empty;
+                }
+                else
+                {
+                    string keyValue = !Char.IsControl((char)e.Key) ? e.Key.ToString() : string.Empty;
+
+                    if (e.Key >= Key.D0 && e.Key <= Key.D9)
+                        keyValue = char.ToString((char)(e.Key - Key.D0 + '0'));
+#if MIGRATION
+                    if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                        keyValue = char.ToString((char)(e.Key - Key.NumPad0 + '0'));
+#else
+                    if (e.Key >= Key.NumberPad0 && e.Key <= Key.NumberPad9)
+                        keyValue = char.ToString((char)(e.Key - Key.NumberPad0 + '0'));
+#endif
+
+                    if (!string.IsNullOrEmpty(keyValue))
+                    {
+                        _searchCriteria += keyValue;
+                        for (int i = 0; i < this.Items.Count; i++)
+                        {
+                            TypeConverterAttribute attr = (TypeConverterAttribute)Attribute.GetCustomAttribute(this.Items[i].GetType(), typeof(TypeConverterAttribute));
+
+                            if (attr != null)
+                            {
+                                TypeConverter converter = (TypeConverter)Activator.CreateInstance(Type.GetType(attr.ConverterTypeName));
+                                if (converter != null)
+                                {
+                                    if (converter.ConvertToString(this.Items[i]).StartsWith(_searchCriteria, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        ScrollToFoundItem(i);
+                                        return;
+                                    }
+                                }
+                            }
+                            if (this.Items[i].ToString().StartsWith(_searchCriteria, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                ScrollToFoundItem(i);
+                                return;
+                            }
+                        }
+                        e.Handled = true;
+                        ResetTimeout();
+                    }
+                }
+            }
+        }
+
+        private void ScrollToFoundItem(int i)
+        {
+            string buffer = _searchCriteria;//to keep crietria when dropdownclosed on select
+            this.SelectedIndex = i;
+            this.ScrollIntoView(this.Items[i]);
+            _searchCriteria = buffer;
+            ResetTimeout();
+        }
+
+        public bool GetCtrlKeyState()
+        {
+
+            bool ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+
+            // The Apple key on a Mac is supposed to behave like the CTRL key on a PC for
+            // things like multi-select, select-all, and grid navigation.  To allow for this,
+            // we set the CTRL to true if the Apple key is pressed.
+            ctrl |= (Keyboard.Modifiers & ModifierKeys.Apple) == ModifierKeys.Apple;
+
+            return ctrl;
+        }
+
+        private void ResetTimeout()
+        {
+            if (_searchTimeoutTimer == null)
+            {
+                _searchTimeoutTimer = new DispatcherTimer();
+                _searchTimeoutTimer.Tick += new EventHandler(OnTimeout);
+            }
+            else
+            {
+                _searchTimeoutTimer.Stop();
+            }
+
+            _searchTimeoutTimer.Interval = _searchCriteriaTimeOut;
+            _searchTimeoutTimer.Start();
+        }
+
+        private void OnTimeout(object sender, EventArgs e)
+        {
+            ResetState();
+        }
+
+        private void ResetState()
+        {
+            _searchCriteria = string.Empty;
+
+            if (_searchTimeoutTimer != null)
+            {
+                _searchTimeoutTimer.Stop();
+            }
+            _searchTimeoutTimer = null;
+        }
+        #endregion
     }
 }

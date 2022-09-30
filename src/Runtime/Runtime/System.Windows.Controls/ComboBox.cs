@@ -311,6 +311,12 @@ namespace Windows.UI.Xaml.Controls
         protected virtual void OnDropDownOpened(RoutedEventArgs e)
 #endif
         {
+            if (this.SelectedItem != null)
+            {
+                var itemContainer = this.ItemContainerGenerator.ContainerFromItem(this.SelectedItem) as FrameworkElement;
+                this.GetScrollHost().ScrollIntoView(itemContainer);
+            }
+
             if (DropDownOpened != null)
                 DropDownOpened(this, e);
         }
