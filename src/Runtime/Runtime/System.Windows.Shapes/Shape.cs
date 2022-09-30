@@ -964,10 +964,6 @@ context.translate($6, 0);
                     }
                 }
             }
-            else if (brush is ImageBrush) 
-            {
-                returnValue = ((ImageBrush)brush).INTERNAL_ToHtmlString(shape);
-            }
             else
             {
                 // Other types of brush are not supported. Use a transparent brush as a fallback.
