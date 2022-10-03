@@ -178,10 +178,21 @@ namespace Windows.UI.Xaml
         private static void CustomLayout_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement fe = d as FrameworkElement;
-            if ((bool)e.NewValue == true && fe.IsCustomLayoutRoot)
-                fe.LayoutRootSizeChanged += Element_SizeChanged;
+
+            if (fe.IsAutoHeightOnCustomLayoutInternal || fe.IsAutoWidthOnCustomLayoutInternal)
+            {
+                if ((bool)e.NewValue && fe.IsCustomLayoutRoot)
+                    fe.LayoutRootSizeChanged += Element_SizeChanged;
+                else
+                    fe.LayoutRootSizeChanged -= Element_SizeChanged;
+            }
             else
-                fe.LayoutRootSizeChanged -= Element_SizeChanged;
+            {
+                if ((bool)e.NewValue && fe.IsCustomLayoutRoot)
+                    fe.SizeChanged += Element_SizeChanged;
+                else
+                    fe.SizeChanged -= Element_SizeChanged;
+            }
         }
 
         private static void Element_SizeChanged(object sender, SizeChangedEventArgs e)
