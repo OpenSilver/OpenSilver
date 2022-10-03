@@ -26,6 +26,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 #else
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -1446,8 +1447,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
         #endregion Obsolete
 
         #region Search Logic
+#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
         {
+#else
+        protected override void OnKeyDown(KeyRoutedEventArgs e)
+        {
+#endif
             base.OnKeyDown(e);
 
             bool ctrl = GetCtrlKeyState();
