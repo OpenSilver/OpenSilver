@@ -1482,14 +1482,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
                         if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
                             keyValue = char.ToString((char)(e.Key - Key.NumPad0 + '0'));
 #else
-                    if (e.Key >= VirtualKey.D0 && e.Key <= VirtualKey.D9)
-                            keyValue = char.ToString((char)(e.Key - VirtualKey.D0 + '0'));
+                    if (e.Key >= VirtualKey.Number0 && e.Key <= VirtualKey.Number9)
+                            keyValue = char.ToString((char)(e.Key - VirtualKey.Number0 + '0'));
 
                     if (e.Key >= VirtualKey.NumberPad0 && e.Key <= VirtualKey.NumberPad9)
                         keyValue = char.ToString((char)(e.Key - VirtualKey.NumberPad0 + '0'));
 #endif
 
-                        if (!string.IsNullOrEmpty(keyValue))
+                    if (!string.IsNullOrEmpty(keyValue))
                     {
                         _searchCriteria += keyValue;
                         for (int i = 0; i < this.Items.Count; i++)
@@ -1554,7 +1554,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (_searchTimeoutTimer == null)
             {
                 _searchTimeoutTimer = new DispatcherTimer();
+#if MIGRATION
                 _searchTimeoutTimer.Tick += new EventHandler(OnTimeout);
+#else
+                _searchTimeoutTimer.Tick += new EventHandler<object>(OnTimeout);
+#endif
             }
             else
             {
@@ -1564,8 +1568,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
             _searchTimeoutTimer.Interval = _searchCriteriaTimeOut;
             _searchTimeoutTimer.Start();
         }
-
+#if MIGRATION
         private void OnTimeout(object sender, EventArgs e)
+#else
+        private void OnTimeout(object sender, object e)
+#endif
         {
             ResetState();
         }
