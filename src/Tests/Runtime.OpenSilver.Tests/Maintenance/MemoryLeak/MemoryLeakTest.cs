@@ -31,46 +31,11 @@ namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
     [TestClass]
     public class MemoryLeakTest
     {
-        private void CreateRemoveGrid(GarbageCollectorTracker c)
-        {
-            var tc = new GridWithTrackingComponent(c);
-            var mainWindow = Application.Current.MainWindow;
-            mainWindow.Content = tc;
-            mainWindow.Content = new Grid();
-        }
-
-        private void CreateRemoveWebBrowser(GarbageCollectorTracker c)
-        {
-            var tc = new WebBrowserWithTrackingComponent(c);
-            var mainWindow = Application.Current.MainWindow;
-            mainWindow.Content = tc;
-            mainWindow.Content = new Grid();
-        }
-
-        private void InvokeCoreDispatcher(GarbageCollectorTracker c)
-        {
-            var resetEvent = new ManualResetEvent(false);
-            var trackableCallback = new ItemWithTrackableCallback(c, resetEvent);
-#if MIGRATION
-            Dispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(trackableCallback.Callback);
-#else
-            CoreDispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(trackableCallback.Callback);
-#endif
-            resetEvent.WaitOne(5000);
-        }
-
-        private static void CollectGarbage()
-        {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-        }
-
         [TestMethod]
-        public void Grid_Must_Be_Collected()
+        public void Element_Must_Be_Collected()
         {
             var c = new GarbageCollectorTracker();
-            CreateRemoveGrid(c);
+            CreateRemoveElement(c);
             CollectGarbage();
             Assert.IsTrue(c.IsCollected);
         }
@@ -103,6 +68,79 @@ namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
             CreateRemoveWebBrowser(c);
             CollectGarbage();
             Assert.IsTrue(c.IsCollected);
+        }
+
+        [TestMethod]
+        public void DependencyObject_Should_Release_InheritedContext()
+        {
+            var c = new GarbageCollectorTracker();
+            CreateDependencyObject(c);
+            CollectGarbage();
+
+            Assert.IsTrue(c.IsCollected);
+
+            DependencyObject CreateDependencyObject(GarbageCollectorTracker tracker)
+            {
+                var depObj = new DependencyObject();
+                _ = new MyFrameworkElement(tracker) { MyProperty = depObj };
+                return depObj;
+            }
+        }
+
+        private void CreateRemoveElement(GarbageCollectorTracker c)
+        {
+            var tc = new FrameworkElementWithTrackingComponent(c);
+            var mainWindow = Application.Current.MainWindow;
+            mainWindow.Content = tc;
+            mainWindow.Content = new Grid();
+        }
+
+        private void CreateRemoveWebBrowser(GarbageCollectorTracker c)
+        {
+            var tc = new WebBrowserWithTrackingComponent(c);
+            var mainWindow = Application.Current.MainWindow;
+            mainWindow.Content = tc;
+            mainWindow.Content = new Grid();
+        }
+
+        private void InvokeCoreDispatcher(GarbageCollectorTracker c)
+        {
+            var resetEvent = new ManualResetEvent(false);
+            var trackableCallback = new ItemWithTrackableCallback(c, resetEvent);
+#if MIGRATION
+            Dispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(trackableCallback.Callback);
+#else
+            CoreDispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(trackableCallback.Callback);
+#endif
+            resetEvent.WaitOne(5000);
+        }
+
+        private static void CollectGarbage()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
+
+        private class MyFrameworkElement : FrameworkElementWithTrackingComponent
+        {
+            public MyFrameworkElement(GarbageCollectorTracker gcTracker)
+                : base(gcTracker)
+            {
+            }
+
+            public static readonly DependencyProperty MyPropertyProperty =
+                DependencyProperty.Register(
+                    nameof(MyProperty),
+                    typeof(object),
+                    typeof(MyFrameworkElement),
+                    null);
+
+            public object MyProperty
+            {
+                get => GetValue(MyPropertyProperty);
+                set => SetValue(MyPropertyProperty, value);
+            }
         }
     }
 }

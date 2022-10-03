@@ -44,9 +44,43 @@ namespace Windows.UI.Xaml
 
         private HashSet<DependencyObject> _contextListeners;
 
-        internal event EventHandler InheritedContextChanged;
+        internal event EventHandler InheritedContextChanged;        
 
-        internal DependencyObject InheritanceContext { get; private set; }
+        private ContextStorage _contextStorage;
+
+        internal DependencyObject InheritanceContext
+        {
+            get => _contextStorage?.GetContext();
+            set => (_contextStorage ?? (_contextStorage = new ContextStorage())).SetContext(value);
+        }
+
+        private sealed class ContextStorage
+        {
+            private object _context;
+            private bool _useWeakRef;
+
+            public DependencyObject GetContext()
+            {
+                if (_useWeakRef)
+                {
+                    var wr = (WeakReference<DependencyObject>)_context;
+                    if (!wr.TryGetTarget(out DependencyObject context))
+                    {
+                        SetContext(null);
+                    }
+
+                    return context;
+                }
+
+                return (DependencyObject)_context;
+            }
+
+            public void SetContext(DependencyObject context)
+            {
+                _useWeakRef = context is FrameworkElement;
+                _context = _useWeakRef ? new WeakReference<DependencyObject>(context) : (object)context;
+            }
+        }
 
         internal bool CanBeInheritanceContext { get; set; }
 
