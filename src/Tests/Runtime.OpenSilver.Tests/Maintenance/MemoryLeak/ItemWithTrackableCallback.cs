@@ -29,7 +29,7 @@ namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
 
         ~ItemWithTrackableCallback()
         {
-            _gcTracker.Collected = true;
+            _gcTracker.MarkAsCollected();
         }
 
         public void Callback()

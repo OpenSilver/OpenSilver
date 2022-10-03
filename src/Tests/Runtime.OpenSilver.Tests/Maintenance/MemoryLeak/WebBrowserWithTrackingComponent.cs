@@ -11,20 +11,26 @@
 *
 \*====================================================================================*/
 
-
-using System.Threading;
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
 {
-    public class GarbageCollectorTracker
+    public class WebBrowserWithTrackingComponent : WebBrowser
     {
-        public bool IsCollected => CollectedResetEvent.WaitOne(0);
+        private readonly GarbageCollectorTracker _gcTracker;
 
-        public ManualResetEvent CollectedResetEvent { get; } = new ManualResetEvent(false);
-
-        public void MarkAsCollected()
+        public WebBrowserWithTrackingComponent(GarbageCollectorTracker gcTracker)
         {
-            CollectedResetEvent.Set();
+            _gcTracker = gcTracker;
+        }
+
+        ~WebBrowserWithTrackingComponent()
+        {
+            _gcTracker.MarkAsCollected();
         }
     }
 }

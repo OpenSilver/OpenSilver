@@ -30,7 +30,7 @@ namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
 
         ~GridWithTrackingComponent()
         {
-            _gcTracker.Collected = true;
+            _gcTracker.MarkAsCollected();
         }
     }
 }
