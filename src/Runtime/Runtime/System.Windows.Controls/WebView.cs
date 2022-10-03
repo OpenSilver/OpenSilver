@@ -16,7 +16,7 @@
 using CSHTML5;
 using CSHTML5.Internal;
 using System;
-#if MIGRATION 
+#if MIGRATION
 using System.Windows.Navigation;
 #else
 using Windows.UI.Xaml.Navigation;
@@ -39,8 +39,9 @@ namespace Windows.UI.Xaml.Controls
     public partial class WebView : FrameworkElement
 #endif
     {
-        object _iFrame;
-        string _htmlString;
+        private object _iFrame;
+        private string _htmlString;
+        private JavascriptCallback _jsCallbackOnIframeLoaded;
 
 #if MIGRATION
         public WebBrowser()
@@ -48,31 +49,13 @@ namespace Windows.UI.Xaml.Controls
         public WebView()
 #endif
         {
-            Unloaded += DisposeJsCallbacks;
+            Unloaded += (o, e) => DisposeJsCallbacks();
         }
 
         internal override bool EnablePointerEventsCore
         {
             get { return true; }
-        }
-
-        private JavascriptCallback _jsCallbackOnIframeLoaded;
-
-        internal protected override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            _jsCallbackOnIframeLoaded?.Dispose();
-            _jsCallbackOnIframeLoaded = JavascriptCallback.Create((Action)OnIframeLoad);
-            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.onload = $1", _iFrame, _jsCallbackOnIframeLoaded);
-        }
-
-        private void DisposeJsCallbacks(object sender, RoutedEventArgs e)
-        {
-            Unloaded -= DisposeJsCallbacks;
-            _jsCallbackOnIframeLoaded?.Dispose();
-            _jsCallbackOnIframeLoaded = null;
-        }
+        }        
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
@@ -85,6 +68,10 @@ namespace Windows.UI.Xaml.Controls
             iFrameStyle.width = "100%";
             iFrameStyle.height = "100%";
             iFrameStyle.border = "none";
+
+            DisposeJsCallbacks();
+            _jsCallbackOnIframeLoaded = JavascriptCallback.Create((Action)OnIframeLoad);
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.onload = $1", _iFrame, _jsCallbackOnIframeLoaded);
 
 #if MIGRATION
             var source = this.SourceUri;
@@ -225,6 +212,12 @@ namespace Windows.UI.Xaml.Controls
 #endif
                 LoadCompleted(this, new NavigationEventArgs(null, source));
             }
+        }
+
+        private void DisposeJsCallbacks()
+        {
+            _jsCallbackOnIframeLoaded?.Dispose();
+            _jsCallbackOnIframeLoaded = null;
         }
     }
 }
