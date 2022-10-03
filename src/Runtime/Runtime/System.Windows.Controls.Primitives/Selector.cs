@@ -27,6 +27,7 @@ using System.Windows.Threading;
 #else
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
+using Windows.System;
 #endif
 
 #if MIGRATION
@@ -1474,17 +1475,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 {
                     string keyValue = !Char.IsControl((char)e.Key) ? e.Key.ToString() : string.Empty;
 
-                    if (e.Key >= Key.D0 && e.Key <= Key.D9)
-                        keyValue = char.ToString((char)(e.Key - Key.D0 + '0'));
 #if MIGRATION
-                    if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
-                        keyValue = char.ToString((char)(e.Key - Key.NumPad0 + '0'));
+                        if (e.Key >= Key.D0 && e.Key <= Key.D9)
+                            keyValue = char.ToString((char)(e.Key - Key.D0 + '0'));
+
+                        if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                            keyValue = char.ToString((char)(e.Key - Key.NumPad0 + '0'));
 #else
+                    if (e.Key >= VirtualKey.D0 && e.Key <= VirtualKey.D9)
+                            keyValue = char.ToString((char)(e.Key - VirtualKey.D0 + '0'));
+
                     if (e.Key >= VirtualKey.NumberPad0 && e.Key <= VirtualKey.NumberPad9)
                         keyValue = char.ToString((char)(e.Key - VirtualKey.NumberPad0 + '0'));
 #endif
 
-                    if (!string.IsNullOrEmpty(keyValue))
+                        if (!string.IsNullOrEmpty(keyValue))
                     {
                         _searchCriteria += keyValue;
                         for (int i = 0; i < this.Items.Count; i++)
@@ -1527,14 +1532,20 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         public bool GetCtrlKeyState()
         {
-
-            bool ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
-
-            // The Apple key on a Mac is supposed to behave like the CTRL key on a PC for
+            bool ctrl = false;
+#if MIGRATION
+            ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+#else
+            ctrl = (Keyboard.Modifiers & VirtualKeyModifiers.Control) == VirtualKeyModifiers.Control;
+#endif
+            // The Apple key on a Mac is supposed to behave like the CTRL key on a PC for 
             // things like multi-select, select-all, and grid navigation.  To allow for this,
             // we set the CTRL to true if the Apple key is pressed.
+#if MIGRATION
             ctrl |= (Keyboard.Modifiers & ModifierKeys.Apple) == ModifierKeys.Apple;
-
+#else
+            ctrl |= (Keyboard.Modifiers & VirtualKeyModifiers.Apple) == VirtualKeyModifiers.Apple;
+#endif
             return ctrl;
         }
 
@@ -1569,6 +1580,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
             _searchTimeoutTimer = null;
         }
-        #endregion
+#endregion
     }
 }
