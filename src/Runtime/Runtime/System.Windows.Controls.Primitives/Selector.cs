@@ -1459,8 +1459,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
             bool ctrl = GetCtrlKeyState();
             if (!ctrl)
             {
+#if MIGRATION
                 if (e.Key == Key.Back || e.Key == Key.Delete || e.Key == Key.Enter ||
                     e.Key == Key.Escape || e.Key == Key.Tab)
+#else
+                if (e.Key == VirtualKey.Back || e.Key == VirtualKey.Delete || e.Key == VirtualKey.Enter ||
+                    e.Key == VirtualKey.Escape || e.Key == VirtualKey.Tab)
+#endif
+
                 {
                     _searchCriteria = string.Empty;
                 }
@@ -1474,8 +1480,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
                         keyValue = char.ToString((char)(e.Key - Key.NumPad0 + '0'));
 #else
-                    if (e.Key >= Key.NumberPad0 && e.Key <= Key.NumberPad9)
-                        keyValue = char.ToString((char)(e.Key - Key.NumberPad0 + '0'));
+                    if (e.Key >= VirtualKey.NumberPad0 && e.Key <= VirtualKey.NumberPad9)
+                        keyValue = char.ToString((char)(e.Key - VirtualKey.NumberPad0 + '0'));
 #endif
 
                     if (!string.IsNullOrEmpty(keyValue))
