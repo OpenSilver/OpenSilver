@@ -209,6 +209,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePickerDateValidationErrorEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DomainUpDown.cs" />
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
+		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
@@ -394,7 +395,7 @@
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextBlock.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextSearch.cs" />
+		<Compile Include="System.Windows.Controls\TextSearch.cs" />
 		<Compile Include="OpenSilver\Controls\TimePicker.NotImplemented.cs" />
 		<Compile Include="OpenSilver\Controls\TimePickerPopup.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WrapPanel.cs" />

@@ -125,27 +125,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="item">
         /// The object to scroll.
         /// </param>
-        public void ScrollIntoView(object item)
-        {
-            int index = Items.IndexOf(item);
-            if (index > -1)
-            {
-                if (ItemsHost is VirtualizingPanel vp)
-                {
-                    vp.BringIndexIntoViewInternal(index);
-                }
-                else
-                {
-                    if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
-                        && container.INTERNAL_OuterDomElement != null)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScript(
-                            "$0.scrollIntoView({ block: 'nearest'})",
-                            container.INTERNAL_OuterDomElement);
-                    }
-                }
-            }
-        }
+        public void ScrollIntoView(object item) => ScrollIntoViewImpl(Items.IndexOf(item));
 
         /// <summary>
         /// Selects all the items in the <see cref="ListBox"/>.
@@ -199,6 +179,54 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ListBoxAutomationPeer(this);
+
+        internal override bool FocusItem(ItemInfo info)
+        {
+            // Base will actually focus the item
+            bool returnValue = base.FocusItem(info);
+
+            if (info.Container is ListBoxItem listItem)
+            {
+                MakeKeyboardSelection(listItem);
+            }
+
+            return returnValue;
+        }
+
+        private void MakeKeyboardSelection(ListBoxItem item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            switch (SelectionMode)
+            {
+                case SelectionMode.Single:
+                    // Navigating when control is down shouldn't select the item
+                    if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
+                    {
+                        MakeSingleSelection(item);
+                    }
+                    break;
+
+                case SelectionMode.Multiple:
+                    UpdateAnchorItem(ItemInfoFromContainer(item));
+                    break;
+
+                case SelectionMode.Extended:
+                    if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                    {
+                        bool clearCurrentSelection = (Keyboard.Modifiers & ModifierKeys.Control) == 0;
+                        MakeAnchorSelection(item, clearCurrentSelection);
+                    }
+                    else if ((Keyboard.Modifiers & ModifierKeys.Control) == 0)
+                    {
+                        MakeSingleSelection(item);
+                    }
+                    break;
+            }
+        }
 
         /// <summary>
         /// Adjust ItemInfos when the Items property changes.

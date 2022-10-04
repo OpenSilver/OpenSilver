@@ -22,5 +22,15 @@ namespace Windows.UI.Xaml.Data
     public abstract class BindingExpressionBase : Expression
     {
         internal BindingExpressionBase() { }
+
+        /// <summary>
+        /// NoTarget DependencyProperty, a placeholder used by BindingExpressions with no target property
+        /// </summary>
+        internal static readonly DependencyProperty NoTargetProperty =
+            DependencyProperty.RegisterAttached(
+                "NoTarget",
+                typeof(object),
+                typeof(BindingExpressionBase),
+                null);
     }
 }

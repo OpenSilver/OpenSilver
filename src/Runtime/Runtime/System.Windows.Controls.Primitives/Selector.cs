@@ -559,6 +559,24 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.AdjustItemInfoOverride(e);
         }
 
+        internal override bool FocusItem(ItemInfo info)
+        {
+            if (info.Index == -1)
+            {
+                return false;
+            }
+
+            bool returnValue = false;
+
+            ScrollIntoViewImpl(info.Index);
+            if (info.Container is ListBoxItem container)
+            {
+                returnValue = container.Focus();
+            }
+
+            return returnValue;
+        }
+
         /// <summary>
         /// Raises the SelectionChanged event
         /// </summary>

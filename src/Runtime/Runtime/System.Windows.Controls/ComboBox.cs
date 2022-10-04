@@ -54,6 +54,7 @@ namespace Windows.UI.Xaml.Controls
     public class ComboBox : Selector
     {
         private Popup _popup;
+        private UIElement _popupChild;
         private ToggleButton _dropDownToggle;
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
@@ -160,6 +161,12 @@ namespace Windows.UI.Xaml.Controls
                 _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick; // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
             }
 
+            if (_popupChild != null)
+            {
+                _popupChild.TextInput -= new TextCompositionEventHandler(OnPopupTextInput);
+                _popupChild = null;
+            }
+
             _popup = GetTemplateChild("Popup") as Popup;
           
             //this will enable virtualization in combo box without templating the whole style
@@ -182,6 +189,12 @@ namespace Windows.UI.Xaml.Controls
                 _popup.StayOpen = false;
                 _popup.OutsideClick += OnOutsideClick;
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
+
+                _popupChild = _popup.Child;
+                if (_popupChild != null)
+                {
+                    _popupChild.TextInput += new TextCompositionEventHandler(OnPopupTextInput);
+                }
             }
 
             _contentPresenter = GetTemplateChild("ContentPresenter") as ContentPresenter;
@@ -270,6 +283,29 @@ namespace Windows.UI.Xaml.Controls
                 IsDropDownOpen = false;
             }
         }
+
+        internal override bool FocusItem(ItemInfo info)
+        {
+            bool returnValue = base.FocusItem(info);
+
+            if (!IsDropDownOpen)
+            {
+                int index = info.Index;
+
+                if (index < 0)
+                {
+                    index = Items.IndexOf(info.Item);
+                }
+
+                SetCurrentValue(SelectedIndexProperty, index);
+
+                returnValue = true;
+            }
+
+            return returnValue;
+        }
+
+        private void OnPopupTextInput(object sender, TextCompositionEventArgs e) => OnTextInput(e);
 
         private void _popup_INTERNAL_PopupMoved(object sender, EventArgs e)
         {
