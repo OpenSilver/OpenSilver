@@ -60,8 +60,8 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.RegisterAttached(
                 "Left", 
                 typeof(double), 
-                typeof(UIElement), 
-                new PropertyMetadata(0d)
+                typeof(UIElement),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsParentArrange)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -87,8 +87,8 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.RegisterAttached(
                 "Top", 
                 typeof(double), 
-                typeof(UIElement), 
-                new PropertyMetadata(0d)
+                typeof(UIElement),
+                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsParentArrange)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
