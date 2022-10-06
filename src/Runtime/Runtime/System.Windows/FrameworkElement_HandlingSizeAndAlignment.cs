@@ -562,6 +562,13 @@ namespace Windows.UI.Xaml
                             if (!isParentAWrapPanelOrAHorizontalStackPanel)
                             {
                                 styleOfWrapperElement.width = "auto"; // Note: in case of an object in a canvas, the "wrapperElement" is the same as the "OuterDomElement", so we need to execute this line before the line that sets the width of the OuterDomElement, otherwise the width is not correctly applied.
+
+                                if (fe is Grid)
+                                {
+                                    styleOfWrapperElement.marginLeft = "auto";
+                                    styleOfWrapperElement.marginRight = "auto";
+                                }
+
                                 styleOfOuterDomElement.marginLeft = "auto";
                                 styleOfOuterDomElement.marginRight = "auto";
                                 if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
