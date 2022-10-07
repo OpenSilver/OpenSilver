@@ -1,0 +1,14 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.TextBlockTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Text should be trimmed with ellipsis on CustomLayout:" TextWrapping="Wrap" Margin="0,10,0,0"/>
+        <Border Name="EllipsisTrimmedCustomLayoutBorder" Width="100">
+            <TextBlock Name="EllipsisTrimmedCustomLayoutTextBlock" Margin="0,10,0,0" Text="Long text that should be trimmed with ellipsis" Height="22" TextTrimming="WordEllipsis"/>
+        </Border>
+    </StackPanel>
+</sdk:Page>

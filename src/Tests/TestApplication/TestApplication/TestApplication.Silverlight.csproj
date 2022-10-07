@@ -314,6 +314,9 @@
     <Compile Include="Tests\TemplatedTextBoxTest.xaml.cs">
       <DependentUpon>TemplatedTextBoxTest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tests\TextBlockTest.xaml.cs">
+      <DependentUpon>TextBlockTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tests\TextBoxPropertiesTest.xaml.cs">
       <DependentUpon>TextBoxPropertiesTest.xaml</DependentUpon>
     </Compile>
@@ -654,6 +657,10 @@
     <Page Include="Tests\TemplatedTextBoxTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\TextBlockTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Tests\TextBoxPropertiesTest.xaml">
       <SubType>Designer</SubType>
