@@ -131,6 +131,7 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.width = "100%";
             passwordFieldStyle.height = "100%";
 
+            passwordFieldStyle.color = "inherit"; //This is to inherit the foreground value from parent div.
             INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password", forceSimulatorExecuteImmediately: true);
 
             //-----------------------
