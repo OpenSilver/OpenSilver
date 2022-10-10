@@ -13,70 +13,35 @@
 *
 \*====================================================================================*/
 
-
-
-//new Element("link",   { rel:"stylesheet", src: "cshtml5.css", type: "text/css" });
-var link = document.createElement('link');
-link.setAttribute('rel', 'stylesheet');
-link.setAttribute('type', 'text/css');
-link.setAttribute('href', 'libs/cshtml5.css');
-document.getElementsByTagName('head')[0].appendChild(link);
-
-//new Element("link",   { rel:"stylesheet", src: "flatpickr.css", type: "text/css" });
-var link = document.createElement('link');
-link.setAttribute('rel', 'stylesheet');
-link.setAttribute('type', 'text/css');
-link.setAttribute('href', 'libs/flatpickr.css');
-document.getElementsByTagName('head')[0].appendChild(link);
-
-//new Element("link",   { rel:"stylesheet", src: "quill.core.css", type: "text/css" });
-var link = document.createElement('link');
-link.setAttribute('rel', 'stylesheet');
-link.setAttribute('type', 'text/css');
-link.setAttribute('href', 'libs/quill.core.css');
-document.getElementsByTagName('head')[0].appendChild(link);
-
-//new Element("script", { src: "cshtml5.js", type: "application/javascript" });
-var cshtml5Script = document.createElement('script');
-cshtml5Script.setAttribute('type', 'application/javascript');
-cshtml5Script.setAttribute('src', 'libs/cshtml5.js');
-document.getElementsByTagName('head')[0].appendChild(cshtml5Script);
-
-//new Element("script", { src: "fastclick.js", type: "application/javascript" });
-var fastclickScript = document.createElement('script');
-fastclickScript.setAttribute('type', 'application/javascript');
-fastclickScript.setAttribute('src', 'libs/fastclick.js');
-document.getElementsByTagName('head')[0].appendChild(fastclickScript);
-
-//new Element("script", { src: "velocity.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/velocity.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-//new Element("script", { src: "flatpickr.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/flatpickr.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-
-//new Element("script", { src: "ResizeSensor.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/ResizeSensor.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-//new Element("script", { src: "ResizeObserver.js", type: "application/javascript" });
-var velocityScript = document.createElement('script');
-velocityScript.setAttribute('type', 'application/javascript');
-velocityScript.setAttribute('src', 'libs/ResizeObserver.js');
-document.getElementsByTagName('head')[0].appendChild(velocityScript);
-
-let quillJsScript = document.createElement('script');
-quillJsScript.setAttribute('type', 'application/javascript');
-quillJsScript.setAttribute('src', 'libs/quill.min.js');
-document.getElementsByTagName('head')[0].appendChild(quillJsScript);
+// Load all css and js files
+(function (names) {
+    names.forEach((name) => {
+        var extension = name.split('.').pop();
+        var url = name + "?date=" + new Date().toISOString();
+        if (extension == 'js') {
+            var el = document.createElement('script');
+            el.setAttribute('type', 'application/javascript');
+            el.setAttribute('src', url);
+            document.getElementsByTagName('head')[0].appendChild(el);
+        }
+        else if (extension == 'css') {
+            var el = document.createElement('link');
+            el.setAttribute('rel', 'stylesheet');
+            el.setAttribute('type', 'text/css');
+            el.setAttribute('href', url);
+            document.getElementsByTagName('head')[0].appendChild(el);
+        }
+    });
+}(['libs/cshtml5.css',
+    'libs/flatpickr.css',
+    'libs/quill.core.css',
+    'libs/cshtml5.js',
+    'libs/fastclick.js',
+    'libs/velocity.js',
+    'libs/flatpickr.js',
+    'libs/ResizeSensor.js',
+    'libs/ResizeObserver.js',
+    'libs/quill.min.js']));
 
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";
