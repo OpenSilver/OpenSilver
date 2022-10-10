@@ -580,9 +580,10 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             int sepIndex = size.IndexOf('|');
             if (sepIndex > -1)
             {
-                double actualWidth = double.Parse(size.Substring(0, sepIndex), CultureInfo.InvariantCulture);
-                double actualHeight = double.Parse(size.Substring(sepIndex + 1), CultureInfo.InvariantCulture);
-                
+                double actualWidth, actualHeight = 0;
+                double.TryParse(size.Substring(0, sepIndex), NumberStyles.Any, CultureInfo.InvariantCulture, out actualWidth);
+                double.TryParse(size.Substring(sepIndex + 1), NumberStyles.Any, CultureInfo.InvariantCulture, out actualHeight);
+
                 return new Size(actualWidth, actualHeight);
             }
 
