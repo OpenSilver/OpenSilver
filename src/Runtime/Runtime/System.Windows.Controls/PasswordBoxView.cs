@@ -127,7 +127,7 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             passwordFieldStyle.backgroundColor = "transparent";
             passwordFieldStyle.fontSize = "inherit"; // Not inherited by default for "input" DOM elements
-
+            passwordFieldStyle.color = "inherit"; //This is to inherit the foreground value from parent div.
             passwordFieldStyle.width = "100%";
             passwordFieldStyle.height = "100%";
 
