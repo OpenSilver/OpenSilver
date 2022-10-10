@@ -150,6 +150,7 @@ namespace CSHTML5.Internal
         public string color { set { SetStylePropertyValue("color", value); } }
         public string cursor { set { SetStylePropertyValue("cursor", value); } }
         public string display { set { SetStylePropertyValue("display", value); _display = value; } get { return _display; } }
+        public string filter { set { SetStylePropertyValue("filter", value); } }
         public string fontSize { set { SetStylePropertyValue("fontSize", value); } }
         public string gridColumnEnd { set { SetStylePropertyValue("gridColumnEnd", value); } }
         public string gridColumnStart { set { SetStylePropertyValue("gridColumnStart", value); } }
