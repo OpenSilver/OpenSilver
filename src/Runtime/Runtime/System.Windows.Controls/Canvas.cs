@@ -18,8 +18,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Media;
+#else
 using Windows.Foundation;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -60,8 +63,8 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.RegisterAttached(
                 "Left", 
                 typeof(double), 
-                typeof(UIElement), 
-                new PropertyMetadata(0d)
+                typeof(UIElement),
+                new FrameworkPropertyMetadata(0d, OnPositioningChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -87,8 +90,8 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.RegisterAttached(
                 "Top", 
                 typeof(double), 
-                typeof(UIElement), 
-                new PropertyMetadata(0d)
+                typeof(UIElement),
+                new FrameworkPropertyMetadata(0d, OnPositioningChanged)
                 {
                     GetCSSEquivalent = (instance) =>
                     {
@@ -106,6 +109,15 @@ namespace Windows.UI.Xaml.Controls
                         return null;
                     }
                 });
+
+        private static void OnPositioningChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is UIElement uie
+                && VisualTreeHelper.GetParent(uie) is Canvas p)
+            {
+                p.InvalidateArrange();
+            }
+        }
 
         /// <summary>
         /// Identifies the Canvas.ZIndex attached property.

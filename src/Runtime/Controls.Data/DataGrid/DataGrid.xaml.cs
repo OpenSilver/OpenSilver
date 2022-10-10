@@ -323,8 +323,6 @@ namespace Windows.UI.Xaml.Controls
         public DataGrid()
         {
             this.CustomLayout = true;
-            this.IsAutoWidthOnCustomLayout = null;
-            this.IsAutoHeightOnCustomLayout = null;
             this.TabNavigation = KeyboardNavigationMode.Once;
             this.KeyDown += new KeyEventHandler(DataGrid_KeyDown);
             this.KeyUp += new KeyEventHandler(DataGrid_KeyUp);

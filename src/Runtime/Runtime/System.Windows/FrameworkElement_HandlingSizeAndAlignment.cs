@@ -101,7 +101,7 @@ namespace Windows.UI.Xaml
                 nameof(IsAutoWidthOnCustomLayout),
                 typeof(bool?),
                 typeof(FrameworkElement),
-                new PropertyMetadata(false));
+                new PropertyMetadata((object)null));
 
         internal bool IsAutoWidthOnCustomLayoutInternal
         {
@@ -135,7 +135,7 @@ namespace Windows.UI.Xaml
                 nameof(IsAutoHeightOnCustomLayout),
                 typeof(bool?),
                 typeof(FrameworkElement),
-                new PropertyMetadata(false));
+                new PropertyMetadata((object)null));
 
         internal bool IsAutoHeightOnCustomLayoutInternal
         {
@@ -178,21 +178,10 @@ namespace Windows.UI.Xaml
         private static void CustomLayout_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement fe = d as FrameworkElement;
-
-            if (fe.IsAutoHeightOnCustomLayoutInternal || fe.IsAutoWidthOnCustomLayoutInternal)
-            {
-                if ((bool)e.NewValue && fe.IsCustomLayoutRoot)
-                    fe.LayoutRootSizeChanged += Element_SizeChanged;
-                else
-                    fe.LayoutRootSizeChanged -= Element_SizeChanged;
-            }
+            if ((bool)e.NewValue && fe.IsCustomLayoutRoot)
+                fe.LayoutRootSizeChanged += Element_SizeChanged;
             else
-            {
-                if ((bool)e.NewValue && fe.IsCustomLayoutRoot)
-                    fe.SizeChanged += Element_SizeChanged;
-                else
-                    fe.SizeChanged -= Element_SizeChanged;
-            }
+                fe.LayoutRootSizeChanged -= Element_SizeChanged;
         }
 
         private static void Element_SizeChanged(object sender, SizeChangedEventArgs e)
