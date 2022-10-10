@@ -61,20 +61,14 @@ namespace System.Windows.Media.Effects
                 throw new ArgumentException();
             }
 
-            ((BlurEffect)d).RefreshEffect();
+            ((BlurEffect)d).RaiseChanged();
         }
 
-        internal override void SetParentUIElement(UIElement newParent)
+        internal override void Render(UIElement renderTarget)
         {
-            base.SetParentUIElement(newParent);
-            RefreshEffect();
-        }
-
-        private void RefreshEffect()
-        {
-            if (_parentUIElement != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(_parentUIElement))
+            if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(_parentUIElement);
+                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
 
                 // This gets a result very similar to Silverlight. Using the Radius directly
                 // makes the element much more blurry than Silverlight.

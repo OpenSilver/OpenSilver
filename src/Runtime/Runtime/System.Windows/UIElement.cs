@@ -506,46 +506,54 @@ namespace Windows.UI.Xaml
         }
 
 
-#region Effect
-
-        // todo: we may add the support for multiple effects on the same 
-        // UIElement since it is possible in html (but not in wpf). If we 
-        // try to, it will require some changes in the Effects already 
-        // implemented and some work to make it work properly in the 
-        // simulator.
-        public Effect Effect
-        {
-            get { return (Effect)GetValue(EffectProperty); }
-            set { SetValue(EffectProperty, value); }
-        }
+        #region Effect
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.Effect"/> dependency
-        /// property.
+        /// Identifies the <see cref="Effect"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty EffectProperty =
             DependencyProperty.Register(
                 nameof(Effect),
                 typeof(Effect),
                 typeof(UIElement),
-                new PropertyMetadata(null, Effect_Changed)
+                new PropertyMetadata(null, OnEffectChanged)
                 {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                    MethodToUpdateDom = (d, e) => ((Effect)e)?.Render((UIElement)d)
                 });
 
-        private static void Effect_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        // todo: we may add the support for multiple effects on the same 
+        // UIElement since it is possible in html (but not in wpf). If we 
+        // try to, it will require some changes in the Effects already 
+        // implemented and some work to make it work properly in the 
+        // simulator.
+        //
+        /// <summary>
+        /// Gets or sets the pixel shader effect to use for rendering this <see cref="UIElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The pixel shader effect to use for rendering this <see cref="UIElement"/>. The
+        /// default is null (no effects).
+        /// </returns>
+        public Effect Effect
+        {
+            get => (Effect)GetValue(EffectProperty);
+            set => SetValue(EffectProperty, value);
+        }
+
+        private static void OnEffectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
-            if (e.OldValue != null)
+            if (e.OldValue is Effect oldEffect)
             {
-                ((Effect)e.OldValue).SetParentUIElement(null);
+                oldEffect.Changed -= new EventHandler(element.OnEffectChanged);
             }
-
-            if (e.NewValue != null)
+            if (e.NewValue is Effect newEffect)
             {
-                ((Effect)e.NewValue).SetParentUIElement(element);
+                newEffect.Changed += new EventHandler(element.OnEffectChanged);
             }
         }
+
+        private void OnEffectChanged(object sender, EventArgs e) => ((Effect)sender).Render(this);
 
 #endregion
 
