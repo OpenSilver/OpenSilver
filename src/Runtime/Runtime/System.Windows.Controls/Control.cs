@@ -775,7 +775,7 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool Focus()
         {
-            if (Keyboard.IsFocusable(this) && IsConnectedToLiveTree)
+            if (Keyboard.IsFocusable(this))
             {
                 INTERNAL_HtmlDomManager.SetFocus(this);
                 

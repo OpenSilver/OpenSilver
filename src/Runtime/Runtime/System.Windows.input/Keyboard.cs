@@ -35,6 +35,6 @@ namespace System.Windows.Input
             => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
 
         internal static bool IsFocusable(Control control)
-            => control.IsVisible && control.IsEnabled && control.IsTabStop;
+            => control.IsConnectedToLiveTree && control.IsVisible && control.IsEnabled && control.IsTabStop;
     }
 }
