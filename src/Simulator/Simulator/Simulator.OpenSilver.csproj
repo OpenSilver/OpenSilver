@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}</ProjectGuid>
+    <ProjectGuid>{D0424346-5496-48D3-BB15-D98B6AC9C4FE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>OpenSilver.Simulator</AssemblyName>

@@ -31,6 +31,7 @@ using System.Windows.Threading;
 using System.Net.NetworkInformation;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Threading.Tasks;
 
 namespace OpenSilver.Simulator
 {
@@ -239,12 +240,10 @@ namespace OpenSilver.Simulator
             Top = (ScreenCoordinatesHelper.ScreenHeight / 2 - Height / 2) / 2;
         }
 
-        private void ButtonStats_Click(object sender, RoutedEventArgs e)
+        private async void ButtonStats_Click(object sender, RoutedEventArgs e)
         {
-            TheSimBrowser.Source = new Uri("http://www.google.com");
-
             // Count the number of DOM elements:
-            var count = TheSimBrowser.ExecuteScriptAsync(@"document.getElementsByTagName(""*"").length").Result.ToString();
+            var count = await TheSimBrowser.ExecuteScriptAsync(@"document.getElementsByTagName(""*"").length");
 
             // Display the result
             MessageBox.Show("Number of DOM elements: " + count
@@ -266,20 +265,9 @@ namespace OpenSilver.Simulator
                 );
         }
 
-        private void ButtonSeeHtml_Click(object sender, RoutedEventArgs e)
+        private async void ButtonSaveHtml_Click(object sender, RoutedEventArgs e)
         {
-            string html = getHtmlSnapshot();
-            var msgBox = new MessageBoxScrollable()
-            {
-                Value = html,
-                Title = "Snapshot of HTML displayed in the Simulator"
-            };
-            msgBox.Show();
-        }
-
-        private void ButtonSaveHtml_Click(object sender, RoutedEventArgs e)
-        {
-            string html = getHtmlSnapshot();
+            string html = await getHtmlSnapshot();
             SaveFileDialog saveFileDialog = new SaveFileDialog() { FileName = "index.html" };
             if (saveFileDialog.ShowDialog() == true)
                 File.WriteAllText(saveFileDialog.FileName, html);
@@ -419,24 +407,6 @@ Click OK to continue.";
             {
                 MessageBox.Show(ex.Message + "\r\n\r\n" + outputPathAbsolute + "\r\n\r\n" + NoteWhenUnableToLaunchTheGeneratedHtml);
             }
-        }
-
-        void ButtonExecuteJS_Click(object sender, RoutedEventArgs e)
-        {
-            var inputBox = new InputBox()
-            {
-                Value = _lastExecutedJavaScript,
-                Title = "Please enter JS to execute"
-            };
-            inputBox.Callback = (Action<bool>)(isOK =>
-            {
-                if (isOK)
-                {
-                    _OpenSilverRuntime.JavaScriptExecutionHandler.ExecuteJavaScript(inputBox.Value);
-                    _lastExecutedJavaScript = inputBox.Value;
-                }
-            });
-            inputBox.Show();
         }
 
         void ButtonTestOnMobileDevices_Click(object sender, RoutedEventArgs e)
@@ -626,24 +596,24 @@ Click OK to continue.";
             }
         }
 
-        private string getHtmlSnapshot(bool osRootOnly = false, string htmlElementId = null, string xamlElementName = null)
+        private async Task<string> getHtmlSnapshot(bool osRootOnly = false, string htmlElementId = null, string xamlElementName = null)
         {
             string html;
             if (htmlElementId != null)
             {
-                html = TheSimBrowser.ExecuteScriptAsync($"document.getElementById('{htmlElementId}').outerHTML").Result.ToString();
+                html = await TheSimBrowser.ExecuteScriptAsync($"document.getElementById('{htmlElementId}').outerHTML");
             }
             else if (xamlElementName != null)
             {
-                html = TheSimBrowser.ExecuteScriptAsync($"document.querySelectorAll('[dataid=\"{xamlElementName}\"]')[0].outerHTML").Result.ToString();
+                html = await TheSimBrowser.ExecuteScriptAsync($"document.querySelectorAll('[dataid=\"{xamlElementName}\"]')[0].outerHTML");
             }
             else if (osRootOnly)
             {
-                html = TheSimBrowser.ExecuteScriptAsync("document.getElementById('opensilver-root').outerHTML").Result.ToString();
+                html = await TheSimBrowser.ExecuteScriptAsync("document.getElementById('opensilver-root').outerHTML");
             }
             else
             {
-                html = TheSimBrowser.ExecuteScriptAsync("document.documentElement.outerHTML").Result.ToString();
+                html = await TheSimBrowser.ExecuteScriptAsync("document.documentElement.outerHTML");
             }
             return html ?? "";
         }
@@ -956,7 +926,7 @@ Click OK to continue.";
 
         public static MainWindow Instance { get; set; }
 
-        public static void SaveHtmlSnapshot(string fileName = null, bool osRootOnly = true, string htmlElementId = null, string xamlElementName = null)
+        public static async void SaveHtmlSnapshot(string fileName = null, bool osRootOnly = true, string htmlElementId = null, string xamlElementName = null)
         {
             if (fileName == null)
             {
@@ -969,7 +939,7 @@ Click OK to continue.";
             if (!Directory.Exists(debuggingFolder))
                 Directory.CreateDirectory(debuggingFolder);
 
-            File.WriteAllText(Path.Combine(debuggingFolder, fileName), Instance.getHtmlSnapshot(osRootOnly, htmlElementId, xamlElementName));
+            File.WriteAllText(Path.Combine(debuggingFolder, fileName), await Instance.getHtmlSnapshot(osRootOnly, htmlElementId, xamlElementName));
         }
     }
 }
