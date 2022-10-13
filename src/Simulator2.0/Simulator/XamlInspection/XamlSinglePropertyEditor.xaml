@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="OpenSilver.Simulator.XamlInspection.XamlSinglePropertyEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d">
+    <Grid Margin="6,3">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition Width="0.5*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="PropertyNameTextBlock" Grid.Column="0" Margin="0,4,5,0" Text="PROPERTYNAME" Foreground="#FFDDDDDD" VerticalAlignment="Top" TextAlignment="Right" TextWrapping="Wrap"/>
+        <TextBox x:Name="PropertyValueTextBox" Grid.Column="1" Text="PROPERTYVALUE" VerticalAlignment="Center" TextWrapping="Wrap" BorderThickness="0" TextChanged="PropertyValueTextBox_TextChanged" KeyDown="PropertyValueTextBox_KeyDown"/>
+        <Button x:Name="ButtonOK" Grid.Column="2" Content="OK" Click="ButtonOK_Click" Cursor="Hand"/>
+    </Grid>
+</UserControl>

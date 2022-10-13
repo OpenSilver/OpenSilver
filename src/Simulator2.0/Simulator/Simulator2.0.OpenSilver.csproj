@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BAB1B2F6-0152-4194-95A1-7D472D10B2E0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>OpenSilver.Simulator</AssemblyName>
+    <RootNamespace>DotNetForHtml5.EmulatorWithoutJavascript</RootNamespace>
+    <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
+    <DocumentationFile>bin\OpenSilver\$(Configuration)\OpenSilver.Simulator.xml</DocumentationFile>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
+    <Optimize>false</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\OpenSilver\Release\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;OPENSILVER</DefineConstants>
+    <DocumentationFile>bin\OpenSilver\Release\OpenSilver.Simulator.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework">
+      <Aliases>global</Aliases>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs">
+      <Link>ActivationHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\PathsHelper.cs">
+      <Link>SupportClasses\PathsHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs">
+      <Link>RegistryHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs">
+      <Link>TrialHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs">
+      <Link>ValidityHelpers_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs">
+      <Link>VersionInformation_SharedWithOtherProjects.cs</Link>
+    </Compile>
+    <Compile Include="Compilation\CompilationState.cs" />
+    <Compile Include="Console\ConsoleControl.xaml.cs">
+      <DependentUpon>ConsoleControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\ConsoleMessage.cs" />
+    <Compile Include="Console\ConsoleMessageControl.xaml.cs">
+      <DependentUpon>ConsoleMessageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Console\FileSource.cs" />
+    <Compile Include="Console\IMessageSource.cs" />
+    <Compile Include="Console\InteropSource.cs" />
+    <Compile Include="Debugging\DevToolsScreencastInfoWindow.xaml.cs">
+      <DependentUpon>DevToolsScreencastInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
+      <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Interop\ClipboardHandler.cs" />
+    <Compile Include="Interop\OSDispatcherTimer.cs" />
+    <Compile Include="Interop\SimulatorProxy.cs" />
+    <Compile Include="Interop\WebClientFactory.cs" />
+    <Compile Include="OpenSilverRuntime.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="RootPage.cs" />
+    <Compile Include="SimBrowser.cs" />
+    <Compile Include="SimulatorLauncher.cs" />
+    <Compile Include="SimulatorLaunchParameters.cs" />
+    <Compile Include="SupportClasses\CookieData.cs" />
+    <Compile Include="SupportClasses\CrossDomainCallsHelper.cs" />
+    <Compile Include="SupportClasses\Serializer.cs" />
+    <Compile Include="Interop\InteropHelpers.cs" />
+    <Compile Include="DialogBoxes\InputBox.xaml.cs">
+      <DependentUpon>InputBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StaticConstructorsCaller.cs" />
+    <Compile Include="SupportClasses\CookiesHelper.cs" />
+    <Compile Include="SupportClasses\ReflectionInUserAssembliesHelper.cs" />
+    <Compile Include="SupportClasses\ScreenCoordinatesHelper.cs" />
+    <Compile Include="Interop\WpfMediaElementFactory.cs" />
+    <Compile Include="Interop\JavaScriptExecutionHandler.cs" />
+    <Compile Include="SupportClasses\ResourceInterceptor.cs" />
+    <Compile Include="TrialHelpers_MoreMethods.cs" />
+    <Compile Include="XamlInspection\SimOverlayCallback.cs" />
+    <Compile Include="XamlInspection\TreeViewDataTemplateSelector.cs" />
+    <Compile Include="XamlInspection\TreeNode.cs" />
+    <Compile Include="XamlInspection\XamlInspectionTreeView.xaml.cs">
+      <DependentUpon>XamlInspectionTreeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XamlInspection\XamlInspectorHelper.cs" />
+    <Compile Include="XamlInspection\XamlPropertiesPane.xaml.cs">
+      <DependentUpon>XamlPropertiesPane.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XamlInspection\XamlSinglePropertyEditor.xaml.cs">
+      <DependentUpon>XamlSinglePropertyEditor.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Console\ConsoleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Console\ConsoleMessageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Debugging\DevToolsScreencastInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DialogBoxes\MessageBoxScrollable.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DialogBoxes\InputBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="XamlInspection\XamlInspectionTreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XamlInspection\XamlPropertiesPane.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XamlInspection\XamlSinglePropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <None Include="Simulator.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="OpenSilverIcon.ico" />
+    <Resource Include="Debugging\DevToolsScreencast.png" />
+    <Resource Include="Expand-Icon-5.png" />
+    <Content Include="interop_debug_root_opensilver.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="simulator_root_opensilver.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro" Version="1.2.4" />
+    <PackageReference Include="Microsoft.Web.Administration" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Web.WebView2">
+      <Version>1.0.1343.22</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Web.WebView2.DevToolsProtocolExtension">
+      <Version>1.0.824</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.Json">
+      <Version>6.0.6</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
