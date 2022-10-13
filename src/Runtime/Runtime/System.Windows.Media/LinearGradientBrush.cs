@@ -70,9 +70,9 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public static readonly DependencyProperty EndPointProperty =
             DependencyProperty.Register(
-                nameof(EndPoint), 
-                typeof(Point), 
-                typeof(LinearGradientBrush), 
+                nameof(EndPoint),
+                typeof(Point),
+                typeof(LinearGradientBrush),
                 new PropertyMetadata(new Point(1, 1), EndPoint_Changed));
 
         private static void EndPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -94,9 +94,9 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public static readonly DependencyProperty StartPointProperty =
             DependencyProperty.Register(
-                nameof(StartPoint), 
-                typeof(Point), 
-                typeof(LinearGradientBrush), 
+                nameof(StartPoint),
+                typeof(Point),
+                typeof(LinearGradientBrush),
                 new PropertyMetadata(new Point(), StartPoint_Changed));
 
         private static void StartPoint_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -109,7 +109,7 @@ namespace Windows.UI.Xaml.Media
             // todo: should that not take into consideration the size of the element 
             // (meaning that if it is twice as wide than it is high, the angle will
             // be different)?
-            _angle = Math.Atan2(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y) * 180.0 / Math.PI - 90.0; 
+            _angle = Math.Atan2(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y) * 180.0 / Math.PI - 90.0;
         }
 
         private void ToHtmlStringForAbsoluteMappingMode(DependencyObject parent, out string gradientStopsString, out double alpha)
@@ -140,13 +140,13 @@ namespace Windows.UI.Xaml.Media
                 // this is the slope of the line L defined by StartPoint and EndPoint
                 double slope = (EndPoint.Y - StartPoint.Y) / (EndPoint.X - StartPoint.X);
                 // this is the slope of any line perpendicular to L
-                double perpSlope = -1 / slope; 
+                double perpSlope = -1 / slope;
 
                 // this is k so that Y = perpSlope X + k is the line perpendicular P1 to
                 // L intersecting on StartPoint
                 double kStart = StartPoint.Y + 1 / slope * StartPoint.X;
                 // same for EndPoint (P2)
-                double kEnd = EndPoint.Y + 1 / slope * EndPoint.X; 
+                double kEnd = EndPoint.Y + 1 / slope * EndPoint.X;
 
                 if (slope > 0)
                 {
@@ -159,7 +159,7 @@ namespace Windows.UI.Xaml.Media
                     double XIStart = kStart / (slope - perpSlope);
                     // this is basically Y of the projection of StartPoint on the
                     // parallel to L, that passes through (0,0)
-                    double YIStart = slope * XIStart; 
+                    double YIStart = slope * XIStart;
 
                     double XIEnd = kEnd / (slope - perpSlope);
                     double YIEnd = slope * XIEnd;
@@ -182,7 +182,7 @@ namespace Windows.UI.Xaml.Media
                     double XIStart = (height - kStart) / (1 - 1 / slope);
                     // this is basically Y of the projection of StartPoint on the parallel to L,
                     // that passes through (0,0)
-                    double YIStart = height - slope * XIStart; 
+                    double YIStart = height - slope * XIStart;
 
                     //same for the end point:
                     double XIEnd = (height - kEnd) / (1 - 1 / slope);
@@ -201,7 +201,7 @@ namespace Windows.UI.Xaml.Media
                 {
                     // Note: these are to "fix" the value returned by the ArcTan (the result
                     // is basically the same angle but in the opposite direction)
-                    XVariation = -XVariation; 
+                    XVariation = -XVariation;
                     YVariation = -YVariation;
                 }
                 alpha = Math.Atan2(XVariation, YVariation) - Math.PI / 2;
@@ -296,7 +296,7 @@ namespace Windows.UI.Xaml.Media
             {
                 // Note: these are to "fix" the value returned by the ArcTan (the result
                 // is basically the same angle but in the opposite direction)
-                XVariation = -XVariation; 
+                XVariation = -XVariation;
                 YVariation = -YVariation;
             }
 
@@ -305,7 +305,7 @@ namespace Windows.UI.Xaml.Media
             alpha = Math.Atan2(XVariation, YVariation) - Math.PI / 2;
 
             // this will be the longest distance inside the shape for a segment with the alpha angle.
-            double D; 
+            double D;
 
             // test: we make the percentages by projecting the points on the diagonal with an angle
             // that is perpendicular to the line defined by StartPoint and Endpoint:
@@ -330,7 +330,7 @@ namespace Windows.UI.Xaml.Media
 
                 // length of the diagonal = sqrt(width ^ 2 + height ^ 2) and we ignore the actual
                 // size of the element since we want relative sizes anyway
-                D = Math.Sqrt(2); 
+                D = Math.Sqrt(2);
 
                 if (m > 0)
                 //if (m != -1)
@@ -406,7 +406,7 @@ namespace Windows.UI.Xaml.Media
             string gradientStopsString;
             // In that case, we want the whole thing to be of the color of the gradientStop
             // with the biggest offset:
-            if (StartPoint == EndPoint) 
+            if (StartPoint == EndPoint)
             {
                 string color = null;
                 double biggestOffset = 0;
@@ -435,16 +435,7 @@ namespace Windows.UI.Xaml.Media
 
             double angle = alpha * 180 / Math.PI;
 
-#if CSHTML5BLAZOR
-            if (!CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (!CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                // In the browsers, the angle goes in the opposite direction of that of the Simulator,
-                // and 0 degrees is not in the same position so we fix it:
-                angle = 360 - angle + 90;
-            }
+            angle = 360 - angle + 90;
 
             string gradientType = this.SpreadMethod == GradientSpreadMethod.Repeat ? "repeating-linear-gradient" : "linear-gradient";
             string baseString = gradientType + "(" + angle.ToInvariantString() + "deg, " + gradientStopsString + ")";

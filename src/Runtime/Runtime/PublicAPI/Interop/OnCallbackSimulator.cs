@@ -13,7 +13,9 @@
 \*====================================================================================*/
 
 using CSHTML5.Types;
+using DotNetForHtml5.Core;
 using System;
+using System.Runtime.InteropServices;
 
 #if BRIDGE
 using Bridge;
@@ -25,36 +27,46 @@ using DotNetBrowser;
 
 namespace CSHTML5.Internal
 {
-    internal class OnCallbackSimulator
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    [ComVisible(true)]
+    public class OnCallbackSimulator
     {
-        public OnCallbackSimulator()
+        public static OnCallbackSimulator Instance { get; }
+        static OnCallbackSimulator() { Instance = new OnCallbackSimulator(); }
+
+        private OnCallbackSimulator()
         {
             CheckIsRunningInTheSimulator();
+
+            INTERNAL_Simulator.SimulatorProxy.AddHostObject("onCallBack", this);
+            INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window.onCallBack = chrome.webview.hostObjects.onCallBack;");
         }
 
         public void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
         {
-            OnCallBackImpl.Instance.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
+            Action callBack = () => OnCallBackImpl.Instance.OnCallbackFromJavaScriptError(idWhereCallbackArgsAreStored);
+            INTERNAL_Simulator.SimulatorProxy.OSInvokeAsync(callBack);
         }
 
         // This method can be removed later. Now it is used for easier migration from old cshtml5.js to new one
-        public object OnCallbackFromJavaScript(
+        public void OnCallbackFromJavaScriptCSHTML5(    //changed name: WebView2 doesn't handle method overloading
             int callbackId,
             string idWhereCallbackArgsAreStored,
             object callbackArgsObject)
         {
-            return OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                false);
+            OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, false);
         }
 
-        public object OnCallbackFromJavaScript(
+        public void OnCallbackFromJavaScript(
             int callbackId,
             string idWhereCallbackArgsAreStored,
             object callbackArgsObject,
             bool returnValue)
         {
-            return OnCallBackImpl.Instance.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                MakeArgumentsForCallbackSimulator, true, returnValue);
+            Action callBack = () => OnCallBackImpl.Instance.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
+                    MakeArgumentsForCallbackSimulator, true, false);
+
+            INTERNAL_Simulator.SimulatorProxy.OSInvokeAsync(callBack);
         }
 
         private static object[] MakeArgumentsForCallbackSimulator(

@@ -38,22 +38,9 @@ namespace CSHTML5.Internal
 
         public void OnCallbackFromJavaScriptError(string idWhereCallbackArgsAreStored)
         {
-            Action action = () =>
-            {
-                string errorMessage = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("document.jsObjRef[$0][0]", idWhereCallbackArgsAreStored));
-                int indexOfNextUnmodifiedJSCallInList = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.jsObjRef[$0][1]", idWhereCallbackArgsAreStored));
-                INTERNAL_InteropImplementation.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
-            };
-
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
-                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(action);
-            }
-            else
-            {
-                action();
-            }
+            string errorMessage = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("document.jsObjRef[$0][0]", idWhereCallbackArgsAreStored));
+            int indexOfNextUnmodifiedJSCallInList = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.jsObjRef[$0][1]", idWhereCallbackArgsAreStored));
+            INTERNAL_InteropImplementation.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
         }
 
         private static object DelegateDynamicInvoke(Delegate d, params object[] args)
@@ -170,50 +157,26 @@ namespace CSHTML5.Internal
         {
             object result = null;
             var actionExecuted = false;
-            Action action = () =>
-            {
-                INTERNAL_SimulatorExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(
-                    () =>
-                    {
+            INTERNAL_SimulatorExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(
+                () =>
+                {
                         //--------------------
                         // Call the callback:
                         //--------------------
-                        try
-                        {
-                            result = CallMethod(callbackId, idWhereCallbackArgsAreStored, makeArguments, callbackArgsObject);
-                            actionExecuted = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-//#if DEBUG
-//                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-//#endif
-//                            throw;
-                        }
-                    });
-            };
-            if (isInSimulator)
-            {
-                // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
-                if (returnValue)
-                {
-                    var timeout = TimeSpan.FromSeconds(30);
-                    INTERNAL_Simulator.WebControlDispatcherInvoke(action, timeout);
-                    if (!actionExecuted)
+                    try
                     {
-                        throw GenerateDeadlockException(timeout);
+                        result = CallMethod(callbackId, idWhereCallbackArgsAreStored, makeArguments, callbackArgsObject);
+                        actionExecuted = true;
                     }
-                }
-                else
-                {
-                    INTERNAL_Simulator.WebControlDispatcherBeginInvoke(action);
-                }
-            }
-            else
-            {
-                action();
-            }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                            //#if DEBUG
+                            //                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                            //#endif
+                            //                            throw;
+                    }
+                });
 
             return returnValue ? result : null;
         }

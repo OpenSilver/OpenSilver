@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 
+using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,53 +30,6 @@ namespace DotNetForHtml5.Core
         static class INTERNAL_Simulator
     {
         // Note: all the properties here are populated by the Simulator, which "injects" stuff here when the application is launched in the Simulator.
-
-        static dynamic htmlDocument;
-        public static dynamic HtmlDocument
-        {
-            set // Intended to be called by the "Emulator" project to inject the HTML document.
-            {
-                htmlDocument = value;
-            }
-            internal get
-            {
-                return htmlDocument;
-            }
-        }
-
-        // Here we get the Document from DotNetBrowser
-        static dynamic domDocument;
-        public static dynamic DOMDocument
-        {
-            set // Intended to be called by the "Emulator" project to inject the Document.
-            {
-                domDocument = value;
-            }
-            internal get
-            {
-                return domDocument;
-            }
-        }
-
-        // BeginInvoke of the WebControl's Dispatcher
-        public static Action<Action> WebControlDispatcherBeginInvoke
-        {
-            set;
-            internal get;
-        }
-        // internal static dynamic WebControlDispatcherBeginInvoke => webControl;
-
-        // Invoke of the WebControl's Dispatcher
-        public static Action<Action, TimeSpan> WebControlDispatcherInvoke
-        {
-            set;
-            internal get;
-        }
-
-        /// <summary>
-        /// CheckAccess() of WebControl's Dispatcher.
-        /// </summary>
-        public static Func<bool> WebControlDispatcherCheckAccess { get; internal set; }
 
 #if CSHTML5NETSTANDARD
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler
@@ -116,25 +70,25 @@ namespace DotNetForHtml5.Core
             }
         }
 
-        static dynamic wpfMediaElementFactory;
-        public static dynamic WpfMediaElementFactory
-        {
-            set // Intended to be called by the "Emulator" project to inject the WpfMediaElementFactory.
-            {
-                wpfMediaElementFactory = value;
-            }
-            internal get
-            {
-                return wpfMediaElementFactory;
-            }
-        }
+        //static dynamic wpfMediaElementFactory;
+        //public static dynamic WpfMediaElementFactory
+        //{
+        //    set // Intended to be called by the "Emulator" project to inject the WpfMediaElementFactory.
+        //    {
+        //        wpfMediaElementFactory = value;
+        //    }
+        //    internal get
+        //    {
+        //        return wpfMediaElementFactory;
+        //    }
+        //}
 
-        static private dynamic webClientFactory;
-        public static dynamic WebClientFactory
-        {
-            get { return webClientFactory; }
-            set { webClientFactory = value; }
-        }
+        //static private dynamic webClientFactory;
+        //public static dynamic WebClientFactory
+        //{
+        //    get { return webClientFactory; }
+        //    set { webClientFactory = value; }
+        //}
 
         static dynamic clipboardHandler;
         public static dynamic ClipboardHandler
@@ -156,7 +110,7 @@ namespace DotNetForHtml5.Core
             {
                 simulatorProxy = value;
             }
-            internal get
+            get
             {
                 return simulatorProxy;
             }
@@ -170,15 +124,13 @@ namespace DotNetForHtml5.Core
         {
             set // Intended to be setted by the "Emulator" project.
             {
-                isRunningInTheSimulator_WorkAround = value; 
+                isRunningInTheSimulator_WorkAround = value;
             }
-            get 
-            { 
-                return isRunningInTheSimulator_WorkAround; 
+            get
+            {
+                return isRunningInTheSimulator_WorkAround;
             }
         }
 #endif
-
-        public static Func<object, object> ConvertBrowserResult { get; set; }
     }
 }
