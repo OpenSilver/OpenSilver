@@ -166,7 +166,7 @@ namespace OpenSilver.Simulator
             return timer;
         }
 
-        public void CreateCookie(string name, string value, string Domain, string Path, DateTime expirationTime = default, bool isSecure = false, string sameSite = "Lax")
+        public void CreateCookie(string name, string value, string Domain, string Path, DateTime expirationTime = default(DateTime), bool isSecure = false, string sameSite = "Lax")
         {
             _SimDispatcher.InvokeAsync(() =>
             {
