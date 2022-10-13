@@ -166,12 +166,12 @@ namespace OpenSilver.Simulator
             return timer;
         }
 
-        public void CreateCookie(string name, string value, string Domain, string Path, DateTime expirationTime = default(DateTime), bool isSecure = false, string sameSite = "Lax")
+        public void CreateCookie(string name, string value, string Domain, string Path, DateTime? expirationTime = null, bool isSecure = false, string sameSite = "Lax")
         {
             _SimDispatcher.InvokeAsync(() =>
             {
                 var cookie = SimBrowser.Instance.CoreWebView2.CookieManager.CreateCookie(name, value, Domain, Path);
-                cookie.Expires = expirationTime;
+                cookie.Expires = expirationTime != null ? (DateTime)expirationTime : DateTime.MinValue;
                 cookie.IsSecure = isSecure;
                 switch (sameSite)
                 {
