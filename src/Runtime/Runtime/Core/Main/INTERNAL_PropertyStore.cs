@@ -134,10 +134,9 @@ namespace CSHTML5.Internal
             {
                 object newLocalValue = newValue;
 
-                if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Local)
+                if (storage.Entry.IsExpression)
                 {
-                    var currentExpr = storage.LocalValue as Expression;
-                    if (currentExpr != null)
+                    if (storage.LocalValue is Expression currentExpr)
                     {
                         var newExpr = newValue as Expression;
                         if (currentExpr == newExpr)
@@ -158,6 +157,10 @@ namespace CSHTML5.Internal
                             newLocalValue = currentExpr;
                         }
                     }
+                }
+                else if (storage.Entry.IsExpressionFromStyle)
+                {
+                    ((Expression)storage.Entry.ModifiedValue.BaseValue).OnDetach(storage.Owner, storage.Property);
                 }
 
                 // Set the new local value
@@ -333,7 +336,7 @@ namespace CSHTML5.Internal
                 effectiveValue = newValue;
                 effectiveValueKind = oldBaseValueSource;
 
-                newEntry = new EffectiveValueEntry(oldEntry.FullValueSource);
+                newEntry = new EffectiveValueEntry(oldEntry.BaseValueSourceInternal);
                 if (!oldEntry.HasModifiers)
                 {
                     newEntry.Value = oldEntry.Value;
@@ -341,12 +344,16 @@ namespace CSHTML5.Internal
                 else
                 {
                     ModifiedValue modifiedValue = oldEntry.ModifiedValue;
-                    newEntry.Value = new ModifiedValue
+                    object baseValue = modifiedValue.BaseValue;
+                    newEntry.Value = baseValue;
+                    if (oldEntry.IsExpression)
                     {
-                        BaseValue = modifiedValue.BaseValue,
-                        ExpressionValue = modifiedValue.ExpressionValue,
-                        CoercedValue = modifiedValue.CoercedValue,
-                    };
+                        newEntry.SetExpressionValue(modifiedValue.ExpressionValue, baseValue);
+                    }
+                    else if (oldEntry.IsExpressionFromStyle)
+                    {
+                        newEntry.SetExpressionFromStyleValue(modifiedValue.ExpressionValue, baseValue);
+                    }
                 }
             }
             else
@@ -356,7 +363,7 @@ namespace CSHTML5.Internal
                 // Check for early exit if effective value is not impacted (if we are doing 
                 // a coerce operation, we have to go through the update process)
                 if (effectiveValueKind == oldBaseValueSource &&
-                    newValueSource < effectiveValueKind)
+                    (newValueSource < effectiveValueKind || clearValue))
                 {
                     // value source remains the same.
                     // Exit if the newly set value is of lower precedence than the effective value.

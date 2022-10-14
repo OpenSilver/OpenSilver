@@ -136,13 +136,11 @@ namespace Windows.UI.Xaml
                     ProcessMouseButtonEvent(
                         jsEventArg,
                         MouseLeftButtonDownEvent,
-                        preventTextSelectionWhenPointerIsCaptured: true,
                         refreshClickCount: true);
 #else
                     ProcessMouseButtonEvent(
                         jsEventArg,
                         PointerPressedEvent,
-                        preventTextSelectionWhenPointerIsCaptured: true,
                         refreshClickCount: true);
 #endif
                     break;
@@ -152,7 +150,6 @@ namespace Windows.UI.Xaml
                     ProcessMouseButtonEvent(
                         jsEventArg,
                         MouseRightButtonDownEvent,
-                        preventTextSelectionWhenPointerIsCaptured: true,
                         refreshClickCount: true);
 #endif
                     break;
@@ -206,7 +203,6 @@ namespace Windows.UI.Xaml
         private void ProcessMouseButtonEvent(
             object jsEventArg,
             RoutedEvent routedEvent,
-            bool preventTextSelectionWhenPointerIsCaptured = false,
             bool refreshClickCount = false)
         {
             string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
@@ -235,12 +231,6 @@ namespace Windows.UI.Xaml
 
                     // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
                     RaiseEvent(e);
-                }
-
-                //Prevent text selection when the pointer is captured:
-                if (preventTextSelectionWhenPointerIsCaptured && Pointer.INTERNAL_captured != null)
-                {
-                    OpenSilver.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
                 }
 
                 if (eventType == "touchend") //prepare to ignore the mouse events since they were already handled as touch events
@@ -386,12 +376,6 @@ namespace Windows.UI.Xaml
             
                 // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
                 RaiseEvent(e);
-            }
-            
-            //Prevent text selection when the pointer is captured:
-            if (Pointer.INTERNAL_captured != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScript(@"window.getSelection().removeAllRanges()");
             }
         }
 

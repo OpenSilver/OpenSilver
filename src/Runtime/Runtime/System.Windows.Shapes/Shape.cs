@@ -16,6 +16,7 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -965,7 +966,9 @@ context.translate($6, 0);
             }
             else
             {
-                throw new NotSupportedException("The specified brush is not supported.");
+                // Other types of brush are not supported. Use a transparent brush as a fallback.
+                Debug.WriteLine($"Brush of type '{brush.GetType().FullName}' are not supported.");
+                returnValue = Colors.Transparent.INTERNAL_ToHtmlString(1.0);
             }
             return returnValue;
         }

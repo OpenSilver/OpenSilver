@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using System.Xml.Linq;
 
 namespace OpenSilver.TemplateWizards
@@ -27,13 +28,28 @@ namespace OpenSilver.TemplateWizards
             );
         }
 
+        private static bool IsProjectAndSolutionSameDir(Dictionary<string, string> replacementsDictionary)
+        {
+            var solutionNameKey = "$specifiedsolutionname$";
+            var solutionName = replacementsDictionary.ContainsKey(solutionNameKey) ? replacementsDictionary[solutionNameKey] : null;
+            return string.IsNullOrEmpty(solutionName);
+        }
+
         private static void CopyNugetConfig(Dictionary<string, string> replacementsDictionary)
         {
-            var solutionDir = replacementsDictionary["$solutiondirectory$"];
-            var vsixNugetConfig = GetVsixFullPath(NugetConfig);
-            if (solutionDir != null && vsixNugetConfig != null)
+            try
             {
-                File.Copy(vsixNugetConfig, Path.Combine(solutionDir, NugetConfig));
+                var directoryKey = IsProjectAndSolutionSameDir(replacementsDictionary) ? "$destinationdirectory$" : "$solutiondirectory$";
+                var solutionDir =  replacementsDictionary.ContainsKey(directoryKey) ? replacementsDictionary[directoryKey] : null;
+                var vsixNugetConfig = GetVsixFullPath(NugetConfig);
+                if (solutionDir != null && vsixNugetConfig != null)
+                {
+                    File.Copy(vsixNugetConfig, Path.Combine(solutionDir, NugetConfig));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Nuget.Config has not been created.\r\nError Message:\r\n" + ex.Message);
             }
         }
 
@@ -119,7 +135,7 @@ namespace OpenSilver.TemplateWizards
                 CopyNugetConfig(replacementsDictionary);
             }
 
-            replacementsDictionary.Add("$opensilverpackageversion$", "1.0.0");
+            replacementsDictionary.Add("$opensilverpackageversion$", "1.1.0");
         }
 
         public bool ShouldAddProjectItem(string filePath)

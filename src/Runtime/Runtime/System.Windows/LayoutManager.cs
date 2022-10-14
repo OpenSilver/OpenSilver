@@ -150,10 +150,10 @@ namespace Windows.UI.Xaml
                     FrameworkElement fe = element as FrameworkElement;
                     if (fe.IsCustomLayoutRoot)
                     {
-                        if (fe.IsAutoWidthOnCustomLayout)
+                        if (fe.IsAutoWidthOnCustomLayoutInternal)
                             previousRect.Width = fe.DesiredSize.Width;
 
-                        if (fe.IsAutoHeightOnCustomLayout)
+                        if (fe.IsAutoHeightOnCustomLayoutInternal)
                             previousRect.Height = fe.DesiredSize.Height;
                     }
                     element.Arrange(previousRect);
@@ -171,12 +171,20 @@ namespace Windows.UI.Xaml
         {
             lock (queueLock)
             {
+                int visualLevelParent = parent.VisualLevel;
                 foreach (UIElement element in measureQueue)
                 {
-                    foreach (UIElement pathElement in GetElementPath(element))
+                    UIElement elIterator = element;
+                    while (elIterator != null)
                     {
-                        if (pathElement == parent)
+                        if (elIterator.VisualLevel <= visualLevelParent)
+                            break;
+
+                        elIterator = (UIElement)elIterator.INTERNAL_VisualParent;
+                        if (elIterator == parent)
+                        {
                             return true;
+                        }
                     }
                 }
             }

@@ -26,10 +26,12 @@ using OpenSilver.Internal.Xaml.Context;
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -492,6 +494,27 @@ namespace Windows.UI.Xaml.Controls
 
         #region Internal Methods
 
+        internal void ScrollIntoViewImpl(int index)
+        {
+            if (index >= 0 && index < Items.Count)
+            {
+                if (ItemsHost is VirtualizingPanel vp)
+                {
+                    vp.BringIndexIntoViewInternal(index);
+                }
+                else
+                {
+                    if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
+                        && container.INTERNAL_OuterDomElement != null)
+                    {
+                        OpenSilver.Interop.ExecuteJavaScript(
+                            "$0.scrollIntoView({ block: 'nearest'})",
+                            container.INTERNAL_OuterDomElement);
+                    }
+                }
+            }
+        }
+
         // adjust ItemInfos after a generator status change
         internal void AdjustItemInfoAfterGeneratorChange(ItemInfo info)
         {
@@ -749,6 +772,11 @@ namespace Windows.UI.Xaml.Controls
             this.OnItemsChanged(e);
         }
 
+        internal void NavigateToItem(object item, int elementIndex)
+            => FocusItem(NewItemInfo(item, ItemContainerGenerator.ContainerFromIndex(elementIndex)));
+
+        internal virtual bool FocusItem(ItemInfo info) => false;
+
         #endregion Internal Methods
 
         /// <summary>
@@ -917,6 +945,23 @@ namespace Windows.UI.Xaml.Controls
             ui = VisualTreeHelper.GetParent(ui) as UIElement;
 
             return ItemsControl.GetItemsOwner(ui);
+        }
+
+        protected override void OnTextInput(TextCompositionEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            if (!string.IsNullOrEmpty(e.Text))
+            {
+                TextSearch instance = TextSearch.EnsureInstance(this);
+
+                if (instance != null)
+                {
+                    instance.DoSearch(e.Text);                    
+                }
+            }
+
+            e.Handled = true;
         }
 
         #region Obsolete

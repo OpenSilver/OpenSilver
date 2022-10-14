@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
@@ -20,6 +21,8 @@ namespace OpenSilver.Internal.Data
 {
     internal sealed class IndexedPropertyPathNode : PropertyPathNode
     {
+        private const string IndexerPropertyName = "Item[]";
+
         private readonly string _index;
         private int? _intIndex;
         private PropertyInfo _indexer;
@@ -33,6 +36,8 @@ namespace OpenSilver.Internal.Data
         }
 
         public override Type Type => _indexer?.PropertyType;
+
+        public override string PropertyName => $"{_indexer.Name}[{_index}]";
 
         public override bool IsBound => _indexer != null;
 
@@ -49,8 +54,19 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        internal override void OnSourceChanged(object oldvalue, object newValue)
+        internal override void OnSourceChanged(object oldValue, object newValue)
         {
+            if (oldValue is INotifyPropertyChanged inpc)
+            {
+                inpc.PropertyChanged -= new PropertyChangedEventHandler(OnSourcePropertyChanged);
+            }
+
+            inpc = newValue as INotifyPropertyChanged;
+            if (inpc != null)
+            {
+                inpc.PropertyChanged += new PropertyChangedEventHandler(OnSourcePropertyChanged);
+            }
+
             // todo: (?) find out how to have a listener here since it
             // is a method and not a DependencyProperty (get_Item and
             // set_Item). I guess it would be nice to be able to attach
@@ -107,6 +123,20 @@ namespace OpenSilver.Internal.Data
             {
                 result = null;
                 return false;
+            }
+        }
+
+        private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == IndexerPropertyName)
+            {
+                UpdateValue();
+
+                IPropertyPathNode next = Next;
+                if (next != null)
+                {
+                    next.Source = Value;
+                }
             }
         }
 

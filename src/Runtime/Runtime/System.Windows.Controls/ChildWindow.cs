@@ -1605,121 +1605,36 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this.Overlay != null && Application.Current != null && Application.Current.Host != null && Application.Current.Host.Content != null)
             {
-#if !SILVERLIGHT
-                Rect windowBounds = Window.Current.Bounds;
-                double windowHeight = windowBounds.Height;
-                double windowWidth = windowBounds.Width;
-                this.Height = windowBounds.Height;
-                this.Width = windowBounds.Width;
-#else
+#if SILVERLIGHT
                 this.Height = Application.Current.Host.Content.ActualHeight;
                 this.Width = Application.Current.Host.Content.ActualWidth;
 #endif
-                this.Overlay.Height = this.Height;
-                this.Overlay.Width = this.Width;
+                Rect bounds = Window.Current.Bounds;
+                this.Overlay.Height = bounds.Height;
+                this.Overlay.Width = bounds.Width;
 
-                if (this.ContentRoot != null)
-                {
+                if (this.ContentRoot == null) return;
+
 #if !SILVERLIGHT
-                    // We set the size of the ContentRoot to be the same size that the user specified for the ChildWindow itself (this is due to the fact that the size of the ChildWindow is automatically changed to fit the screen so that the overlay fits the screen):
-                    this.ContentRoot.Width = this._widthThatWasInitiallySpecified;
-                    this.ContentRoot.Height = this._heightThatWasInitiallySpecified;
+                // We set the size of the ContentRoot to be the same size that the user specified for the ChildWindow itself (this is due to the fact that the size of the ChildWindow is automatically changed to fit the screen so that the overlay fits the screen):
 
-                    // Get the content of the ContentPresenter if any. This is useful so that the Grid that is at the root of the ChildWindow user code is able to enforce its size on its children (to work around an issue with the CSS grid that is unable to properly enforce its size on its children if the size comes from a parent element) (cf. zendesk ticket #1178 where scrollbars inside the ChildWindow did not function properly)
-                    FrameworkElement childWindowContentIfAny = (this._contentPresenter is ContentPresenter ? ((ContentPresenter)this._contentPresenter).Content as FrameworkElement : null);
-
-                    // Determine the chrome size (ie. size of the header bar and margins, that is the difference between the size of the ContentPresenter and the ContentRoot):
-                    double chromeHeight;
-                    if (TryCalculateChromeHeight(out chromeHeight))
-                    {
-                        // If the size is "Auto", we set a limit (max height and max width) so that scroll bars work as expected:
-                        bool isHeightAuto = double.IsNaN(this._heightThatWasInitiallySpecified); // Means "Auto"
-                        if (isHeightAuto)
-                        {
-                            double maxHeight = windowHeight - chromeHeight;
-                            this._contentPresenter.MaxHeight = maxHeight; // Note: "this._contentPresenter" is not null because the "TryCalculateChromeHeight" method verified it.
-                            if (childWindowContentIfAny != null)
-                                childWindowContentIfAny.MaxHeight = maxHeight;
-                        }
-                        else
-                        {
-                            double maxHeight = this._heightThatWasInitiallySpecified - chromeHeight;
-                            this._contentPresenter.MaxHeight = maxHeight;
-                            if (childWindowContentIfAny != null)
-                                childWindowContentIfAny.MaxHeight = maxHeight;
-                        }
-                    }
-                    // Determine the chrome size (ie. size of the header bar and margins, that is the difference between the size of the ContentPresenter and the ContentRoot):
-                    double chromeWidth;
-                    if (TryCalculateChromeWidth(out chromeWidth))
-                    {
-                        // If the size is "Auto", we set a limit (max height and max width) so that scroll bars work as expected:
-                        bool isWidthAuto = double.IsNaN(this._widthThatWasInitiallySpecified); // Means "Auto"
-                        if (isWidthAuto)
-                        {
-                            double maxWidth = windowWidth - chromeWidth;
-                            this._contentPresenter.MaxWidth = maxWidth; // Note: "this._contentPresenter" is not null because the "TryCalculateChromeWidth" method verified it.
-                            if (childWindowContentIfAny != null)
-                                childWindowContentIfAny.MaxWidth = maxWidth;
-                        }
-                        else
-                        {
-                            double maxWidth = this._widthThatWasInitiallySpecified - chromeWidth;
-                            this._contentPresenter.MaxWidth = maxWidth;
-                            if (childWindowContentIfAny != null)
-                                childWindowContentIfAny.MaxWidth = maxWidth;
-                        }
-                    }
-#else
+                if (!double.IsNaN(this._widthThatWasInitiallySpecified))
+                {
                     this.ContentRoot.Width = this._desiredContentWidth;
+                }
+
+                if (!double.IsNaN(this._heightThatWasInitiallySpecified))
+                {
                     this.ContentRoot.Height = this._desiredContentHeight;
-#endif
-                    this.ContentRoot.Margin = this._desiredMargin;
                 }
-            }
-        }
 
-#if !SILVERLIGHT
-        /// <summary>
-        /// Determines the chrome size (ie. size of the header bar and margins, that is the difference between the size of the ContentPresenter and the ContentRoot)
-        /// </summary>
-        bool TryCalculateChromeHeight(out double chromeHeight)
-        {
-            if (this.ContentRoot != null && this._contentPresenter != null)
-            {
-                double actualContentRootHeight = this.ContentRoot.ActualHeight;
-                double actualContentPresenterHeight = this._contentPresenter.ActualHeight;
-                if (!double.IsNaN(actualContentRootHeight)
-                    && !double.IsNaN(actualContentPresenterHeight))
-                {
-                    chromeHeight = actualContentRootHeight - actualContentPresenterHeight;
-                    return true;
-                }
-            }
-            chromeHeight = 0d;
-            return false;
-        }
-
-        /// <summary>
-        /// Determines the chrome size (ie. size of the header bar and margins, that is the difference between the size of the ContentPresenter and the ContentRoot)
-        /// </summary>
-        bool TryCalculateChromeWidth(out double chromeWidth)
-        {
-            if (this.ContentRoot != null && this._contentPresenter != null)
-            {
-                double actualContentRootWidth = this.ContentRoot.ActualWidth;
-                double actualContentPresenterWidth = this._contentPresenter.ActualWidth;
-                if (!double.IsNaN(actualContentRootWidth)
-                    && !double.IsNaN(actualContentPresenterWidth))
-                {
-                    chromeWidth = actualContentRootWidth - actualContentPresenterWidth;
-                    return true;
-                }
-            }
-            chromeWidth = 0d;
-            return false;
-        }
+#else
+                this.ContentRoot.Width = this._desiredContentWidth;
+                this.ContentRoot.Height = this._desiredContentHeight;
 #endif
+                this.ContentRoot.Margin = this._desiredMargin;
+            }
+        }
 
         /// <summary>
         /// Updates the position of the window in case the size of the content changes.

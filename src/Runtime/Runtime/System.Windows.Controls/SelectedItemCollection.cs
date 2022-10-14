@@ -51,6 +51,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected override void ClearItems()
         {
+            CheckReadOnly();
             if (_updatingSelectedItems)
             {
                 foreach (ItemsControl.ItemInfo current in _selector.SelectedItemsInternal)
@@ -72,6 +73,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected override void RemoveItem(int index)
         {
+            CheckReadOnly();
             if (_updatingSelectedItems)
             {
                 _selector.SelectionChange.Unselect(_selector.NewItemInfo(this[index]));
@@ -90,6 +92,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected override void InsertItem(int index, object item)
         {
+            CheckReadOnly();
             if (_updatingSelectedItems)
             {
                 // For defered selection we should allow only Add method
@@ -116,6 +119,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         protected override void SetItem(int index, object item)
         {
+            CheckReadOnly();
             if (_updatingSelectedItems)
             {
                 throw new InvalidOperationException("Cannot set an item in a selection when selection is in progress. Use Add or Remove method.");
@@ -136,6 +140,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="newIndex">index of the column to be move to</param>
         protected override void MoveItem(int oldIndex, int newIndex)
         {
+            CheckReadOnly();
             if (oldIndex != newIndex)
             {
                 if (_updatingSelectedItems)
@@ -268,5 +273,13 @@ namespace Windows.UI.Xaml.Controls
         // When EndUpdateSelectedItems() is called we first reset this flag to allow SelectedItems.Add to change the collection
         private bool _updatingSelectedItems;
 #endregion
+
+        private void CheckReadOnly()
+        {
+            if (!_selector.CanSelectMultiple && !_selector.SelectionChange.IsActive)
+            {
+                throw new InvalidOperationException("Can only change SelectedItems collection in multiple selection modes. Use SelectedItem in single select modes.");
+            }
+        }
     }
 }

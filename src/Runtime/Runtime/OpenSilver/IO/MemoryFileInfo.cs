@@ -24,7 +24,7 @@ namespace OpenSilver.IO
     /// </summary>
     public class MemoryFileInfo
     {
-        private byte[] _content;
+        private readonly byte[] _content;
 
         public MemoryFileInfo(string filename, byte[] content)
         {
@@ -34,6 +34,8 @@ namespace OpenSilver.IO
 
         public string Name { get; }
 
+        public string Extension => Path.GetExtension(Name);
+
         public Stream OpenRead()
         {
             MemoryStream memoryStream = new MemoryStream();
@@ -41,5 +43,16 @@ namespace OpenSilver.IO
             memoryStream.Seek(0, SeekOrigin.Begin);
             return memoryStream;
         }
+
+        public override string ToString() => Name;
+
+        [NotImplemented]
+        public bool Exists { get; }
+
+        [NotImplemented]
+        public FileAttributes Attributes { get; set; }
+
+        [NotImplemented]
+        public virtual string FullName => Name;
     }
 }

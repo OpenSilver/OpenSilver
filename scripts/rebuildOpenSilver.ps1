@@ -1,10 +1,10 @@
 param (
-    $OS_VERSION = $(if ($null -eq $env:OS_VERSION) { "1.0.0" } else { $env:OS_VERSION }),
+    $OS_VERSION = $(if ($null -eq $env:OS_VERSION) { "1.1.0" } else { $env:OS_VERSION }),
     $OS_CONFIGURATION = $(if ($null -eq $env:OS_CONFIGURATION) { "SL" } else { $env:OS_CONFIGURATION }),
     $OS_NAME = $(if ($null -eq $env:OS_NAME) { "OpenSilver" } else { $env:OS_NAME }),
     $OS_SIMULATOR_NAME = $(if ($null -eq $env:OS_SIMULATOR_NAME) { "OpenSilver.Simulator" } else { $env:OS_SIMULATOR_NAME }),
-    $OS_SIMULATOR_VERSION = $(if ($null -eq $env:OS_SIMULATOR_VERSION) { "1.0.0" } else { $env:OS_SIMULATOR_VERSION }),
-    $OS_BUILD_VERSION=$(if ($null -eq $env:OS_BUILD_VERSION) { "1.0.0" } else { $env:OS_BUILD_VERSION }),
+    $OS_SIMULATOR_VERSION = $(if ($null -eq $env:OS_SIMULATOR_VERSION) { "1.1.0" } else { $env:OS_SIMULATOR_VERSION }),
+    $OS_BUILD_VERSION=$(if ($null -eq $env:OS_BUILD_VERSION) { "1.1.0" } else { $env:OS_BUILD_VERSION }),
     $MSBUILD = "msbuild.exe",
     $NUGET_CACHE = "$env:USERPROFILE\.nuget\packages",
     $COPY_PDB = $false,

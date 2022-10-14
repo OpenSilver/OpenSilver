@@ -99,7 +99,10 @@ namespace CSHTML5
             // 10 arguments and using "$10".
             for (int i = variables.Length - 1; i >= 0; i--)
             {
-                var variable = variables[i];
+                var variable = variables[i] is Delegate
+                    ? JavascriptCallback.Create((Delegate)variables[i])
+                    : variables[i];
+
                 if (variable is INTERNAL_JSObjectReference)
                 {
                     //----------------------
@@ -129,18 +132,18 @@ namespace CSHTML5
                     string id = ((INTERNAL_HtmlDomElementReference)variable).UniqueIdentifier;
                     javascript = javascript.Replace("$" + i.ToString(), $@"document.getElementByIdSafe(""{id}"")");
                 }
-                else if (variable is Delegate)
+                else if (variable is JavascriptCallback)
                 {
                     //-----------
                     // Delegates
                     //-----------
 
-                    Delegate callback = (Delegate)variable;
+                    var jsCallback = (JavascriptCallback)variable;
 
                     // Add the callback to the document:
-                    int callbackId = OnCallBackImpl.Instance.RegisterCallBack(callback);
+                    int callbackId = jsCallback.Id;
 
-                    var isVoid = callback.Method.ReturnType == typeof(void);
+                    var isVoid = jsCallback.GetCallback().Method.ReturnType == typeof(void);
 
                     // Change the JS code to point to that callback:
                     javascript = javascript.Replace("$" + i.ToString(), string.Format(
@@ -420,6 +423,11 @@ img.src = $0;", html5Path, callback);
                 _items.Add(item);
                 return _items.Count - 1;
             }
+        }
+
+        public void Clean(int index)
+        {
+            _items[index] = default;
         }
 
         public T Get(int index) => _items[index];

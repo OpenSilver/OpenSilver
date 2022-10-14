@@ -66,6 +66,8 @@ namespace OpenSilver.Internal.Data
             }
         }
 
+        public override string PropertyName => _propertyName;
+
         public override bool IsBound => _dp != null || _prop != null;
 
         internal override void SetValue(object value)

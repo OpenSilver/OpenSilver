@@ -18,8 +18,8 @@ namespace TestApplication
             Tests.Add(new Test("ItemsControl", "ItemsControl"));
             Tests.Add(new Test("ComboBox", "ComboBox"));
             Tests.Add(new Test("AutoCompleteBox", "AutoCompleteBox"));
-            Tests.Add(new Test("TimePicker", "TimePicker"));
             Tests.Add(new Test("Accordion", "Accordion"));
+            Tests.Add(new Test("TimePicker", "TimePicker"));
             Tests.Add(new Test("Negative Margin", "Negative Margin"));
             Tests.Add(new Test("LinQ", "LinQ"));
             Tests.Add(new Test("Opacity", "IsHitTestVisible Opacity"));
@@ -127,6 +127,7 @@ namespace TestApplication
             Tests.Add(new Test("(De)Serialization", "DeSerialization"));
             Tests.Add(new Test("Two TextBoxes Horizontally", "TwoTextBoxesHorizontally"));
             Tests.Add(new Test("TextBox Properties", "TextBoxProperties"));
+            Tests.Add(new Test("TextBlock", "TextBlock"));
 
 			TestCategory shapes = new TestCategory("Shapes");
 			shapes.Add(new Test("Polygon", "Shapes/Polygon"));

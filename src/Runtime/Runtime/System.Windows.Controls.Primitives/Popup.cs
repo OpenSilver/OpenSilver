@@ -242,11 +242,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (newContent != null)
             {
                 popup.AddLogicalChild(newContent);
+                if (popup.CustomLayout && newContent is FrameworkElement feContent)
+                {
+                    feContent.CustomLayout = true;
+                }
             }
 
             if (popup._isVisible)
             {
-                popup._outerBorder.Child = newContent;
+                popup._outerBorder.Content = newContent;
             }
             else
             {
@@ -601,14 +605,20 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 _popupRoot.UpdateIsVisible();
 
                 // Set CustomLayout of the popup root:
-                if (this.CustomLayout)
+                if (CustomLayout)
+                {
                     _popupRoot.CustomLayout = true;
+                    if (Child is FrameworkElement childFe)
+                    {
+                        childFe.CustomLayout = true;
+                    }
+                }
 
                 UpdatePopupParent();
 
                 // Clear the previous content if any:
                 if (_outerBorder != null)
-                    _outerBorder.Child = null;
+                    _outerBorder.Content = null;
 
                 // Calculate the position of the parent of the popup, in case that the popup is in the Visual Tree:
                 _referencePosition = CalculateReferencePosition(parentWindow) ?? new Point();
@@ -620,7 +630,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 _outerBorder = new NonLogicalContainer()
                 {
                     Margin = new Thickness(_referencePosition.X + this.HorizontalOffset, _referencePosition.Y + this.VerticalOffset, 0d, 0d),
-                    Child = child,
+                    Content = child,
                     HorizontalAlignment = this.HorizontalContentAlignment,
                     VerticalAlignment = this.VerticalContentAlignment,
                     INTERNAL_ForceEnableAllPointerEvents = INTERNAL_AllowDisableClickTransparency && !transparentToClicks, // This is here because we set "pointerEvents='none' to the PopupRoot, so we need to re-enable pointer events in the children (unless we have calculated that the popup should be "transparentToClicks").
@@ -719,12 +729,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
         internal void OnOutsideClick(OutsideClickEventArgs args) => OutsideClick?.Invoke(this, args);
 
         private bool _stayOpen = true;
+
         public bool StayOpen
         {
-            get { return _stayOpen; }
-            set { _stayOpen = value; }
+            get => _stayOpen;
+            set
+            {
+                if (_stayOpen != value)
+                {
+                    _stayOpen = value;
+                    if (_popupRoot != null)
+                    {
+                        SetPointerEvents(_popupRoot);
+                    }
+                }
+            }
         }
-
 
         internal void UpdatePopupParent()
         {
@@ -818,97 +838,42 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public bool Handled { get; set; }
     }
 
-    internal sealed class NonLogicalContainer : FrameworkElement
+    internal sealed class NonLogicalContainer : ContentPresenter
     {
-        private UIElement _child;
-
-        public UIElement Child
+        public NonLogicalContainer()
         {
-            get => _child;
+            ContentTemplate = UIElementContentTemplate;
+        }
+
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+
+            if (VisualTreeHelper.GetChildrenCount(this) > 0
+                && VisualTreeHelper.GetChild(this, 0) is UIElement child)
+            {
+                child.UpdateIsVisible();
+            }
+        }
+
+        internal override FrameworkElement TemplateChild
+        {
+            get => _templateChild;
             set
             {
-                if (ReferenceEquals(_child, value))
+                if (_templateChild != value)
                 {
-                    return;
-                }
-
-                if (_child != null)
-                {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_child, this);
-                    _child.UpdateIsVisible();
-                }
-
-                _child = value;
-
-                if (_child != null)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_child, this);
-                    _child.UpdateIsVisible();
+                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_templateChild, this);
+                    _templateChild = value;
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
                 }
             }
         }
 
-        protected internal override void INTERNAL_OnAttachedToVisualTree()
-        {
-            base.INTERNAL_OnAttachedToVisualTree();
-
-            if (Child != null)
-            {
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
-                Child.UpdateIsVisible();
-            }
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            UIElement child = Child;
-            if (child != null)
-            {
-                child.Measure(availableSize);
-                return child.DesiredSize;
-            }
-
-            return new Size();
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            UIElement child = Child;
-            if (child != null)
-            {
-                child.Arrange(new Rect(finalSize));
-            }
-
-            return finalSize;
-        }
-
-        /// <summary>
-        /// Returns the Visual children count.
-        /// </summary>
-        internal override int VisualChildrenCount
-        {
-            get
-            {
-                if (Child == null)
-                {
-                    return 0;
-                }
-
-                return 1;
-            }
-        }
-
-        /// <summary>
-        /// Returns the child at the specified index.
-        /// </summary>
-        internal override UIElement GetVisualChild(int index)
-        {
-            if (Child == null || index != 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
-            return Child;
-        }
+        private FrameworkElement _templateChild;
     }
 }

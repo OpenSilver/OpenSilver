@@ -248,7 +248,7 @@ namespace Windows.UI.Xaml.Controls
                 bool isConstrainedHeight = availableSizeY != double.PositiveInfinity;
 
                 Size availableSize = new Size(availableSizeX, availableSizeY);
-                Size scale = ComputeScaleFactor(availableSize, contentSize);
+                Size scale = ComputeScaleFactor(availableSize, contentSize, Stretch, StretchDirection);
 
                 Scale.ScaleX = scale.Width;
                 Scale.ScaleY = scale.Height;
@@ -266,36 +266,31 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Compute the scale factor of the Child content.
+        /// This is a helper function that computes scale factors depending on a target size and a content size
         /// </summary>
-        /// <param name="availableSize">
-        /// Available size to fill with content.
-        /// </param>
-        /// <param name="contentSize">Desired size of the content.</param>
-        /// <returns>Width and Height scale factors.</returns>
-        private Size ComputeScaleFactor(Size availableSize, Size contentSize)
+        /// <param name="availableSize">Size into which the content is being fitted.</param>
+        /// <param name="contentSize">Size of the content, measured natively (unconstrained).</param>
+        /// <param name="stretch">Value of the Stretch property on the element.</param>
+        /// <param name="stretchDirection">Value of the StretchDirection property on the element.</param>
+        internal static Size ComputeScaleFactor(Size availableSize,
+                                                Size contentSize,
+                                                Stretch stretch,
+                                                StretchDirection stretchDirection)
         {
+            // Compute scaling factors to use for axes
             double scaleX = 1.0;
             double scaleY = 1.0;
 
-            bool isConstrainedWidth = availableSize.Width != double.PositiveInfinity;
-            bool isConstrainedHeight = availableSize.Height != double.PositiveInfinity;
+            bool isConstrainedWidth = !double.IsPositiveInfinity(availableSize.Width);
+            bool isConstrainedHeight = !double.IsPositiveInfinity(availableSize.Height);
 
-            //bool isConstrainedWidth = !double.IsPositiveInfinity(availableSize.Width);
-            //bool isConstrainedHeight = !double.IsPositiveInfinity(availableSize.Height);
-
-            Stretch stretch = Stretch;
-
-            // Don't scale if we shouldn't stretch or the scaleX and scaleY are both infinity.
-            if ((stretch != Stretch.None) && (isConstrainedWidth || !isConstrainedHeight))
+            if ((stretch == Stretch.Uniform || stretch == Stretch.UniformToFill || stretch == Stretch.Fill)
+                 && (isConstrainedWidth || isConstrainedHeight))
             {
-                // Compute the individual scaleX and scaleY scale factors
-                scaleX = contentSize.Width == 0.0 ? 0.0 : (availableSize.Width / contentSize.Width);
-                scaleY = contentSize.Height == 0.0 ? 0.0 : (availableSize.Height / contentSize.Height);
+                // Compute scaling factors for both axes
+                scaleX = contentSize.Width.IsZero() ? 0.0 : availableSize.Width / contentSize.Width;
+                scaleY = contentSize.Height.IsZero() ? 0.0 : availableSize.Height / contentSize.Height;
 
-                // Make the scale factors uniform by setting them both equal to
-                // the larger or smaller (depending on infinite lengths and the
-                // Stretch value)
                 if (!isConstrainedWidth)
                 {
                     scaleX = scaleY;
@@ -306,40 +301,46 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-                    // (isConstrainedWidth && isConstrainedHeight)
+                    // If not preserving aspect ratio, then just apply transform to fit
                     switch (stretch)
                     {
-                        case Stretch.Uniform:
-                            // Use the smaller factor for both
+                        case Stretch.Uniform:       //Find minimum scale that we use for both axes
                             scaleX = scaleY = Math.Min(scaleX, scaleY);
                             break;
-                        case Stretch.UniformToFill:
-                            // Use the larger factor for both
+
+                        case Stretch.UniformToFill: //Find maximum scale that we use for both axes
                             scaleX = scaleY = Math.Max(scaleX, scaleY);
                             break;
-                        case Stretch.Fill:
-                        default:
+
+                        case Stretch.Fill:          //We already computed the fill scale factors above, so just use them
                             break;
                     }
                 }
 
-                // Prevent scaling in an undesired direction
-                switch (StretchDirection)
+                //Apply stretch direction by bounding scales.
+                //In the uniform case, scaleX=scaleY, so this sort of clamping will maintain aspect ratio
+                //In the uniform fill case, we have the same result too.
+                //In the fill case, note that we change aspect ratio, but that is okay
+                switch (stretchDirection)
                 {
                     case StretchDirection.UpOnly:
-                        scaleX = Math.Max(1.0, scaleX);
-                        scaleY = Math.Max(1.0, scaleY);
+                        if (scaleX < 1.0) scaleX = 1.0;
+                        if (scaleY < 1.0) scaleY = 1.0;
                         break;
+
                     case StretchDirection.DownOnly:
-                        scaleX = Math.Min(1.0, scaleX);
-                        scaleY = Math.Min(1.0, scaleY);
+                        if (scaleX > 1.0) scaleX = 1.0;
+                        if (scaleY > 1.0) scaleY = 1.0;
                         break;
+
                     case StretchDirection.Both:
+                        break;
+
                     default:
                         break;
                 }
             }
-
+            //Return this as a size now
             return new Size(scaleX, scaleY);
         }
 

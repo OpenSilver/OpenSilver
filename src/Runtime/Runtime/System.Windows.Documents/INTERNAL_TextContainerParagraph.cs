@@ -1,4 +1,5 @@
-﻿/*===================================================================================
+﻿
+/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -13,13 +14,6 @@
 using CSHTML5.Internal;
 
 #if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
-
-
-#if MIGRATION
 namespace System.Windows.Documents
 #else
 namespace Windows.UI.Xaml.Documents
@@ -28,14 +22,37 @@ namespace Windows.UI.Xaml.Documents
     internal class INTERNAL_TextContainerParagraph : INTERNAL_TextContainer
     {
         public INTERNAL_TextContainerParagraph(Paragraph parent)
-            :base(parent)
+            : base(parent)
         {
-
         }
 
         public Paragraph Paragraph => (Paragraph)this.Parent;
 
-        public override string Text => "This is paragraph";
+        public override string Text
+        {
+            get
+            {
+                string text = "";
+                foreach (var inline in ((Paragraph)Parent).Inlines)
+                {
+                    if (inline is Run run)
+                    {
+                        text += run.Text;
+                    }
+                    else if (inline is LineBreak)
+                    {
+                        text += "\\n";
+                    }
+                    else if (inline is Span span)
+                    {
+                        var textContainer = new INTERNAL_TextContainerSpan(span);
+                        text += textContainer.Text;
+                    }
+                }
+
+                return text;
+            }
+        }
 
         protected override void OnTextAddedOverride(TextElement textElement)
         {

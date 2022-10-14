@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #if !MIGRATION
 using Windows.UI.Xaml;
@@ -27,22 +21,25 @@ using Windows.UI.Xaml.Media;
 namespace System.Windows.Media.Effects
 {
     /// <summary>
-    /// Provides a custom bitmap effect.
+    /// Provides a base class for all bitmap effects.
     /// </summary>
-    public abstract partial class Effect : DependencyObject//: Animatable
+    public abstract class Effect : DependencyObject
     {
-        //Note: we inherit from DependencyObject but we should only inherit from Animatable
-
-        internal UIElement _parentUIElement;
-        internal virtual void SetParentUIElement(UIElement newParent)
-        {
-            _parentUIElement = newParent;
-        }
-
         /// <summary>
-        /// Initializes a new instance of the System.Windows.Media.Effects.Effect class.
+        /// Initializes a new instance of the <see cref="Effect"/> class.
         /// </summary>
         protected Effect() { }
+
+        /// <summary>
+        /// Gets a <see cref="Brush"/> that, when it is used as an input for an <see cref="Effect"/>,
+        /// causes the bitmap of the <see cref="UIElement"/> that the <see cref="Effect"/>
+        /// is applied to be that input.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Brush"/> that acts as the input.
+        /// </returns>
+        [OpenSilver.NotImplemented]
+        public static Brush ImplicitInput { get; }
 
         /// <summary>
         /// When overridden in a derived class, transforms mouse input and coordinate systems
@@ -54,37 +51,10 @@ namespace System.Windows.Media.Effects
         [OpenSilver.NotImplemented]
         protected internal virtual GeneralTransform EffectMapping => new MatrixTransform();
 
-        ///// <summary>
-        ///// Gets a System.Windows.Media.Brush that, when it is used as an input for an
-        ///// System.Windows.Media.Effects.Effect, causes the bitmap of the System.Windows.UIElement
-        ///// that the System.Windows.Media.Effects.Effect is applied to be that input.
-        ///// </summary>
-        //public static Brush ImplicitInput { get; }
+        internal event EventHandler Changed;
 
-        //// Returns:
-        ////     A modifiable clone of this instance. The returned clone is effectively a
-        ////     deep copy of the current object. The clone's System.Windows.Freezable.IsFrozen
-        ////     property is false.
-        ///// <summary>
-        ///// Creates a modifiable clone of this System.Windows.Media.Effects.Effect object,
-        ///// making deep copies of this object's values. When copying this object's dependency
-        ///// properties, this method copies resource references and data bindings (which
-        ///// may no longer resolve), but not animations or their current values.
-        ///// </summary>
-        ///// <returns></returns>
-        //public Effect Clone();
+        internal void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
-        //// Returns:
-        ////     A modifiable clone of the current object. The cloned object's System.Windows.Freezable.IsFrozen
-        ////     property will be false even if the source's System.Windows.Freezable.IsFrozen
-        ////     property was true.
-        ///// <summary>
-        ///// Creates a modifiable clone of this System.Windows.Media.Effects.Effect object,
-        ///// making deep copies of this object's current values. Resource references,
-        ///// data bindings, and animations are not copied, but their current values are
-        ///// copied.
-        ///// </summary>
-        ///// <returns></returns>
-        //public Effect CloneCurrentValue();
+        internal virtual void Render(UIElement renderTarget) { }
     }
 }

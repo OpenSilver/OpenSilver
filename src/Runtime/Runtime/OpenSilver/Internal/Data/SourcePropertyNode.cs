@@ -41,6 +41,8 @@ namespace OpenSilver.Internal.Data
 
         Type IPropertyPathNode.Type => null;
 
+        string IPropertyPathNode.PropertyName => string.Empty;
+
         IPropertyPathNode IPropertyPathNode.Next 
         { 
             get => null;

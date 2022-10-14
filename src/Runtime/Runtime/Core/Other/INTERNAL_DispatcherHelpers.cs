@@ -27,19 +27,17 @@ using Windows.Foundation;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
+using Dispatcher = Windows.UI.Core.CoreDispatcher;
 #endif
 
 namespace CSHTML5.Internal
 {
     public static class INTERNAL_DispatcherHelpers
     {
-        static List<Action> _pendingActionsExecute = new List<Action>();
-        static bool _isDispatcherPending = false;
-#if MIGRATION
-        static Dispatcher _dispatcher = null;
-#else
-        static CoreDispatcher _dispatcher = null;
-#endif
+        private static readonly object _lock = new object();
+        private static readonly List<Action> _pendingActionsExecute = new List<Action>();
+        private static bool _isDispatcherPending = false;
+        private static Dispatcher _dispatcher = null;
 
         /// <summary>
         /// This will add the action to a list of actions to perform at once in a Dispatcher.Invoke call.
@@ -49,38 +47,39 @@ namespace CSHTML5.Internal
         /// <param name="action">The action to queue.</param>
         public static void QueueAction(Action action)
         {
-            _pendingActionsExecute.Add(action);
-
-            if (!_isDispatcherPending)
+            lock (_lock)
             {
+                _pendingActionsExecute.Add(action);
+                
+                if (_isDispatcherPending)
+                {
+                    return;
+                }
                 _isDispatcherPending = true;
 
                 if (_dispatcher == null)
                 {
-#if MIGRATION
                     _dispatcher = Dispatcher.INTERNAL_GetCurrentDispatcher();
-#else
-                    _dispatcher = CoreDispatcher.INTERNAL_GetCurrentDispatcher();
-#endif
                 }
-
-                _dispatcher.BeginInvoke((Action)(() =>
-                    {
-                        if (_isDispatcherPending) // We check again in case it has been cancelled - not sure if useful though
-                        {
-                            ExecutePendingActions();
-                        }
-                    }));
             }
+
+            _dispatcher.BeginInvoke(ExecutePendingActions);
         }
 
-        static void ExecutePendingActions()
+        private static void ExecutePendingActions()
         {
-            _isDispatcherPending = false;
+            Action[] copy;
+            lock (_lock)
+            {
+                if (!_isDispatcherPending)
+                {
+                    return;
+                }
 
-            List<Action> copy = new List<Action>(_pendingActionsExecute);
-
-            _pendingActionsExecute.Clear();
+                _isDispatcherPending = false;
+                copy = _pendingActionsExecute.ToArray();
+                _pendingActionsExecute.Clear();
+            }
 
             foreach (Action action in copy)
             {

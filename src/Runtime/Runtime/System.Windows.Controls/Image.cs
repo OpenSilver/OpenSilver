@@ -27,6 +27,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -35,6 +36,7 @@ using System.Windows.Automation.Peers;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Automation.Peers;
+using Windows.Foundation;
 #endif
 
 #if MIGRATION
@@ -531,9 +533,61 @@ $0.style.objectPosition = $2", image._imageDiv, objectFitvalue, objectPosition);
             {
                 return _imageDiv;
             }
-        }
+        }        
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ImageAutomationPeer(this);
+
+        protected override Size MeasureOverride(Size availableSize)
+            => MeasureArrangeHelper(availableSize);
+
+        protected override Size ArrangeOverride(Size finalSize)
+            => MeasureArrangeHelper(finalSize);
+
+        /// <summary>
+        /// Contains the code common for MeasureOverride and ArrangeOverride.
+        /// </summary>
+        /// <param name="inputSize">
+        /// input size is the parent-provided space that Image should use to "fit in", 
+        /// according to other properties.
+        /// </param>
+        /// <returns>Image's desired size.</returns>
+        private Size MeasureArrangeHelper(Size inputSize)
+        {
+            if (Source == null)
+            {
+                return new Size();
+            }
+
+            Size naturalSize = GetNaturalSize();
+
+            //get computed scale factor
+            Size scaleFactor = Viewbox.ComputeScaleFactor(inputSize,
+                naturalSize,
+                Stretch,
+                StretchDirection.Both);
+
+            // Returns our minimum size & sets DesiredSize.
+            return new Size(naturalSize.Width * scaleFactor.Width, naturalSize.Height * scaleFactor.Height);
+        }
+
+        private Size GetNaturalSize()
+        {
+            var size = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
+                "(function(img) { return img.naturalWidth + '|' + img.naturalHeight; })($0);",
+                _imageDiv));
+
+            int sepIndex = size.IndexOf('|');
+            if (sepIndex > -1)
+            {
+                double actualWidth, actualHeight = 0;
+                double.TryParse(size.Substring(0, sepIndex), NumberStyles.Any, CultureInfo.InvariantCulture, out actualWidth);
+                double.TryParse(size.Substring(sepIndex + 1), NumberStyles.Any, CultureInfo.InvariantCulture, out actualHeight);
+
+                return new Size(actualWidth, actualHeight);
+            }
+
+            return new Size(0, 0);
+        }
     }
 }

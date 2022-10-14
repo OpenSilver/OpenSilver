@@ -597,12 +597,17 @@ namespace Windows.Foundation
         /// <param name="point">The point to include.</param>
         public void Union(Point point)
         {
+            if (IsEmpty)
+            {
+                this = new Rect(point, point);
+                return;
+            }
             if (point.X < X)
             {
                 Width = Width + X - point.X;
                 X = point.X;
             }
-            else if (point.X > X+Width)
+            else if (point.X > X + Width)
             {
                 Width = Width + point.X - X;
             }
@@ -625,6 +630,11 @@ namespace Windows.Foundation
         /// <param name="rect">The rectangle to include.</param>
         public void Union(Rect rect)
         {
+            if (IsEmpty)
+            {
+                this = rect;
+                return;
+            }
             if (rect.X < X)
             {
                 Width = Width + X - rect.X;

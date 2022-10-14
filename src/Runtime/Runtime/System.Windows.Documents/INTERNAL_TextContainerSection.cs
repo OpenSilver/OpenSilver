@@ -1,4 +1,5 @@
-﻿/*===================================================================================
+﻿
+/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -13,12 +14,6 @@
 using CSHTML5.Internal;
 
 #if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Xaml.Controls;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Documents
 #else
 namespace Windows.UI.Xaml.Documents
@@ -26,10 +21,9 @@ namespace Windows.UI.Xaml.Documents
 {
     internal class INTERNAL_TextContainerSection : INTERNAL_TextContainer
     {
-        public INTERNAL_TextContainerSection(Section parent) :
-            base(parent)
+        public INTERNAL_TextContainerSection(Section parent)
+            : base(parent)
         {
-
         }
 
         public Section Section => (Section)Parent;
@@ -39,9 +33,9 @@ namespace Windows.UI.Xaml.Documents
             get
             {
                 string text = "";
-                foreach(var block in Section.Blocks)
+                foreach (var block in Section.Blocks)
                 {
-                    text += block.GetContainerText();
+                    text += block.GetContainerText() + "\\n";
                 }
 
                 return text;

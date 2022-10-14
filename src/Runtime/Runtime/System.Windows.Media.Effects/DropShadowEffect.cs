@@ -26,44 +26,156 @@ using Windows.UI;
 namespace System.Windows.Media.Effects
 {
     /// <summary>
-    /// A bitmap effect that paints a drop shadow around the target texture.
+    /// Applies a shadow behind a visual object at a slight offset. The offset is determined
+    /// by mimicking a casting shadow from an imaginary light source.
     /// </summary>
     public sealed partial class DropShadowEffect : Effect
     {
-        //Note: If we want to allow inwards shadows, we can use "inset" in the string that is set.
-        //      From what I could gather, the shadows in WPF are naturally going both ways (inwards and outwards), and the trick the people use to have an inwards shadow is
-        //      to add a transparent border (inside the original border) on which they put the DropShadowEffect. This allows the inwards shadow to be seen (otherwise it is hidden by the parent element).
-
+        // Note: If we want to allow inwards shadows, we can use "inset" in the string that is set.
+        // From what I could gather, the shadows in WPF are naturally going both ways (inwards and
+        // outwards), and the trick the people use to have an inwards shadow is to add a transparent
+        // border (inside the original border) on which they put the DropShadowEffect. This allows
+        // the inwards shadow to be seen (otherwise it is hidden by the parent element).
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DropShadowEffect"/>
-        /// class.
+        /// Initializes a new instance of the <see cref="DropShadowEffect"/> class.
         /// </summary>
-        public DropShadowEffect()
+        public DropShadowEffect() { }
+
+        /// <summary>
+        /// Identifies the <see cref="BlurRadius"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty BlurRadiusProperty =
+            DependencyProperty.Register(
+                nameof(BlurRadius),
+                typeof(double),
+                typeof(DropShadowEffect),
+                new PropertyMetadata(5.0, OnPropertyChanged));
+
+        /// <summary>
+        /// Gets or sets how defined the edges of the shadow are (how blurry the shadow is).
+        /// </summary>
+        /// <returns>
+        /// How blurry the shadow is. The default is 5.
+        /// </returns>
+        public double BlurRadius
         {
+            get => (double)GetValue(BlurRadiusProperty);
+            set => SetValue(BlurRadiusProperty, value);
         }
 
-        internal override void SetParentUIElement(UIElement newParent)
+        /// <summary>
+        /// Identifies the <see cref="Color"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ColorProperty =
+            DependencyProperty.Register(
+                nameof(Color),
+                typeof(Color),
+                typeof(DropShadowEffect),
+                new PropertyMetadata(Colors.Black, OnPropertyChanged));
+
+        /// <summary>
+        /// Gets or sets the color of the shadow.
+        /// </summary>
+        /// <returns>
+        /// The color of the shadow. The default is a color with ARGB value of FF000000 (black).
+        /// </returns>
+        public Color Color
         {
-            base.SetParentUIElement(newParent);
-            RefreshEffect();
+            get => (Color)GetValue(ColorProperty);
+            set => SetValue(ColorProperty, value);
         }
 
-        private void RefreshEffect() //todo: if we add support for multiple effects on a same element, return the string instead of directly setting the property.
+        /// <summary>
+        /// Identifies the <see cref="Direction"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty DirectionProperty =
+            DependencyProperty.Register(
+                nameof(Direction),
+                typeof(double),
+                typeof(DropShadowEffect),
+                new PropertyMetadata(315.0, OnPropertyChanged));
+
+        /// <summary>
+        /// Gets or sets the angle at which the shadow is cast.
+        /// </summary>
+        /// <returns>
+        /// The angle at which the shadow is cast, where 0 is immediately to the right of
+        /// the object and positive values move the shadow counterclockwise. The default
+        /// is 315.
+        /// </returns>
+        public double Direction
         {
-            if (_parentUIElement != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(_parentUIElement))
+            get => (double)GetValue(DirectionProperty);
+            set => SetValue(DirectionProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Opacity"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty OpacityProperty =
+            DependencyProperty.Register(
+                nameof(Opacity),
+                typeof(double),
+                typeof(DropShadowEffect),
+                new PropertyMetadata(1.0, OnPropertyChanged));
+
+        /// <summary>
+        /// Gets or sets the degree of opacity of the shadow.
+        /// </summary>
+        /// <returns>
+        /// The degree of opacity. The valid range of values is from 0 through 1, where 0
+        /// is completely transparent and 1 is completely opaque. The default is 1.
+        /// </returns>
+        public double Opacity
+        {
+            get => (double)GetValue(OpacityProperty);
+            set => SetValue(OpacityProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="ShadowDepth"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ShadowDepthProperty =
+            DependencyProperty.Register(
+                nameof(ShadowDepth),
+                typeof(double),
+                typeof(DropShadowEffect),
+                new PropertyMetadata(5.0, OnPropertyChanged));
+
+        /// <summary>
+        /// Gets or sets the distance between the object and the shadow that it casts.
+        /// </summary>
+        /// <returns>
+        /// The distance between the plane of the object casting the shadow and the shadow
+        /// plane measured in devicepixels. The valid range of values is from 0 through 300.
+        /// The default is 5.
+        /// </returns>
+        public double ShadowDepth
+        {
+            get => (double)GetValue(ShadowDepthProperty);
+            set => SetValue(ShadowDepthProperty, value);
+        }
+
+        private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            => ((DropShadowEffect)d).RaiseChanged();
+
+        internal override void Render(UIElement renderTarget)
+        {
+            if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
             {
-                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(_parentUIElement);
-                double x, y;
-                GetXYPositionFromDirectionAndDepth(out x, out y);
-                double opacity = Math.Max(Math.Min(1.0, this.Opacity), 0.0);
-               
+                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
+
+                double x = Math.Cos(Direction * Math.PI / 180d) * ShadowDepth;
+                double y = -(Math.Sin(Direction * Math.PI / 180d) * ShadowDepth);
+                double opacity = Math.Max(Math.Min(1.0, Opacity), 0.0);
+
                 string shadowString = x.ToInvariantString() + "px " +
                     y.ToInvariantString() + "px " +
                     BlurRadius.ToInvariantString() + "px " +
                     Color.FromArgb(Convert.ToByte(opacity * 255d), Color.R, Color.G, Color.B).INTERNAL_ToHtmlString(1d);
 
-                if (_parentUIElement is TextBlock)
+                if (renderTarget is TextBlock)
                 {
                     domStyle.textShadow = shadowString;
                 }
@@ -76,158 +188,5 @@ namespace System.Windows.Media.Effects
                 }
             }
         }
-
-        private void GetXYPositionFromDirectionAndDepth(out double x, out double y)
-        {
-            x = Math.Cos(Direction * Math.PI / 180d) * ShadowDepth;
-            y = -(Math.Sin(Direction * Math.PI / 180d) * ShadowDepth);
-        }
-
-        /// <summary>
-        /// Gets or sets a value that indicates the radius of the shadow's blur effect.
-        /// </summary>
-        public double BlurRadius
-        {
-            get { return (double)GetValue(BlurRadiusProperty); }
-            set { SetValue(BlurRadiusProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="BlurRadius"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty BlurRadiusProperty =
-            DependencyProperty.Register(
-                nameof(BlurRadius), 
-                typeof(double), 
-                typeof(DropShadowEffect), 
-                new PropertyMetadata(5d, ManageChange));
-
-        private static void ManageChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((DropShadowEffect)d).RefreshEffect();
-        }
-
-        /// <summary>
-        /// Gets or sets the color of the drop shadow.
-        /// </summary>
-        public Color Color
-        {
-            get { return (Color)GetValue(ColorProperty); }
-            set { SetValue(ColorProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Color"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ColorProperty =
-            DependencyProperty.Register(
-                nameof(Color), 
-                typeof(Color), 
-                typeof(DropShadowEffect), 
-                new PropertyMetadata(Colors.Black, ManageChange));
-
-        /// <summary>
-        /// Gets or sets the direction of the drop shadow.
-        /// </summary>
-        public double Direction
-        {
-            get { return (double)GetValue(DirectionProperty); }
-            set { SetValue(DirectionProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Direction"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty DirectionProperty =
-            DependencyProperty.Register(
-                nameof(Direction), 
-                typeof(double), 
-                typeof(DropShadowEffect), 
-                new PropertyMetadata(315d, ManageChange));
-
-        /// <summary>
-        /// Gets or sets the opacity of the drop shadow.
-        /// </summary>
-        public double Opacity
-        {
-            get { return (double)GetValue(OpacityProperty); }
-            set { SetValue(OpacityProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="Opacity"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty OpacityProperty =
-            DependencyProperty.Register(
-                nameof(Opacity), 
-                typeof(double), 
-                typeof(DropShadowEffect), 
-                new PropertyMetadata(1d, ManageChange));
-
-        //// Returns:
-        ////     A System.Windows.Media.Effects.RenderingBias value that indicates whether
-        ////     the system renders the drop shadow with emphasis on speed or quality. The
-        ////     default is System.Windows.Media.Effects.RenderingBias.Performance.
-        ///// <summary>
-        ///// Gets or sets a value that indicates whether the system renders the drop shadow
-        ///// with emphasis on speed or quality.
-        ///// </summary>
-        //public RenderingBias RenderingBias
-        //{
-        //    get { return (RenderingBias)GetValue(RenderingBiasProperty); }
-        //    set { SetValue(RenderingBiasProperty, value); }
-        //}
-        ///// <summary>
-        ///// Identifies the System.Windows.Media.Effects.DropShadowEffect.RenderingBias
-        ///// dependency property.
-        ///// </summary>
-        //public static readonly DependencyProperty RenderingBiasProperty =
-        //    DependencyProperty.Register("RenderingBias", typeof(RenderingBias), typeof(DropShadowEffect), new PropertyMetadata());
-
-        /// <summary>
-        /// Gets or sets the distance of the drop shadow below the texture.
-        /// </summary>
-        public double ShadowDepth
-        {
-            get { return (double)GetValue(ShadowDepthProperty); }
-            set { SetValue(ShadowDepthProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="ShadowDepth"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ShadowDepthProperty =
-            DependencyProperty.Register(
-                nameof(ShadowDepth), 
-                typeof(double), 
-                typeof(DropShadowEffect), 
-                new PropertyMetadata(5d, ManageChange));
-
-        ///// <summary>
-        ///// Creates a modifiable clone of this System.Windows.Media.Effects.Effect object,
-        ///// making deep copies of this object's values. When copying this object's dependency
-        ///// properties, this method copies resource references and data bindings (which
-        ///// may no longer resolve), but not animations or their current values.
-        ///// </summary>
-        ///// <returns>
-        ///// A modifiable clone of this instance. The returned clone is effectively a
-        ///// deep copy of the current object. The clone's System.Windows.Freezable.IsFrozen
-        ///// property is false.
-        ///// </returns>
-        //public DropShadowEffect Clone();
-        
-        ///// <summary>
-        ///// Creates a modifiable clone of this System.Windows.Media.Effects.Effect object,
-        ///// making deep copies of this object's current values. Resource references,
-        ///// data bindings, and animations are not copied, but their current values are
-        ///// copied.
-        ///// </summary>
-        ///// <returns>
-        ///// A modifiable clone of the current object. The cloned object's System.Windows.Freezable.IsFrozen
-        ///// property will be false even if the source's System.Windows.Freezable.IsFrozen
-        ///// property was true.
-        ///// </returns>
-        //public DropShadowEffect CloneCurrentValue();
-        //protected override Freezable CreateInstanceCore();
     }
 }

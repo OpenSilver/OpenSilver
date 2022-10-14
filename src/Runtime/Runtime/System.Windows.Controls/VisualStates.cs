@@ -106,6 +106,7 @@ namespace Windows.UI.Xaml.Controls
         /// Selected inactive state of the Selection state group.
         /// </summary>
         public const string StateSelectedInactive = "SelectedInactive";
+        public const string StateSelectedUnfocused = "SelectedUnfocused";
         #endregion GroupSelection
 
         #region GroupExpansion

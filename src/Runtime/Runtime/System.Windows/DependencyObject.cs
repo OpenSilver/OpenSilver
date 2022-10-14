@@ -530,23 +530,6 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStore.RefreshExpressionCommon(storage, expression, isInStyle); // Set LocalStyle if Binding is from style.
         }
 
-        internal void INTERNAL_UpdateBindingsSource()
-        {
-            // Note: we make a copy to avoid any errors related to the collection being modified during the "foreach" below.
-            INTERNAL_PropertyStorage[] copyOfCollection = this.INTERNAL_PropertyStorageDictionary.Select(kp => kp.Value).ToArray();
-            foreach (INTERNAL_PropertyStorage storage in copyOfCollection)
-            {
-                if (storage.Entry.IsExpression)
-                {
-                    (storage.LocalValue as BindingExpression)?.OnSourceAvailable(false);
-                }
-                else if (storage.Entry.IsExpressionFromStyle)
-                {
-                    (storage.Entry.ModifiedValue.BaseValue as BindingExpression)?.OnSourceAvailable(false);
-                }
-            }
-        }
-
         /// <exclude/>
         internal protected virtual void INTERNAL_OnAttachedToVisualTree()
         {

@@ -15,6 +15,13 @@ using System;
 using System.Diagnostics;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Collections;
+using System.Reflection;
+using System.Threading;
+using System.Security;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -60,6 +67,8 @@ namespace Windows.UI.Xaml.Data
 
         private DependencyPropertyListener _dataContextListener;
         private DependencyPropertyListener _cvsListener;
+        private INotifyDataErrorInfo _dataErrorSource;
+        private INotifyDataErrorInfo _dataErrorValue;
 
         private readonly PropertyPathWalker _propertyPathWalker;
 
@@ -268,13 +277,25 @@ namespace Windows.UI.Xaml.Data
                 _dataContextListener = null;
             }
 
-            if (_cvsListener != null)
+            if (ParentBinding.ValidatesOnNotifyDataErrors)
             {
-                _cvsListener.Source = null;
-                _cvsListener = null;
+                if (_dataErrorSource != null)
+                {
+                    _dataErrorSource.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnSourceErrorsChanged);
+                    _dataErrorSource = null;
+                }
+
+                if (_dataErrorValue != null)
+                {
+                    _dataErrorValue.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnValueErrorsChanged);
+                    _dataErrorValue = null;
+                }
             }
 
+            BindingSource = null;
             _propertyPathWalker.Update(null);
+
+            UpdateNotifyDataErrorValidationErrors(null);
 
             if (_isUpdateOnLostFocus)
             {
@@ -288,7 +309,12 @@ namespace Windows.UI.Xaml.Data
             Target = null;
         }
 
-        internal void ValueChanged() => Refresh();
+        internal void ValueChanged()
+        {
+            UpdateNotifyDataErrors(_propertyPathWalker.FinalNode.Value);
+
+            Refresh();
+        }
 
         /// <summary>
         /// The element that is the binding target object of this binding expression.
@@ -328,40 +354,155 @@ namespace Windows.UI.Xaml.Data
             _propertyPathWalker.Update(BindingSource);
         }
 
-        /// <summary>
-        /// This method is used to check whether the value is Valid if needed.
-        /// </summary>
-        /// <param name="initialValue"></param>
-        internal void CheckInitialValueValidity(object initialValue)
+        private void UpdateNotifyDataErrors(object value)
         {
-            if (ParentBinding.ValidatesOnExceptions && ParentBinding.ValidatesOnLoad)
+            if (!ParentBinding.ValidatesOnNotifyDataErrors)
             {
-                if (!_propertyPathWalker.IsPathBroken)
+                return;
+            }
+
+            UpdateNotifyDataErrors(
+                _propertyPathWalker.FinalNode.Source,
+                _propertyPathWalker.FinalNode.PropertyName,
+                value);
+        }
+
+        private void UpdateNotifyDataErrors(object source, string propertyName, object value)
+        {
+            if (!ParentBinding.ValidatesOnNotifyDataErrors || !IsAttached)
+            {
+                return;
+            }
+
+            if (source != _dataErrorSource)
+            {
+                if (_dataErrorSource != null)
                 {
-                    INTERNAL_ForceValidateOnNextSetValue = false;
+                    _dataErrorSource.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnSourceErrorsChanged);
+                }
+
+                _dataErrorSource = source as INotifyDataErrorInfo;
+
+                if (_dataErrorSource != null)
+                {
+                    _dataErrorSource.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(OnSourceErrorsChanged);
+                }
+            }
+
+            if (value != DependencyProperty.UnsetValue && value != _dataErrorValue)
+            {
+                if (_dataErrorValue != null)
+                {
+                    _dataErrorValue.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnValueErrorsChanged);
+                }
+
+                _dataErrorValue = value as INotifyDataErrorInfo;
+
+                if (_dataErrorValue != null)
+                {
+                    _dataErrorValue.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(OnValueErrorsChanged);
+                }
+            }
+
+            try
+            {
+                List<object> propertyErrors = GetDataErrors(_dataErrorSource, propertyName);
+                List<object> valueErrors = GetDataErrors(_dataErrorValue, string.Empty);
+                List<object> errors = MergeErrors(propertyErrors, valueErrors);
+
+                UpdateNotifyDataErrorValidationErrors(errors);
+            }
+            catch (Exception ex)
+            {
+                if (ex is StackOverflowException || ex is OutOfMemoryException ||
+                    ex is ThreadAbortException || ex is SecurityException)
+                {
+                    throw;
+                }
+            }
+        }
+
+        // fetch errors for the given property
+        private static List<object> GetDataErrors(INotifyDataErrorInfo indei, string propertyName)
+        {
+            const int RetryCount = 3;
+            List<object> result = null;
+            if (indei != null && indei.HasErrors)
+            {
+                // if a worker thread is updating the source's errors while we're trying to
+                // read them, the enumerator will throw.   The interface doesn't provide
+                // any way to work around this, so we'll just try it a few times hoping
+                // for success.
+                for (int i = RetryCount; i >= 0; --i)
+                {
                     try
                     {
-                        IPropertyPathNode node = _propertyPathWalker.FinalNode;
-                        node.SetValue(node.Value); //we set the source property to its own value to check whether it causes an exception, in which case the value is not valid.
-                    }
-                    catch (Exception e) //todo: put the content of this catch in a method which will be called here and in UpdateSourceObject (OR put the whole try/catch in the method and put the Value to set as parameter).
-                    {
-                        //We get the new Error (which is the innermost exception as far as I know):
-                        Exception currentException = e;
-#if OPENSILVER
-                        if (true) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
-#elif BRIDGE
-                        if (CSHTML5.Interop.IsRunningInTheSimulator) // Note: "InnerException" is only supported in the Simulator as of July 27, 2017.
-#endif
+                        result = new List<object>();
+                        IEnumerable ie = indei.GetErrors(propertyName);
+                        if (ie != null)
                         {
-                            while (currentException.InnerException != null)
-                                currentException = currentException.InnerException;
+                            foreach (object o in ie)
+                            {
+                                result.Add(o);
+                            }
                         }
-
-                        Validation.MarkInvalid(this, new ValidationError(this) { Exception = currentException, ErrorContent = currentException.Message });
+                        break;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // on the last try, let the exception bubble up
+                        if (i == 0)
+                            throw;
                     }
                 }
             }
+
+            if (result != null && result.Count == 0)
+                result = null;
+
+            return result;
+        }
+
+        private List<object> MergeErrors(List<object> list1, List<object> list2)
+        {
+            if (list1 == null)
+                return list2;
+            if (list2 == null)
+                return list1;
+
+            foreach (object o in list2)
+                list1.Add(o);
+            return list1;
+        }
+
+        private void UpdateNotifyDataErrorValidationErrors(List<object> errors)
+        {
+            if (errors == null || errors.Count == 0)
+            {
+                Validation.ClearInvalid(this);
+                return;
+            }
+
+            foreach (object error in errors)
+            {
+                if (error != null)
+                {
+                    Validation.MarkInvalid(this, new ValidationError(this) { ErrorContent = error });
+                }
+            }
+        }
+
+        private void OnSourceErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            if (e.PropertyName == _propertyPathWalker.FirstNode.PropertyName)
+            {
+                UpdateNotifyDataErrors((INotifyDataErrorInfo)sender, e.PropertyName, DependencyProperty.UnsetValue);
+            }
+        }
+
+        private void OnValueErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        {
+            UpdateNotifyDataErrors(DependencyProperty.UnsetValue);
         }
 
         internal void OnSourceAvailable(bool lastAttempt)
@@ -476,8 +617,9 @@ namespace Windows.UI.Xaml.Data
                         return;                    
                 }
 
-                node.SetValue(convertedValue);
+                // clearing invalid stuff first as node.SetValue triggers the INotifyDataErrorInfo.ErrorsChanged event
                 Validation.ClearInvalid(this);
+                node.SetValue(convertedValue);
             }
             catch (Exception e)
             {
@@ -654,6 +796,15 @@ namespace Windows.UI.Xaml.Data
 
         private void OnMentorLoaded(object sender, RoutedEventArgs e)
         {
+            // Note: When the loaded event of this Binding's mentor is raised, a handler could
+            // clear this binding. In that case we would still run this handler, even if we
+            // detach it in 'OnDetach', so we need make sure the binding is still attached to
+            // prevent any unexpected errors.
+            if (!IsAttached)
+            {
+                return;
+            }
+
             ((FrameworkElement)sender).Loaded -= new RoutedEventHandler(OnMentorLoaded);
             OnSourceAvailable(true);
         }
@@ -730,6 +881,10 @@ namespace Windows.UI.Xaml.Data
                         TargetProperty == ContentPresenter.ContentProperty)
                     {
                         contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
+                        if (contextElement == null && !lastAttempt)
+                        {
+                            targetFE.Loaded += new RoutedEventHandler(OnMentorLoaded);
+                        }
                     }
 
                     source = contextElement;
