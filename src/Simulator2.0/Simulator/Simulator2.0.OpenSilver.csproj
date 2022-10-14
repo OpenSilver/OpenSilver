@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>OpenSilver.Simulator</AssemblyName>
-    <RootNamespace>DotNetForHtml5.EmulatorWithoutJavascript</RootNamespace>
+    <RootNamespace>OpenSilver.Simulator</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <DocumentationFile>bin\OpenSilver\$(Configuration)\OpenSilver.Simulator.xml</DocumentationFile>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -217,9 +217,6 @@
     <Content Include="simulator_root_opensilver.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="1.2.4" />
