@@ -167,30 +167,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public bool CheckChildMeasureValidation(UIElement parent)
-        {
-            lock (queueLock)
-            {
-                int visualLevelParent = parent.VisualLevel;
-                foreach (UIElement element in measureQueue)
-                {
-                    UIElement elIterator = element;
-                    while (elIterator != null)
-                    {
-                        if (elIterator.VisualLevel <= visualLevelParent)
-                            break;
-
-                        elIterator = (UIElement)elIterator.INTERNAL_VisualParent;
-                        if (elIterator == parent)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
         private UIElement GetTopElement(IEnumerable<UIElement> measureQueue)
         {
             UIElement topElement = null;
