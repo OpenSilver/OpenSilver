@@ -89,9 +89,6 @@
     <Compile Include="Console\FileSource.cs" />
     <Compile Include="Console\IMessageSource.cs" />
     <Compile Include="Console\InteropSource.cs" />
-    <Compile Include="Debugging\DevToolsScreencastInfoWindow.xaml.cs">
-      <DependentUpon>DevToolsScreencastInfoWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="DialogBoxes\MessageBoxScrollable.xaml.cs">
       <DependentUpon>MessageBoxScrollable.xaml</DependentUpon>
     </Compile>
@@ -150,10 +147,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Debugging\DevToolsScreencastInfoWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="DialogBoxes\MessageBoxScrollable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -209,7 +202,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="OpenSilverIcon.ico" />
-    <Resource Include="Debugging\DevToolsScreencast.png" />
     <Resource Include="Expand-Icon-5.png" />
     <Content Include="interop_debug_root_opensilver.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
