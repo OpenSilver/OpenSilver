@@ -43,8 +43,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// </summary>
     public partial class ButtonBase : ContentControl
     {
+        // We need to keep a strong reference to the handler otherwise it can be
+        // garbage collected to early if the command used by this button implements
+        // the CanExecuteChanged event with a weak event pattern.
+        private readonly EventHandler _canExecuteChangedHandler;
+
         public ButtonBase()
         {
+            _canExecuteChangedHandler = new EventHandler(OnCanExecuteChanged);
             UseSystemFocusVisuals = true;
 
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Interval = new TimeSpan(0, 0, 5); // See comment where this variable is defined.
@@ -157,13 +163,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         private void UnhookCommand(ICommand command)
         {
-            command.CanExecuteChanged -= new EventHandler(OnCanExecuteChanged);
+            command.CanExecuteChanged -= _canExecuteChangedHandler;
             UpdateCanExecute();
         }
 
         private void HookCommand(ICommand command)
         {
-            command.CanExecuteChanged += new EventHandler(OnCanExecuteChanged);
+            command.CanExecuteChanged += _canExecuteChangedHandler;
             UpdateCanExecute();
         }
 
