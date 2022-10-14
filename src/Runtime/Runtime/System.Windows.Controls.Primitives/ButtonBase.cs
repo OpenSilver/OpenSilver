@@ -157,13 +157,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         private void UnhookCommand(ICommand command)
         {
-            command.CanExecuteChanged -= new EventHandler(OnCanExecuteChanged);
+            command.CanExecuteChanged -= preventEventHandler;
+            preventEventHandler = null;
             UpdateCanExecute();
         }
 
+        EventHandler preventEventHandler;
+
         private void HookCommand(ICommand command)
         {
-            command.CanExecuteChanged += new EventHandler(OnCanExecuteChanged);
+            preventEventHandler = OnCanExecuteChanged;
+            command.CanExecuteChanged += preventEventHandler;
             UpdateCanExecute();
         }
 
