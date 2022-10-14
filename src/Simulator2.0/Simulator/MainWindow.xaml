@@ -78,8 +78,15 @@
                                                 <ContextMenu>
                                                     <MenuItem Header="Inspect Visual Tree" Cursor="Hand" Click="ButtonViewXamlTree_Click"/>
                                                     <MenuItem Header="View HTML/JS compilation log..." x:Name="MenuButtonViewCompilationLog" Cursor="Hand" Click="ButtonViewCompilationLog_Click"/>
-                                                    <MenuItem Header="View all JS code executed by the Simulator so far..." Visibility="Collapsed" Cursor="Hand" Click="ButtonViewJavaScriptLog_Click"/>
-                                                    <MenuItem Header="Debug JS code executed since interops logging last started" Cursor="Hand" Click="ButtonDebugJavaScriptLog_Click"/>
+                                                    <MenuItem Click="ButtonDebugJavaScriptLog_Click">
+                                                        <MenuItem.Header>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="Debug JS code executed since app start"/>
+                                                                <CheckBox x:Name="IsContinuousInteropsLoggingEnabled" Click="EnableContinuousInteropsLogging_Click" Margin="20,0,0,0" VerticalAlignment="Center"/>
+                                                                <TextBlock Name="InteropsLogNote" Text="(Enable and Restart)" Margin="5,0,0,0" />
+                                                            </StackPanel>
+                                                        </MenuItem.Header>
+                                                    </MenuItem>
                                                     <MenuItem Header="Save current HTML as File..." Cursor="Hand" Click="ButtonSaveHtml_Click"/>
                                                     <MenuItem Header="Display the number of DOM elements..." Cursor="Hand" Click="ButtonStats_Click"/>
                                                     <MenuItem Header="Clear cookies and cache" Cursor="Hand" Click="ButtonClearCookiesAndCache_Click"/>

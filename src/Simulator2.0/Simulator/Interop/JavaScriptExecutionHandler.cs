@@ -23,8 +23,10 @@ namespace OpenSilver.Simulator
     {
         private bool _webControlDisposed = false;
         private string _lastExecutedJavaScriptCode;
-        private List<string> _InteropLog = new List<string>();
-        private bool _IsJSLoggingEnabled;
+        private List<string> _InteropsPartLog = new List<string>();
+        private List<string> _InteropsContinuousLog = new List<string>();
+        private bool _IsInteropsPartLogEnabled;
+        public bool IsInteropsContinuousLogEnabled { get; set; }
 
         // Called via reflection by the "INTERNAL_HtmlDomManager" class of the "Core" project.
         public void ExecuteJavaScript(string javaScriptToExecute)
@@ -33,8 +35,11 @@ namespace OpenSilver.Simulator
             if (_webControlDisposed)
                 return;
             _lastExecutedJavaScriptCode = javaScriptToExecute;
-            if (_IsJSLoggingEnabled)
-                _InteropLog.Add(javaScriptToExecute + ";");
+            if (_IsInteropsPartLogEnabled)
+                _InteropsPartLog.Add(javaScriptToExecute + ";");
+            if (IsInteropsContinuousLogEnabled)
+                _InteropsContinuousLog.Add(javaScriptToExecute + ";");
+
             SimBrowser.Instance.ExecuteScriptAsync(javaScriptToExecute);
         }
 
@@ -45,8 +50,12 @@ namespace OpenSilver.Simulator
             if (_webControlDisposed)
                 return null;
             _lastExecutedJavaScriptCode = javaScriptToExecute;
-            if (_IsJSLoggingEnabled)
-                _InteropLog.Add(javaScriptToExecute + ";");
+            if (_IsInteropsPartLogEnabled)
+                _InteropsPartLog.Add(javaScriptToExecute + ";");
+
+            if (IsInteropsContinuousLogEnabled)
+                _InteropsContinuousLog.Add(javaScriptToExecute + ";");
+
             return SimBrowser.Instance.ExecuteScriptWithResult(javaScriptToExecute);
         }
 
@@ -55,27 +64,45 @@ namespace OpenSilver.Simulator
             return _lastExecutedJavaScriptCode;
         }
 
-        public string InteropLog
+        public string InteropsPartLog
         {
             get
             {
-                return string.Join("\n\n", _InteropLog);
+                return string.Join("\n\n", _InteropsPartLog);
+            }
+        }
+        public string InteropsContinuousLog
+        {
+            get
+            {
+                return
+                    @"window.onCallBack = {
+                        OnCallbackFromJavaScript: function(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject)
+                        {
+                            // dummy function
+                        },
+                        OnCallbackFromJavaScriptError: function(idWhereCallbackArgsAreStored)
+                        {
+                            // dummy function
+                        }
+                    };"
+                    + string.Join("\n\n", _InteropsContinuousLog);
             }
         }
 
         public void ClearInteropLog()
         {
-            _InteropLog.Clear();
+            _InteropsPartLog.Clear();
         }
 
         public void StartInteropLogging()
         {
-            _IsJSLoggingEnabled = true;
+            _IsInteropsPartLogEnabled = true;
         }
 
         public void StopInteropLoggin()
         {
-            _IsJSLoggingEnabled = false;
+            _IsInteropsPartLogEnabled = false;
         }
     }
 }

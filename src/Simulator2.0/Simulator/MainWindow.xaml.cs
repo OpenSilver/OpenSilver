@@ -91,6 +91,7 @@ namespace OpenSilver.Simulator
             TheSimBrowser.OnInitialized = () =>
             {
                 _OpenSilverRuntime = new OpenSilverRuntime(this, Dispatcher.CurrentDispatcher);
+                _OpenSilverRuntime.OnInitialized = () => _OpenSilverRuntime.JavaScriptExecutionHandler.IsInteropsContinuousLogEnabled = Properties.Settings.Default.IsContinuousInteropsLoggingEnabled;
                 LoadRootPage();
             };
 
@@ -204,6 +205,7 @@ namespace OpenSilver.Simulator
         async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             IsDevToolsOpened.IsChecked = Properties.Settings.Default.IsDevToolsOpened;
+            IsContinuousInteropsLoggingEnabled.IsChecked = Properties.Settings.Default.IsContinuousInteropsLoggingEnabled;
 
             Width = ScreenCoordinatesHelper.ScreenWidth / 3 * 2;
             Height = ScreenCoordinatesHelper.ScreenHeight / 3 * 2;
@@ -275,13 +277,13 @@ namespace OpenSilver.Simulator
 
         private void ButtonViewJavaScriptLog_Click(object sender, RoutedEventArgs e)
         {
-            string fullLog = _OpenSilverRuntime.JavaScriptExecutionHandler.InteropLog;
-            var msgBox = new MessageBoxScrollable()
-            {
-                Value = fullLog,
-                Title = "All JS code executed so far by the Simulator"
-            };
-            msgBox.Show();
+            //string fullLog = _OpenSilverRuntime.JavaScriptExecutionHandler.InteropsPartLog;
+            //var msgBox = new MessageBoxScrollable()
+            //{
+            //    Value = fullLog,
+            //    Title = "All JS code executed so far by the Simulator"
+            //};
+            //msgBox.Show();
         }
 
         private void ButtonDebugJavaScriptLog_Click(object sender, RoutedEventArgs e)
@@ -327,7 +329,8 @@ Click OK to continue.";
                     File.Copy(Path.Combine(simulatorJsCssPath, "ResizeSensor.js"), Path.Combine(destinationPath, "ResizeSensor.js"), true);
 
                     // Create "interopcalls.js" which contains all the JS executed by the Simulator so far:
-                    string fullLog = _OpenSilverRuntime.JavaScriptExecutionHandler.InteropLog;
+                    string fullLog = _OpenSilverRuntime.JavaScriptExecutionHandler.InteropsContinuousLog;
+                    fullLog = fullLog.Replace("window.onCallBack = chrome.webview.hostObjects.onCallBack;", "");
                     File.WriteAllText(Path.Combine(destinationPath, "interopcalls.js"), fullLog);
                 }
                 catch (Exception ex)
@@ -546,13 +549,19 @@ Click OK to continue.";
         private void ViewInteropLog_Click(object sender, RoutedEventArgs e)
         {
             var logWin = new Window() { Title = "Interops Log", WindowStartupLocation = WindowStartupLocation.CenterScreen };
-            logWin.Content = new TextBox() { Text = _OpenSilverRuntime.JavaScriptExecutionHandler.InteropLog, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+            logWin.Content = new TextBox() { Text = _OpenSilverRuntime.JavaScriptExecutionHandler.InteropsPartLog, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
             logWin.Show();
         }
 
         private void IsDevToolsOpened_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.IsDevToolsOpened = (bool)IsDevToolsOpened.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void EnableContinuousInteropsLogging_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.IsContinuousInteropsLoggingEnabled = (bool)IsContinuousInteropsLoggingEnabled.IsChecked;
             Properties.Settings.Default.Save();
         }
 

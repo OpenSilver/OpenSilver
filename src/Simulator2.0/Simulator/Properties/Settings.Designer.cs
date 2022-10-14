@@ -94,5 +94,17 @@ namespace OpenSilver.Simulator.Properties {
                 this["IsDevToolsOpened"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsContinuousInteropsLoggingEnabled {
+            get {
+                return ((bool)(this["IsContinuousInteropsLoggingEnabled"]));
+            }
+            set {
+                this["IsContinuousInteropsLoggingEnabled"] = value;
+            }
+        }
     }
 }
