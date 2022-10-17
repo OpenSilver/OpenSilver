@@ -289,8 +289,7 @@ namespace Windows.UI.Xaml
         private Size layoutMeasuredSize;
         private Size layoutLastSize;
         private bool layoutProcessing;
-
-        internal bool measureInProgress;
+        private bool measureInProgress;
 
         private int visualLevel;
 
