@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
     <EnableAdditionalMetadataAttributes>true</EnableAdditionalMetadataAttributes>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 </Project>
