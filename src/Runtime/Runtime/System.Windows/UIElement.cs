@@ -289,6 +289,7 @@ namespace Windows.UI.Xaml
         private Size layoutMeasuredSize;
         private Size layoutLastSize;
         private bool layoutProcessing;
+        private bool measureInProgress;
 
         private int visualLevel;
 
@@ -1688,18 +1689,28 @@ document.ondblclick = null;
                 }
                 else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
                 {
-                    if (LayoutManager.Current.CheckChildMeasureValidation(this) == false)
-                    {
-                        DesiredSize = previousDesiredSize;
-                        return;
-                    }
+                    return;
                 }
 
                 Size previousDesiredSizeInMeasure = this.DesiredSize;
-                DesiredSize = MeasureCore(availableSize);
+                measureInProgress = true;
+                try
+                {
+                    DesiredSize = MeasureCore(availableSize);
+                }
+                finally
+                {
+                    measureInProgress = false;
+                }
+
                 if (previousDesiredSizeInMeasure != DesiredSize)
                 {
                     this.InvalidateArrange();
+
+                    if (VisualTreeHelper.GetParent(this) is UIElement parent && !parent.measureInProgress)
+                    {
+                        this.InvalidateParentMeasure();
+                    }
                 }
 
                 PreviousAvailableSize = availableSize;
