@@ -91,7 +91,30 @@ namespace System.ComponentModel
             return td.GetProperties();
         }
 
-        private static bool IsCoreType(Type type)
+        // Helper method for TemplateBindingExpression
+        internal static TypeConverter GetBuiltInConverter(Type type)
+        {
+            if (IsNullableType(type))
+            {
+                type = Nullable.GetUnderlyingType(type);
+            }
+
+            TypeConverter converter = null;
+
+            if (IsCoreType(type))
+            {
+                converter = GetCoreTypeConverter(type);
+            }
+
+            if ((converter ??= GetIntrinsicTypeConverter(type)) == NullConverter)
+            {
+                converter = null;
+            }
+
+            return converter;
+        }
+
+        internal static bool IsCoreType(Type type)
         {
             return type.Assembly == _openSilverAssembly;
         }
