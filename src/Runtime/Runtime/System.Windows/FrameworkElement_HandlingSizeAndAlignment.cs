@@ -588,19 +588,13 @@ namespace Windows.UI.Xaml
                             if (!isParentAWrapPanelOrAHorizontalStackPanel)
                             {
                                 styleOfWrapperElement.width = "auto";
-                                
-                                if (fe is Grid) 
-                                { 
-                                    styleOfWrapperElement.marginLeft = "auto";
-                                }
-
                                 styleOfOuterDomElement.marginLeft = "auto";
                                 styleOfOuterDomElement.marginRight = "0px";
                                 if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
                                 {
+                                    styleOfOuterDomElement.display = "table";
                                     if (!isCSSGrid || !(fe is Grid))
                                     {
-                                        styleOfOuterDomElement.display = "table";
                                         if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
                                         {
                                             //Example of the note below: cf at the same place in case HorizontalAlignment.Left of the switch statement
