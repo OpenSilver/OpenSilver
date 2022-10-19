@@ -1822,10 +1822,10 @@ document.ondblclick = null;
             if (fe != null)
             {
                 if (fe.IsAutoWidthOnCustomLayoutInternal)
-                    availableSize.Width = Math.Max(this.DesiredSize.Width, savedLastSize.Width);
+                    availableSize.Width = this.DesiredSize.Width;
 
                 if (fe.IsAutoHeightOnCustomLayoutInternal)
-                    availableSize.Height = Math.Max(this.DesiredSize.Height, savedLastSize.Height);
+                    availableSize.Height = this.DesiredSize.Height;
             }
 
             Arrange(new Rect(availableSize));
