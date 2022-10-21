@@ -1778,7 +1778,7 @@ document.ondblclick = null;
 
         public void UpdateLayout()
         {
-
+            LayoutManager.Current.UpdateLayout();
         }
 
         internal void UpdateCustomLayout(Size newSize)
