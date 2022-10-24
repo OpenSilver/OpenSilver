@@ -677,9 +677,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Hide the PopupRoot:
                 //---------------------
                 var popupRoot = _popupRoot;
-                popupRoot.INTERNAL_LinkedPopup = null;
                 popupRoot.Content = null;
                 INTERNAL_PopupsManager.RemovePopupRoot(popupRoot);
+                popupRoot.INTERNAL_LinkedPopup = null;
                 _popupRoot = null;
                 _isVisible = false;
             }
