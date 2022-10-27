@@ -205,5 +205,12 @@ namespace OpenSilver.Internal.Xaml
                 timeline.NameResolver = context.NameResolver;
             }
         }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void UIElement_SetKeepHiddenInFirstRender(UIElement uie, bool value)
+        {
+            Debug.Assert(uie != null);
+            uie.KeepHiddenInFirstRender = value;
+        }
     }
 }
