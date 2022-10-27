@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,23 +11,37 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.ComponentModel;
+using DotNetForHtml5.Core;
+
 namespace DotNetForHtml5
 {
     public static class Cshtml5Initializer
     {
-        public static void Initialize()
+        public static void Initialize(IJavaScriptExecutionHandler2 executionHandler)
         {
-            Initialize(new JavaScriptExecutionHandler());
-        }
-
-        public static void Initialize(IJavaScriptExecutionHandler executionHandler)
-        {
-            DotNetForHtml5.Core.INTERNAL_Simulator.JavaScriptExecutionHandler = executionHandler;
+            INTERNAL_Simulator.JavaScriptExecutionHandler2 = executionHandler;
 #if MIGRATION
             EmulatorWithoutJavascript.StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(typeof(System.Windows.Controls.Button).Assembly);
 #else
             EmulatorWithoutJavascript.StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(typeof(Windows.UI.Xaml.Controls.Button).Assembly);
 #endif
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void Initialize()
+        {
+            Initialize(new JavaScriptExecutionHandler());
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void Initialize(IJavaScriptExecutionHandler executionHandler)
+        {
+            IJavaScriptExecutionHandler2 jsRuntime = executionHandler as IJavaScriptExecutionHandler2
+                ?? new JSRuntimeWrapper(executionHandler);
+
+            Initialize(jsRuntime);
         }
     }
 }

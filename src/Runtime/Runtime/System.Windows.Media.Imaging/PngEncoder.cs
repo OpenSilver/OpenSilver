@@ -1,29 +1,37 @@
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System;
 using System.IO;
 
 #if MIGRATION
-using System.Windows.Controls;
 namespace System.Windows.Media.Imaging
 #else
-using Windows.UI.Xaml.Controls;
 namespace Windows.UI.Xaml.Media.Imaging
 #endif
 {
-    internal class PngCoder
+    internal static class PngEncoder
     {
-        protected const int _ADLER32_BASE = 65521;
-        protected const int _MAXBLOCK = 0xFFFF;
-        protected static byte[] _HEADER = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-        protected static byte[] _IHDR = { (byte)'I', (byte)'H', (byte)'D', (byte)'R' };
-        protected static byte[] _GAMA = { (byte)'g', (byte)'A', (byte)'M', (byte)'A' };
-        protected static byte[] _IDAT = { (byte)'I', (byte)'D', (byte)'A', (byte)'T' };
-        protected static byte[] _IEND = { (byte)'I', (byte)'E', (byte)'N', (byte)'D' };
-        protected static byte[] _4BYTEDATA = { 0, 0, 0, 0 };
-        protected static byte[] _ARGB = { 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0 };
-    }
+        private const int _ADLER32_BASE = 65521;
+        private const int _MAXBLOCK = 0xFFFF;
+        private static readonly byte[] _HEADER = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        private static readonly byte[] _IHDR = { (byte)'I', (byte)'H', (byte)'D', (byte)'R' };
+        private static readonly byte[] _GAMA = { (byte)'g', (byte)'A', (byte)'M', (byte)'A' };
+        private static readonly byte[] _IDAT = { (byte)'I', (byte)'D', (byte)'A', (byte)'T' };
+        private static readonly byte[] _IEND = { (byte)'I', (byte)'E', (byte)'N', (byte)'D' };
+        private static readonly byte[] _4BYTEDATA = { 0, 0, 0, 0 };
+        private static readonly byte[] _ARGB = { 0, 0, 0, 0, 0, 0, 0, 0, 8, 6, 0, 0, 0 };
 
-    internal class PngEncoder : PngCoder
-    {
         public static Stream Encode(byte[] data, int width, int height)
         {
             // See http://www.libpng.org/pub/png//spec/1.2/PNG-Chunks.html
@@ -201,6 +209,7 @@ namespace Windows.UI.Xaml.Media.Imaging
             {
                 c = (uint)n;
                 for (int k = 0; k < 8; k++)
+                {
                     if ((c & 0x00000001) > 0)
                     {
                         c = 0xEDB88320 ^ c >> 1;
@@ -209,6 +218,7 @@ namespace Windows.UI.Xaml.Media.Imaging
                     {
                         c = c >> 1;
                     }
+                }
 
                 _crcTable[n] = c;
             }

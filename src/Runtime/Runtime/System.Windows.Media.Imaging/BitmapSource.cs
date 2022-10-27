@@ -13,6 +13,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Imaging
@@ -106,16 +107,27 @@ namespace Windows.UI.Xaml.Media.Imaging
             INTERNAL_DataURL = dataUrl;
         }
 
+        internal override Task<string> GetDataStringAsync()
+        {
+            string data = string.Empty;
+            if (INTERNAL_StreamSource != null)
+            {
+                data = "data:image/png;base64," + INTERNAL_StreamAsBase64String;
+            }
+            else if (!string.IsNullOrEmpty(INTERNAL_DataURL))
+            {
+                data = INTERNAL_DataURL;
+            }
+
+            return Task.FromResult(data);
+        }
 
         #region Not supported yet
         /// <summary>
         /// Gets the height of the bitmap in pixels.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public int PixelHeight
-        {
-            get { return PixelHeightInternal; }
-        }
+        public int PixelHeight => PixelHeightInternal;
 
         /// <summary>
         /// Identifies the PixelHeight dependency property.
@@ -129,10 +141,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// Gets the width of the bitmap in pixels.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public int PixelWidth
-        {
-            get { return PixelWidthInternal; }
-        }
+        public int PixelWidth => PixelWidthInternal;
 
         /// <summary>
         /// Identifies the PixelWidth dependency property.
@@ -157,24 +166,8 @@ namespace Windows.UI.Xaml.Media.Imaging
         //public IAsyncAction SetSourceAsync(IRandomAccessStream streamSource);
         #endregion
 
+        internal virtual int PixelHeightInternal => (int)GetValue(PixelHeightProperty);
 
-        internal virtual int PixelHeightInternal
-        {
-            get
-            {
-                return (int)this.GetValue(PixelHeightProperty);
-            }
-        }
-
-        internal virtual int PixelWidthInternal
-        {
-            get
-            {
-                return (int)this.GetValue(PixelWidthProperty);
-            }
-        }
-
-        /// <summary>Sets the source of the <see cref="T:System.Windows.Media.Imaging.BitmapSource" />.</summary>
-        /// <param name="streamSource">The stream to set the source to.</param>
+        internal virtual int PixelWidthInternal => (int)GetValue(PixelWidthProperty);
     }
 }

@@ -212,6 +212,8 @@
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
+		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Wasm.cs" />
+		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Simulator.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
@@ -979,7 +981,7 @@
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplineDoubleKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\FillBehavior.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\ClockState.cs" />
-		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\BitmapImage.cs" />
+		<Compile Include="System.Windows.Media.Imaging\BitmapImage.cs" />
 		<Compile Include="System.Windows.Media.Imaging\BitmapSource.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\BitmapCreateOptions.cs" />
 		<Compile Include="System.Windows.Media\ArcSegment.cs" />

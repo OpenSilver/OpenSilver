@@ -11,18 +11,14 @@
 *  
 \*====================================================================================*/
 
-#if BRIDGE
-using CSHTML5.Internal;
-#endif
-
-
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media.Imaging
 #else
-using Windows.Foundation;
 namespace Windows.UI.Xaml.Media.Imaging
 #endif
 {
@@ -43,6 +39,19 @@ namespace Windows.UI.Xaml.Media.Imaging
             : base()
         {
             UriSource = uriSource;
+        }
+
+        internal override Task<string> GetDataStringAsync()
+        {
+            if (UriSource != null)
+            {
+                return Task.FromResult(
+                    INTERNAL_UriHelper.ConvertToHtml5Path(
+                        UriSource.OriginalString,
+                        InheritanceContext as UIElement));
+            }
+
+            return base.GetDataStringAsync();
         }
 
         public string INTERNAL_NameOfAssemblyThatSetTheSourceUri; // Useful to convert relative URI to absolute URI.
