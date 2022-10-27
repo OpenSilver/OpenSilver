@@ -23,6 +23,7 @@ namespace Windows.UI.Xaml
         private HashSet<UIElement> arrangeQueue;
         private HashSet<UIElement> updatedElements;
 
+        private bool _updateInProgress;
         private object queueLock = new object();
         private object updatedElementsLock = new object();
 
@@ -125,6 +126,9 @@ namespace Windows.UI.Xaml
 
         public void UpdateLayout()
         {
+            if (_updateInProgress) return;
+
+            _updateInProgress = true;
             while (measureQueue.Count > 0 || arrangeQueue.Count > 0)
             {
                 while (measureQueue.Count > 0)
@@ -165,6 +169,7 @@ namespace Windows.UI.Xaml
                     element.RaiseLayoutUpdated();
                 }
             }
+            _updateInProgress = false;
         }
 
         private UIElement GetTopElement(IEnumerable<UIElement> measureQueue)

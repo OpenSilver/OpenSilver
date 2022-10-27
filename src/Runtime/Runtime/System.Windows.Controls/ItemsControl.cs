@@ -501,6 +501,7 @@ namespace Windows.UI.Xaml.Controls
                 if (ItemsHost is VirtualizingPanel vp)
                 {
                     vp.BringIndexIntoViewInternal(index);
+                    vp.UpdateLayout();
                 }
                 else
                 {
@@ -773,7 +774,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         internal void NavigateToItem(object item, int elementIndex)
-            => FocusItem(NewItemInfo(item, ItemContainerGenerator.ContainerFromIndex(elementIndex)));
+            => FocusItem(NewItemInfo(item, ItemContainerGenerator.ContainerFromItem(item), elementIndex));
 
         internal virtual bool FocusItem(ItemInfo info) => false;
 

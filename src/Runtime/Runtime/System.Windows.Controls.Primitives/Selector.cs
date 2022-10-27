@@ -569,7 +569,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             bool returnValue = false;
 
             ScrollIntoViewImpl(info.Index);
-            if (info.Container is ListBoxItem container)
+
+            if ((info.Container ?? ItemContainerGenerator.ContainerFromIndex(info.Index)) is ListBoxItem container)
             {
                 returnValue = container.Focus();
             }
