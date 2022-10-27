@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using CSHTML5.Internal;
+using OpenSilver.Internal.Xaml;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -549,7 +550,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_measured)
             {
-                if (IsProgressiveLoadingInProgress)
+                if (_isProgressiveLoadingInProgress)
                 {
                     _pendingRefreshRowsArgs = new bool[] { recycleRows, clearRows };
                     return;
@@ -844,7 +845,7 @@ namespace Windows.UI.Xaml.Controls
             }
 #endif
             // this can happen while changing ItemsSource while progressive loading rows
-            if (IsProgressiveLoadingInProgress && slot != SlotCount)
+            if (_isProgressiveLoadingInProgress && slot != SlotCount)
             {
                 return;
             }
@@ -859,23 +860,33 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Global settings for rows progressive loading (NOTE: <see cref="ProgressiveLoadingRowChunkSize"/> overrides the global settings)
+        /// null or &lt;= 0 : disable progressive loading
+        /// &gt; 0 : enable progressive loading with this chunk size
+        /// </summary>
+        public static int? GlobalProgressiveLoadingChunkSize { get; set; }
+
+        /// <summary>
         /// Local settings for rows progressive loading
-        ///  null: uses global settings (DataGridProgressiveLoadingChunkSize)
-        ///  <= 0 : disables progressive loading even if global is enabled
-        ///  > 0 : enables progressive loading with this chunk size
+        /// null: uses global settings (<see cref="GlobalProgressiveLoadingChunkSize"/>)
+        /// &lt;= 0 : disable progressive loading even if global is enabled
+        /// &gt; 0 : enable progressive loading with this chunk size
         /// </summary>
         public int? ProgressiveLoadingRowChunkSize { get; set; }
 
         /// <summary>
         /// Fires when progressive loading starts and ends
         /// </summary>
-        public event Action<bool> ProgressiveLoadingInProgressChanged;
+        public event EventHandler<DataGridProgressiveLoadingInProgressChangedEventArgs> ProgressiveLoadingInProgressChanged;
 
-        /// <summary>
-        /// Indicates if progressive loading is running
-        /// </summary>
-        public bool IsProgressiveLoadingInProgress { get; private set; } = false;
-        private bool[] _pendingRefreshRowsArgs = null;
+        private void OnProgressiveLoadingInProgressChanged(bool value)
+        {
+            _isProgressiveLoadingInProgress = value;
+            ProgressiveLoadingInProgressChanged?.Invoke(this, new DataGridProgressiveLoadingInProgressChangedEventArgs(value));
+        }
+
+        private bool _isProgressiveLoadingInProgress;
+        private bool[] _pendingRefreshRowsArgs;
 
         private async void AddSlots(int totalSlots)
         {
@@ -892,9 +903,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            int globalChunkSize = Application.Current.Host.Settings.DataGridProgressiveLoadingChunkSize != null ?
-                Application.Current.Host.Settings.DataGridProgressiveLoadingChunkSize.Value : 0;
-            int chunkSize = ProgressiveLoadingRowChunkSize != null ? ProgressiveLoadingRowChunkSize.Value : globalChunkSize;
+            int chunkSize = ProgressiveLoadingRowChunkSize ?? GlobalProgressiveLoadingChunkSize ?? 0;
             int chunkSlots = chunkSize > 0 ? Math.Min(chunkSize, totalSlots) : totalSlots;
 
             int addedfRows = 0;
@@ -903,8 +912,7 @@ namespace Windows.UI.Xaml.Controls
 
             if (chunkSlots < totalSlots)
             {
-                IsProgressiveLoadingInProgress = true;
-                ProgressiveLoadingInProgressChanged?.Invoke(true);
+                OnProgressiveLoadingInProgressChanged(true);
             }
 
             while (chunkSlots < totalSlots)
@@ -914,15 +922,14 @@ namespace Windows.UI.Xaml.Controls
                 // this can happen if the DataGrid is detached during the delay.
                 if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    IsProgressiveLoadingInProgress = false;                    
+                    OnProgressiveLoadingInProgressChanged(false);
                     return;
                 }
 
                 // this can happen while refreshing rows while progressive loading rows
                 if (_pendingRefreshRowsArgs != null && _pendingRefreshRowsArgs.Length == 2)
-                {                    
-                    IsProgressiveLoadingInProgress = false;
-                    ProgressiveLoadingInProgressChanged?.Invoke(false);
+                {
+                    OnProgressiveLoadingInProgressChanged(false);
                     bool recycleRows = _pendingRefreshRowsArgs[0];
                     bool clearRows = _pendingRefreshRowsArgs[1];
                     _pendingRefreshRowsArgs = null;
@@ -934,10 +941,9 @@ namespace Windows.UI.Xaml.Controls
                 AddSlotsInChunk(ref addedfRows, ref slot, ref nextGroupSlot, chunkSlots, groupSlots);
             }
 
-            if (IsProgressiveLoadingInProgress)
+            if (_isProgressiveLoadingInProgress)
             {
-                IsProgressiveLoadingInProgress = false;
-                ProgressiveLoadingInProgressChanged?.Invoke(false);
+                OnProgressiveLoadingInProgressChanged(false);
             }
 
             if (slot < totalSlots)
@@ -1684,6 +1690,13 @@ namespace Windows.UI.Xaml.Controls
             return GenerateRow(rowIndex, slot, this.DataConnection.GetDataItem(rowIndex));
         }
 
+        private static DataGridRow NewDataGridRow(bool keepHiddenOnFirstRender)
+        {
+            var row = new DataGridRow();
+            RuntimeHelpers.UIElement_SetKeepHiddenInFirstRender(row, keepHiddenOnFirstRender);
+            return row;
+        }
+
         /// <summary>
         /// Returns a row for the provided index. The row gets first loaded through the LoadingRow event.
         /// </summary>
@@ -1693,7 +1706,7 @@ namespace Windows.UI.Xaml.Controls
             DataGridRow dataGridRow = GetGeneratedRow(dataContext);
             if (dataGridRow == null)
             {
-                dataGridRow = this.DisplayData.GetUsedRow() ?? new DataGridRow() { KeepHiddenInFirstRender = IsProgressiveLoadingInProgress };
+                dataGridRow = this.DisplayData.GetUsedRow() ?? NewDataGridRow(true);
                 dataGridRow.Index = rowIndex;
                 dataGridRow.Slot = slot;
                 dataGridRow.OwningGrid = this;
@@ -3228,5 +3241,25 @@ namespace Windows.UI.Xaml.Controls
             _collapsedSlotsTable.PrintIndexes();
         }
 #endif
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="DataGrid.ProgressiveLoadingInProgressChanged "/>
+    /// event.
+    /// </summary>
+    public sealed class DataGridProgressiveLoadingInProgressChangedEventArgs : EventArgs
+    {
+        internal DataGridProgressiveLoadingInProgressChangedEventArgs(bool value)
+        {
+            InProgress = value;
+        }
+
+        /// <summary>
+        /// Get the progressive rendering status.
+        /// </summary>
+        /// <returns>
+        /// true if progressive rendering is in progress, false otherwise.
+        /// </returns>
+        public bool InProgress { get; }
     }
 }

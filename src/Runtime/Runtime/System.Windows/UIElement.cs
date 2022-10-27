@@ -347,7 +347,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        public bool KeepHiddenInFirstRender { get; set; } = false;
+        internal bool KeepHiddenInFirstRender { get; set; }
 
         public UIElement()
         {
