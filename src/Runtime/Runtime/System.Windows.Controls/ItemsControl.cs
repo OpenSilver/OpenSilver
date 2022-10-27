@@ -774,7 +774,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         internal void NavigateToItem(object item, int elementIndex)
-            => FocusItem(NewItemInfo(item, ItemContainerGenerator.ContainerFromItem(item),elementIndex));
+            => FocusItem(NewItemInfo(item, ItemContainerGenerator.ContainerFromItem(item), elementIndex));
 
         internal virtual bool FocusItem(ItemInfo info) => false;
 
