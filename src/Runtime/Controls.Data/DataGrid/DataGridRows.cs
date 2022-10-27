@@ -843,6 +843,12 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 #endif
+            // this can happen while changing ItemsSource while progressive loading rows
+            if (IsProgressiveLoadingInProgress && slot != SlotCount)
+            {
+                return;
+            }
+
             Debug.Assert(slot == this.SlotCount);
 
             OnAddedElement_Phase1(slot, element);
