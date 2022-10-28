@@ -61,7 +61,7 @@ namespace Windows.UI.Xaml.Media.Imaging
             // Write IHDR chunk
             WriteChunk(ms, _IHDR, _ARGB);
 
-            // Set gamma = 1
+            // Set gamma
             size = BitConverter.GetBytes((uint)Math.Round(1.0 / 2.2 * 100000));
             _4BYTEDATA[0] = size[3];
             _4BYTEDATA[1] = size[2];
