@@ -890,7 +890,7 @@ namespace Windows.UI.Xaml
                 {
                     while (enumerator.MoveNext())
                     {
-                        DependencyObject child = enumerator.Current as DependencyObject;
+                        FrameworkElement child = enumerator.Current as FrameworkElement;
                         if (child != null)
                         {
                             child.CoerceValue(property);
