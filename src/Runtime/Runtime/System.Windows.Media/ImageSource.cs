@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,5 +28,7 @@ namespace Windows.UI.Xaml.Media
     public abstract partial class ImageSource : DependencyObject
     {
         internal ImageSource() { }
+
+        internal abstract Task<string> GetDataStringAsync();
     }
 }

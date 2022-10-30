@@ -40,8 +40,9 @@
     'libs/velocity.js',
     'libs/flatpickr.js',
     'libs/ResizeSensor.js',
-    'libs/ResizeObserver.js',
-    'libs/quill.min.js']));
+    'libs/ResizeObserver.js',    
+    'libs/quill.min.js',
+    'libs/html2canvas.js']));
 
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";
