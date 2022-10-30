@@ -20,6 +20,9 @@ namespace System.Windows.Media.Imaging
 namespace Windows.UI.Xaml.Media.Imaging
 #endif
 {
+    /// <summary>
+    /// Provides a <see cref="BitmapSource"/> that can be written to and updated.
+    /// </summary>
     public sealed partial class WriteableBitmap : BitmapSource
     {
         private readonly IWriteableBitmapImpl _impl;
@@ -73,6 +76,9 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// <param name="source">
         /// The <see cref="BitmapSource" /> to use for initialization.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="source"/> is null.
+        /// </exception>
         public WriteableBitmap(BitmapSource source)
             : this()
         {
