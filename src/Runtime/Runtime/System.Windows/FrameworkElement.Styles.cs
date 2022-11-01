@@ -238,7 +238,9 @@ namespace Windows.UI.Xaml
                     }
                 }
 
-                if (inheritanceBehavior == InheritanceBehavior.SkipToAppNow)
+                if ((inheritanceBehavior == InheritanceBehavior.Default ||
+                     inheritanceBehavior == InheritanceBehavior.SkipToAppNow)
+                    && boundaryElement == null)
                 {
                     // Then we try to find the resource in the App's Resources
                     // if we can't find it in the parents.
