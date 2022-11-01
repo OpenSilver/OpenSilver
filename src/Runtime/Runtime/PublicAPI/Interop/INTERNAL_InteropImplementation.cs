@@ -38,7 +38,7 @@ namespace CSHTML5
         private static bool _isInitialized;
         private static readonly SynchronyzedStore<string> _javascriptCallsStore = new SynchronyzedStore<string>();
         private static readonly ReferenceIDGenerator _refIdGenerator = new ReferenceIDGenerator();
-        private static Dictionary<JavascriptCallback, string> JsCallbackFunctions = new Dictionary<JavascriptCallback, string>();
+        
         static INTERNAL_InteropImplementation()
         {
             Application.INTERNAL_Reloaded += (sender, e) =>
@@ -62,23 +62,6 @@ namespace CSHTML5
             }
 
             _isInitialized = true;
-        }
-
-        private static string GetCallbackJsCode(JavascriptCallback callback, bool isVoid)
-        {
-            if (!JsCallbackFunctions.ContainsKey(callback))
-            {
-                // Add the callback to the document:
-                var callbackId = callback.Id;
-
-                JsCallbackFunctions[callback] = $@"document.getCallbackFunc({callbackId}, {(!isVoid).ToString().ToLower()}," +              
-#if OPENSILVER
-                $"{(!Interop.IsRunningInTheSimulator_WorkAround).ToString().ToLower()})";
-#elif BRIDGE
-                "true)";
-#endif
-            }
-            return JsCallbackFunctions[callback];
         }
 
         internal static string GetVariableStringForJS(object variable)
@@ -123,11 +106,8 @@ namespace CSHTML5
                 //-----------
 
                 var jsCallback = (JavascriptCallback)variable;
-
-                // Add the callback to the document:
-                var isVoid = jsCallback.GetCallback().Method.ReturnType == typeof(void);
-                return GetCallbackJsCode(jsCallback, isVoid);
-
+                bool isVoid = jsCallback.GetCallback().Method.ReturnType == typeof(void);
+                return $"document.getCallbackFunc({jsCallback.Id}, {(!isVoid).ToString().ToLower()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
 
                 // Note: generating the random number in JS rather than C# is important in order
                 // to be able to put this code inside a JavaScript "for" statement (cf.

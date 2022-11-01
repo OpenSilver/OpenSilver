@@ -511,18 +511,12 @@ document.eventCallback = function (callbackId, arguments, sync) {
     }
 }
 
-document.jsCallBackFunctionsReference = new Array();
-
 document.getCallbackFunc = function (callbackId, sync, sliceArguments) {
-    if (document.jsCallBackFunctionsReference[callbackId] === undefined) {
-        document.jsCallBackFunctionsReference[callbackId] = function () {
-            return document.eventCallback(callbackId,
-                (sliceArguments) ? Array.prototype.slice.call(arguments) : arguments,
-                sync);
-        }
-    }
-
-    return document.jsCallBackFunctionsReference[callbackId];
+    return function () {
+        return document.eventCallback(callbackId,
+            (sliceArguments) ? Array.prototype.slice.call(arguments) : arguments,
+            sync);
+    };
 }
 
 document.callScriptSafe = function (referenceId, javaScriptToExecute, errorCallBackId) {

@@ -28,10 +28,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
+using OpenSilver.Internal;
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
 #else
 using Windows.UI.Xaml.Media;

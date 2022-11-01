@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,6 @@ using Bridge;
 #endif
 #if !MIGRATION
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media.Animation;
 #endif
 
 #if MIGRATION
@@ -54,7 +54,7 @@ namespace Windows.UI.Xaml.Media.Animation
             {
                 CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
 {sOptions}.easing = ""{CSHTML5.Internal.INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"";
-{sOptions}.duration = {duration.ToString(Globalization.CultureInfo.InvariantCulture)};
+{sOptions}.duration = {duration.ToString(CultureInfo.InvariantCulture)};
 {sOptions}.queue = false;
 {sOptions}.queue = ""{visualStateGroupName}"";
 ");
@@ -64,7 +64,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(callbackForWhenfinished);
                 CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
 {sOptions}.easing = ""{CSHTML5.Internal.INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"";
-{sOptions}.duration = {duration.ToString(Globalization.CultureInfo.InvariantCulture)};
+{sOptions}.duration = {duration.ToString(CultureInfo.InvariantCulture)};
 {sOptions}.queue = false;
 {sOptions}.queue = ""{visualStateGroupName}"";
 {sOptions}.complete = {sAction};

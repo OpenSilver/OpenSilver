@@ -148,12 +148,6 @@ namespace Windows.UI.Xaml.Shapes
 				ApplyMarginToFixNegativeCoordinates(_marginOffsets);
 			}
 
-			// Element has been removed prevent redraw
-			if (! IsStillInDOM())
-			{
-				return;
-			}
-
 			object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDomElement);
 
 			//we remove the previous drawing:
