@@ -1363,8 +1363,7 @@ document.ondblclick = null;
                 // Note: "none" disables scrolling, pinching and other gestures.
                 // It is supposed to not have any effect on the "TouchStart",
                 // "TouchMove", and "TouchEnd" events.
-                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1",
-                    element.INTERNAL_OuterDomElement, (bool)e.NewValue ? "auto" : "none");
+                CSHTML5.Interop.ExecuteJavaScript($@"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(element.INTERNAL_OuterDomElement)}.style.touchAction = ""{((bool)e.NewValue ? "auto" : "none")}""");
             }
         }
 
@@ -1453,8 +1452,10 @@ document.ondblclick = null;
                 // ------- SIMULATOR -------
 
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
-                    outerDivOfThisControl, outerDivOfReferenceVisual));
+                string sOuterDivOfControl = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
+                string sOuterDivOfReferenceVisual = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
+                string concatenated = Convert.ToString(
+                    OpenSilver.Interop.ExecuteJavaScript($"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)"));
                 int sepIndex = concatenated.IndexOf('|');
                 string offsetLeftAsString = concatenated.Substring(0, sepIndex);
                 string offsetTopAsString = concatenated.Substring(sepIndex + 1);

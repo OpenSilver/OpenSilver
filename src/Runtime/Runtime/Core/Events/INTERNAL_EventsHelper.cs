@@ -55,10 +55,11 @@ namespace CSHTML5.Internal
         static void AttachEvent(string eventName, object domElementRef, HtmlEventProxy newProxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
+            string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(newProxy.Handler);
             if (domElementRef is INTERNAL_HtmlDomElementReference)
-                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier, eventName, newProxy.Handler);
+                Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
             else
-                Interop.ExecuteJavaScriptAsync(@"document.addEventListenerSafe($0, $1, $2)", domElementRef, eventName, newProxy.Handler);
+                Interop.ExecuteJavaScriptFastAsync($@"document.addEventListenerSafe({INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
 
             /*
             DOMEventType eventType;
@@ -87,7 +88,11 @@ namespace CSHTML5.Internal
         internal static void DetachEvent(string eventName, object domElementRef, HtmlEventProxy proxy, Action<object> originalEventHandler)
         {
 #if !BUILDINGDOCUMENTATION
-            Interop.ExecuteJavaScriptAsync(@"document.removeEventListenerSafe($0, $1, $2)", domElementRef, eventName, proxy.Handler);
+            string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(proxy.Handler);
+            if (domElementRef is INTERNAL_HtmlDomElementReference)
+                Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"", ""{eventName}"", {sAction})");
+            else
+                Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe({INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
 
             /*
             DOMEventType eventType;

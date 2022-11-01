@@ -36,10 +36,10 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             if (hookupEvents)
             {
                 // Hooks the FullScreenChanged event
-                CSHTML5.Interop.ExecuteJavaScript(@"document.addEventListener('fullscreenchange', $0)", new Action(FullScreenChangedCallback));
+                CSHTML5.Interop.ExecuteJavaScript($"document.addEventListener('fullscreenchange', {INTERNAL_InteropImplementation.GetVariableStringForJS(new Action(FullScreenChangedCallback))})");
 
                 // Hooks the Resized event
-                CSHTML5.Interop.ExecuteJavaScript("new ResizeSensor(document.getXamlRoot(), $0)", new Action(WindowResizeCallback));
+                CSHTML5.Interop.ExecuteJavaScript($"new ResizeSensor(document.getXamlRoot(), {INTERNAL_InteropImplementation.GetVariableStringForJS(new Action(WindowResizeCallback))})");
 
                 // WORKINPROGRESS
                 // Add Zoomed event

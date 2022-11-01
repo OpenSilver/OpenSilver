@@ -264,7 +264,8 @@ namespace Windows.UI.Xaml.Media.Animation
                             }
                             if (cssEquivalent.DomElement != null)
                             {
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
+                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"Velocity({sDomElement}, ""stop"", ""{specificGroupName}"");");
                             }
                         }
                     }
@@ -276,7 +277,8 @@ namespace Windows.UI.Xaml.Media.Animation
                     {
                         if (equivalent.DomElement != null)
                         {
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                            string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
+                            CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"Velocity({sDomElement}, ""stop"", ""{specificGroupName}"");");
                         }
                     }
                 }
@@ -341,21 +343,22 @@ namespace Windows.UI.Xaml.Media.Animation
                             cssEquivalent.Value = (finalInstance, value) => { return value ?? ""; }; // Default value
                         }
                         object cssValue = cssEquivalent.Value(target, to);
-
+                        string sCssValue = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
                         object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
-
+                        string sNewObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(newObj);
                         if (AnimationHelpers.IsValueNull(from)) //todo: when using Bridge, I guess we would want to directly use "from == null" since it worked in the first place (I think).
                         {
                             foreach (string csspropertyName in cssEquivalent.Name)
                             {
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
+                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewObj}[""{csspropertyName}""] = {sCssValue};");
                             }
                         }
                         else
                         {
+                            string sFrom = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(from);
                             foreach (string csspropertyName in cssEquivalent.Name)
                             {
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = [$2, $3];", newObj, csspropertyName, cssValue, from);
+                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewObj}[""{csspropertyName}""] = [{sCssValue}, {sFrom}];");
                             }
                         }
                         AnimationHelpers.CallVelocity(cssEquivalent.DomElement, Duration, easingFunction, visualStateGroupName, callbackForWhenfinished, newObj);

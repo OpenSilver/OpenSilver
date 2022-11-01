@@ -511,6 +511,14 @@ document.eventCallback = function (callbackId, arguments, sync) {
     }
 }
 
+document.getCallbackFunc = function (callbackId, sync, sliceArguments) {
+    return function () {
+        return document.eventCallback(callbackId,
+            (sliceArguments) ? Array.prototype.slice.call(arguments) : arguments,
+            sync);
+    };
+}
+
 document.callScriptSafe = function (referenceId, javaScriptToExecute, errorCallBackId) {
     try {
         document.jsObjRef[referenceId] = eval(javaScriptToExecute);
