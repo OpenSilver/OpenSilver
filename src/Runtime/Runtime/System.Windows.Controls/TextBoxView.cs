@@ -330,7 +330,7 @@ element.setAttribute(""data-maxlength"", ""{maxLength}"");");
             {
                 string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
                 OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    $"{sDiv}.setAttribute(\"contentEditable\", \"{(!isReadOnly).ToString().ToLower()});\""
+                    $"{sDiv}.setAttribute(\"contentEditable\", \"{(!isReadOnly).ToString().ToLower()}\");"
                 );
 
                 if (!IsRunningInJavaScript())
