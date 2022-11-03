@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,28 +11,14 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
     // Note: this class is intented to be used by the Simulator only, not when compiled to JavaScript.
-#if !BRIDGE
-    [JSIgnore]
-#else
-    [External]
-#endif
-    public class INTERNAL_HtmlDomElementReference
+    public class INTERNAL_HtmlDomElementReference : IJavaScriptConvertible
     {
+        private string _jsCache;
         private INTERNAL_HtmlDomElementReference _parent;
         private INTERNAL_HtmlDomStyleReference _style;
         private INTERNAL_Html2dContextReference _context2d;
@@ -62,8 +47,10 @@ namespace CSHTML5.Internal
 
         public INTERNAL_HtmlDomElementReference FirstChild { get; internal set; }
         
-        internal INTERNAL_HtmlDomStyleReference Style => _style ?? (_style = new INTERNAL_HtmlDomStyleReference(UniqueIdentifier));
+        internal INTERNAL_HtmlDomStyleReference Style => _style ??= new INTERNAL_HtmlDomStyleReference(UniqueIdentifier);
 
-        internal INTERNAL_Html2dContextReference Context2d => _context2d ?? (_context2d = new INTERNAL_Html2dContextReference(UniqueIdentifier));
+        internal INTERNAL_Html2dContextReference Context2d => _context2d ??= new INTERNAL_Html2dContextReference(UniqueIdentifier);
+
+        string IJavaScriptConvertible.ToJavaScriptString() => _jsCache ??= $"document.getElementByIdSafe(\"{UniqueIdentifier}\")";
     }
 }

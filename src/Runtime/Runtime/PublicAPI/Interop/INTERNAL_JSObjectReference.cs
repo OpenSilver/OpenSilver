@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if BRIDGE
 using Bridge;
@@ -29,13 +30,23 @@ using System.Text.Json;
 
 namespace CSHTML5.Types
 {
-#if BRIDGE
-    [External] //we exclude this class
-#else
-    [JSIgnore]
-#endif
-    internal class INTERNAL_JSObjectReference : IConvertible
+    internal class INTERNAL_JSObjectReference : IConvertible, IJavaScriptConvertible
     {
+        private string _jsCache;
+
+        string IJavaScriptConvertible.ToJavaScriptString()
+        {
+            
+            if (IsArray)
+            {
+                return $"document.jsObjRef[\"{ReferenceId}\"][{_arrayIndex}]";
+            }
+            else
+            {
+                return _jsCache ??= $"document.jsObjRef[\"{ReferenceId}\"]";
+            }
+        }
+
         private object Value { get; }
 
         public string ReferenceId { get; }

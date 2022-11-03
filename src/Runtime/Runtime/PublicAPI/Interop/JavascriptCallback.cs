@@ -11,12 +11,12 @@
 *
 \*====================================================================================*/
 
-
 using System;
+using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
-    internal class JavascriptCallback : IDisposable
+    internal class JavascriptCallback : IJavaScriptConvertible, IDisposable
     {
         private static readonly SynchronyzedStore<JavascriptCallback> _store = new SynchronyzedStore<JavascriptCallback>();
 
@@ -73,6 +73,12 @@ namespace CSHTML5.Internal
         public void Dispose()
         {
             _store.Clean(Id);
+        }
+
+        string IJavaScriptConvertible.ToJavaScriptString()
+        {
+            bool isVoid = GetCallback().Method.ReturnType == typeof(void);
+            return $"document.getCallbackFunc({Id}, {(!isVoid).ToString().ToLower()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
         }
     }
 }
