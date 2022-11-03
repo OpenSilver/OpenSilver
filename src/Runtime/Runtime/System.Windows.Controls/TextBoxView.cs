@@ -86,7 +86,9 @@ namespace Windows.UI.Xaml.Controls
             // the focus will be redirected to the <input>, unless the click was on an element that
             // absorbs pointer events.
 
-            OpenSilver.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)TextBoxView_GotFocus);
+            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement);
+            string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action<object>)TextBoxView_GotFocus);
+            OpenSilver.Interop.ExecuteJavaScript($"{sElement}.addEventListener('click', {sAction})");
 
             UpdateDomText(Host.Text);
         }
@@ -326,9 +328,9 @@ element.setAttribute(""data-maxlength"", ""{maxLength}"");");
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && 
                 INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(_contentEditableDiv))
             {
+                string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
                 OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    "$0.setAttribute(\"contentEditable\", $1);",
-                    _contentEditableDiv, (!isReadOnly).ToString().ToLower()
+                    $"{sDiv}.setAttribute(\"contentEditable\", \"{(!isReadOnly).ToString().ToLower()}\");"
                 );
 
                 if (!IsRunningInJavaScript())
@@ -354,26 +356,27 @@ element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
                 return;
             }
 
-            var globalIndexes = OpenSilver.Interop.ExecuteJavaScript(@"
-(function(domElement){
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+            var globalIndexes = OpenSilver.Interop.ExecuteJavaScript($@"
+(function(domElement){{
 var sel = window.getSelection();
-var globalIndexes = {}; //this will hold indexes of start and end and booleans that specify if each has been found.
+var globalIndexes = {{}}; //this will hold indexes of start and end and booleans that specify if each has been found.
 if(sel.rangeCount == 0)
-{
+{{
     globalIndexes.startIndex = 0; //apparently, we get 0 and not -1 when nothing is selected.
     globalIndexes.endIndex = 0; //apparently, we get 0 and not -1 when nothing is selected.
-}
+}}
 else
-{
+{{
     var range = sel.getRangeAt(0);
     document.getRangeGlobalStartAndEndIndexes(domElement, true, 0, range, globalIndexes);
-}
+}}
 return globalIndexes;
-}($0))
-", _contentEditableDiv);
+}}({sDiv}))");
 
-            selectionStartIndex = CastToInt(OpenSilver.Interop.ExecuteJavaScript("($0.isStartFound ? $0.startIndex : 0)", globalIndexes)); //todo: if not "isStartFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
-            int selectionLastIndex = CastToInt(CSHTML5.Interop.ExecuteJavaScript("($0.isEndFound ? $0.endIndex : ($0.isStartFound ? $0.startIndex : 0))", globalIndexes)); //todo: if not "isEndFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
+            string sGlobalIndexes = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(globalIndexes);
+            selectionStartIndex = CastToInt(OpenSilver.Interop.ExecuteJavaScript($"({sGlobalIndexes}.isStartFound ? {sGlobalIndexes}.startIndex : 0)")); //todo: if not "isStartFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
+            int selectionLastIndex = CastToInt(OpenSilver.Interop.ExecuteJavaScript($"({sGlobalIndexes}.isEndFound ? {sGlobalIndexes}.endIndex : ({sGlobalIndexes}.isStartFound ? {sGlobalIndexes}.startIndex : 0))")); //todo: if not "isEndFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
             selectionLength = selectionLastIndex - selectionStartIndex;
         }
 
@@ -385,12 +388,13 @@ return globalIndexes;
             if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 return;
 
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 var sel = window.getSelection()
-var nodesAndOffsets = {}; //this will hold the nodes and offsets useful to set the range's start and end.
-document.getRangeStartAndEnd($0, true, 0, $1, $2, nodesAndOffsets, false, false)
+var nodesAndOffsets = {{}}; //this will hold the nodes and offsets useful to set the range's start and end.
+document.getRangeStartAndEnd({sDiv}, true, 0, {startIndex.ToInvariantString()}, {endIndex.ToInvariantString()}, nodesAndOffsets, false, false)
 sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset'], nodesAndOffsets['endParent'], nodesAndOffsets['endOffset'])
-", _contentEditableDiv, startIndex, endIndex);
+");
         }
 
         internal int GetCaretPosition()
@@ -427,7 +431,8 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
             if (INTERNAL_HtmlDomManager.IsInternetExplorer())
             {
                 //set the class to remove margins on <p> inside the contentEditableDiv
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.classList.add(""ie_set_p_margins_to_zero"")", contentEditableDiv);
+                string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(contentEditableDiv);
+                OpenSilver.Interop.ExecuteJavaScript(@"{sDiv}.classList.add(""ie_set_p_margins_to_zero"")");
             }
 
             contentEditableDivStyle.width = "100%";
@@ -909,32 +914,46 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
 
         private void TextBoxView_GotFocus(object e)
         {
-            bool ignoreEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", e));
+            string sE = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e);
+            bool ignoreEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript($"document.checkForDivsThatAbsorbEvents({sE})"));
             if (!ignoreEvent)
             {
                 if (_contentEditableDiv != null)
                 {
-                    OpenSilver.Interop.ExecuteJavaScript(@"
-if($1.target != $0) {
-$0.focus()
+                    string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                    OpenSilver.Interop.ExecuteJavaScript($@"
+if({sE}.target != {sDiv}) {{
+{sDiv}.focus()
 var range,selection;
-    if(document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
-    {
-        range = document.createRange();//Create a range (a range is a like the selection but invisible)
-        range.selectNodeContents($0);//Select the entire contents of the element with the range
-        range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
-        selection = window.getSelection();//get the selection object (allows you to change selection)
-        selection.removeAllRanges();//remove any selections already made
-        selection.addRange(range);//make the range you have just created the visible selection
-    }
-    else if(document.selection)//IE 8 and lower
-    { 
-        range = document.body.createTextRange();//Create a range (a range is a like the selection but invisible)
-        range.moveToElementText($0);//Select the entire contents of the element with the range
-        range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
-        range.select();//Select the range (make it the visible selection
-    }
-}", _contentEditableDiv, e);
+    if(document.createRange)
+    {{
+        range = document.createRange();
+        range.selectNodeContents({sDiv});
+        range.collapse(false);
+        selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }}
+    else if(document.selection)
+    {{
+        range = document.body.createTextRange();
+        range.moveToElementText({sDiv});
+        range.collapse(false);
+        range.select();
+    }}
+}}");
+                    // -- Firefox, Chrome, Opera, Safari, IE 9+
+                    //Create a range (a range is a like the selection but invisible)
+                    //Select the entire contents of the element with the range
+                    //collapse the range to the end point. false means collapse to end rather than the start
+                    //get the selection object (allows you to change selection)
+                    //remove any selections already made
+                    //make the range you have just created the visible selection
+                    // -- IE 8 and lower
+                    //Create a range (a range is a like the selection but invisible)
+                    //Select the entire contents of the element with the range
+                    //collapse the range to the end point. false means collapse to end rather than the start
+                    //Select the range (make it the visible selection
                 }
             }
         }

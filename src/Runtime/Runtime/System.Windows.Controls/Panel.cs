@@ -613,6 +613,10 @@ namespace Windows.UI.Xaml.Controls
 
                 for (int i = from; i < to; ++i)
                 {
+                    if (i >= newChildren.Count)
+                    {
+                        return; // in some cases Children collection can be changed during attach process
+                    }
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this, i);
                 }
 

@@ -38,7 +38,7 @@ namespace CSHTML5
         private static bool _isInitialized;
         private static readonly SynchronyzedStore<string> _javascriptCallsStore = new SynchronyzedStore<string>();
         private static readonly ReferenceIDGenerator _refIdGenerator = new ReferenceIDGenerator();
-
+        
         static INTERNAL_InteropImplementation()
         {
             Application.INTERNAL_Reloaded += (sender, e) =>
@@ -62,6 +62,84 @@ namespace CSHTML5
             }
 
             _isInitialized = true;
+        }
+
+        internal static string GetVariableStringForJS(object variable)
+        {
+            variable = variable is Delegate
+                ? JavascriptCallback.Create((Delegate)variable)
+                : variable;
+
+            if (variable is INTERNAL_JSObjectReference)
+            {
+                //----------------------
+                // JS Object References
+                //----------------------
+
+                var jsObjectReference = (INTERNAL_JSObjectReference)variable;
+                string jsCodeForAccessingTheObject;
+
+                if (jsObjectReference.IsArray)
+                {
+                    jsCodeForAccessingTheObject = $@"document.jsObjRef[""{jsObjectReference.ReferenceId}""][{jsObjectReference.ArrayIndex}]";
+                }
+                else
+                {
+                    jsCodeForAccessingTheObject = $@"document.jsObjRef[""{jsObjectReference.ReferenceId}""]";
+                }
+
+                return jsCodeForAccessingTheObject;
+            }
+            else if (variable is INTERNAL_HtmlDomElementReference)
+            {
+                //------------------------
+                // DOM Element References
+                //------------------------
+
+                string id = ((INTERNAL_HtmlDomElementReference)variable).UniqueIdentifier;
+                return $@"document.getElementByIdSafe(""{id}"")";
+            }
+            else if (variable is JavascriptCallback)
+            {
+                //-----------
+                // Delegates
+                //-----------
+
+                var jsCallback = (JavascriptCallback)variable;
+                bool isVoid = jsCallback.GetCallback().Method.ReturnType == typeof(void);
+                return $"document.getCallbackFunc({jsCallback.Id}, {(!isVoid).ToString().ToLower()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
+
+                // Note: generating the random number in JS rather than C# is important in order
+                // to be able to put this code inside a JavaScript "for" statement (cf.
+                // deserialization code of the JsonConvert extension, and also ZenDesk ticket #974)
+                // so that the "closure" system of JavaScript ensures that the number is the same
+                // before and inside the "setTimeout" call, but different for each iteration of the
+                // "for" statement in which this piece of code is put.
+                // Note: we store the arguments in the jsObjRef that is inside
+                // the JS context, so that the user can access them from the callback.
+                // Note: "Array.prototype.slice.call" will convert the arguments keyword into an array
+                // (cf. http://stackoverflow.com/questions/960866/how-can-i-convert-the-arguments-object-to-an-array-in-javascript)
+                // Note: in the command above, we use "setTimeout" to avoid thread/locks problems.
+            }
+            else if (variable == null)
+            {
+                //--------------------
+                // Null
+                //--------------------
+
+                return "null";
+            }
+            else
+            {
+                //--------------------
+                // Simple value types or other objects
+                // (note: this includes objects that
+                // override the "ToString" method, such
+                // as the class "Uri")
+                //--------------------
+
+                return INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(variable);
+            }
         }
 
 #if BRIDGE
@@ -99,94 +177,7 @@ namespace CSHTML5
             // 10 arguments and using "$10".
             for (int i = variables.Length - 1; i >= 0; i--)
             {
-                var variable = variables[i] is Delegate
-                    ? JavascriptCallback.Create((Delegate)variables[i])
-                    : variables[i];
-
-                if (variable is INTERNAL_JSObjectReference)
-                {
-                    //----------------------
-                    // JS Object References
-                    //----------------------
-
-                    var jsObjectReference = (INTERNAL_JSObjectReference)variable;
-                    string jsCodeForAccessingTheObject;
-
-                    if (jsObjectReference.IsArray)
-                    {
-                        jsCodeForAccessingTheObject = $@"document.jsObjRef[""{jsObjectReference.ReferenceId}""][{jsObjectReference.ArrayIndex}]";
-                    }
-                    else
-                    {
-                        jsCodeForAccessingTheObject = $@"document.jsObjRef[""{jsObjectReference.ReferenceId}""]";
-                    }
-
-                    javascript = javascript.Replace("$" + i.ToString(), jsCodeForAccessingTheObject);
-                }
-                else if (variable is INTERNAL_HtmlDomElementReference)
-                {
-                    //------------------------
-                    // DOM Element References
-                    //------------------------
-
-                    string id = ((INTERNAL_HtmlDomElementReference)variable).UniqueIdentifier;
-                    javascript = javascript.Replace("$" + i.ToString(), $@"document.getElementByIdSafe(""{id}"")");
-                }
-                else if (variable is JavascriptCallback)
-                {
-                    //-----------
-                    // Delegates
-                    //-----------
-
-                    var jsCallback = (JavascriptCallback)variable;
-
-                    // Add the callback to the document:
-                    int callbackId = jsCallback.Id;
-
-                    var isVoid = jsCallback.GetCallback().Method.ReturnType == typeof(void);
-
-                    // Change the JS code to point to that callback:
-                    javascript = javascript.Replace("$" + i.ToString(), string.Format(
-                                       @"(function() {{ return document.eventCallback({0}, {1}, {2});}})", callbackId,
-#if OPENSILVER
-                                       Interop.IsRunningInTheSimulator_WorkAround ? "arguments" : "Array.prototype.slice.call(arguments)",
-#elif BRIDGE
-                                       "Array.prototype.slice.call(arguments)",
-#endif
-                                       (!isVoid).ToString().ToLower()
-                                       ));
-
-                    // Note: generating the random number in JS rather than C# is important in order
-                    // to be able to put this code inside a JavaScript "for" statement (cf.
-                    // deserialization code of the JsonConvert extension, and also ZenDesk ticket #974)
-                    // so that the "closure" system of JavaScript ensures that the number is the same
-                    // before and inside the "setTimeout" call, but different for each iteration of the
-                    // "for" statement in which this piece of code is put.
-                    // Note: we store the arguments in the jsObjRef that is inside
-                    // the JS context, so that the user can access them from the callback.
-                    // Note: "Array.prototype.slice.call" will convert the arguments keyword into an array
-                    // (cf. http://stackoverflow.com/questions/960866/how-can-i-convert-the-arguments-object-to-an-array-in-javascript)
-                    // Note: in the command above, we use "setTimeout" to avoid thread/locks problems.
-                }
-                else if (variable == null)
-                {
-                    //--------------------
-                    // Null
-                    //--------------------
-
-                    javascript = javascript.Replace("$" + i.ToString(), "null");
-                }
-                else
-                {
-                    //--------------------
-                    // Simple value types or other objects
-                    // (note: this includes objects that
-                    // override the "ToString" method, such
-                    // as the class "Uri")
-                    //--------------------
-
-                    javascript = javascript.Replace("$" + i.ToString(), INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(variable));
-                }
+                javascript = javascript.Replace("$" + i.ToString(), GetVariableStringForJS(variables[i]));
             }
 
             // Change the JS code to call ShowErrorMessage in case of error:
@@ -267,31 +258,33 @@ namespace CSHTML5
             else
             {
                 _pendingJSFile.Add(html5Path, new List<Tuple<Action, Action>> { new Tuple<Action, Action>(callbackOnSuccess, callbackOnFailure) });
+                string sSuccessAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileSuccess);
+                string sFailureAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileFailure);
                 CSHTML5.Interop.ExecuteJavaScript(
-    @"// Add the script tag to the head
-var filePath = $0;
+    $@"// Add the script tag to the head
+var filePath = {GetVariableStringForJS(html5Path)};
 var head = document.getElementsByTagName('head')[0];
 var script = document.createElement('script');
 script.type = 'text/javascript';
 script.src = filePath;
 // Then bind the event to the callback function
 // There are several events for cross browser compatibility.
-if(script.onreadystatechange != undefined) {
-script.onreadystatechange = $1;
-} else {
-script.onload = function () { $1(filePath) };
-script.onerror = function () { $2(filePath) };
-}
+if(script.onreadystatechange != undefined) {{
+script.onreadystatechange = {sSuccessAction};
+}} else {{
+script.onload = function () {{ {sSuccessAction}(filePath) }};
+script.onerror = function () {{ {sFailureAction}(filePath) }};
+}}
 
 // Fire the loading
-head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess, (Action<object>)LoadJavaScriptFileFailure);
+head.appendChild(script);");
             }
         }
 
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument));
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(GetVariableStringForJS(jsArgument))); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -303,7 +296,7 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(@"$0", jsArgument));
+            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(GetVariableStringForJS(jsArgument))); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();
@@ -347,13 +340,15 @@ head.appendChild(script);", html5Path, (Action<object>)LoadJavaScriptFileSuccess
 
             string html5Path = INTERNAL_UriHelper.ConvertToHtml5Path(url);
 
+            string sHtml5Path = GetVariableStringForJS(html5Path);
+            string sCallback = GetVariableStringForJS(callback);
             CSHTML5.Interop.ExecuteJavaScript(
-@"// Add the link tag to the head
+$@"// Add the link tag to the head
 var head = document.getElementsByTagName('head')[0];
 var link = document.createElement('link');
 link.rel  = 'stylesheet';
 link.type = 'text/css';
-link.href = $0;
+link.href = {sHtml5Path};
 link.media = 'all';
 
 // Fire the loading
@@ -362,8 +357,8 @@ head.appendChild(link);
 // Some browsers do not support the 'onload' event of the 'link' element,
 // therefore we use the 'onerror' event of the 'img' tag instead, which is always triggered:
 var img = document.createElement('img');
-img.onerror = $1;
-img.src = $0;", html5Path, callback);
+img.onerror = {sCallback};
+img.src = {sHtml5Path};");
         }
 
         internal static void LoadCssFiles(List<string> urls, Action onCompleted)

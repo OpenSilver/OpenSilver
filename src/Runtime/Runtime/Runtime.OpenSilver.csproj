@@ -121,6 +121,8 @@
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\CompositionHost.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
+		<Compile Include="System.Runtime.CompilerServices\DefaultInterpolatedStringHandler.cs" />
+		<Compile Include="System.Runtime.CompilerServices\InterpolatedStringHandlerAttribute.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\PollingDuplexMode.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\PollingDuplexHttpBinding.cs" />
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\PollingDuplexHttpSecurity.cs" />
@@ -211,6 +213,9 @@
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
+		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
+		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Wasm.cs" />
+		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Simulator.cs" />
 		<Compile Include="System.Windows.Media\MediaElementState.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\NotifyEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Rating.cs" />
@@ -278,6 +283,7 @@
 		<Compile Include="System.Windows.Media.Animation\KeyTimeConverter.cs" />
 		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
+		<Compile Include="System.Windows\InheritanceBehavior.cs" />
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />
 		<Compile Include="System.Windows\PropertyPathConverter.cs" />
@@ -558,7 +564,7 @@
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\PixelShader.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\SamplingMode.cs" />
 		<Compile Include="System.Windows.Media.Effects\WORKINPROGRESS\ShaderEffect.cs" />
-		<Compile Include="System.Windows.Media.Imaging\WORKINPROGRESS\WriteableBitmap.cs" />
+		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.cs" />
 		<Compile Include="System.Windows.Media.Media3D\WORKINPROGRESS\Matrix3D.cs" />
 		<Compile Include="System.Windows.Printing\BeginPrintEventArgs.cs" />
 		<Compile Include="System.Windows.Printing\PrinterFallbackSettings.cs" />

@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,6 @@ using Bridge;
 #endif
 #if !MIGRATION
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Media.Animation;
 #endif
 
 #if MIGRATION
@@ -49,24 +49,26 @@ namespace Windows.UI.Xaml.Media.Animation
             }
 
             object options = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
+            string sOptions = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(options);
             if (callbackForWhenfinished == null)
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.easing = $1;
-$0.duration = $2;
-$0.queue = false;
-$0.queue = $3;
-", options, easingFunctionAsString, duration, visualStateGroupName);
+                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
+{sOptions}.easing = ""{CSHTML5.Internal.INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"";
+{sOptions}.duration = {duration.ToString(CultureInfo.InvariantCulture)};
+{sOptions}.queue = false;
+{sOptions}.queue = ""{visualStateGroupName}"";
+");
             }
             else
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-$0.easing = $1;
-$0.duration = $2;
-$0.queue = false;
-$0.queue = $3;
-$0.complete = $4;
-", options, easingFunctionAsString, duration, visualStateGroupName, callbackForWhenfinished);
+                string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(callbackForWhenfinished);
+                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
+{sOptions}.easing = ""{CSHTML5.Internal.INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"";
+{sOptions}.duration = {duration.ToString(CultureInfo.InvariantCulture)};
+{sOptions}.queue = false;
+{sOptions}.queue = ""{visualStateGroupName}"";
+{sOptions}.complete = {sAction};
+");
             }
 
             if (easingFunction != null)
@@ -76,14 +78,16 @@ $0.complete = $4;
                 {
                     foreach (string key in additionalOptions.Keys)
                     {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", options, key, additionalOptions[key]);
+                        string sAdditionalOptions = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(additionalOptions[key]);
+                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sOptions}[""{CSHTML5.Internal.INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(key)}""] = {sAdditionalOptions};");
                     }
                 }
             }
 
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, $1, $2);
-                                                     Velocity.Utilities.dequeue($0, $3);",
-                                                     domElement, jsFromToValues, options, visualStateGroupName);
+            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
+            string sValues = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsFromToValues);
+            CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"Velocity({sElement}, {sValues}, {sOptions});
+                                                     Velocity.Utilities.dequeue({sElement}, ""{visualStateGroupName}"");");
         }
 
         internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value)

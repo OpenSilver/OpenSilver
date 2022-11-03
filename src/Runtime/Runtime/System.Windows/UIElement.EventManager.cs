@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml
 
         internal static void NativeEventCallback(UIElement mouseTarget, UIElement keyboardTarget, object jsEventArg)
         {
-            string type = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+            string type = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.type"));
             switch (type)
             {
                 case "mousemove":
@@ -95,7 +95,7 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnMouseMove(object jsEventArg)
         {
-            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.type"));
             if (!(ignoreMouseEvents && eventType == "mousemove"))
             {
 #if MIGRATION
@@ -205,7 +205,7 @@ namespace Windows.UI.Xaml
             RoutedEvent routedEvent,
             bool refreshClickCount = false)
         {
-            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0.type", jsEventArg));
+            string eventType = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.type"));
             if (!(ignoreMouseEvents && eventType.StartsWith("mouse"))) //Ignore mousedown and mouseup if the touch equivalents have been handled.
             {
 #if MIGRATION

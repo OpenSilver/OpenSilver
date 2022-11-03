@@ -603,7 +603,7 @@ if(nextSibling != undefined) {
             INTERNAL_HtmlDomManager.SetDomElementAttribute(outerDomElement, "class", child.GetType().ToString());
 
             // Set Visibility hidden when rendering with CustomLayout
-            if (child.IsCustomLayoutRoot && child.Visibility == Visibility.Visible)
+            if ((child.IsCustomLayoutRoot || child.KeepHiddenInFirstRender) && child.Visibility == Visibility.Visible)
             {
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).visibility = "hidden";
                 child.isFirstRendering = true;

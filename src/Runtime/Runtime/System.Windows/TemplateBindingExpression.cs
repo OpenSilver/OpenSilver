@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
@@ -55,7 +56,7 @@ namespace Windows.UI.Xaml
         internal override object GetValue(DependencyObject d, DependencyProperty dp)
         {
             var value = _source.GetValue(_sourceProperty);
-            if (_skipTypeCheck || DependencyProperty.IsValueTypeValid(value, dp.PropertyType))
+            if (_skipTypeCheck || ValidateValue(ref value, dp))
             {
                 return value;
             }
@@ -98,6 +99,32 @@ namespace Windows.UI.Xaml
         internal override void SetValue(DependencyObject d, DependencyProperty dp, object value)
         {
             return;
+        }
+
+        private bool ValidateValue(ref object value, DependencyProperty targetProperty)
+        {
+            if (DependencyProperty.IsValueTypeValid(value, targetProperty.PropertyType))
+            {
+                return true;
+            }
+
+            if (value != null
+                && _sourceProperty == ContentControl.ContentProperty
+                && TypeConverterHelper.IsCoreType(targetProperty.OwnerType))
+            {
+                TypeConverter converter = TypeConverterHelper.GetBuiltInConverter(targetProperty.PropertyType);
+                if (converter?.CanConvertFrom(value.GetType()) ?? false)
+                {
+                    try
+                    {
+                        value = converter.ConvertFrom(value);
+                        return true;
+                    }
+                    catch { }
+                }
+            }
+
+            return false;
         }
     }
 }

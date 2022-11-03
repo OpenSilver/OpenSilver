@@ -24,7 +24,31 @@ namespace DotNetForHtml5
     {
         void ExecuteJavaScript(string javaScriptToExecute);
 
-        object ExecuteJavaScriptWithResult(string javaScriptToExecute);
+        object ExecuteJavaScriptWithResult(string javaScriptToExecute);        
+    }
+
+    public interface IJavaScriptExecutionHandler2 : IJavaScriptExecutionHandler
+    {
+        TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
+    }
+
+    internal sealed class JSRuntimeWrapper : IJavaScriptExecutionHandler2
+    {
+        private readonly IJavaScriptExecutionHandler _jsRuntime;
+
+        public JSRuntimeWrapper(IJavaScriptExecutionHandler jsRuntime)
+        {
+            _jsRuntime = jsRuntime ?? throw new ArgumentNullException(nameof(jsRuntime));
+        }
+
+        public void ExecuteJavaScript(string javaScriptToExecute)
+            => _jsRuntime.ExecuteJavaScript(javaScriptToExecute);
+
+        public object ExecuteJavaScriptWithResult(string javaScriptToExecute)
+            => _jsRuntime.ExecuteJavaScriptWithResult(javaScriptToExecute);
+
+        public TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0)
+            => throw new NotSupportedException();
     }
 }
 

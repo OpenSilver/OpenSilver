@@ -14,7 +14,7 @@
     <licenseUrl>https://raw.githubusercontent.com/OpenSilver/OpenSilver/master/LICENSE.txt</licenseUrl>
 
     <dependencies>
-      <group targetFramework="net461">
+      <group targetFramework="net462">
         <dependency id="DotNetBrowser" version="1.21.5" />
         <dependency id="MahApps.Metro" version="1.2.4.0" />
         <dependency id="Microsoft.Web.Administration" version="7.0.0.0" />
@@ -22,22 +22,22 @@
     </dependencies>
 
     <contentFiles>
-        <files include="any/net461/**" buildAction="None" copyToOutput="true"/>
+        <files include="any/net462/**" buildAction="None" copyToOutput="true"/>
     </contentFiles>
   </metadata>
 
   <files>
     <!-- OpenSilver.Simulator libs -->
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.dll" target="lib/net461" />
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.pdb" target="lib/net461" />
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.xml" target="lib/net461" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.dll" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.pdb" target="lib/net462" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/OpenSilver.Simulator.xml" target="lib/net462" />
 
     <!-- OpenSilver targets -->
     <file src="../src/Targets/OpenSilver.Simulator.targets" target="build/OpenSilver.Simulator.targets" />
 
     <!-- OpenSilver HTML files -->
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root_opensilver.html" target="contentFiles/any/net461/simulator_root.html" />
-    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root_opensilver.html" target="contentFiles/any/net461/interop_debug_root.html" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/simulator_root_opensilver.html" target="contentFiles/any/net462/simulator_root.html" />
+    <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root_opensilver.html" target="contentFiles/any/net462/interop_debug_root.html" />
 
     <!-- OpenSilver compiler -->
     <file src="../src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
@@ -50,17 +50,17 @@
     <file src="../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/Release/net461/OpenSilver.Compiler.TypeScriptDefToCSharp.pdb" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.pdb" />
 
     <!-- OpenSilver JS and CSS files -->
-    <file src="../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/cshtml5.css" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/cshtml5.js" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/fastclick.js" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/flatpickr.css" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/flatpickr.js" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/velocity.js" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/net461/js_css" />
-    <file src="../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/net461/js_css" />    
-	<file src="../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/net461/js_css" />
-	<file src="../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/net461/js_css" />
+    <file src="../src/Runtime/Scripts/opensilver.js" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/cshtml5.css" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/cshtml5.js" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/fastclick.js" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/flatpickr.css" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/flatpickr.js" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/velocity.js" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/ResizeSensor.js" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/ResizeObserver.js" target="contentFiles/any/net462/js_css" />    
+    <file src="../src/Runtime/Scripts/quill.min.js" target="contentFiles/any/net462/js_css" />
+    <file src="../src/Runtime/Scripts/quill.core.css" target="contentFiles/any/net462/js_css" />
 	
     <!-- OpenSilver icon -->
     <file src="nuspec/OpenSilver_icon.png" target="images\OpenSilver_icon.png" />

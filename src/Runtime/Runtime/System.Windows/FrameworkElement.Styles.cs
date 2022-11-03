@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -36,6 +37,40 @@ namespace Windows.UI.Xaml
         private Style _themeStyleCache;
 
         private Style _implicitStyleCache;
+        private InheritanceBehavior? _resourceLookupMode;
+
+        /// <summary>
+        /// Indicates the current mode of lookup for resources.
+        /// </summary>
+        public InheritanceBehavior ResourceLookupMode
+        {
+            get
+            {
+                if (_resourceLookupMode.HasValue)
+                {
+                    return _resourceLookupMode.Value;
+                }
+
+                Application app = Application.Current;
+                if (app != null)
+                {
+                    return app.Host.Settings.DefaultResourceLookupMode;
+                }
+
+                return InheritanceBehavior.Default;
+            }
+            set
+            {
+                if (value != InheritanceBehavior.Default
+                    && value != InheritanceBehavior.SkipToAppNow
+                    && value != InheritanceBehavior.SkipAllNow)
+                {
+                    throw new InvalidEnumArgumentException(nameof(value), (int)value, typeof(InheritanceBehavior));
+                }
+
+                _resourceLookupMode = value;
+            }
+        }
 
         /// <summary>
         /// Identifies the <see cref="Style"/> dependency property.
@@ -178,8 +213,15 @@ namespace Windows.UI.Xaml
                 object implicitStyle;
                 // First, try to find an implicit style in parents' resources.
                 FrameworkElement f = fe;
+                InheritanceBehavior inheritanceBehavior = InheritanceBehavior.Default;
                 while (f != null)
                 {
+                    inheritanceBehavior = f.ResourceLookupMode;
+                    if (inheritanceBehavior != InheritanceBehavior.Default)
+                    {
+                        break;
+                    }
+
                     if (f.HasResources && f.Resources.HasImplicitStyles)
                     {
                         implicitStyle = f.Resources[resourceKey];
@@ -196,17 +238,22 @@ namespace Windows.UI.Xaml
                     }
                 }
 
-                // Then we try to find the resource in the App's Resources
-                // if we can't find it in the parents.
-                Application app = Application.Current;
-                if (app != null)
+                if ((inheritanceBehavior == InheritanceBehavior.Default ||
+                     inheritanceBehavior == InheritanceBehavior.SkipToAppNow)
+                    && boundaryElement == null)
                 {
-                    implicitStyle = app.Resources[resourceKey];
-                    if (implicitStyle != null)
+                    // Then we try to find the resource in the App's Resources
+                    // if we can't find it in the parents.
+                    Application app = Application.Current;
+                    if (app != null)
                     {
-                        return implicitStyle;
+                        implicitStyle = app.Resources[resourceKey];
+                        if (implicitStyle != null)
+                        {
+                            return implicitStyle;
+                        }
                     }
-                }
+                }                
             }
 
             return null;

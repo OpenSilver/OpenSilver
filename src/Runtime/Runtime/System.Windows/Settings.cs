@@ -53,7 +53,10 @@ namespace System
             EnableBindingErrorsThrowing = false;
             EnableInvalidPropertyMetadataDefaultValueExceptions = true;
             ScrollDebounce = TimeSpan.Zero;
+            DefaultResourceLookupMode = InheritanceBehavior.Default;
         }
+
+        public InheritanceBehavior DefaultResourceLookupMode { get; set; }
 
         public TimeSpan ScrollDebounce { get; set; }
 

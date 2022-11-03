@@ -289,6 +289,7 @@ namespace Windows.UI.Xaml
         private Size layoutMeasuredSize;
         private Size layoutLastSize;
         private bool layoutProcessing;
+        private bool measureInProgress;
 
         private int visualLevel;
 
@@ -345,6 +346,8 @@ namespace Windows.UI.Xaml
                 return false;
             }
         }
+
+        internal bool KeepHiddenInFirstRender { get; set; }
 
         public UIElement()
         {
@@ -1360,8 +1363,7 @@ document.ondblclick = null;
                 // Note: "none" disables scrolling, pinching and other gestures.
                 // It is supposed to not have any effect on the "TouchStart",
                 // "TouchMove", and "TouchEnd" events.
-                CSHTML5.Interop.ExecuteJavaScript("$0.style.touchAction = $1",
-                    element.INTERNAL_OuterDomElement, (bool)e.NewValue ? "auto" : "none");
+                CSHTML5.Interop.ExecuteJavaScript($@"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(element.INTERNAL_OuterDomElement)}.style.touchAction = ""{((bool)e.NewValue ? "auto" : "none")}""");
             }
         }
 
@@ -1450,8 +1452,10 @@ document.ondblclick = null;
                 // ------- SIMULATOR -------
 
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("($0.getBoundingClientRect().left - $1.getBoundingClientRect().left) + '|' + ($0.getBoundingClientRect().top - $1.getBoundingClientRect().top)",
-                    outerDivOfThisControl, outerDivOfReferenceVisual));
+                string sOuterDivOfControl = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
+                string sOuterDivOfReferenceVisual = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
+                string concatenated = Convert.ToString(
+                    OpenSilver.Interop.ExecuteJavaScript($"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)"));
                 int sepIndex = concatenated.IndexOf('|');
                 string offsetLeftAsString = concatenated.Substring(0, sepIndex);
                 string offsetTopAsString = concatenated.Substring(sepIndex + 1);
@@ -1688,18 +1692,28 @@ document.ondblclick = null;
                 }
                 else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
                 {
-                    if (LayoutManager.Current.CheckChildMeasureValidation(this) == false)
-                    {
-                        DesiredSize = previousDesiredSize;
-                        return;
-                    }
+                    return;
                 }
 
                 Size previousDesiredSizeInMeasure = this.DesiredSize;
-                DesiredSize = MeasureCore(availableSize);
+                measureInProgress = true;
+                try
+                {
+                    DesiredSize = MeasureCore(availableSize);
+                }
+                finally
+                {
+                    measureInProgress = false;
+                }
+
                 if (previousDesiredSizeInMeasure != DesiredSize)
                 {
                     this.InvalidateArrange();
+
+                    if (VisualTreeHelper.GetParent(this) is UIElement parent && !parent.measureInProgress)
+                    {
+                        this.InvalidateParentMeasure();
+                    }
                 }
 
                 PreviousAvailableSize = availableSize;
@@ -1767,7 +1781,7 @@ document.ondblclick = null;
 
         public void UpdateLayout()
         {
-
+            LayoutManager.Current.UpdateLayout();
         }
 
         internal void UpdateCustomLayout(Size newSize)
@@ -1809,10 +1823,10 @@ document.ondblclick = null;
             if (fe != null)
             {
                 if (fe.IsAutoWidthOnCustomLayoutInternal)
-                    availableSize.Width = Math.Max(this.DesiredSize.Width, savedLastSize.Width);
+                    availableSize.Width = this.DesiredSize.Width;
 
                 if (fe.IsAutoHeightOnCustomLayoutInternal)
-                    availableSize.Height = Math.Max(this.DesiredSize.Height, savedLastSize.Height);
+                    availableSize.Height = this.DesiredSize.Height;
             }
 
             Arrange(new Rect(availableSize));

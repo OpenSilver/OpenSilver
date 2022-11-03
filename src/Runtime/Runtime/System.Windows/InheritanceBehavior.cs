@@ -11,24 +11,30 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.ComponentModel;
-using System.Threading.Tasks;
-
 #if MIGRATION
-namespace System.Windows.Media
+namespace System.Windows
 #else
-namespace Windows.UI.Xaml.Media
+namespace Windows.UI.Xaml
 #endif
 {
     /// <summary>
-    /// Provides an object source type for Source and ImageSource.
+    /// Modes used for resource lookup
     /// </summary>
-    [TypeConverter(typeof(ImageSourceConverter))]
-    public abstract partial class ImageSource : DependencyObject
+    public enum InheritanceBehavior
     {
-        internal ImageSource() { }
+        /// <summary>
+        /// Resource lookup will query through the current element and further.
+        /// </summary>
+        Default = 0,
 
-        internal abstract Task<string> GetDataStringAsync();
+        /// <summary>
+        /// Resource lookup will not query the current element but will skip over to the app dictionary.
+        /// </summary>
+        SkipToAppNow = 1,
+
+        /// <summary>
+        /// Resource lookup will not query the current element or any further.
+        /// </summary>
+        SkipAllNow = 2,
     }
 }

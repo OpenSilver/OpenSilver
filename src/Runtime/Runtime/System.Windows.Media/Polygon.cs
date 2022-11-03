@@ -108,7 +108,7 @@ namespace Windows.UI.Xaml.Shapes
 		{
 			return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
 		}
-
+		
 		override internal protected void Redraw()
 		{
 			if (Points.Count < 2)

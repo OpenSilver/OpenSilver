@@ -184,13 +184,14 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 #endif
         public static INTERNAL_HtmlDomElementReference GetChildDomElementAt(INTERNAL_HtmlDomElementReference domElementRef, int index)
         {
-            int length = Convert.ToInt32(Interop.ExecuteJavaScript("$0.childNodes.length", domElementRef));
+            string sDomElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            int length = Convert.ToInt32(Interop.ExecuteJavaScript($"{sDomElement}.childNodes.length"));
             if (index < 0 || length <= index)
             {
                 throw new IndexOutOfRangeException();
             }
 
-            string childNodeId = Interop.ExecuteJavaScript(@"var child = $0.childNodes[$1]; child.id;", domElementRef, index).ToString();
+            string childNodeId = Interop.ExecuteJavaScript($@"var child = {sDomElement}.childNodes[{index.ToInvariantString()}]; child.id;").ToString();
             return new INTERNAL_HtmlDomElementReference(childNodeId, domElementRef);
         }
 
@@ -243,7 +244,8 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 if (IsRunningInJavaScript())
 #endif
                 {
-                    CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout(function() { $0.focus(); }, 1)", domElementRefConcernedByFocus);
+                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRefConcernedByFocus);
+                    CSHTML5.Interop.ExecuteJavaScriptAsync($@"setTimeout(function() {{ {sElement}.focus(); }}, 1)");
                 }
                 else
                 {
@@ -400,10 +402,11 @@ setTimeout(function(){{ var element2 = document.getElementByIdSafe(""{uniqueIden
             {
 #endif
                 string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
-                object domElement = Interop.ExecuteJavaScriptAsync(@"document.getElementByIdSafe($0)", uniqueIdentifier);
+                object domElement = Interop.ExecuteJavaScriptAsync($@"document.getElementByIdSafe(""{uniqueIdentifier}"")");
                 //todo-perfs: replace the code above with a call to the faster "ExecuteJavaScript" method instead of "ExecuteJavaScriptWithResult". To do so, see other methods in this class, or see the class "INTERNAL_HtmlDomStyleReference.cs".
 
-                return Interop.ExecuteJavaScript("getTextAreaInnerText($0)", domElement).ToString();
+                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
+                return Interop.ExecuteJavaScript($"getTextAreaInnerText({sElement})").ToString();
 #if !CSHTML5NETSTANDARD
             }
 #endif
@@ -434,14 +437,14 @@ return innerText;
             string elementToAdd,
             int index)
         {
-            var optionDomElement = CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-(function(){
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(nativeComboBoxDomElement);
+            var optionDomElement = CSHTML5.Interop.ExecuteJavaScriptAsync($@"
+(function(){{
     var option = document.createElement(""option"");
-    option.text = $1;
-    $0.add(option, $2);
+    option.text = ""{EscapeStringForUseInJavaScript(elementToAdd)}"";
+    {sElement}.add(option, {index.ToInvariantString()});
     return option;
-}())
-", nativeComboBoxDomElement, elementToAdd, index);
+}}())");
 
             return optionDomElement;
         }
@@ -459,14 +462,14 @@ function(){
 }()
 ", domNode, elementToAdd);
 */
-            var optionDomElement = CSHTML5.Interop.ExecuteJavaScriptAsync(@"
-(function(){
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(nativeComboBoxDomElement);
+            var optionDomElement = CSHTML5.Interop.ExecuteJavaScriptAsync($@"
+(function(){{
     var option = document.createElement(""option"");
-    option.text = $1;
-    $0.add(option);
+    option.text = ""{EscapeStringForUseInJavaScript(elementToAdd)}"";
+    {sElement}.add(option);
     return option;
-}())
-", nativeComboBoxDomElement, elementToAdd);
+}}())");
             return optionDomElement;
             /*
             if (IsRunningInJavaScript())
@@ -509,12 +512,15 @@ element.remove({1});
 
         public static void RemoveOptionFromNativeComboBox(object optionToRemove, object nativeComboBoxDomElement)
         {
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.removeChild($1)", nativeComboBoxDomElement, optionToRemove);
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(nativeComboBoxDomElement);
+            string sToRemove = INTERNAL_InteropImplementation.GetVariableStringForJS(optionToRemove);
+            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sElement}.removeChild({sToRemove})");
         }
 
         public static void RemoveOptionFromNativeComboBox(object nativeComboBoxDomElement, int index)
         {
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.remove($1)", nativeComboBoxDomElement, index);
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(nativeComboBoxDomElement);
+            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sElement}.remove({index.ToInvariantString()})");
         }
 
         //public static void AppendChild(dynamic parentDomElement, dynamic childDomElement)
@@ -685,12 +691,14 @@ element.remove({1});
                 {
                     //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
                     object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
-
+                    string sNewobj = INTERNAL_InteropImplementation.GetVariableStringForJS(newObj);
+                    string sCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
                     foreach (string csspropertyName in cssPropertyNames)
                     {
-                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
+                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewobj}[""{csspropertyName}""] = {sCssValue};");
                     }
-                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, $1, {duration:1, queue:false});", domElement, newObj);
+                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement); ;
+                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($"Velocity({sElement}, {sNewobj}, {{duration:1, queue:false}});");
                 }
 
             }
@@ -723,7 +731,8 @@ element.remove({1});
 
         public static object GetDomElementAttribute(object domElementRef, string attributeName)
         {
-            return Interop.ExecuteJavaScript("$0[$1]", domElementRef, attributeName);
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            return Interop.ExecuteJavaScript($@"{sElement}[""{attributeName}""]");
 
             //            if (IsRunningInJavaScript())
             //            {
@@ -874,19 +883,14 @@ function(){
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createTextBlockElement($0, $1, $2)",
-                    uniqueIdentifier,
-                    parent.UniqueIdentifier,
-                    whiteSpace);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", ""{whiteSpace}"")");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createTextBlockElement($0, $1, $2)",
-                    uniqueIdentifier,
-                    parentRef,
-                    whiteSpace);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", {sParentRef}, ""{whiteSpace}"")");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -906,17 +910,14 @@ function(){
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createCanvasElement($0, $1)",
-                    uniqueIdentifier,
-                    parent.UniqueIdentifier);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createCanvasElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createCanvasElement($0, $1)",
-                    uniqueIdentifier,
-                    parentRef);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createCanvasElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -936,17 +937,14 @@ function(){
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createImageElement($0, $1)",
-                    uniqueIdentifier,
-                    parent.UniqueIdentifier);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createImageElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createImageElement($0, $1)",
-                    uniqueIdentifier,
-                    parentRef);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createImageElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -967,19 +965,14 @@ function(){
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createFrameworkElement($0, $1, $2)",
-                    uniqueIdentifier,
-                    parent.UniqueIdentifier,
-                    enablePointerEvents);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createFrameworkElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {(enablePointerEvents ? "true" : "false")})");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createFrameworkElement($0, $1, $2)",
-                    uniqueIdentifier,
-                    parentRef,
-                    enablePointerEvents);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createFrameworkElement(""{uniqueIdentifier}"", {sParentRef}, {(enablePointerEvents ? "true" : "false")}))");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -999,17 +992,14 @@ function(){
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createRunElement($0, $1)",
-                    uniqueIdentifier,
-                    parent.UniqueIdentifier);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createRunElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createRunElement($0, $1)",
-                    uniqueIdentifier,
-                    parentRef);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createRunElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -1029,17 +1019,14 @@ function(){
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createShapeOuterElement($0, $1)",
-                    uniqueIdentifier,
-                    parent.UniqueIdentifier);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createShapeOuterElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createShapeOuterElement($0, $1)",
-                    uniqueIdentifier,
-                    parentRef);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createShapeOuterElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -1059,17 +1046,14 @@ function(){
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createShapeInnerElement($0, $1)",
-                    uniqueIdentifier,
-                    parent.UniqueIdentifier);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createShapeInnerElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
             }
             else
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
-                    @"document.createShapeInnerElement($0, $1)",
-                    uniqueIdentifier,
-                    parentRef);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.createShapeInnerElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -1141,11 +1125,13 @@ function(){
             if (parentRef is INTERNAL_HtmlDomElementReference)
             {
                 parent = (INTERNAL_HtmlDomElementReference)parentRef;
-                Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parent.UniqueIdentifier, index);
+                string javaScriptToExecute = $@"document.createElementSafe(""{domElementTag}"", ""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {index.ToInvariantString()})";
+                Interop.ExecuteJavaScriptFastAsync(javaScriptToExecute);
             }
             else
             {
-                Interop.ExecuteJavaScriptAsync(@"document.createElementSafe($0, $1, $2, $3)", domElementTag, uniqueIdentifier, parentRef, index);
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                Interop.ExecuteJavaScriptFastAsync($@"document.createElementSafe(""{domElementTag}"", ""{uniqueIdentifier}"", {sParentRef}, {index.ToInvariantString()})");
             }
             
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
@@ -1412,19 +1398,18 @@ parentElement.appendChild(child);";
         /// in the visual tree composition at the specified point.</returns>
         public static UIElement FindElementInHostCoordinates_UsedBySimulatorToo(double x, double y) // IMPORTANT: If you rename this method or change its signature, make sure to rename its dynamic call in the Simulator.
         {
-            object domElementAtCoordinates = Interop.ExecuteJavaScript(@"
-(function(){
-    var domElementAtCoordinates = document.elementFromPoint($0, $1);
+            object domElementAtCoordinates = Interop.ExecuteJavaScript($@"
+(function(){{
+    var domElementAtCoordinates = document.elementFromPoint({x.ToInvariantString()}, {y.ToInvariantString()});
     if (!domElementAtCoordinates || domElementAtCoordinates === document.documentElement)
-    {
+    {{
         return null;
-    }
+    }}
     else
-    {
+    {{
         return domElementAtCoordinates;
-    }
-}())
-", x, y);
+    }}
+}}())");
 
             UIElement result = GetUIElementFromDomElement(domElementAtCoordinates);
 
@@ -1474,6 +1459,7 @@ parentElement.appendChild(child);";
 
             while (!IsNullOrUndefined(domElementRef))
             {
+                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
                 // Walk up the DOM tree until we find a DOM element that has a corresponding CSharp object:
 
                 // Check if element exists in the DOM Tree; strangely, sometimes it doesn't
@@ -1488,7 +1474,7 @@ parentElement.appendChild(child);";
                 {
                     // In the Simulator, we get the CSharp object associated to a DOM element by searching for the DOM element ID in the "INTERNAL_idsToUIElements" dictionary.
 
-                    object jsId = Interop.ExecuteJavaScript("$0.id", domElementRef);
+                    object jsId = Interop.ExecuteJavaScript($"{sElement}.id");
                     if (!IsNullOrUndefined(jsId))
                     {
                         string id = Convert.ToString(jsId);
@@ -1510,7 +1496,7 @@ parentElement.appendChild(child);";
                 {
                     // In JavaScript, we get the CSharp object associated to a DOM element by reading the "associatedUIElement" property:
 
-                    object associatedUIElement = Interop.ExecuteJavaScript("$0.associatedUIElement", domElementRef);
+                    object associatedUIElement = Interop.ExecuteJavaScript($"{sElement}.associatedUIElement");
                     if (!IsNullOrUndefined(associatedUIElement))
                     {
                         result = (UIElement)associatedUIElement;
@@ -1519,7 +1505,7 @@ parentElement.appendChild(child);";
                 }
 
                 // Move to the parent:
-                domElementRef = Interop.ExecuteJavaScript("$0.parentNode", domElementRef);
+                domElementRef = Interop.ExecuteJavaScript($"{sElement}.parentNode");
             }
 
             return result;

@@ -102,10 +102,10 @@ namespace Windows.UI.Xaml.Input
         internal bool CheckIfEventShouldBeTreated(UIElement element, object jsEventArg)
         {
             //todo: this method is called by "OnMouseEvent", "OnMouseLeave", etc., but there appears to be other events where this method is not called: shouldn't we call it in those methods too? todo: verify that the handler is not called twice when an element has captured the pointer and registered the PointerPressed event for example.
-
+            string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
             if (Pointer.INTERNAL_captured == null)
             {
-                CSHTML5.Interop.ExecuteJavaScript("$0.doNotReroute = true", jsEventArg); //this is just in case the handler of this event starts a capture of the Pointer: we do not want to reroute it right away.
+                CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.doNotReroute = true"); //this is just in case the handler of this event starts a capture of the Pointer: we do not want to reroute it right away.
                 //todo: check if the comment above is always right (questionnable if capturing element is another one than the one that threw this event).
                 return true;
             }
@@ -113,12 +113,12 @@ namespace Windows.UI.Xaml.Input
             {
                 if (Pointer.INTERNAL_captured == element)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("$0.doNotReroute = true", jsEventArg);
+                    CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.doNotReroute = true");
                     return true;
                 }
                 else
                 {
-                    if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.doNotReroute == true", jsEventArg)))
+                    if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.doNotReroute == true")))
                     {
                         return true;
                     }
@@ -132,7 +132,8 @@ namespace Windows.UI.Xaml.Input
             // If the element has captured the pointer, we do not want the Document to reroute the event to the element because it would result in the event being handled twice.
             if (Pointer.INTERNAL_captured == null || Pointer.INTERNAL_captured == element)
             {
-                CSHTML5.Interop.ExecuteJavaScript("$0.doNotReroute = true", jsEventArg);
+                string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
+                CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.doNotReroute = true");
             }
 
             AddKeyModifiers(jsEventArg);
@@ -141,12 +142,13 @@ namespace Windows.UI.Xaml.Input
 
         private void AddKeyModifiers(object jsEventArg)
         {
+            string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
 #if MIGRATION
             ModifierKeys keyModifiers = ModifierKeys.None;
 #else
             VirtualKeyModifiers keyModifiers = VirtualKeyModifiers.None;
 #endif
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.shiftKey || false", jsEventArg))) //Note: we use "||" because the value "shiftKey" may be null or undefined. For more information on "||", read: https://stackoverflow.com/questions/476436/is-there-a-null-coalescing-operator-in-javascript
+            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.shiftKey || false"))) //Note: we use "||" because the value "shiftKey" may be null or undefined. For more information on "||", read: https://stackoverflow.com/questions/476436/is-there-a-null-coalescing-operator-in-javascript
             {
 #if MIGRATION
                 keyModifiers = keyModifiers | ModifierKeys.Shift;
@@ -154,7 +156,7 @@ namespace Windows.UI.Xaml.Input
                 keyModifiers = keyModifiers | VirtualKeyModifiers.Shift;
 #endif
             }
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.altKey || false", jsEventArg)))
+            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.altKey || false")))
             {
 #if MIGRATION
                 keyModifiers = keyModifiers | ModifierKeys.Alt;
@@ -162,7 +164,7 @@ namespace Windows.UI.Xaml.Input
                 keyModifiers = keyModifiers | VirtualKeyModifiers.Menu;
 #endif
             }
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0.ctrlKey || false", jsEventArg)))
+            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.ctrlKey || false")))
             {
 #if MIGRATION
                 keyModifiers = keyModifiers | ModifierKeys.Control;
@@ -182,7 +184,8 @@ namespace Windows.UI.Xaml.Input
 #endif
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("$0.pageX + '|' + $0.pageY", jsEventArg));
+                string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
+                string concatenated = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript($"{sEvent}.pageX + '|' + {sEvent}.pageY"));
                 int sepIndex = concatenated.IndexOf('|');
                 string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
                 string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
@@ -246,14 +249,17 @@ namespace Windows.UI.Xaml.Input
             {
                 // Get the XAML Window root position relative to the page:
                 object windowRootDomElement = window.INTERNAL_OuterDomElement;
-                object windowBoundingClientRect = CSHTML5.Interop.ExecuteJavaScript("$0.getBoundingClientRect()", windowRootDomElement);
+                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(windowRootDomElement);
+                object windowBoundingClientRect = CSHTML5.Interop.ExecuteJavaScript($"{sElement}.getBoundingClientRect()");
                 object pageBodyBoundingClientRect = CSHTML5.Interop.ExecuteJavaScript("document.body.getBoundingClientRect()"); // This is to take into account the scrolling.
 
                 double windowRootLeft;
                 double windowRootTop;
 
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = CSHTML5.Interop.ExecuteJavaScript("($0.left - $1.left) + '|' + ($0.top - $1.top)", windowBoundingClientRect, pageBodyBoundingClientRect).ToString();
+                string sWindowClientRect = INTERNAL_InteropImplementation.GetVariableStringForJS(windowBoundingClientRect);
+                string sPageClientRect = INTERNAL_InteropImplementation.GetVariableStringForJS(pageBodyBoundingClientRect);
+                string concatenated = CSHTML5.Interop.ExecuteJavaScript($"({sWindowClientRect}.left - {sPageClientRect}.left) + '|' + ({sWindowClientRect}.top - {sPageClientRect}.top)").ToString();
                 int sepIndex = concatenated.IndexOf('|');
                 if (sepIndex > -1)
                 {

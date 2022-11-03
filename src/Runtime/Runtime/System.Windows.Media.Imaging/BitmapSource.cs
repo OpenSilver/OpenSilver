@@ -13,6 +13,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 #if MIGRATION
 namespace System.Windows.Media.Imaging
@@ -106,16 +107,27 @@ namespace Windows.UI.Xaml.Media.Imaging
             INTERNAL_DataURL = dataUrl;
         }
 
+        internal override Task<string> GetDataStringAsync()
+        {
+            string data = string.Empty;
+            if (INTERNAL_StreamSource != null)
+            {
+                data = "data:image/png;base64," + INTERNAL_StreamAsBase64String;
+            }
+            else if (!string.IsNullOrEmpty(INTERNAL_DataURL))
+            {
+                data = INTERNAL_DataURL;
+            }
+
+            return Task.FromResult(data);
+        }
 
         #region Not supported yet
         /// <summary>
         /// Gets the height of the bitmap in pixels.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public int PixelHeight
-        {
-            get { return (int)this.GetValue(BitmapSource.PixelHeightProperty); }
-        }
+        public int PixelHeight => PixelHeightInternal;
 
         /// <summary>
         /// Identifies the PixelHeight dependency property.
@@ -129,10 +141,7 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// Gets the width of the bitmap in pixels.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public int PixelWidth
-        {
-            get { return (int)this.GetValue(BitmapSource.PixelWidthProperty); }
-        }
+        public int PixelWidth => PixelWidthInternal;
 
         /// <summary>
         /// Identifies the PixelWidth dependency property.
@@ -141,8 +150,8 @@ namespace Windows.UI.Xaml.Media.Imaging
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty PixelWidthProperty = DependencyProperty.Register("PixelWidth", typeof(int), typeof(BitmapSource), new PropertyMetadata(0));
-        
-        
+
+
         ////
         //// Summary:
         ////     Sets the source image for a BitmapSource by accessing a stream and processing
@@ -156,5 +165,9 @@ namespace Windows.UI.Xaml.Media.Imaging
         ////     An asynchronous handler called when the operation is complete.
         //public IAsyncAction SetSourceAsync(IRandomAccessStream streamSource);
         #endregion
+
+        internal virtual int PixelHeightInternal => (int)GetValue(PixelHeightProperty);
+
+        internal virtual int PixelWidthInternal => (int)GetValue(PixelWidthProperty);
     }
 }

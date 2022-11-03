@@ -53,38 +53,8 @@ namespace CSHTML5.Internal
             object callbackArgsObject,
             bool returnValue)
         {
-            return OnCallBackImpl.Instance.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                MakeArgumentsForCallbackSimulator, true, returnValue);
-        }
-
-        private static object[] MakeArgumentsForCallbackSimulator(
-            int count,
-            int callbackId,
-            string idWhereCallbackArgsAreStored,
-            object callbackArgs,
-            Type[] callbackGenericArgs)
-        {
-            var result = new object[count];
-
-            for (int i = 0; i < count; i++)
-            {
-                var arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i);
-                if (callbackGenericArgs != null
-                    && i < callbackGenericArgs.Length
-                    && callbackGenericArgs[i] != typeof(object)
-                    && (
-                    callbackGenericArgs[i].IsPrimitive
-                    || callbackGenericArgs[i] == typeof(string)))
-                {
-                    // Attempt to cast from JS object to the desired primitive or string type. This is useful for example when passing an Action<string> to an Interop.ExecuteJavaScript so as to not get an exception that says that it cannot cast the JS object into string (when running in the Simulator only):
-                    result[i] = Convert.ChangeType(arg, callbackGenericArgs[i]);
-                }
-                else
-                {
-                    result[i] = arg;
-                }
-            }
-            return result;
+            return OnCallBackImpl.Instance.OnCallbackFromJavaScript(
+                callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, true, returnValue);
         }
 
         private static void CheckIsRunningInTheSimulator()

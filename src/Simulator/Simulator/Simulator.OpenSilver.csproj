@@ -11,7 +11,7 @@
     <RootNamespace>DotNetForHtml5.EmulatorWithoutJavascript</RootNamespace>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <DocumentationFile>bin\OpenSilver\$(Configuration)\OpenSilver.Simulator.xml</DocumentationFile>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <FileAlignment>512</FileAlignment>
