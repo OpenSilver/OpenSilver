@@ -34,7 +34,7 @@ namespace System
 {
     internal class INTERNAL_WebRequestHelper_JSOnly
     {
-        dynamic _xmlHttpRequest;
+        object _xmlHttpRequest;
 
         /// <summary>
         /// Occurs when the string download is completed.
@@ -165,14 +165,7 @@ namespace System
             {
                 if (result.IndexOf(":Fault>") == -1) // We make a special case to not consider FaultExceptions as a server Internal error. The error will be handled later in CSHTML5_ClientBase.WebMethodsCaller.ReadAndPrepareResponse
                 {
-#if OPENSILVER
 	                throw new Exception("The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".");
-#else
-	                //todo: test the following that replaces the commented code below it. Also, "WebExceptionStatus.ProtocolError" should be dependent on the actual error.
-	                string errorMessage = "The remote server has returned an error: (" + GetCurrentStatus((object)_xmlHttpRequest) + ") " + GetCurrentStatusText((object)_xmlHttpRequest) + ".";
-	                WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
-	                throw exception;
-#endif
                 }
             }
             else
@@ -184,11 +177,7 @@ namespace System
                 {
                     if (!isAsync) // Note: we only throw the exception when the call is not asynchronous because it is dealt with in the callback (defined by SetCallbackMethod and automatically called by SendRequest).
                     {
-#if BRIDGE
-                        throw new System.ServiceModel.CommunicationException("An error occured. Please make sure that the target URL is available: " + address.ToString());
-#else
                         throw new Exception("An error occured. Please make sure that the target URL is available: " + address.ToString());
-#endif
                     }
                 }
             }
@@ -312,120 +301,61 @@ namespace System
             _requester = this;
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("(document.location.protocol === \"file:\")")]
-#else
-        [Template("(document.location.protocol === \"file:\")")]
-#endif
         private static bool GetIsFileProtocol()
-        {
-#if BRIDGE || CSHTML5BLAZOR
-            return Convert.ToBoolean(Interop.ExecuteJavaScript(@"(document.location.protocol === ""file:"")"));
-#else
-            throw new InvalidOperationException();//we should never arrive here
-#endif
-        }
+            => OpenSilver.Interop.ExecuteJavaScriptBoolean(@"(document.location.protocol === 'file:')");
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.setRequestHeader($key,$header)")]
-#else
-        [Template("{xmlHttpRequest}.setRequestHeader({key},{header})")]
-#endif
         private static void SetRequestHeader(object xmlHttpRequest, string key, string header)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            Interop.ExecuteJavaScript("$0.setRequestHeader($1, $2)", xmlHttpRequest, key, header);
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            string sKey = INTERNAL_InteropImplementation.GetVariableStringForJS(key);
+            string sHeader = INTERNAL_InteropImplementation.GetVariableStringForJS(header);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.setRequestHeader({sKey}, {sHeader})");
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("new XMLHttpRequest()")]
-#else
-        [Template("new XMLHttpRequest()")]
-#endif
-        internal static dynamic GetWebRequest()
-        {
-#if BRIDGE || CSHTML5BLAZOR
-            return Interop.ExecuteJavaScript("new XMLHttpRequest()");
-#else
-            throw new InvalidOperationException();//we should never arrive here
-#endif
-        }
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.onloadend = $OnDownloadStatusCompleted")]
-#else
-        [Template("{xmlHttpRequest}.onloadend = {OnDownloadStatusCompleted}")] // Note: we  register to the loadend event instead of the load event because the load event is only fired when the request is SUCCESSFULLY completed, while the loadend is triggered after errors and abortions as well. This allows us to handle the error cases in the callback of asynchronous calls.
-#endif
+        internal static object GetWebRequest()
+            => OpenSilver.Interop.ExecuteJavaScript("new XMLHttpRequest()");
 
         internal static void SetCallbackMethod(object xmlHttpRequest, Action OnDownloadStatusCompleted)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            Interop.ExecuteJavaScript("$0.onloadend = $1", xmlHttpRequest, OnDownloadStatusCompleted);
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            string sCallback = INTERNAL_InteropImplementation.GetVariableStringForJS(OnDownloadStatusCompleted);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.onloadend = {sCallback}");
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.open($method, $address, $isAsync)")]
-#else
-        [Template("{xmlHttpRequest}.open({method}, {address}, {isAsync})")]
-#endif
         private static void CreateRequest(object xmlHttpRequest, string address, string method, bool isAsync)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            Interop.ExecuteJavaScript("$0.open($1, $2, $3)", xmlHttpRequest, method, address, isAsync);
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            string sAddress = INTERNAL_InteropImplementation.GetVariableStringForJS(address);
+            string sMethod = INTERNAL_InteropImplementation.GetVariableStringForJS(method);
+            string sAsync = INTERNAL_InteropImplementation.GetVariableStringForJS(isAsync);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.open({sMethod}, {sAddress}, {sAsync})");
         }
 
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.withCredentials = $value")]
-#else
-        [Template("{xmlHttpRequest}.withCredentials = {value}")]
-#endif
         private static void EnableCookies(object xmlHttpRequest, bool value)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            Interop.ExecuteJavaScript("$0.withCredentials = $1", xmlHttpRequest, value);
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            string enableCookies = INTERNAL_InteropImplementation.GetVariableStringForJS(value);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.withCredentials = {enableCookies}");
         }
 
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.onerror = $OnError")]
-#else
-        [Template("{xmlHttpRequest}.onerror = {OnError}")]
-#endif
         internal static void SetErrorCallback(object xmlHttpRequest, Action<object> OnError)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            Interop.ExecuteJavaScript("$0.onerror = $1", xmlHttpRequest, OnError);
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            string sCallback = INTERNAL_InteropImplementation.GetVariableStringForJS(OnError);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.onerror = {sCallback}");
         }
 
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("console.log($message);")]
-#else
-        [Template("console.log({message});")]
-#endif
         internal static void ConsoleLog_JSOnly(string message)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            Interop.ExecuteJavaScript("console.log($0);", message);
-#endif
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"console.log({INTERNAL_InteropImplementation.GetVariableStringForJS(message)});");
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.send($body)")]
-#else
-        [Template("{xmlHttpRequest}.send({body})")]
-#endif
         internal static void SendRequest(object xmlHttpRequest, string address, string method, bool isAsync, string body)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            Interop.ExecuteJavaScript("$0.send($1)", xmlHttpRequest, body);
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            string sBody = INTERNAL_InteropImplementation.GetVariableStringForJS(body);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.send({sBody})");
         }
 
         private void OnDownloadStringCompleted()
@@ -470,72 +400,34 @@ namespace System
             }
             if(errorMessage != null)
             {
-#if OPENSILVER
 	            Exception exception = new Exception("An Error has occured while submitting your request.");
-#else
-	            WebException exception = new WebException(errorMessage, null, WebExceptionStatus.ProtocolError, new HttpWebResponse(this.GetXmlHttpRequest())); //todo: put the correct error type depending on the error (I'm guessing we can know what type it should be by using the statuscode. The test with an error 400 bad request I made was a ProtocolError so I put this here.
-#endif
                 e.Error = exception;
             }
             e.Result = GetResult((object)_xmlHttpRequest);
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.readyState")]
-#else
-        [Template("{xmlHttpRequest}.readyState")]
-#endif
         private static int GetCurrentReadyState(object xmlHttpRequest)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.readyState", xmlHttpRequest));
-#else
-            throw new InvalidOperationException(); //We should never arrive here.
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            return OpenSilver.Interop.ExecuteJavaScriptInt32($"{sRequest}.readyState");
         }
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.status")]
-#else
-        [Template("{xmlHttpRequest}.status")]
-#endif
 
         private static int GetCurrentStatus(object xmlHttpRequest)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            return Convert.ToInt32(Interop.ExecuteJavaScript("$0.status", xmlHttpRequest));
-#else
-            throw new InvalidOperationException(); //We should never arrive here.
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            return OpenSilver.Interop.ExecuteJavaScriptInt32($"{sRequest}.status");
         }
 
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.statusText")]
-#else
-        [Template("{xmlHttpRequest}.statusText")]
-#endif
         private static string GetCurrentStatusText(object xmlHttpRequest)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            return Convert.ToString(Interop.ExecuteJavaScript("$0.statusText", xmlHttpRequest));
-#else
-            throw new InvalidOperationException(); //We should never arrive here.
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            return OpenSilver.Interop.ExecuteJavaScriptString($"{sRequest}.statusText");
         }
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("$xmlHttpRequest.responseText")]
-#else
-        [Template("{xmlHttpRequest}.responseText")]
-#endif
 
         private static string GetResult(object xmlHttpRequest)
         {
-#if BRIDGE || CSHTML5BLAZOR
-            return Convert.ToString(Interop.ExecuteJavaScript("$0.responseText", xmlHttpRequest));
-#else
-            throw new InvalidOperationException(); //We should never arrive here.
-#endif
+            string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
+            return OpenSilver.Interop.ExecuteJavaScriptString($"{sRequest}.responseText");
         }
 
         private static bool GetHasError(object xmlHttpRequest)

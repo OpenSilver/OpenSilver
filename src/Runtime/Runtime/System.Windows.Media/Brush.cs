@@ -29,7 +29,7 @@ namespace Windows.UI.Xaml.Media
     {
         internal static Brush Parse(string source)
         {
-            return new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString(source));
+            return new SolidColorBrush(Color.INTERNAL_ConvertFromString(source));
         }
 
         /// <summary>

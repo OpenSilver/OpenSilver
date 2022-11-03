@@ -215,10 +215,10 @@ namespace Windows.UI.Xaml.Shapes
                     ApplyMarginToFixNegativeCoordinates(_marginOffsets);
                 }
 
-                object context = CSHTML5.Interop.ExecuteJavaScriptAsync($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext('2d')"); //Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
+                object context = OpenSilver.Interop.ExecuteJavaScriptAsync($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext('2d')"); //Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
                 string sContext = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(context);
                 //we remove the previous drawing:
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.clearRect(0,0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.clearRect(0,0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
 
 
                 //double preparedX1 = (X1 + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
@@ -239,35 +239,13 @@ namespace Windows.UI.Xaml.Shapes
                 if (strokeValue != null && StrokeThickness > 0)
                 {
                     double thickness = StrokeThickness;
-                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 {sContext}.strokeStyle = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
-                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 {sContext}.lineWidth = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(StrokeThickness)}");
                     if (StrokeDashArray != null)
                     {
-#if OPENSILVER
-                        if (true)
-#elif BRIDGE
-                        if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-                        {
-                            //todo: put a message saying that it doesn't work in certain browsers (maybe use a static boolean to put that message only once)
-                        }
-                        else
-                        {
-                            object options = CSHTML5.Interop.ExecuteJavaScript(@"new Array()");
-                            string sOptions = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(options);
-                            for (int i = 0; i < StrokeDashArray.Count; ++i)
-                            {
-                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
-{sOptions}[{i.ToInvariantString()}] = {(StrokeDashArray[i] * thickness).ToInvariantString()};");
-                            }
-
-                            CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
-if ({sContext}.setLineDash)
-    {sContext}.setLineDash({sOptions})");
-                            //context.setLineDash(str + "]");
-                        }
+                        // TODO
                     }
                 }
 
@@ -275,14 +253,14 @@ if ({sContext}.setLineDash)
                 INTERNAL_ShapesDrawHelpers.PrepareLine(_canvasDomElement, new Point(preparedX1, preparedY1), new Point(preparedX2, preparedY2));
 
                 if (strokeValue != null)
-                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.strokeStyle = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.strokeStyle = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
 
                 //context.strokeStyle = strokeAsString; //set the shape's lines color
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth= {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(StrokeThickness)}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth= {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(StrokeThickness)}");
                 //context.lineWidth = StrokeThickness.ToString();
                 if (Stroke != null && StrokeThickness > 0)
                 {
-                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke()"); //draw the line
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke()"); //draw the line
                     //context.stroke(); //draw the line
                 }
             }

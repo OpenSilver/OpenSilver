@@ -276,7 +276,7 @@ namespace TypeScriptDefinitionsSupport
 
         public JSArray()
         {
-            this.UnderlyingJSInstance = Interop.ExecuteJavaScript("[]");
+            this.UnderlyingJSInstance = OpenSilver.Interop.ExecuteJavaScript("[]");
         }
 
         public JSArray(object jsObj)

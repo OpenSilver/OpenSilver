@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Media.Imaging
 
             static WriteableBitmapWasm()
             {
-                OpenSilver.Interop.ExecuteJavaScript(@"
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"
 document.WB_Fill32Buffer = function (wasmArray) {
   const dataPtr = Blazor.platform.getArrayEntryPtr(wasmArray, 0, 4);
   const length = Blazor.platform.getArrayLength(wasmArray);

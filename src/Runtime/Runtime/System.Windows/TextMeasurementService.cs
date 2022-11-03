@@ -2,6 +2,7 @@ using CSHTML5.Internal;
 using System;
 using System.Globalization;
 using OpenSilver.Internal;
+using CSHTML5;
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -157,7 +158,8 @@ namespace Windows.UI.Xaml
             associatedTextBlock.Text = "A";
 
             measureTextBlockElementID = ((INTERNAL_HtmlDomElementReference)textBlockReference).UniqueIdentifier;
-            CSHTML5.Interop.ExecuteJavaScriptAsync(@"document.measureTextBlockElement=$0", textBlockReference);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"document.measureTextBlockElement={INTERNAL_InteropImplementation.GetVariableStringForJS(textBlockReference)}");
         }
 
         public bool IsTextMeasureDivID(string id)
@@ -254,11 +256,7 @@ namespace Windows.UI.Xaml
                 savedTextBlockPadding = padding;
 
             string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
-#if OPENSILVER
-            string strTextSize = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(javaScriptCodeToExecute));
-#elif BRIDGE
-            string strTextSize = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("eval($0)", javaScriptCodeToExecute));
-#endif
+            string strTextSize = OpenSilver.Interop.ExecuteJavaScriptString(javaScriptCodeToExecute);
             Size measuredSize;
             int sepIndex = strTextSize != null ? strTextSize.IndexOf('|') : -1;
             if (sepIndex > -1)

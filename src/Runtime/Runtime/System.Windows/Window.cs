@@ -193,25 +193,13 @@ namespace Windows.UI.Xaml
             double width;
             double height;
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement);
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript($"{sElement}.offsetWidth + '|' + {sElement}.offsetHeight"));
-                int sepIndex = concatenated.IndexOf('|');
-                string widthAsString = concatenated.Substring(0, sepIndex);
-                string heightAsString = concatenated.Substring(sepIndex + 1);
-                width = double.Parse(widthAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                height = double.Parse(heightAsString, CultureInfo.InvariantCulture); //todo: read note above
-            }
-            else
-            {
-                width = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript($"{sElement}.offsetWidth")); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientWidth;
-                height = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript($"{sElement}.offsetHeight")); //(double)INTERNAL_HtmlDomManager.GetRawHtmlBody().clientHeight;
-            }
+            // Hack to improve the Simulator performance by making only one interop call rather than two:
+            string concatenated = OpenSilver.Interop.ExecuteJavaScriptString($"{sElement}.offsetWidth + '|' + {sElement}.offsetHeight");
+            int sepIndex = concatenated.IndexOf('|');
+            string widthAsString = concatenated.Substring(0, sepIndex);
+            string heightAsString = concatenated.Substring(sepIndex + 1);
+            width = double.Parse(widthAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+            height = double.Parse(heightAsString, CultureInfo.InvariantCulture); //todo: read note above
 
             var eventArgs = new WindowSizeChangedEventArgs()
             {

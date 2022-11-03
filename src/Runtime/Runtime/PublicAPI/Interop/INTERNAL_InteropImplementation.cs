@@ -211,7 +211,7 @@ namespace CSHTML5
                 _pendingJSFile.Add(html5Path, new List<Tuple<Action, Action>> { new Tuple<Action, Action>(callbackOnSuccess, callbackOnFailure) });
                 string sSuccessAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileSuccess);
                 string sFailureAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileFailure);
-                CSHTML5.Interop.ExecuteJavaScript(
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
     $@"// Add the script tag to the head
 var filePath = {GetVariableStringForJS(html5Path)};
 var head = document.getElementsByTagName('head')[0];
@@ -235,7 +235,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(GetVariableStringForJS(jsArgument))); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -247,7 +247,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(GetVariableStringForJS(jsArgument))); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();
@@ -293,7 +293,7 @@ head.appendChild(script);");
 
             string sHtml5Path = GetVariableStringForJS(html5Path);
             string sCallback = GetVariableStringForJS(callback);
-            CSHTML5.Interop.ExecuteJavaScript(
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
 $@"// Add the link tag to the head
 var head = document.getElementsByTagName('head')[0];
 var link = document.createElement('link');

@@ -73,15 +73,11 @@ namespace Windows.UI.Xaml.Media.Animation
                 //note: below,  p is the advancement of the animation in percentage (decimal)
                 //              opts (optional) are the options (such as "queue")
                 //              tweenDelta (optional) is the delta between the starting value and the end value
-                CSHTML5.Interop.ExecuteJavaScript(@"
-        Velocity.Easings.easeInExponentialCustomEasing = function (p, opts, tweenDelta) {
-    var exponent = 2;
-    if(opts != undefined) {
-        if(opts.exponent != undefined) {
-            exponent = opts.exponent;
-        }
-    }
-    return (Math.exp(opts.exponent * p)- 1) / (Math.exp(opts.exponent) - 1);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+@"Velocity.Easings.easeInExponentialCustomEasing = function (p, opts, tweenDelta) {
+ var exponent = 2;
+ if (opts && opts.exponent) exponent = opts.exponent;
+ return (Math.exp(opts.exponent * p)- 1) / (Math.exp(opts.exponent) - 1);
 };");
 
                 //defining the easeOut EasingMode:
@@ -89,15 +85,11 @@ namespace Windows.UI.Xaml.Media.Animation
                 //note: below,  p is the advancement of the animation in percentage (decimal)
                 //              opts (optional) are the options (such as "queue")
                 //              tweenDelta (optional) is the delta between the starting value and the end value
-                CSHTML5.Interop.ExecuteJavaScript(@"
-        Velocity.Easings.easeOutExponentialCustomEasing = function (p, opts, tweenDelta) {
-    var exponent = 2;
-    if(opts != undefined) {
-        if(opts.exponent != undefined) {
-            exponent = opts.exponent;
-        }
-    }
-    return 1 - ((Math.exp(opts.exponent * (1-p))- 1) / (Math.exp(opts.exponent) - 1));
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+@"Velocity.Easings.easeOutExponentialCustomEasing = function (p, opts, tweenDelta) {
+ var exponent = 2;
+ if (opts && opts.exponent) exponent = opts.exponent;
+ return 1 - ((Math.exp(opts.exponent * (1-p))- 1) / (Math.exp(opts.exponent) - 1));
 };");
 
                 //defining the easeInOut EasingMode:
@@ -105,22 +97,13 @@ namespace Windows.UI.Xaml.Media.Animation
                 //note: below,  p is the advancement of the animation in percentage (decimal)
                 //              opts (optional) are the options (such as "queue")
                 //              tweenDelta (optional) is the delta between the starting value and the end value
-                CSHTML5.Interop.ExecuteJavaScript(@"
-        Velocity.Easings.easeInOutExponentialCustomEasing = function (p, opts, tweenDelta) {
-    var exponent = 2;
-    if(opts != undefined) {
-        if(opts.exponent != undefined) {
-            exponent = opts.exponent;
-        }
-    }
-    if(p < 0.5) {
-        return (Math.exp(opts.exponent * 2 * p)- 1) / (2 * (Math.exp(opts.exponent) - 1));
-    }
-    else {
-        return 1 - ((Math.exp(2 * opts.exponent * (1 - p)) - 1) / (2 * (Math.exp(opts.exponent) - 1)));
-    }
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+@"Velocity.Easings.easeInOutExponentialCustomEasing = function (p, opts, tweenDelta) {
+ var exponent = 2;
+ if (opts && opts.exponent) exponent = opts.exponent;
+ if (p < 0.5) return (Math.exp(opts.exponent * 2 * p)- 1) / (2 * (Math.exp(opts.exponent) - 1));
+ else return 1 - ((Math.exp(2 * opts.exponent * (1 - p)) - 1) / (2 * (Math.exp(opts.exponent) - 1)));
 };");
-        //return 1 - ((Math.exp(opts.exponent * (1 - (2 * (p - 0,5))))- 1) / (2 * (Math.exp(opts.exponent) - 1)));
 
                 velocityInitializationMade = true;
             }

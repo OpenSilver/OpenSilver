@@ -287,7 +287,7 @@ namespace CSHTML5.Internal
             _defaultResources["ContentControlThemeFontFamily"] = new FontFamily("Segoe UI");
             _defaultResources["SymbolThemeFontFamily"] = new FontFamily("Segoe UI Symbol");
             _defaultResources["ControlContentThemeFontSize"] = 14.667;
-            _defaultResources["ThumbBorderThemeBrush"] = new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString("#3B555555"));
+            _defaultResources["ThumbBorderThemeBrush"] = new SolidColorBrush(Color.INTERNAL_ConvertFromString("#3B555555"));
             _defaultResources["SystemAccentColor"] = Color.INTERNAL_ConvertFromString("#FF0078D7");// this is the default blue value but it can be changed in windows so yeah...
             _defaultResources["SystemColorButtonFaceColor"] = Color.INTERNAL_ConvertFromString("#FF000000");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
             _defaultResources["ScrollBarThumbBackgroundColor"] = Color.INTERNAL_ConvertFromString("#FF333333");// todo: find what the value is supposed to be by default, coudln't find it so I put black and we'll see if it's ok.
@@ -315,122 +315,122 @@ namespace CSHTML5.Internal
 
             #region setting light default values
             #region AltHigh Light
-            Color color = (Color)Color.INTERNAL_ConvertFromString("#FFFFFFFF");
+            Color color = Color.INTERNAL_ConvertFromString("#FFFFFFFF");
             resourceDictionary.Add("SystemAltHighColor", color);
             #endregion
 
             #region AltLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#33FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#33FFFFFF");
             resourceDictionary.Add("SystemAltLowColor", color);
             #endregion
 
             #region AltMedium Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#99FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#99FFFFFF");
             resourceDictionary.Add("SystemAltMediumColor", color);
             #endregion
 
             #region AltMediumHigh Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#CCFFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#CCFFFFFF");
             resourceDictionary.Add("SystemAltMediumHighColor", color);
             #endregion
 
             #region AltMediumLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#66FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#66FFFFFF");
             resourceDictionary.Add("SystemAltMediumLowColor", color);
             #endregion
 
             #region BaseHigh Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF000000");
+            color = Color.INTERNAL_ConvertFromString("#FF000000");
             resourceDictionary.Add("SystemBaseHighColor", color);
             #endregion
 
             #region BaseLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#33000000");
+            color = Color.INTERNAL_ConvertFromString("#33000000");
             resourceDictionary.Add("SystemBaseLowColor", color);
             #endregion
 
             #region BaseMedium Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#99000000");
+            color = Color.INTERNAL_ConvertFromString("#99000000");
             resourceDictionary.Add("SystemBaseMediumColor", color);
             #endregion
 
             #region BaseMediumHigh Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#CC000000");
+            color = Color.INTERNAL_ConvertFromString("#CC000000");
             resourceDictionary.Add("SystemBaseMediumHighColor", color);
             #endregion
 
             #region BaseMediumLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#66000000");
+            color = Color.INTERNAL_ConvertFromString("#66000000");
             resourceDictionary.Add("SystemBaseMediumLowColor", color);
             #endregion
 
             #region ChromeAltLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF171717");
+            color = Color.INTERNAL_ConvertFromString("#FF171717");
             resourceDictionary.Add("SystemChromeAltLowColor", color);
             #endregion
 
             #region ChromeBlackHigh Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF000000");
+            color = Color.INTERNAL_ConvertFromString("#FF000000");
             resourceDictionary.Add("SystemChromeBlackHighColor", color);
             #endregion
 
             #region ChromeBlackLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#33000000");
+            color = Color.INTERNAL_ConvertFromString("#33000000");
             resourceDictionary.Add("SystemChromeBlackLowColor", color);
             #endregion
 
             #region ChromeBlackMediumLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#66000000");
+            color = Color.INTERNAL_ConvertFromString("#66000000");
             resourceDictionary.Add("SystemChromeBlackMediumLowColor", color);
             #endregion
 
             #region ChromeBlackMedium Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#CC000000");
+            color = Color.INTERNAL_ConvertFromString("#CC000000");
             resourceDictionary.Add("SystemChromeBlackMediumColor", color);
             #endregion
 
             #region ChromeDisabledHigh Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFCCCCCC");
+            color = Color.INTERNAL_ConvertFromString("#FFCCCCCC");
             resourceDictionary.Add("SystemChromeDisabledHighColor", color);
             #endregion
 
             #region ChromeDisabledLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF7A7A7A");
+            color = Color.INTERNAL_ConvertFromString("#FF7A7A7A");
             resourceDictionary.Add("SystemChromeDisabledLowColor", color);
             #endregion
 
             #region ChromeHigh Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFCCCCCC");
+            color = Color.INTERNAL_ConvertFromString("#FFCCCCCC");
             resourceDictionary.Add("SystemChromeHighColor", color);
             #endregion
 
             #region ChromeLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFF2F2F2");
+            color = Color.INTERNAL_ConvertFromString("#FFF2F2F2");
             resourceDictionary.Add("SystemChromeLowColor", color);
             #endregion
 
             #region ChromeMedium Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFE6E6E6");
+            color = Color.INTERNAL_ConvertFromString("#FFE6E6E6");
             resourceDictionary.Add("SystemChromeMediumColor", color);
             #endregion
 
             #region ChromeMediumLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFF2F2F2");
+            color = Color.INTERNAL_ConvertFromString("#FFF2F2F2");
             resourceDictionary.Add("SystemChromeMediumLowColor", color);
             #endregion
 
             #region ChromeWhite Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFFFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#FFFFFFFF");
             resourceDictionary.Add("SystemChromeWhiteColor", color);
             #endregion
 
             #region ListLow Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#19000000");
+            color = Color.INTERNAL_ConvertFromString("#19000000");
             resourceDictionary.Add("SystemListLowColor", color);
             #endregion
 
             #region ListMedium Light
-            color = (Color)Color.INTERNAL_ConvertFromString("#33000000");
+            color = Color.INTERNAL_ConvertFromString("#33000000");
             resourceDictionary.Add("SystemListMediumColor", color);
             #endregion
 
@@ -443,122 +443,122 @@ namespace CSHTML5.Internal
             #region setting dark default values
 
             #region AltHigh Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF000000");
+            color = Color.INTERNAL_ConvertFromString("#FF000000");
             resourceDictionary.Add("SystemAltHighColor", color);
             #endregion
 
             #region AltLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#33000000");
+            color = Color.INTERNAL_ConvertFromString("#33000000");
             resourceDictionary.Add("SystemAltLowColor", color);
             #endregion
 
             #region AltMedium Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#99000000");
+            color = Color.INTERNAL_ConvertFromString("#99000000");
             resourceDictionary.Add("SystemAltMediumColor", color);
             #endregion
 
             #region AltMediumHigh Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#CC000000");
+            color = Color.INTERNAL_ConvertFromString("#CC000000");
             resourceDictionary.Add("SystemAltMediumHighColor", color);
             #endregion
 
             #region AltMediumLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#66000000");
+            color = Color.INTERNAL_ConvertFromString("#66000000");
             resourceDictionary.Add("SystemAltMediumLowColor", color);
             #endregion
 
             #region BaseHigh Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFFFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#FFFFFFFF");
             resourceDictionary.Add("SystemBaseHighColor", color);
             #endregion
 
             #region BaseLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#33FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#33FFFFFF");
             resourceDictionary.Add("SystemBaseLowColor", color);
             #endregion
 
             #region BaseMedium Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#99FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#99FFFFFF");
             resourceDictionary.Add("SystemBaseMediumColor", color);
             #endregion
 
             #region BaseMediumHigh Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#CCFFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#CCFFFFFF");
             resourceDictionary.Add("SystemBaseMediumHighColor", color);
             #endregion
 
             #region BaseMediumLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#66FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#66FFFFFF");
             resourceDictionary.Add("SystemBaseMediumLowColor", color);
             #endregion
 
             #region ChromeAltLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFF2F2F2");
+            color = Color.INTERNAL_ConvertFromString("#FFF2F2F2");
             resourceDictionary.Add("SystemChromeAltLowColor", color);
             #endregion
 
             #region ChromeBlackHigh Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF000000");
+            color = Color.INTERNAL_ConvertFromString("#FF000000");
             resourceDictionary.Add("SystemChromeBlackHighColor", color);
             #endregion
 
             #region ChromeBlackLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#33000000");
+            color = Color.INTERNAL_ConvertFromString("#33000000");
             resourceDictionary.Add("SystemChromeBlackLowColor", color);
             #endregion
 
             #region ChromeBlackMediumLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#66000000");
+            color = Color.INTERNAL_ConvertFromString("#66000000");
             resourceDictionary.Add("SystemChromeBlackMediumLowColor", color);
             #endregion
 
             #region ChromeBlackMedium Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#CC000000");
+            color = Color.INTERNAL_ConvertFromString("#CC000000");
             resourceDictionary.Add("SystemChromeBlackMediumColor", color);
             #endregion
 
             #region ChromeDisabledHigh Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF333333");
+            color = Color.INTERNAL_ConvertFromString("#FF333333");
             resourceDictionary.Add("SystemChromeDisabledHighColor", color);
             #endregion
 
             #region ChromeDisabledLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF858585");
+            color = Color.INTERNAL_ConvertFromString("#FF858585");
             resourceDictionary.Add("SystemChromeDisabledLowColor", color);
             #endregion
 
             #region ChromeHigh Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF767676");
+            color = Color.INTERNAL_ConvertFromString("#FF767676");
             resourceDictionary.Add("SystemChromeHighColor", color);
             #endregion
 
             #region ChromeLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF171717");
+            color = Color.INTERNAL_ConvertFromString("#FF171717");
             resourceDictionary.Add("SystemChromeLowColor", color);
             #endregion
 
             #region ChromeMedium Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF1F1F1F");
+            color = Color.INTERNAL_ConvertFromString("#FF1F1F1F");
             resourceDictionary.Add("SystemChromeMediumColor", color);
             #endregion
 
             #region ChromeMediumLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF2B2B2B");
+            color = Color.INTERNAL_ConvertFromString("#FF2B2B2B");
             resourceDictionary.Add("SystemChromeMediumLowColor", color);
             #endregion
 
             #region ChromeWhite Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFFFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#FFFFFFFF");
             resourceDictionary.Add("SystemChromeWhiteColor", color);
             #endregion
 
             #region ListLow Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#19FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#19FFFFFF");
             resourceDictionary.Add("SystemListLowColor", color);
             #endregion
 
             #region ListMedium Dark
-            color = (Color)Color.INTERNAL_ConvertFromString("#33FFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#33FFFFFF");
             resourceDictionary.Add("SystemListMediumColor", color);
             #endregion
 
@@ -573,49 +573,49 @@ namespace CSHTML5.Internal
 
             #region Button Text (background) HighContrast
             //simple name: Background
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFF0F0F0");
+            color = Color.INTERNAL_ConvertFromString("#FFF0F0F0");
             resourceDictionary.Add("SystemColorButtonFaceColor", color);
             #endregion
 
             #region Button Text (foreground) HighContrast
             //simple name: Foreground
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF000000");
+            color = Color.INTERNAL_ConvertFromString("#FF000000");
             resourceDictionary.Add("SystemColorButtonTextColor", color);
             #endregion
 
             #region Disabled Text HighContrast
             //simple name: Disabled
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF6D6D6D");
+            color = Color.INTERNAL_ConvertFromString("#FF6D6D6D");
             resourceDictionary.Add("SystemColorGrayTextColor", color);
             #endregion
 
             #region Selected Text (background) HighContrast
             //simple name: Highlight
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF3399FF");
+            color = Color.INTERNAL_ConvertFromString("#FF3399FF");
             resourceDictionary.Add("SystemColorHighlightColor", color);
             #endregion
 
             #region Selected Text (foreground) HighContrast
             //simple name: HighlightAlt
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFFFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#FFFFFFFF");
             resourceDictionary.Add("SystemColorHighlightTextColor", color);
             #endregion
 
             #region Hyperlinks HighContrast
             //simple name: Hyperlink
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF0066CC");
+            color = Color.INTERNAL_ConvertFromString("#FF0066CC");
             resourceDictionary.Add("SystemColorHotlightColor", color);
             #endregion
 
             #region Background HighContrast
             //simple name: PageBackground
-            color = (Color)Color.INTERNAL_ConvertFromString("#FFFFFFFF");
+            color = Color.INTERNAL_ConvertFromString("#FFFFFFFF");
             resourceDictionary.Add("SystemColorWindowColor", color);
             #endregion
 
             #region Text HighContrast
             //simple name: PageText
-            color = (Color)Color.INTERNAL_ConvertFromString("#FF000000");
+            color = Color.INTERNAL_ConvertFromString("#FF000000");
             resourceDictionary.Add("SystemColorWindowTextColor", color);
             #endregion
 

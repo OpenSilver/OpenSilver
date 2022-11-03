@@ -71,7 +71,10 @@ namespace Windows.UI.Xaml.Controls
 
             DisposeJsCallbacks();
             _jsCallbackOnIframeLoaded = JavascriptCallback.Create((Action)OnIframeLoad);
-            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.onload = $1", _iFrame, _jsCallbackOnIframeLoaded);
+
+            string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(_iFrame);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"{sIFrame}.onload = {INTERNAL_InteropImplementation.GetVariableStringForJS(_jsCallbackOnIframeLoaded)}");
 
 #if MIGRATION
             var source = this.SourceUri;
@@ -80,15 +83,17 @@ namespace Windows.UI.Xaml.Controls
 #endif
             if (source != null && !string.IsNullOrEmpty(source.OriginalString))
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = $1", _iFrame, source.OriginalString);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"{sIFrame}.src = {INTERNAL_InteropImplementation.GetVariableStringForJS(source.OriginalString)}");
             }
             else if (_htmlString != null)
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync("srcDoc.set($0, $1)", _iFrame, _htmlString);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"srcDoc.set({sIFrame}, {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)})");
             }
             else
             {
-                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", _iFrame);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = 'about:blank'");
             }
 
             domElementWhereToPlaceChildren = _iFrame;
@@ -143,14 +148,16 @@ namespace Windows.UI.Xaml.Controls
 #else
                 var source = webView.Source;
 #endif
+                string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(webView._iFrame);
                 if (source != null && !string.IsNullOrEmpty(source.OriginalString))
                 {
                     string uri = INTERNAL_UriHelper.ConvertToHtml5Path(source.OriginalString, null);
-                    CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = $1", webView._iFrame, uri);
+                    string sUri = INTERNAL_InteropImplementation.GetVariableStringForJS(uri);
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = {sUri}");
                 }
                 else
                 {
-                    CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", webView._iFrame);
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = 'about:blank'");
                 }
             }
         }
@@ -181,13 +188,15 @@ namespace Windows.UI.Xaml.Controls
 
             if (this._isLoaded) // Note: if not loaded, we will set the HTML later when adding the control to the visual tree.
             {
+                string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(_iFrame);
                 if (_htmlString != null)
                 {
-                    CSHTML5.Interop.ExecuteJavaScriptAsync("srcDoc.set($0, $1)", _iFrame, _htmlString);
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                        $"srcDoc.set({sIFrame}, {INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlString)})");
                 }
                 else
                 {
-                    CSHTML5.Interop.ExecuteJavaScriptAsync("$0.src = 'about:blank'", _iFrame);
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sIFrame}.src = 'about:blank'");
                 }
             }
         }

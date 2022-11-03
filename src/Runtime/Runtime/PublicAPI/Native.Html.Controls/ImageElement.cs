@@ -91,7 +91,7 @@ namespace CSHTML5.Native.Html.Controls
         /// </summary>
         public ImageElement() : base()
         {
-            _jsImage = Interop.ExecuteJavaScript("document.createElement('img')");
+            _jsImage = OpenSilver.Interop.ExecuteJavaScript("document.createElement('img')");
         }
 
         /// <summary>

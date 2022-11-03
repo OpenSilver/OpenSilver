@@ -372,22 +372,15 @@ namespace Windows.UI
 
         internal string INTERNAL_ToHtmlStringForVelocity()
         {
-            return string.Format("#{0}{1}{2}",
-                R.ToInvariantString("X2"),
-                G.ToInvariantString("X2"),
-                B.ToInvariantString("X2"));
+            return $"#{R.ToInvariantString("X2")}{G.ToInvariantString("X2")}{B.ToInvariantString("X2")}";
         }
 
         internal string INTERNAL_ToHtmlString(double opacity)
         {
-            return string.Format(
-                CultureInfo.InvariantCulture,
-                "rgba({0}, {1}, {2}, {3})",
-                this.R, this.G, this.B, opacity * this.A / 255d
-            );
+            return $"rgba({R.ToInvariantString()}, {G.ToInvariantString()}, {B.ToInvariantString()}, {(opacity * A / 255d).ToInvariantString()})";
         }
 
-        internal static object INTERNAL_ConvertFromString(string color)
+        internal static Color INTERNAL_ConvertFromString(string color)
         {
             return Parsers.ParseColor(color, null);
         }

@@ -76,7 +76,9 @@ namespace Windows.UI.Xaml.Controls
             // the focus will be redirected to the <input>, unless the click was on an element that
             // absorbs pointer events.
 
-            OpenSilver.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)PasswordBox_GotFocus);
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action<object>)PasswordBox_GotFocus);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.addEventListener('click', {sCallback})");
 
             UpdateDOMPassword(Host.Password);
         }
@@ -223,7 +225,8 @@ namespace Windows.UI.Xaml.Controls
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                string text = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0['value'] || ''", this.INTERNAL_InnerDomElement));
+                string text = OpenSilver.Interop.ExecuteJavaScriptString(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_InnerDomElement)}['value'] || ''");
 
                 _isUpdatingDOM = true;
 
@@ -240,16 +243,16 @@ namespace Windows.UI.Xaml.Controls
 
         private void PasswordBox_GotFocus(object e)//object sender, RoutedEventArgs e)
         {
-            bool ignoreEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", e));
+            bool ignoreEvent = OpenSilver.Interop.ExecuteJavaScriptBoolean(
+                $"document.checkForDivsThatAbsorbEvents({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e)})");
             if (!ignoreEvent)
             {
                 if (_passwordInputField != null)
                 {
-                    OpenSilver.Interop.ExecuteJavaScript(@"
-if($1.target != $0) {
-$0.focus()
-}", _passwordInputField, e);
-                    //NEW_SET_SELECTION(_tempSelectionStartIndex, _tempSelectionStartIndex + _tempSelectionLength);
+                    string sInput = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_passwordInputField);
+                    string sEventArg = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(
+                        $"if ({sEventArg}.target != {sInput}) {{ {sInput}.focus(); }}");
                 }
             }
         }

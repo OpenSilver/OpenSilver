@@ -774,7 +774,7 @@ namespace CSHTML5.Native.Html.Controls
         {
             if (this._nativeComboBoxDomElement != null)
             {
-                int selectedIndexInHtmlDom = Convert.ToInt32(INTERNAL_HtmlDomManager.GetDomElementAttribute(this._nativeComboBoxDomElement, "selectedIndex"));
+                int selectedIndexInHtmlDom = INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(_nativeComboBoxDomElement, "selectedIndex");
 
                 // Compensate for the fact that the ComboBox contains an empty 
                 // element at the beginning (see note in 'AddEmptyOption' method)

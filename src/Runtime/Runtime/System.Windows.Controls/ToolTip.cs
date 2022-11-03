@@ -180,8 +180,8 @@ namespace Windows.UI.Xaml.Controls
         private static Point GetMousePosition()
         {
             return Point.Parse(
-                Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("_opensilver.mousePositionX.toString() + \",\" + _opensilver.mousePositionY.toString()"))
-            );
+                OpenSilver.Interop.ExecuteJavaScriptString(
+                    "_opensilver.mousePositionX.toString() + \",\" + _opensilver.mousePositionY.toString()"));
         }
 
         private void ParentPopupLoaded(object sender, RoutedEventArgs e)

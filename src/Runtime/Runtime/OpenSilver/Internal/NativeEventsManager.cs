@@ -64,12 +64,12 @@ namespace OpenSilver.Internal
             string sHandler = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_handler);
             if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
             {
-                Interop.ExecuteJavaScriptAsync($@"document._attachEventListeners(""{domRef.UniqueIdentifier}"", {sHandler}, {(_isFocusable ? "true" : "false")})");
+                Interop.ExecuteJavaScriptFastAsync($@"document._attachEventListeners(""{domRef.UniqueIdentifier}"", {sHandler}, {(_isFocusable ? "true" : "false")})");
             }
             else
             {
                 string sOuter = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_owner.INTERNAL_OuterDomElement);
-                Interop.ExecuteJavaScriptAsync($"document._attachEventListeners({sOuter}, {sHandler}, {(_isFocusable ? "true" : "false")})");
+                Interop.ExecuteJavaScriptFastAsync($"document._attachEventListeners({sOuter}, {sHandler}, {(_isFocusable ? "true" : "false")})");
             }
         }
 
@@ -77,12 +77,12 @@ namespace OpenSilver.Internal
         {
             if (_owner.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
             {
-                Interop.ExecuteJavaScriptAsync($@"document._removeEventListeners(""{domRef.UniqueIdentifier}"")");
+                Interop.ExecuteJavaScriptFastAsync($@"document._removeEventListeners(""{domRef.UniqueIdentifier}"")");
             }
             else
             {
                 string sOuter = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_owner.INTERNAL_OuterDomElement);
-                Interop.ExecuteJavaScriptAsync($"document._removeEventListeners({sOuter})");
+                Interop.ExecuteJavaScriptFastAsync($"document._removeEventListeners({sOuter})");
             }
         }
 

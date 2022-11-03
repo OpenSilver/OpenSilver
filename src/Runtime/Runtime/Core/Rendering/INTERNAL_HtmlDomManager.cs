@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Text.Json;
 using System.Text;
 using OpenSilver.Internal;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows;
@@ -40,17 +41,19 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             _store = new Dictionary<string, WeakReference<UIElement>>(2048);
         }
 
+        private static object _rootDomElement;
+
         public static object GetApplicationRootDomElement()
         {
-            var rootDomElement = OpenSilver.Interop.ExecuteJavaScriptAsync("document.getXamlRoot()");
+            _rootDomElement ??= OpenSilver.Interop.ExecuteJavaScriptAsync("document.getXamlRoot()");
 
-            if (rootDomElement == null)
+            if (_rootDomElement == null)
             {
                 const string ROOT_NAME = "opensilver-root";
                 throw new Exception("The application root DOM element was not found. To fix this issue, please add a DIV with the ID '" + ROOT_NAME + "' to the HTML page.");
             }
 
-            return rootDomElement;
+            return _rootDomElement;
         }
 
         public static void RemoveFromDom(object domNode, string commentForDebugging = null)
@@ -82,20 +85,21 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         public static INTERNAL_HtmlDomElementReference GetChildDomElementAt(INTERNAL_HtmlDomElementReference domElementRef, int index)
         {
             string sDomElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            int length = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript($"{sDomElement}.childNodes.length"));
+            int length = OpenSilver.Interop.ExecuteJavaScriptInt32($"{sDomElement}.childNodes.length");
             if (index < 0 || length <= index)
             {
                 throw new IndexOutOfRangeException();
             }
 
-            string childNodeId = OpenSilver.Interop.ExecuteJavaScript($@"var child = {sDomElement}.childNodes[{index.ToInvariantString()}]; child.id;").ToString();
+            string childNodeId = OpenSilver.Interop.ExecuteJavaScriptString($@"var child = {sDomElement}.childNodes[{index.ToInvariantString()}]; child.id;");
             return new INTERNAL_HtmlDomElementReference(childNodeId, domElementRef);
         }
 
+        private static object _window;
 
         public static object GetHtmlWindow()
         {
-            return OpenSilver.Interop.ExecuteJavaScript("window");
+            return _window ??= OpenSilver.Interop.ExecuteJavaScript("window");
         }
 
         public static bool IsNotUndefinedOrNull(object obj)
@@ -118,7 +122,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 if (!OpenSilver.Interop.IsRunningInTheSimulator)
                 {
                     string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRefConcernedByFocus);
-                    OpenSilver.Interop.ExecuteJavaScriptAsync($@"setTimeout(function() {{ {sElement}.focus(); }}, 1)");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"setTimeout(function() {{ {sElement}.focus(); }}, 1)");
                 }
                 else
                 {
@@ -164,7 +168,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
         public static string GetTextBoxText(object domElementRef)
         {
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            return OpenSilver.Interop.ExecuteJavaScript($"getTextAreaInnerText({sElement})").ToString();
+            return OpenSilver.Interop.ExecuteJavaScriptString($"getTextAreaInnerText({sElement})");
         }
 
         public static object AddOptionToNativeComboBox(
@@ -302,16 +306,10 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             {
                 if (domElement != null)
                 {
-                    //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                    object newObj = OpenSilver.Interop.ExecuteJavaScriptAsync(@"new Object()");
-                    string sNewobj = INTERNAL_InteropImplementation.GetVariableStringForJS(newObj);
+                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
                     string sCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
-                    foreach (string csspropertyName in cssPropertyNames)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"{sNewobj}[""{csspropertyName}""] = {sCssValue};");
-                    }
-                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement); ;
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"Velocity({sElement}, {sNewobj}, {{duration:1, queue:false}});");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                        $"Velocity({sElement}, {{{string.Join(",", cssPropertyNames.Select(name => $"{name}:{sCssValue}"))}}}, {{duration:1,queue:false}});");
                 }
             }
             else
@@ -338,6 +336,12 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
         {
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
             return OpenSilver.Interop.ExecuteJavaScript($@"{sElement}[""{attributeName}""]");
+        }
+
+        internal static int GetDomElementAttributeInt32(object domElementRef, string attributeName)
+        {
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            return OpenSilver.Interop.ExecuteJavaScriptInt32($"{sElement}['{attributeName}']");
         }
 
         public static object CallDomMethod(object domElementRef, string methodName, params object[] args)
@@ -812,20 +816,16 @@ parentElement.appendChild(child);";
             string[] elements;
             if (subtree != null)
             {
+                string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(OpenSilver.Interop.GetDiv(subtree));
                 elements = JsonSerializer.Deserialize<string[]>(
-                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
-                        @"window.elementsFromPointOpensilver($0,$1,$2)",
-                        intersectingPoint.X,
-                        intersectingPoint.Y,
-                        OpenSilver.Interop.GetDiv(subtree))));
+                    OpenSilver.Interop.ExecuteJavaScriptString(
+                        $"window.elementsFromPointOpensilver({intersectingPoint.X.ToInvariantString()},{intersectingPoint.Y.ToInvariantString()},{sDiv})"));
             }
             else
             {
                 elements = JsonSerializer.Deserialize<string[]>(
-                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
-                        @"window.elementsFromPointOpensilver($0,$1,null)",
-                        intersectingPoint.X,
-                        intersectingPoint.Y)));
+                    OpenSilver.Interop.ExecuteJavaScriptString(
+                        $"window.elementsFromPointOpensilver({intersectingPoint.X.ToInvariantString()},{intersectingPoint.Y.ToInvariantString()},null)"));
             }
 
             for (int i = elements.Length - 1; i >= 0; i--)

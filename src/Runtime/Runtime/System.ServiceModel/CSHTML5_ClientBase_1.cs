@@ -289,7 +289,7 @@ namespace System.ServiceModel
             // Attempt to read the WCF endpoint address by first looking into the 
             // "ServiceReferences.ClientConfig" file, and then the "App.Config" file
             string endpointAddress;
-            object serviceReferencesClientConfig = CSHTML5.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig");
+            object serviceReferencesClientConfig = OpenSilver.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig");
             if (TryReadEndpoint(serviceReferencesClientConfig,
                                 "ServiceReferences.ClientConfig",
                                 contractConfigurationName,
@@ -300,7 +300,7 @@ namespace System.ServiceModel
             }
             else
             {
-                object appConfig = CSHTML5.Interop.ExecuteJavaScript("window.AppConfig");
+                object appConfig = OpenSilver.Interop.ExecuteJavaScript("window.AppConfig");
                 if (TryReadEndpoint(appConfig,
                                     "App.Config",
                                     contractConfigurationName,
@@ -325,7 +325,8 @@ namespace System.ServiceModel
             bool throwIfFileNotFound,
             out string endpointAddress)
         {
-            bool isNullOrUndefined = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("$0 == undefined || $0 == null", configFileContent));
+            bool isNullOrUndefined = OpenSilver.Interop.ExecuteJavaScriptBoolean(
+                $"!{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(configFileContent)}");
             if (!isNullOrUndefined)
             {
                 string fileContentAsString = Convert.ToString(configFileContent);

@@ -111,7 +111,7 @@ namespace Windows.UI.Xaml.Input
             VirtualKeyModifiers keyModifiers = VirtualKeyModifiers.None;
 #endif
             string sEventArg = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{sEventArg}.shiftKey || false"))) //Note: we use "||" because the value "shiftKey" may be null or undefined. For more information on "||", read: https://stackoverflow.com/questions/476436/is-there-a-null-coalescing-operator-in-javascript
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEventArg}.shiftKey || false"))
             {
 #if MIGRATION
                 keyModifiers = keyModifiers | ModifierKeys.Shift;
@@ -119,7 +119,7 @@ namespace Windows.UI.Xaml.Input
                 keyModifiers = keyModifiers | VirtualKeyModifiers.Shift;
 #endif
             }
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{sEventArg}.altKey || false")))
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEventArg}.altKey || false"))
             {
 #if MIGRATION
                 keyModifiers = keyModifiers | ModifierKeys.Alt;
@@ -127,7 +127,7 @@ namespace Windows.UI.Xaml.Input
                 keyModifiers = keyModifiers | VirtualKeyModifiers.Menu;
 #endif
             }
-            if (Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript($"{sEventArg}.ctrlKey || false")))
+            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEventArg}.ctrlKey || false"))
             {
 #if MIGRATION
                 keyModifiers = keyModifiers | ModifierKeys.Control;
@@ -139,19 +139,7 @@ namespace Windows.UI.Xaml.Input
 
             //Refreshing the value for key modifiers in the html document to ensure the value is correct when sending the event (For cases where the users use Keyboard.Modifiers inside the event's handler).
             //Note: this is mandatory because we have no way to be sure the events document.onkeyup and document.onkeydown are thrown before the one that made us arrive here.
-            CSHTML5.Interop.ExecuteJavaScript($"document.refreshKeyModifiers({sEventArg});");
-
-            /*
-            if (!CSHTML5.Interop.IsRunningInTheSimulator)
-            {
-                CSHTML5.Interop.ExecuteJavaScript(@"document.refreshKeyModifiers($0);", jsEventArg);
-            }
-            else
-            {
-                dynamic document = INTERNAL_Simulator.HtmlDocument;
-                document.Invoke("refreshKeyModifiers", jsEventArg);
-            }
-             */
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.refreshKeyModifiers({sEventArg});");
         }
     }
 }

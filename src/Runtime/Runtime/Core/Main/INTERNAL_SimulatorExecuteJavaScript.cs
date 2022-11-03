@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,20 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DotNetForHtml5.Core;
+
 #if MIGRATION
 using System.Windows;
 #else
@@ -40,19 +29,14 @@ namespace CSHTML5.Internal
         static List<string> _pendingAsyncJavaScriptToExecute = new List<string>();
         static bool _disableAsyncJavaScriptExecution = false;
         static bool _isDispatcherPending = false;
-#if CSHTML5NETSTANDARD
         static bool _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false; //todo: make sure this variable is thread-safe.
-#else
-#endif
+        
         /// <summary>
         /// Executes JavaScript code immediately. This also forces all the pending async JS code to be executed (flush).
         /// </summary>
         /// <param name="javaScriptToExecute">The JS code to execute.</param>
         /// <param name="commentForDebugging">Some optional comments to write to the log of JS calls.</param>
         /// <returns></returns>
-#if !BRIDGE
-        [JSIgnore]
-#endif
         internal static object ExecuteJavaScriptSync(string javaScriptToExecute, string commentForDebugging = null, bool noImpactOnPendingJSCode = false)
         {
             if (!noImpactOnPendingJSCode)
@@ -82,9 +66,6 @@ namespace CSHTML5.Internal
         /// </summary>
         /// <param name="javaScriptToExecute">The JS code to execute.</param>
         /// <param name="commentForDebugging">Some optional comments to write to the log of JS calls.</param>
-#if !BRIDGE
-        [JSIgnore]
-#endif
         internal static void ExecuteJavaScriptAsync(string javaScriptToExecute, string commentForDebugging = null)
         {
             if (EnableInteropLogging)
@@ -109,20 +90,6 @@ namespace CSHTML5.Internal
                     _pendingAsyncJavaScriptToExecute.Add(javaScriptToExecute);
                 }
 
-#if !CSHTML5NETSTANDARD
-                if (!_isDispatcherPending)
-                {
-                    _isDispatcherPending = true;
-
-                    INTERNAL_Simulator.WebControlDispatcherBeginInvoke((Action)(() =>
-                        {
-                            if (_isDispatcherPending) // We check again, because in the meantime the dispatcher can be cancelled in case of a forced execution of the pending JS code, for example when making a JavaScript execution that "returns a value".
-                            {
-                                ExecutePendingJavaScriptCode("BEGININVOKE COMPLETED");
-                            }
-                        }));
-                }
-#else
                 if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
                 {
 #if OPTIMIZATION_LOG
@@ -158,7 +125,7 @@ namespace CSHTML5.Internal
                             (Action)(() =>
                             {
 #if OPTIMIZATION_LOG
-                                    Console.WriteLine("[OPTIMIZATION] Executing setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
+                                Console.WriteLine("[OPTIMIZATION] Executing setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
                                 if (_isDispatcherPending) // We check again, because in the meantime the dispatcher can be cancelled in case of a forced execution of the pending JS code, for example when making a JavaScript execution that "returns a value".
                                 {
@@ -166,15 +133,10 @@ namespace CSHTML5.Internal
                                 }
                             })
                         );
-                        CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(
-                            javascript: $"setTimeout({action}, 1)",
-                            runAsynchronously: false,
-                            noImpactOnPendingJSCode: true
-                        );
+                        ExecuteJavaScriptSync($"setTimeout({action}, 1)", null, true);
                     }
                 }
-#endif
-                                }
+            }
             else
             {
 #if OPTIMIZATION_LOG
@@ -184,9 +146,6 @@ namespace CSHTML5.Internal
             }
         }
 
-#if !BRIDGE
-        [JSIgnore]
-#endif
         static void ExecutePendingJavaScriptCode(string reasonForPerformingTheCallNow)
         {
             string aggregatedPendingJavaScriptCode = ReadAndClearAggregatedPendingJavaScriptCode();
@@ -197,9 +156,6 @@ namespace CSHTML5.Internal
             }
         }
 
-#if !BRIDGE
-        [JSIgnore]
-#endif
         static string ReadAndClearAggregatedPendingJavaScriptCode()
         {
 #if OPTIMIZATION_LOG
@@ -215,24 +171,19 @@ namespace CSHTML5.Internal
                 if (_pendingAsyncJavaScriptToExecute.Count == 0)
                     return null;
 
-                string aggregatedPendingJavaScriptCode = string.Join("\r\n", _pendingAsyncJavaScriptToExecute.ToList());
+                _pendingAsyncJavaScriptToExecute.Add("");
+                string aggregatedPendingJavaScriptCode = string.Join(";\r\n", _pendingAsyncJavaScriptToExecute);
                 _pendingAsyncJavaScriptToExecute.Clear();
                 return aggregatedPendingJavaScriptCode;
             }
         }
 
-#if !BRIDGE
-        [JSIgnore]
-#endif
         static void AddCommentsForDebuggingIfAny(ref string javaScriptToExecute, string commentForDebugging)
         {
             if (commentForDebugging != null)
                 javaScriptToExecute = "//" + commentForDebugging + Environment.NewLine + javaScriptToExecute;
         }
 
-#if !BRIDGE
-        [JSIgnore]
-#endif
         static object PerformActualInteropCall(string javaScriptToExecute, string reasonForPerformingTheCallNow)
         {
             if (EnableInteropLogging)
@@ -246,7 +197,6 @@ namespace CSHTML5.Internal
 
             try
             {
-#if CSHTML5BLAZOR
                 if (EnableInteropLogging)
                 {
                     global::System.Diagnostics.Debug.WriteLine(javaScriptToExecute);
@@ -255,14 +205,10 @@ namespace CSHTML5.Internal
                 // OpenSilver Version has two distincts JavaScriptExecutionHandler:
                 // - DynamicJavaScriptExecutionHandler is a dynamic typed JavaScriptExecutionHandler setted by the Emulator  
                 // - JavaScriptExecutionHandler        is a static typed JavaScriptExecutionHandler used in the browser version
-                if (Interop.IsRunningInTheSimulator_WorkAround) // this is the JavaScriptHandler injected by the Emulator
+                if (OpenSilver.Interop.IsRunningInTheSimulator) // this is the JavaScriptHandler injected by the Emulator
                     return INTERNAL_Simulator.DynamicJavaScriptExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
                 else
                     return INTERNAL_Simulator.JavaScriptExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
-
-#else
-                return ((dynamic)INTERNAL_Simulator.JavaScriptExecutionHandler).ExecuteJavaScriptWithResult(javaScriptToExecute);
-#endif
             }
             catch (InvalidOperationException ex)
             {
@@ -276,7 +222,6 @@ namespace CSHTML5.Internal
             set { _disableAsyncJavaScriptExecution = value; }
         }
 
-#if CSHTML5NETSTANDARD
         /// <summary>
         /// Makes sure that, after the provided action has been executed, all the
         /// pending aysnc JavaScript calls that were made during that action will
@@ -310,7 +255,7 @@ namespace CSHTML5.Internal
                     _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false;
 
 #if OPTIMIZATION_LOG
-                Console.WriteLine("[OPTIMIZATION] Auto-flush");
+                    Console.WriteLine("[OPTIMIZATION] Auto-flush");
 #endif
                     // After the action has finished execution, let's flush all the pending JavaScript calls if any:
                     ExecutePendingJavaScriptCode("AUTO-FLUSH");
@@ -321,6 +266,5 @@ namespace CSHTML5.Internal
                 Application.Current.OnUnhandledException(e, false);
             } 
         }
-#endif
     }
 }

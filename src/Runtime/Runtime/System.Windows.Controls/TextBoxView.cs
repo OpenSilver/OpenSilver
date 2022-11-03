@@ -12,6 +12,8 @@
 \*====================================================================================*/
 
 using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
@@ -88,7 +90,7 @@ namespace Windows.UI.Xaml.Controls
 
             string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement);
             string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action<object>)TextBoxView_GotFocus);
-            OpenSilver.Interop.ExecuteJavaScript($"{sElement}.addEventListener('click', {sAction})");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.addEventListener('click', {sAction})");
 
             UpdateDomText(Host.Text);
         }
@@ -325,18 +327,17 @@ element.setAttribute(""data-maxlength"", ""{maxLength}"");");
 
         internal void OnIsReadOnlyChanged(bool isReadOnly)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && 
-                INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(_contentEditableDiv))
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv != null)
             {
                 string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
-                OpenSilver.Interop.ExecuteJavaScriptAsync(
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                     $"{sDiv}.setAttribute(\"contentEditable\", \"{(!isReadOnly).ToString().ToLower()}\");"
                 );
 
                 if (!IsRunningInJavaScript())
                 {
                     //--- SIMULATOR ONLY: ---
-                    INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)_contentEditableDiv).UniqueIdentifier}"");
 element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");");
                 }
@@ -357,27 +358,34 @@ element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
             }
 
             string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
-            var globalIndexes = OpenSilver.Interop.ExecuteJavaScript($@"
-(function(domElement){{
-var sel = window.getSelection();
-var globalIndexes = {{}}; //this will hold indexes of start and end and booleans that specify if each has been found.
-if(sel.rangeCount == 0)
-{{
-    globalIndexes.startIndex = 0; //apparently, we get 0 and not -1 when nothing is selected.
-    globalIndexes.endIndex = 0; //apparently, we get 0 and not -1 when nothing is selected.
-}}
-else
-{{
-    var range = sel.getRangeAt(0);
-    document.getRangeGlobalStartAndEndIndexes(domElement, true, 0, range, globalIndexes);
-}}
-return globalIndexes;
-}}({sDiv}))");
+            GlobalIndexes globalIndexes = JsonSerializer.Deserialize<GlobalIndexes>(
+                OpenSilver.Interop.ExecuteJavaScriptString(
+$@"(function(e){{
+ var s = window.getSelection();
+ var gi = {{}};
+ if (s.rangeCount == 0) {{ gi.startIndex = 0; gi.endIndex = 0; }} 
+ else {{ document.getRangeGlobalStartAndEndIndexes(e, true, 0, s.getRangeAt(0), gi); }}
+ return JSON.stringify(gi);
+}}({sDiv}))"));
 
-            string sGlobalIndexes = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(globalIndexes);
-            selectionStartIndex = CastToInt(OpenSilver.Interop.ExecuteJavaScript($"({sGlobalIndexes}.isStartFound ? {sGlobalIndexes}.startIndex : 0)")); //todo: if not "isStartFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
-            int selectionLastIndex = CastToInt(OpenSilver.Interop.ExecuteJavaScript($"({sGlobalIndexes}.isEndFound ? {sGlobalIndexes}.endIndex : ({sGlobalIndexes}.isStartFound ? {sGlobalIndexes}.startIndex : 0))")); //todo: if not "isEndFound", should we raise an exception? (eg. running "STAR" app in the Simulator and clicking the TextBox in the "Products and key performance measures" screen)
+            selectionStartIndex = globalIndexes.IsStartFound ? globalIndexes.StartIndex : 0;
+            int selectionLastIndex = globalIndexes.IsEndFound ? globalIndexes.EndIndex : (globalIndexes.IsStartFound ? globalIndexes.StartIndex : 0);
             selectionLength = selectionLastIndex - selectionStartIndex;
+        }
+
+        private struct GlobalIndexes
+        {
+            [JsonPropertyName("startIndex")]
+            public int StartIndex { get; set; }
+
+            [JsonPropertyName("endIndex")]
+            public int EndIndex { get; set; }
+
+            [JsonPropertyName("isStartFound")]
+            public bool IsStartFound { get; set; }
+
+            [JsonPropertyName("isEndFound")]
+            public bool IsEndFound { get; set; }
         }
 
         internal void NEW_SET_SELECTION(int startIndex, int endIndex)
@@ -405,9 +413,8 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
                 return 0;
             }
 
-            var result = OpenSilver.Interop.ExecuteJavaScript(@"document.getCaretPosition($0)", _contentEditableDiv);
-
-            return CastToInt(result);
+            return OpenSilver.Interop.ExecuteJavaScriptInt32(
+                $"document.getCaretPosition({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv)})");
         }
 
         private object AddContentEditableDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -902,32 +909,28 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
         private void TextBoxView_GotFocus(object e)
         {
             string sE = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e);
-            bool ignoreEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript($"document.checkForDivsThatAbsorbEvents({sE})"));
+            bool ignoreEvent = OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.checkForDivsThatAbsorbEvents({sE})");
             if (!ignoreEvent)
             {
                 if (_contentEditableDiv != null)
                 {
                     string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
-                    OpenSilver.Interop.ExecuteJavaScript($@"
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($@"
 if({sE}.target != {sDiv}) {{
-{sDiv}.focus()
-var range,selection;
-    if(document.createRange)
-    {{
-        range = document.createRange();
-        range.selectNodeContents({sDiv});
-        range.collapse(false);
-        selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }}
-    else if(document.selection)
-    {{
-        range = document.body.createTextRange();
-        range.moveToElementText({sDiv});
-        range.collapse(false);
-        range.select();
-    }}
+ {sDiv}.focus()
+ if (document.createRange) {{
+  let r = document.createRange();
+  r.selectNodeContents({sDiv});
+  r.collapse(false);
+  let s = window.getSelection();
+  s.removeAllRanges();
+  s.addRange(r);
+ }} else if (document.selection) {{
+  let r = document.body.createTextRange();
+  r.moveToElementText({sDiv});
+  r.collapse(false);
+  r.select();
+ }}
 }}");
                     // -- Firefox, Chrome, Opera, Safari, IE 9+
                     //Create a range (a range is a like the selection but invisible)
@@ -989,14 +992,6 @@ var range,selection;
                 default:
                     return null;
             }
-        }
-
-#if BRIDGE
-        [Bridge.Template("{value}")]
-#endif
-        private static int CastToInt(object value)
-        {
-            return Convert.ToInt32(value);
         }
 
 #if BRIDGE

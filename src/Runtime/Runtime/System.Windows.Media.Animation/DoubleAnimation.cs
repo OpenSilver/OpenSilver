@@ -183,25 +183,25 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
                         object cssValue = cssEquivalent.Value(target, to);
 
-                        object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
-                        string sNewObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(newObj);
                         string sCssValue = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
-                        if (AnimationHelpers.IsValueNull(from)) //todo: when using Bridge, I guess we would want to directly use "from == null" since it worked in the first place (I think).
+                        string fromToValues;
+                        if (!from.HasValue)
                         {
-                            foreach (string csspropertyName in cssEquivalent.Name)
-                            {
-                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewObj}[""{csspropertyName}""] = {sCssValue};");
-                            }
+                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"{name}:{sCssValue}")) + "}";
                         }
                         else
                         {
                             string sFrom = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(from);
-                            foreach (string csspropertyName in cssEquivalent.Name)
-                            {
-                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{sNewObj}[""{csspropertyName}""] = [{sCssValue}, {sFrom}];");
-                            }
+                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"{name}:[{sCssValue},{sFrom}]")) + "}";
                         }
-                        AnimationHelpers.CallVelocity(cssEquivalent.DomElement, Duration, easingFunction, visualStateGroupName, callbackForWhenfinished, newObj);
+
+                        AnimationHelpers.CallVelocity(
+                            cssEquivalent.DomElement,
+                            Duration,
+                            easingFunction,
+                            visualStateGroupName,
+                            callbackForWhenfinished,
+                            fromToValues);
                         target.DirtyVisualValue(dependencyProperty);
                     }
                 }

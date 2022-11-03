@@ -17,6 +17,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Markup;
+using CSHTML5;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -272,71 +274,49 @@ namespace Windows.UI.Xaml.Media.Animation
                             }; // Default value
                         }
                         object cssValue = cssEquivalent.Value(target, to);
-
-                        //INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-
-
-                        object newObj = CSHTML5.Interop.ExecuteJavaScriptAsync(@"new Object()");
-
-                        if (AnimationHelpers.IsValueNull(from)) //todo: when using Bridge, I guess we would want to directly use "from == null" since it worked in the first place (I think).
+                        string fromToValues;
+                        if (!from.HasValue)
                         {
-                            if (!(cssValue is Dictionary<string, object>))
+                            if (cssValue is Dictionary<string, object> cssValueAsDictionary)
                             {
-                                foreach (string csspropertyName in cssEquivalent.Name)
-                                {
-                                    //todo: check the note below once the clone will work properly (a value set through velocity is not set in c#, which makes the clone take the former value).
-                                    //Note: the test below is to avoid setting Background because Velocity cannot handle it,
-                                    //      which makes the element go transparent (no color) before then changing color with backgroundColor.
-                                    //      Therefore, we no longer go in the animation from the previous color to the new one but from no color to the new one
-                                    if (csspropertyName != "background") //todo: when we will be able to use velocity for linearGradientBrush, we will need another solution here.
-                                    {
-                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValue);
-                                    }
-                                }
+                                fromToValues = "{" +
+                                    string.Join(",", cssEquivalent.Name
+                                        .Where(name => name != "background")
+                                        .Select(name => $"{name}:{INTERNAL_InteropImplementation.GetVariableStringForJS(cssValueAsDictionary[name])}")) + "}";
                             }
                             else
                             {
-                                Dictionary<string, object> cssValueAsDictionary = (Dictionary<string, object>)cssValue;
-                                foreach (string csspropertyName in cssEquivalent.Name)
-                                {
-                                    //todo: check the note below once the clone will work properly (a value set through velocity is not set in c#, which makes the clone take the former value).
-                                    //Note: the test below is to avoid setting Background because Velocity cannot handle it,
-                                    //      which makes the element go transparent (no color) before then changing color with backgroundColor.
-                                    //      Therefore, we no longer go in the animation from the previous color to the new one but from no color to the new one
-                                    if (csspropertyName != "background") //todo: when we will be able to use velocity for linearGradientBrush, we will need another solution here.
-                                    {
-                                        CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = $2;", newObj, csspropertyName, cssValueAsDictionary[csspropertyName]);
-                                    }
-                                }
+                                string sCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
+                                fromToValues = "{" +
+                                    string.Join(",", cssEquivalent.Name
+                                        .Where(name => name != "background")
+                                        .Select(name => $"{name}:{sCssValue}")) + "}";
                             }
                         }
                         else
                         {
                             object fromCssValue = cssEquivalent.Value(target, from);
-                            foreach (string csspropertyName in cssEquivalent.Name)
-                            {
-                                //todo: check the note below once the clone will work properly (a value set through velocity is not set in c#, which makes the clone take the former value).
-                                //Note: the test below is to avoid setting Background because Velocity cannot handle it,
-                                //      which makes the element go transparent (no color) before then changing color with backgroundColor.
-                                //      Therefore, we no longer go in the animation from the previous color to the new one but from no color to the new one
-                                if (csspropertyName != "background") //todo: when we will be able to use velocity for linearGradientBrush, we will need another solution here.
-                                {
-                                    object currentCssValue = cssValue;
-                                    if (cssValue is Dictionary<string, object>)
+                            fromToValues = "{" +
+                                string.Join(",", cssEquivalent.Name
+                                    .Where(name => name != "background")
+                                    .Select(name =>
                                     {
-                                        currentCssValue = ((Dictionary<string, object>)cssValue)[csspropertyName];
-                                    }
-                                    object currentFromCssValue = fromCssValue;
-                                    if (fromCssValue is Dictionary<string, object>)
-                                    {
-                                        currentFromCssValue = ((Dictionary<string, object>)fromCssValue)[csspropertyName];
-                                    }
-                                    CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0[$1] = [$2, $3];", newObj, csspropertyName, currentCssValue, currentFromCssValue);
-                                }
-                            }
+                                        object currentCssValue = cssValue is Dictionary<string, object> d1 ? d1[name] : cssValue;
+                                        object currentFromCssValue = fromCssValue is Dictionary<string, object> d2 ? d2[name] : fromCssValue;
+                                        string sCurrentCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(currentCssValue);
+                                        string sCurrentFromCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(currentFromCssValue);
+                                        return $"{name}:[{sCurrentCssValue}, {sCurrentFromCssValue}]";
+                                    })) + "}";
                         }
 
-                        AnimationHelpers.CallVelocity(cssEquivalent.DomElement, duration, easingFunction, visualStateGroupName, callbackForWhenfinished, newObj);
+                        AnimationHelpers.CallVelocity(
+                            cssEquivalent.DomElement,
+                            duration,
+                            easingFunction,
+                            visualStateGroupName,
+                            callbackForWhenfinished,
+                            fromToValues);
+                        
                         target.DirtyVisualValue(dependencyProperty);
                         return true;
                     }

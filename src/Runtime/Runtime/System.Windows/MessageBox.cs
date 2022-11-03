@@ -137,11 +137,11 @@ namespace Windows.UI.Xaml
                 bool isOK = true;
                 if (button == MessageBoxButton.OK)
                 {
-                    CSHTML5.Interop.ExecuteJavaScript("alert($0)", messageIncludingTitleIfAny);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"alert({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
                 }
                 else if (button == MessageBoxButton.OKCancel)
                 {
-                    isOK = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("confirm($0)", messageIncludingTitleIfAny));
+                    isOK = OpenSilver.Interop.ExecuteJavaScriptBoolean($"confirm({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(messageIncludingTitleIfAny)})");
                 }
                 else
                 {

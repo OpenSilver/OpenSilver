@@ -117,7 +117,7 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
             // Create a DIV for the PopupRoot in the DOM tree:
             //--------------------------------------
 
-            CSHTML5.Interop.ExecuteJavaScriptFastAsync(
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
 $@"
 var popupRoot = document.createElement('div');
 popupRoot.setAttribute('id', ""{uniquePopupRootIdentifier}"");
@@ -132,16 +132,7 @@ popupRoot.style.overflowY = 'hidden';
             // Get the PopupRoot DIV:
             //--------------------------------------
 
-            object popupRootDiv;
-
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (Interop.IsRunningInTheSimulator)
-#endif
-                popupRootDiv = new INTERNAL_HtmlDomElementReference(uniquePopupRootIdentifier, null);
-            else
-                popupRootDiv = Interop.ExecuteJavaScriptAsync($@"document.getElementByIdSafe(""{uniquePopupRootIdentifier}"")");
+            object popupRootDiv = new INTERNAL_HtmlDomElementReference(uniquePopupRootIdentifier, null);
 
             //--------------------------------------
             // Create the C# class that points to the PopupRoot DIV:

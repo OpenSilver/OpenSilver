@@ -47,13 +47,9 @@ namespace CSHTML5.Native.Html.Printing
         /// </summary>
         public static void Print()
         {
-#if CSHTML5BLAZOR
-            if (!Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (!Interop.IsRunningInTheSimulator)
-#endif
+            if (!OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                Interop.ExecuteJavaScript("window.print()");
+                OpenSilver.Interop.ExecuteJavaScriptVoid("window.print()");
             }
             else
             {
@@ -79,10 +75,12 @@ namespace CSHTML5.Native.Html.Printing
                     {
                         // Remove the class "section-to-print" from the previous print area:
                         if (CurrentPrintArea != null && CurrentPrintArea._isLoaded)
-                            Interop.ExecuteJavaScript(@"$0.classList.remove(""section-to-print"")", CurrentPrintArea.INTERNAL_OuterDomElement);
+                            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                                $"{INTERNAL_InteropImplementation.GetVariableStringForJS(CurrentPrintArea.INTERNAL_OuterDomElement)}.classList.remove(\"section-to-print\")");
 
                         // Add the class "section-to-print" to the new print area: (credits: https://stackoverflow.com/questions/468881/print-div-id-printarea-div-only )
-                        Interop.ExecuteJavaScript(@"$0.classList.add(""section-to-print"")", element.INTERNAL_OuterDomElement);
+                        OpenSilver.Interop.ExecuteJavaScriptVoid(
+                            $"{INTERNAL_InteropImplementation.GetVariableStringForJS(element.INTERNAL_OuterDomElement)}.classList.add(\"section-to-print\")");
 
                         // Remember the new print area:
                         CurrentPrintArea = element;

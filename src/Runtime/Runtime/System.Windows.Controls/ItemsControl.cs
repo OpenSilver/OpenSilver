@@ -508,9 +508,8 @@ namespace Windows.UI.Xaml.Controls
                     if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
                         && container.INTERNAL_OuterDomElement != null)
                     {
-                        OpenSilver.Interop.ExecuteJavaScript(
-                            "$0.scrollIntoView({ block: 'nearest'})",
-                            container.INTERNAL_OuterDomElement);
+                        OpenSilver.Interop.ExecuteJavaScriptVoid(
+                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(container.INTERNAL_OuterDomElement)}.scrollIntoView({{ block: 'nearest' }})");
                     }
                 }
             }

@@ -25,15 +25,7 @@ using OpenSilver.Internal;
 namespace CSHTML5.Internal
 {
     // Note: this class is intented to be used by the Simulator only, not when compiled to JavaScript.
-#if BRIDGE
-    [Bridge.External] //we exclude this class
-#endif
-
-#if CSHTML5NETSTANDARD
     public class INTERNAL_Html2dContextReference : DynamicObject
-#else
-    internal class INTERNAL_Html2dContextReference : DynamicObject
-#endif
     {
         private readonly string _id;
 
@@ -47,74 +39,36 @@ namespace CSHTML5.Internal
         public static INTERNAL_Html2dContextReference GetInstance(string elementId)
             => new INTERNAL_Html2dContextReference(elementId);
 
-        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
-        {
-            string methodName = binder.Name;
-            result = InvokeMethod(methodName, args);
-            return true;
-        }
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result) => throw new NotSupportedException();
 
-        public override bool TrySetMember(SetMemberBinder binder, object value)
-        {
-            string propertyName = binder.Name;
-            string propertyValue = (string)value;
-            SetPropertyValue(propertyName, propertyValue);
-            return true;
-        }
+        public override bool TrySetMember(SetMemberBinder binder, object value) => throw new NotSupportedException();
 
         void SetPropertyValue(string propertyName, string propertyValue)
-        {
-            string javaScriptCodeToExecute = $"document.set2dContextProperty(\"{_id}\",\"{propertyName}\",\"{propertyValue}\")";
-            //INTERNAL_SimulatorPerformanceOptimizer.QueueJavaScriptCode(javaScriptCodeToExecute);
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
-        }
+            => OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.set2dContextProperty(\"{_id}\",\"{propertyName}\",\"{propertyValue}\");");
 
-        object InvokeMethod(string methodName, object[] args)
-        {
-            string argsString = string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x)));
-            return InvokeMethodImpl(methodName, argsString);
-        }
+        void InvokeMethod(string methodName, object[] args)
+            => InvokeMethodImpl(methodName, string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x))));
 
-        object InvokeMethod(string methodName)
-        {
-            return InvokeMethodImpl(methodName, string.Empty);
-        }
+        void InvokeMethod(string methodName) => InvokeMethodImpl(methodName, string.Empty);
 
-        object InvokeMethod(string methodName, double arg0)
-        {
-            string args = $"{arg0.ToInvariantString()}";
-            return InvokeMethodImpl(methodName, args);
-        }
+        void InvokeMethod(string methodName, double arg0) => InvokeMethodImpl(methodName, arg0.ToInvariantString());
 
-        object InvokeMethod(string methodName, double arg0, double arg1)
-        {
-            string args = $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}";
-            return InvokeMethodImpl(methodName, args);
-        }
+        void InvokeMethod(string methodName, double arg0, double arg1)
+            => InvokeMethodImpl(methodName, $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}");
 
-        object InvokeMethod(string methodName, double arg0, double arg1, double arg2, double arg3)
-        {
-            string args = $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}, {arg2.ToInvariantString()}, {arg3.ToInvariantString()}";
-            return InvokeMethodImpl(methodName, args);
-        }
+        void InvokeMethod(string methodName, double arg0, double arg1, double arg2, double arg3)
+            => InvokeMethodImpl(methodName, $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}, {arg2.ToInvariantString()}, {arg3.ToInvariantString()}");
 
-        object InvokeMethod(string methodName, double arg0, double arg1, double arg2, double arg3, double arg4, double arg5)
-        {
-            string args = $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}, {arg2.ToInvariantString()}, {arg3.ToInvariantString()}, {arg4.ToInvariantString()}, {arg5.ToInvariantString()}";
-            return InvokeMethodImpl(methodName, args);
-        }
+        void InvokeMethod(string methodName, double arg0, double arg1, double arg2, double arg3, double arg4, double arg5)
+            => InvokeMethodImpl(methodName, $"{arg0.ToInvariantString()}, {arg1.ToInvariantString()}, {arg2.ToInvariantString()}, {arg3.ToInvariantString()}, {arg4.ToInvariantString()}, {arg5.ToInvariantString()}");
 
-        object InvokeMethod(string methodName, double[] args)
-        {
-            string argsString = string.Join(", ", args.Select(x => x.ToInvariantString()));
-            return InvokeMethodImpl(methodName, argsString);
-        }
+        void InvokeMethod(string methodName, double[] args)
+            => InvokeMethodImpl(methodName, string.Join(", ", args.Select(x => x.ToInvariantString())));
 
-        object InvokeMethodImpl(string methodName, string args)
-        {
-            return OpenSilver.Interop.ExecuteJavaScriptAsync($"document.invoke2dContextMethod(\"{_id}\", \"{methodName}\", \"{args}\")");
-        }
+        void InvokeMethodImpl(string methodName, string args)
+            => OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.invoke2dContextMethod(\"{_id}\", \"{methodName}\", \"{args}\");");
 
+#pragma warning disable IDE1006 // Naming Styles
         public string fillStyle { set { SetPropertyValue("fillStyle", value); } }
         public string strokeStyle { set { SetPropertyValue("strokeStyle", value); } }
         public string lineWidth { set { SetPropertyValue("lineWidth", value); } }
@@ -145,5 +99,6 @@ namespace CSHTML5.Internal
         public void lineTo(double x, double y) { InvokeMethod("lineTo", x, y); }
         public void bezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y, double x, double y) { InvokeMethod("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y); }
         public void quadraticCurveTo(double cpx, double cpy, double x, double y) { InvokeMethod("quadraticCurveTo", cpx, cpy, x, y); }
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

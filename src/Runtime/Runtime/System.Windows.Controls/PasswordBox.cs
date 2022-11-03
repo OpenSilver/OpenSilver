@@ -257,7 +257,14 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public void SelectAll()
         {
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.setSelectionRange(0, $0.value.length)", this.INTERNAL_InnerDomElement);
+            if (INTERNAL_InnerDomElement is null)
+            {
+                return;
+            }
+
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_InnerDomElement);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"{sDiv}.setSelectionRange(0, {sDiv}.value.length)");
         }
 
 #region Not supported yet

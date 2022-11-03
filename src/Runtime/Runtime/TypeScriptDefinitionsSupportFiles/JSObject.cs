@@ -29,8 +29,8 @@ namespace TypeScriptDefinitionsSupport
 
     public class JSObject : IJSObject
     {
-        public static readonly JSObject Undefined = new JSObject(Interop.ExecuteJavaScript("undefined"));
-        public static readonly JSObject Null = new JSObject(Interop.ExecuteJavaScript("null"));
+        public static readonly JSObject Undefined = new JSObject(OpenSilver.Interop.ExecuteJavaScript("undefined"));
+        public static readonly JSObject Null = new JSObject(OpenSilver.Interop.ExecuteJavaScript("null"));
 
         public object UnderlyingJSInstance { get; set; }
 
@@ -38,7 +38,7 @@ namespace TypeScriptDefinitionsSupport
         {
             // Use new Object() instead of {} syntax, because the latter
             // is interpreted as undefined in the Simulator
-            this.UnderlyingJSInstance = Interop.ExecuteJavaScript("new Object()");
+            this.UnderlyingJSInstance = OpenSilver.Interop.ExecuteJavaScript("new Object()");
         }
 
         public JSObject(object jsObj)

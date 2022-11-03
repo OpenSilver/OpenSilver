@@ -133,7 +133,7 @@ namespace OpenSilver.Internal
                     _resizeSensor = null;
 
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
-                    OpenSilver.Interop.ExecuteJavaScript($"{sSensor}.detach({sElement})");
+                    Interop.ExecuteJavaScriptVoid($"{sSensor}.detach({sElement})");
                 }
             }
         }
@@ -170,7 +170,7 @@ namespace OpenSilver.Internal
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
                     string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(new Action<string>((string arg) => callback(ParseSize(arg))));
 
-                    OpenSilver.Interop.ExecuteJavaScript($"{sReference}.observe({sElement}, {sAction})");
+                    Interop.ExecuteJavaScriptVoid($"{sReference}.observe({sElement}, {sAction})");
                 }
             }
 
@@ -185,7 +185,7 @@ namespace OpenSilver.Internal
 
                     string sReference = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_observerJsReference);
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
-                    OpenSilver.Interop.ExecuteJavaScript($"{sReference}.unobserve({sElement})");
+                    Interop.ExecuteJavaScriptVoid($"{sReference}.unobserve({sElement})");
                 }
             }
 
