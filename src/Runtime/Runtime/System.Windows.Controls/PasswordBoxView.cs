@@ -26,6 +26,7 @@ namespace Windows.UI.Xaml.Controls
     {
         private object _passwordInputField;
         private bool _isUpdatingDOM;
+        private JavascriptCallback _jsCallbackOnClicked;
 
         internal PasswordBoxView(PasswordBox host)
         {
@@ -35,6 +36,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             Host = host;
+            Host.Unloaded += (s, e) => DisposeJsCallbacks();
         }
 
         internal PasswordBox Host { get; }
@@ -76,9 +78,12 @@ namespace Windows.UI.Xaml.Controls
             // the focus will be redirected to the <input>, unless the click was on an element that
             // absorbs pointer events.
 
-            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-            string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action<object>)PasswordBox_GotFocus);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.addEventListener('click', {sCallback})");
+            DisposeJsCallbacks();
+            _jsCallbackOnClicked = JavascriptCallback.Create((Action<object>)PasswordBox_GotFocus);
+
+            var sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            var sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsCallbackOnClicked);
+            OpenSilver.Interop.ExecuteJavaScript($"{sDiv}.addEventListener('click', {sCallback})");
 
             UpdateDOMPassword(Host.Password);
         }
@@ -255,6 +260,12 @@ namespace Windows.UI.Xaml.Controls
                         $"if ({sEventArg}.target != {sInput}) {{ {sInput}.focus(); }}");
                 }
             }
+        }
+
+        private void DisposeJsCallbacks()
+        {
+            _jsCallbackOnClicked?.Dispose();
+            _jsCallbackOnClicked = null;
         }
     }
 }
