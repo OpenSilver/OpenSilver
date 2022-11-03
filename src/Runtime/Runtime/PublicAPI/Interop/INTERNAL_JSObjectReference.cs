@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 *
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,21 +11,10 @@
 *
 \*====================================================================================*/
 
+using System;
+using System.Text.Json;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-
-#if BRIDGE
-using Bridge;
-using DotNetBrowser;
-#else
-using JSIL.Meta;
-#endif
-
-using System;
-
-#if OPENSILVER
-using System.Text.Json;
-#endif
 
 namespace CSHTML5.Types
 {
@@ -36,7 +24,7 @@ namespace CSHTML5.Types
 
         string IJavaScriptConvertible.ToJavaScriptString()
         {
-            
+
             if (IsArray)
             {
                 return $"document.jsObjRef[\"{ReferenceId}\"][{_arrayIndex}]";
@@ -94,62 +82,64 @@ namespace CSHTML5.Types
             INTERNAL_HtmlDomManager.ExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
         }
 
-#if BRIDGE
-        [Bridge.Template("null")]
-#endif
-        internal static object CastFromJsValue(object obj)
+        public object GetActualValue()
         {
-#if OPENSILVER
-            if (!Interop.IsRunningInTheSimulator_WorkAround)
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
-                if (obj != null && (obj is string || obj.GetType().IsPrimitive))
-                {
-                    return obj;
-                }
-
-                JsonElement jsonElement = (JsonElement)obj;
-                object res;
-                switch (jsonElement.ValueKind)
-                {
-                    case JsonValueKind.Object:
-                    case JsonValueKind.Array:
-                        res = obj;
-                        break;
-                    case JsonValueKind.String:
-                        res = jsonElement.GetString();
-                        break;
-                    case JsonValueKind.Number:
-                        res = jsonElement.GetSingle();
-                        break;
-                    case JsonValueKind.True:
-                    case JsonValueKind.False:
-                        res = jsonElement.GetBoolean();
-                        break;
-                    case JsonValueKind.Undefined:
-                    case JsonValueKind.Null:
-                        res = null;
-                        break;
-                    default:
-                        res = null;
-                        break;
-                }
-                return res;
+                return GetActualValueSimulator();
             }
             else
-#endif
             {
-                return DotNetForHtml5.Core.INTERNAL_Simulator.ConvertBrowserResult(obj);
+                return GetActualValueWasm();
             }
         }
 
-#if BRIDGE
-        [External] //we exclude this method
-#else
-        [JSReplacement("null")]
-#endif
-        public object GetActualValue()
+        private object GetActualValueWasm()
         {
-#if !BUILDINGDOCUMENTATION // We don't have the references to the "DotNetBrowser" web browser control when building the documentation.
+            static object GetValueFromJsonElement(JsonElement jsonElement)
+            {
+                return jsonElement.ValueKind switch
+                {
+                    JsonValueKind.Object or JsonValueKind.Array => jsonElement,
+                    JsonValueKind.String => jsonElement.GetString(),
+                    JsonValueKind.Number => jsonElement.GetSingle(),
+                    JsonValueKind.True or JsonValueKind.False => jsonElement.GetBoolean(),
+                    JsonValueKind.Undefined or JsonValueKind.Null or _ => null,
+                };
+            }
+
+            static object GetValueFromObject(object o)
+            {
+                if (o is null)
+                {
+                    return null;
+                }
+
+                if (o is string || o.GetType().IsPrimitive)
+                {
+                    return o;
+                }
+
+                return GetValueFromJsonElement((JsonElement)o);
+            }
+
+            if (IsArray)
+            {
+                return Value switch
+                {
+                    object[] array => GetValueFromObject(array[ArrayIndex]),
+                    JsonElement jsonElement => GetValueFromJsonElement(jsonElement.GetProperty(_arrayIndex.ToString())),
+                    _ => throw new InvalidOperationException("Value is marked as array but is neither an object[], nor a JsonElement. ReferenceId: " + (ReferenceId ?? "n/a")),
+                };
+            }
+            else
+            {
+                return GetValueFromObject(Value);
+            }
+        }
+
+        private object GetActualValueSimulator()
+        {
             object result;
 
             if (IsArray)
@@ -163,13 +153,13 @@ namespace CSHTML5.Types
                 {
                     result = array[ArrayIndex];
                 }
-                else if(Value != null && (fullName == "DotNetBrowser.JSObject" || fullName == "System.Text.Json.JsonElement"))
+                else if (Value != null && (fullName == "DotNetBrowser.JSObject"))
                 {
                     result = ((dynamic)Value).GetProperty(ArrayIndex.ToString());
                 }
                 else
                 {
-                    throw new InvalidOperationException("Value is marked as array but is neither an object[], nor a JSArray, nor a JSObject, nor a JsonElement. ReferenceId: " + (this.ReferenceId ?? "n/a"));
+                    throw new InvalidOperationException("Value is marked as array but is neither an object[], nor a JSArray, nor a JSObject. ReferenceId: " + (this.ReferenceId ?? "n/a"));
                 }
             }
             else
@@ -193,217 +183,66 @@ namespace CSHTML5.Types
             {
                 return ((dynamic)result).GetString();
             }
-            else
-            {
-                return CastFromJsValue(result);
-            }
-#endif
+
+            return DotNetForHtml5.Core.INTERNAL_Simulator.ConvertBrowserResult(result);
         }
 
         public bool IsUndefined()
         {
             var actualValue = GetActualValue();
-#if CSHTML5NETSTANDARD
-            if (Interop.IsRunningInTheSimulator_WorkAround)
-                return (actualValue == null || actualValue.GetType().FullName == "DotNetBrowser.JSUndefined");
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+            {
+                return actualValue == null || actualValue.GetType().FullName == "DotNetBrowser.JSUndefined";
+            }
             else
+            {
                 return actualValue == null || actualValue.ToString() == "[UNDEFINED]";
-#else
-            if (actualValue ==  null || !(actualValue is JSValue))
-                return false;
-            return ((JSValue)actualValue).IsUndefined();
-#endif
+            }
         }
 
-        public bool IsNull()
-        {
-            var actualValue = GetActualValue();
-#if CSHTML5NETSTANDARD
-            return actualValue == null;
-#else
-            if (actualValue == null)
-                return true;
-            if (!(actualValue is JSValue))
-                return false;
-            return ((JSValue)actualValue).IsNull();
-#endif
-        }
+        public bool IsNull() => GetActualValue() == null;
 
+        public override string ToString() => ToString(null);
 
-        //  Note: in the methods below, we use "Convert.*" rather than  casting, in order to prevent issues related to unboxing values. cf. http://stackoverflow.com/questions/4113056/whats-wrong-with-casting-0-0-to-double
+        public static explicit operator string(INTERNAL_JSObjectReference input) => input.ToString(null);
+        public static explicit operator bool(INTERNAL_JSObjectReference input) => input.ToBoolean(null);
+        public static explicit operator byte(INTERNAL_JSObjectReference input) => input.ToByte(null);
+        public static explicit operator DateTime(INTERNAL_JSObjectReference input) => input.ToDateTime(null);
+        public static explicit operator decimal(INTERNAL_JSObjectReference input) => input.ToDecimal(null);
+        public static explicit operator double(INTERNAL_JSObjectReference input) => input.ToDouble(null);
+        public static explicit operator short(INTERNAL_JSObjectReference input) => input.ToInt16(null);
+        public static explicit operator int(INTERNAL_JSObjectReference input) => input.ToInt32(null);
+        public static explicit operator long(INTERNAL_JSObjectReference input) => input.ToInt64(null);
+        public static explicit operator sbyte(INTERNAL_JSObjectReference input) => input.ToSByte(null);
+        public static explicit operator float(INTERNAL_JSObjectReference input) => input.ToSingle(null);
+        public static explicit operator ushort(INTERNAL_JSObjectReference input) => input.ToUInt16(null);
+        public static explicit operator uint(INTERNAL_JSObjectReference input) => input.ToUInt32(null);
+        public static explicit operator ulong(INTERNAL_JSObjectReference input) => input.ToUInt64(null);
 
-        public static explicit operator string(INTERNAL_JSObjectReference input)
-        {
-            return input.GetActualValue().ToString();
-        }
-
-        public static explicit operator bool(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToBoolean(input.GetActualValue());
-        }
-
-        public static explicit operator byte(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToByte(input.GetActualValue());
-        }
-
-        public static explicit operator DateTime(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToDateTime(input.GetActualValue());
-        }
-
-        public static explicit operator decimal(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToDecimal(input.GetActualValue());
-        }
-
-
-        public static explicit operator double(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToDouble(input.GetActualValue());
-        }
-
-        public static explicit operator short(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToInt16(input.GetActualValue());
-        }
-
-        public static explicit operator int(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToInt32(input.GetActualValue());
-        }
-
-        public static explicit operator long(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToInt64(input.GetActualValue());
-        }
-
-        public static explicit operator sbyte(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToSByte(input.GetActualValue());
-        }
-
-        public static explicit operator float(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToSingle(input.GetActualValue());
-        }
-
-        public static explicit operator ushort(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToUInt16(input.GetActualValue());
-        }
-
-        public static explicit operator uint(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToUInt32(input.GetActualValue());
-        }
-
-        public static explicit operator ulong(INTERNAL_JSObjectReference input)
-        {
-            return Convert.ToUInt64(input.GetActualValue());
-        }
-
-
-        public override string ToString()
-        {
-            object actualValue = this.GetActualValue();
-            return (actualValue != null ? actualValue.ToString() : null);
-        }
-
-#region IConvertible implementation
-
-        //  Note: in the methods below, we use "Convert.*" rather than  casting, in order to prevent issues related to unboxing values. cf. http://stackoverflow.com/questions/4113056/whats-wrong-with-casting-0-0-to-double
-
-        public TypeCode GetTypeCode()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool ToBoolean(IFormatProvider provider)
-        {
-            return Convert.ToBoolean(this.GetActualValue());
-        }
-
-        public byte ToByte(IFormatProvider provider)
-        {
-            return Convert.ToByte(this.GetActualValue());
-        }
-
-        public char ToChar(IFormatProvider provider)
-        {
-            return Convert.ToChar(this.GetActualValue());
-        }
-
-        public DateTime ToDateTime(IFormatProvider provider)
-        {
-            return Convert.ToDateTime(this.GetActualValue());
-        }
-
-        public decimal ToDecimal(IFormatProvider provider)
-        {
-            return Convert.ToDecimal(this.GetActualValue());
-        }
-
-        public double ToDouble(IFormatProvider provider)
-        {
-            return Convert.ToDouble(this.GetActualValue());
-        }
-
-        public short ToInt16(IFormatProvider provider)
-        {
-            return Convert.ToInt16(this.GetActualValue());
-        }
-
-        public int ToInt32(IFormatProvider provider)
-        {
-            return Convert.ToInt32(this.GetActualValue());
-        }
-
-        public long ToInt64(IFormatProvider provider)
-        {
-            return Convert.ToInt64(this.GetActualValue());
-        }
-
-        public sbyte ToSByte(IFormatProvider provider)
-        {
-            return Convert.ToSByte(this.GetActualValue());
-        }
-
-        public float ToSingle(IFormatProvider provider)
-        {
-            return Convert.ToSingle(this.GetActualValue());
-        }
-
-        public ushort ToUInt16(IFormatProvider provider)
-        {
-            return Convert.ToUInt16(this.GetActualValue());
-        }
-
-        public uint ToUInt32(IFormatProvider provider)
-        {
-            return Convert.ToUInt32(this.GetActualValue());
-        }
-
-        public ulong ToUInt64(IFormatProvider provider)
-        {
-            return Convert.ToUInt64(this.GetActualValue());
-        }
-
-        public string ToString(IFormatProvider provider)
-        {
-            object actualValue = this.GetActualValue();
-            return (actualValue != null ? actualValue.ToString() : null);
-        }
-
+        public TypeCode GetTypeCode() => throw new NotImplementedException();
+        public bool ToBoolean(IFormatProvider provider) => Convert.ToBoolean(GetActualValue());
+        public byte ToByte(IFormatProvider provider) => Convert.ToByte(GetActualValue());
+        public char ToChar(IFormatProvider provider) => Convert.ToChar(GetActualValue());
+        public DateTime ToDateTime(IFormatProvider provider) => Convert.ToDateTime(GetActualValue());
+        public decimal ToDecimal(IFormatProvider provider) => Convert.ToDecimal(GetActualValue());
+        public double ToDouble(IFormatProvider provider) => Convert.ToDouble(GetActualValue());
+        public short ToInt16(IFormatProvider provider) => Convert.ToInt16(GetActualValue());
+        public int ToInt32(IFormatProvider provider) => Convert.ToInt32(GetActualValue());
+        public long ToInt64(IFormatProvider provider) => Convert.ToInt64(GetActualValue());
+        public sbyte ToSByte(IFormatProvider provider) => Convert.ToSByte(GetActualValue());
+        public float ToSingle(IFormatProvider provider) => Convert.ToSingle(GetActualValue());
+        public ushort ToUInt16(IFormatProvider provider) => Convert.ToUInt16(GetActualValue());
+        public uint ToUInt32(IFormatProvider provider) => Convert.ToUInt32(GetActualValue());
+        public ulong ToUInt64(IFormatProvider provider) => Convert.ToUInt64(GetActualValue());
+        public string ToString(IFormatProvider provider) => GetActualValue()?.ToString();
         public object ToType(Type conversionType, IFormatProvider provider)
         {
             if (conversionType == typeof(Guid))
             {
-                return Guid.Parse(GetActualValue().ToString());
+                return Guid.Parse(ToString(null));
             }
 
             throw new NotImplementedException();
         }
-#endregion
     }
 }
