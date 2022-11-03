@@ -50,7 +50,7 @@ namespace Windows.UI.Xaml.Controls
 
         static readonly List<string> SupportedVideoTypes = new List<string>() { "mp4", "ogv", "webm", "3gp" }; // IMPORTANT: if you change this list, remember to also change the error messages in this class.
         static readonly List<string> SupportedAudioTypes = new List<string>() { "mp3", "ogg" };  // IMPORTANT: if you change this list, remember to also change the error messages in this class. //todo: not sure if ogg is actually only for audio or not. If not, find a way to know which one it currently is.
-        dynamic _mediaElement = null;
+        object _mediaElement = null;
         dynamic _mediaElement_ForAudioOnly_ForSimulatorOnly = null;
 
         string _nameOfAssemblyThatSetTheSourceUri; // Useful to convert relative URI to absolute URI.
@@ -324,14 +324,14 @@ namespace Windows.UI.Xaml.Controls
                     }
 
                     // Update the "src" property of the <video> or <audio> tag
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(control._mediaElement, "src", valueForHtml5SourceProperty, forceSimulatorExecuteImmediately: true);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(control._mediaElement, "src", valueForHtml5SourceProperty, true);
                 }
                 else
                 {
                     if (control._mediaElement != null)
                     {
                         // Remove previous video/audio if any:
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(control._mediaElement, "src", "", forceSimulatorExecuteImmediately: true);
+                        INTERNAL_HtmlDomManager.SetDomElementAttribute(control._mediaElement, "src", "");
                     }
                 }
             }

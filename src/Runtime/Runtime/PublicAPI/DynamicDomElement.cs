@@ -53,7 +53,7 @@ public static partial class CSharpXamlForHtml5
 #if !BRIDGE
                 public override bool TrySetMember(SetMemberBinder binder, object value)
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_domElementRef, binder.Name, value, forceSimulatorExecuteImmediately: true);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_domElementRef, binder.Name, value);
                     return true;
                 }
 

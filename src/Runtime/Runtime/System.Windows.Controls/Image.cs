@@ -164,7 +164,7 @@ namespace Windows.UI.Xaml.Controls
                 var imageSrc = await Source.GetDataStringAsync();
                 if (!string.IsNullOrEmpty(imageSrc))
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc, true);
                     //set the width and height to "inherit" so the image takes up the size defined for it (and applied to _imageDiv's parent):
                     OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = 'inherit'; {sImageDiv}.style.height = 'inherit'");
                 }
@@ -172,7 +172,7 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 //If Source == null we show empty image to prevent broken image icon
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", TransparentGifOnePixel);
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", TransparentGifOnePixel, true);
 
                 //Set css width and height values to 0 so we don't use space for an image that should not take any. Note: if the size is specifically set in the Xaml, it will still apply on a parent dom element so it won't change the appearance.
                 OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = ''; {sImageDiv}.style.height = ''");

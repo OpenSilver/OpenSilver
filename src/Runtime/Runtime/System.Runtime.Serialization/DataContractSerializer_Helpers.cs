@@ -221,10 +221,7 @@ namespace System.Runtime.Serialization
                         //we found an unused prefix:
                         //we add the prefix definition to the XElement:
                         element.SetAttributeValue(XNamespace.Get(DataContractSerializer_Helpers.XMLNS_NAMESPACE).GetName(prefix), namespaceName);
-                        if (INTERNAL_HtmlDomManager.IsInternetExplorer()) //this "if" is so that the prefix is not removed from the string version of the xml by IE when calling XNode.ToString().
-                        {
-                            element.SetAttributeValue(XNamespace.Get(namespaceName).GetName(prefix + ":" + ATTRIBUTE_TO_REMOVE_FROM_XMLSERIALIZATION_NAME), ATTRIBUTE_TO_REMOVE_FROM_XMLSERIALIZATION_VALUE);
-                        }
+
                         //and we return the prefix so the calling method can use it.
                         return prefix;
                     }

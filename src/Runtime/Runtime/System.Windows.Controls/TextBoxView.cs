@@ -428,12 +428,6 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
             object contentEditableDiv;
             var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", middleDiv, this, out contentEditableDiv);
             _contentEditableDiv = contentEditableDiv;
-            if (INTERNAL_HtmlDomManager.IsInternetExplorer())
-            {
-                //set the class to remove margins on <p> inside the contentEditableDiv
-                string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(contentEditableDiv);
-                OpenSilver.Interop.ExecuteJavaScript(@"{sDiv}.classList.add(""ie_set_p_margins_to_zero"")");
-            }
 
             contentEditableDivStyle.width = "100%";
             contentEditableDivStyle.height = "100%";
@@ -460,13 +454,6 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
 
             contentEditableDivStyle.minWidth = "14px";
             contentEditableDivStyle.minHeight = (Math.Floor(this.Host.FontSize * 1.5 * 1000) / 1000).ToInvariantString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most. //Note: setting "minHeight" is for FireFox only, because other browsers don't seem to need it. The "1.5" factor is here to ensure that the resulting Height is the same as that of the PasswordBox.
-
-            // Fix for Internet Explorer: when pressing Enter in the ContentEditable div, IE will create a new paragraph, which results in graphical issues to the distance between paragraphs. To fix this issue, we put an empty DIV inside by default. When IE detects that there are DIVs inside, it adds a new DIV instead of creating a new paragraph when the user presses Enter.
-            if (INTERNAL_HtmlDomManager.IsInternetExplorer())
-            {
-                object divToImproveIELineBreaks;
-                var divToImproveIELineBreaksStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", contentEditableDiv, this, out divToImproveIELineBreaks);
-            }
 
             domElementWhereToPlaceChildren = contentEditableDiv;
 

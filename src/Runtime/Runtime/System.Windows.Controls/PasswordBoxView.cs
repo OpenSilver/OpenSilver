@@ -131,7 +131,7 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.width = "100%";
             passwordFieldStyle.height = "100%";
 
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password", forceSimulatorExecuteImmediately: true);
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password");
 
             //-----------------------
             // Prepare to raise the "TextChanged" event and to update the value of the "Text" property when the DOM text changes:

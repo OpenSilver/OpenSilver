@@ -871,7 +871,7 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementToEnableOrDisable, "disabled", true, forceSimulatorExecuteImmediately: true);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementToEnableOrDisable, "disabled", "true");
                 }
             }
         }
