@@ -127,7 +127,7 @@ namespace TypeScriptDefToCSharp.Model
                 jsObj.Append(classPath);
             // Else call with $0 ($0 will be this.UnderlyingJSInstance here)
             else
-                jsObj.Append("$0.");
+                jsObj.Append(string.IsNullOrWhiteSpace(this.Name) ? "$0" : "$0.");
             jsObj.Append(this.Name)
                  .Append("(");
 
