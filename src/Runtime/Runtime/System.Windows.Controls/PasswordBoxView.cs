@@ -36,7 +36,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             Host = host;
-            Host.Unloaded += (s, e) => DisposeJsCallbacks();
+            Unloaded += (s, e) => DisposeJsCallbacks();
         }
 
         internal PasswordBox Host { get; }
