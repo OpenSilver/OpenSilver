@@ -67,11 +67,9 @@ namespace Runtime.OpenSilver.Tests
                     }
 
                     // Mocks INTERNAL_GridHelpers isCSSGridSupported() and isMSGrid()
-                    // JS code example is: document.callScriptSafe("14","document.isGridSupported",9)
-                    if (Regex.Matches(param, @"document.callScriptSafe\(""\d+"",""document.isGridSupported"",\d+\)").Count == 1 ||
-                        Regex.Matches(param, @"document.callScriptSafe\(""\d+"",""document.isMSGrid"",\d+\)").Count == 1)
+                    if (param == @"document.isGridSupported" || param == @"document.isMSGrid")
                     {
-                        return JsonDocument.Parse("false").RootElement;
+                        return false;
                     }
                     // Mocks Simulator portion of UIElement.TransformToVisual
                     // JS code example is:

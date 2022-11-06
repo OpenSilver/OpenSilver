@@ -7,7 +7,7 @@ namespace Runtime.OpenSilver.Tests
     {
         public bool Handled { get; set; }
 
-        public JsonElement Result { get; set; }
+        public object Result { get; set; }
 
         public string Javascript { get; set; }
     }
