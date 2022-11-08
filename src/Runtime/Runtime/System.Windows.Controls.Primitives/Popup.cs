@@ -860,7 +860,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-        internal override FrameworkElement TemplateChild
+        public override FrameworkElement TemplateChild
         {
             get => _templateChild;
             set
