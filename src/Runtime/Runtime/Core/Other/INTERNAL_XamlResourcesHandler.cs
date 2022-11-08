@@ -72,18 +72,9 @@ namespace CSHTML5.Internal
         /// <returns>The resource associated with the given key in the given assembly's resources.</returns>
         internal object TryFindResourceInGenericXaml(Assembly assemblyWhereGenericXamlIsLocated, object resourceKey)
         {
-            ResourceDictionary resourceDictionary = null;
-            if (_assemblyToResourceDictionary.ContainsKey(assemblyWhereGenericXamlIsLocated))
+            if (!_assemblyToResourceDictionary.TryGetValue(assemblyWhereGenericXamlIsLocated, out ResourceDictionary resourceDictionary))
             {
-                resourceDictionary = _assemblyToResourceDictionary[assemblyWhereGenericXamlIsLocated];
-            }
-            else
-            {
-#if NETSTANDARD
                 string assemblyName = assemblyWhereGenericXamlIsLocated.GetName().Name;
-#else // BRIDGE
-                string assemblyName = INTERNAL_BridgeWorkarounds.GetAssemblyNameWithoutCallingGetNameMethod(assemblyWhereGenericXamlIsLocated);
-#endif
                 assemblyName = assemblyName.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
                 string factoryTypeName = XamlResourcesHelper.MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
                 Type resourceDictionaryFactoryType = assemblyWhereGenericXamlIsLocated.GetType(factoryTypeName);
@@ -105,9 +96,9 @@ namespace CSHTML5.Internal
                 }
             }
 
-            if (resourceDictionary != null && resourceDictionary.Contains(resourceKey))
+            if (resourceDictionary != null && resourceDictionary.TryGetResource(resourceKey, out object resource))
             {
-                return resourceDictionary[resourceKey];
+                return resource;
             }
 
             return null;
@@ -123,19 +114,21 @@ namespace CSHTML5.Internal
         /// </returns>
         internal object TryFindResource(object resourceKey)
         {
+            object resource;
+
             if (resourceKey is Type)
             {
                 Type resourceKeyAsType = resourceKey as Type;
-                object result = TryFindResourceInGenericXaml(resourceKeyAsType.Assembly, resourceKeyAsType);
-                if (result != null)
+                resource = TryFindResourceInGenericXaml(resourceKeyAsType.Assembly, resourceKeyAsType);
+                if (resource != null)
                 {
-                    return result;
+                    return resource;
                 }
             }
 
-            if (Application.Current.Resources.Contains(resourceKey))
+            if (Application.Current.Resources.TryGetResource(resourceKey, out resource))
             {
-                return Application.Current.Resources[resourceKey]; //I guess we try to find in the local resources first?
+                return resource; //I guess we try to find in the local resources first?
             }
 
             IsSystemResourcesParsing = true;
@@ -152,25 +145,24 @@ namespace CSHTML5.Internal
             //todo: find what the current theme is.
             //for now we assume the current theme is Light:
             ResourceDictionary lightResourceDictionary = _defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY];
-            if (lightResourceDictionary.Contains(resourceKey))
+            if (lightResourceDictionary.TryGetResource(resourceKey, out resource))
             {
-                return lightResourceDictionary[resourceKey];
+                return resource;
             }
 
             //if we didn't find the key, try in the HighContrast resources.
             //todo: (Note:) I think the HighContrast resources can be changed outside of the app but that is probably specific to the machine so we'll ignore that for now and simply take the default high contrast values.
-            if (_defaultThemeResourcesDictionary.ThemeDictionaries[HIGH_CONSTRAST_RESOURCE_THEME_KEY].Contains(resourceKey))
+            if (_defaultThemeResourcesDictionary.ThemeDictionaries[HIGH_CONSTRAST_RESOURCE_THEME_KEY].TryGetResource(resourceKey, out resource))
             {
-                return _defaultThemeResourcesDictionary.ThemeDictionaries[HIGH_CONSTRAST_RESOURCE_THEME_KEY][resourceKey];
+                return resource;
             }
 
             if (resourceKey is string)
             {
-                object result = null;
-                result = FindThemeDependentBrush(resourceKey as string);
-                if (result != null)
+                resource = FindThemeDependentBrush(resourceKey as string);
+                if (resource != null)
                 {
-                    return result;
+                    return resource;
                 }
             }
             //todo: find out whether this is a theme-dependent resource name. See:
@@ -188,9 +180,9 @@ namespace CSHTML5.Internal
                 IsSystemResourcesParsing = false;
             }
 
-            if (_defaultResources.Contains(resourceKey))
+            if (_defaultResources.TryGetResource(resourceKey, out resource))
             {
-                return _defaultResources[resourceKey];
+                return resource;
             }
             return null;
         }
@@ -251,9 +243,9 @@ namespace CSHTML5.Internal
                 }
             }
 
-            if (_defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY].Contains(resourceName))
+            if (_defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY].TryGetResource(resourceName, out object resource))
             {
-                Color color = (Color)_defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY][resourceName];
+                Color color = (Color)resource;
                 return new SolidColorBrush(color);
             }
             else
@@ -261,13 +253,13 @@ namespace CSHTML5.Internal
                 if (resourceName.StartsWith("Alt")) //if the [Simple HighContrast name] was "HighlightAlt", there is an "Alt" that was not removed here.
                 {
                     resourceName = resourceName.Substring(3);
-                    if (_defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY].Contains(resourceName))
+                    if (_defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY].TryGetResource(resourceName, out resource))
                     {
-                        Color color = (Color)_defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY][resourceName];
+                        Color color = (Color)resource;
                         return new SolidColorBrush(color);
                     }
                 }
-                if (resourceName == "Transparent") //todo: see if this should be added to _defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY] and such or not. 
+                else if (resourceName == "Transparent") //todo: see if this should be added to _defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY] and such or not. 
                 {
                     return new SolidColorBrush(Colors.Transparent);
                 }

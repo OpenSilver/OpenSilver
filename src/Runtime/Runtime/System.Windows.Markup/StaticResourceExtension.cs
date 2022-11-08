@@ -53,10 +53,9 @@ namespace System.Windows.Markup
         /// <returns>An object that is provided as the value of the target property for this StaticResource.</returns>
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            ResourceDictionary dictionaryWithKey = FindTheResourceDictionary(serviceProvider);
-            if (dictionaryWithKey != null)
+            if (TryFindTheResource(serviceProvider, out object resource))
             {
-                return dictionaryWithKey[ResourceKey];
+                return resource;
             }
 
             object value = FindResourceInAppOrSystem();
@@ -67,10 +66,9 @@ namespace System.Windows.Markup
             return value;
         }
 
-        private ResourceDictionary FindTheResourceDictionary(IServiceProvider serviceProvider)
+        private bool TryFindTheResource(IServiceProvider serviceProvider, out object resource)
         {
-            IAmbientResourcesProvider ambientProvider = serviceProvider.GetService(typeof(IAmbientResourcesProvider)) as IAmbientResourcesProvider;
-            if (ambientProvider == null)
+            if (serviceProvider.GetService(typeof(IAmbientResourcesProvider)) is not IAmbientResourcesProvider ambientProvider)
             {
                 throw new InvalidOperationException(
                     string.Format("Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.",
@@ -83,14 +81,15 @@ namespace System.Windows.Markup
             {
                 if (ambientValue is ResourceDictionary rd)
                 {
-                    if (rd.Contains(ResourceKey))
+                    if (rd.TryGetResource(ResourceKey, out resource))
                     {
-                        return rd;
+                        return true;
                     }
                 }
             }
 
-            return null;
+            resource = null;
+            return false;
         }
 
         private object FindResourceInAppOrSystem()
@@ -98,9 +97,9 @@ namespace System.Windows.Markup
             Application app = Application.Current;
             if (app != null)
             {
-                if (app.HasResources && app.Resources.Contains(ResourceKey))
+                if (app.HasResources && app.Resources.TryGetResource(ResourceKey, out object resource))
                 {
-                    return app.Resources[ResourceKey];
+                    return resource;
                 }
                 else
                 {

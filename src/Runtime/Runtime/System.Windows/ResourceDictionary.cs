@@ -256,11 +256,21 @@ namespace Windows.UI.Xaml
         /// </exception>
         public void Add(object key, object value)
         {
+            if (value is null)
+            {
+                throw new NotSupportedException("Null value not supported in a ResourceDictionary.");
+            }
+
             this.AddInternal(key, value, true);
         }
 
         public void Add(string key, object value)
         {
+            if (value is null)
+            {
+                throw new NotSupportedException("Null value not supported in a ResourceDictionary.");
+            }
+
             this.AddInternal(key, value, false);
         }
 
@@ -522,7 +532,7 @@ namespace Windows.UI.Xaml
 
         bool IDictionary<object, object>.TryGetValue(object key, out object value)
         {
-            return (value = this.GetItem(key)) != null;
+            return TryGetResource(key, out value);
         }
 
         void ICollection<KeyValuePair<object, object>>.Add(KeyValuePair<object, object> item)
@@ -1120,6 +1130,11 @@ namespace Windows.UI.Xaml
         }
 
         #endregion Inheritance Context
+
+        internal bool TryGetResource(object key, out object value)
+        {
+            return (value = GetItem(key)) != null;
+        }
 
         internal object GetItem(object key)
         {
