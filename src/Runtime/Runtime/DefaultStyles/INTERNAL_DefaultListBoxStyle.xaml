@@ -224,9 +224,8 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         
-                        <!--RadiusX="1" RadiusY="1"!-->
-                        <Rectangle x:Name="FillColor" Opacity="0" Fill="#FFBADDE9" IsHitTestVisible="False"/>
-                        <Rectangle x:Name="FillColor2" Opacity="0" Fill="#FFBADDE9" IsHitTestVisible="False"/>
+                        <Border x:Name="FillColor" Opacity="0" Background="#FFBADDE9" IsHitTestVisible="False" CornerRadius="1"/>
+                        <Border x:Name="FillColor2" Opacity="0" Background="#FFBADDE9" IsHitTestVisible="False" CornerRadius="1"/>
                         
                         <ContentPresenter x:Name="ContentPresenter"
                                           Content="{TemplateBinding Content}"
