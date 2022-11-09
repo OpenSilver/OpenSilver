@@ -28,6 +28,7 @@ using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
 using System.Text.Json;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
@@ -57,9 +58,10 @@ namespace Windows.UI.Xaml
         private ApplicationLifetimeObjectsCollection lifetime_objects;
         private Window _mainWindow;
         private ResourceDictionary _resources;
+        private Dictionary<Type, Style> _implicitStylesCache;
 
         // Says if App.Resources has any implicit styles
-        internal bool HasImplicitStylesInResources { get; set; }
+        internal bool HasImplicitStylesInResources { get; set; }        
 
         /// <summary>
         /// Gets the Application object for the current application.
@@ -316,12 +318,13 @@ namespace Windows.UI.Xaml
                     }
                 }
 
-                // todo: implement this.
-                // this notify all window in the app that Application resources changed
-                //if (oldValue != value)
-                //{
-                //    InvalidateResourceReferences(new ResourcesChangeInfo(oldValue, value));
-                //}
+                if (oldValue != value)
+                {
+                    InvalidateStyleCache(new ResourcesChangeInfo(oldValue, value));
+
+                    //// this notify all window in the app that Application resources changed
+                    // InvalidateResourceReferences(new ResourcesChangeInfo(oldValue, value));
+                }
             }
         }
 
@@ -349,6 +352,45 @@ namespace Windows.UI.Xaml
             else
             {
                 return resources[resourceKey];
+            }
+        }
+
+        internal Style FindStyleResourceInternal(Type resourceKey)
+        {
+            if (_implicitStylesCache?.TryGetValue(resourceKey, out Style style) ?? false)
+            {
+                return style;
+            }
+
+            return null;
+        }
+
+        internal void InvalidateStyleCache(ResourcesChangeInfo info)
+        {
+            if (info.Key is Type type)
+            {
+                Style newStyle = (Style)Resources[type];
+                if (newStyle is null)
+                {
+                    _implicitStylesCache?.Remove(type);
+                }
+                else
+                {
+                    _implicitStylesCache ??= new();
+                    _implicitStylesCache[type] = newStyle;
+                }
+            }
+            else if (info.IsCatastrophicDictionaryChange ||
+                (info.NewDictionary != null && info.NewDictionary.HasImplicitStyles) ||
+                (info.OldDictionary != null && info.OldDictionary.HasImplicitStyles))
+            {
+                _implicitStylesCache = HasResources && Resources.HasImplicitStyles ?
+                    ResourceDictionary.Helpers.BuildImplicitStylesCache(Resources) :
+                    null;
+            }
+            else
+            {
+                Debug.Assert(false, "Unexpected resource update !");
             }
         }
 

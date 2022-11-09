@@ -198,7 +198,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal static object FindImplicitStyleResource(FrameworkElement fe, object resourceKey)
+        internal static object FindImplicitStyleResource(FrameworkElement fe, Type resourceKey)
         {
             if (fe.ShouldLookupImplicitStyles)
             {
@@ -247,7 +247,7 @@ namespace Windows.UI.Xaml
                     Application app = Application.Current;
                     if (app != null)
                     {
-                        implicitStyle = app.Resources[resourceKey];
+                        implicitStyle = app.FindStyleResourceInternal(resourceKey);
                         if (implicitStyle != null)
                         {
                             return implicitStyle;
