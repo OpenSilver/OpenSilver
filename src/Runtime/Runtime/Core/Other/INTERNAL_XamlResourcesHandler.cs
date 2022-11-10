@@ -15,11 +15,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using OpenSilver.Internal;
+using OpenSilver.Internal.Xaml;
+
 #if MIGRATION
 using System.Windows;
 using System.Windows.Media;
@@ -54,79 +54,111 @@ namespace CSHTML5.Internal
             }
         }
 
-        const string HIGH_CONSTRAST_RESOURCE_THEME_KEY = "HighContrast";
-        const string LIGHT_RESOURCE_THEME_KEY = "Light";
-        const string DARK_RESOURCE_THEME_KEY = "Dark";
+        private const string HIGH_CONSTRAST_RESOURCE_THEME_KEY = "HighContrast";
+        private const string LIGHT_RESOURCE_THEME_KEY = "Light";
+        private const string DARK_RESOURCE_THEME_KEY = "Dark";
 
-        Dictionary<Assembly, ResourceDictionary> _assemblyToResourceDictionary = new Dictionary<Assembly, ResourceDictionary>();
-        ResourceDictionary _defaultResources;
-        ResourceDictionary _defaultThemeResourcesDictionary;
-        Dictionary<char, List<string>> _charToSimpleHighContrastNames; //this dictionary serves to link the first letter of the theme-dependent resource to the simple high contrast names that start with that letter.
+        private readonly Dictionary<Assembly, ResourceDictionary> _dictionaries = new();
+        private readonly Dictionary<Type, Style> _resourcesCache = new();
+        private ResourceDictionary _defaultResources;
+        private ResourceDictionary _defaultThemeResourcesDictionary;
+        private Dictionary<char, List<string>> _charToSimpleHighContrastNames; //this dictionary serves to link the first letter of the theme-dependent resource to the simple high contrast names that start with that letter.
         //The objective is to reduce the amount of strings we try to find in the resource (probably a minor improvement in performance but it's something)
 
         /// <summary>
         /// Tries to find the resourceKey in the Generic.xaml resources of the assembly. Note: the resource currently need to be defined in Project/Themes/generic.xaml
         /// </summary>
-        /// <param name="assemblyWhereGenericXamlIsLocated">The assembly where we will look into.</param>
-        /// <param name="resourceKey">The resource to find in the Assembly's resources.</param>
+        /// <param name="typeKey">The resource to find in the Assembly's resources.</param>
         /// <returns>The resource associated with the given key in the given assembly's resources.</returns>
-        internal object TryFindResourceInGenericXaml(Assembly assemblyWhereGenericXamlIsLocated, object resourceKey)
+        internal Style FindStyleResourceInGenericXaml(Type typeKey)
         {
-            if (!_assemblyToResourceDictionary.TryGetValue(assemblyWhereGenericXamlIsLocated, out ResourceDictionary resourceDictionary))
+            Debug.Assert(typeKey != null);
+
+            if (!FindCachedResource(typeKey, out Style resource))
             {
-                string assemblyName = assemblyWhereGenericXamlIsLocated.GetName().Name;
-                assemblyName = assemblyName.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
-                string factoryTypeName = XamlResourcesHelper.MakeTitleCase("ǀǀ" + assemblyName + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
-                Type resourceDictionaryFactoryType = assemblyWhereGenericXamlIsLocated.GetType(factoryTypeName);
+                resource = (Style)FindDictionaryResource(typeKey);
+                CacheResource(typeKey, resource);
+            }
 
-                if (resourceDictionaryFactoryType != null)
+            return resource;
+        }
+
+        private static Type GetGenericXamlFactoryForAssembly(Assembly assembly)
+        {
+            Debug.Assert(assembly != null);
+
+            string name = assembly.GetName().Name.Replace(" ", "ǀǀ").Replace(".", "ǀǀ");
+            string factoryName = XamlResourcesHelper.MakeTitleCase("ǀǀ" + name + "ǀǀComponentǀǀThemesǀǀGenericǀǀXamlǀǀFactory");
+            return assembly.GetType(factoryName);
+        }
+
+        private bool FindCachedResource(Type typeKey, out Style resource) => _resourcesCache.TryGetValue(typeKey, out resource);
+
+        private void CacheResource(Type typeKey, Style resource) => _resourcesCache[typeKey] = resource;
+
+        private object FindDictionaryResource(Type typeKey)
+        {
+            Debug.Assert(typeKey != null);
+
+            Assembly assembly = typeKey.Assembly;
+            if (!_dictionaries.TryGetValue(assembly, out ResourceDictionary rd))
+            {
+                rd = LoadGenericResourceDictionary(assembly);
+            }
+
+            return rd?[typeKey];
+        }
+
+        private ResourceDictionary LoadGenericResourceDictionary(Assembly assembly)
+        {
+            ResourceDictionary rd = null;
+
+            Type factoryType = GetGenericXamlFactoryForAssembly(assembly);
+            if (factoryType != null)
+            {
+                IsSystemResourcesParsing = true;
+
+                try
                 {
-                    IsSystemResourcesParsing = true;
-
-                    try
+                    if (Activator.CreateInstance(factoryType) is IXamlComponentLoader loader)
                     {
-                        resourceDictionary = (ResourceDictionary)resourceDictionaryFactoryType.GetMethod("Instantiate").Invoke(null, null);
+                        rd = new ResourceDictionary();
+                        loader.LoadComponent(rd);
                     }
-                    finally
-                    {
-                        IsSystemResourcesParsing = false;
-                    }
-
-                    _assemblyToResourceDictionary.Add(assemblyWhereGenericXamlIsLocated, resourceDictionary);
+                }
+                finally
+                {
+                    IsSystemResourcesParsing = false;
                 }
             }
 
-            if (resourceDictionary != null && resourceDictionary.TryGetResource(resourceKey, out object resource))
-            {
-                return resource;
-            }
+            _dictionaries.Add(assembly, rd);
 
-            return null;
+            return rd;
         }
 
         /// <summary>
         /// Searches for the specified resource.
         /// </summary>
-        /// <param name="resourceKey">The name of the resource to find.</param>
+        /// <param name="key">The name of the resource to find.</param>
         /// <returns>
         /// The requested resource object. If the requested resource is not found, a
         /// null reference is returned.
         /// </returns>
-        internal object TryFindResource(object resourceKey)
+        internal object TryFindResource(object key)
         {
             object resource;
 
-            if (resourceKey is Type)
+            if (key is Type resourceKey)
             {
-                Type resourceKeyAsType = resourceKey as Type;
-                resource = TryFindResourceInGenericXaml(resourceKeyAsType.Assembly, resourceKeyAsType);
+                resource = FindStyleResourceInGenericXaml(resourceKey);
                 if (resource != null)
                 {
                     return resource;
                 }
             }
 
-            if (Application.Current.Resources.TryGetResource(resourceKey, out resource))
+            if (Application.Current.Resources.TryGetResource(key, out resource))
             {
                 return resource; //I guess we try to find in the local resources first?
             }
@@ -145,21 +177,21 @@ namespace CSHTML5.Internal
             //todo: find what the current theme is.
             //for now we assume the current theme is Light:
             ResourceDictionary lightResourceDictionary = _defaultThemeResourcesDictionary.ThemeDictionaries[LIGHT_RESOURCE_THEME_KEY];
-            if (lightResourceDictionary.TryGetResource(resourceKey, out resource))
+            if (lightResourceDictionary.TryGetResource(key, out resource))
             {
                 return resource;
             }
 
             //if we didn't find the key, try in the HighContrast resources.
             //todo: (Note:) I think the HighContrast resources can be changed outside of the app but that is probably specific to the machine so we'll ignore that for now and simply take the default high contrast values.
-            if (_defaultThemeResourcesDictionary.ThemeDictionaries[HIGH_CONSTRAST_RESOURCE_THEME_KEY].TryGetResource(resourceKey, out resource))
+            if (_defaultThemeResourcesDictionary.ThemeDictionaries[HIGH_CONSTRAST_RESOURCE_THEME_KEY].TryGetResource(key, out resource))
             {
                 return resource;
             }
 
-            if (resourceKey is string)
+            if (key is string keyString)
             {
-                resource = FindThemeDependentBrush(resourceKey as string);
+                resource = FindThemeDependentBrush(keyString);
                 if (resource != null)
                 {
                     return resource;
@@ -180,7 +212,7 @@ namespace CSHTML5.Internal
                 IsSystemResourcesParsing = false;
             }
 
-            if (_defaultResources.TryGetResource(resourceKey, out resource))
+            if (_defaultResources.TryGetResource(key, out resource))
             {
                 return resource;
             }

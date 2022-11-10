@@ -137,10 +137,9 @@ namespace Windows.UI.Xaml
                 object styleLookup;
                 // Regular lookup based on the DefaultStyleKey. Involves locking and Hashtable lookup
 
-                Type typeKey = themeStyleKey as Type;
-                if (typeKey != null)
+                if (themeStyleKey is Type typeKey)
                 {
-                    styleLookup = Application.Current?.XamlResourcesHandler?.TryFindResourceInGenericXaml(typeKey.Assembly, themeStyleKey);
+                    styleLookup = Application.Current?.XamlResourcesHandler.FindStyleResourceInGenericXaml(typeKey);
                 }
                 else
                 {
