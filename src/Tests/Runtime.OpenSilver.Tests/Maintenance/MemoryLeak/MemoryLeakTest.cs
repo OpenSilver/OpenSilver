@@ -74,6 +74,22 @@ namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
         }
 
         [TestMethod]
+        public void PasswordBoxView_Must_Be_Collected()
+        {
+            void CreateRemovePasswordBoxView(GarbageCollectorTracker tracker)
+            {
+                var pwbView = new PasswordBoxViewWithTrackingComponent(tracker);
+                Application.Current.MainWindow.Content = pwbView;
+                Application.Current.MainWindow.Content = null;
+            }
+
+            var c = new GarbageCollectorTracker();
+            CreateRemovePasswordBoxView(c);
+            CollectGarbage();
+            Assert.IsTrue(c.IsCollected);
+        }
+
+        [TestMethod]
         public void DependencyObject_Should_Release_InheritedContext()
         {
             var c = new GarbageCollectorTracker();
@@ -89,7 +105,6 @@ namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
                 return depObj;
             }
         }
-
 
         [TestMethod]
         public void FrameworkElement_Should_Release_TemplatedParent()
