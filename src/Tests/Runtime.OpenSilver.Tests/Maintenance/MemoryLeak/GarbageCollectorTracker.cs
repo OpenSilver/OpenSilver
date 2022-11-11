@@ -11,20 +11,15 @@
 *
 \*====================================================================================*/
 
-
 using System.Threading;
 
-namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
+namespace OpenSilver.MemoryLeak;
+
+public class GCTracker
 {
-    public class GarbageCollectorTracker
-    {
-        public bool IsCollected => CollectedResetEvent.WaitOne(0);
+    public bool IsCollected => CollectedResetEvent.WaitOne(0);
 
-        public ManualResetEvent CollectedResetEvent { get; } = new ManualResetEvent(false);
+    public ManualResetEvent CollectedResetEvent { get; } = new ManualResetEvent(false);
 
-        public void MarkAsCollected()
-        {
-            CollectedResetEvent.Set();
-        }
-    }
+    public void MarkAsCollected() => CollectedResetEvent.Set();
 }

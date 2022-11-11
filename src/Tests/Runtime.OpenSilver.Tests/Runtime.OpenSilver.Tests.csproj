@@ -4,6 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <Configurations>SL;UWP</Configurations>
     <IsPackable>false</IsPackable>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
