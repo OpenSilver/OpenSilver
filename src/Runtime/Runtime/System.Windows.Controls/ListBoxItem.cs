@@ -136,9 +136,9 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #if MIGRATION
-        protected internal override void OnMouseLeave(MouseEventArgs e)
+        protected override void OnMouseLeave(MouseEventArgs e)
 #else
-        protected internal override void OnPointerExited(PointerRoutedEventArgs e)
+        protected override void OnPointerExited(PointerRoutedEventArgs e)
 #endif
         {
 #if MIGRATION

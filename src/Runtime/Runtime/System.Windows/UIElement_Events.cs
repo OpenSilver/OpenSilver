@@ -710,11 +710,11 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <param name="eventArgs">The arguments for the event.</param>
 #if MIGRATION
-        protected internal virtual void OnMouseLeave(MouseEventArgs eventArgs)
+        protected virtual void OnMouseLeave(MouseEventArgs eventArgs)
         {
         }
 #else
-        protected internal virtual void OnPointerExited(PointerRoutedEventArgs eventArgs)
+        protected virtual void OnPointerExited(PointerRoutedEventArgs eventArgs)
         {
         }
 #endif
