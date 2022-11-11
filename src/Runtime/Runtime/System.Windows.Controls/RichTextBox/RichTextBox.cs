@@ -715,11 +715,13 @@ namespace Windows.UI.Xaml.Controls
                 case Run run:
                     var format = new Dictionary<string, object>();
                     if (run.FontSize > 0)
-                        format.Add("font-size", run.FontSize);
+                        format.Add("font-size", $"{run.FontSize}px");
                     if (run.FontFamily != null)
                         format.Add("font-family", run.FontFamily.ToString());
                     if (run.FontWeight != null)
                         format.Add("bold", run.FontWeight.Weight > 500);
+                    if (run.FontStyle == FontStyles.Italic)
+                        format.Add("italic", true);
                     if (run.Margin != null)
                         format.Add("margin", run.Margin.ToString());
                     if (run.Background is SolidColorBrush background)
@@ -737,7 +739,7 @@ namespace Windows.UI.Xaml.Controls
                     break;
 
                 case LineBreak _:
-                    _textViewHost.View.SetText("\n");
+                    _textViewHost.View.InsertText("\n");
                     break;
             }
         }
