@@ -26,7 +26,7 @@ namespace System.Net
     /// <summary>
     /// Provides data for the System.Net.WebClient.DownloadStringCompleted event.
     /// </summary>
-    internal class INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs// : AsyncCompletedEventArgs //todo: AsyncCompletedEventArgs() is obsolete, see what we should do (it might be that it is only obsolete for use by the user, but not for us)
+    internal sealed class INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs// : AsyncCompletedEventArgs //todo: AsyncCompletedEventArgs() is obsolete, see what we should do (it might be that it is only obsolete for use by the user, but not for us)
     {
         public INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs() { }
         internal INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs(System.Net.INTERNAL_WebRequestHelper_JSOnly_RequestCompletedEventArgs e)

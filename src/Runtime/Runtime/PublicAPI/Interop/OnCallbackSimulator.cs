@@ -25,7 +25,7 @@ using DotNetBrowser;
 
 namespace CSHTML5.Internal
 {
-    internal class OnCallbackSimulator
+    internal sealed class OnCallbackSimulator
     {
         public OnCallbackSimulator()
         {

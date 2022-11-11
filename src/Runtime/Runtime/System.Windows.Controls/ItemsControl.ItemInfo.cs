@@ -48,7 +48,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         [DebuggerDisplay("Index: {Index}  Item: {Item}")]
-        internal class ItemInfo
+        internal sealed class ItemInfo
         {
             internal object Item { get; private set; }
             internal DependencyObject Container { get; set; }

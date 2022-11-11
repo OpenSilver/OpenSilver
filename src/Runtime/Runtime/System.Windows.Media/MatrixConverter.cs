@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// MatrixConverter - Converter class for converting instances of other types to and from Matrix instances
     /// </summary>
-    internal class MatrixConverter : TypeConverter
+    internal sealed class MatrixConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.

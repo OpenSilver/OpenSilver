@@ -25,7 +25,7 @@ namespace Windows.UI.Xaml
     /// GridLengthConverter - Converter class for converting 
     /// instances of other types to and from GridLength instances.
     /// </summary> 
-    internal class GridLengthConverter : TypeConverter
+    internal sealed class GridLengthConverter : TypeConverter
     {
         /// <summary>
         /// Checks whether or not this class can convert from a given type.

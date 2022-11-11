@@ -37,7 +37,7 @@ namespace OpenSilver.Internal.Controls
         void DetachView();
     }
 
-    internal class TextBoxViewHost_ContentControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxViewHost_ContentControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly ContentControl _host;
         private T _view;
@@ -62,7 +62,7 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal class TextBoxViewHost_Border<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxViewHost_Border<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly Border _host;
         private T _view;
@@ -87,7 +87,7 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal class TextBoxViewHost_ContentPresenter<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxViewHost_ContentPresenter<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly ContentPresenter _host;
         private T _view;
@@ -112,7 +112,7 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal class TextBoxViewHost_UserControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxViewHost_UserControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly UserControl _host;
         private T _view;
@@ -137,7 +137,7 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal class TextBoxViewHost_Panel<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxViewHost_Panel<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly Panel _host;
         private T _view;
@@ -163,7 +163,7 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal class TextBoxViewHost_ItemsControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxViewHost_ItemsControl<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly ItemsControl _host;
         private T _view;
@@ -194,7 +194,7 @@ namespace OpenSilver.Internal.Controls
         }
     }
 
-    internal class TextBoxViewHost_ContentProperty<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxViewHost_ContentProperty<T> : ITextBoxViewHost<T> where T : FrameworkElement, ITextBoxView
     {
         private readonly FrameworkElement _host;
         private readonly string _contentPropertyName;

@@ -47,7 +47,7 @@ namespace CSHTML5.Internal
 
         internal static LayoutManagerInternal LayoutManager { get; }
 
-        internal class MeasureQueue
+        internal sealed class MeasureQueue
         {
             private Queue<UIElement> _queue;
 
@@ -95,7 +95,7 @@ namespace CSHTML5.Internal
             }
         }
 
-        internal class LayoutManagerInternal
+        internal sealed class LayoutManagerInternal
         {
             private MeasureQueue _measureQueue;
 

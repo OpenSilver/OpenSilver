@@ -18,7 +18,7 @@ namespace OpenSilver.Internal
     /// <summary>
     /// This class has a method that generates IDs in sequence (0, 1, 2, 3...)
     /// </summary>
-    internal class ReferenceIDGenerator
+    internal sealed class ReferenceIDGenerator
     {
         private int _id = 0;
 

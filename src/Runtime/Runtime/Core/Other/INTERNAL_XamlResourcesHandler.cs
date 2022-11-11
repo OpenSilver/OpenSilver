@@ -31,7 +31,7 @@ using Windows.UI.Xaml.Media;
 
 namespace CSHTML5.Internal
 {
-    internal class INTERNAL_XamlResourcesHandler
+    internal sealed class INTERNAL_XamlResourcesHandler
     {
         [ThreadStatic]
         private static int _parsing;

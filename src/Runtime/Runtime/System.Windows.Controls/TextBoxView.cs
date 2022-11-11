@@ -29,7 +29,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class TextBoxView : FrameworkElement, ITextBoxView
+    internal sealed class TextBoxView : FrameworkElement, ITextBoxView
     {
         private object _contentEditableDiv;
 

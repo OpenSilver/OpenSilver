@@ -24,7 +24,7 @@ namespace Windows.Foundation
     /// <summary>
     /// RectConverter - Converter class for converting instances of other types to and from Rect instances
     /// </summary>
-    internal class RectConverter : TypeConverter
+    internal sealed class RectConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.

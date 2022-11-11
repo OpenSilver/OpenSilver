@@ -22,7 +22,7 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal.Data
 {
-    internal class PropertyChangedListener : IPropertyChangedListener
+    internal sealed class PropertyChangedListener : IPropertyChangedListener
     {
         public DependencyProperty Property { get; set; }
         private INTERNAL_PropertyStorage _storage;

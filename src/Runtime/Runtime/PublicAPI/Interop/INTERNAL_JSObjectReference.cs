@@ -18,7 +18,7 @@ using OpenSilver.Internal;
 
 namespace CSHTML5.Types
 {
-    internal class INTERNAL_JSObjectReference : IConvertible, IJavaScriptConvertible
+    internal sealed class INTERNAL_JSObjectReference : IConvertible, IJavaScriptConvertible
     {
         private string _jsCache;
 

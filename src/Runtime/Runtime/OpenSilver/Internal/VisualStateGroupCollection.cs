@@ -21,7 +21,7 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal
 {
-    internal class VisualStateGroupCollection : PresentationFrameworkCollection<VisualStateGroup>
+    internal sealed class VisualStateGroupCollection : PresentationFrameworkCollection<VisualStateGroup>
     {
         public VisualStateGroupCollection(FrameworkElement owner)
             : base(false)

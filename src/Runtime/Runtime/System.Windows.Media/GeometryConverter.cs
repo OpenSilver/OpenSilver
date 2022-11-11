@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// GeometryConverter - Converter class for converting instances of other types to and from Geometry instances
     /// </summary>
-    internal class GeometryConverter : TypeConverter
+    internal sealed class GeometryConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.

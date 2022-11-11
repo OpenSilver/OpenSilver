@@ -13,7 +13,7 @@ namespace OpenSilver.Internal.Controls
     /// <summary>
     /// Returns an Enumerator that enumerates over nothing.
     /// </summary>
-    internal class EmptyEnumerator : IEnumerator
+    internal sealed class EmptyEnumerator : IEnumerator
     {
         // singleton class, private ctor
         private EmptyEnumerator()
@@ -60,7 +60,7 @@ namespace OpenSilver.Internal.Controls
         private static IEnumerator _instance;
     }
 
-    internal class SingleChildEnumerator : IEnumerator
+    internal sealed class SingleChildEnumerator : IEnumerator
     {
         internal SingleChildEnumerator(object Child)
         {
@@ -213,7 +213,7 @@ namespace OpenSilver.Internal.Controls
 #endregion
     }
 
-    internal class ContentModelTreeEnumerator : ModelTreeEnumerator
+    internal sealed class ContentModelTreeEnumerator : ModelTreeEnumerator
     {
         internal ContentModelTreeEnumerator(ContentControl contentControl, object content) : base(content)
         {

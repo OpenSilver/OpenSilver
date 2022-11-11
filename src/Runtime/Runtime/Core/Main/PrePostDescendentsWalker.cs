@@ -12,7 +12,7 @@ namespace OpenSilver.Internal
     ///     A simple subclass of DescendentsWalker which introduces a second callback
     ///     which is called after a node's children have been visited.
     /// </summary>
-    internal class PrePostDescendentsWalker<T> : DescendentsWalker<T>
+    internal sealed class PrePostDescendentsWalker<T> : DescendentsWalker<T>
     {
         //------------------------------------------------------
         //

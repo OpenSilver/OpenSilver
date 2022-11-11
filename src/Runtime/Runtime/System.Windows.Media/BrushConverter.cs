@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// BrushConverter - Converter class for converting instances of other types to and from Brush instances
     /// </summary>
-    internal class BrushConverter : TypeConverter
+    internal sealed class BrushConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.

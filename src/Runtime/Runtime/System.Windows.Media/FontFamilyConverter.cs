@@ -25,7 +25,7 @@ namespace Windows.UI.Xaml.Media
     /// FontFamilyConverter - converter class for converting between the FontFamily
     /// and String types.
     /// </summary>
-    internal class FontFamilyConverter : TypeConverter
+    internal sealed class FontFamilyConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom - Returns whether or not the given type can be converted to a

@@ -833,7 +833,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
     }
 
-    internal class OutsideClickEventArgs : EventArgs
+    internal sealed class OutsideClickEventArgs : EventArgs
     {
         public bool Handled { get; set; }
     }

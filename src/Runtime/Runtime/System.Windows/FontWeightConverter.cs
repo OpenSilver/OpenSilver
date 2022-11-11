@@ -30,7 +30,7 @@ namespace Windows.UI.Text
     /// <summary>
     /// FontWeightConverter class parses a font weight string.
     /// </summary>
-    internal class FontWeightConverter : TypeConverter
+    internal sealed class FontWeightConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom

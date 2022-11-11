@@ -8,7 +8,7 @@ namespace System.Windows
 namespace Windows.Foundation
 #endif
 {
-    internal class Disposable : IDisposable
+    internal sealed class Disposable : IDisposable
     {
         private class EmptyDisposable : IDisposable
         {

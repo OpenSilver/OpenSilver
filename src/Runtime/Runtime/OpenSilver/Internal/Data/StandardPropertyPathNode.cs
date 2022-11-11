@@ -26,7 +26,7 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal.Data
 {
-    internal class StandardPropertyPathNode : PropertyPathNode
+    internal sealed class StandardPropertyPathNode : PropertyPathNode
     {
         private readonly Type _resolvedType;
         private readonly string _propertyName;

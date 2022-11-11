@@ -28,7 +28,7 @@ namespace CSHTML5.Internal
 #if BRIDGE
     [External] //we exclude this class
 #endif
-    internal class OnCallBackImpl
+    internal sealed class OnCallBackImpl
     {
         private OnCallBackImpl()
         {

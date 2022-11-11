@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// TransformConverter - Converter class for converting instances of other types to and from Transform instances
     /// </summary>
-    internal class TransformConverter : TypeConverter
+    internal sealed class TransformConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.

@@ -30,7 +30,7 @@ namespace OpenSilver.Internal.Data
     /// if the source collection implements IList or ICollection, the corresponding
     /// properties/methods will be used instead of the cached versions
     /// </remarks>
-    internal class IndexedEnumerable : IEnumerable
+    internal sealed class IndexedEnumerable : IEnumerable
     {
         //------------------------------------------------------
         //

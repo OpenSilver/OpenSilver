@@ -29,7 +29,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class RichTextXamlParser
+    internal static class RichTextXamlParser
     {
         public static IEnumerable<Block> Parse(string xaml)
         {

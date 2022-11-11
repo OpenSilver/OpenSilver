@@ -28,7 +28,7 @@ namespace OpenSilver.Internal
         object Resolve(string name);
     }
 
-    internal class TemplateNameResolver : INameResolver
+    internal sealed class TemplateNameResolver : INameResolver
     {
         private readonly WeakReference<FrameworkElement> _templateRootRef;
 
@@ -62,7 +62,7 @@ namespace OpenSilver.Internal
         }
     }
 
-    internal class XamlNameResolver : INameResolver
+    internal sealed class XamlNameResolver : INameResolver
     {
         private readonly WeakReference<FrameworkElement> _namescopeOwnerRef;
 

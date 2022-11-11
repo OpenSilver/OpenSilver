@@ -25,7 +25,7 @@ namespace Windows.UI
     /// <summary>
     /// ColorConverter Parses a color.
     /// </summary>
-    internal class ColorConverter : TypeConverter
+    internal sealed class ColorConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom

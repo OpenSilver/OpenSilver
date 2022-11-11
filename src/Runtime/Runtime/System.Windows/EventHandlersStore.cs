@@ -27,7 +27,7 @@ namespace Windows.UI.Xaml
     /// <remarks>
     ///     EventHandlersStore is a hashtable of handlers for a given RoutedEvent
     /// </remarks>
-    internal class EventHandlersStore
+    internal sealed class EventHandlersStore
     {
         private readonly Dictionary<RoutedEvent, List<RoutedEventHandlerInfo>> _entries;
 

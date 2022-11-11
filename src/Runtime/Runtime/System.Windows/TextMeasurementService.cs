@@ -44,7 +44,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Measure Text Block width and height from html element.
     /// </summary>
-    internal class TextMeasurementService : ITextMeasurementService
+    internal sealed class TextMeasurementService : ITextMeasurementService
     {
 #if OPENSILVER
         private INTERNAL_HtmlDomStyleReference textBoxDivStyle;

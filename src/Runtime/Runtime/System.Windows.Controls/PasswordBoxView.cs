@@ -22,7 +22,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class PasswordBoxView : FrameworkElement, ITextBoxView
+    internal sealed class PasswordBoxView : FrameworkElement, ITextBoxView
     {
         private object _passwordInputField;
         private bool _isUpdatingDOM;

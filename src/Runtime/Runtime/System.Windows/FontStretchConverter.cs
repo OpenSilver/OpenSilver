@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// FontStretchConverter class parses a font stretch string.
     /// </summary>
-    internal class FontStretchConverter : TypeConverter
+    internal sealed class FontStretchConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom

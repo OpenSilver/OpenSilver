@@ -26,7 +26,7 @@ using Windows.UI.Xaml;
 
 namespace CSHTML5.Internal
 {
-    internal class INTERNAL_VisualChildInformation
+    internal sealed class INTERNAL_VisualChildInformation
     {
         // Understanding the concept:
         // For some layouts like vertical stackpanels (implemented using table-like nested divs), the parent needs to create

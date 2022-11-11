@@ -22,7 +22,7 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal
 {
-    internal class NativeEventsManager : IDisposable
+    internal sealed class NativeEventsManager : IDisposable
     {
         private bool _disposed;
         private JavascriptCallback _handler;

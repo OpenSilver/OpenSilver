@@ -21,7 +21,7 @@ using Windows.UI.Xaml.Data;
 
 namespace OpenSilver.Internal.Data
 {
-    internal class PropertyPathWalker
+    internal sealed class PropertyPathWalker
     {
         private readonly BindingExpression _expr;
 

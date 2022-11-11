@@ -347,7 +347,7 @@ img.src = {sHtml5Path};");
 #endif
     }
 
-    internal class SynchronyzedStore<T>
+    internal sealed class SynchronyzedStore<T>
     {
         private readonly object _lock = new object();
         private readonly List<T> _items;

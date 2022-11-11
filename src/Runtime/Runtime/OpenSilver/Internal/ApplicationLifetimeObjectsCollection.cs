@@ -38,7 +38,7 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal
 {
-	internal class ApplicationLifetimeObjectsCollection : IList
+	internal sealed class ApplicationLifetimeObjectsCollection : IList
 	{
 		private readonly List<object> list = new List<object>();
 		private bool read_only;

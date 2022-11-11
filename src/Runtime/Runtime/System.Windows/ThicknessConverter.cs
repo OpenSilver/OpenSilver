@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// ThicknessConverter - Converter class for converting instances of other types to and from Thickness instances.
     /// </summary> 
-    internal class ThicknessConverter : TypeConverter
+    internal sealed class ThicknessConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom - Returns whether or not this class can convert from a given type.

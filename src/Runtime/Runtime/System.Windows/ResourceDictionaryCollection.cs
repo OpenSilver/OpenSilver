@@ -20,7 +20,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal class ResourceDictionaryCollection : PresentationFrameworkCollection<ResourceDictionary>
+    internal sealed class ResourceDictionaryCollection : PresentationFrameworkCollection<ResourceDictionary>
     {
         private readonly ResourceDictionary _owner;
 

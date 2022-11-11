@@ -12,7 +12,7 @@ using Windows.UI.Xaml.Data;
 
 namespace CSHTML5.Internal
 {
-    internal class INTERNAL_PropertyStorage
+    internal sealed class INTERNAL_PropertyStorage
     {
         #region Data
 
@@ -100,7 +100,7 @@ namespace CSHTML5.Internal
         #endregion
     }
 
-    internal class ModifiedValue
+    internal sealed class ModifiedValue
     {
         private object _baseValue;
         private object _expressionValue;

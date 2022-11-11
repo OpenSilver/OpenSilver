@@ -22,7 +22,7 @@ using Windows.UI.Xaml.Data;
 namespace OpenSilver.Internal.Data
 {
     // dynamically pick and switch a default value converter to convert between source and target type
-    internal class DynamicValueConverter : IValueConverter
+    internal sealed class DynamicValueConverter : IValueConverter
     {
         internal DynamicValueConverter(bool targetToSourceNeeded)
         {

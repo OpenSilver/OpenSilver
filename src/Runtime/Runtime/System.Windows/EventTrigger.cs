@@ -213,7 +213,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal class EventTriggerSourceListener
+        internal sealed class EventTriggerSourceListener
         {
             internal EventTriggerSourceListener(EventTrigger trigger, FrameworkElement host)
             {

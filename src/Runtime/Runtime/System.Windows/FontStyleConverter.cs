@@ -21,7 +21,7 @@ namespace System.Windows
     /// <summary>
     /// FontStyleConverter class parses a font style string.
     /// </summary>
-    internal class FontStyleConverter : TypeConverter
+    internal sealed class FontStyleConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom

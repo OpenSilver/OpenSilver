@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Helper class for selection change batching.
         /// </summary>
-        internal class SelectionChanger
+        internal sealed class SelectionChanger
         {
             /// <summary>
             /// Create a new SelectionChangeHelper -- there should only be one instance per Selector.

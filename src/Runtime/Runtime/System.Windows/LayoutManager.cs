@@ -15,7 +15,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal class LayoutManager
+    internal sealed class LayoutManager
     {
         public static readonly LayoutManager Current = new LayoutManager();
 

@@ -16,7 +16,7 @@ using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
-    internal class JavascriptCallback : IJavaScriptConvertible, IDisposable
+    internal sealed class JavascriptCallback : IJavaScriptConvertible, IDisposable
     {
         private static readonly SynchronyzedStore<JavascriptCallback> _store = new SynchronyzedStore<JavascriptCallback>();
 

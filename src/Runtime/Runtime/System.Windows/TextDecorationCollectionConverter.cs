@@ -21,7 +21,7 @@ namespace System.Windows
     /// <summary>
     /// TypeConverter for TextDecorationCollection 
     /// </summary>   
-    internal class TextDecorationCollectionConverter : TypeConverter
+    internal sealed class TextDecorationCollectionConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom

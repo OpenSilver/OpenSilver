@@ -19,7 +19,7 @@ namespace System.Windows.Markup
     /// XmlLanuageConverter - Converter class for converting instances of other types to and from XmlLanguage
     /// in a way that does not depend on the current user's language settings.
     /// </summary> 
-    internal class XmlLanguageConverter : TypeConverter
+    internal sealed class XmlLanguageConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom - Returns whether or not this class can convert from a given type.

@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// 
     /// </summary>
-    internal class KeyTimeConverter : TypeConverter
+    internal sealed class KeyTimeConverter : TypeConverter
     {
         /// <summary>
         /// Returns whether or not this class can convert from a given type

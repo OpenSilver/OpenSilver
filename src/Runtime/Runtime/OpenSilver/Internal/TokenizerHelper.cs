@@ -17,7 +17,7 @@ using System.Globalization;
 
 namespace OpenSilver.Internal
 {
-    internal class TokenizerHelper
+    internal sealed class TokenizerHelper
     {
         // Helper to get the numeric list separator for a given IFormatProvider.
         // Separator is a comma [,] if the decimal separator is not a comma, or a semicolon [;] otherwise.

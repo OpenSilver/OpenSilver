@@ -15,7 +15,7 @@ using System;
 
 namespace OpenSilver.Internal.Data
 {
-    internal class SourcePropertyNode : IPropertyPathNode
+    internal sealed class SourcePropertyNode : IPropertyPathNode
     {
         private readonly PropertyPathWalker _listener;
         private object _source;

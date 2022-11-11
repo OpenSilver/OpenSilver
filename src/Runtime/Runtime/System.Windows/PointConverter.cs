@@ -24,7 +24,7 @@ namespace Windows.Foundation
     /// <summary>
     /// PointConverter - Converter class for converting instances of other types to and from Point instances
     /// </summary>
-    internal class PointConverter : TypeConverter
+    internal sealed class PointConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.
