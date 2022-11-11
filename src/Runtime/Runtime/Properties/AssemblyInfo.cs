@@ -59,6 +59,9 @@ using System.Runtime.InteropServices;
 
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")] // This is used for example in the {x:Static ...} markup extension.
 
+[assembly: InternalsVisibleTo("Telerik.Windows.Controls.GridView")]
+
+
 #if MIGRATION
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows")]
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]
