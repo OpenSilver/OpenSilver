@@ -334,7 +334,7 @@ namespace Windows.UI.Xaml
         protected FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
         // Note: TemplateChild is an UIElement in WPF.
-        public virtual FrameworkElement TemplateChild
+        protected internal virtual FrameworkElement TemplateChild
         {
             get => _templateChild;
             set

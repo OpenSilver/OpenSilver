@@ -260,9 +260,6 @@ namespace Windows.UI.Xaml
         internal Action INTERNAL_DeferredRenderingWhenControlBecomesVisible;
         internal Action INTERNAL_DeferredLoadingWhenControlBecomesVisible;
 
-        public bool HasVisualChild(UIElement e) =>
-            e.IsConnectedToLiveTree && INTERNAL_VisualChildrenInformation != null && INTERNAL_VisualChildrenInformation.ContainsKey(e);
-
         /// <summary>
         /// Dictionary that helps link the validationErrors to the BindingExpressions for managing the errors.
         /// </summary>
