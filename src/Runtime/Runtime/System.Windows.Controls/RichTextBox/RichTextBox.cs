@@ -23,6 +23,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.Foundation;
+using Windows.UI.Text;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
@@ -720,7 +721,11 @@ namespace Windows.UI.Xaml.Controls
                         format.Add("font-family", run.FontFamily.ToString());
                     if (run.FontWeight != null)
                         format.Add("bold", run.FontWeight.Weight > 500);
+#if MIGRATION
                     if (run.FontStyle == FontStyles.Italic)
+#else
+                    if (run.FontStyle == FontStyle.Italic)
+#endif
                         format.Add("italic", true);
                     if (run.Margin != null)
                         format.Add("margin", run.Margin.ToString());
