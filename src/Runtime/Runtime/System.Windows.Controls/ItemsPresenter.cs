@@ -37,7 +37,7 @@ namespace Windows.UI.Xaml.Controls
         private ItemsControl _owner; // templated parent.
         private ItemContainerGenerator _generator;
 
-        protected internal sealed override FrameworkElement TemplateChild
+        internal sealed override FrameworkElement TemplateChild
         {
             get { return base.TemplateChild; }
             set
