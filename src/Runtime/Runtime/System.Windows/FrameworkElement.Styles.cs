@@ -247,7 +247,7 @@ namespace Windows.UI.Xaml
                     Application app = Application.Current;
                     if (app != null)
                     {
-                        implicitStyle = app.FindStyleResourceInternal(resourceKey);
+                        implicitStyle = app.FindImplicitResourceInternal(resourceKey);
                         if (implicitStyle != null)
                         {
                             return implicitStyle;

@@ -396,7 +396,7 @@ namespace Windows.UI.Xaml.Controls
                 // If the element is rooted to a Window and App exists, defer to App.
                 for (k = 0; k < bestMatch; ++k)
                 {
-                    object appResource = app.FindResourceInternal(keys[k]);
+                    object appResource = app.FindImplicitResourceInternal(keys[k]);
                     if (appResource != null)
                     {
                         bestMatch = k;

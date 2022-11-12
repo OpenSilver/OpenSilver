@@ -1239,7 +1239,14 @@ namespace Windows.UI.Xaml
         internal bool HasImplicitDataTemplates
         {
             get => ReadPrivateFlag(PrivateFlags.HasImplicitDataTemplates);
-            set => WritePrivateFlag(PrivateFlags.HasImplicitDataTemplates, value);
+            set
+            {
+                WritePrivateFlag(PrivateFlags.HasImplicitDataTemplates, value);
+                if (value && _parentDictionary != null && !_parentDictionary.HasImplicitDataTemplates)
+                {
+                    _parentDictionary.HasImplicitDataTemplates = true;
+                }
+            }
         }
 
         /// <summary>
@@ -1336,9 +1343,9 @@ namespace Windows.UI.Xaml
 
         internal static class Helpers
         {
-            internal static Dictionary<Type, Style> BuildImplicitStylesCache(ResourceDictionary rd)
+            internal static Dictionary<object, object> BuildImplicitResourcesCache(ResourceDictionary rd)
             {
-                static void AddResourcesToCache(ResourceDictionary rd, Dictionary<Type, Style> cache)
+                static void AddResourcesToCache(ResourceDictionary rd, Dictionary<object, object> cache)
                 {
                     if (rd._mergedDictionaries != null)
                     {
@@ -1350,15 +1357,22 @@ namespace Windows.UI.Xaml
 
                     foreach (var kvp in rd._baseDictionary)
                     {
-                        if (kvp.Key is Type type)
+                        switch (kvp.Key)
                         {
-                            Debug.Assert(kvp.Value is Style);
-                            cache[type] = (Style)kvp.Value;
+                            case Type type:
+                                Debug.Assert(kvp.Value is Style);
+                                cache[type] = kvp.Value;
+                                break;
+
+                            case DataTemplateKey templateKey:
+                                Debug.Assert(kvp.Value is DataTemplate);
+                                cache[templateKey] = kvp.Value;
+                                break;
                         }
                     }
                 }
 
-                var cache = new Dictionary<Type, Style>();
+                var cache = new Dictionary<object, object>();
                 AddResourcesToCache(rd, cache);
                 return cache;
             }
