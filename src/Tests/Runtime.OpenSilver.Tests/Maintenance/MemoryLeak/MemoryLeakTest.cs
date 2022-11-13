@@ -15,6 +15,7 @@ using System;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Internal.Xaml.Context;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows;
@@ -121,6 +122,25 @@ public class MemoryLeakTest
 
         var c = new GCTracker();
         CreateRemovePasswordBoxView(c);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
+    public void TextBoxView_Must_Be_Collected()
+    {
+        static void CreateRemoveTextBoxView(GCTracker tracker)
+        {
+            var tbView = new TextBoxView(new TextBox());
+            MemoryLeaksHelper.SetTracker(tbView, tracker);
+
+            Application.Current.MainWindow.Content = tbView;
+            Application.Current.MainWindow.Content = null;
+        }
+
+        var c = new GCTracker();
+        CreateRemoveTextBoxView(c);
         MemoryLeaksHelper.Collect();
 
         Assert.IsTrue(c.IsCollected);
