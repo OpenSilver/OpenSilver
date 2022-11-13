@@ -147,6 +147,26 @@ public class MemoryLeakTest
     }
 
     [TestMethod]
+    public void SizeChanged_Should_Not_Keep_FrameworkElement_Alive()
+    {
+        static void CreateFrameworkElement(GCTracker tracker)
+        {
+            var fe = new MyFrameworkElement();
+            fe.SizeChanged += (o, e) => { };
+            MemoryLeaksHelper.SetTracker(fe, tracker);
+
+            Application.Current.RootVisual = fe;
+            Application.Current.RootVisual = null;
+        }
+
+        var c = new GCTracker();
+        CreateFrameworkElement(c);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
     public void DependencyObject_Should_Release_InheritedContext()
     {
         static DependencyObject CreateDependencyObject(GCTracker tracker)

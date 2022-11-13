@@ -12,6 +12,8 @@
 \*====================================================================================*/
 
 using System;
+using System.Globalization;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows;
@@ -48,11 +50,7 @@ namespace OpenSilver.Internal
         /// <returns></returns>
         public static IResizeObserverAdapter Create()
         {
-#if OPENSILVER
-            if (Application.Current.Host.Settings.UseResizeSensor || OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#elif BRIDGE
-            if (Application.Current.Host.Settings.UseResizeSensor || OpenSilver.Interop.IsRunningInTheSimulator || IsRunningOnInternetExplorer())
-#endif
+            if (Application.Current.Host.Settings.UseResizeSensor || Interop.IsRunningInTheSimulator)
             {
                 return new ResizeSensorAdapter();
             }
@@ -67,7 +65,7 @@ namespace OpenSilver.Internal
         /// </summary>
         /// <param name="argSize">The size string to parse.</param>
         /// <returns>The parsed <see cref="Size"/>, or <see cref="Size.Empty"/> if the parse fails.</returns>
-        internal static Size ParseSize(string argSize)
+        private static Size ParseSize(string argSize)
         {
             int sepIndex = argSize != null ? argSize.IndexOf('|') : -1;
 
@@ -78,18 +76,10 @@ namespace OpenSilver.Internal
 
             string actualWidthAsString = argSize.Substring(0, sepIndex);
             string actualHeightAsString = argSize.Substring(sepIndex + 1);
-            double actualWidth = double.Parse(actualWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture);
-            double actualHeight = double.Parse(actualHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture);
+            double actualWidth = double.Parse(actualWidthAsString, CultureInfo.InvariantCulture);
+            double actualHeight = double.Parse(actualHeightAsString, CultureInfo.InvariantCulture);
             return new Size(actualWidth, actualHeight);
         }
-
-#if BRIDGE
-        [Bridge.Template("window.IE_VERSION")]
-        private static bool IsRunningOnInternetExplorer()
-        {
-            return false;
-        }
-#endif
 
         /// <summary>
         /// An implementation of the <see cref="IResizeObserverAdapter"/> using the ResizeSensor js library.
@@ -98,6 +88,7 @@ namespace OpenSilver.Internal
         {
             private bool _isObserved;
             private object _resizeSensor;
+            private JavascriptCallback _sizeChangedCallback;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ResizeSensorAdapter"/>.
@@ -114,11 +105,12 @@ namespace OpenSilver.Internal
                 if (!_isObserved)
                 {
                     _isObserved = true;
+                    _sizeChangedCallback = JavascriptCallback.Create((string arg) => callback(ParseSize(arg)));
 
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
-                    string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(new Action<string>((string arg) => callback(ParseSize(arg))));
+                    string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_sizeChangedCallback);
 
-                    _resizeSensor = OpenSilver.Interop.ExecuteJavaScript($"new ResizeSensor({sElement}, {sAction})");
+                    _resizeSensor = Interop.ExecuteJavaScript($"new ResizeSensor({sElement}, {sAction})");
                 }
             }
 
@@ -128,6 +120,9 @@ namespace OpenSilver.Internal
                 if (_isObserved)
                 {
                     _isObserved = false;
+
+                    _sizeChangedCallback.Dispose();
+                    _sizeChangedCallback = null;
 
                     string sSensor = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_resizeSensor);
                     _resizeSensor = null;
@@ -147,6 +142,7 @@ namespace OpenSilver.Internal
             private static object _observerJsReference;
 
             private bool _isObserved;
+            private JavascriptCallback _sizeChangedCallback;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ResizeObserverAdapter"/>.
@@ -165,10 +161,11 @@ namespace OpenSilver.Internal
                 if (!_isObserved)
                 {
                     _isObserved = true;
+                    _sizeChangedCallback = JavascriptCallback.Create((string arg) => callback(ParseSize(arg)));
 
                     string sReference = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_observerJsReference);
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
-                    string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(new Action<string>((string arg) => callback(ParseSize(arg))));
+                    string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_sizeChangedCallback);
 
                     Interop.ExecuteJavaScriptVoid($"{sReference}.observe({sElement}, {sAction})");
                 }
@@ -182,6 +179,8 @@ namespace OpenSilver.Internal
                 if (_isObserved)
                 {
                     _isObserved = false;
+                    _sizeChangedCallback.Dispose();
+                    _sizeChangedCallback = null;
 
                     string sReference = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_observerJsReference);
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
@@ -190,12 +189,7 @@ namespace OpenSilver.Internal
             }
 
             private static void EnsureResizeObserverInitialized()
-            {
-                if (_observerJsReference == null)
-                {
-                    _observerJsReference = Interop.ExecuteJavaScript("new ResizeObserverAdapter()");
-                }
-            }
+                => _observerJsReference ??= Interop.ExecuteJavaScript("new ResizeObserverAdapter()");
         }
     }
 }
