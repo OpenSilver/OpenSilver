@@ -264,7 +264,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                 fromToValues = "{" +
                                     string.Join(",", cssEquivalent.Name
                                         .Where(name => name != "background")
-                                        .Select(name => $"{name}:{INTERNAL_InteropImplementation.GetVariableStringForJS(cssValueAsDictionary[name])}")) + "}";
+                                        .Select(name => $"\"{name}\":{INTERNAL_InteropImplementation.GetVariableStringForJS(cssValueAsDictionary[name])}")) + "}";
                             }
                             else
                             {
@@ -272,7 +272,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                 fromToValues = "{" +
                                     string.Join(",", cssEquivalent.Name
                                         .Where(name => name != "background")
-                                        .Select(name => $"{name}:{sCssValue}")) + "}";
+                                        .Select(name => $"\"{name}\":{sCssValue}")) + "}";
                             }
                         }
                         else
@@ -287,7 +287,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                         object currentFromCssValue = fromCssValue is Dictionary<string, object> d2 ? d2[name] : fromCssValue;
                                         string sCurrentCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(currentCssValue);
                                         string sCurrentFromCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(currentFromCssValue);
-                                        return $"{name}:[{sCurrentCssValue}, {sCurrentFromCssValue}]";
+                                        return $"\"{name}\":[{sCurrentCssValue}, {sCurrentFromCssValue}]";
                                     })) + "}";
                         }
 

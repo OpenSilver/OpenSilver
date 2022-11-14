@@ -346,12 +346,12 @@ namespace Windows.UI.Xaml.Media.Animation
                         string fromToValues;
                         if (!from.HasValue)
                         {
-                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"{name}:{sCssValue}")) + "}";
+                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"\"{name}\":{sCssValue}")) + "}";
                         }
                         else
                         {
                             string sFrom = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(from);
-                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"{name}:[{sCssValue},{sFrom}]")) + "}";
+                            fromToValues = "{" + string.Join(",", cssEquivalent.Name.Select(name => $"\"{name}\":[{sCssValue},{sFrom}]")) + "}";
                         }
 
                         AnimationHelpers.CallVelocity(
