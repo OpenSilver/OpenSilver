@@ -28,7 +28,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class RichTextXamlParser
+    internal static class RichTextXamlParser
     {
         public static IEnumerable<Block> Parse(string xaml)
         {
@@ -158,11 +158,11 @@ namespace Windows.UI.Xaml.Controls
                     return element;
                 }
             }
-
-            if (node.NodeType == XmlNodeType.Text)
+            else if (node.NodeType == XmlNodeType.Text)
             {
                 return node.InnerText; // return Run element with text
             }
+
             return null;
         }
 

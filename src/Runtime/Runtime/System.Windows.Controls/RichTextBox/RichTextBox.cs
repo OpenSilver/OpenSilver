@@ -15,6 +15,7 @@ using System;
 using System.Windows.Markup;
 using System.Collections.Generic;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -716,7 +717,7 @@ namespace Windows.UI.Xaml.Controls
                 case Run run:
                     var format = new Dictionary<string, object>();
                     if (run.FontSize > 0)
-                        format.Add("font-size", $"{run.FontSize}px");
+                        format.Add("font-size", $"{run.FontSize.ToInvariantString()}px");
                     if (run.FontFamily != null)
                         format.Add("font-family", run.FontFamily.ToString());
                     if (run.FontWeight != null)
