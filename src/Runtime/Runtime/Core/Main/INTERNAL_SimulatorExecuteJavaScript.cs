@@ -30,12 +30,13 @@ namespace CSHTML5.Internal
         static bool _disableAsyncJavaScriptExecution = false;
         static bool _isDispatcherPending = false;
         static bool _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false; //todo: make sure this variable is thread-safe.
-        
+
         /// <summary>
         /// Executes JavaScript code immediately. This also forces all the pending async JS code to be executed (flush).
         /// </summary>
         /// <param name="javaScriptToExecute">The JS code to execute.</param>
         /// <param name="commentForDebugging">Some optional comments to write to the log of JS calls.</param>
+        /// <param name="noImpactOnPendingJSCode">true to ignore pending javascript code from asynchronous interops</param>
         /// <returns></returns>
         internal static object ExecuteJavaScriptSync(string javaScriptToExecute, string commentForDebugging = null, bool noImpactOnPendingJSCode = false)
         {
@@ -121,18 +122,19 @@ namespace CSHTML5.Internal
 #if OPTIMIZATION_LOG
                         Console.WriteLine("[OPTIMIZATION] Calling setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
-                        string action = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
-                            (Action)(() =>
+
+                        string action = INTERNAL_InteropImplementation.GetVariableStringForJS(
+                            JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(() =>
                             {
 #if OPTIMIZATION_LOG
                                 Console.WriteLine("[OPTIMIZATION] Executing setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
-                                if (_isDispatcherPending) // We check again, because in the meantime the dispatcher can be cancelled in case of a forced execution of the pending JS code, for example when making a JavaScript execution that "returns a value".
+                                if (_isDispatcherPending)
                                 {
                                     ExecutePendingJavaScriptCode("SETTIMEOUT COMPLETED");
                                 }
-                            })
-                        );
+                            }));
+
                         ExecuteJavaScriptSync($"setTimeout({action}, 1)", null, true);
                     }
                 }

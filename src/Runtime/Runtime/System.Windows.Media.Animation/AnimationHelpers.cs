@@ -19,6 +19,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 #if BRIDGE
 using Bridge;
@@ -60,7 +61,7 @@ namespace Windows.UI.Xaml.Media.Animation
             var sb = new StringBuilder();
             sb.AppendLine("(function(el) {");
             sb.AppendLine($@"const options = {{
-easing:""{CSHTML5.Internal.INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"",
+easing:""{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"",
 duration:{duration.ToInvariantString()},
 queue:false,
 queue:""{visualStateGroupName}""
@@ -68,7 +69,8 @@ queue:""{visualStateGroupName}""
 
             if (callbackForWhenfinished != null)
             {
-                sb.Append($"options.complete = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(callbackForWhenfinished)};");
+                var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(callbackForWhenfinished);
+                sb.Append($"options.complete = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsCallback)};");
             }
 
             if (easingFunction != null)
@@ -79,7 +81,7 @@ queue:""{visualStateGroupName}""
                     foreach (string key in additionalOptions.Keys)
                     {
                         string sAdditionalOptions = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(additionalOptions[key]);
-                        sb.Append($@"options.{CSHTML5.Internal.INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(key)} = {sAdditionalOptions};");
+                        sb.Append($@"options.{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(key)} = {sAdditionalOptions};");
                     }
                 }
             }
