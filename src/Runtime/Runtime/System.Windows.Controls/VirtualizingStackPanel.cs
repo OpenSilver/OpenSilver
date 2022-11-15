@@ -466,32 +466,17 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
-            base.OnItemsChanged(sender, args);
-            IItemContainerGenerator generator = ItemContainerGenerator;
-            ItemsControl owner = ItemsControl.GetItemsOwner(this);
-            int index, offset, viewable;
+            base.OnItemsChanged(sender, args);            
 
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    // The following logic is meant to keep the current viewable items in view
-                    // after adjusting for added items.
-                    index = generator.IndexFromGeneratorPosition(args.Position);
-                    if (Orientation == Orientation.Horizontal)
-                        offset = (int)HorizontalOffset;
-                    else
-                        offset = (int)VerticalOffset;
-
-                    if (index <= offset)
-                    {
-                        // items have been added earlier in the list than what is viewable
-                        offset += args.ItemCount;
-                    }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     // The following logic is meant to keep the current viewable items in view
                     // after adjusting for removed items.
-                    index = generator.IndexFromGeneratorPosition(args.Position);
+                    ItemsControl owner = ItemsControl.GetItemsOwner(this);
+                    int offset, viewable;
                     if (Orientation == Orientation.Horizontal)
                     {
                         offset = (int)HorizontalOffset;
@@ -501,12 +486,6 @@ namespace Windows.UI.Xaml.Controls
                     {
                         viewable = (int)ViewportHeight;
                         offset = (int)VerticalOffset;
-                    }
-
-                    if (index < offset)
-                    {
-                        // items earlier in the list than what is viewable have been removed
-                        offset = Math.Max(offset - args.ItemCount, 0);
                     }
 
                     // adjust for items removed in the current view and/or beyond the current view
