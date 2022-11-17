@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml
         private readonly DependencyProperty _sourceProperty;
         private DependencyObject _target;
         private DependencyProperty _targetProperty;
-        private IPropertyChangedListener _listener;
+        private IDependencyPropertyChangedListener _listener;
         private bool _skipTypeCheck;
 
         internal TemplateBindingExpression(Control templatedParent, DependencyProperty sourceDP)

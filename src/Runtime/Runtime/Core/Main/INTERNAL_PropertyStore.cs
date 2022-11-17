@@ -877,14 +877,14 @@ namespace CSHTML5.Internal
             }
         }
 
-        internal static IPropertyChangedListener ListenToChanged(DependencyObject target, DependencyProperty property, Action<object, IDependencyPropertyChangedEventArgs> updateSourceCallback)
+        internal static IDependencyPropertyChangedListener ListenToChanged(DependencyObject target, DependencyProperty property, Action<object, IDependencyPropertyChangedEventArgs> updateSourceCallback)
         {
             INTERNAL_PropertyStorage storage;
             TryGetStorage(target, property, true/*create*/, out storage);
-            List<IPropertyChangedListener> listeners = storage.PropertyListeners;
+            List<IDependencyPropertyChangedListener> listeners = storage.PropertyListeners;
             if (listeners == null)
             {
-                listeners = storage.PropertyListeners = new List<IPropertyChangedListener>(1);
+                listeners = storage.PropertyListeners = new List<IDependencyPropertyChangedListener>(1);
             }
 
             PropertyChangedListener listener = new PropertyChangedListener(storage, updateSourceCallback);

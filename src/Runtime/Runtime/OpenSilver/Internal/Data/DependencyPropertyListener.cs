@@ -28,7 +28,7 @@ namespace OpenSilver.Internal.Data
         private readonly DependencyProperty _dp;
         private readonly Action<object, IDependencyPropertyChangedEventArgs> _callback;
         
-        private IPropertyChangedListener _dpListener;
+        private IDependencyPropertyChangedListener _dpListener;
         private object _source;
 
         internal DependencyPropertyListener(DependencyProperty dp, Action<object, IDependencyPropertyChangedEventArgs> callback) 
@@ -47,7 +47,7 @@ namespace OpenSilver.Internal.Data
             get => _source;
             set
             {
-                IPropertyChangedListener listener = _dpListener;
+                IDependencyPropertyChangedListener listener = _dpListener;
                 if (listener != null)
                 {
                     _dpListener = null;

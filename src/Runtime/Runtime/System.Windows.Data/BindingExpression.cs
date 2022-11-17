@@ -58,7 +58,7 @@ namespace Windows.UI.Xaml.Data
         internal bool INTERNAL_ForceValidateOnNextSetValue = false;
         internal bool IsUpdating;
         private bool _isAttaching;
-        private IPropertyChangedListener _propertyListener;
+        private IDependencyPropertyChangedListener _propertyListener;
         private DynamicValueConverter _dynamicConverter;
         private object _bindingSource;
         private bool _isUpdateOnLostFocus; // True if this binding expression updates on LostFocus

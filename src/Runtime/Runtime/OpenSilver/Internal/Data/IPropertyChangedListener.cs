@@ -21,7 +21,7 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal.Data
 {
-    internal interface IPropertyChangedListener
+    internal interface IDependencyPropertyChangedListener
     {
         DependencyProperty Property { get; set; }
 

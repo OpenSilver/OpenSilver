@@ -31,7 +31,7 @@ namespace OpenSilver.Internal.Data
         private readonly Type _resolvedType;
         private readonly string _propertyName;
 
-        private IPropertyChangedListener _dpListener;
+        private IDependencyPropertyChangedListener _dpListener;
         private DependencyProperty _dp;
         private PropertyInfo _prop;
         private FieldInfo _field;
@@ -145,7 +145,7 @@ namespace OpenSilver.Internal.Data
                 inpc.PropertyChanged -= new PropertyChangedEventHandler(OnSourcePropertyChanged);
             }
 
-            IPropertyChangedListener listener = _dpListener;
+            IDependencyPropertyChangedListener listener = _dpListener;
             if (listener != null)
             {
                 _dpListener = null;
