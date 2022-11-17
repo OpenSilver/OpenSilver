@@ -11,12 +11,13 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -24,10 +25,11 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public sealed class ItemCollection : PresentationFrameworkCollection<object>, INotifyCollectionChanged
+    public sealed class ItemCollection : PresentationFrameworkCollection<object>, INotifyCollectionChanged, ICollectionChangedListener
     {
         private bool _isUsingItemsSource;
         private IEnumerable _itemsSource; // base collection
+        private WeakCollectionChangedListener _collectionChangedListener;
 
         private bool _isUsingListWrapper;
         private EnumerableWrapper _listWrapper;
@@ -71,7 +73,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 this.ClearModelParent(item);
             }
-            
+
             this.ClearInternal();
         }
 
@@ -236,13 +238,13 @@ namespace Windows.UI.Xaml.Controls
                 throw new InvalidOperationException("Items collection must be empty before using ItemsSource.");
             }
 
-            this.TryUnsubscribeFromCollectionChangedEvent(this._itemsSource);
+            this.TryUnsubscribeFromCollectionChangedEvent();
 
             this._itemsSource = value;
             this._isUsingItemsSource = true;
 
             this.TrySubscribeToCollectionChangedEvent(value);
-            
+
             this.InitializeSourceList(value);
 
             this.UpdateCountProperty();
@@ -255,7 +257,7 @@ namespace Windows.UI.Xaml.Controls
             if (this.IsUsingItemsSource)
             {
                 // return to normal mode
-                this.TryUnsubscribeFromCollectionChangedEvent(this._itemsSource);
+                this.TryUnsubscribeFromCollectionChangedEvent();
 
                 this._itemsSource = null;
                 this._listWrapper = null;
@@ -368,21 +370,23 @@ namespace Windows.UI.Xaml.Controls
 
         private void TrySubscribeToCollectionChangedEvent(IEnumerable collection)
         {
-            INotifyCollectionChanged incc = collection as INotifyCollectionChanged;
-            if (incc != null)
+            if (collection is INotifyCollectionChanged incc)
             {
-                incc.CollectionChanged += new NotifyCollectionChangedEventHandler(this.OnSourceCollectionChanged);
+                _collectionChangedListener = new WeakCollectionChangedListener(this, incc);
             }
         }
 
-        private void TryUnsubscribeFromCollectionChangedEvent(IEnumerable collection)
+        private void TryUnsubscribeFromCollectionChangedEvent()
         {
-            INotifyCollectionChanged incc = collection as INotifyCollectionChanged;
-            if (incc != null)
+            if (_collectionChangedListener != null)
             {
-                incc.CollectionChanged -= new NotifyCollectionChangedEventHandler(this.OnSourceCollectionChanged);
+                _collectionChangedListener.Dispose();
+                _collectionChangedListener = null;
             }
         }
+
+        void ICollectionChangedListener.OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            => OnSourceCollectionChanged(sender, e);
 
         private class EnumerableWrapper : List<object>
         {

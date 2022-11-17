@@ -62,6 +62,7 @@
 		<Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
 		<Compile Include="OpenSilver\Internal\Clipboard.cs" />
 		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
+		<Compile Include="OpenSilver\Internal\ICollectionChangedListener.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
 		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />

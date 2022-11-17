@@ -28,8 +28,4 @@
     <ProjectReference Include="..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="OpenSilver\MemoryLeak\" />
-  </ItemGroup>
-
 </Project>

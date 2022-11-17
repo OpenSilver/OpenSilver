@@ -15,7 +15,8 @@ using System;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Internal.Xaml.Context;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.Collections;
 
 #if MIGRATION
 using System.Windows;
@@ -208,6 +209,24 @@ public class MemoryLeakTest
 
         var c = new GCTracker();
         var child = CreateFrameworkElementWithTemplateParent(c);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
+    public void ItemsSource_Should_Not_Keep_ItemsControl_Alive()
+    {
+        static void CreateItemsControl(GCTracker tracker, IEnumerable itemsSource)
+        {
+            var ic = new ItemsControl();
+            MemoryLeaksHelper.SetTracker(ic, tracker);
+            ic.ItemsSource = itemsSource;
+        }
+
+        var c = new GCTracker();
+        var itemsSource = new ObservableCollection<object>();
+        CreateItemsControl(c, itemsSource);
         MemoryLeaksHelper.Collect();
 
         Assert.IsTrue(c.IsCollected);
