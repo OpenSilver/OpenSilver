@@ -64,6 +64,7 @@
 		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
 		<Compile Include="OpenSilver\Internal\ICollectionChangedListener.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
+		<Compile Include="OpenSilver\Internal\IPropertyChangedListener.cs" />
 		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />

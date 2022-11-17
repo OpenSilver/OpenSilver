@@ -17,6 +17,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Internal.Xaml.Context;
 using System.Collections.ObjectModel;
 using System.Collections;
+using System.Diagnostics;
+using System.Windows.Data;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows;
@@ -215,7 +218,7 @@ public class MemoryLeakTest
     }
 
     [TestMethod]
-    public void ItemsSource_Should_Not_Keep_ItemsControl_Alive()
+    public void CollectionChanged_Event_Should_Not_Keep_ItemsControl_Alive()
     {
         static void CreateItemsControl(GCTracker tracker, IEnumerable itemsSource)
         {
@@ -227,6 +230,27 @@ public class MemoryLeakTest
         var c = new GCTracker();
         var itemsSource = new ObservableCollection<object>();
         CreateItemsControl(c, itemsSource);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
+    public void PropertyChanged_Event_Should_Not_Keep_Binding_Target_Alive()
+    {
+        static void CreateBinding(GCTracker tracker, MyViewModel source)
+        {
+            var target = new MyFrameworkElement();
+            MemoryLeaksHelper.SetTracker(target, tracker);
+            var binding = new Binding("Prop1") { Source = source };
+            BindingOperations.SetBinding(target, MyFrameworkElement.MyPropertyProperty, binding);
+
+            Assert.AreEqual(target.MyProperty, source.Prop1);
+        }
+
+        var c = new GCTracker();
+        var source = new MyViewModel { Prop1 = "HELLO" };
+        CreateBinding(c, source);
         MemoryLeaksHelper.Collect();
 
         Assert.IsTrue(c.IsCollected);
@@ -249,4 +273,24 @@ public class MemoryLeakTest
     }
 
     private class MyControl : Control { }
+
+    private class MyViewModel : INotifyPropertyChanged
+    {
+        private string _prop1;
+
+        public string Prop1
+        {
+            get => _prop1;
+            set
+            {
+                _prop1 = value;
+                OnPropertyChanged(nameof(Prop1));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string propertyName)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
