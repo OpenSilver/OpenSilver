@@ -256,6 +256,27 @@ public class MemoryLeakTest
         Assert.IsTrue(c.IsCollected);
     }
 
+    [TestMethod]
+    public void PropertyChanged_Event_Should_Not_Keep_Binding_Target_Alive_Indexer()
+    {
+        static void CreateBinding(GCTracker tracker, MyViewModel source)
+        {
+            var target = new MyFrameworkElement();
+            MemoryLeaksHelper.SetTracker(target, tracker);
+            var binding = new Binding("Prop2[2]") { Source = source };
+            BindingOperations.SetBinding(target, MyFrameworkElement.MyPropertyProperty, binding);
+
+            Assert.AreEqual((int)target.MyProperty, source.Prop2[2]);
+        }
+
+        var c = new GCTracker();
+        var source = new MyViewModel { Prop1 = "HELLO", Prop2 = new ObservableCollection<int> { 1, 2, 3, 4 } };
+        CreateBinding(c, source);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
     private class MyFrameworkElement : FrameworkElement
     {
         public static readonly DependencyProperty MyPropertyProperty =
@@ -285,6 +306,18 @@ public class MemoryLeakTest
             {
                 _prop1 = value;
                 OnPropertyChanged(nameof(Prop1));
+            }
+        }
+
+        private ObservableCollection<int> _prop2;
+
+        public ObservableCollection<int> Prop2
+        {
+            get => _prop2;
+            set
+            {
+                _prop2 = value;
+                OnPropertyChanged(nameof(Prop2));
             }
         }
 

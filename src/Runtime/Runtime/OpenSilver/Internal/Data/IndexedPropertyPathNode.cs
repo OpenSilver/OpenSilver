@@ -19,13 +19,14 @@ using System.Reflection;
 
 namespace OpenSilver.Internal.Data
 {
-    internal sealed class IndexedPropertyPathNode : PropertyPathNode
+    internal sealed class IndexedPropertyPathNode : PropertyPathNode, IPropertyChangedListener
     {
         private const string IndexerPropertyName = "Item[]";
 
         private readonly string _index;
         private int? _intIndex;
         private PropertyInfo _indexer;
+        private WeakPropertyChangedListener _propertyChangedListener;
 
         private static readonly PropertyInfo _iListIndexer = GetIListIndexer();
 
@@ -56,15 +57,18 @@ namespace OpenSilver.Internal.Data
 
         internal override void OnSourceChanged(object oldValue, object newValue)
         {
-            if (oldValue is INotifyPropertyChanged inpc)
+            if (Listener.ListenForChanges)
             {
-                inpc.PropertyChanged -= new PropertyChangedEventHandler(OnSourcePropertyChanged);
-            }
+                if (_propertyChangedListener != null)
+                {
+                    _propertyChangedListener.Dispose();
+                    _propertyChangedListener = null;
+                }
 
-            inpc = newValue as INotifyPropertyChanged;
-            if (inpc != null)
-            {
-                inpc.PropertyChanged += new PropertyChangedEventHandler(OnSourcePropertyChanged);
+                if (newValue is INotifyPropertyChanged inpc)
+                {
+                    _propertyChangedListener = new WeakPropertyChangedListener(this, inpc);
+                }
             }
 
             // todo: (?) find out how to have a listener here since it
@@ -126,7 +130,7 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
+        void IPropertyChangedListener.OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == IndexerPropertyName)
             {
@@ -140,7 +144,6 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-#if NETSTANDARD
         private void FindIndexer(Type type)
         {
             // 1 - Look for an Int32 indexer
@@ -187,52 +190,5 @@ namespace OpenSilver.Internal.Data
         {
             return typeof(IList).GetDefaultMembers()[0] as PropertyInfo;
         }
-#elif BRIDGE
-        private void FindIndexer(Type type)
-        {
-            foreach (PropertyInfo property in type.GetProperties())
-            {
-                ParameterInfo[] parameters = property.GetIndexParameters();
-                if (parameters.Length != 1)
-                    continue;
-
-                if (parameters[0].ParameterType == typeof(int))
-                {
-                    if (int.TryParse(_index, out int value))
-                    {
-                        _indexer = property;
-                        _intIndex = value;
-                        break;
-                    }
-                }
-                else if (parameters[0].ParameterType == typeof(string))
-                {
-                    _indexer = property;
-                    _intIndex = null;
-                    // Do not exit the loop because we can still find an Int32 indexer,
-                    // which takes priority over this one.
-                }
-            }
-
-            if (_indexer == null)
-            {
-                if (type is IList)
-                {
-                    _indexer = _iListIndexer;
-                    _intIndex = int.Parse(_index);
-                }
-            }
-
-            if (_indexer == null)
-            {
-                throw new NotSupportedException("Only String and Int32 indexers with one parameters are supported.");
-            }
-        }
-
-        private static PropertyInfo GetIListIndexer()
-        {
-            return typeof(IList).GetProperty("Item");
-        }
-#endif
     }
 }
