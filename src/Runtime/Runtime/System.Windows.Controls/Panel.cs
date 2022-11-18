@@ -333,6 +333,42 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private bool VerifyBoundState()
+        {
+            // If the panel becomes "unbound" while attached to a generator, this
+            // method detaches it and makes it really behave like "unbound."  This
+            // can happen because of a style change, a theme change, etc. It returns
+            // the correct "bound" state, after the dust has settled.
+            //
+            // This is really a workaround for a more general problem that the panel
+            // needs to release resources (an event handler) when it is "out of the tree."
+            // Currently, there is no good notification for when this happens.
+
+            bool isItemsHost = ItemsControl.GetItemsOwner(this) != null;
+
+            if (isItemsHost)
+            {
+                if (_itemContainerGenerator == null)
+                {
+                    // Transitioning from being unbound to bound
+                    ClearChildren();
+                }
+
+                return _itemContainerGenerator != null;
+            }
+            else
+            {
+                if (_itemContainerGenerator != null)
+                {
+                    // Transitioning from being bound to unbound
+                    DisconnectFromGenerator();
+                    ClearChildren();
+                }
+
+                return false;
+            }
+        }
+
         private void ConnectToGenerator()
         {
             Debug.Assert(_itemContainerGenerator == null, "Attempted to connect to a generator when Panel._itemContainerGenerator is non-null.");
@@ -354,6 +390,15 @@ namespace Windows.UI.Xaml.Controls
                     ((IItemContainerGenerator)_itemContainerGenerator).RemoveAll();
                 }
             }
+        }
+
+        private void DisconnectFromGenerator()
+        {
+            Debug.Assert(_itemContainerGenerator != null, "Attempted to disconnect from a generator when Panel._itemContainerGenerator is null.");
+
+            _itemContainerGenerator.ItemsChanged -= new ItemsChangedEventHandler(OnItemsChanged);
+            ((IItemContainerGenerator)_itemContainerGenerator).RemoveAll();
+            _itemContainerGenerator = null;
         }
 
         private void EnsureEmptyChildren(FrameworkElement logicalParent)
@@ -451,32 +496,6 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
         }
-
-        // System.Windows.Controls.Panel
-        private bool VerifyBoundState()
-        {
-            if (ItemsControl.GetItemsOwnerInternal(this) != null)
-            {
-                if (_itemContainerGenerator == null)
-                {
-                    ClearChildren();
-                }
-                return _itemContainerGenerator != null;
-            }
-            if (_itemContainerGenerator != null)
-            {
-                DisconnectFromGenerator();
-                ClearChildren();
-            }
-            return false;
-        }
-        private void DisconnectFromGenerator()
-        {
-            _itemContainerGenerator.ItemsChanged -= OnItemsChanged;
-            ((IItemContainerGenerator)_itemContainerGenerator).RemoveAll();
-            _itemContainerGenerator = null;
-        }
-
 
         // This method returns a bool to indicate if or not the panel layout is affected by this collection change
         internal virtual bool OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
@@ -608,7 +627,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
@@ -693,11 +711,44 @@ namespace Windows.UI.Xaml.Controls
         private static void OnIsItemsHostChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Panel panel = (Panel)d;
-            ItemsControl itemsControl = ItemsControl.GetItemsOwner(panel);
+
+            panel.OnIsItemsHostChanged((bool)e.OldValue, (bool)e.NewValue);
+        }
+
+        /// <summary>
+        /// This method is invoked when the IsItemsHost property changes.
+        /// </summary>
+        /// <param name="oldIsItemsHost">The old value of the IsItemsHost property.</param>
+        /// <param name="newIsItemsHost">The new value of the IsItemsHost property.</param>
+        private void OnIsItemsHostChanged(bool oldIsItemsHost, bool newIsItemsHost)
+        {
+            // GetItemsOwner will check IsItemsHost first, so we don't have
+            // to check that IsItemsHost == true before calling it.
+            ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
+            Panel oldItemsHost = null;
+
             if (itemsControl != null)
             {
-                itemsControl.ItemsHost = panel;
+                // ItemsHost should be the "root" element which has
+                // IsItemsHost = true on it.  In the case of grouping,
+                // IsItemsHost is true on all panels which are generating
+                // content.  Thus, we care only about the panel which
+                // is generating content for the ItemsControl.
+                IItemContainerGenerator generator = itemsControl.ItemContainerGenerator;
+                if (generator != null && generator == generator.GetItemContainerGeneratorForPanel(this))
+                {
+                    oldItemsHost = itemsControl.ItemsHost;
+                    itemsControl.ItemsHost = this;
+                }
             }
+
+            if (oldItemsHost != null && oldItemsHost != this)
+            {
+                // when changing ItemsHost panels, disconnect the old one
+                oldItemsHost.VerifyBoundState();
+            }
+
+            VerifyBoundState();
         }
     }
 }
