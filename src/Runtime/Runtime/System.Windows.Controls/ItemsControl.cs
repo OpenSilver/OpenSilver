@@ -897,6 +897,32 @@ namespace Windows.UI.Xaml.Controls
 
             return template;
         }
+        internal static DependencyObject GetItemsOwnerInternal(DependencyObject element)
+        {
+            ItemsControl itemsControl;
+            return GetItemsOwnerInternal(element, out itemsControl);
+        }
+        internal static DependencyObject GetItemsOwnerInternal(DependencyObject element, out ItemsControl itemsControl)
+        {
+            DependencyObject dependencyObject = null;
+            Panel panel = element as Panel;
+            itemsControl = null;
+            if (panel != null && panel.IsItemsHost)
+            {
+                ItemsPresenter itemsPresenter = ItemsPresenter.FromPanel(panel);
+                if (itemsPresenter != null)
+                {
+                    dependencyObject = itemsPresenter.TemplatedParent;
+                    itemsControl = itemsPresenter.Owner;
+                }
+                else
+                {
+                    dependencyObject = panel.TemplatedParent;
+                    itemsControl = dependencyObject as ItemsControl;
+                }
+            }
+            return dependencyObject;
+        }
 
         public static ItemsControl GetItemsOwner(DependencyObject element)
         {

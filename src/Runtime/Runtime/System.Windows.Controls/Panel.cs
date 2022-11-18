@@ -189,7 +189,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#region Children Management
+        #region Children Management
 
         internal virtual void OnChildrenReset()
         {
@@ -243,7 +243,7 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
         }
 
-#endregion Children Management
+        #endregion Children Management
 
         /// <summary>
         /// Gets or sets a Brush that is used to fill the panel.
@@ -259,9 +259,9 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
             DependencyProperty.Register(
-                nameof(Background), 
-                typeof(Brush), 
-                typeof(Panel), 
+                nameof(Background),
+                typeof(Brush),
+                typeof(Panel),
                 new PropertyMetadata((object)null)
                 {
                     GetCSSEquivalent = (instance) =>
@@ -366,7 +366,7 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 _uiElementCollection = CreateUIElementCollection(logicalParent);
-                
+
                 if (_uiElementCollection != null && IsLoaded)
                 {
                     _uiElementCollection.CollectionChanged += new NotifyCollectionChangedEventHandler(OnChildrenCollectionChanged);
@@ -438,19 +438,45 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnItemsChanged(object sender, ItemsChangedEventArgs args)
         {
-            //if (VerifyBoundState())
-            //{
-            Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while receiving an ItemsChanged from a generator.");
-
-            bool affectsLayout = OnItemsChangedInternal(sender, args);
-
-            if (affectsLayout)
+            if (VerifyBoundState())
             {
-                // todo
-                InvalidateMeasure();
+                Debug.Assert(_itemContainerGenerator != null, "Encountered a null _itemContainerGenerator while receiving an ItemsChanged from a generator.");
+
+                bool affectsLayout = OnItemsChangedInternal(sender, args);
+
+                if (affectsLayout)
+                {
+                    // todo
+                    InvalidateMeasure();
+                }
             }
-            //}
         }
+
+        // System.Windows.Controls.Panel
+        private bool VerifyBoundState()
+        {
+            if (ItemsControl.GetItemsOwnerInternal(this) != null)
+            {
+                if (_itemContainerGenerator == null)
+                {
+                    ClearChildren();
+                }
+                return _itemContainerGenerator != null;
+            }
+            if (_itemContainerGenerator != null)
+            {
+                DisconnectFromGenerator();
+                ClearChildren();
+            }
+            return false;
+        }
+        private void DisconnectFromGenerator()
+        {
+            _itemContainerGenerator.ItemsChanged -= OnItemsChanged;
+            ((IItemContainerGenerator)_itemContainerGenerator).RemoveAll();
+            _itemContainerGenerator = null;
+        }
+
 
         // This method returns a bool to indicate if or not the panel layout is affected by this collection change
         internal virtual bool OnItemsChangedInternal(object sender, ItemsChangedEventArgs args)
@@ -601,7 +627,7 @@ namespace Windows.UI.Xaml.Controls
             int chunkSize = ProgressiveRenderingChunkSize;
             int from = 0;
             int to = (chunkSize * 2 > newChildren.Count) ? newChildren.Count : chunkSize; // do not process less number of items than chunk size
-            
+
             while (true)
             {
                 await Task.Delay(1);
@@ -625,7 +651,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     break;
                 }
-                
+
                 from = to;
                 to += (chunkSize * 2 > remaining) ? remaining : chunkSize;
             }
