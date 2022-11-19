@@ -18,17 +18,18 @@ using OpenSilver.Internal.Xaml.Context;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Diagnostics;
-using System.Windows.Data;
 using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Threading;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Core;
 #endif
