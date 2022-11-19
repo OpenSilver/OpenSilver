@@ -57,9 +57,16 @@ namespace Windows.UI.Xaml.Controls
             {
                 throw new InvalidOperationException("Operation is not valid while ItemsSource is in use. Access and modify elements with ItemsControl.ItemsSource instead.");
             }
-
-            this.SetModelParent(value);
-            this.AddInternal(value);
+            try
+            {
+                this.SetModelParent(value);
+                this.AddInternal(value);
+            }
+            finally
+            {
+                this.ClearModelParent(value);
+                
+            }            
         }
 
         internal override void ClearOverride()
