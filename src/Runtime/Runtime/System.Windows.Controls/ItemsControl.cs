@@ -901,9 +901,8 @@ namespace Windows.UI.Xaml.Controls
         public static ItemsControl GetItemsOwner(DependencyObject element)
         {
             ItemsControl container = null;
-            Panel panel = element as Panel;
 
-            if (panel != null && panel.IsItemsHost)
+            if (element is Panel panel && panel.IsItemsHost)
             {
                 // see if element was generated for an ItemsPresenter
                 ItemsPresenter ip = ItemsPresenter.FromPanel(panel);
@@ -913,11 +912,6 @@ namespace Windows.UI.Xaml.Controls
                     // if so use the element whose style begat the ItemsPresenter
                     container = ip.Owner;
                 }
-                //else
-                //{
-                //    // otherwise use element's templated parent
-                //    container = panel.TemplatedParent as ItemsControl;
-                //}
             }
 
             return container;
