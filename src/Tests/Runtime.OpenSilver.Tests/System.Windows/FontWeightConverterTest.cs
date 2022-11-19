@@ -18,12 +18,6 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #if MIGRATION
-using FontweightsEnum = System.Windows.FontWeights.INTERNAL_FontweightsEnum;
-#else
-using FontweightsEnum = Windows.UI.Text.FontWeights.INTERNAL_FontweightsEnum;
-#endif
-
-#if MIGRATION
 namespace System.Windows.Tests
 #else
 namespace Windows.UI.Text.Tests
@@ -100,9 +94,9 @@ namespace Windows.UI.Text.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
+        public void ConvertFrom_Bool_Should_Throw_ArgumentException()
         {
-            Assert.ThrowsException<NotSupportedException>(
+            Assert.ThrowsException<ArgumentException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -120,7 +114,7 @@ namespace Windows.UI.Text.Tests
         {
             Converter.ConvertTo(FontWeights.Light, typeof(string))
                 .Should()
-                .Be(((ushort)FontweightsEnum.Light).ToString());
+                .Be("Light");
         }
 
         [TestMethod]

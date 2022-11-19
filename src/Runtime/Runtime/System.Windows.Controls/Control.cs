@@ -232,7 +232,7 @@ namespace Windows.UI.Xaml.Controls
                     Inherits = true,
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
-                        Value = (inst, value) => ((FontWeight)value).Weight.ToInvariantString(),
+                        Value = (inst, value) => ((FontWeight)value).ToOpenTypeWeight().ToInvariantString(),
                         Name = new List<string> { "fontWeight" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
                     }

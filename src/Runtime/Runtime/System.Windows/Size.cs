@@ -24,27 +24,42 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width and height of an object.
     /// </summary>
-    public partial struct Size
+    public struct Size
     {
-        private double _width;
-        private double _height;
+        internal double _width;
+        internal double _height;
 
         /// <summary>
-        /// Initializes a new instance of the Windows.Foundation.Size
-        /// structure and assigns it an initial width and height.
+        /// Initializes a new instance of the <see cref="Size"/> structure and assigns it
+        /// an initial width and height.
         /// </summary>
-        /// <param name="width">The initial width of the instance of Windows.Foundation.Size.</param>
-        /// <param name="height">The initial height of the instance of Windows.Foundation.Size.</param>
+        /// <param name="width">
+        /// The initial width of the instance of <see cref="Size"/>.
+        /// </param>
+        /// <param name="height">
+        /// The initial height of the instance of <see cref="Size"/>.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// width or height are less than 0.
+        /// </exception>
         public Size(double width, double height)
         {
-            if(width < 0 || height < 0)
+            if (width < 0 || height < 0)
             {
                 throw new ArgumentException("Width and Height cannot be negative.");
             }
-            this._width = width;
-            this._height = height;
+
+            _width = width;
+            _height = height;
         }
 
+        /// <summary>
+        /// Parse - returns an instance converted from the provided string using
+        /// the <see cref="CultureInfo.InvariantCulture"/>.
+        /// <param name="source">
+        /// string with Size data
+        /// </param>
+        /// </summary>
         public static Size Parse(string source)
         {
             if (source != null)
@@ -66,36 +81,11 @@ namespace Windows.Foundation
         }
 
         /// <summary>
-        /// Compares two instances of Windows.Foundation.Size for
-        /// inequality.</summary>
-        /// <param name="size1">The first instance of Windows.Foundation.Size to compare.</param>
-        /// <param name="size2">The second instance of Windows.Foundation.Size to compare.</param>
-        /// <returns>
-        /// true if the instances of Windows.Foundation.Size are not equal; otherwise
-        /// false.
-        /// </returns>
-        public static bool operator !=(Size size1, Size size2)
-        {
-            return size1.Height != size2.Height || size1.Width != size2.Width;
-        }
-
-        /// <summary>
-        /// Compares two instances of Windows.Foundation.Size for
-        /// equality.</summary>
-        /// <param name="size1">The first instance of Windows.Foundation.Size to compare.</param>
-        /// <param name="size2">The second instance of Windows.Foundation.Size to compare.</param>
-        /// <returns>
-        /// true if the two instances of Windows.Foundation.Size are equal; otherwise
-        /// false.
-        /// </returns>
-        public static bool operator ==(Size size1, Size size2)
-        {
-            return size1.Height == size2.Height && size1.Width == size2.Width;
-        }
-
-        /// <summary>
-        /// Gets a value that represents a static empty Windows.Foundation.Size.
+        /// Gets a value that represents a static empty <see cref="Size"/>.
         /// </summary>
+        /// <returns>
+        /// An empty instance of <see cref="Size"/>.
+        /// </returns>
         public static Size Empty { get; } =
             new Size
             {
@@ -104,127 +94,137 @@ namespace Windows.Foundation
             };
 
         /// <summary>
-        /// Gets or sets the height of this instance of Windows.Foundation.Size in pixels. The default is 0. The value cannot be negative.
+        /// Gets a value that indicates whether this instance of <see cref="Size"/> is <see cref="Empty"/>.
         /// </summary>
+        public bool IsEmpty => _width < 0;
+
+        /// <summary>
+        /// Gets or sets the height of this instance of <see cref="Size"/>.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Height"/> of this instance of <see cref="Size"/>, in pixels.
+        /// The default is 0. The value cannot be negative.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Specified a value less than 0.
+        /// </exception>
         public double Height
         {
-            get
-            {
-                return this._height;
-            }
+            get => _height;
             set
             {
-                if (this.IsEmpty)
-                {
-                    throw new InvalidOperationException("Cannot modify Empty size.");
-                }
-                if(value < 0)
+                if (value < 0)
                 {
                     throw new ArgumentException("Height cannot be negative.");
                 }
-                this._height = value;
+
+                _height = value;
             }
         }
 
         /// <summary>
-        /// Gets a value that indicates whether this instance of
-        /// Windows.Foundation.Size is Windows.Foundation.Size.Empty.
+        /// Gets or sets the width of this instance of <see cref="Size"/>.
         /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return this._width < 0;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the width of this instance of Windows.Foundation.Size.
-        /// </summary>
+        /// <returns>
+        /// The <see cref="Width"/> of this instance of <see cref="Size"/>, in pixels.
+        /// The default value is 0. The value cannot be negative.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Specified a value less than 0.
+        /// </exception>
         public double Width
         {
-            get
-            {
-                return this._width;
-            }
+            get => _width;
             set
             {
-                if (this.IsEmpty)
-                {
-                    throw new InvalidOperationException("Cannot modify Empty size.");
-                }
-                if(value < 0)
+                if (value < 0)
                 {
                     throw new ArgumentException("Width cannot be negative.");
                 }
-                this._width = value;
-            }
-        }
 
-        public static bool Equals(Size size1, Size size2)
-        {
-            if (size1.IsEmpty)
-            {
-                return size2.IsEmpty;
-            }
-            else
-            {
-                return size1.Width == size2.Width && size1.Height == size2.Height;
+                _width = value;
             }
         }
 
         /// <summary>
-        /// Compares an object to an instance of Windows.Foundation.Size
-        /// for equality.
+        /// Compares an object to an instance of <see cref="Size"/> for equality.
         /// </summary>
-        /// <param name="o">The System.Object to compare.</param>
-        /// <returns>true if the sizes are equal; otherwise, false.</returns>
-        public override bool Equals(object o)
-        {
-            if (o is Size value)
-            {
-               return Size.Equals(this, value);
-            }
-            return false;
-        }
-
+        /// <param name="o">
+        /// The object to compare.
+        /// </param>
+        /// <returns>
+        /// true if the sizes are equal; otherwise, false.
+        /// </returns>
+        public override bool Equals(object o) => o is Size size && size == this;
 
         /// <summary>
-        /// Compares a value to an instance of Windows.Foundation.Size
-        /// for equality.
+        /// Compares a value to an instance of <see cref="Size"/> for equality.
         /// </summary>
-        /// <param name="value">The size to compare to this current instance of Windows.Foundation.Size.</param>
-        /// <returns>true if the instances of Windows.Foundation.Size are equal; otherwise, false.</returns>
-        public bool Equals(Size value)
-        {
-            return Size.Equals(this, value);
-        }
+        /// <param name="value">
+        /// The size to compare to this current instance of <see cref="Size"/>.
+        /// </param>
+        /// <returns>
+        /// true if the instances of <see cref="Size"/> are equal; otherwise, false.
+        /// </returns>
+        public bool Equals(Size value) => this == value;
 
         /// <summary>
-        /// Gets the hash code for this instance of Windows.Foundation.Size.
+        /// Gets the hash code for this instance of <see cref="Size"/>.
         /// </summary>
-        /// <returns>The hash code for this instance of Windows.Foundation.Size.</returns>
+        /// <returns>
+        /// The hash code for this instance of <see cref="Size"/>.
+        /// </returns>
         public override int GetHashCode()
         {
-            if (this.IsEmpty)
+            if (IsEmpty)
             {
                 return 0;
             }
             else
             {
                 // Perform field-by-field XOR of HashCodes
-                return this.Width.GetHashCode() ^ this.Height.GetHashCode();
+                return Width.GetHashCode() ^ Height.GetHashCode();
             }
         }
 
         /// <summary>
-        /// Returns a string representation of this Windows.Foundation.Size.
+        /// Returns a string representation of this <see cref="Size"/>.
         /// </summary>
-        /// <returns>A string representation of this Windows.Foundation.Size.</returns>
-        public override string ToString()
-        {
-            return ConvertToString(null);
-        }
+        /// <returns>
+        /// A string representation of this <see cref="Size"/>.
+        /// </returns>
+        public override string ToString() => ConvertToString(null);
+
+        /// <summary>
+        /// Compares two instances of <see cref="Size"/> for equality.
+        /// </summary>
+        /// <param name="size1">
+        /// The first instance of <see cref="Size"/> to compare.
+        /// </param>
+        /// <param name="size2">
+        /// The second instance of <see cref="Size"/> to compare.
+        /// </param>
+        /// <returns>
+        /// true if the two instances of <see cref="Size"/> are equal; otherwise false.
+        /// </returns>
+        public static bool operator ==(Size size1, Size size2)
+            => size1.Width == size2.Width && size1.Height == size2.Height;
+
+        /// <summary>
+        /// Compares two instances of <see cref="Size"/> for inequality.
+        /// </summary>
+        /// <param name="size1">
+        /// The first instance of <see cref="Size"/> to compare.
+        /// </param>
+        /// <param name="size2">
+        /// The second instance of <see cref="Size"/> to compare.
+        /// </param>
+        /// <returns>
+        /// true if the instances of <see cref="Size"/> are not equal; otherwise false.
+        /// </returns>
+        public static bool operator !=(Size size1, Size size2) => !(size1 == size2);
+
+        public static bool Equals(Size size1, Size size2) => size1 == size2;
 
         /// <summary>
         /// Creates a string representation of this object based on the format string
@@ -251,7 +251,7 @@ namespace Windows.Foundation
                                 _height);
         }
     }
-    
+
     internal static class SizeExtensions
     {
         public static bool IsWidthAuto(this Size size)

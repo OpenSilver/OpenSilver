@@ -721,7 +721,7 @@ namespace Windows.UI.Xaml.Controls
                     if (run.FontFamily != null)
                         format.Add("font-family", run.FontFamily.ToString());
                     if (run.FontWeight != null)
-                        format.Add("bold", run.FontWeight.Weight > 500);
+                        format.Add("bold", run.FontWeight.ToOpenTypeWeight() > 500);
 #if MIGRATION
                     if (run.FontStyle == FontStyles.Italic)
 #else

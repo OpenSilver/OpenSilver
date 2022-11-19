@@ -355,7 +355,7 @@
 		<Compile Include="System.Windows\TemplateBindingExtension.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\CheckAndDownloadUpdateCompletedEventArgs.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\FontCapitals.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\FontStretches.cs" />
+		<Compile Include="System.Windows\FontStretches.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\NotificationWindow.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\WebRequestCreator.cs" />
 		<Compile Include="System.Windows\IntExtensions.cs" />
@@ -1122,7 +1122,7 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\ApplicationUnhandledExceptionEventArgs.cs" />
 		<Compile Include="System.Windows\EventTrigger.cs" />
 		<Compile Include="System.Windows\FlowDirection.cs" />
-		<Compile Include="System.Windows\WORKINPROGRESS\FontStretch.cs" />
+		<Compile Include="System.Windows\FontStretch.cs" />
 		<Compile Include="System.Windows\HierarchicalDataTemplate.cs" />
 		<Compile Include="System.Windows\PresentationFrameworkCollection_1.cs" />
 		<Compile Include="System.Windows\TextDecorationCollection.cs" />

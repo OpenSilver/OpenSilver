@@ -62,25 +62,41 @@ namespace Windows.UI.Xaml.Tests
         }
 
         [TestMethod]
-        public void ConvertFrom_String_Should_Return_FontStretch()
+        public void ConvertFrom_String_Should_Return_FontStretch_1()
         {
-            Converter.ConvertFrom(string.Empty)
+            Converter.ConvertFrom("Condensed")
                 .Should()
-                .BeOfType<FontStretch>();
+                .Be(FontStretches.Condensed);
         }
 
         [TestMethod]
-        public void ConvertFrom_Null_Should_Return_FontStretch()
+        public void ConvertFrom_String_Should_Return_FontStretch_2()
         {
-            Converter.ConvertFrom(null)
+            Converter.ConvertFrom("semiexpanded")
                 .Should()
-                .BeOfType<FontStretch>();
+                .Be(FontStretches.SemiExpanded);
         }
 
         [TestMethod]
-        public void ConvertFrom_Bool_Should_Throw_NotSupportedException()
+        public void ConvertFrom_String_Should_Return_FontStretch_3()
+        {
+            Converter.ConvertFrom("8")
+                .Should()
+                .Be(FontStretches.ExtraExpanded);
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Null_Should_Throw_NotSupportedException()
         {
             Assert.ThrowsException<NotSupportedException>(
+                () => Converter.ConvertFrom(null)
+            );
+        }
+
+        [TestMethod]
+        public void ConvertFrom_Bool_Should_Throw_ArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(
                 () => Converter.ConvertFrom(true)
             );
         }
@@ -88,9 +104,9 @@ namespace Windows.UI.Xaml.Tests
         [TestMethod]
         public void ConvertTo_String()
         {
-            Converter.ConvertTo(new FontStretch(), typeof(string))
+            Converter.ConvertTo(FontStretches.UltraExpanded, typeof(string))
                 .Should()
-                .Be(typeof(FontStretch).FullName);
+                .Be("UltraExpanded");
         }
 
         [TestMethod]

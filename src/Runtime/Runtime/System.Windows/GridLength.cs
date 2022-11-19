@@ -21,205 +21,201 @@ namespace Windows.UI.Xaml
 #endif
 {
     /// <summary>
-    /// Represents the length of elements that explicitly support Windows.UI.Xaml.GridUnitType.Star
+    /// Represents the length of elements that explicitly support <see cref="GridUnitType.Star"/>
     /// unit types.
     /// </summary>
-    public partial struct GridLength
+    public struct GridLength
     {
-        /// <summary>
-        /// Returns a new instance of Gridlength with the same properties values.
-        /// </summary>
-        /// <returns>A new instance of Gridlength with the same properties values.</returns>
-        public GridLength Clone()
-        {
-            return new GridLength()
-            {
-                _type = this._type,
-                _value = this._value
-            };
-        }
-
-        private double _value;
-        private GridUnitType _type;
+        private double _unitValue;      //  unit value storage
+        private GridUnitType _unitType; //  unit type storage
 
         /// <summary>
-        /// Initializes a new instance of the Windows.UI.Xaml.GridLength
-        /// structure using the specified absolute value in pixels.
+        /// Initializes a new instance of the <see cref="GridLength"/> structure using the
+        /// specified absolute value in pixels.
         /// </summary>
-        /// <param name="pixels">The absolute count of pixels to establish as the value.</param>
+        /// <param name="pixels">
+        /// The absolute count of pixels to establish as the value.
+        /// </param>
         public GridLength(double pixels)
+            : this(pixels, GridUnitType.Pixel)
         {
-            _value = pixels;
-            _type = GridUnitType.Pixel;
         }
 
         /// <summary>
-        /// Initializes a new instance of the Windows.UI.Xaml.GridLength
-        /// structure and specifies what kind of value it holds.
+        /// Initializes a new instance of the <see cref="GridLength"/> structure and specifies
+        /// what kind of value it holds.
         /// </summary>
-        /// <param name="value">The initial value of this instance of Windows.UI.Xaml.GridLength.</param>
-        /// <param name="type">The Windows.UI.Xaml.GridUnitType held by this instance of Windows.UI.Xaml.GridLength.</param>
+        /// <param name="value">
+        /// The initial value of this instance of <see cref="GridLength"/>.
+        /// </param>
+        /// <param name="type">
+        /// The <see cref="GridUnitType"/> held by this instance of <see cref="GridLength"/>.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// value is less than 0 or is not a number.- or -type is not a valid <see cref="GridUnitType"/>.
+        /// </exception>
         public GridLength(double value, GridUnitType type)
         {
-            _value = (type == GridUnitType.Auto ? 0.0 : value);
-            _type = type;
+            if (double.IsNaN(value))
+            {
+                throw new ArgumentException($"'{value}' parameter cannot be NaN.", nameof(value));
+            }
+            if (double.IsInfinity(value))
+            {
+                throw new ArgumentException($"'{value}' parameter cannot be Infinity.", nameof(value));
+            }
+            if (value < 0.0)
+            {
+                throw new ArgumentException($"'{value}' parameter cannot be negative.", nameof(value));
+            }
+            if (type != GridUnitType.Auto
+                && type != GridUnitType.Pixel
+                && type != GridUnitType.Star)
+            {
+                throw new ArgumentException(
+                    $"'{type}' parameter is not valid. Valid values are GridUnitType.Auto, GridUnitType.Pixel, or GridUnitType.Star.",
+                    nameof(type));
+            }
+
+            _unitValue = type == GridUnitType.Auto ? 1.0 : value;
+            _unitType = type;
         }
 
         /// <summary>
-        /// Gets an instance of Windows.UI.Xaml.GridLength that holds
-        /// a value whose size is determined by the size properties of the content object.
+        /// Gets an instance of <see cref="GridLength"/> that holds a value whose size is
+        /// determined by the size properties of the content object.
         /// </summary>
-        public static GridLength Auto
-        {
-            get
-            {
-                return new GridLength(1.0, GridUnitType.Auto);
-            }
-        }
-        
-        /// <summary>
-        /// Gets the associated Windows.UI.Xaml.GridUnitType for
-        /// the Windows.UI.Xaml.GridLength.
-        /// </summary>
-        public GridUnitType GridUnitType
-        {
-            get
-            {
-                return _type;
-            }
-        }
-        
-        /// <summary>
-        /// Gets a value that indicates whether the Windows.UI.Xaml.GridLength
-        /// holds a value that is expressed in pixels.
-        /// </summary>
-        public bool IsAbsolute
-        {
-            get
-            {
-                return _type == GridUnitType.Pixel;
-            }
-        }
-        
-        /// <summary>
-        /// Gets a value that indicates whether the Windows.UI.Xaml.GridLength
-        /// holds a value whose size is determined by the size properties of the content
-        /// object.
-        /// </summary>
-        public bool IsAuto
-        {
-            get
-            {
-                return _type == GridUnitType.Auto;
-            }
-        }
-        
-        /// <summary>
-        /// Gets a value that indicates whether the Windows.UI.Xaml.GridLength
-        /// holds a value that is expressed as a weighted proportion of available space.
-        /// </summary>
-        public bool IsStar
-        {
-            get
-            {
-                return _type == GridUnitType.Star;
-            }
-        }
-        
-        /// <summary>
-        /// Gets a System.Double that represents the value of the
-        /// Windows.UI.Xaml.GridLength.
-        /// </summary>
-        public double Value
-        {
-            get
-            {
-                return _value;
-            }
-        }
- 
-        /// <summary>
-        /// Compares two Windows.UI.Xaml.GridLength structures to
-        /// determine if they are not equal.
-        /// </summary>
-        /// <param name="gl1">The first instance of Windows.UI.Xaml.GridLength to compare.</param>
-        /// <param name="gl2">The second instance of Windows.UI.Xaml.GridLength to compare.</param>
         /// <returns>
-        /// true if the two instances of Windows.UI.Xaml.GridLength do not have the same
-        /// value and Windows.UI.Xaml.GridUnitType; otherwise, false.
+        /// A instance of <see cref="GridLength"/> whose <see cref="GridUnitType"/>
+        /// property is set to <see cref="GridUnitType.Auto"/>.
         /// </returns>
-        public static bool operator !=(GridLength gl1, GridLength gl2)
-        {
-            return (gl1.GridUnitType != gl2.GridUnitType || gl1.Value != gl2.Value);
-        }
-        
-        /// <summary>
-        /// Compares two Windows.UI.Xaml.GridLength structures for
-        /// equality.
-        /// </summary>
-        /// <param name="gl1">The first instance of Windows.UI.Xaml.GridLength to compare.</param>
-        /// <param name="gl2">The second instance of Windows.UI.Xaml.GridLength to compare.</param>
-        /// <returns>
-        /// true if the two instances of Windows.UI.Xaml.GridLength have the same value
-        /// and Windows.UI.Xaml.GridUnitType; otherwise, false.
-        /// </returns>
-        public static bool operator ==(GridLength gl1, GridLength gl2)
-        {
-            return (gl1.GridUnitType == gl2.GridUnitType && gl1.Value == gl2.Value);
-        }
+        public static GridLength Auto { get; } = new GridLength(1.0, GridUnitType.Auto);
 
         /// <summary>
-        /// Determines whether the specified Windows.UI.Xaml.GridLength
-        /// is equal to the current Windows.UI.Xaml.GridLength.
+        /// Gets the associated <see cref="GridUnitType"/> for the <see cref="GridLength"/>.
         /// </summary>
-        /// <param name="gridLength">The Windows.UI.Xaml.GridLength structure to compare with the current instance.</param>
         /// <returns>
-        /// true if the specified Windows.UI.Xaml.GridLength has the same value and Windows.UI.Xaml.GridLength.GridUnitType
-        /// as the current instance; otherwise, false.
+        /// One of the <see cref="GridUnitType"/> values. The default is <see cref="GridUnitType.Auto"/>.
         /// </returns>
-        public bool Equals(GridLength gridLength)
-        {
-            return (this == gridLength);
-        }
-        
+        public GridUnitType GridUnitType => _unitType;
+
         /// <summary>
-        /// Determines whether the specified object is equal to the
-        /// current Windows.UI.Xaml.GridLength instance.
+        /// Gets a value that indicates whether the <see cref="GridLength"/> holds a value
+        /// that is expressed in pixels.
         /// </summary>
-        /// <param name="oCompare">The object to compare with the current instance.</param>
         /// <returns>
-        /// true if the specified object has the same value and Windows.UI.Xaml.GridUnitType
+        /// true if the <see cref="GridUnitType"/> property is <see cref="GridUnitType.Pixel"/>;
+        /// otherwise, false.
+        /// </returns>
+        public bool IsAbsolute => _unitType == GridUnitType.Pixel;
+
+        /// <summary>
+        /// Gets a value that indicates whether the <see cref="GridLength"/> holds a value
+        /// whose size is determined by the size properties of the content object.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="GridUnitType"/> property is <see cref="GridUnitType.Auto"/>;
+        /// otherwise, false.
+        /// </returns>
+        public bool IsAuto => _unitType == GridUnitType.Auto;
+
+        /// <summary>
+        /// Gets a value that indicates whether the <see cref="GridLength"/> holds a value
+        /// that is expressed as a weighted proportion of available space.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="GridUnitType"/> property is <see cref="GridUnitType.Star"/>;
+        /// otherwise, false.
+        /// </returns>
+        public bool IsStar => _unitType == GridUnitType.Star;
+
+        /// <summary>
+        /// Gets a <see cref="double"/> that represents the value of the <see cref="GridLength"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="double"/> that represents the value of the current instance.
+        /// </returns>
+        public double Value => _unitType == GridUnitType.Auto ? 1.0 : _unitValue;
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="GridLength"/>
+        /// instance.
+        /// </summary>
+        /// <param name="oCompare">
+        /// The object to compare with the current instance.
+        /// </param>
+        /// <returns>
+        /// true if the specified object has the same value and <see cref="GridUnitType"/>
         /// as the current instance; otherwise, false.
         /// </returns>
         public override bool Equals(object oCompare)
-        {
-            if (oCompare is GridLength)
-            {
-                return (this == (GridLength)oCompare);
-            }
-            else
-                return false;
-        }
-        
+            => oCompare is GridLength gridLength && this == gridLength;
+
         /// <summary>
-        /// Gets a hash code for the Windows.UI.Xaml.GridLength.
+        /// Determines whether the specified <see cref="GridLength"/> is equal to the current
+        /// <see cref="GridLength"/>.
         /// </summary>
-        /// <returns>A hash code for the Windows.UI.Xaml.GridLength.</returns>
-        public override int GetHashCode()
-        {
-            return ((int)_value) * 7 + (int)_type;
-        }
-         
+        /// <param name="gridLength">
+        /// The <see cref="GridLength"/> structure to compare with the current instance.
+        /// </param>
+        /// <returns>
+        /// true if the specified <see cref="GridLength"/> has the same value and <see cref="GridUnitType"/>
+        /// as the current instance; otherwise, false.
+        /// </returns>
+        public bool Equals(GridLength gridLength) => this == gridLength;
+
         /// <summary>
-        /// Returns a System.String representation of the Windows.UI.Xaml.GridLength.
+        /// Gets a hash code for the <see cref="GridLength"/>.
         /// </summary>
         /// <returns>
-        /// A System.String representation of the current Windows.UI.Xaml.GridLength
-        /// structure.
+        /// A hash code for the <see cref="GridLength"/>.
+        /// </returns>
+        public override int GetHashCode() => (int)_unitValue + (int)_unitType;
+
+        /// <summary>
+        /// Returns a <see cref="string"/> representation of the <see cref="GridLength"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="string"/> representation of the current <see cref="GridLength"/> structure.
         /// </returns>
         public override string ToString()
-        {
-            return GridLengthConverter.ToString(this, CultureInfo.InvariantCulture);
-        }
+            => GridLengthConverter.ToString(this, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Compares two <see cref="GridLength"/> structures for equality.
+        /// </summary>
+        /// <param name="gl1">
+        /// The first instance of <see cref="GridLength"/> to compare.
+        /// </param>
+        /// <param name="gl2">
+        /// The second instance of <see cref="GridLength"/> to compare.
+        /// </param>
+        /// <returns>
+        /// true if the two instances of <see cref="GridLength"/> have the same value and
+        /// <see cref="GridUnitType"/>; otherwise, false. 
+        /// </returns>
+        public static bool operator ==(GridLength gl1, GridLength gl2)
+            => gl1.GridUnitType == gl2.GridUnitType && gl1.Value == gl2.Value;
+
+        /// <summary>
+        /// Compares two <see cref="GridLength"/> structures to determine if they are not
+        /// equal.
+        /// </summary>
+        /// <param name="gl1">
+        /// The first instance of <see cref="GridLength"/> to compare.
+        /// </param>
+        /// <param name="gl2">
+        /// The second instance of <see cref="GridLength"/> to compare.
+        /// </param>
+        /// <returns>
+        /// true if the two instances of <see cref="GridLength"/> do not have the same value
+        /// and <see cref="GridUnitType"/>; otherwise, false.
+        /// </returns>
+        public static bool operator !=(GridLength gl1, GridLength gl2) => !(gl1 == gl2);
+
+        /// <summary>
+        /// Get a copy of the current instance of <see cref="GridLength"/>.
+        /// </summary>
+        public GridLength Clone() => new GridLength() { _unitType = _unitType, _unitValue = _unitValue };
     }
 }
