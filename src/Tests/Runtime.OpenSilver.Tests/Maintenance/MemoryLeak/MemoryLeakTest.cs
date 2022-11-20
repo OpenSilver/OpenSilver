@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.Collections;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows;
@@ -278,6 +279,25 @@ public class MemoryLeakTest
         Assert.IsTrue(c.IsCollected);
     }
 
+    [TestMethod]
+    public void ErrorsChanged_Event_Should_Not_Keep_Binding_Target_Alive()
+    {
+        static void CreateBinding(GCTracker tracker, MyViewModelWithValidation source)
+        {
+            var target = new MyFrameworkElement();
+            MemoryLeaksHelper.SetTracker(target, tracker);
+            var binding = new Binding("Prop1") { Source = source, ValidatesOnNotifyDataErrors = true };
+            BindingOperations.SetBinding(target, MyFrameworkElement.MyPropertyProperty, binding);
+        }
+
+        var c = new GCTracker();
+        var source = new MyViewModelWithValidation();
+        CreateBinding(c, source);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
     private class MyFrameworkElement : FrameworkElement
     {
         public static readonly DependencyProperty MyPropertyProperty =
@@ -326,5 +346,14 @@ public class MemoryLeakTest
 
         private void OnPropertyChanged(string propertyName)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private class MyViewModelWithValidation : MyViewModel, INotifyDataErrorInfo
+    {
+        public bool HasErrors => false;
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+        public IEnumerable GetErrors(string propertyName) => Enumerable.Empty<object>();
     }
 }

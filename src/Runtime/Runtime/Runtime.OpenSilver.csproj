@@ -15,7 +15,7 @@
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
 		<DebugType>full</DebugType>
-		<Optimize>true</Optimize>
+		<Optimize>false</Optimize>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
@@ -63,6 +63,7 @@
 		<Compile Include="OpenSilver\Internal\Clipboard.cs" />
 		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
 		<Compile Include="OpenSilver\Internal\ICollectionChangedListener.cs" />
+		<Compile Include="OpenSilver\Internal\IErrorsChangedListener.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
 		<Compile Include="OpenSilver\Internal\IPropertyChangedListener.cs" />
 		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />

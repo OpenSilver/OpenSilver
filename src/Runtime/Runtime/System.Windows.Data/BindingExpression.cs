@@ -13,15 +13,14 @@
 
 using System;
 using System.Diagnostics;
-using CSHTML5.Internal;
-using OpenSilver.Internal.Data;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Collections;
-using System.Reflection;
 using System.Threading;
 using System.Security;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -42,7 +41,7 @@ namespace Windows.UI.Xaml.Data
     /// <summary>
     /// Contains information about a single instance of a <see cref="Binding" />.
     /// </summary>
-    public class BindingExpression : BindingExpressionBase
+    public class BindingExpression : BindingExpressionBase, IErrorsChangedListener
     {
         // we are not allowed to change the following in BindingExpression because it is used:
         //  - ParentBinding.Mode
@@ -67,6 +66,8 @@ namespace Windows.UI.Xaml.Data
 
         private DependencyPropertyListener _dataContextListener;
         private DependencyPropertyListener _cvsListener;
+        private WeakErrorsChangedListener _sourceErrorsChangedListener;
+        private WeakErrorsChangedListener _valueErrorsChangedListener;
         private INotifyDataErrorInfo _dataErrorSource;
         private INotifyDataErrorInfo _dataErrorValue;
 
@@ -122,7 +123,7 @@ namespace Windows.UI.Xaml.Data
 
             // found this info at: https://msdn.microsoft.com/fr-fr/library/windows/apps/windows.ui.xaml.data.bindingexpression.updatesource.aspx
             // in the remark.
-            if (!IsUpdating && ParentBinding.Mode == BindingMode.TwoWay) 
+            if (!IsUpdating && ParentBinding.Mode == BindingMode.TwoWay)
             {
                 UpdateSourceObject(Target.GetValue(TargetProperty));
             }
@@ -220,7 +221,7 @@ namespace Windows.UI.Xaml.Data
             Target = d;
 
             _isUpdateOnLostFocus = ParentBinding.UpdateSourceTrigger == UpdateSourceTrigger.Default &&
-                (d is TextBox && dp == TextBox.TextProperty || 
+                (d is TextBox && dp == TextBox.TextProperty ||
                  d is PasswordBox && dp == PasswordBox.PasswordProperty);
             if (_isUpdateOnLostFocus)
             {
@@ -279,17 +280,20 @@ namespace Windows.UI.Xaml.Data
 
             if (ParentBinding.ValidatesOnNotifyDataErrors)
             {
-                if (_dataErrorSource != null)
+                if (_sourceErrorsChangedListener != null)
                 {
-                    _dataErrorSource.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnSourceErrorsChanged);
-                    _dataErrorSource = null;
+                    _sourceErrorsChangedListener.Dispose();
+                    _sourceErrorsChangedListener = null;
                 }
 
-                if (_dataErrorValue != null)
+                if (_valueErrorsChangedListener != null)
                 {
-                    _dataErrorValue.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnValueErrorsChanged);
-                    _dataErrorValue = null;
+                    _valueErrorsChangedListener.Dispose();
+                    _valueErrorsChangedListener = null;
                 }
+
+                _dataErrorSource = null;
+                _dataErrorValue = null;
             }
 
             BindingSource = null;
@@ -376,31 +380,33 @@ namespace Windows.UI.Xaml.Data
 
             if (source != _dataErrorSource)
             {
-                if (_dataErrorSource != null)
+                if (_sourceErrorsChangedListener != null)
                 {
-                    _dataErrorSource.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnSourceErrorsChanged);
+                    _sourceErrorsChangedListener.Dispose();
+                    _sourceErrorsChangedListener = null;
                 }
 
                 _dataErrorSource = source as INotifyDataErrorInfo;
 
                 if (_dataErrorSource != null)
                 {
-                    _dataErrorSource.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(OnSourceErrorsChanged);
+                    _sourceErrorsChangedListener = new WeakErrorsChangedListener(this, _dataErrorSource);
                 }
             }
 
             if (value != DependencyProperty.UnsetValue && value != _dataErrorValue)
             {
-                if (_dataErrorValue != null)
+                if (_valueErrorsChangedListener != null)
                 {
-                    _dataErrorValue.ErrorsChanged -= new EventHandler<DataErrorsChangedEventArgs>(OnValueErrorsChanged);
+                    _valueErrorsChangedListener.Dispose();
+                    _valueErrorsChangedListener = null;
                 }
 
                 _dataErrorValue = value as INotifyDataErrorInfo;
 
                 if (_dataErrorValue != null)
                 {
-                    _dataErrorValue.ErrorsChanged += new EventHandler<DataErrorsChangedEventArgs>(OnValueErrorsChanged);
+                    _valueErrorsChangedListener = new WeakErrorsChangedListener(this, _dataErrorValue);
                 }
             }
 
@@ -492,17 +498,20 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        private void OnSourceErrorsChanged(object sender, DataErrorsChangedEventArgs e)
+        void IErrorsChangedListener.OnErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            if (e.PropertyName == _propertyPathWalker.FirstNode.PropertyName)
+            if (sender == _dataErrorSource)
             {
-                UpdateNotifyDataErrors((INotifyDataErrorInfo)sender, e.PropertyName, DependencyProperty.UnsetValue);
+                if (e.PropertyName == _propertyPathWalker.FirstNode.PropertyName)
+                {
+                    UpdateNotifyDataErrors(_dataErrorSource, e.PropertyName, DependencyProperty.UnsetValue);
+                }
             }
-        }
-
-        private void OnValueErrorsChanged(object sender, DataErrorsChangedEventArgs e)
-        {
-            UpdateNotifyDataErrors(DependencyProperty.UnsetValue);
+            else
+            {
+                Debug.Assert(sender == _dataErrorValue);
+                UpdateNotifyDataErrors(DependencyProperty.UnsetValue);
+            }
         }
 
         internal void OnSourceAvailable(bool lastAttempt)
@@ -574,7 +583,7 @@ namespace Windows.UI.Xaml.Data
             {
                 return !type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == NullableType);
             }
-            
+
             return type.IsAssignableFrom(value.GetType());
         }
 
@@ -614,7 +623,7 @@ namespace Windows.UI.Xaml.Data
 #endif
 
                     if (convertedValue == DependencyProperty.UnsetValue)
-                        return;                    
+                        return;
                 }
 
                 // clearing invalid stuff first as node.SetValue triggers the INotifyDataErrorInfo.ErrorsChanged event
@@ -677,7 +686,7 @@ namespace Windows.UI.Xaml.Data
 
                 return _dynamicConverter;
             }
-        } 
+        }
 
         private object ConvertValueImplicitly(object value, Type targetType)
         {
@@ -743,7 +752,7 @@ namespace Windows.UI.Xaml.Data
             {
                 value = ConvertValueImplicitly(ParentBinding.FallbackValue, TargetProperty.PropertyType);
             }
-            
+
             if (value == DependencyProperty.UnsetValue)
             {
                 value = GetDefaultValue();
