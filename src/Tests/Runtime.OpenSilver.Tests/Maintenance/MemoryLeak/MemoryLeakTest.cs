@@ -298,6 +298,27 @@ public class MemoryLeakTest
         Assert.IsTrue(c.IsCollected);
     }
 
+    [TestMethod]
+    public void DependencyProperty_Listener_Should_Not_Keep_Binding_Target_Alive()
+    {
+        static void CreateBinding(GCTracker tracker, MyViewModel source)
+        {
+            var target = new MyFrameworkElement();
+            MemoryLeaksHelper.SetTracker(target, tracker);
+            var binding = new Binding("Prop3") { Source = source };
+            BindingOperations.SetBinding(target, MyFrameworkElement.MyPropertyProperty, binding);
+
+            Assert.AreEqual((string)target.MyProperty, (string)source.Prop3);
+        }
+
+        var c = new GCTracker();
+        var source = new MyViewModel { Prop3 = "SomeValue" };
+        CreateBinding(c, source);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
     private class MyFrameworkElement : FrameworkElement
     {
         public static readonly DependencyProperty MyPropertyProperty =
@@ -316,7 +337,7 @@ public class MemoryLeakTest
 
     private class MyControl : Control { }
 
-    private class MyViewModel : INotifyPropertyChanged
+    private class MyViewModel : DependencyObject, INotifyPropertyChanged
     {
         private string _prop1;
 
@@ -340,6 +361,19 @@ public class MemoryLeakTest
                 _prop2 = value;
                 OnPropertyChanged(nameof(Prop2));
             }
+        }
+
+        public static readonly DependencyProperty Prop3Property =
+            DependencyProperty.Register(
+                nameof(Prop3),
+                typeof(object),
+                typeof(MyViewModel),
+                null);
+
+        public object Prop3
+        {
+            get => GetValue(Prop3Property);
+            set => SetValue(Prop3Property, value);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml
         private readonly DependencyProperty _sourceProperty;
         private DependencyObject _target;
         private DependencyProperty _targetProperty;
-        private IDependencyPropertyChangedListener _listener;
+        private DependencyPropertyChangedListener _listener;
         private bool _skipTypeCheck;
 
         internal TemplateBindingExpression(Control templatedParent, DependencyProperty sourceDP)
@@ -79,8 +79,7 @@ namespace Windows.UI.Xaml
             _targetProperty = dp;
 
             _skipTypeCheck = _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
-            _listener = INTERNAL_PropertyStore.ListenToChanged(_source, _sourceProperty, 
-                (o, args) => _target.ApplyExpression(_targetProperty, this, false));
+            _listener = new DependencyPropertyChangedListener(_source, _sourceProperty, OnPropertyChanged);
         }
 
         internal override void OnDetach(DependencyObject d, DependencyProperty dp)
@@ -93,12 +92,17 @@ namespace Windows.UI.Xaml
             _skipTypeCheck = false;
             var listener = _listener;
             _listener = null;
-            listener?.Detach();
+            listener?.Dispose();
         }
 
         internal override void SetValue(DependencyObject d, DependencyProperty dp, object value)
         {
             return;
+        }
+
+        private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
+        {
+            _target.ApplyExpression(_targetProperty, this, false);
         }
 
         private bool ValidateValue(ref object value, DependencyProperty targetProperty)

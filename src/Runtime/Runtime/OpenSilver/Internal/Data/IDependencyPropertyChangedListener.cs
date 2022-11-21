@@ -23,10 +23,6 @@ namespace OpenSilver.Internal.Data
 {
     internal interface IDependencyPropertyChangedListener
     {
-        DependencyProperty Property { get; set; }
-
-        void OnPropertyChanged(DependencyObject sender, IDependencyPropertyChangedEventArgs args);
-        
-        void Detach();
+        void OnPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args);
     }
 }

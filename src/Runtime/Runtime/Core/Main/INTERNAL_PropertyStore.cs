@@ -647,23 +647,17 @@ namespace CSHTML5.Internal
             // Call the PropertyChangedCallback if any:
             //---------------------
 
+            var args = new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property);
             if (typeMetadata != null && typeMetadata.PropertyChangedCallback != null)
             {
-                typeMetadata.PropertyChangedCallback(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
+                typeMetadata.PropertyChangedCallback(sender, args);
             }
 
             //---------------------
             // Update bindings if any:
             //---------------------
 
-            if (storage.PropertyListeners != null)
-            {
-                var listeners = storage.PropertyListeners.ToArray();
-                foreach (var listener in listeners)
-                {
-                    listener.OnPropertyChanged(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
-                }
-            }
+            sender.InvalidateDependents(args);
         }
 
         private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
@@ -875,22 +869,6 @@ namespace CSHTML5.Internal
             {
                 throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
             }
-        }
-
-        internal static IDependencyPropertyChangedListener ListenToChanged(DependencyObject target, DependencyProperty property, Action<object, IDependencyPropertyChangedEventArgs> updateSourceCallback)
-        {
-            INTERNAL_PropertyStorage storage;
-            TryGetStorage(target, property, true/*create*/, out storage);
-            List<IDependencyPropertyChangedListener> listeners = storage.PropertyListeners;
-            if (listeners == null)
-            {
-                listeners = storage.PropertyListeners = new List<IDependencyPropertyChangedListener>(1);
-            }
-
-            PropertyChangedListener listener = new PropertyChangedListener(storage, updateSourceCallback);
-
-            listeners.Add(listener);
-            return listener;
         }
     }
 }

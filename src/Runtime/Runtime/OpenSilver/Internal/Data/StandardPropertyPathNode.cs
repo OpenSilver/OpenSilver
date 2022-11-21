@@ -31,7 +31,7 @@ namespace OpenSilver.Internal.Data
         private readonly Type _resolvedType;
         private readonly string _propertyName;
 
-        private IDependencyPropertyChangedListener _dpListener;
+        private DependencyPropertyChangedListener _dpListener;
         private WeakPropertyChangedListener _propertyChangedListener;
         private DependencyProperty _dp;
         private PropertyInfo _prop;
@@ -147,11 +147,11 @@ namespace OpenSilver.Internal.Data
                 _propertyChangedListener = null;
             }
 
-            IDependencyPropertyChangedListener listener = _dpListener;
+            var listener = _dpListener;
             if (listener != null)
             {
                 _dpListener = null;
-                listener.Detach();
+                listener.Dispose();
             }
 
             _dp = null;
@@ -177,7 +177,7 @@ namespace OpenSilver.Internal.Data
                     _dp = dependencyProperty;
                     if (Listener.ListenForChanges)
                     {
-                        _dpListener = INTERNAL_PropertyStore.ListenToChanged(sourceDO, dependencyProperty, OnPropertyChanged);
+                        _dpListener = new DependencyPropertyChangedListener(sourceDO, dependencyProperty, OnPropertyChanged);
                     }
                 }
             }
@@ -206,7 +206,7 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        private void OnPropertyChanged(object sender, IDependencyPropertyChangedEventArgs args)
+        private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
             try
             {
