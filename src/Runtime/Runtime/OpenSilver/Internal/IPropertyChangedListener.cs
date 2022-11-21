@@ -45,6 +45,11 @@ internal sealed class WeakPropertyChangedListener : IDisposable
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
+        if (_weakRef is null)
+        {
+            return;
+        }
+
         if (!_weakRef.TryGetTarget(out IPropertyChangedListener listener))
         {
             Dispose();

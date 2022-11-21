@@ -46,6 +46,11 @@ internal sealed class WeakCollectionChangedListener : IDisposable
 
     private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
+        if (_weakRef is null)
+        {
+            return;
+        }
+
         if (!_weakRef.TryGetTarget(out ICollectionChangedListener listener))
         {
             Dispose();

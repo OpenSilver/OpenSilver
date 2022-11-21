@@ -45,6 +45,11 @@ internal sealed class WeakErrorsChangedListener
 
     private void OnErrorsChanged(object sender, DataErrorsChangedEventArgs e)
     {
+        if (_weakRef is null)
+        {
+            return;
+        }
+
         if (!_weakRef.TryGetTarget(out IErrorsChangedListener listener))
         {
             Dispose();
