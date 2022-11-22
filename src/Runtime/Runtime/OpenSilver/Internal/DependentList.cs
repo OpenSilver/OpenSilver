@@ -197,6 +197,8 @@ internal class DependentList
         {
             _listStore = list._listStore;
             _newCount = newCount;
+            _validItemCount = 0;
+            _previousEnd = 0;
         }
 
         public void Include(int start, int end)
