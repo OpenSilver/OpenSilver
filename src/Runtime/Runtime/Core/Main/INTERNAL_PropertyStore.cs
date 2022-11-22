@@ -537,8 +537,6 @@ namespace CSHTML5.Internal
                 currentExpr.SetValue(storage.Owner, storage.Property, computedValue);
             }
 
-			// Raise the InvalidateMeasure or InvalidateArrange
-            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
             return valueChanged;
         }
 
@@ -658,6 +656,9 @@ namespace CSHTML5.Internal
             //---------------------
 
             sender.InvalidateDependents(args);
+
+            // Raise the InvalidateMeasure or InvalidateArrange
+            sender.OnPropertyChanged(args);
         }
 
         private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
