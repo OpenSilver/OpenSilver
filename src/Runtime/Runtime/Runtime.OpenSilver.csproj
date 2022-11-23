@@ -128,6 +128,7 @@
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
 		<Compile Include="System.Runtime.CompilerServices\DefaultInterpolatedStringHandler.cs" />
 		<Compile Include="System.Runtime.CompilerServices\InterpolatedStringHandlerAttribute.cs" />
+		<Compile Include="System.Runtime.CompilerServices\IsExternalInit.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\PollingDuplexMode.cs" />
 		<Compile Include="System.ServiceModel.Channels\WORKINPROGRESS\PollingDuplexHttpBinding.cs" />
 		<Compile Include="System.ServiceModel\WORKINPROGRESS\PollingDuplexHttpSecurity.cs" />
