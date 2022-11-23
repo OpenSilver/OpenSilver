@@ -17,9 +17,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSilver.Internal.Xaml.Context;
 using System.Collections.ObjectModel;
 using System.Collections;
-using System.Diagnostics;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Media.Effects;
 
 #if MIGRATION
 using System.Windows;
@@ -314,6 +314,24 @@ public class MemoryLeakTest
         var c = new GCTracker();
         var source = new MyViewModel { Prop3 = "SomeValue" };
         CreateBinding(c, source);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
+    public void Effect_Should_Not_Keep_Owner_Alive()
+    {
+        static void CreateElementAndApplyEffect(GCTracker tracker, Effect effect)
+        {
+            var element = new MyControl();
+            MemoryLeaksHelper.SetTracker(element, tracker);
+            element.Effect = effect;
+        }
+
+        var c = new GCTracker();
+        var effect = new BlurEffect();
+        CreateElementAndApplyEffect(c, effect);
         MemoryLeaksHelper.Collect();
 
         Assert.IsTrue(c.IsCollected);

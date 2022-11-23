@@ -96,6 +96,7 @@
 			<Link>OpenSilver\Internal\XamlResourcesHelper.cs</Link>
 		</Compile>
 		<Compile Include="OpenSilver\Internal\TokenizerHelper.cs" />
+		<Compile Include="OpenSilver\Internal\WeakEventListener.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\Context\XamlContext.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\Context\XamlContextStack.cs" />
 		<Compile Include="OpenSilver\Internal\Xaml\Context\XamlObjectFrame.cs" />

@@ -546,17 +546,27 @@ namespace Windows.UI.Xaml
         private static void OnEffectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
-            if (e.OldValue is Effect oldEffect)
+            
+            if (element._effectChangedListener != null)
             {
-                oldEffect.Changed -= new EventHandler(element.OnEffectChanged);
+                element._effectChangedListener.Detach();
+                element._effectChangedListener = null;
             }
+
             if (e.NewValue is Effect newEffect)
             {
-                newEffect.Changed += new EventHandler(element.OnEffectChanged);
+                element._effectChangedListener = new WeakEventListener<UIElement, Effect, EventArgs>(element, newEffect)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnEffectChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newEffect.Changed += element._effectChangedListener.OnEvent;
             }
         }
 
         private void OnEffectChanged(object sender, EventArgs e) => ((Effect)sender).Render(this);
+
+        private WeakEventListener<UIElement, Effect, EventArgs> _effectChangedListener;
 
 #endregion
 
