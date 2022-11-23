@@ -25,11 +25,11 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public sealed class ItemCollection : PresentationFrameworkCollection<object>, INotifyCollectionChanged, ICollectionChangedListener
+    public sealed class ItemCollection : PresentationFrameworkCollection<object>, INotifyCollectionChanged
     {
         private bool _isUsingItemsSource;
         private IEnumerable _itemsSource; // base collection
-        private WeakCollectionChangedListener _collectionChangedListener;
+        private WeakEventListener<ItemCollection, INotifyCollectionChanged, NotifyCollectionChangedEventArgs> _collectionChangedListener;
 
         private bool _isUsingListWrapper;
         private EnumerableWrapper _listWrapper;
@@ -372,7 +372,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (collection is INotifyCollectionChanged incc)
             {
-                _collectionChangedListener = new WeakCollectionChangedListener(this, incc);
+                _collectionChangedListener = new(this, incc)
+                {
+                    OnEventAction = static (instance, source, args) => instance.OnSourceCollectionChanged(source, args),
+                    OnDetachAction = static (listener, source) => source.CollectionChanged -= listener.OnEvent,
+                };
+                incc.CollectionChanged += _collectionChangedListener.OnEvent;
             }
         }
 
@@ -380,13 +385,10 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_collectionChangedListener != null)
             {
-                _collectionChangedListener.Dispose();
+                _collectionChangedListener.Detach();
                 _collectionChangedListener = null;
             }
         }
-
-        void ICollectionChangedListener.OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-            => OnSourceCollectionChanged(sender, e);
 
         private class EnumerableWrapper : List<object>
         {

@@ -555,7 +555,7 @@ namespace Windows.UI.Xaml
 
             if (e.NewValue is Effect newEffect)
             {
-                element._effectChangedListener = new WeakEventListener<UIElement, Effect, EventArgs>(element, newEffect)
+                element._effectChangedListener = new(element, newEffect)
                 {
                     OnEventAction = static (instance, sender, args) => instance.OnEffectChanged(sender, args),
                     OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,

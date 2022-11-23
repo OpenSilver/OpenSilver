@@ -22,7 +22,7 @@ namespace OpenSilver.Internal;
 /// <typeparam name="TInstance">Type of instance listening for the event.</typeparam>
 /// <typeparam name="TSource">Type of source for the event.</typeparam>
 /// <typeparam name="TEventArgs">Type of event arguments for the event.</typeparam>
-internal class WeakEventListener<TInstance, TSource, TEventArgs>
+internal sealed class WeakEventListener<TInstance, TSource, TEventArgs>
     where TInstance : class
     where TSource : class
 {
