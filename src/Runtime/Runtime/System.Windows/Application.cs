@@ -377,10 +377,6 @@ namespace Windows.UI.Xaml
                     ResourceDictionary.Helpers.BuildImplicitResourcesCache(Resources) :
                     null;
             }
-            else
-            {
-                Debug.Assert(false, "Unexpected resource update !");
-            }
         }
 
         /// <summary>
