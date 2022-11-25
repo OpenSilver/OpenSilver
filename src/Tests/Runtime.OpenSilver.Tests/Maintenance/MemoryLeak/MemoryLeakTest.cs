@@ -153,6 +153,25 @@ public class MemoryLeakTest
     }
 
     [TestMethod]
+    public void Button_Must_Be_Collected()
+    {
+        static void CreateRemoveButton(GCTracker tracker)
+        {
+            var button = new Button();
+            MemoryLeaksHelper.SetTracker(button, tracker);
+
+            Application.Current.MainWindow.Content = button;
+            Application.Current.MainWindow.Content = null;
+        }
+
+        var c = new GCTracker();
+        CreateRemoveButton(c);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
     public void SizeChanged_Should_Not_Keep_FrameworkElement_Alive()
     {
         static void CreateFrameworkElement(GCTracker tracker)

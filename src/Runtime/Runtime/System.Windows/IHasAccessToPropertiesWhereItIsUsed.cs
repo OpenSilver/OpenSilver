@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml
     public partial interface IHasAccessToPropertiesWhereItIsUsed
     {
 
-        HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
+        HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>> PropertiesWhereUsed
         {
             get;
         }

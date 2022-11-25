@@ -614,14 +614,22 @@ namespace CSHTML5.Internal
 
             if (oldValue is IHasAccessToPropertiesWhereItIsUsed)
             {
-                ((IHasAccessToPropertiesWhereItIsUsed)oldValue).PropertiesWhereUsed.Remove(new KeyValuePair<DependencyObject, DependencyProperty>(sender, storage.Property));
+                ((IHasAccessToPropertiesWhereItIsUsed)oldValue).PropertiesWhereUsed.Remove(
+                    new KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>(
+                        new WeakReference<DependencyObject>(sender),
+                        new WeakReference<DependencyProperty>(storage.Property))
+                    );
             }
 
             if (newValue is IHasAccessToPropertiesWhereItIsUsed)
             {
                 IHasAccessToPropertiesWhereItIsUsed newValueAsIHasAccessToPropertiesWhereItIsUsed = (IHasAccessToPropertiesWhereItIsUsed)newValue;
                 // Note: it is not supposed to happen that the element is already in the list.
-                newValueAsIHasAccessToPropertiesWhereItIsUsed.PropertiesWhereUsed.Add(new KeyValuePair<DependencyObject, DependencyProperty>(sender, storage.Property));
+                newValueAsIHasAccessToPropertiesWhereItIsUsed.PropertiesWhereUsed.Add(
+                    new KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>(
+                        new WeakReference<DependencyObject>(sender),
+                        new WeakReference<DependencyProperty>(storage.Property))
+                    );
             }
 
             //---------------------

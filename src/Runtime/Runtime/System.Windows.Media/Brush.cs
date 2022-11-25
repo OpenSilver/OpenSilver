@@ -49,14 +49,14 @@ namespace Windows.UI.Xaml.Media
         public static readonly DependencyProperty OpacityProperty =
             DependencyProperty.Register("Opacity", typeof(double), typeof(Brush), new PropertyMetadata(1d));
 
-        private HashSet<KeyValuePair<DependencyObject, DependencyProperty>> _propertiesWhereUsed;
-        public HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
+        private HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>> _propertiesWhereUsed;
+        public HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>> PropertiesWhereUsed
         {
             get
             {
-                if(_propertiesWhereUsed == null)
+                if (_propertiesWhereUsed == null)
                 {
-                    _propertiesWhereUsed = new HashSet<KeyValuePair<DependencyObject, DependencyProperty>>();
+                    _propertiesWhereUsed = new HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>>();
                 }
                 return _propertiesWhereUsed;
             }
@@ -66,51 +66,33 @@ namespace Windows.UI.Xaml.Media
         {
             List<CSSEquivalent> result = new List<CSSEquivalent>();
             //We copy brush.PropertiesWhereUsed in a local variable because we need to modify it in the foreach:
-            HashSet<KeyValuePair<DependencyObject, DependencyProperty>> propertiesWhereUsed = new HashSet<KeyValuePair<DependencyObject, DependencyProperty>>();
-            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in brush.PropertiesWhereUsed)
+            var propertiesWhereUsed = new HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>>();
+            foreach (var tuple in brush.PropertiesWhereUsed)
             {
                 propertiesWhereUsed.Add(tuple);
             }
 
-            foreach (KeyValuePair<DependencyObject, DependencyProperty> tuple in propertiesWhereUsed)
+            foreach (var tuple in propertiesWhereUsed)
             {
-                UIElement uiElement = tuple.Key as UIElement;
-                DependencyProperty dependencyProperty = tuple.Value;
-                if (uiElement != null)
-                {
-                    if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                    {
-                        brush.PropertiesWhereUsed.Remove(tuple);
-                    }
-                    else
-                    {
-                        PropertyMetadata propertyMetadata = dependencyProperty.GetTypeMetaData(uiElement.GetType());
-                        if (propertyMetadata.GetCSSEquivalent != null) // If the parent has a CSSEquivalent, we use it, otherwise we use the parent PropertyChanged method.
-                        {
-                            var parentPropertyCSSEquivalent = propertyMetadata.GetCSSEquivalent(uiElement);
-                            if (parentPropertyCSSEquivalent != null)
-                            {
-                                CSSEquivalent newCSSEquivalent = new CSSEquivalent()
-                                {
-                                    Name = parentPropertyCSSEquivalent.Name,
-                                    ApplyAlsoWhenThereIsAControlTemplate = parentPropertyCSSEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
+                bool hasKey = tuple.Key.TryGetTarget(out DependencyObject key);
+                bool hasValue = tuple.Value.TryGetTarget(out DependencyProperty value);
 
-                                    Value = parentPropertyToValueToHtmlConverter(parentPropertyCSSEquivalent),
-                                    DomElement = parentPropertyCSSEquivalent.DomElement,
-                                    UIElement = uiElement
-                                };
-                                if (newCSSEquivalent.DomElement == null)
-                                {
-                                    newCSSEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement;
-                                }
-                                result.Add(newCSSEquivalent);
-                            }
-                        }
-                        else if (propertyMetadata.GetCSSEquivalents != null)
+                if (hasKey && hasValue)
+                {
+                    UIElement uiElement = key as UIElement;
+                    DependencyProperty dependencyProperty = value;
+                    if (uiElement != null)
+                    {
+                        if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
                         {
-                            var parentPropertyCSSEquivalents = propertyMetadata.GetCSSEquivalents(uiElement);
-                            foreach (var parentPropertyCSSEquivalent in parentPropertyCSSEquivalents)
+                            brush.PropertiesWhereUsed.Remove(tuple);
+                        }
+                        else
+                        {
+                            PropertyMetadata propertyMetadata = dependencyProperty.GetTypeMetaData(uiElement.GetType());
+                            if (propertyMetadata.GetCSSEquivalent != null) // If the parent has a CSSEquivalent, we use it, otherwise we use the parent PropertyChanged method.
                             {
+                                var parentPropertyCSSEquivalent = propertyMetadata.GetCSSEquivalent(uiElement);
                                 if (parentPropertyCSSEquivalent != null)
                                 {
                                     CSSEquivalent newCSSEquivalent = new CSSEquivalent()
@@ -129,26 +111,54 @@ namespace Windows.UI.Xaml.Media
                                     result.Add(newCSSEquivalent);
                                 }
                             }
-                        }
-                        else
-                        {
-                            //we want to create a CSSEquivalent that will just make the UIElement call the property callback if any:
-                            if (propertyMetadata.PropertyChangedCallback != null)
+                            else if (propertyMetadata.GetCSSEquivalents != null)
                             {
-                                result.Add(new CSSEquivalent()
+                                var parentPropertyCSSEquivalents = propertyMetadata.GetCSSEquivalents(uiElement);
+                                foreach (var parentPropertyCSSEquivalent in parentPropertyCSSEquivalents)
                                 {
-                                    UIElement = uiElement,
-                                    CallbackMethod = propertyMetadata.PropertyChangedCallback,
-                                    DependencyProperty = dependencyProperty
-                                });
+                                    if (parentPropertyCSSEquivalent != null)
+                                    {
+                                        CSSEquivalent newCSSEquivalent = new CSSEquivalent()
+                                        {
+                                            Name = parentPropertyCSSEquivalent.Name,
+                                            ApplyAlsoWhenThereIsAControlTemplate = parentPropertyCSSEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
+
+                                            Value = parentPropertyToValueToHtmlConverter(parentPropertyCSSEquivalent),
+                                            DomElement = parentPropertyCSSEquivalent.DomElement,
+                                            UIElement = uiElement
+                                        };
+                                        if (newCSSEquivalent.DomElement == null)
+                                        {
+                                            newCSSEquivalent.DomElement = uiElement.INTERNAL_OuterDomElement;
+                                        }
+                                        result.Add(newCSSEquivalent);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //we want to create a CSSEquivalent that will just make the UIElement call the property callback if any:
+                                if (propertyMetadata.PropertyChangedCallback != null)
+                                {
+                                    result.Add(new CSSEquivalent()
+                                    {
+                                        UIElement = uiElement,
+                                        CallbackMethod = propertyMetadata.PropertyChangedCallback,
+                                        DependencyProperty = dependencyProperty
+                                    });
+                                }
                             }
                         }
+                    }
+                    else
+                    {
+                        //Commented because it could be a Setter in a Style
+                        //throw new NotSupportedException("A solidColorBrush cannot currently be set inside a class that desn't inherit from UIElement.");
                     }
                 }
                 else
                 {
-                    //Commented because it could be a Setter in a Style
-                    //throw new NotSupportedException("A solidColorBrush cannot currently be set inside a class that desn't inherit from UIElement.");
+                    brush.PropertiesWhereUsed.Remove(tuple);
                 }
             }
             return result;

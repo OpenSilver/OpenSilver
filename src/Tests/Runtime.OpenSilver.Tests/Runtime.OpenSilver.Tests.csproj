@@ -25,6 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Controls.Data\Controls.Data.OpenSilver.csproj" />
     <ProjectReference Include="..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
   </ItemGroup>
 
