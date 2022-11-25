@@ -550,15 +550,8 @@ namespace Windows.UI.Xaml.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-#if OPENSILVER
-            if (false)
-#elif BRIDGE
-            if (!CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                // Prevent the selection of text while dragging from the DragDropTarget
-                CSHTML5.Interop.ExecuteJavaScriptAsync("$0.onselectstart = function() { return false; }", this.INTERNAL_OuterDomElement);
-            }
+            // Prevent the selection of text while dragging from the DragDropTarget
+            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.style.userSelect = 'none'", this.INTERNAL_OuterDomElement);
         }
 
 
