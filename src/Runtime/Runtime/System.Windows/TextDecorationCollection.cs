@@ -15,7 +15,7 @@
 
 namespace System.Windows
 {
-    public sealed partial class TextDecorationCollection
+    public sealed class TextDecorationCollection
     {
         internal TextDecorationCollection() { }
 

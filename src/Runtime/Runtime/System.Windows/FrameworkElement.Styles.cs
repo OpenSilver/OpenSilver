@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml
                 nameof(Style),
                 typeof(Style),
                 typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnStyleChanged));
+                new FrameworkPropertyMetadata(null, OnStyleChanged));
 
         /// <summary>
         /// Gets or sets an instance Style that is applied for this object during rendering.

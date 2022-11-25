@@ -51,6 +51,12 @@ namespace Windows.UI.Xaml
             
         }
 
+        public FrameworkPropertyMetadata(object defaultValue, PropertyChangedCallback propertyChangedCallback)
+            : this(defaultValue, FrameworkPropertyMetadataOptions.None, propertyChangedCallback)
+        {
+
+        }
+
         public FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions flags) :
             this(null, flags, null, null)
         {

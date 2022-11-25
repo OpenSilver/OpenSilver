@@ -340,7 +340,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-		private Size noWrapSize = Size.Empty;
+        private Size noWrapSize = Size.Empty;
 
 		internal override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
 		{

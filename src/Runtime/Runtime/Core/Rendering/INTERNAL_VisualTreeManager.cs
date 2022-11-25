@@ -727,12 +727,10 @@ if(nextSibling != undefined) {
             // Int32.MaxValue). At the time when this code was written, there was no way to automatically call the "OnChanged"
             // on a dependency property if no value was set.
 
-            if (isChildAControl)
+            if (isChildAControl && child is not TextBlock)
             {
-                if (!(child is TextBlock)) // TextBlock should not count in tabbing (TextBlock is not supposed to be a Control).
-                {
-                    Control.TabIndexProperty_MethodToUpdateDom(child, ((Control)child).TabIndex);
-                }
+                Control c = (Control)child;
+                c.UpdateTabIndex(c.IsTabStop, c.TabIndex);
             }
 
             //--------------------------------------------------------

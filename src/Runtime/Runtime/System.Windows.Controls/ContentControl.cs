@@ -71,7 +71,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Content),
                 typeof(object),
                 typeof(ContentControl),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, OnContentChanged));
+                new FrameworkPropertyMetadata(null, OnContentChanged));
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
