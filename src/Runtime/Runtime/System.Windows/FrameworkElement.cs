@@ -1303,32 +1303,18 @@ namespace Windows.UI.Xaml
             return alignedLeft == 0 && alignedTop == 0 ? new Point() : new Point(alignedLeft, alignedTop);
         }
 
-        //
-        // Summary:
-        //     Provides the behavior for the Arrange pass of Silverlight layout. Classes can
-        //     override this method to define their own Arrange pass behavior.
-        //
-        // Parameters:
-        //   finalSize:
-        //     The final area within the parent that this object should use to arrange itself
-        //     and its children.
-        //
-        // Returns:
-        //     The actual size that is used after the element is arranged in layout.
-        protected virtual Size ArrangeOverride(Size finalSize)
-        {
-            int count = VisualChildrenCount;
-
-            if (count > 0)
-            {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
-                {
-                    child.Arrange(new Rect(finalSize));
-                }
-            }
-            return finalSize;
-        }
+        /// <summary>
+        /// Provides the behavior for the Arrange pass of Silverlight layout. Classes can
+        /// override this method to define their own Arrange pass behavior.
+        /// </summary>
+        /// <param name="finalSize">
+        /// The final area within the parent that this object should use to arrange itself
+        /// and its children.
+        /// </param>
+        /// <returns>
+        /// The actual size that is used after the element is arranged in layout.
+        /// </returns>
+        protected virtual Size ArrangeOverride(Size finalSize) => finalSize;
 
         internal sealed override Size MeasureCore(Size availableSize)
         {
@@ -1360,27 +1346,21 @@ namespace Windows.UI.Xaml
             return measuredSize;
         }
 
-        //
-        // Summary:
-        //     Provides the behavior for the Measure pass of Silverlight layout. Classes can
-        //     override this method to define their own Measure pass behavior.
-        //
-        // Parameters:
-        //   availableSize:
-        //     The available size that this object can give to child objects. Infinity (System.Double.PositiveInfinity)
-        //     can be specified as a value to indicate that the object will size to whatever
-        //     content is available.
-        //
-        // Returns:
-        //     The size that this object determines it needs during layout, based on its calculations
-        //     of the allocated sizes for child objects; or based on other considerations, such
-        //     as a fixed container size.
-        protected virtual Size MeasureOverride(Size availableSize)
-        {
-            INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement;
-            Debug.WriteLine($"FrmeworkElement MeasureOverride ({this}) {domElementReference.UniqueIdentifier}, ({Width}, {Height})");
-            return new Size();
-        }
+        /// <summary>
+        /// Provides the behavior for the Measure pass of Silverlight layout. Classes can override 
+        /// this method to define their own Measure pass behavior.
+        /// </summary>
+        /// <param name="availableSize">
+        /// The available size that this object can give to child objects. Infinity (<see cref="double.PositiveInfinity"/>)
+        /// can be specified as a value to indicate that the object will size to whatever content is 
+        /// available.
+        /// </param>
+        /// <returns>
+        /// The size that this object determines it needs during layout, based on its calculations
+        /// of the allocated sizes for child objects; or based on other considerations, such as a 
+        /// fixed container size.
+        /// </returns>
+        protected virtual Size MeasureOverride(Size availableSize) => new Size(0, 0);
 
 #endregion Work in progress
 

@@ -1107,6 +1107,8 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
         {
 
         }
+
+        /// <inheritdoc/>
         protected override Size MeasureOverride(Size availableSize)
         {
             int count = VisualChildrenCount;
@@ -1124,5 +1126,20 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             return new Size(0.0, 0.0);
         }
 
+        /// <inheritdoc/>
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            int count = VisualChildrenCount;
+
+            if (count > 0)
+            {
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Arrange(new Rect(finalSize));
+                }
+            }
+            return finalSize;
+        }
     }
 }

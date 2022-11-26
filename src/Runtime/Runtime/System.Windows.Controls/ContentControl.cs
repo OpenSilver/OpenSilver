@@ -245,23 +245,5 @@ namespace Windows.UI.Xaml.Controls
                 this.TemplateChild = presenter;
             }
         }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            int count = VisualChildrenCount;
-
-            if (count > 0)
-            {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
-                {
-                    child.Measure(availableSize);
-                    return child.DesiredSize;
-                }
-            }
-
-            Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
-            return actualSize;
-        }
     }
 }
