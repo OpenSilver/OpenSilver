@@ -25,6 +25,30 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+    public class WrapperOfWeakReferenceOfDependencyObject
+    {
+        public WrapperOfWeakReferenceOfDependencyObject(DependencyObject d)
+        {
+            DependencyObject = new WeakReference<DependencyObject>(d);
+        }
+
+        public WeakReference<DependencyObject> DependencyObject { get; }
+
+        public static implicit operator WrapperOfWeakReferenceOfDependencyObject(DependencyObject d)
+        {
+            return new WrapperOfWeakReferenceOfDependencyObject(d);
+        }
+    }
+
+    internal interface IHasAccessToPropertiesWhereItIsUsed2
+    {
+        Dictionary<WrapperOfWeakReferenceOfDependencyObject, HashSet<DependencyProperty>> PropertiesWhereUsed
+        {
+            get;
+        }
+    }
+
+    [Obsolete("Use IHasAccessToPropertiesWhereItIsUsed2 instead.")]
     public partial interface IHasAccessToPropertiesWhereItIsUsed
     {
 

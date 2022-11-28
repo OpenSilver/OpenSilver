@@ -612,24 +612,30 @@ namespace CSHTML5.Internal
             // Ensure tha the value knows in which properties it is used (this is useful for example so that a SolidColorBrush knows in which properties it is used):
             //---------------------
 
-            if (oldValue is IHasAccessToPropertiesWhereItIsUsed)
+            if (oldValue is IHasAccessToPropertiesWhereItIsUsed2)
             {
-                ((IHasAccessToPropertiesWhereItIsUsed)oldValue).PropertiesWhereUsed.Remove(
-                    new KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>(
-                        new WeakReference<DependencyObject>(sender),
-                        new WeakReference<DependencyProperty>(storage.Property))
-                    );
+                var propertiesWhereUsed = ((IHasAccessToPropertiesWhereItIsUsed2)oldValue).PropertiesWhereUsed;
+                if (propertiesWhereUsed.TryGetValue(sender, out HashSet<DependencyProperty> val))
+                {
+                    val.Remove(storage.Property);
+                    // Remove key from dictionary if no properties left
+                    if (val.Count == 0)
+                        propertiesWhereUsed.Remove(sender);
+                }
             }
 
-            if (newValue is IHasAccessToPropertiesWhereItIsUsed)
+            if (newValue is IHasAccessToPropertiesWhereItIsUsed2)
             {
-                IHasAccessToPropertiesWhereItIsUsed newValueAsIHasAccessToPropertiesWhereItIsUsed = (IHasAccessToPropertiesWhereItIsUsed)newValue;
+                var propertiesWhereUsed = ((IHasAccessToPropertiesWhereItIsUsed2)newValue).PropertiesWhereUsed;
                 // Note: it is not supposed to happen that the element is already in the list.
-                newValueAsIHasAccessToPropertiesWhereItIsUsed.PropertiesWhereUsed.Add(
-                    new KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>(
-                        new WeakReference<DependencyObject>(sender),
-                        new WeakReference<DependencyProperty>(storage.Property))
-                    );
+                if (propertiesWhereUsed.TryGetValue(sender, out HashSet<DependencyProperty> val))
+                {
+                    val.Add(storage.Property);
+                }
+                else
+                {
+                    propertiesWhereUsed.Add(sender, new HashSet<DependencyProperty>() { storage.Property });
+                }
             }
 
             //---------------------

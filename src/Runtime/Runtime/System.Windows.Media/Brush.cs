@@ -13,6 +13,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Controls;
 using CSHTML5.Internal;
 
 #if MIGRATION
@@ -25,7 +27,7 @@ namespace Windows.UI.Xaml.Media
     /// Defines objects used to paint graphical objects. Classes that derive from
     /// Brush describe how the area is painted.
     /// </summary>
-    public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed
+    public partial class Brush : DependencyObject, IHasAccessToPropertiesWhereItIsUsed2
     {
         internal static Brush Parse(string source)
         {
@@ -49,14 +51,14 @@ namespace Windows.UI.Xaml.Media
         public static readonly DependencyProperty OpacityProperty =
             DependencyProperty.Register("Opacity", typeof(double), typeof(Brush), new PropertyMetadata(1d));
 
-        private HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>> _propertiesWhereUsed;
-        public HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>> PropertiesWhereUsed
+        private Dictionary<WrapperOfWeakReferenceOfDependencyObject, HashSet<DependencyProperty>> _propertiesWhereUsed;
+        public Dictionary<WrapperOfWeakReferenceOfDependencyObject, HashSet<DependencyProperty>> PropertiesWhereUsed
         {
             get
             {
                 if (_propertiesWhereUsed == null)
                 {
-                    _propertiesWhereUsed = new HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>>();
+                    _propertiesWhereUsed = new Dictionary<WrapperOfWeakReferenceOfDependencyObject, HashSet<DependencyProperty>>();
                 }
                 return _propertiesWhereUsed;
             }
@@ -65,29 +67,25 @@ namespace Windows.UI.Xaml.Media
         internal static List<CSSEquivalent> MergeCSSEquivalentsOfTheParentsProperties(Brush brush, Func<CSSEquivalent, ValueToHtmlConverter> parentPropertyToValueToHtmlConverter) // note: "CSSEquivalent" here stands for the CSSEquicalent of the parent property.
         {
             List<CSSEquivalent> result = new List<CSSEquivalent>();
-            //We copy brush.PropertiesWhereUsed in a local variable because we need to modify it in the foreach:
-            var propertiesWhereUsed = new HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>>();
-            foreach (var tuple in brush.PropertiesWhereUsed)
+            foreach (var item in brush.PropertiesWhereUsed.ToList())
             {
-                propertiesWhereUsed.Add(tuple);
-            }
-
-            foreach (var tuple in propertiesWhereUsed)
-            {
-                bool hasKey = tuple.Key.TryGetTarget(out DependencyObject key);
-                bool hasValue = tuple.Value.TryGetTarget(out DependencyProperty value);
-
-                if (hasKey && hasValue)
+                bool hasKey = item.Key.DependencyObject.TryGetTarget(out var dependencyObject);
+                if (!hasKey)
                 {
-                    UIElement uiElement = key as UIElement;
-                    DependencyProperty dependencyProperty = value;
-                    if (uiElement != null)
+                    brush.PropertiesWhereUsed.Remove(item.Key);
+                    continue;
+                }
+
+                UIElement uiElement = dependencyObject as UIElement;
+                if (uiElement != null)
+                {
+                    if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
                     {
-                        if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                        {
-                            brush.PropertiesWhereUsed.Remove(tuple);
-                        }
-                        else
+                        brush.PropertiesWhereUsed.Remove(item.Key);
+                    }
+                    else
+                    {
+                        foreach (var dependencyProperty in item.Value)
                         {
                             PropertyMetadata propertyMetadata = dependencyProperty.GetTypeMetaData(uiElement.GetType());
                             if (propertyMetadata.GetCSSEquivalent != null) // If the parent has a CSSEquivalent, we use it, otherwise we use the parent PropertyChanged method.
@@ -150,15 +148,11 @@ namespace Windows.UI.Xaml.Media
                             }
                         }
                     }
-                    else
-                    {
-                        //Commented because it could be a Setter in a Style
-                        //throw new NotSupportedException("A solidColorBrush cannot currently be set inside a class that desn't inherit from UIElement.");
-                    }
                 }
                 else
                 {
-                    brush.PropertiesWhereUsed.Remove(tuple);
+                    //Commented because it could be a Setter in a Style
+                    //throw new NotSupportedException("A solidColorBrush cannot currently be set inside a class that desn't inherit from UIElement.");
                 }
             }
             return result;
