@@ -153,6 +153,26 @@ public class MemoryLeakTest
     }
 
     [TestMethod]
+    public void Brush_Should_Not_Keep_Owner_Alive()
+    {
+        static void CreateRemoveControlWithBackground(GCTracker tracker, Brush brush)
+        {
+            var control = new MyControl { Background = brush };
+            MemoryLeaksHelper.SetTracker(control, tracker);
+
+            Application.Current.MainWindow.Content = control;
+            Application.Current.MainWindow.Content = null;
+        }
+
+        var c = new GCTracker();
+        var brush = new SolidColorBrush();
+        CreateRemoveControlWithBackground(c, brush);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
     public void SizeChanged_Should_Not_Keep_FrameworkElement_Alive()
     {
         static void CreateFrameworkElement(GCTracker tracker)
