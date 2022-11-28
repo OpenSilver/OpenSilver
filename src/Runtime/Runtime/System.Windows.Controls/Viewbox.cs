@@ -195,12 +195,12 @@ namespace Windows.UI.Xaml.Controls
             }
 
             Dispatcher.BeginInvoke(() => // (This fixes the issue in the MatrixView in the STAR application, where the Viewbox scale was incorrect until the window was resized. Note that when doing step-by-step debugging it worked properly)
+            {
+                if (Content is FrameworkElement)
                 {
-                    if (Content is FrameworkElement)
-                    {
-                        UpdateScale(Content as FrameworkElement);
-                    }
-                });
+                    UpdateScale(Content as FrameworkElement);
+                }
+            });
         }
 
         protected override void OnContentChanged(object oldContent, object newContent)
@@ -230,6 +230,11 @@ namespace Windows.UI.Xaml.Controls
 
         private void UpdateScale(FrameworkElement content)
         {
+            if (CustomLayout || IsUnderCustomLayout)
+            {
+                return;
+            }
+
             if (Scale != null && RootCanvas != null)
             {
                 Size contentSize = content.INTERNAL_GetActualWidthAndHeight();
@@ -356,78 +361,78 @@ namespace Windows.UI.Xaml.Controls
         //          "VerticalAlignment=\"{TemplateBinding VerticalAlignment}\"/>" +
         //    "</ControlTemplate>";
 
-        ///// <summary>
-        ///// Measures the child element of a Viewbox to prepare for arranging
-        ///// it during the ArrangeOverride pass.
-        ///// </summary>
-        ///// <remarks>
-        ///// Viewbox measures it's child at an infinite constraint; it allows the child to be however large it so desires.
-        ///// The child's returned size will be used as it's natural size for scaling to Viewbox's size during Arrange.
-        ///// </remarks>
-        ///// <param name="availableSize">
-        ///// An upper limit Size that should not be exceeded.
-        ///// </param>
-        ///// <returns>The target Size of the element.</returns>
-        ///// 
-        //protected override Size MeasureOverride(Size availableSize)
-        //{
-        //    Size size = new Size();
-        //    if (Child != null)
-        //    {
-        //        Debug.Assert(ChildElement != null, "The required template part ChildElement was not found!");
-        //
-        //        // Get the child's desired size
-        //        ChildElement.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        //        Size desiredSize = ChildElement.DesiredSize;
-        //
-        //        // Determine how much we should scale the child
-        //        Size scale = ComputeScaleFactor(availableSize, desiredSize);
-        //        Debug.Assert(!double.IsPositiveInfinity(scale.Width), "The scale scaleX should not be infinite.");
-        //        Debug.Assert(!double.IsPositiveInfinity(scale.Height), "The scale scaleY should not be infinite.");
-        //
-        //        // Determine the desired size of the Viewbox
-        //        size.Width = scale.Width * desiredSize.Width;
-        //        size.Height = scale.Height * desiredSize.Height;
-        //    }
-        //    return size;
-        //}
+        /// <summary>
+        /// Measures the child element of a Viewbox to prepare for arranging
+        /// it during the ArrangeOverride pass.
+        /// </summary>
+        /// <remarks>
+        /// Viewbox measures it's child at an infinite constraint; it allows the child to be however large it so desires.
+        /// The child's returned size will be used as it's natural size for scaling to Viewbox's size during Arrange.
+        /// </remarks>
+        /// <param name="availableSize">
+        /// An upper limit Size that should not be exceeded.
+        /// </param>
+        /// <returns>The target Size of the element.</returns>
+        /// 
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            Size size = new Size();
+            if (Child != null)
+            {
+                Debug.Assert(ChildElement != null, "The required template part ChildElement was not found!");
 
-        ///// <summary>
-        ///// Arranges the content of a Viewbox element.
-        ///// Viewbox always sets the child to its desired size.  It then computes and applies a transformation
-        ///// from that size to the space available: Viewbox's own input size less child margin.
-        ///// </summary>
-        ///// <param name="finalSize">
-        ///// The Size this element uses to arrange its child content.
-        ///// </param>
-        ///// <returns>
-        ///// The Size that represents the arranged size of this Viewbox element
-        ///// and its child.
-        ///// </returns>
-        //protected override Size ArrangeOverride(Size finalSize)
-        //{
-        //    Debug.Assert(ChildElement != null, "The required template part ChildElement was not found!");
-        //    if (Child != null)
-        //    {
-        //        // Determine the scale factor given the final size
-        //        Size desiredSize = ChildElement.DesiredSize;
-        //        Size scale = ComputeScaleFactor(finalSize, desiredSize);
-        //
-        //        // Scale the ChildElement by the necessary factor
-        //        Debug.Assert(Scale != null, "Scale should not be null!");
-        //        Scale.ScaleX = scale.Width;
-        //        Scale.ScaleY = scale.Height;
-        //
-        //        // Position the ChildElement to fill the ChildElement
-        //        Rect originalPosition = new Rect(0, 0, desiredSize.Width, desiredSize.Height);
-        //        ChildElement.Arrange(originalPosition);
-        //
-        //        // Determine the final size used by the Viewbox
-        //        finalSize.Width = scale.Width * desiredSize.Width;
-        //        finalSize.Height = scale.Height * desiredSize.Height;
-        //    }
-        //    return finalSize;
-        //}
+                // Get the child's desired size
+                ChildElement.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                Size desiredSize = ChildElement.DesiredSize;
+
+                // Determine how much we should scale the child
+                Size scale = ComputeScaleFactor(availableSize, desiredSize, Stretch, StretchDirection);
+                Debug.Assert(!double.IsPositiveInfinity(scale.Width), "The scale scaleX should not be infinite.");
+                Debug.Assert(!double.IsPositiveInfinity(scale.Height), "The scale scaleY should not be infinite.");
+
+                // Determine the desired size of the Viewbox
+                size.Width = scale.Width * desiredSize.Width;
+                size.Height = scale.Height * desiredSize.Height;
+            }
+            return size;
+        }
+
+        /// <summary>
+        /// Arranges the content of a Viewbox element.
+        /// Viewbox always sets the child to its desired size.  It then computes and applies a transformation
+        /// from that size to the space available: Viewbox's own input size less child margin.
+        /// </summary>
+        /// <param name="finalSize">
+        /// The Size this element uses to arrange its child content.
+        /// </param>
+        /// <returns>
+        /// The Size that represents the arranged size of this Viewbox element
+        /// and its child.
+        /// </returns>
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            Debug.Assert(ChildElement != null, "The required template part ChildElement was not found!");
+            if (Child != null)
+            {
+                // Determine the scale factor given the final size
+                Size desiredSize = ChildElement.DesiredSize;
+                Size scale = ComputeScaleFactor(finalSize, desiredSize, Stretch, StretchDirection);
+
+                // Scale the ChildElement by the necessary factor
+                Debug.Assert(Scale != null, "Scale should not be null!");
+                Scale.ScaleX = scale.Width;
+                Scale.ScaleY = scale.Height;
+
+                // Position the ChildElement to fill the ChildElement
+                Rect originalPosition = new Rect(0, 0, desiredSize.Width, desiredSize.Height);
+                ChildElement.Arrange(originalPosition);
+
+                // Determine the final size used by the Viewbox
+                finalSize.Width = scale.Width * desiredSize.Width;
+                finalSize.Height = scale.Height * desiredSize.Height;
+            }
+            return finalSize;
+        }
 
     }
 
