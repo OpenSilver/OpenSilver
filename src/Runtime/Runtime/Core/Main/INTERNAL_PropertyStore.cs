@@ -612,29 +612,32 @@ namespace CSHTML5.Internal
             // Ensure tha the value knows in which properties it is used (this is useful for example so that a SolidColorBrush knows in which properties it is used):
             //---------------------
 
-            if (oldValue is IHasAccessToPropertiesWhereItIsUsed2)
+            if (oldValue is IHasAccessToPropertiesWhereItIsUsed2 hasAccessToProperties)
             {
-                var propertiesWhereUsed = ((IHasAccessToPropertiesWhereItIsUsed2)oldValue).PropertiesWhereUsed;
-                if (propertiesWhereUsed.TryGetValue(sender, out HashSet<DependencyProperty> val))
+                var key = new WeakDependencyObjectWrapper(sender);
+                var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
+                if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
                 {
                     val.Remove(storage.Property);
                     // Remove key from dictionary if no properties left
                     if (val.Count == 0)
-                        propertiesWhereUsed.Remove(sender);
+                    {
+                        propertiesWhereUsed.Remove(key);
+                    }
                 }
             }
 
-            if (newValue is IHasAccessToPropertiesWhereItIsUsed2)
+            if ((hasAccessToProperties = newValue as IHasAccessToPropertiesWhereItIsUsed2) != null)
             {
-                var propertiesWhereUsed = ((IHasAccessToPropertiesWhereItIsUsed2)newValue).PropertiesWhereUsed;
-                // Note: it is not supposed to happen that the element is already in the list.
-                if (propertiesWhereUsed.TryGetValue(sender, out HashSet<DependencyProperty> val))
+                var key = new WeakDependencyObjectWrapper(sender);
+                var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
+                if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
                 {
                     val.Add(storage.Property);
                 }
                 else
                 {
-                    propertiesWhereUsed.Add(sender, new HashSet<DependencyProperty>() { storage.Property });
+                    propertiesWhereUsed.Add(key, new HashSet<DependencyProperty>() { storage.Property });
                 }
             }
 

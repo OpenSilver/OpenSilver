@@ -153,19 +153,20 @@ public class MemoryLeakTest
     }
 
     [TestMethod]
-    public void Button_Must_Be_Collected()
+    public void Brush_Should_Not_Keep_Owner_Alive()
     {
-        static void CreateRemoveButton(GCTracker tracker)
+        static void CreateRemoveControlWithBackground(GCTracker tracker, Brush brush)
         {
-            var button = new Button();
-            MemoryLeaksHelper.SetTracker(button, tracker);
+            var control = new MyControl { Background = brush };
+            MemoryLeaksHelper.SetTracker(control, tracker);
 
-            Application.Current.MainWindow.Content = button;
+            Application.Current.MainWindow.Content = control;
             Application.Current.MainWindow.Content = null;
         }
 
         var c = new GCTracker();
-        CreateRemoveButton(c);
+        var brush = new SolidColorBrush();
+        CreateRemoveControlWithBackground(c, brush);
         MemoryLeaksHelper.Collect();
 
         Assert.IsTrue(c.IsCollected);

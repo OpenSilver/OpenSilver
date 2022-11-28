@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,36 +26,55 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public class WrapperOfWeakReferenceOfDependencyObject
+    [Obsolete("This interface is no longer used and will be removed in later releases.")]
+    public interface IHasAccessToPropertiesWhereItIsUsed
     {
-        public WrapperOfWeakReferenceOfDependencyObject(DependencyObject d)
+        HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
         {
-            DependencyObject = new WeakReference<DependencyObject>(d);
-        }
-
-        public WeakReference<DependencyObject> DependencyObject { get; }
-
-        public static implicit operator WrapperOfWeakReferenceOfDependencyObject(DependencyObject d)
-        {
-            return new WrapperOfWeakReferenceOfDependencyObject(d);
+            get;
         }
     }
 
     internal interface IHasAccessToPropertiesWhereItIsUsed2
     {
-        Dictionary<WrapperOfWeakReferenceOfDependencyObject, HashSet<DependencyProperty>> PropertiesWhereUsed
+        Dictionary<WeakDependencyObjectWrapper, HashSet<DependencyProperty>> PropertiesWhereUsed
         {
             get;
         }
     }
 
-    [Obsolete("Use IHasAccessToPropertiesWhereItIsUsed2 instead.")]
-    public partial interface IHasAccessToPropertiesWhereItIsUsed
+    internal readonly struct WeakDependencyObjectWrapper
     {
+        private readonly WeakReference<DependencyObject> _weakRef;
+        private readonly int _hashCode;
 
-        HashSet<KeyValuePair<WeakReference<DependencyObject>, WeakReference<DependencyProperty>>> PropertiesWhereUsed
+        public WeakDependencyObjectWrapper(DependencyObject d)
         {
-            get;
+            Debug.Assert(d != null);
+            _weakRef = new WeakReference<DependencyObject>(d);
+            _hashCode = d.GetHashCode();
         }
+
+        public bool TryGetDependencyObject(out DependencyObject dependencyObject)
+            => _weakRef.TryGetTarget(out dependencyObject);
+
+        public override bool Equals(object obj)
+        {
+            if (obj is WeakDependencyObjectWrapper wrapper)
+            {
+                if (_weakRef != wrapper._weakRef)
+                {
+                    return TryGetDependencyObject(out DependencyObject target1) &&
+                        wrapper.TryGetDependencyObject(out DependencyObject target2) &&
+                        target1 == target2;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode() => _hashCode;
     }
 }
