@@ -29,7 +29,7 @@
                             <VisualStateGroup Name="CommonStates">
                                 <VisualState Name="Normal">
                                 </VisualState>
-                                <VisualState Name="PointerOver">
+                                <VisualState Name="MouseOver">
                                     <Storyboard>
                                         <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"
@@ -114,7 +114,7 @@
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal"/>
-                                <VisualState x:Name="PointerOver">
+                                <VisualState x:Name="MouseOver">
                                     <Storyboard>
                                         <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundPointerOver"/>
                                         <DoubleAnimation Duration="0" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Background" />
@@ -170,7 +170,7 @@
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
-                                <VisualState x:Name="PointerOver" />
+                                <VisualState x:Name="MouseOver" />
                                 <VisualState x:Name="Disabled" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
