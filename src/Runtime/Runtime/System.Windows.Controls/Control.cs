@@ -130,7 +130,13 @@ namespace Windows.UI.Xaml.Controls
             DependencyProperty.Register(
                 nameof(Background), typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata((object)null));
+                new PropertyMetadata((object)null)
+                {
+                    GetCSSEquivalent = (instance) => new CSSEquivalent
+                    {
+                        Name = new List<string>(3) { "background", "backgroundColor", "backgroundColorAlpha" },
+                    },
+                });
 
         internal bool INTERNAL_IsLegacyVisualStates
         {
