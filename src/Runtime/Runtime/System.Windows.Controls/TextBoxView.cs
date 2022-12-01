@@ -591,6 +591,8 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
                 text = text.Replace('\n', '\0').Replace('\r', '\0');
             }
 
+            // This is the case when the text is changed by backspace or paste.
+            InvalidateMeasure();
             return text;
         }
 
@@ -610,6 +612,9 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
                 return;
 
             INTERNAL_HtmlDomManager.SetContentString(this, Host.Text);
+
+            // This is the case when the text is changed by typing.
+            InvalidateMeasure();
         }
 
         private void TextBoxView_GotFocus(object e)
