@@ -408,7 +408,7 @@ namespace Windows.UI.Xaml.Data
 
                 if (_dataErrorValue != null)
                 {
-                    _valueErrorsChangedListener = new(this, _dataErrorSource)
+                    _valueErrorsChangedListener = new(this, _dataErrorValue)
                     {
                         OnEventAction = static (instance, source, args) => instance.OnValueErrorsChanged(source, args),
                         OnDetachAction = static (listener, source) => source.ErrorsChanged -= listener.OnEvent,
