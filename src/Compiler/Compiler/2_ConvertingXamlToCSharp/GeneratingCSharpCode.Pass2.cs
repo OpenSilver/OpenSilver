@@ -478,7 +478,8 @@ namespace DotNetForHtml5.Compiler
                         bool isAttachedProperty = attributeLocalName.Contains(".");
                         if (!isAttachedProperty)
                         {
-                            if (IsAttributeTheXNameAttribute(attribute))
+                            bool isXNameAttr = IsXNameAttribute(attribute);
+                            if (isXNameAttr || IsNameAttribute(attribute))
                             {
                                 //-------------
                                 // x:Name (or "Name")
@@ -503,11 +504,21 @@ namespace DotNetForHtml5.Compiler
                                     parameters.ResultingFindNameCalls.Add($"this.{fieldName} = (({elementTypeInCSharp})(this.FindName(\"{name}\")));");
                                 }
 
-                                // We also set the Name property on the object itself, if the XAML was "Name=..." or (if the XAML was x:Name=... AND the Name property exists in the object).    (Note: setting the Name property on the object is useful for example in <VisualStateGroup Name="Pressed"/> where the parent control looks at the name of its direct children:
-                                bool isNamePropertyRatherThanXColonNameProperty = string.IsNullOrEmpty(attribute.Name.NamespaceName); // This is used to distinguish between "Name" and "x:Name"
-                                if (isNamePropertyRatherThanXColonNameProperty || _reflectionOnSeparateAppDomain.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny))
+                                if (isXNameAttr)
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.Name = \"{1}\";", elementUniqueNameOrThisKeyword, name));
+                                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "DependencyObject",
+                                        element.Name.NamespaceName, element.Name.LocalName))
+                                    {
+                                        parameters.StringBuilder.AppendLine(
+                                            $"{elementUniqueNameOrThisKeyword}.SetValue(global::{_metadata.SystemWindowsNS}.FrameworkElement.NameProperty, \"{name}\");");                                        
+                                    }
+                                }
+                                else
+                                {
+                                    if (_reflectionOnSeparateAppDomain.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny))
+                                    {
+                                        parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.Name = \"{name}\";");
+                                    }
                                 }
 
                                 parameters.CurrentScope.RegisterName(name, elementUniqueNameOrThisKeyword);

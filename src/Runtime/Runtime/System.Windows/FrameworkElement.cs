@@ -1013,19 +1013,23 @@ namespace Windows.UI.Xaml
         /// Identifies the <see cref="Name"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty NameProperty =
-            DependencyProperty.Register(
-                nameof(Name), 
-                typeof(string), 
-                typeof(FrameworkElement), 
-                new PropertyMetadata(string.Empty)
+            DependencyProperty.RegisterAttached(
+                nameof(Name),
+                typeof(string),
+                typeof(FrameworkElement),
+                new PropertyMetadata(string.Empty, null, OnCoerceName)
                 {
                     MethodToUpdateDom = OnNameChanged_MethodToUpdateDom,
                 });
 
+        private static object OnCoerceName(DependencyObject d, object baseValue) => baseValue ?? string.Empty;
+
         private static void OnNameChanged_MethodToUpdateDom(DependencyObject d, object value)
         {
-            var fe = (FrameworkElement)d;
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(fe.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
+            if (d is FrameworkElement fe)
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(fe.INTERNAL_OuterDomElement, "dataId", (value ?? string.Empty).ToString());
+            }
         }
 
 #endregion

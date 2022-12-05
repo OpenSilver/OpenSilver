@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -54,8 +55,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public string Name
         {
-            get;
-            set;
+            get => (string)GetValue(FrameworkElement.NameProperty);
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            set => SetValue(FrameworkElement.NameProperty, value);
         }
 
         /// <summary>
