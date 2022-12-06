@@ -126,6 +126,7 @@ popupRoot.style.width = '100%';
 popupRoot.style.height = '100%';
 popupRoot.style.overflowX = 'hidden';
 popupRoot.style.overflowY = 'hidden';
+popupRoot.style.pointerEvents = 'none';
 {INTERNAL_InteropImplementation.GetVariableStringForJS(parentWindow.INTERNAL_RootDomElement)}.appendChild(popupRoot);");
 
             //--------------------------------------
@@ -143,8 +144,6 @@ popupRoot.style.overflowY = 'hidden';
                 = popupRoot.INTERNAL_InnerDomElement
                 = popupRootDiv;
             popupRoot.IsConnectedToLiveTree = true;
-            UIElement.SetPointerEvents(popupRoot);
-
             //--------------------------------------
             // Listen to clicks anywhere in the popup (this is used to close other popups that are not supposed to stay open):
             //--------------------------------------

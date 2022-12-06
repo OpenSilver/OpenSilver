@@ -728,23 +728,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal void OnOutsideClick(OutsideClickEventArgs args) => OutsideClick?.Invoke(this, args);
 
-        private bool _stayOpen = true;
-
-        public bool StayOpen
-        {
-            get => _stayOpen;
-            set
-            {
-                if (_stayOpen != value)
-                {
-                    _stayOpen = value;
-                    if (_popupRoot != null)
-                    {
-                        SetPointerEvents(_popupRoot);
-                    }
-                }
-            }
-        }
+        public bool StayOpen { get; set; } = true;
 
         internal void UpdatePopupParent()
         {

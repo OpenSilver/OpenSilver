@@ -25,7 +25,7 @@ namespace System.Windows.Controls.Primitives
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
-    internal partial class PopupRoot : FrameworkElement
+    internal sealed class PopupRoot : FrameworkElement
     {
         /// <summary>
         /// Returns the Visual children count.
@@ -59,9 +59,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         internal string INTERNAL_UniqueIndentifier { get; set; }
 
         internal Popup INTERNAL_LinkedPopup { get; set; }
-
-        internal sealed override bool EnablePointerEventsCore
-            => !INTERNAL_LinkedPopup?.StayOpen ?? false;
 
         internal PopupRoot(string uniqueIdentifier, Window parentWindow)
         {

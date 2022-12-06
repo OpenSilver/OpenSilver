@@ -156,6 +156,8 @@ namespace Windows.UI.Xaml
             this.INTERNAL_OuterDomElement = windowRootDiv;
             this.INTERNAL_InnerDomElement = windowRootDiv;
 
+            this.INTERNAL_AttachToDomEvents();
+
             // Set the window as "loaded":
             this._isLoaded = true;
             this.IsConnectedToLiveTree = true;
