@@ -157,8 +157,8 @@ namespace Windows.UI.Xaml.Controls
             if (_popup != null)
             {
                 _popup.PlacementTarget = null;
-                _popup.OutsideClick -= OnOutsideClick;
-                _popup.ClosedDueToOutsideClick -= Popup_ClosedDueToOutsideClick; // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
+                _popup.OutsideClick -= new EventHandler<OutsideClickEventArgs>(OnOutsideClick);
+                _popup.ClosedDueToOutsideClick -= new EventHandler(OnPopupClosedDueToOutsideClick); // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
             }
 
             if (_popupChild != null)
@@ -187,8 +187,8 @@ namespace Windows.UI.Xaml.Controls
 
                 // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
                 _popup.StayOpen = false;
-                _popup.OutsideClick += OnOutsideClick;
-                _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
+                _popup.OutsideClick += new EventHandler<OutsideClickEventArgs>(OnOutsideClick);
+                _popup.ClosedDueToOutsideClick += new EventHandler(OnPopupClosedDueToOutsideClick);
 
                 _popupChild = _popup.Child;
                 if (_popupChild != null)
@@ -211,8 +211,7 @@ namespace Windows.UI.Xaml.Controls
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
             if (_dropDownToggle != null)
             {
-                _dropDownToggle.Checked += DropDownToggle_Checked;
-                _dropDownToggle.Unchecked += DropDownToggle_Unchecked;
+                _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
             }
 
             UpdatePresenter();
@@ -312,16 +311,10 @@ namespace Windows.UI.Xaml.Controls
             INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
         }
 
-        void DropDownToggle_Checked(object sender, RoutedEventArgs e)
+        private void OnDropDownToggleClick(object sender, RoutedEventArgs e)
         {
-            IsDropDownOpen = true;
+            IsDropDownOpen = _dropDownToggle.IsChecked.GetValueOrDefault();
         }
-
-        void DropDownToggle_Unchecked(object sender, RoutedEventArgs e)
-        {
-            IsDropDownOpen = false;
-        }
-
 
         /// <summary>
         /// Invoked when the DropDownClosed event is raised.
@@ -490,37 +483,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        void Popup_ClosedDueToOutsideClick(object sender, EventArgs e)
+        private void OnPopupClosedDueToOutsideClick(object sender, EventArgs e)
         {
-            //------------------
-            // The user clicked outside the combo box, so the Popup closed itself. We now need to reflect this on the ComboBox appearance (drop-down toggle...).
-            //------------------
-
-            if (this._dropDownToggle != null)
-            {
-#if MIGRATION
-                // See comment below
-                if (this._dropDownToggle.IsMouseCaptured)
-                {
-                    this._dropDownToggle.ReleaseMouseCapture();
-                }
-
-#else
-                // In case the pointer is captured by the toggle button, we need to release it because the Click event would be triggered right after the popup was closed, 
-                // resulting in the popup to reopen right away.
-                // To reproduce the issue that happens if we remove the "if" block of code below: create a ComboBox with items, click the ToggleButton of the ComboBox to
-                // open the drop -down popup, then click it again to close the drop-down. Expected result: the drop-down is closed. Actual result: the popup closes and re-opens.
-                // The issue was due to the fact that, when we clicked on the ToggleButton to close the drop-down, the toggle button became Unchecked due to the
-                // "Popup.ClosedDueToOutsideClick" event (resulting in the popup being successfully closed), but then it reopened because the "PointerReleased" event of the
-                // ToggleButton was raised, which re-checked the unchecked ToggleButton. By releasing the capture, we prevent the "PointerReleased" event of the ToggleButton
-                // to be raised.
-                if (this._dropDownToggle.IsPointerCaptured)
-                {
-                    this._dropDownToggle.ReleasePointerCapture();
-                }
-#endif
-                this._dropDownToggle.IsChecked = false; // Note: this has other effects as well: see the "IsDropDownOpen_Changed" method
-            }
+            IsDropDownOpen = false;
         }
 
         /// <summary>
