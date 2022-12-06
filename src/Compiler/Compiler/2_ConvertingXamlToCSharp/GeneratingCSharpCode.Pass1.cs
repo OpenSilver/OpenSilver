@@ -159,15 +159,15 @@ namespace DotNetForHtml5.Compiler
             {
                 while (element.Parent != null)
                 {
-                    if (IsDataTemplate(element) || IsItemsPanelTemplate(element) || IsControlTemplate(element))
+                    XElement parent = element.Parent;
+                    if (IsDataTemplate(parent) || IsItemsPanelTemplate(parent) || IsControlTemplate(parent))
                     {
-                        return element;
+                        return parent;
                     }
-                    element = element.Parent;
+                    element = parent;
                 }
                 return element;
             }
-
 
 #if BRIDGE
             private bool IsClassTheApplicationClass(string className)
