@@ -58,7 +58,6 @@ namespace Windows.UI.Xaml.Controls
         private ToggleButton _dropDownToggle;
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
-        private bool _suppressCloseOnOutsideClick;
 
         [Obsolete("ComboBox does not support Native ComboBox. Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
@@ -158,7 +157,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 _popup.PlacementTarget = null;
                 _popup.OutsideClick -= new EventHandler<OutsideClickEventArgs>(OnOutsideClick);
-                _popup.ClosedDueToOutsideClick -= new EventHandler(OnPopupClosedDueToOutsideClick); // Note: we do this here rather than at "OnDetached" because it may happen that the popup is closed after the ComboBox has been removed from the visual tree (in which case, when putting it back into the visual tree, we want the drop down to be in its initial closed state).
             }
 
             if (_popupChild != null)
@@ -188,7 +186,6 @@ namespace Windows.UI.Xaml.Controls
                 // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
                 _popup.StayOpen = false;
                 _popup.OutsideClick += new EventHandler<OutsideClickEventArgs>(OnOutsideClick);
-                _popup.ClosedDueToOutsideClick += new EventHandler(OnPopupClosedDueToOutsideClick);
 
                 _popupChild = _popup.Child;
                 if (_popupChild != null)
@@ -244,7 +241,6 @@ namespace Windows.UI.Xaml.Controls
 
             e.Handled = true;
 
-            _suppressCloseOnOutsideClick = true;
             IsDropDownOpen = true;
         }
 
@@ -476,15 +472,8 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnOutsideClick(object sender, OutsideClickEventArgs e)
         {
-            if (_suppressCloseOnOutsideClick)
-            {
-                e.Handled = true;
-                _suppressCloseOnOutsideClick = false;
-            }
-        }
+            e.Handled = true;
 
-        private void OnPopupClosedDueToOutsideClick(object sender, EventArgs e)
-        {
             IsDropDownOpen = false;
         }
 

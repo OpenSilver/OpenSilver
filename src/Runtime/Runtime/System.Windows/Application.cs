@@ -115,13 +115,6 @@ namespace Windows.UI.Xaml
                 object applicationRootDomElement = INTERNAL_HtmlDomManager.GetApplicationRootDomElement();
                 _mainWindow.AttachToDomElement(applicationRootDomElement);
 
-                // Listen to clicks anywhere in the window (this is used to close the popups that are not supposed to stay open):
-#if MIGRATION
-                _mainWindow.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
-#else
-                _mainWindow.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
-#endif
-
 #if !CSHTML5NETSTANDARD
                 // Workaround an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
                 if (INTERNAL_HtmlDomManager.IsFirefox())

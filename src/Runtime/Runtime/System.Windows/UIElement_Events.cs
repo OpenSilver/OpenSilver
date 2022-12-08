@@ -18,13 +18,11 @@ using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 #else
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.System;
@@ -308,13 +306,7 @@ namespace Windows.UI.Xaml
                         uiElement.AddToEventRoute(route, args);
 
                         // Get element's visual parent
-                        UIElement parent = VisualTreeHelper.GetParent(uiElement) as UIElement;
-                        if (parent == null && uiElement is FrameworkElement fe && fe.Parent is Popup popup && popup.PopupRoot != null)
-                        {
-                            popup.PopupRoot.AddToEventRoute(route, args);
-                        }
-
-                        e = parent;
+                        e = VisualTreeHelper.GetParent(uiElement);
                     }
                 }
             }

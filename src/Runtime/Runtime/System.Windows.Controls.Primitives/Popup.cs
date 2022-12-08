@@ -599,10 +599,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 Window parentWindow = GetParentWindowOfPopup();
 
                 // Create the popup root:
-                var popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(parentWindow);
-                _popupRoot = popupRoot;
-                _popupRoot.INTERNAL_LinkedPopup = this;
-                _popupRoot.UpdateIsVisible();
+                _popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(this, parentWindow);
 
                 // Set CustomLayout of the popup root:
                 if (CustomLayout)
@@ -645,11 +642,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
                 _outerBorder.Loaded += (s, e) =>
                 {
-                    popupRoot.RaiseLoadedEvent();
-                    popupRoot.InvalidateMeasure();
+                    _popupRoot?.RaiseLoadedEvent();
+                    _popupRoot?.InvalidateMeasure();
                 };
 
-                popupRoot.Content = _outerBorder;
+                _popupRoot.Content = _outerBorder;
                 _isVisible = true;
                 // Show the popup in front of any potential previously displayed popup:
                 PutPopupInFront();

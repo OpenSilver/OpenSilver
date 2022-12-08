@@ -41,73 +41,7 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
         static int CurrentPopupRootIndentifier = 0;
         static Dictionary<string, object> PopupRootIdentifierToInstance = new Dictionary<string, object>();
 
-
-        // Is called every time a click happens, the sender is the root element that has received the click
-#if MIGRATION
-        internal static void OnClickOnPopupOrWindow(object sender, MouseButtonEventArgs e)
-#else
-        internal static void OnClickOnPopupOrWindow(object sender, PointerRoutedEventArgs e)
-#endif
-        {
-            // Note: If a popup has StayOpen=True, the value of "StayOpen" of its parents is ignored.
-            // In other words, the parents of a popup that has StayOpen=True will always stay open
-            // regardless of the value of their "StayOpen" property.
-
-            HashSet<Popup> listOfPopupThatMustBeClosed = new HashSet<Popup>();
-            List<PopupRoot> popupRootList = new List<PopupRoot>();
-
-            foreach (object obj in GetAllRootUIElements())
-            {
-                if (obj is PopupRoot)
-                {
-                    PopupRoot root = (PopupRoot)obj;
-                    popupRootList.Add(root);
-
-                    if (root.INTERNAL_LinkedPopup != null)
-                        listOfPopupThatMustBeClosed.Add(root.INTERNAL_LinkedPopup);
-                }
-            }
-
-            // We determine which popup needs to stay open after this click
-            foreach (PopupRoot popupRoot in popupRootList)
-            {
-                if (popupRoot.INTERNAL_LinkedPopup != null)
-                {
-                    // We must prevent all the parents of a popup to be closed when:
-                    // - this popup is set to StayOpen
-                    // - or the click happend in this popup
-
-                    Popup popup = popupRoot.INTERNAL_LinkedPopup;
-
-                    if (popup.StayOpen || sender == popupRoot)
-                    {
-                        do
-                        {
-                            if (!listOfPopupThatMustBeClosed.Contains(popup))
-                                break;
-
-                            listOfPopupThatMustBeClosed.Remove(popup);
-
-                            popup = popup.ParentPopup;
-
-                        } while (popup != null);
-                    }
-                }
-            }
-
-            foreach (Popup popup in listOfPopupThatMustBeClosed)
-            {
-                var args = new OutsideClickEventArgs();
-                popup.OnOutsideClick(args);
-                if (!args.Handled)
-                {
-                    popup.CloseFromAnOutsideClick();
-                }
-            }
-
-        }
-
-        public static PopupRoot CreateAndAppendNewPopupRoot(Window parentWindow)
+        public static PopupRoot CreateAndAppendNewPopupRoot(Popup popup, Window parentWindow)
         {
             // Generate a unique identifier for the PopupRoot:
             CurrentPopupRootIndentifier++;
@@ -126,7 +60,7 @@ popupRoot.style.width = '100%';
 popupRoot.style.height = '100%';
 popupRoot.style.overflowX = 'hidden';
 popupRoot.style.overflowY = 'hidden';
-popupRoot.style.pointerEvents = 'none';
+popupRoot.style.pointerEvents = '{(popup.StayOpen ? "none" : "auto")}';
 {INTERNAL_InteropImplementation.GetVariableStringForJS(parentWindow.INTERNAL_RootDomElement)}.appendChild(popupRoot);");
 
             //--------------------------------------
@@ -140,19 +74,13 @@ popupRoot.style.pointerEvents = 'none';
             //--------------------------------------
 
             var popupRoot = new PopupRoot(uniquePopupRootIdentifier, parentWindow);
+            popupRoot.INTERNAL_LinkedPopup = popup;
             popupRoot.INTERNAL_OuterDomElement
                 = popupRoot.INTERNAL_InnerDomElement
                 = popupRootDiv;
             popupRoot.IsConnectedToLiveTree = true;
-            //--------------------------------------
-            // Listen to clicks anywhere in the popup (this is used to close other popups that are not supposed to stay open):
-            //--------------------------------------
-
-#if MIGRATION
-            popupRoot.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
-#else
-            popupRoot.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
-#endif
+            popupRoot.INTERNAL_AttachToDomEvents();
+            popupRoot.UpdateIsVisible();
 
             //--------------------------------------
             // Remember the PopupRoot for later use:
@@ -171,20 +99,12 @@ popupRoot.style.pointerEvents = 'none';
                 Window parentWindow = popupRoot.INTERNAL_ParentWindow;
 
                 //--------------------------------------
-                // Stop listening to clicks anywhere in the popup (this was used to close other popups that are not supposed to stay open):
-                //--------------------------------------
-
-#if MIGRATION
-                popupRoot.RemoveHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow));
-#else
-                popupRoot.RemoveHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow));
-#endif
-
-                //--------------------------------------
                 // Remove from the DOM:
                 //--------------------------------------
 
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync(
+                popupRoot.INTERNAL_DetachFromDomEvents();
+
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
 $@"
 var popupRoot = document.getElementByIdSafe(""{uniquePopupRootIdentifier}"");
 {INTERNAL_InteropImplementation.GetVariableStringForJS(parentWindow.INTERNAL_RootDomElement)}.removeChild(popupRoot);");
