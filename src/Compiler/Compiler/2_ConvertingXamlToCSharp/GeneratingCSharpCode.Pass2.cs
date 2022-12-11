@@ -1087,8 +1087,8 @@ namespace DotNetForHtml5.Compiler
                                     );
 
                                     string markupExtension = string.Format(
-                                        "{0}.ProvideValue(new global::System.ServiceProvider({1}, {2}))",
-                                        childUniqueName, GetUniqueName(parent), propertyKeyString
+                                        "(({0}){1}).ProvideValue(new global::System.ServiceProvider({2}, {3}))",
+                                        IMarkupExtensionClass, childUniqueName, GetUniqueName(parent), propertyKeyString
                                     );
 
                                     parameters.StringBuilder.AppendLine(
@@ -1149,20 +1149,18 @@ namespace DotNetForHtml5.Compiler
 
                                     if (isDependencyProperty)
                                     {
-                                        string bindingBaseTypeString = $"{_metadata.SystemWindowsDataNS}.Binding";
+                                        string bindingBaseTypeString = $"global::{_metadata.SystemWindowsDataNS}.Binding";
 
                                         //todo: make this more readable by cutting it into parts ?
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3}));
-#pragma warning disable CS0184
+                                            string.Format(@"object {0} = (({10}){1}).ProvideValue(new global::System.ServiceProvider({2}, {3}));
 if ({0} is {4})
-#pragma warning restore CS0184
 {{
-    global::{9}.BindingOperations.SetBinding({7}, {8}, ({4})(object){0});
+    global::{9}.BindingOperations.SetBinding({7}, {8}, ({4}){0});
 }}
 else
 {{
-    {2}.{5} = ({6})(object){0};
+    {2}.{5} = ({6}){0};
 }}",
                                                           customMarkupValueName, //0
                                                           childUniqueName,//1
@@ -1173,20 +1171,20 @@ else
                                                           "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
                                                           parentElementUniqueNameOrThisKeyword,//7
                                                           propertyDeclaringTypeName + "." + propertyName + "Property", //8
-                                                          _metadata.SystemWindowsDataNS//9
-                                                          ));
+                                                          _metadata.SystemWindowsDataNS, //9
+                                                          IMarkupExtensionClass));
                                     }
                                     else
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                           string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3})); {2}.{4} = ({5}){0};",
-                                                    customMarkupValueName, //0
-                                                    childUniqueName,//1
-                                                    GetUniqueName(parent),//2
-                                                    propertyKeyString,//3
-                                                    propertyName,//4
-                                                    "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName//5
-                                           ));
+                                            string.Format(
+                                                "{0}.{1} = ({2})(({3}){4}).ProvideValue(new global::System.ServiceProvider({0}, {5}));",
+                                                GetUniqueName(parent),
+                                                propertyName,
+                                                "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
+                                                IMarkupExtensionClass,
+                                                childUniqueName,
+                                                propertyKeyString));
                                     }
                                 }
                             }
