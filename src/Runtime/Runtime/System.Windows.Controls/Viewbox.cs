@@ -87,8 +87,20 @@ namespace Windows.UI.Xaml.Controls
         /// </remarks>
         public UIElement Child
         {
-            get { return Content as UIElement; }
-            set { Content = value; }
+            get { return (UIElement)GetValue(ChildProperty); }
+            set { SetValue(ChildProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Child"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty ChildProperty =
+            DependencyProperty.Register("Child", typeof(UIElement), typeof(Viewbox), new PropertyMetadata(OnChildChanged));
+
+        private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (Viewbox)d;
+            control.Content = e.NewValue;
         }
 
         /// <summary>
@@ -214,7 +226,7 @@ namespace Windows.UI.Xaml.Controls
 
         protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if(IsLoaded && Content is FrameworkElement)
+            if (IsLoaded && Content is FrameworkElement)
             {
                 UpdateScale(Content as FrameworkElement);
             }
