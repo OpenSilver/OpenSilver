@@ -31,37 +31,22 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
-                    <StackPanel>
+                    <Grid>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="MouseOver" />
                                 <VisualState Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
-                                                                       Storyboard.TargetName="OuterBorder">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="0.4" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush"
-                                                                       Storyboard.TargetName="OuterBorder">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="#FFD0D0D0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Fill"
-                                                                       Storyboard.TargetName="arrow">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="#FFD0D0D0" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Stroke"
-                                                                       Storyboard.TargetName="arrow">
-                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="#FFD0D0D0" />
-                                        </ObjectAnimationUsingKeyFrames>
-
+                                        <DoubleAnimation Duration="00:00:00"
+                                                         Storyboard.TargetName="DisabledVisualElement"
+                                                         Storyboard.TargetProperty="(UIElement.Opacity)"
+                                                         To=".55" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Border x:Name="OuterBorder"
+                        <Border x:Name="ContentPresenterBorder"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -102,6 +87,11 @@
                                            Margin="{TemplateBinding Padding}" />
                             </Grid>
                         </Border>
+                        <Border x:Name="DisabledVisualElement"
+                                CornerRadius="3"
+                                Background="White"
+                                Opacity="0"
+                                IsHitTestVisible="false" />
                         <Popup x:Name="Popup"
                                IsOpen="False">
                             <Border HorizontalAlignment="Stretch" 
@@ -125,7 +115,7 @@
                                 </ScrollViewer>
                             </Border>
                         </Popup>
-                    </StackPanel>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
