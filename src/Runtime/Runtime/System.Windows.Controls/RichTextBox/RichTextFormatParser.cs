@@ -11,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
@@ -29,7 +28,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class RichTextXamlParser
+    internal static class RichTextXamlParser
     {
         public static IEnumerable<Block> Parse(string xaml)
         {
@@ -48,25 +47,33 @@ namespace Windows.UI.Xaml.Controls
             {
                 var currentNode = ProcessNode(node);
                 result.Add(currentNode);
+
                 if (node.HasChildNodes)
                 {
-                    if (currentNode is Section)
+                    if (currentNode is Section section)
                     {
                         foreach (var item in ParseInternal(node.FirstChild))
                         {
-                            ((Section)currentNode).Blocks.Add(item);
+                            section.Blocks.Add(item);
                         }
                     }
-                    else if (currentNode is Paragraph)
+                    else if (currentNode is Paragraph paragraph)
                     {
-                        foreach (var item in node.ChildNodes)
+                        foreach (XmlNode item in node.ChildNodes)
                         {
-                            ((Paragraph)currentNode).Inlines.Add(ProcessNodeInline((XmlNode)item));
+                            var inline = ProcessNodeInline(item);
+                            if (inline != null)
+                            {
+                                paragraph.Inlines.Add(inline);
+                            }
                         }
                     }
                 }
+
                 if (node.NextSibling != null)
+                {
                     result.AddRange(ParseInternal(node.NextSibling));
+                }
             }
             return result;
         }
@@ -78,22 +85,17 @@ namespace Windows.UI.Xaml.Controls
                 if (node.Name == nameof(Section))
                 {
                     var element = new Section();
-                    foreach (XmlAttribute attribute in node.Attributes)
-                    {
-                        SetProperty(element, attribute.Name, attribute.Value);
-                    }
+                    SetProperties(element, node);
                     return element;
                 }
-                else if (node.Name == nameof(Paragraph))
+                if (node.Name == nameof(Paragraph))
                 {
                     var element = new Paragraph();
-                    foreach (XmlAttribute attribute in node.Attributes)
-                    {
-                        SetProperty(element, attribute.Name, attribute.Value);
-                    }
+                    SetProperties(element, node);
                     return element;
                 }
             }
+
             return null;
         }
 
@@ -104,42 +106,84 @@ namespace Windows.UI.Xaml.Controls
                 if (node.Name == nameof(Run))
                 {
                     var element = new Run();
-                    foreach (XmlAttribute attribute in node.Attributes)
-                    {
-                        SetProperty(element, attribute.Name, attribute.Value);
-                    }
+                    SetProperties(element, node);
                     element.Text = node.InnerText;
                     return element;
                 }
-                else if (node.Name == nameof(Span))
-                {
-                    var element = new Span();
-                    foreach (XmlAttribute attribute in node.Attributes)
-                    {
-                        SetProperty(element, attribute.Name, attribute.Value);
-                    }
-                    return element;
-                }
-                else if (node.Name == nameof(LineBreak))
+                if (node.Name == nameof(LineBreak))
                 {
                     var element = new LineBreak();
-                    foreach (XmlAttribute attribute in node.Attributes)
-                    {
-                        SetProperty(element, attribute.Name, attribute.Value);
-                    }
+                    SetProperties(element, node);
                     return element;
                 }
-                else if (node.Name == nameof(InlineUIContainer))
+                if (node.Name == nameof(InlineUIContainer))
                 {
                     var element = new InlineUIContainer();
-                    foreach (XmlAttribute attribute in node.Attributes)
-                    {
-                        SetProperty(element, attribute.Name, attribute.Value);
-                    }
+                    SetProperties(element, node);
+                    return element;
+                }
+                if (node.Name == nameof(Span))
+                {
+                    var element = new Span();
+                    SetProperties(element, node);
+                    ProcessChildInlines(element, node);
+                    return element;
+                }
+                if (node.Name == nameof(Bold))
+                {
+                    var element = new Bold();
+                    SetProperties(element, node);
+                    ProcessChildInlines(element, node);
+                    return element;
+                }
+                if (node.Name == nameof(Italic))
+                {
+                    var element = new Italic();
+                    SetProperties(element, node);
+                    ProcessChildInlines(element, node);
+                    return element;
+                }
+                if (node.Name == nameof(Underline))
+                {
+                    var element = new Underline();
+                    SetProperties(element, node);
+                    ProcessChildInlines(element, node);
+                    return element;
+                }
+                if (node.Name == nameof(Hyperlink))
+                {
+                    var element = new Hyperlink();
+                    SetProperties(element, node);
+                    ProcessChildInlines(element, node);
                     return element;
                 }
             }
+            else if (node.NodeType == XmlNodeType.Text)
+            {
+                return node.InnerText; // return Run element with text
+            }
+
             return null;
+        }
+
+        private static void ProcessChildInlines(Span element, XmlNode node)
+        {
+            foreach (XmlNode item in node.ChildNodes)
+            {
+                var inline = ProcessNodeInline(item);
+                if (inline != null)
+                {
+                    element.Inlines.Add(inline);
+                }
+            }
+        }
+
+        private static void SetProperties(TextElement element, XmlNode node)
+        {
+            foreach (XmlAttribute attribute in node.Attributes)
+            {
+                SetProperty(element, attribute.Name, attribute.Value);
+            }
         }
 
         private static void SetProperty(object obj, string propertyName, object value)

@@ -256,7 +256,7 @@ namespace Windows.UI.Xaml
         }
     }
 
-    internal class DependencyObjectCollectionInternal : PresentationFrameworkCollection<DependencyObject>
+    internal sealed class DependencyObjectCollectionInternal : PresentationFrameworkCollection<DependencyObject>
     {
         internal DependencyObjectCollectionInternal(DependencyObject owner) : base(true)
         {

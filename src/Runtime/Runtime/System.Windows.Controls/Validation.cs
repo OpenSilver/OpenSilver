@@ -433,7 +433,7 @@ namespace Windows.UI.Xaml.Controls
     ///      the various Bindings on an Element.  ValidationErrorCollection
     ///      be set through the Validation.ErrorsProperty.
     /// </summary>
-    internal class ValidationErrorCollection : ObservableCollection<ValidationError>
+    internal sealed class ValidationErrorCollection : ObservableCollection<ValidationError>
     {
 
         /// <summary>

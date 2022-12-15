@@ -23,7 +23,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 {
     public partial class Selector
     {
-        internal class InternalSelectedItemsStorage : IEnumerable<ItemInfo>
+        internal sealed class InternalSelectedItemsStorage : IEnumerable<ItemInfo>
         {
             internal InternalSelectedItemsStorage(int capacity, IEqualityComparer<ItemInfo> equalityComparer)
             {

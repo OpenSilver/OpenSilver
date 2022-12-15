@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// This class represent the collection of SelectedItems in Selector. It extends the ObservableCollection by providing methods for bulk selection.
     /// </summary>
-    internal class SelectedItemCollection : ObservableCollection<object>
+    internal sealed class SelectedItemCollection : ObservableCollection<object>
     {
 #region Contructors
         /// <summary>

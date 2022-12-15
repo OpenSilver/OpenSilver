@@ -20,7 +20,7 @@ using System.Linq;
 
 namespace System.Windows.Browser
 {
-    internal class EventSubscriber
+    internal sealed class EventSubscriber
     {
         private string _scriptKey;
         private string _functionName;

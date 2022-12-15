@@ -38,7 +38,8 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             _content = new Content(_hookupEvents);
 
             _navigationState = GetBrowserNavigationState();
-            OpenSilver.Interop.ExecuteJavaScript("window.addEventListener('hashchange', $0, false)", (Action)OnNavigationChanged);
+            string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action)OnNavigationChanged);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"window.addEventListener('hashchange', {sCallback}, false)");
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
         /// The URI of the package, XAML file, or XAML scripting tag that contains the
         /// content to load into the Silverlight plug-in.
         /// </returns>
-        public Uri Source => new Uri(OpenSilver.Interop.ExecuteJavaScript("window.location.origin").ToString());
+        public Uri Source => new Uri(OpenSilver.Interop.ExecuteJavaScriptString("window.location.origin", false));
 
         /// <summary>
         /// Gets or sets a URI fragment that represents the current navigation state.
@@ -102,7 +103,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
                     throw new ArgumentNullException(nameof(value));
                 }
 
-                OpenSilver.Interop.ExecuteJavaScript("window.location.hash = $0", value);
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"window.location.hash = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(value)}");
             }
         }
 
@@ -124,7 +125,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
 
         private string GetBrowserNavigationState()
         {
-            string state = HttpUtility.UrlDecode(Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("location.hash"))) ?? string.Empty;
+            string state = HttpUtility.UrlDecode(OpenSilver.Interop.ExecuteJavaScriptString("location.hash")) ?? string.Empty;
 
             if (state.Length > 0 && state[0] == '#')
             {

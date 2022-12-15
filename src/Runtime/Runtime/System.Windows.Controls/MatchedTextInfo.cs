@@ -13,7 +13,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class MatchedTextInfo
+    internal sealed class MatchedTextInfo
     {
         internal MatchedTextInfo(int matchedItemIndex, string matchedText, int matchedPrefixLength, int textExcludingPrefixLength)
         {

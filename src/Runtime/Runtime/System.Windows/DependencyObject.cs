@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSHTML5.Internal;
+using OpenSilver.Internal.Data;
+using OpenSilver.Internal;
+
 #if MIGRATION
 using System.Windows.Threading;
 using System.Windows.Data;
@@ -264,6 +263,7 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        private Dictionary<DependencyProperty, DependentList> _dependentListMap;
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_PropertyStorageDictionary { get; } // Contains all the properties that are either not in INTERNAL_AllInheritedProperties or in INTERNAL_UsefulInheritedProperties
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_AllInheritedProperties { get; } // Here so that when we attach a child, the child gets all the properties that are in there (this allows the inherited properties to go all the way down even for properties that are not contained in the children)
         internal List<DependencyProperty> INTERNAL_PropertiesForWhichToCallPropertyChangedWhenLoadedIntoVisualTree; // When a UI element is added to the Visual Tree, we call "PropertyChanged" on all its set properties so that the control can refresh itself. However, when a property is not set, we don't call PropertyChanged. Unless the property is listed here.
@@ -272,9 +272,9 @@ namespace Windows.UI.Xaml
         #region Constructor
         public DependencyObject()
         {
-            this.CanBeInheritanceContext = true;
-            this.INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
-            this.INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+            CanBeInheritanceContext = true;
+            INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+            INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
         }
         #endregion
 
@@ -519,18 +519,17 @@ namespace Windows.UI.Xaml
         internal void ResetInheritedProperties()
         {
             // Copy of the keys to allow removing items from the Dictionary furing the foreach.
-            INTERNAL_PropertyStorage[] storages = this.INTERNAL_AllInheritedProperties.Values.ToArray();
+            INTERNAL_PropertyStorage[] storages = INTERNAL_AllInheritedProperties.Values.ToArray();
             foreach (INTERNAL_PropertyStorage storage in storages)
             {
                 INTERNAL_PropertyStore.SetInheritedValue(storage, 
                                                          DependencyProperty.UnsetValue,
                                                          false); // recursively
-                if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default &&
-                    (storage.PropertyListeners == null || storage.PropertyListeners.Count == 0)) //this second test is to make sure we keep any listener working (for example Bindings would stop working if we remove an element from the Visual tree then add it back))
+                if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default)
                 {
                     // Remove storage if the effective value is the default value.
-                    this.INTERNAL_AllInheritedProperties.Remove(storage.Property);
-                    this.INTERNAL_PropertyStorageDictionary.Remove(storage.Property);
+                    INTERNAL_AllInheritedProperties.Remove(storage.Property);
+                    INTERNAL_PropertyStorageDictionary.Remove(storage.Property);
                 }
             }
         }
@@ -609,6 +608,53 @@ namespace Windows.UI.Xaml
         public object GetAnimationBaseValue(DependencyProperty dp)
         {
             return default(object);
+        }
+
+        internal void InvalidateDependents(DependencyPropertyChangedEventArgs args)
+        {
+            if (_dependentListMap is null)
+            {
+                return;
+            }
+
+            if (_dependentListMap.TryGetValue(args.Property, out var dependents))
+            {
+                if (dependents.IsEmpty)
+                {
+                    dependents.Clear();
+                }
+                else
+                {
+                    dependents.InvalidateDependents(this, args);
+                }
+            }
+        }
+
+        internal void AddDependent(DependencyProperty dp, IDependencyPropertyChangedListener dependent)
+        {
+            _dependentListMap ??= new();
+            if (!_dependentListMap.TryGetValue(dp, out var dependents))
+            {
+                _dependentListMap[dp] = dependents = new();
+            }
+            dependents.Add(dependent);
+        }
+
+        internal void RemoveDependent(DependencyProperty dp, IDependencyPropertyChangedListener dependent)
+        {
+            if (_dependentListMap is null)
+            {
+                return;
+            }
+
+            if (_dependentListMap.TryGetValue(dp, out var dependents))
+            {
+                dependents.Remove(dependent);
+                if (dependents.IsEmpty)
+                {
+                    dependents.Clear();
+                }
+            }
         }
     }
 }

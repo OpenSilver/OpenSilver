@@ -68,6 +68,11 @@ namespace OpenSilver.Analyzers
 
             var member = contextAnalysis.SemanticModel.GetSymbolInfo(memberAccess);
 
+            if (member.Symbol is null)
+            {
+                return;
+            }
+
             if (HasNotImplementedAttribute(notImplSymbol, member.Symbol.ContainingAssembly))
             {
                 ReportDiagnostic(contextAnalysis, memberAccess.Name.GetLocation(), member.Symbol.ContainingAssembly.ToDisplayString());

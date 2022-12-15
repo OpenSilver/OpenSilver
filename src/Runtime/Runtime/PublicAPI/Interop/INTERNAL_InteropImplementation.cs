@@ -66,60 +66,11 @@ namespace CSHTML5
 
         internal static string GetVariableStringForJS(object variable)
         {
-            variable = variable is Delegate
-                ? JavascriptCallback.Create((Delegate)variable)
-                : variable;
+            variable = variable is Delegate d ? JavascriptCallback.Create(d) : variable;
 
-            if (variable is INTERNAL_JSObjectReference)
+            if (variable is IJavaScriptConvertible jsConvertible)
             {
-                //----------------------
-                // JS Object References
-                //----------------------
-
-                var jsObjectReference = (INTERNAL_JSObjectReference)variable;
-                string jsCodeForAccessingTheObject;
-
-                if (jsObjectReference.IsArray)
-                {
-                    jsCodeForAccessingTheObject = $@"document.jsObjRef[""{jsObjectReference.ReferenceId}""][{jsObjectReference.ArrayIndex}]";
-                }
-                else
-                {
-                    jsCodeForAccessingTheObject = $@"document.jsObjRef[""{jsObjectReference.ReferenceId}""]";
-                }
-
-                return jsCodeForAccessingTheObject;
-            }
-            else if (variable is INTERNAL_HtmlDomElementReference)
-            {
-                //------------------------
-                // DOM Element References
-                //------------------------
-
-                string id = ((INTERNAL_HtmlDomElementReference)variable).UniqueIdentifier;
-                return $@"document.getElementByIdSafe(""{id}"")";
-            }
-            else if (variable is JavascriptCallback)
-            {
-                //-----------
-                // Delegates
-                //-----------
-
-                var jsCallback = (JavascriptCallback)variable;
-                bool isVoid = jsCallback.GetCallback().Method.ReturnType == typeof(void);
-                return $"document.getCallbackFunc({jsCallback.Id}, {(!isVoid).ToString().ToLower()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
-
-                // Note: generating the random number in JS rather than C# is important in order
-                // to be able to put this code inside a JavaScript "for" statement (cf.
-                // deserialization code of the JsonConvert extension, and also ZenDesk ticket #974)
-                // so that the "closure" system of JavaScript ensures that the number is the same
-                // before and inside the "setTimeout" call, but different for each iteration of the
-                // "for" statement in which this piece of code is put.
-                // Note: we store the arguments in the jsObjRef that is inside
-                // the JS context, so that the user can access them from the callback.
-                // Note: "Array.prototype.slice.call" will convert the arguments keyword into an array
-                // (cf. http://stackoverflow.com/questions/960866/how-can-i-convert-the-arguments-object-to-an-array-in-javascript)
-                // Note: in the command above, we use "setTimeout" to avoid thread/locks problems.
+                return jsConvertible.ToJavaScriptString();
             }
             else if (variable == null)
             {
@@ -260,7 +211,7 @@ namespace CSHTML5
                 _pendingJSFile.Add(html5Path, new List<Tuple<Action, Action>> { new Tuple<Action, Action>(callbackOnSuccess, callbackOnFailure) });
                 string sSuccessAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileSuccess);
                 string sFailureAction = GetVariableStringForJS((Action<object>)LoadJavaScriptFileFailure);
-                CSHTML5.Interop.ExecuteJavaScript(
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
     $@"// Add the script tag to the head
 var filePath = {GetVariableStringForJS(html5Path)};
 var head = document.getElementsByTagName('head')[0];
@@ -284,7 +235,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(GetVariableStringForJS(jsArgument))); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -296,7 +247,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = Convert.ToString(Interop.ExecuteJavaScript(GetVariableStringForJS(jsArgument))); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();
@@ -342,7 +293,7 @@ head.appendChild(script);");
 
             string sHtml5Path = GetVariableStringForJS(html5Path);
             string sCallback = GetVariableStringForJS(callback);
-            CSHTML5.Interop.ExecuteJavaScript(
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
 $@"// Add the link tag to the head
 var head = document.getElementsByTagName('head')[0];
 var link = document.createElement('link');
@@ -396,7 +347,7 @@ img.src = {sHtml5Path};");
 #endif
     }
 
-    internal class SynchronyzedStore<T>
+    internal sealed class SynchronyzedStore<T>
     {
         private readonly object _lock = new object();
         private readonly List<T> _items;

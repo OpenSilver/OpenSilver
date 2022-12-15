@@ -25,7 +25,7 @@ namespace OpenSilver.Internal.Xaml
         IEnumerable<object> GetAllAmbientValues();
     }
 
-    internal class ServiceProviderContext :
+    internal sealed class ServiceProviderContext :
         IProvideValueTarget,
         IServiceProvider,
         IRootObjectProvider,

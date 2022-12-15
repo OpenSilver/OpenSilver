@@ -23,7 +23,7 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class INTERNAL_TextContainerRichTextBox : INTERNAL_TextContainer
+    internal sealed class INTERNAL_TextContainerRichTextBox : INTERNAL_TextContainer
     {
         private readonly RichTextBox _parent;
 

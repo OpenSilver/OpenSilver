@@ -32,7 +32,7 @@ namespace System.Windows.Input
         /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
         /// </summary>
         public static ModifierKeys Modifiers
-            => (ModifierKeys)Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.modifiersPressed"));
+            => (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("document.modifiersPressed", false);
 
         internal static bool IsFocusable(Control control)
             => control.IsConnectedToLiveTree && control.IsVisible && control.IsEnabled && control.IsTabStop;

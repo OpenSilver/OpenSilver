@@ -28,6 +28,7 @@ using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml;
 using System.Text.Json;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
@@ -57,9 +58,10 @@ namespace Windows.UI.Xaml
         private ApplicationLifetimeObjectsCollection lifetime_objects;
         private Window _mainWindow;
         private ResourceDictionary _resources;
+        private Dictionary<object, object> _implicitResourcesCache;
 
         // Says if App.Resources has any implicit styles
-        internal bool HasImplicitStylesInResources { get; set; }
+        internal bool HasImplicitStylesInResources { get; set; }        
 
         /// <summary>
         /// Gets the Application object for the current application.
@@ -85,43 +87,22 @@ namespace Windows.UI.Xaml
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:
             INTERNAL_InteropImplementation.ResetLoadedFilesDictionaries();
 
-#if CSHTML5BLAZOR
             // we change the resource manager for every resource registered
             ClientSideResourceRegister.Startup();
-#endif
+
             // Keep a reference to the startup assembly:
             StartupAssemblyInfo.StartupAssembly = this.GetType().Assembly;
 
             // Remember whether we are in "SL Migration" mode or not:
 #if MIGRATION
-            CSHTML5.Interop.ExecuteJavaScript(@"document.isSLMigration = true");
+            OpenSilver.Interop.ExecuteJavaScriptVoid(@"document.isSLMigration = true", false);
 #else
-            CSHTML5.Interop.ExecuteJavaScript(@"document.isSLMigration = false");
-#endif
-
-            //Interop.ExecuteJavaScript("document.raiseunhandledException = $0", (Action<object>)RaiseUnhandledException);
-
-
-            // Inject the "DataContractSerializer" into the "XmlSerializer" (read note in the "XmlSerializer" implementation to understand why):
-#if OPENSILVER
-            if (false) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
-#elif BRIDGE
-            if (!CSHTML5.Interop.IsRunningInTheSimulator) //Note: in case of the Simulator, we reference the .NET Framework version of "System.xml.dll", so we cannot inject stuff because the required members of XmlSerializer would be missing.
-#endif
-            {
-                InjectDataContractSerializerIntoXmlSerializer();
-            }
-
-#if !CSHTML5NETSTANDARD
-            // Fix the freezing of the Simulator when calling 'alert' using the "Interop.ExecuteJavaScript()" method by redirecting the JavaScript "alert" to the Simulator message box:
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-            {
-                RedirectAlertToMessageBox_SimulatorOnly();
-            }
+            OpenSilver.Interop.ExecuteJavaScriptVoid(@"document.isSLMigration = false", false);
 #endif
 
             // Get default font-family from css
-            INTERNAL_FontsHelper.DefaultCssFontFamily = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.getComputedStyle(document.getElementsByTagName('body')[0]).getPropertyValue(\"font-family\")"));
+            INTERNAL_FontsHelper.DefaultCssFontFamily = OpenSilver.Interop.ExecuteJavaScriptString(
+                "window.getComputedStyle(document.getElementsByTagName('body')[0]).getPropertyValue(\"font-family\")");
 
 
             TextMeasurementService = new TextMeasurementService();
@@ -133,13 +114,6 @@ namespace Windows.UI.Xaml
                 Window.Current = _mainWindow;
                 object applicationRootDomElement = INTERNAL_HtmlDomManager.GetApplicationRootDomElement();
                 _mainWindow.AttachToDomElement(applicationRootDomElement);
-
-                // Listen to clicks anywhere in the window (this is used to close the popups that are not supposed to stay open):
-#if MIGRATION
-                _mainWindow.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
-#else
-                _mainWindow.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(INTERNAL_PopupsManager.OnClickOnPopupOrWindow), true);
-#endif
 
 #if !CSHTML5NETSTANDARD
                 // Workaround an issue on Firefox where the UI disappears if the window is resized and on some other occasions:
@@ -219,7 +193,7 @@ namespace Windows.UI.Xaml
             try
             {
                 paramsArray = JsonSerializer.Deserialize<HTMLParam[]>(
-                    Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("document.getAppParams()")));
+                    OpenSilver.Interop.ExecuteJavaScriptString("document.getAppParams()"));
             }
             catch
             {
@@ -337,12 +311,13 @@ namespace Windows.UI.Xaml
                     }
                 }
 
-                // todo: implement this.
-                // this notify all window in the app that Application resources changed
-                //if (oldValue != value)
-                //{
-                //    InvalidateResourceReferences(new ResourcesChangeInfo(oldValue, value));
-                //}
+                if (oldValue != value)
+                {
+                    InvalidateStyleCache(new ResourcesChangeInfo(oldValue, value));
+
+                    //// this notify all window in the app that Application resources changed
+                    // InvalidateResourceReferences(new ResourcesChangeInfo(oldValue, value));
+                }
             }
         }
 
@@ -356,20 +331,44 @@ namespace Windows.UI.Xaml
             }
         }
 
-        //
-        // Internal routine only look up in application resources
-        //
-        internal object FindResourceInternal(object resourceKey)
+        internal object FindImplicitResourceInternal(object resourceKey)
         {
-            ResourceDictionary resources = _resources;
-
-            if (resources == null)
+            if (_implicitResourcesCache?.TryGetValue(resourceKey, out object resource) ?? false)
             {
-                return null;
+                return resource;
             }
-            else
+
+            return null;
+        }
+
+        internal void InvalidateStyleCache(ResourcesChangeInfo info)
+        {
+            if (info.Key is not null)
             {
-                return resources[resourceKey];
+                switch (info.Key)
+                {
+                    case Type:
+                    case DataTemplateKey:
+                        object resource = Resources[info.Key];
+                        if (resource is null)
+                        {
+                            _implicitResourcesCache?.Remove(info.Key);
+                        }
+                        else
+                        {
+                            _implicitResourcesCache ??= new();
+                            _implicitResourcesCache[info.Key] = resource;
+                        }
+                        break;
+                }
+            }
+            else if (info.IsCatastrophicDictionaryChange ||
+                (info.NewDictionary != null && (info.NewDictionary.HasImplicitStyles || info.NewDictionary.HasImplicitDataTemplates)) ||
+                (info.OldDictionary != null && (info.OldDictionary.HasImplicitStyles || info.OldDictionary.HasImplicitDataTemplates)))
+            {
+                _implicitResourcesCache = HasResources && (Resources.HasImplicitStyles || Resources.HasImplicitDataTemplates) ?
+                    ResourceDictionary.Helpers.BuildImplicitResourcesCache(Resources) :
+                    null;
             }
         }
 
@@ -413,10 +412,7 @@ namespace Windows.UI.Xaml
         //public event EventHandler Exit;
 
         //returns the html window element
-        internal object GetWindow()
-        {
-            return OpenSilver.Interop.ExecuteJavaScript(@"window");
-        }
+        internal object GetWindow() => INTERNAL_HtmlDomManager.GetHtmlWindow();
 
         /// <summary>
         /// Gets the application main window.
@@ -482,7 +478,7 @@ namespace Windows.UI.Xaml
                     uris,
                     (Action)(() =>
                     {
-                        tcs.SetResult(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.AppConfig")));
+                        tcs.SetResult(OpenSilver.Interop.ExecuteJavaScriptString("window.AppConfig"));
                     })
                     );
             }
@@ -492,7 +488,7 @@ namespace Windows.UI.Xaml
                     uris,
                     (Action)(() =>
                     {
-                        tcs.SetResult(Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig")));
+                        tcs.SetResult(OpenSilver.Interop.ExecuteJavaScriptString("window.ServiceReferencesClientConfig"));
                     })
                     );
             }
@@ -502,7 +498,7 @@ namespace Windows.UI.Xaml
                     uris,
                     (Action)(() =>
                     {
-                        string result = Convert.ToString(CSHTML5.Interop.ExecuteJavaScript("window.FileContent"));
+                        string result = OpenSilver.Interop.ExecuteJavaScriptString("window.FileContent");
                         _resourcesCache.Add(uriResource.OriginalString.ToLower(), result);
                         tcs.SetResult(result);
                     })

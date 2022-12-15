@@ -546,17 +546,27 @@ namespace Windows.UI.Xaml
         private static void OnEffectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement element = (UIElement)d;
-            if (e.OldValue is Effect oldEffect)
+            
+            if (element._effectChangedListener != null)
             {
-                oldEffect.Changed -= new EventHandler(element.OnEffectChanged);
+                element._effectChangedListener.Detach();
+                element._effectChangedListener = null;
             }
+
             if (e.NewValue is Effect newEffect)
             {
-                newEffect.Changed += new EventHandler(element.OnEffectChanged);
+                element._effectChangedListener = new(element, newEffect)
+                {
+                    OnEventAction = static (instance, sender, args) => instance.OnEffectChanged(sender, args),
+                    OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
+                };
+                newEffect.Changed += element._effectChangedListener.OnEvent;
             }
         }
 
         private void OnEffectChanged(object sender, EventArgs e) => ((Effect)sender).Render(this);
+
+        private WeakEventListener<UIElement, Effect, EventArgs> _effectChangedListener;
 
 #endregion
 
@@ -1363,7 +1373,8 @@ document.ondblclick = null;
                 // Note: "none" disables scrolling, pinching and other gestures.
                 // It is supposed to not have any effect on the "TouchStart",
                 // "TouchMove", and "TouchEnd" events.
-                CSHTML5.Interop.ExecuteJavaScript($@"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(element.INTERNAL_OuterDomElement)}.style.touchAction = ""{((bool)e.NewValue ? "auto" : "none")}""");
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(element.INTERNAL_OuterDomElement)}.style.touchAction = \"{((bool)e.NewValue ? "auto" : "none")}\"");
             }
         }
 
@@ -1436,33 +1447,16 @@ document.ondblclick = null;
                 outerDivOfReferenceVisual = rootVisual.INTERNAL_OuterDomElement;
             }
 
-            double offsetLeft, offsetTop;
-            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-            {
-                // ------- IN-BROWSER -------
-                var rectOfThisControl = ((dynamic)outerDivOfThisControl).getBoundingClientRect();
-                var rectOfReferenceVisual = ((dynamic)outerDivOfReferenceVisual).getBoundingClientRect();
-
-                offsetLeft = rectOfThisControl.left - rectOfReferenceVisual.left;
-                offsetTop = rectOfThisControl.top - rectOfReferenceVisual.top;
-            }
-            //#if !BRIDGE
-            else
-            {
-                // ------- SIMULATOR -------
-
-                // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string sOuterDivOfControl = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
-                string sOuterDivOfReferenceVisual = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
-                string concatenated = Convert.ToString(
-                    OpenSilver.Interop.ExecuteJavaScript($"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)"));
-                int sepIndex = concatenated.IndexOf('|');
-                string offsetLeftAsString = concatenated.Substring(0, sepIndex);
-                string offsetTopAsString = concatenated.Substring(sepIndex + 1);
-                offsetLeft = Convert.ToDouble(offsetLeftAsString, CultureInfo.InvariantCulture);
-                offsetTop = Convert.ToDouble(offsetTopAsString, CultureInfo.InvariantCulture);
-            }
-            //#endif
+            // Hack to improve the Simulator performance by making only one interop call rather than two:
+            string sOuterDivOfControl = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfThisControl);
+            string sOuterDivOfReferenceVisual = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(outerDivOfReferenceVisual);
+            string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
+                $"({sOuterDivOfControl}.getBoundingClientRect().left - {sOuterDivOfReferenceVisual}.getBoundingClientRect().left) + '|' + ({sOuterDivOfControl}.getBoundingClientRect().top - {sOuterDivOfReferenceVisual}.getBoundingClientRect().top)");
+            int sepIndex = concatenated.IndexOf('|');
+            string offsetLeftAsString = concatenated.Substring(0, sepIndex);
+            string offsetTopAsString = concatenated.Substring(sepIndex + 1);
+            double offsetLeft = Convert.ToDouble(offsetLeftAsString, CultureInfo.InvariantCulture);
+            double offsetTop = Convert.ToDouble(offsetTopAsString, CultureInfo.InvariantCulture);
 
             return new MatrixTransform(new Matrix(1, 0, 0, 1, offsetLeft, offsetTop));
         }

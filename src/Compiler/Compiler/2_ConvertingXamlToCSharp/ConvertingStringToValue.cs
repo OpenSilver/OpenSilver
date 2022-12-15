@@ -299,24 +299,24 @@ namespace DotNetForHtml5.Compiler
     // IMPORTANT: if you add or remove entries in this Enum, you must update
     // accordingly the file "FontWeights.cs" in the Runtime project.
     //
-    internal enum FontweightsEnum : ushort
+    internal enum FontWeightsCode : int
     {
-        Black = 900,
-        Bold = 700,
-        DemiBold = 600,
-        ExtraBlack = 900, //note: the value should be 950 but it is not supported in html5
-        ExtraBold = 800,
+        Thin = 100,
         ExtraLight = 200,
-        Heavy = 900,
+        UltraLight = 200,
         Light = 300,
-        Medium = 500,
+        SemiLight = 350,
         Normal = 400,
         Regular = 400,
+        Medium = 500,
+        DemiBold = 600,
         SemiBold = 600,
-        SemiLight = 300, //note: the value should be 350 (I think) but it is not supported in html5
-        Thin = 100,
-        UltraBlack = 900, //note: the value should be 950 but it is not supported in html5
+        Bold = 700,
+        ExtraBold = 800,
         UltraBold = 800,
-        UltraLight = 200
+        Black = 900,
+        Heavy = 900,
+        ExtraBlack = 950,
+        UltraBlack = 950,
     }
 }

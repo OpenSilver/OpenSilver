@@ -86,9 +86,10 @@ namespace CSHTML5.Native.Html.Controls
                 {
                     if (!IsNullOrUndefined(_jsDiv))
                     {
-                        if (Convert.ToBoolean(Interop.ExecuteJavaScript( "$0 && $0.hasChildNodes()", _jsDiv)))
+                        string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
+                        if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.hasChildNodes()"))
                         {
-                            return Interop.ExecuteJavaScriptAsync("$0.firstChild", _jsDiv);
+                            return OpenSilver.Interop.ExecuteJavaScriptAsync($"{sDiv}.firstChild");
                         }
                     }
                 }
@@ -98,30 +99,11 @@ namespace CSHTML5.Native.Html.Controls
 
         void ApplyHtmlContent(string htmlContent)
         {
-            Interop.ExecuteJavaScriptAsync("$0.innerHTML = $1", _jsDiv, _htmlContent);
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
+            string sContent = INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlContent);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.innerHTML = {sContent}");
         }
 
-        static bool IsNullOrUndefined(object jsObject)
-        {
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (Interop.IsRunningInTheSimulator)
-#endif
-            {
-                if (jsObject == null)
-                    return true;
-#if CSHTML5NETSTANDARD 
-                return false;
-#else
-                if (!(jsObject is JSValue))
-                    return false;
-                JSValue value = ((JSValue)jsObject);
-                return value.IsNull() || value.IsUndefined();
-#endif
-            }
-            else
-                return Convert.ToBoolean(Interop.ExecuteJavaScript("(typeof $0 === 'undefined' || $0 === null)", jsObject));
-        }
+        static bool IsNullOrUndefined(object jsObject) => jsObject == null;
     }
 }

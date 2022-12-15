@@ -71,7 +71,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Content),
                 typeof(object),
                 typeof(ContentControl),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, OnContentChanged));
+                new FrameworkPropertyMetadata(null, OnContentChanged));
 
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -244,24 +244,6 @@ namespace Windows.UI.Xaml.Controls
                 BindingOperations.SetBinding(presenter, ContentPresenter.ContentProperty, new Binding("Content") { Source = this });
                 this.TemplateChild = presenter;
             }
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            int count = VisualChildrenCount;
-
-            if (count > 0)
-            {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
-                {
-                    child.Measure(availableSize);
-                    return child.DesiredSize;
-                }
-            }
-
-            Size actualSize = new Size(Double.IsNaN(Width) ? ActualWidth : Width, Double.IsNaN(Height) ? ActualHeight : Height);
-            return actualSize;
         }
     }
 }

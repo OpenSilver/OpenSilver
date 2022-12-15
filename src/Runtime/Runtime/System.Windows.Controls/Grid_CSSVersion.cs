@@ -312,16 +312,7 @@ namespace Windows.UI.Xaml.Controls
             int columnIndex = _columnDefinitionsOrNull.IndexOf(columnDefinition);
 
             var div1 = AddTemporaryDivForRowOrColumnDimensions(columnIndex, 0);
-
-            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-            {
-                returnValue = ((dynamic)div1).offsetWidth;
-            }
-            else
-            {
-                returnValue = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(div1, "offsetWidth"));
-            }
-
+            returnValue = INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(div1, "offsetWidth");
             INTERNAL_HtmlDomManager.RemoveFromDom(div1);
 
             return returnValue;
@@ -335,16 +326,7 @@ namespace Windows.UI.Xaml.Controls
             int rowIndex = _rowDefinitionsOrNull.IndexOf(rowDefinition);
 
             var div1 = AddTemporaryDivForRowOrColumnDimensions(0, rowIndex);
-
-            if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-            {
-                returnValue = ((dynamic)div1).offsetHeight;
-            }
-            else
-            {
-                returnValue = Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(div1, "offsetHeight"));
-            }
-
+            returnValue = INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(div1, "offsetHeight");
             INTERNAL_HtmlDomManager.RemoveFromDom(div1);
 
             return returnValue;

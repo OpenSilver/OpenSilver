@@ -478,7 +478,8 @@ namespace DotNetForHtml5.Compiler
                         bool isAttachedProperty = attributeLocalName.Contains(".");
                         if (!isAttachedProperty)
                         {
-                            if (IsAttributeTheXNameAttribute(attribute))
+                            bool isXNameAttr = IsXNameAttribute(attribute);
+                            if (isXNameAttr || IsNameAttribute(attribute))
                             {
                                 //-------------
                                 // x:Name (or "Name")
@@ -503,11 +504,21 @@ namespace DotNetForHtml5.Compiler
                                     parameters.ResultingFindNameCalls.Add($"this.{fieldName} = (({elementTypeInCSharp})(this.FindName(\"{name}\")));");
                                 }
 
-                                // We also set the Name property on the object itself, if the XAML was "Name=..." or (if the XAML was x:Name=... AND the Name property exists in the object).    (Note: setting the Name property on the object is useful for example in <VisualStateGroup Name="Pressed"/> where the parent control looks at the name of its direct children:
-                                bool isNamePropertyRatherThanXColonNameProperty = string.IsNullOrEmpty(attribute.Name.NamespaceName); // This is used to distinguish between "Name" and "x:Name"
-                                if (isNamePropertyRatherThanXColonNameProperty || _reflectionOnSeparateAppDomain.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny))
+                                if (isXNameAttr)
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("{0}.Name = \"{1}\";", elementUniqueNameOrThisKeyword, name));
+                                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "DependencyObject",
+                                        element.Name.NamespaceName, element.Name.LocalName))
+                                    {
+                                        parameters.StringBuilder.AppendLine(
+                                            $"{elementUniqueNameOrThisKeyword}.SetValue(global::{_metadata.SystemWindowsNS}.FrameworkElement.NameProperty, \"{name}\");");                                        
+                                    }
+                                }
+                                else
+                                {
+                                    if (_reflectionOnSeparateAppDomain.DoesTypeContainNameMemberOfTypeString(namespaceName, localTypeName, assemblyNameIfAny))
+                                    {
+                                        parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.Name = \"{name}\";");
+                                    }
                                 }
 
                                 parameters.CurrentScope.RegisterName(name, elementUniqueNameOrThisKeyword);
@@ -1076,8 +1087,8 @@ namespace DotNetForHtml5.Compiler
                                     );
 
                                     string markupExtension = string.Format(
-                                        "{0}.ProvideValue(new global::System.ServiceProvider({1}, {2}))",
-                                        childUniqueName, GetUniqueName(parent), propertyKeyString
+                                        "(({0}){1}).ProvideValue(new global::System.ServiceProvider({2}, {3}))",
+                                        IMarkupExtensionClass, childUniqueName, GetUniqueName(parent), propertyKeyString
                                     );
 
                                     parameters.StringBuilder.AppendLine(
@@ -1138,20 +1149,18 @@ namespace DotNetForHtml5.Compiler
 
                                     if (isDependencyProperty)
                                     {
-                                        string bindingBaseTypeString = $"{_metadata.SystemWindowsDataNS}.Binding";
+                                        string bindingBaseTypeString = $"global::{_metadata.SystemWindowsDataNS}.Binding";
 
                                         //todo: make this more readable by cutting it into parts ?
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3}));
-#pragma warning disable CS0184
+                                            string.Format(@"object {0} = (({10}){1}).ProvideValue(new global::System.ServiceProvider({2}, {3}));
 if ({0} is {4})
-#pragma warning restore CS0184
 {{
-    global::{9}.BindingOperations.SetBinding({7}, {8}, ({4})(object){0});
+    global::{9}.BindingOperations.SetBinding({7}, {8}, ({4}){0});
 }}
 else
 {{
-    {2}.{5} = ({6})(object){0};
+    {2}.{5} = ({6}){0};
 }}",
                                                           customMarkupValueName, //0
                                                           childUniqueName,//1
@@ -1162,20 +1171,20 @@ else
                                                           "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
                                                           parentElementUniqueNameOrThisKeyword,//7
                                                           propertyDeclaringTypeName + "." + propertyName + "Property", //8
-                                                          _metadata.SystemWindowsDataNS//9
-                                                          ));
+                                                          _metadata.SystemWindowsDataNS, //9
+                                                          IMarkupExtensionClass));
                                     }
                                     else
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                           string.Format(@"var {0} = {1}.ProvideValue(new global::System.ServiceProvider({2}, {3})); {2}.{4} = ({5}){0};",
-                                                    customMarkupValueName, //0
-                                                    childUniqueName,//1
-                                                    GetUniqueName(parent),//2
-                                                    propertyKeyString,//3
-                                                    propertyName,//4
-                                                    "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName//5
-                                           ));
+                                            string.Format(
+                                                "{0}.{1} = ({2})(({3}){4}).ProvideValue(new global::System.ServiceProvider({0}, {5}));",
+                                                GetUniqueName(parent),
+                                                propertyName,
+                                                "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,
+                                                IMarkupExtensionClass,
+                                                childUniqueName,
+                                                propertyKeyString));
                                     }
                                 }
                             }

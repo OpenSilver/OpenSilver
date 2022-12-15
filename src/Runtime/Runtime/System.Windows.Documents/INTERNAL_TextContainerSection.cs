@@ -19,7 +19,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    internal class INTERNAL_TextContainerSection : INTERNAL_TextContainer
+    internal sealed class INTERNAL_TextContainerSection : INTERNAL_TextContainer
     {
         public INTERNAL_TextContainerSection(Section parent)
             : base(parent)

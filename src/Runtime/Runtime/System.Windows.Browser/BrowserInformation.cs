@@ -71,7 +71,7 @@ namespace System.Windows.Browser
         /// Gets a value that indicates whether the browser supports cookies.
         /// </summary>
         public bool CookiesEnabled =>
-            Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("navigator.cookieEnabled"));
+            OpenSilver.Interop.ExecuteJavaScriptBoolean("navigator.cookieEnabled", false);
 
         private static Version GetVersion(string userAgent)
         {

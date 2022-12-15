@@ -16,7 +16,7 @@ namespace Windows.UI.Xaml.Controls
     /// TimeInput controls.
     /// </summary>
     /// <QualityBand>Preview</QualityBand>
-    internal class TimeCoercionHelper
+    internal sealed class TimeCoercionHelper
     {
         /// <summary>
         /// The TimeInput control that needs to be coerced.

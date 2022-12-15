@@ -10,9 +10,9 @@ env:
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - develop
+  #push:
+  #  branches:
+  #    - develop
 
 jobs:
   TestApplicationBuild:

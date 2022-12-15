@@ -396,7 +396,7 @@ namespace Windows.UI.Xaml.Controls
                 // If the element is rooted to a Window and App exists, defer to App.
                 for (k = 0; k < bestMatch; ++k)
                 {
-                    object appResource = app.FindResourceInternal(keys[k]);
+                    object appResource = app.FindImplicitResourceInternal(keys[k]);
                     if (appResource != null)
                     {
                         bestMatch = k;
@@ -557,6 +557,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        /// <inheritdoc/>
         protected override Size MeasureOverride(Size availableSize)
         {
             int count = VisualChildrenCount;
@@ -571,11 +572,23 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            if (Content == null)
-                return new Size();
+            return new Size();
+        }
 
-            Size actualSize = new Size(double.IsNaN(Width) ? ActualWidth : Width, double.IsNaN(Height) ? ActualHeight : Height);
-            return actualSize;
+        /// <inheritdoc/>
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            int count = VisualChildrenCount;
+
+            if (count > 0)
+            {
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Arrange(new Rect(finalSize));
+                }
+            }
+            return finalSize;
         }
     }
 }

@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Markup;
 
 #if MIGRATION
@@ -45,8 +46,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public string Name
         {
-            get;
-            set; //todo: this was originally not public (but we need it in the compiler)
+            get => (string)GetValue(FrameworkElement.NameProperty);
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            set => SetValue(FrameworkElement.NameProperty, value);
         }
 
         private static readonly DependencyProperty StoryboardProperty =

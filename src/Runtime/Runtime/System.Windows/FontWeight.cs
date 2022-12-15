@@ -12,6 +12,8 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 
 #if MIGRATION
 namespace System.Windows
@@ -20,102 +22,181 @@ namespace Windows.UI.Text
 #endif
 {
     /// <summary>
-    /// Refers to the density of a typeface, in terms of the lightness or heaviness
-    /// of the strokes.
+    /// Refers to the density of a typeface, in terms of the lightness or heaviness of
+    /// the strokes.
     /// </summary>
-    public partial struct FontWeight : IFormattable
+    public struct FontWeight : IFormattable
     {
+        private readonly int _weight;
+
+        internal FontWeight(int weight)
+        {
+            Debug.Assert(1 <= weight && weight <= 999);
+
+            // We want the default zero value of new FontWeight() to correspond to FontWeights.Normal.
+            // Therefore, the _weight value is shifted by 400 relative to the OpenType weight value.
+            _weight = weight - 400;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            Weight = (ushort)weight;
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
         /// <summary>
-        /// The font weight expressed as a numeric value. See Remarks.
+        /// Determines whether the current <see cref="FontWeight"/> object is equal to a
+        /// specified object.
         /// </summary>
-        public ushort Weight;
+        /// <param name="obj">
+        /// The object to compare for equality.
+        /// </param>
+        /// <returns>
+        /// true if the values are equal; otherwise, false.
+        /// </returns>
+        public override bool Equals(object obj)
+            => obj is FontWeight fontWeight && this == fontWeight;
 
-        internal string INTERNAL_ToHtmlString()
-        {
-            return Weight.ToString();
-        }
+        /// <summary>
+        /// Compares this <see cref="FontWeight"/> structure to another <see cref="FontWeight"/>
+        /// structure for equality.
+        /// </summary>
+        /// <param name="fontWeight">
+        /// An instance of <see cref="FontWeight"/> to compare for equality.
+        /// </param>
+        /// <returns>
+        /// true if the two instances of <see cref="FontWeight"/> are equal; otherwise, false.
+        /// </returns>
+        public bool Equals(FontWeight fontWeight) => this == fontWeight;
 
-        internal static FontWeight INTERNAL_ConvertFromUshort(ushort fontWeightAsUshort)
-        {
-            return new FontWeight()
-            {
-                Weight = fontWeightAsUshort
-            };
-        }
+        /// <summary>
+        /// Retrieves the hash code for this object.
+        /// </summary>
+        /// <returns>
+        /// An integer hash value.
+        /// </returns>
+        public override int GetHashCode() => RealWeight;
 
-        public override string ToString()
-        {
-            return Weight.ToString();
-        }
+        /// <summary>
+        /// Returns a text string that represents the value of the <see cref="FontWeight"/> object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the value of the <see cref="FontWeight"/> object, such
+        /// as "Light" or "Normal".
+        /// </returns>
+        public override string ToString() => ConvertToString(null, null);
 
         string IFormattable.ToString(string format, IFormatProvider formatProvider)
-        {
-            return Weight.ToString(format, formatProvider);
-        }
+            => ConvertToString(format, formatProvider);
 
         /// <summary>
         /// Compares two font weight values and returns an indication of their relative values.
         /// </summary>
-        /// <param name="left">First object to compare.</param>
-        /// <param name="right">Second object to compare.</param>
-        /// <returns>A 32-bit signed integer indicating the lexical relationship between the two comparands.
+        /// <param name="left">
+        /// First object to compare.
+        /// </param>
+        /// <param name="right">
+        /// Second object to compare.
+        /// </param>
+        /// <returns>
+        /// A 32-bit signed integer indicating the lexical relationship between the two comparands.
         /// When the return value is less than zero this means that left is less than right.
         /// When the return value is zero this means that left is equal to right.
         /// When the return value is greater than zero this means that left is greater than right.
         /// </returns>
-        public static int Compare(FontWeight left, FontWeight right)
-        {
-            return left.Weight - right.Weight;
-        }
+        public static int Compare(FontWeight left, FontWeight right) => left._weight - right._weight;
+        
+        /// <summary>
+        /// Compares two instances of <see cref="FontWeight"/> for equality.
+        /// </summary>
+        /// <param name="left">
+        /// The first instance of <see cref="FontWeight"/> to compare.
+        /// </param>
+        /// <param name="right">
+        /// The second instance of <see cref="FontWeight"/> to compare.
+        /// </param>
+        /// <returns>
+        /// true if the values of <see cref="FontWeight"/> are equal; otherwise, false.
+        /// </returns>
+        public static bool operator ==(FontWeight left, FontWeight right) => Compare(left, right) == 0;
 
-        public bool Equals(FontWeight fontWeight)
-        {
-            return this == fontWeight;
-        }
+        /// <summary>
+        /// Evaluates two instances of <see cref="FontWeight"/> to determine inequality.
+        /// </summary>
+        /// <param name="left">
+        /// The first instance of <see cref="FontWeight"/> to compare.
+        /// </param>
+        /// <param name="right">
+        /// The second instance of <see cref="FontWeight"/> to compare.
+        /// </param>
+        /// <returns>
+        /// false if values of left are equal to right; otherwise, true.
+        /// </returns>
+        public static bool operator !=(FontWeight left, FontWeight right) => !(left == right);
 
-        public override bool Equals(object o)
+        public static bool operator >(FontWeight left, FontWeight right) => Compare(left, right) > 0;
+
+        public static bool operator <(FontWeight left, FontWeight right) => Compare(left, right) < 0;
+
+        public static bool operator >=(FontWeight left, FontWeight right) => Compare(left, right) >= 0;
+
+        public static bool operator <=(FontWeight left, FontWeight right) => Compare(left, right) <= 0;
+        
+        /// <summary>
+        /// Creates a new FontWeight object that corresponds to the OpenType usWeightClass value.
+        /// </summary>
+        /// <param name="weightValue">
+        /// An integer value between 1 and 999 that corresponds to the usWeightClass definition in 
+        /// the OpenType specification.
+        /// </param>
+        /// <returns>
+        /// A new FontWeight object that corresponds to the weightValue parameter.
+        /// </returns>
+        internal static FontWeight FromOpenTypeWeight(int weightValue)
         {
-            if (o is FontWeight)
+            if (weightValue < 1 || weightValue > 999)
             {
-                FontWeight fw = (FontWeight)o;
-                return this == fw;
+                throw new ArgumentOutOfRangeException(nameof(weightValue), "The parameter value must be between '1' and '999'.");
             }
-            return false;
+
+            return new FontWeight(weightValue);
         }
 
-        public override int GetHashCode()
+        /// <summary>
+        /// Obtains OpenType usWeightClass value that corresponds to the FontWeight object.
+        /// </summary>
+        /// <returns>
+        /// An integer value between 1 and 999 that corresponds to the usWeightClass definition 
+        /// in the OpenType specification.
+        /// </returns>
+        internal int ToOpenTypeWeight() => RealWeight;
+
+        /// <summary>
+        /// Creates a string representation of this object based on the format string 
+        /// and IFormatProvider passed in.  
+        /// If the provider is null, the CurrentCulture is used.
+        /// See the documentation for IFormattable for more information.
+        /// </summary>
+        /// <returns>
+        /// A string representation of this object.
+        /// </returns>
+        private string ConvertToString(string format, IFormatProvider provider)
         {
-            return this.Weight;
+            if (!FontWeights.FontWeightToString(RealWeight, out string convertedValue))
+            {
+                // This can happen if _weight value is not a multiple of 100.
+                return RealWeight.ToString(provider);
+            }
+
+            return convertedValue;
         }
 
-        public static bool operator ==(FontWeight left, FontWeight right)
-        {
-            return Compare(left, right) == 0;
-        }
+        /// <summary>
+        /// We want the default zero value of new FontWeight() to correspond to FontWeights.Normal.
+        /// Therefore, _weight value is shifted by 400 relative to the OpenType weight value.
+        /// </summary>
+        private int RealWeight => _weight + 400;
 
-        public static bool operator !=(FontWeight left, FontWeight right)
-        {
-            return Compare(left, right) != 0;
-        }
-
-        public static bool operator >(FontWeight left, FontWeight right)
-        {
-            return Compare(left, right) > 0;
-        }
-
-        public static bool operator <(FontWeight left, FontWeight right)
-        {
-            return Compare(left, right) < 0;
-        }
-
-        public static bool operator >=(FontWeight left, FontWeight right)
-        {
-            return Compare(left, right) >= 0;
-        }
-
-        public static bool operator <=(FontWeight left, FontWeight right)
-        {
-            return Compare(left, right) <= 0;
-        }
+        [Obsolete("Unused")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ushort Weight;
     }
 }

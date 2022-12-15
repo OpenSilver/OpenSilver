@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using CSHTML5.Types;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -35,12 +36,81 @@ namespace OpenSilver
         /// </summary>
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <returns>The result, if any, of the JavaScript call.</returns>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScript(string javascript)
         {
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false);
+        }
+
+        /// <summary>
+        /// Execute JavaScript code without document.callScriptSafe
+        /// </summary> 
+        internal static double ExecuteJavaScriptDouble(string javascript, bool flushQueue = true)
+        {
+            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            if (IsRunningInTheSimulator)
+            {
+                return new INTERNAL_JSObjectReference(value).ToDouble(null);
+            }
+            else
+            {
+                return Convert.ToDouble(value);
+            }
+        }
+
+        /// <summary>
+        /// Execute JavaScript code without document.callScriptSafe
+        /// </summary>
+        internal static int ExecuteJavaScriptInt32(string javascript, bool flushQueue = true)
+        {
+            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            if (IsRunningInTheSimulator)
+            {
+                return new INTERNAL_JSObjectReference(value).ToInt32(null);
+            }
+            else
+            {
+                return Convert.ToInt32(value);
+            }
+        }
+
+        /// <summary>
+        /// Execute JavaScript code without document.callScriptSafe
+        /// </summary>
+        internal static string ExecuteJavaScriptString(string javascript, bool flushQueue = true)
+        {
+            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            if (IsRunningInTheSimulator)
+            {
+                return new INTERNAL_JSObjectReference(value).ToString(null);
+            }
+            else
+            {
+                return Convert.ToString(value);
+            }
+        }
+
+        /// <summary>
+        /// Execute JavaScript code without document.callScriptSafe
+        /// </summary>
+        internal static bool ExecuteJavaScriptBoolean(string javascript, bool flushQueue = true)
+        {
+            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            if (IsRunningInTheSimulator)
+            {
+                return new INTERNAL_JSObjectReference(value).ToBoolean(null);
+            }
+            else
+            {
+                return Convert.ToBoolean(value);
+            }
+        }
+
+        /// <summary>
+        /// Execute JavaScript code without document.callScriptSafe
+        /// </summary>
+        internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue = true)
+        {
+            _ = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
         }
 
         /// <summary>
@@ -49,9 +119,6 @@ namespace OpenSilver
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
         /// <returns>The result, if any, of the JavaScript call.</returns>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScript(string javascript, params object[] variables)
         {
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false, variables: variables);
@@ -61,9 +128,6 @@ namespace OpenSilver
         /// Allows calling JavaScript code from within C#. The call will be asynchronous when run in the Simulator.
         /// </summary>
         /// <param name="javascript">The JavaScript code to execute.</param>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScriptAsync(string javascript)
         {
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true);
@@ -74,9 +138,6 @@ namespace OpenSilver
         /// </summary>
         /// <param name="javascript">The JavaScript code to execute.</param>
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
-#if BRIDGE
-        [Bridge.Template]
-#endif
         public static object ExecuteJavaScriptAsync(string javascript, params object[] variables)
         {
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true, variables: variables);

@@ -22,19 +22,17 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal class PasswordBoxView : FrameworkElement, ITextBoxView
+    internal sealed class PasswordBoxView : FrameworkElement, ITextBoxView
     {
         private object _passwordInputField;
         private bool _isUpdatingDOM;
+        private JavascriptCallback _gotFocusCallback;
+        private JavascriptCallback _inputCallback;
 
         internal PasswordBoxView(PasswordBox host)
         {
-            if (host == null)
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            Host = host;
+            Host = host ?? throw new ArgumentNullException(nameof(host));
+            Unloaded += (s, e) => DisposeJsCallbacks();
         }
 
         internal PasswordBox Host { get; }
@@ -43,10 +41,11 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = AddPasswordInputDomElement(parentRef, out domElementWhereToPlaceChildren, false);
+            var div = AddPasswordInputDomElement(parentRef, out domElementWhereToPlaceChildren);
             INTERNAL_InnerDomElement = _passwordInputField;
             return div;
         }
+
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
@@ -76,7 +75,16 @@ namespace Windows.UI.Xaml.Controls
             // the focus will be redirected to the <input>, unless the click was on an element that
             // absorbs pointer events.
 
-            OpenSilver.Interop.ExecuteJavaScript(@"$0.addEventListener('click', $1)", this.INTERNAL_OuterDomElement, (Action<object>)PasswordBox_GotFocus);
+            DisposeJsCallbacks();
+
+            _gotFocusCallback = JavascriptCallback.Create(PasswordBox_GotFocus);
+            _inputCallback = JavascriptCallback.Create(PasswordAreaValueChanged);
+
+            var sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+            var sGotFocusCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_gotFocusCallback);
+            var sInputCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_inputCallback);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.addEventListener('click', {sGotFocusCallback})");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.addEventListener('input', {sInputCallback})");
 
             UpdateDOMPassword(Host.Password);
         }
@@ -114,10 +122,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private object AddPasswordInputDomElement(object parentRef, out object domElementWhereToPlaceChildren, bool isTemplated)
+        private object AddPasswordInputDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            object passwordField;
-            var passwordFieldStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("input", parentRef, this, out passwordField);
+            var passwordFieldStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("input", parentRef, this, out object passwordField);
 
             _passwordInputField = passwordField;
 
@@ -131,99 +138,17 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.width = "100%";
             passwordFieldStyle.height = "100%";
 
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password", forceSimulatorExecuteImmediately: true);
-
-            //-----------------------
-            // Prepare to raise the "TextChanged" event and to update the value of the "Text" property when the DOM text changes:
-            //-----------------------
-            //todo: why did we put this here instead of in INTERNAL_AttachToDomEvents?
-            if (IsRunningOnInternetExplorer())
-            {
-                //-----------------------
-                // Fix "input" event not working under IE:
-                //-----------------------
-                this.GotFocus += InternetExplorer_GotFocus;
-                this.LostFocus += InternetExplorer_LostFocus;
-                INTERNAL_EventsHelper.AttachToDomEvents("textinput", passwordField, (Action<object>)(e =>
-                {
-                    InternetExplorer_RaisePasswordChangedIfNecessary();
-                }));
-                INTERNAL_EventsHelper.AttachToDomEvents("paste", passwordField, (Action<object>)(e =>
-                {
-                    InternetExplorer_RaisePasswordChangedIfNecessary();
-                }));
-                INTERNAL_EventsHelper.AttachToDomEvents("cut", passwordField, (Action<object>)(e =>
-                {
-                    InternetExplorer_RaisePasswordChangedIfNecessary();
-                }));
-                INTERNAL_EventsHelper.AttachToDomEvents("keyup", passwordField, (Action<object>)(e =>
-                {
-                    InternetExplorer_RaisePasswordChangedIfNecessary();
-                }));
-                INTERNAL_EventsHelper.AttachToDomEvents("delete", passwordField, (Action<object>)(e =>
-                {
-                    InternetExplorer_RaisePasswordChangedIfNecessary();
-                }));
-                INTERNAL_EventsHelper.AttachToDomEvents("mouseup", passwordField, (Action<object>)(e =>
-                {
-                    InternetExplorer_RaisePasswordChangedIfNecessary();
-                }));
-            }
-            else
-            {
-                //-----------------------
-                // Modern browsers
-                //-----------------------
-                INTERNAL_EventsHelper.AttachToDomEvents("input", passwordField, (Action<object>)(e =>
-                {
-                    PasswordAreaValueChanged();
-                }));
-            }
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password");
 
             return passwordField;
         }
 
-#if BRIDGE
-        [Bridge.Template("window.IE_VERSION")]
-#endif
-        private static bool IsRunningOnInternetExplorer()
-        {
-            return false;
-        }
-
-#if BRIDGE
-        private string previousInnerText = null;
-#endif
-
-        private void InternetExplorer_GotFocus(object sender, RoutedEventArgs e)
-        {
-#if BRIDGE //todo: fixme
-            previousInnerText = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0['value'] || ''", this.INTERNAL_InnerDomElement));
-#endif
-        }
-
-        private void InternetExplorer_LostFocus(object sender, RoutedEventArgs e)
-        {
-            InternetExplorer_RaisePasswordChangedIfNecessary();
-        }
-
-        private void InternetExplorer_RaisePasswordChangedIfNecessary()
-        {
-#if BRIDGE //todo: fixme
-            string newInnerText = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0['value'] || ''", this.INTERNAL_InnerDomElement));
-            if (newInnerText != previousInnerText)
-            {
-                PasswordAreaValueChanged();
-                previousInnerText = newInnerText;
-            }
-#endif
-        }
-
-        private void PasswordAreaValueChanged()
+        private void PasswordAreaValueChanged(object e)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                string text = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("$0['value'] || ''", this.INTERNAL_InnerDomElement));
+                string text = OpenSilver.Interop.ExecuteJavaScriptString(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_InnerDomElement)}['value'] || ''");
 
                 _isUpdatingDOM = true;
 
@@ -238,20 +163,29 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private void PasswordBox_GotFocus(object e)//object sender, RoutedEventArgs e)
+        private void PasswordBox_GotFocus(object e)
         {
-            bool ignoreEvent = Convert.ToBoolean(OpenSilver.Interop.ExecuteJavaScript("document.checkForDivsThatAbsorbEvents($0)", e));
+            bool ignoreEvent = OpenSilver.Interop.ExecuteJavaScriptBoolean(
+                $"document.checkForDivsThatAbsorbEvents({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e)})");
             if (!ignoreEvent)
             {
                 if (_passwordInputField != null)
                 {
-                    OpenSilver.Interop.ExecuteJavaScript(@"
-if($1.target != $0) {
-$0.focus()
-}", _passwordInputField, e);
-                    //NEW_SET_SELECTION(_tempSelectionStartIndex, _tempSelectionStartIndex + _tempSelectionLength);
+                    string sInput = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_passwordInputField);
+                    string sEventArg = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(
+                        $"if ({sEventArg}.target != {sInput}) {{ {sInput}.focus(); }}");
                 }
             }
+        }
+
+        private void DisposeJsCallbacks()
+        {
+            _gotFocusCallback?.Dispose();
+            _gotFocusCallback = null;
+
+            _inputCallback?.Dispose();
+            _inputCallback = null;
         }
     }
 }

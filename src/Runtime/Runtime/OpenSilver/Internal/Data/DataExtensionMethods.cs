@@ -135,7 +135,7 @@ namespace OpenSilver.Internal
     /// Helper class that allows to use a <see cref="IComparer"/> object
     /// as a <see cref="IComparer{T}"/>.
     /// </summary>
-    internal class ComparerHelper<T> : IComparer<T>
+    internal sealed class ComparerHelper<T> : IComparer<T>
     {
         private IComparer _comparer;
 

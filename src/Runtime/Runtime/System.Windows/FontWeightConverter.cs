@@ -16,12 +16,6 @@ using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
-using FontweightsEnum = System.Windows.FontWeights.INTERNAL_FontweightsEnum;
-#else
-using FontweightsEnum = Windows.UI.Text.FontWeights.INTERNAL_FontweightsEnum;
-#endif
-
-#if MIGRATION
 namespace System.Windows
 #else
 namespace Windows.UI.Text
@@ -30,7 +24,7 @@ namespace Windows.UI.Text
     /// <summary>
     /// FontWeightConverter class parses a font weight string.
     /// </summary>
-    internal class FontWeightConverter : TypeConverter
+    internal sealed class FontWeightConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom
@@ -60,23 +54,23 @@ namespace Windows.UI.Text
         /// </exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value is string s)
+            if (null == value)
             {
-                if (Enum.TryParse(s, true, out FontweightsEnum fontCode))
-                {
-                    return FontWeight.INTERNAL_ConvertFromUshort((ushort)fontCode);
-                }
-                else if (ushort.TryParse(s, out ushort code))
-                {
-                    return FontWeight.INTERNAL_ConvertFromUshort(code);
-                }
-                else
-                {
-                    throw new FormatException("Token is not valid.");
-                }
+                throw GetConvertFromException(value);
             }
 
-            throw GetConvertFromException(value);
+            if (!(value is string s))
+            {
+                throw new ArgumentException("The object passed to 'ConvertFrom' is not a valid type.", nameof(value));
+            }
+
+            FontWeight fontWeight = new FontWeight();
+            if (!FontWeights.FontWeightStringToKnownWeight(s, culture, ref fontWeight))
+            {
+                throw new FormatException("Token is not valid.");
+            }
+
+            return fontWeight;
         }
 
         /// <summary>

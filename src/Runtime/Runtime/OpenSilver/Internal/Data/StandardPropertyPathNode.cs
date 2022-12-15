@@ -26,12 +26,13 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal.Data
 {
-    internal class StandardPropertyPathNode : PropertyPathNode
+    internal sealed class StandardPropertyPathNode : PropertyPathNode
     {
         private readonly Type _resolvedType;
         private readonly string _propertyName;
 
-        private IPropertyChangedListener _dpListener;
+        private DependencyPropertyChangedListener _dpListener;
+        private WeakEventListener<StandardPropertyPathNode, INotifyPropertyChanged, PropertyChangedEventArgs> _propertyChangedListener;
         private DependencyProperty _dp;
         private PropertyInfo _prop;
         private FieldInfo _field;
@@ -140,16 +141,17 @@ namespace OpenSilver.Internal.Data
 
         internal override void OnSourceChanged(object oldValue, object newValue)
         {
-            if (Listener.ListenForChanges && oldValue is INotifyPropertyChanged inpc)
+            if (Listener.ListenForChanges && _propertyChangedListener != null)
             {
-                inpc.PropertyChanged -= new PropertyChangedEventHandler(OnSourcePropertyChanged);
+                _propertyChangedListener.Detach();
+                _propertyChangedListener = null;
             }
 
-            IPropertyChangedListener listener = _dpListener;
+            var listener = _dpListener;
             if (listener != null)
             {
                 _dpListener = null;
-                listener.Detach();
+                listener.Dispose();
             }
 
             _dp = null;
@@ -159,13 +161,14 @@ namespace OpenSilver.Internal.Data
             if (Source == null)
                 return;
 
-            if (Listener.ListenForChanges)
+            if (Listener.ListenForChanges && newValue is INotifyPropertyChanged inpc)
             {
-                inpc = newValue as INotifyPropertyChanged;
-                if (inpc != null)
+                _propertyChangedListener = new(this, inpc)
                 {
-                    inpc.PropertyChanged += new PropertyChangedEventHandler(OnSourcePropertyChanged);
-                }
+                    OnEventAction = static (instance, source, args) => instance.OnPropertyChanged(source, args),
+                    OnDetachAction = static (listener, source) => source.PropertyChanged -= listener.OnEvent,
+                };
+                inpc.PropertyChanged += _propertyChangedListener.OnEvent;
             }
 
             if (newValue is DependencyObject sourceDO)
@@ -179,7 +182,7 @@ namespace OpenSilver.Internal.Data
                     _dp = dependencyProperty;
                     if (Listener.ListenForChanges)
                     {
-                        _dpListener = INTERNAL_PropertyStore.ListenToChanged(sourceDO, dependencyProperty, OnPropertyChanged);
+                        _dpListener = new DependencyPropertyChangedListener(sourceDO, dependencyProperty, OnPropertyChanged);
                     }
                 }
             }
@@ -208,21 +211,7 @@ namespace OpenSilver.Internal.Data
             }
         }
 
-        private void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop != null || _field != null))
-            {
-                UpdateValue();
-
-                IPropertyPathNode next = Next;
-                if (next != null)
-                {
-                    next.Source = Value;
-                }
-            }
-        }
-
-        private void OnPropertyChanged(object sender, IDependencyPropertyChangedEventArgs args)
+        private void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
             try
             {
@@ -249,6 +238,20 @@ namespace OpenSilver.Internal.Data
         private bool CheckIsBroken()
         {
             return Source == null || (_prop == null && _field == null && _dp == null);
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if ((e.PropertyName == _propertyName || string.IsNullOrEmpty(e.PropertyName)) && (_prop != null || _field != null))
+            {
+                UpdateValue();
+
+                IPropertyPathNode next = Next;
+                if (next != null)
+                {
+                    next.Source = Value;
+                }
+            }
         }
     }
 }

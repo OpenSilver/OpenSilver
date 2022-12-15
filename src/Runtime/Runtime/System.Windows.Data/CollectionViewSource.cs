@@ -755,7 +755,7 @@ namespace Windows.UI.Xaml.Data
         #endregion Private Data
     }
 
-    internal class ViewRecord
+    internal sealed class ViewRecord
     {
         internal ViewRecord(ICollectionView view)
         {

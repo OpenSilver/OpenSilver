@@ -23,7 +23,7 @@ namespace System.Windows.Automation.Peers
 namespace Windows.UI.Xaml.Automation.Peers
 #endif
 {
-    internal class PopupRootAutomationPeer : FrameworkElementAutomationPeer
+    internal sealed class PopupRootAutomationPeer : FrameworkElementAutomationPeer
     {
         public PopupRootAutomationPeer(Popup owner)
             : base(owner)

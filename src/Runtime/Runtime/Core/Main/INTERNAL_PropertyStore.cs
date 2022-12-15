@@ -537,8 +537,6 @@ namespace CSHTML5.Internal
                 currentExpr.SetValue(storage.Owner, storage.Property, computedValue);
             }
 
-			// Raise the InvalidateMeasure or InvalidateArrange
-            storage.Owner.OnPropertyChanged(new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
             return valueChanged;
         }
 
@@ -614,16 +612,33 @@ namespace CSHTML5.Internal
             // Ensure tha the value knows in which properties it is used (this is useful for example so that a SolidColorBrush knows in which properties it is used):
             //---------------------
 
-            if (oldValue is IHasAccessToPropertiesWhereItIsUsed)
+            if (oldValue is IHasAccessToPropertiesWhereItIsUsed2 hasAccessToProperties)
             {
-                ((IHasAccessToPropertiesWhereItIsUsed)oldValue).PropertiesWhereUsed.Remove(new KeyValuePair<DependencyObject, DependencyProperty>(sender, storage.Property));
+                var key = new WeakDependencyObjectWrapper(sender);
+                var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
+                if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
+                {
+                    val.Remove(storage.Property);
+                    // Remove key from dictionary if no properties left
+                    if (val.Count == 0)
+                    {
+                        propertiesWhereUsed.Remove(key);
+                    }
+                }
             }
 
-            if (newValue is IHasAccessToPropertiesWhereItIsUsed)
+            if ((hasAccessToProperties = newValue as IHasAccessToPropertiesWhereItIsUsed2) != null)
             {
-                IHasAccessToPropertiesWhereItIsUsed newValueAsIHasAccessToPropertiesWhereItIsUsed = (IHasAccessToPropertiesWhereItIsUsed)newValue;
-                // Note: it is not supposed to happen that the element is already in the list.
-                newValueAsIHasAccessToPropertiesWhereItIsUsed.PropertiesWhereUsed.Add(new KeyValuePair<DependencyObject, DependencyProperty>(sender, storage.Property));
+                var key = new WeakDependencyObjectWrapper(sender);
+                var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
+                if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
+                {
+                    val.Add(storage.Property);
+                }
+                else
+                {
+                    propertiesWhereUsed.Add(key, new HashSet<DependencyProperty>() { storage.Property });
+                }
             }
 
             //---------------------
@@ -647,23 +662,20 @@ namespace CSHTML5.Internal
             // Call the PropertyChangedCallback if any:
             //---------------------
 
+            var args = new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property);
             if (typeMetadata != null && typeMetadata.PropertyChangedCallback != null)
             {
-                typeMetadata.PropertyChangedCallback(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
+                typeMetadata.PropertyChangedCallback(sender, args);
             }
 
             //---------------------
             // Update bindings if any:
             //---------------------
 
-            if (storage.PropertyListeners != null)
-            {
-                var listeners = storage.PropertyListeners.ToArray();
-                foreach (var listener in listeners)
-                {
-                    listener.OnPropertyChanged(sender, new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property));
-                }
-            }
+            sender.InvalidateDependents(args);
+
+            // Raise the InvalidateMeasure or InvalidateArrange
+            sender.OnPropertyChanged(args);
         }
 
         private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
@@ -875,22 +887,6 @@ namespace CSHTML5.Internal
             {
                 throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
             }
-        }
-
-        internal static IPropertyChangedListener ListenToChanged(DependencyObject target, DependencyProperty property, Action<object, IDependencyPropertyChangedEventArgs> updateSourceCallback)
-        {
-            INTERNAL_PropertyStorage storage;
-            TryGetStorage(target, property, true/*create*/, out storage);
-            List<IPropertyChangedListener> listeners = storage.PropertyListeners;
-            if (listeners == null)
-            {
-                listeners = storage.PropertyListeners = new List<IPropertyChangedListener>(1);
-            }
-
-            PropertyChangedListener listener = new PropertyChangedListener(storage, updateSourceCallback);
-
-            listeners.Add(listener);
-            return listener;
         }
     }
 }

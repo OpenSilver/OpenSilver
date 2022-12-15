@@ -15,6 +15,7 @@ using System;
 using System.Windows.Markup;
 using System.Collections.Generic;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -23,6 +24,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.Foundation;
+using Windows.UI.Text;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
@@ -572,9 +574,9 @@ namespace Windows.UI.Xaml.Controls
         /// </param>
         [OpenSilver.NotImplemented]
 #if MIGRATION
-        protected internal override void OnMouseLeave(MouseEventArgs e)
+        protected override void OnMouseLeave(MouseEventArgs e)
 #else
-		protected internal override void OnPointerExited(PointerRoutedEventArgs e)
+		protected override void OnPointerExited(PointerRoutedEventArgs e)
 #endif
         {
 #if MIGRATION
@@ -715,11 +717,17 @@ namespace Windows.UI.Xaml.Controls
                 case Run run:
                     var format = new Dictionary<string, object>();
                     if (run.FontSize > 0)
-                        format.Add("font-size", run.FontSize);
+                        format.Add("font-size", $"{run.FontSize.ToInvariantString()}px");
                     if (run.FontFamily != null)
                         format.Add("font-family", run.FontFamily.ToString());
                     if (run.FontWeight != null)
-                        format.Add("bold", run.FontWeight.Weight > 500);
+                        format.Add("bold", run.FontWeight.ToOpenTypeWeight() > 500);
+#if MIGRATION
+                    if (run.FontStyle == FontStyles.Italic)
+#else
+                    if (run.FontStyle == FontStyle.Italic)
+#endif
+                        format.Add("italic", true);
                     if (run.Margin != null)
                         format.Add("margin", run.Margin.ToString());
                     if (run.Background is SolidColorBrush background)
@@ -737,7 +745,7 @@ namespace Windows.UI.Xaml.Controls
                     break;
 
                 case LineBreak _:
-                    _textViewHost.View.SetText("\n");
+                    _textViewHost.View.InsertText("\n");
                     break;
             }
         }

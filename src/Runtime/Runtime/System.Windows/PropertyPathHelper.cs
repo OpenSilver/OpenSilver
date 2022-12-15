@@ -54,45 +54,7 @@ namespace Windows.UI.Xaml
                     }
                     else
                     {
-                        //in the case of JS, members with reserved names(?) (such as "name" without uppercase) do not work properly
-                        //in regards to getting the member since the name of the member was changed to "$name" AND the GetValue method does not work either even if we manage to get the $name member.
-                        // for that, we try to directly get the value with currentItem["someVariationOfThePropName"];
-#if OPENSILVER
-                        if (false)
-#elif BRIDGE
-                        if (!CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-                        {
-                            //Note: there are a lot of tests below because depending on how the property/field was declared, it is not in the same place in JS:
-                            //      - in $propName
-                            //      - in TypeName$$propName
-                            //      - in TypeName$$propName$value
-                            // are the possible names observed.
-                            object obj = CSHTML5.Interop.ExecuteJavaScript(@"
-                            (function(){
-    var propname = ""$$"" + $1;
-    var temp = $0[propname];
-    if(!temp){
-        propname = $0.GetType().Name + ""$$"" + propname;
-        temp = $0[propname];
-        if(!temp){
-            propname = propname + ""$$value"";
-            temp = $0[propname];
-            if(!temp) temp = null;
-        }
-    }
-    return temp;
-}())", currentItem, splittedPath[i]);
-                            if (obj == null)
-                            {
-                                return "";
-                            }
-                            currentItem = obj;
-                        }
-                        else
-                        {
-                            return ""; //the path cannot be followed until the end
-                        }
+                        return ""; //the path cannot be followed until the end
                     }
                 }
                 return currentItem;

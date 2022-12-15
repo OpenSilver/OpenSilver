@@ -164,18 +164,18 @@ namespace Windows.UI.Xaml.Controls
                 var imageSrc = await Source.GetDataStringAsync();
                 if (!string.IsNullOrEmpty(imageSrc))
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc, true);
                     //set the width and height to "inherit" so the image takes up the size defined for it (and applied to _imageDiv's parent):
-                    OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = 'inherit'; {sImageDiv}.style.height = 'inherit'");
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sImageDiv}.style.width = 'inherit'; {sImageDiv}.style.height = 'inherit'");
                 }
             }            
             else
             {
                 //If Source == null we show empty image to prevent broken image icon
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", TransparentGifOnePixel);
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", TransparentGifOnePixel, true);
 
                 //Set css width and height values to 0 so we don't use space for an image that should not take any. Note: if the size is specifically set in the Xaml, it will still apply on a parent dom element so it won't change the appearance.
-                OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = ''; {sImageDiv}.style.height = ''");
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"{sImageDiv}.style.width = ''; {sImageDiv}.style.height = ''");
             }
             INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "alt", " "); //the text displayed when the image cannot be found. We set it as an empty string since there is nothing in Xaml
         }
@@ -200,30 +200,13 @@ namespace Windows.UI.Xaml.Controls
             double parentHeight = parent.ActualHeight;
 
             string sImageDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imageDiv);
-#if OPENSILVER
-            if (true)
-#elif BRIDGE
-            if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.naturalWidth + '|' + {sImageDiv}.naturalHeight"));
-                int sepIndex = concatenated.IndexOf('|');
-                string imgWidthAsString = concatenated.Substring(0, sepIndex);
-                string imgHeightAsString = concatenated.Substring(sepIndex + 1);
-#if NETSTANDARD
-                double.TryParse(imgWidthAsString, global::System.Globalization.NumberStyles.Any, global::System.Globalization.CultureInfo.InvariantCulture, out imgWidth); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                double.TryParse(imgHeightAsString, global::System.Globalization.NumberStyles.Any, global::System.Globalization.CultureInfo.InvariantCulture, out imgHeight); //todo: read note above
-#elif BRIDGE
-                double.TryParse(imgWidthAsString, global::System.Globalization.CultureInfo.InvariantCulture, out imgWidth); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                double.TryParse(imgHeightAsString, global::System.Globalization.CultureInfo.InvariantCulture, out imgHeight); //todo: read note above
-#endif
-            }
-            else
-            {
-                imgHeight = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.naturalHeight"));
-                imgWidth = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.naturalWidth"));
-            }
+            // Hack to improve the Simulator performance by making only one interop call rather than two:
+            string concatenated = OpenSilver.Interop.ExecuteJavaScriptString($"{sImageDiv}.naturalWidth + '|' + {sImageDiv}.naturalHeight");
+            int sepIndex = concatenated.IndexOf('|');
+            string imgWidthAsString = concatenated.Substring(0, sepIndex);
+            string imgHeightAsString = concatenated.Substring(sepIndex + 1);
+            double.TryParse(imgWidthAsString, NumberStyles.Any, CultureInfo.InvariantCulture, out imgWidth); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+            double.TryParse(imgHeightAsString, NumberStyles.Any, CultureInfo.InvariantCulture, out imgHeight); //todo: read note above
 
             double currentWidth = ActualWidth;
             double currentHeight = ActualHeight;
@@ -243,7 +226,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (double.IsNaN(Width) && currentWidth != parentWidth)
                 {
-                    imgWidth = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.style.width = {parentWidth.ToInvariantString()}"));
+                    imgWidth = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sImageDiv}.style.width = {parentWidth.ToInvariantString()}");
                     //_imageDiv.style.width = parentWidth;
                 }
             }
@@ -255,8 +238,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (double.IsNaN(Height) && currentHeight != parentHeight)
                 {
-                    imgWidth = Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript($"{sImageDiv}.style.height = {parentHeight.ToInvariantString()}"));
-                    //_imageDiv.style.height = parentHeight;
+                    imgWidth = OpenSilver.Interop.ExecuteJavaScriptDouble($"{sImageDiv}.style.height = {parentHeight.ToInvariantString()}");
                 }
             }
 
@@ -333,8 +315,8 @@ namespace Windows.UI.Xaml.Controls
                         break;
                 }
                 string sImageDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(image._imageDiv);
-                CSHTML5.Interop.ExecuteJavaScript($@"{sImageDiv}.style.objectFit = ""{objectFitvalue}"";
-{sImageDiv}.style.objectPosition = ""{objectPosition}""");
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{sImageDiv}.style.objectFit = \"{objectFitvalue}\";{sImageDiv}.style.objectPosition = \"{objectPosition}\"");
 
             }
         }
@@ -559,9 +541,9 @@ namespace Windows.UI.Xaml.Controls
 
         private Size GetNaturalSize()
         {
-            var size = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript(
-                "(function(img) { return img.naturalWidth + '|' + img.naturalHeight; })($0);",
-                _imageDiv));
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imageDiv);
+            var size = OpenSilver.Interop.ExecuteJavaScriptString(
+                $"(function(img) {{ return img.naturalWidth + '|' + img.naturalHeight; }})({sDiv});");
 
             int sepIndex = size.IndexOf('|');
             if (sepIndex > -1)

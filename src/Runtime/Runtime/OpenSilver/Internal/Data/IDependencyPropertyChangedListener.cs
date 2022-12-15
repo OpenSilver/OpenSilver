@@ -1,36 +1,28 @@
 ﻿
 /*===================================================================================
-*
+* 
 *   Copyright (c) Userware/OpenSilver.net
-*
+*      
 *   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
 *   licensed under the MIT license: https://opensource.org/licenses/MIT
-*
+*   
 *   As stated in the MIT license, "the above copyright notice and this permission
 *   notice shall be included in all copies or substantial portions of the Software."
-*
+*  
 \*====================================================================================*/
 
+using System;
+
 #if MIGRATION
-using System.Windows.Controls;
+using System.Windows;
 #else
-using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
 #endif
 
-namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
+namespace OpenSilver.Internal.Data
 {
-    public class WebBrowserWithTrackingComponent : WebBrowser
+    internal interface IDependencyPropertyChangedListener
     {
-        private readonly GarbageCollectorTracker _gcTracker;
-
-        public WebBrowserWithTrackingComponent(GarbageCollectorTracker gcTracker)
-        {
-            _gcTracker = gcTracker;
-        }
-
-        ~WebBrowserWithTrackingComponent()
-        {
-            _gcTracker.MarkAsCollected();
-        }
+        void OnPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args);
     }
 }

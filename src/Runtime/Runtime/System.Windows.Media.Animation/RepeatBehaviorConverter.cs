@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// 
     /// </summary>
-    internal class RepeatBehaviorConverter : TypeConverter
+    internal sealed class RepeatBehaviorConverter : TypeConverter
     {
         private static readonly char[] _iterationCharacter = new char[] { 'x' };
 

@@ -20,7 +20,7 @@ namespace System.Windows.Input
     /// TypeConverter to convert CursorType to/from other types.
     /// Currently To/From string is only supported.
     /// </summary>
-    internal class CursorConverter : TypeConverter
+    internal sealed class CursorConverter : TypeConverter
     {
         /// <summary>
         /// TypeConverter method override.

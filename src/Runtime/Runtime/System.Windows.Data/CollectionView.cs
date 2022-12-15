@@ -1422,7 +1422,7 @@ namespace Windows.UI.Xaml.Data
 
 #region Internal Types
 
-        internal class PlaceholderAwareEnumerator : IEnumerator
+        internal sealed class PlaceholderAwareEnumerator : IEnumerator
         {
             enum Position { BeforePlaceholder, OnPlaceholder, OnNewItem, AfterPlaceholder }
 

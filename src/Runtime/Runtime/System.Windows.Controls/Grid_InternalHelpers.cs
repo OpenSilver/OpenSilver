@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!_isGridSupported.HasValue)
             {
-                _isGridSupported = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.isGridSupported"));
+                _isGridSupported = OpenSilver.Interop.ExecuteJavaScriptBoolean("document.isGridSupported", false);
             }
             return _isGridSupported.Value;
         }
@@ -55,17 +55,9 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!_isMSGrid.HasValue)
             {
-                _isMSGrid = Convert.ToBoolean(CSHTML5.Interop.ExecuteJavaScript("document.isMSGrid"));
+                _isMSGrid = OpenSilver.Interop.ExecuteJavaScriptBoolean("document.isMSGrid", false);
             }
             return _isMSGrid.Value;
-        }
-
-#if BRIDGE
-        [Bridge.Template("document.gridSupport")]
-#endif
-        private static string GetGridSupportAsString()
-        {
-            return CSHTML5.Interop.ExecuteJavaScript("document.gridSupport").ToString();
         }
 
         public static List<List<INTERNAL_CellDefinition>> CalculateNewCellsStructure(ColumnDefinitionCollection columnDefinitionsOrNull, RowDefinitionCollection rowDefinitionsOrNull)

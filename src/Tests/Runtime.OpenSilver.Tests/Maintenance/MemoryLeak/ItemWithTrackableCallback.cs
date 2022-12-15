@@ -11,30 +11,28 @@
 *
 \*====================================================================================*/
 
-
 using System.Threading;
 
-namespace Runtime.OpenSilver.Tests.Maintenance.MemoryLeak
+namespace OpenSilver.MemoryLeak;
+
+internal class ItemWithTrackableCallback
 {
-    class ItemWithTrackableCallback
+    private readonly GCTracker _gcTracker;
+    private readonly ManualResetEvent _manualResetEvent;
+
+    public ItemWithTrackableCallback(GCTracker gcTracker, ManualResetEvent manualResetEvent)
     {
-        private readonly GarbageCollectorTracker _gcTracker;
-        private readonly ManualResetEvent _manualResetEvent;
+        _gcTracker = gcTracker;
+        _manualResetEvent = manualResetEvent;
+    }
 
-        public ItemWithTrackableCallback(GarbageCollectorTracker gcTracker, ManualResetEvent manualResetEvent)
-        {
-            _gcTracker = gcTracker;
-            _manualResetEvent = manualResetEvent;
-        }
+    ~ItemWithTrackableCallback()
+    {
+        _gcTracker.MarkAsCollected();
+    }
 
-        ~ItemWithTrackableCallback()
-        {
-            _gcTracker.MarkAsCollected();
-        }
-
-        public void Callback()
-        {
-            _manualResetEvent.Set();
-        }
+    public void Callback()
+    {
+        _manualResetEvent.Set();
     }
 }

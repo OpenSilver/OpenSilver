@@ -160,12 +160,11 @@ namespace DotNetForHtml5.Compiler
             return -1;
         }
 
-        private static bool IsAttributeTheXNameAttribute(XAttribute attribute)
-        {
-            bool isXName = (attribute.Name.LocalName == "Name" && attribute.Name.NamespaceName == xNamespace);
-            bool isName = (attribute.Name.LocalName == "Name" && string.IsNullOrEmpty(attribute.Name.NamespaceName));
-            return isXName || isName;
-        }
+        private static bool IsXNameAttribute(XAttribute attr)
+            => attr.Name.LocalName == "Name" && attr.Name.NamespaceName == xNamespace;
+
+        private static bool IsNameAttribute(XAttribute attr)
+            => attr.Name.LocalName == "Name" && string.IsNullOrEmpty(attr.Name.NamespaceName);
 
         private static string CreateInitializeComponentMethod(
             string applicationTypeFullName,
@@ -403,6 +402,7 @@ public sealed class {factoryName} : {IXamlComponentFactoryClass}<{componentTypeF
         private const string IXamlComponentLoaderClass = "global::OpenSilver.Internal.Xaml.IXamlComponentLoader";
         private const string IComponentConnectorClass = "global::OpenSilver.Internal.Xaml.IComponentConnector";
         private const string XamlContextClass = "global::OpenSilver.Internal.Xaml.Context.XamlContext";
+        private const string IMarkupExtensionClass = "global::System.Xaml.IMarkupExtension<object>";
 
         public static bool IsDataTemplate(XElement element) => IsXElementOfType(element, "DataTemplate");
 

@@ -33,13 +33,7 @@ namespace System.Windows.Browser
         /// Gets a Uniform Resource Identifier (URI) object that represents the current HTML
         /// document.
         /// </summary>
-        public Uri DocumentUri
-        {
-            get
-            {
-                return new Uri(CSHTML5.Interop.ExecuteJavaScript("window.location.href").ToString());
-            }
-        }
+        public Uri DocumentUri => new Uri(OpenSilver.Interop.ExecuteJavaScriptString("window.location.href"));
 
         /// <summary>
         /// Gets a navigable, read-only collection of name/value pairs that represent
@@ -51,7 +45,7 @@ namespace System.Windows.Browser
             {
                 Dictionary<string, string> query = new Dictionary<string, string>();
                 
-                string url = OpenSilver.Interop.ExecuteJavaScript("window.location.search").ToString();
+                string url = OpenSilver.Interop.ExecuteJavaScriptString("window.location.search");
                 if (!string.IsNullOrEmpty(url))
                 {
                     string[] parts = url.Substring(1).Split(new char[1] { '&' }, StringSplitOptions.RemoveEmptyEntries);
@@ -105,14 +99,8 @@ namespace System.Windows.Browser
         /// </summary>
         public string Cookies
         {
-            get
-            {
-                return CSHTML5.Interop.ExecuteJavaScript("document.cookie").ToString() ?? string.Empty;
-            }
-            set
-            {
-                CSHTML5.Interop.ExecuteJavaScript("document.cookie = $0", value);
-            }
+            get => OpenSilver.Interop.ExecuteJavaScriptString("document.cookie") ?? string.Empty;
+            set => OpenSilver.Interop.ExecuteJavaScriptVoid($"document.cookie = {INTERNAL_InteropImplementation.GetVariableStringForJS(value)}");
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using System;
 using System.Collections.Generic;
@@ -56,11 +54,13 @@ namespace System.ComponentModel
                 {
                     if (value)
                     {
-                        CSHTML5.Interop.ExecuteJavaScript(@"$0.returnValue = ""The modifications you made may not be saved."";", INTERNAL_JSArgs); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe Edge).
+                        OpenSilver.Interop.ExecuteJavaScriptVoid(
+                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_JSArgs)}.returnValue = 'The modifications you made may not be saved.';"); //todo: find a way to change this message at will (changing this only has an impact on IE and maybe Edge).
                     }
                     else
                     {
-                        CSHTML5.Interop.ExecuteJavaScript(@"$0.returnValue = """";", INTERNAL_JSArgs);
+                        OpenSilver.Interop.ExecuteJavaScriptVoid(
+                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_JSArgs)}.returnValue = '';");
                     }
                 }
             }

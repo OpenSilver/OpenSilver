@@ -28,7 +28,7 @@ namespace CSHTML5.Internal
 #if BRIDGE
     [External] //we exclude this class
 #endif
-    internal class OnCallBackImpl
+    internal sealed class OnCallBackImpl
     {
         private OnCallBackImpl()
         {
@@ -40,8 +40,8 @@ namespace CSHTML5.Internal
         {
             Action action = () =>
             {
-                string errorMessage = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("document.jsObjRef[$0][0]", idWhereCallbackArgsAreStored));
-                int indexOfNextUnmodifiedJSCallInList = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript("document.jsObjRef[$0][1]", idWhereCallbackArgsAreStored));
+                string errorMessage = OpenSilver.Interop.ExecuteJavaScriptString($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][0]");
+                int indexOfNextUnmodifiedJSCallInList = OpenSilver.Interop.ExecuteJavaScriptInt32($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][1]");
                 INTERNAL_InteropImplementation.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
             };
 

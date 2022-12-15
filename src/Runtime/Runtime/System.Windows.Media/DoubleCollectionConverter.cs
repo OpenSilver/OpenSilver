@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// DoubleCollectionConverter - Converter class for converting instances of other types to and from DoubleCollection instances
     /// </summary>
-    internal class DoubleCollectionConverter : TypeConverter
+    internal sealed class DoubleCollectionConverter : TypeConverter
     {
         /// <summary>
         /// Returns true if this type converter can convert from a given type.

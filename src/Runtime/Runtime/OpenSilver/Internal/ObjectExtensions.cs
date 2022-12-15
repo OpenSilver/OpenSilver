@@ -30,6 +30,16 @@ namespace OpenSilver.Internal
             return d.ToString(CultureInfo.InvariantCulture);
         }
 
+        internal static string ToInvariantString(this int i)
+        {
+            return i.ToString(CultureInfo.InvariantCulture);
+        }
+
+        internal static string ToInvariantString(this byte b)
+        {
+            return b.ToString(CultureInfo.InvariantCulture);
+        }
+
         internal static string ToInvariantString(this double d, string format)
         {
             return d.ToString(format, CultureInfo.InvariantCulture);

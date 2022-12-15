@@ -611,16 +611,16 @@ namespace Windows.UI.Xaml.Shapes
         {
             // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
             // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
-            object context = CSHTML5.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
+            object context = OpenSilver.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
             string sContext = INTERNAL_InteropImplementation.GetVariableStringForJS(context);
 
             // we remove the previous drawing:
             // todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
-            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.clearRect(0, 0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})"); 
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.clearRect(0, 0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
 
 
             // context.save() for the fill
-            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.save()");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.save()");
 
             // FillStyle:
             double opacity = shape.Fill == null ? 1 : shape.Fill.Opacity;
@@ -640,28 +640,28 @@ namespace Windows.UI.Xaml.Shapes
 
             if (fillValue != null)
             {
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(fillValue)}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(fillValue)}");
             }
             else
             {
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = ''");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = ''");
             }
 
-            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineJoin = '{shape.StrokeLineJoin.ToString().ToLower()}';");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineJoin = '{shape.StrokeLineJoin.ToString().ToLower()}';");
             if (shape.StrokeLineJoin == PenLineJoin.Miter)
             {
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.miterLimit = {shape.StrokeMiterLimit.ToInvariantString()}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.miterLimit = {shape.StrokeMiterLimit.ToInvariantString()}");
             }
 
             if (shape.Fill != null)
             {
                 // Note: I am not sure that calling fill("evenodd") works properly in Edge, the canvasRenderingContext2d 
                 // has a msfillRule property which might be the intended way to use the evenodd rule when in Edge.
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fill({INTERNAL_InteropImplementation.GetVariableStringForJS(fillRule)})"); 
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fill({INTERNAL_InteropImplementation.GetVariableStringForJS(fillRule)})"); 
             }
 
             // restore after fill then save before stroke
-            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.restore(); {sContext}.save()"); 
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.restore(); {sContext}.save()"); 
 
             //stroke
             opacity = shape.Stroke == null ? 1 : shape.Stroke.Opacity;
@@ -689,42 +689,24 @@ namespace Windows.UI.Xaml.Shapes
             if (strokeValue != null && strokeThickness > 0)
             {
                 double thickness = shape.StrokeThickness;
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.strokeStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {strokeThickness.ToInvariantString()}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.strokeStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {strokeThickness.ToInvariantString()}");
                 DoubleCollection strokeDashArray = shape.StrokeDashArray;
                 if (strokeDashArray != null)
                 {
-#if OPENSILVER
-                    if (true)
-#elif BRIDGE
-                    if (CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
-                    {
-                        // todo: put a message saying that it doesn't work in certain browsers (maybe use a static boolean to put that message only once)
-                    }
-                    else
-                    {
-                        object options = CSHTML5.Interop.ExecuteJavaScript(@"new Array()");
-                        string sOptions = INTERNAL_InteropImplementation.GetVariableStringForJS(options);
-                        for (int i = 0; i < strokeDashArray.Count; ++i)
-                        {
-                            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sOptions}[{i.ToInvariantString()}] = {(strokeDashArray[i] * thickness).ToInvariantString()};");
-                        }
-
-                        CSHTML5.Interop.ExecuteJavaScriptFastAsync($"if ({sContext}.setLineDash) {sContext}.setLineDash({sOptions})");
-                    }
+                    // TODO
                 }
 
                 if (shape.Stroke != null && shape.StrokeThickness > 0)
                 {
-                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke()");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke()");
                 }
 
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sContext}.restore()");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.restore()");
             }
 
             //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
-            CSHTML5.Interop.ExecuteJavaScriptAsync($"{sContext}.lineWidth = {shape.StrokeThickness.ToInvariantString()}");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {shape.StrokeThickness.ToInvariantString()}");
         }
 
         internal static object GetHtmlBrush(Shape shape, 
@@ -858,24 +840,24 @@ namespace Windows.UI.Xaml.Shapes
                     double tempCanvasHeight = shapeHeight > shapeWidth ? shapeHeight : shapeWidth;
 
 
-                    var canvas = CSHTML5.Interop.ExecuteJavaScript(@"document.createElement('canvas')");
+                    var canvas = OpenSilver.Interop.ExecuteJavaScript(@"document.createElement('canvas')");
                     string sCanvas = INTERNAL_InteropImplementation.GetVariableStringForJS(canvas);
                     string width = distance.ToInvariantString() + "px";
                     string height = tempCanvasHeight.ToInvariantString() + "px";
-                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 {sCanvas}.setAttribute('width', ""{width}"");
 {sCanvas}.setAttribute('height', ""{height}"");
 {sCanvas}.style.width = ""{width}"";
 {sCanvas}.style.height = ""{height}""");
 
-                    var ctx = CSHTML5.Interop.ExecuteJavaScriptAsync($"{sCanvas}.getContext('2d')");
+                    var ctx = OpenSilver.Interop.ExecuteJavaScriptAsync($"{sCanvas}.getContext('2d')");
 
                     var gradient = createLinearGradient(ctx, 0d, 0d, distance, 0d, fillAsLinearGradientBrush, opacity);
 
                     string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement);
                     string sCtx = INTERNAL_InteropImplementation.GetVariableStringForJS(ctx);
                     string sGradient = INTERNAL_InteropImplementation.GetVariableStringForJS(gradient);
-                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 {sCtx}.fillStyle = {sGradient};
 {sCtx}.fillRect(0, 0, {distance.ToInvariantString()}, {tempCanvasHeight.ToInvariantString()});
 if({sElement} != undefined && {sElement} != null) {{
@@ -884,7 +866,7 @@ context.rotate({angle.ToInvariantString()});
 context.translate({offset.ToInvariantString()}, 0);
 }}");
 
-                    returnValue = CSHTML5.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.createPattern({sCanvas}, 'repeat')");
+                    returnValue = OpenSilver.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.createPattern({sCanvas}, 'repeat')");
                 }
             }
             else if (brush is RadialGradientBrush)
@@ -923,7 +905,7 @@ context.translate({offset.ToInvariantString()}, 0);
                     r = r * (yOffsetToApplyBeforeMultiplication + maxY - minY) * verticalMultiplicator + minY;
                 }
 
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.scale({radiusScaling.ToInvariantString()},1)");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.scale({radiusScaling.ToInvariantString()},1)");
                 if (fillAsRadialGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
                     returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d, centerX, centerY, r,
@@ -1096,7 +1078,8 @@ context.restore();
             LinearGradientBrush lgb, double opacity)
         {
             string sContext2d = INTERNAL_InteropImplementation.GetVariableStringForJS(context2d);
-            object canvasGradient = CSHTML5.Interop.ExecuteJavaScriptAsync($"{sContext2d}.createLinearGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()})");
+            object canvasGradient = OpenSilver.Interop.ExecuteJavaScriptAsync(
+                $"{sContext2d}.createLinearGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()})");
 
             if (lgb != null)
             {
@@ -1110,7 +1093,8 @@ context.restore();
             RadialGradientBrush rgb, double opacity)
         {
             string sContext2d = INTERNAL_InteropImplementation.GetVariableStringForJS(context2d);
-            object canvasGradient = CSHTML5.Interop.ExecuteJavaScriptAsync($"{sContext2d}.createRadialGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {r0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()}, {r1.ToInvariantString()})");
+            object canvasGradient = OpenSilver.Interop.ExecuteJavaScriptAsync(
+                $"{sContext2d}.createRadialGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {r0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()}, {r1.ToInvariantString()})");
 
             if (rgb != null)
             {

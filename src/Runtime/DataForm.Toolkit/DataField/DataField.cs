@@ -1189,7 +1189,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (maxWidth > 0 && !double.IsInfinity(field.LabelColumn.ActualWidth))
                 {
-                    field.LabelColumn.MinWidth = maxWidth;
+                    field.LabelColumn.Width = new GridLength(maxWidth);
                 }
             }
         }

@@ -14,6 +14,8 @@
 using System;
 using System.Collections.Specialized;
 using CSHTML5.Internal;
+using System.Text;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Ink;
@@ -66,20 +68,21 @@ namespace Windows.UI.Xaml.Controls
             // 2 - increase the actual size of our canvas
             // 3 - ensure all drawing operations are scaled
             // 4 - scale everything down using CSS
-
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"let rect = $0.getBoundingClientRect();
-                    $0.width = rect.width * window.devicePixelRatio;
-                    $0.height = rect.height * window.devicePixelRatio;
-                    let ctx = $0.getContext('2d');
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.webkitImageSmoothingEnabled = true;
-                    ctx.mozImageSmoothingEnabled = true;
-                    ctx.msImageSmoothingEnabled = true;
-                    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-                    $0.style.width = rect.width + 'px';
-                    $0.style.height = rect.height + 'px';
-                    ctx.strokeStyle=$1; ctx.lineWidth=$2;
-                    ctx.clearRect(0, 0, $0.width, $0.height);", _canvasDom, "#222222", 4);
+            string sCanvas = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDom);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+@$"(function(cvs) {{ let rect = cvs.getBoundingClientRect();
+cvs.width = rect.width * window.devicePixelRatio;
+cvs.height = rect.height * window.devicePixelRatio;
+let ctx = cvs.getContext('2d');
+ctx.imageSmoothingEnabled = true;
+ctx.webkitImageSmoothingEnabled = true;
+ctx.mozImageSmoothingEnabled = true;
+ctx.msImageSmoothingEnabled = true;
+ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+cvs.style.width = rect.width + 'px';
+cvs.style.height = rect.height + 'px';
+ctx.strokeStyle='#222222'; ctx.lineWidth='4';
+ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
@@ -164,16 +167,23 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
+            string sCanvas = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDom);
+            var sb = new StringBuilder();
+            sb.AppendLine($"(function(cvs) {{ const ctx = cvs.getContext('2d');");
+            //object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
             var firstPoint = stroke.StylusPoints[0];
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2);", context, firstPoint.X, firstPoint.Y);
+            //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2);", context, firstPoint.X, firstPoint.Y);
+            sb.AppendLine($"ctx.moveTo({firstPoint.X.ToInvariantString()}, {firstPoint.Y.ToInvariantString()});");
 
             for (int i = 1; i < stroke.StylusPoints.Count; i++)
             {
-                OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.lineTo($1, $2);", context, stroke.StylusPoints[i].X, stroke.StylusPoints[i].Y);
+                //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.lineTo($1, $2);", context, stroke.StylusPoints[i].X, stroke.StylusPoints[i].Y);
+                sb.AppendLine($"ctx.lineTo({stroke.StylusPoints[i].X.ToInvariantString()}, {stroke.StylusPoints[i].Y.ToInvariantString()});");
             }
 
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.stroke();", context);
+            //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.stroke();", context);
+            sb.AppendLine($"ctx.stroke(); }})({sCanvas});");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(sb.ToString());
         }
 
 
@@ -251,8 +261,11 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
-            OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2); $0.lineTo($3, $4); $0.stroke();", context, _lastPos.X, _lastPos.Y, _mousePos.X, _mousePos.Y);
+            string sCanvas = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDom);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"(function(cvs) {{ const ctx = cvs.getContext('2d'); ctx.moveTo({_lastPos.X.ToInvariantString()}, {_lastPos.Y.ToInvariantString()}); ctx.lineTo({_mousePos.X.ToInvariantString()}, {_mousePos.Y.ToInvariantString()}); ctx.stroke(); }})({sCanvas})");
+            //object context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDom);
+            //OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.moveTo($1, $2); $0.lineTo($3, $4); $0.stroke();", context, _lastPos.X, _lastPos.Y, _mousePos.X, _mousePos.Y);
             _lastPos = _mousePos;
         }
     }

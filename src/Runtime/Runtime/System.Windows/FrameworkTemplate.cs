@@ -163,7 +163,7 @@ namespace Windows.UI.Xaml
         }
     }
 
-    internal class TemplateContent
+    internal sealed class TemplateContent
     {
         private readonly XamlContext _xamlContext;
         private readonly Func<FrameworkElement, XamlContext, FrameworkElement> _factory;

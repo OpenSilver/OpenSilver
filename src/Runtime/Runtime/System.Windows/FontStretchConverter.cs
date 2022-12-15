@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// FontStretchConverter class parses a font stretch string.
     /// </summary>
-    internal class FontStretchConverter : TypeConverter
+    internal sealed class FontStretchConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom
@@ -54,12 +54,23 @@ namespace Windows.UI.Xaml
         /// </exception>
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if (value == null || value is string)
+            if (null == value)
             {
-                return new FontStretch();
+                throw GetConvertFromException(value);
             }
 
-            throw GetConvertFromException(value);
+            if (!(value is string s))
+            {
+                throw new ArgumentException("The object passed to 'ConvertFrom' is not a valid type.", nameof(value));
+            }
+
+            FontStretch fontStretch = new FontStretch();
+            if (!FontStretches.FontStretchStringToKnownStretch(s, culture, ref fontStretch))
+            {
+                throw new FormatException("Token is not valid.");
+            }
+
+            return fontStretch;
         }
 
         /// <summary>
@@ -85,7 +96,7 @@ namespace Windows.UI.Xaml
             {
                 if (value is FontStretch instance)
                 {
-                    return instance.ToString();
+                    return ((IFormattable)instance).ToString(null, culture);
                 }
             }
 

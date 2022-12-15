@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// CornerRadiusConverter - Converter class for converting instances of other types to and from CornerRadius instances.
     /// </summary> 
-    internal class CornerRadiusConverter : TypeConverter
+    internal sealed class CornerRadiusConverter : TypeConverter
     {
         /// <summary>
         /// CanConvertFrom - Returns whether or not this class can convert from a given type.

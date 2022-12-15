@@ -780,7 +780,7 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            OpenSilver.Interop.ExecuteJavaScript("$0.preventDefault()", jsEventArg);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.preventDefault()");
         }
 
         internal void INTERNAL_TextUpdated()

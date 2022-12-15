@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,12 +26,55 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    public partial interface IHasAccessToPropertiesWhereItIsUsed
+    [Obsolete("This interface is no longer used and will be removed in later releases.")]
+    public interface IHasAccessToPropertiesWhereItIsUsed
     {
-
         HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
         {
             get;
         }
+    }
+
+    internal interface IHasAccessToPropertiesWhereItIsUsed2
+    {
+        Dictionary<WeakDependencyObjectWrapper, HashSet<DependencyProperty>> PropertiesWhereUsed
+        {
+            get;
+        }
+    }
+
+    internal readonly struct WeakDependencyObjectWrapper
+    {
+        private readonly WeakReference<DependencyObject> _weakRef;
+        private readonly int _hashCode;
+
+        public WeakDependencyObjectWrapper(DependencyObject d)
+        {
+            Debug.Assert(d != null);
+            _weakRef = new WeakReference<DependencyObject>(d);
+            _hashCode = d.GetHashCode();
+        }
+
+        public bool TryGetDependencyObject(out DependencyObject dependencyObject)
+            => _weakRef.TryGetTarget(out dependencyObject);
+
+        public override bool Equals(object obj)
+        {
+            if (obj is WeakDependencyObjectWrapper wrapper)
+            {
+                if (_weakRef != wrapper._weakRef)
+                {
+                    return TryGetDependencyObject(out DependencyObject target1) &&
+                        wrapper.TryGetDependencyObject(out DependencyObject target2) &&
+                        target1 == target2;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode() => _hashCode;
     }
 }

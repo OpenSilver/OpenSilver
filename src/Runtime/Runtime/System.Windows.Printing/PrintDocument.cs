@@ -179,7 +179,7 @@ namespace Windows.UI.Xaml.Printing
         private void PrintPrivate()
         {
             AddPrintSection();
-            OpenSilver.Interop.ExecuteJavaScript("window.print()");
+            OpenSilver.Interop.ExecuteJavaScriptVoid("window.print()");
             RemovePrintSection(elements);
         }
 
@@ -215,16 +215,17 @@ namespace Windows.UI.Xaml.Printing
                 {
                     foreach (var el in NotLoadedElements)
                     {
-                        OpenSilver.Interop.ExecuteJavaScript(@"$0.classList.add(""print-section"")", el.INTERNAL_OuterDomElement);
+                        OpenSilver.Interop.ExecuteJavaScriptVoid(
+                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(el.INTERNAL_OuterDomElement)}.classList.add(\"print-section\")");
                     }
 
+                    string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action)(() =>
+                    {
+                        callback();
+                        temporaryPopup.IsOpen = false;
+                    }));
                     // Even though the Loaded event is fired, sometimes we need to wait little bit more.
-                    OpenSilver.Interop.ExecuteJavaScriptAsync("setTimeout($0, 100)",
-                        (Action)(() =>
-                        {
-                            callback();
-                            temporaryPopup.IsOpen = false;
-                        }));
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"setTimeout({sCallback}, 100)");
                 });
             };
 
@@ -238,7 +239,8 @@ namespace Windows.UI.Xaml.Printing
             // Add 'print-section' class for elements we want to print
             foreach (var e in elements)
             {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.classList.add(""print-section"")", e.INTERNAL_OuterDomElement);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e.INTERNAL_OuterDomElement)}.classList.add(\"print-section\")");
             }
         }
 
@@ -247,7 +249,8 @@ namespace Windows.UI.Xaml.Printing
             // Remove 'print-section' class for elements we want to print
             foreach (var e in elements)
             {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.classList.remove(""print-section"")", e.INTERNAL_OuterDomElement);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e.INTERNAL_OuterDomElement)}.classList.remove(\"print-section\")");
             }
             elements.Clear();
         }

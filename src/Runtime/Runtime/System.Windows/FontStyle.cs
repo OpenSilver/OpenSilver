@@ -17,7 +17,10 @@ using System.Diagnostics;
 
 namespace System.Windows
 {
-    public partial struct FontStyle : IFormattable
+    /// <summary>
+    /// Represents the style of a font face (for instance, as normal or italic).
+    /// </summary>
+    public struct FontStyle : IFormattable
     {
         private readonly int _style;
 
@@ -26,45 +29,77 @@ namespace System.Windows
             _style = style;
         }
 
-        public override bool Equals(object o)
-        {
-            if (o is FontStyle)
-            {
-                FontStyle fs = (FontStyle)o;
-                return this == fs;
-            }
-            return false;
-        }
+        /// <summary>
+        /// Compares an object with the current <see cref="FontStyle"/> instance for equality.
+        /// </summary>
+        /// <param name="obj">
+        /// An object that represents the <see cref="FontStyle"/> to compare for equality.
+        /// </param>
+        /// <returns>
+        /// true to show the two instances are equal; otherwise, false.
+        /// </returns>
+        public override bool Equals(object obj)
+            => obj is FontStyle fontStyle && this == fontStyle;
 
-        public bool Equals(FontStyle fontStyle)
-        {
-            return this == fontStyle;
-        }
+        /// <summary>
+        /// Compares this <see cref="FontStyle"/> structure to another <see cref="FontStyle"/>
+        /// structure for equality.
+        /// </summary>
+        /// <param name="fontStyle">
+        /// An instance of <see cref="FontStyle"/> to compare for equality.
+        /// </param>
+        /// <returns>
+        /// true if the two instances of <see cref="FontStyle"/> are equal; otherwise, false.
+        /// </returns>
+        public bool Equals(FontStyle fontStyle) => this == fontStyle;
 
-        public override int GetHashCode()
-        {
-            return this._style;
-        }
+        /// <summary>
+        /// Retrieves the hash code for this object.
+        /// </summary>
+        /// <returns>
+        /// An integer hash value.
+        /// </returns>
+        public override int GetHashCode() => _style;
 
-        public static bool operator ==(FontStyle left, FontStyle right)
-        {
-            return left._style == right._style;
-        }
+        /// <summary>
+        /// Compares two instances of <see cref="FontStyle"/> for equality.
+        /// </summary>
+        /// <param name="left">
+        /// The first instance of <see cref="FontStyle"/> to compare.
+        /// </param>
+        /// <param name="right">
+        /// The second instance of <see cref="FontStyle"/> to compare.
+        /// </param>
+        /// <returns>
+        /// true if the specified <see cref="FontStyle"/> objects are equal; otherwise,
+        /// false.
+        /// </returns>
+        public static bool operator ==(FontStyle left, FontStyle right) => left._style == right._style;
 
-        public static bool operator !=(FontStyle left, FontStyle right)
-        {
-            return left._style != right._style;
-        }
+        /// <summary>
+        /// Evaluates two instances of <see cref="FontStyle"/> to determine inequality.
+        /// </summary>
+        /// <param name="left">
+        /// The first instance of <see cref="FontStyle"/> to compare.
+        /// </param>
+        /// <param name="right">
+        /// The second instance of <see cref="FontStyle"/> to compare.
+        /// </param>
+        /// <returns>
+        /// false to show left is equal to right; otherwise, true.
+        /// </returns>
+        public static bool operator !=(FontStyle left, FontStyle right) => !(left == right);
 
-        public override string ToString()
-        {
-            return ConvertToString(null, null);
-        }
+        /// <summary>
+        /// Creates a string that represents the current <see cref="FontStyle"/> object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the value of the <see cref="FontStyle"/> object.
+        /// </returns>
+        public override string ToString() => ConvertToString(null, null);
 
         string IFormattable.ToString(string format, IFormatProvider formatProvider)
-        {
-            return ConvertToString(format, formatProvider);
-        }
+            => ConvertToString(format, formatProvider);
 
         /// <summary>
         /// Creates a string representation of this object based on the format string 

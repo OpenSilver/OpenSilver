@@ -273,7 +273,7 @@ namespace OpenSilver.Internal.Data
         static Type StringType = typeof(String);
     }
 
-    internal class SourceDefaultValueConverter : DefaultValueConverter, IValueConverter
+    internal sealed class SourceDefaultValueConverter : DefaultValueConverter, IValueConverter
     {
         //------------------------------------------------------
         //
@@ -316,7 +316,7 @@ namespace OpenSilver.Internal.Data
 #endif
     }
 
-    internal class TargetDefaultValueConverter : DefaultValueConverter, IValueConverter
+    internal sealed class TargetDefaultValueConverter : DefaultValueConverter, IValueConverter
     {
         //------------------------------------------------------
         //
@@ -359,7 +359,7 @@ namespace OpenSilver.Internal.Data
 #endif
     }
 
-    internal class SystemConvertConverter : IValueConverter
+    internal sealed class SystemConvertConverter : IValueConverter
     {
         public SystemConvertConverter(Type sourceType, Type targetType)
         {
@@ -466,7 +466,7 @@ namespace OpenSilver.Internal.Data
     // BUG: 1109257 ObjectTargetConverter is not the best converter possible:
     // it'll use the Source type's system converter, but at conversion time,
     // the real target type's converter is another converter that can be tried.
-    internal class ObjectTargetConverter : DefaultValueConverter, IValueConverter
+    internal sealed class ObjectTargetConverter : DefaultValueConverter, IValueConverter
     {
         //------------------------------------------------------
         //
@@ -525,7 +525,7 @@ namespace OpenSilver.Internal.Data
     }
 
     // BUG: 1109257 ObjectSourceConverter is not the best converter possible.
-    internal class ObjectSourceConverter : DefaultValueConverter, IValueConverter
+    internal sealed class ObjectSourceConverter : DefaultValueConverter, IValueConverter
     {
         //------------------------------------------------------
         //
@@ -583,7 +583,7 @@ namespace OpenSilver.Internal.Data
 
 #if NETSTANDARD
 
-    internal class ListSourceConverter : IValueConverter
+    internal sealed class ListSourceConverter : IValueConverter
     {
         //------------------------------------------------------
         //
@@ -627,7 +627,7 @@ namespace OpenSilver.Internal.Data
 
 #endif // NETSTANDARD
 
-    internal class InterfaceConverter : IValueConverter
+    internal sealed class InterfaceConverter : IValueConverter
     {
         //------------------------------------------------------
         //

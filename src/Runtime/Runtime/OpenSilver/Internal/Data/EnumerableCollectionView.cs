@@ -25,7 +25,7 @@ namespace OpenSilver.Internal.Data
     ///<summary>
     /// Collection view over an IEnumerable.
     ///</summary>
-    internal class EnumerableCollectionView : CollectionView
+    internal sealed class EnumerableCollectionView : CollectionView
 #if WPF
         , IItemProperties
 #endif // WPF

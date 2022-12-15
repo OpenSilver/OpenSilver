@@ -59,18 +59,18 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
                 new [] { Environment.NewLine },
                 StringSplitOptions.None
             ).Last();
-            string result = null;
+            object result = null;
             if (lastLine.Contains("navigator.userAgent"))
             {
-                result = ChromeUserAgent;
+                result = JsonDocument.Parse($"\"{ChromeUserAgent}\"").RootElement;
             }
             else if (lastLine.Contains("navigator.cookieEnabled"))
             {
-                result = "true";
+                result = true;
             }
             else if (lastLine.Contains("navigator.platform"))
             {
-                result = Platform;
+                result = JsonDocument.Parse($"\"{Platform}\"").RootElement;
             }
 
             if (result == null)
@@ -79,7 +79,7 @@ namespace Runtime.OpenSilver.Tests.System.Windows.Browser
             }
 
             args.Handled = true;
-            args.Result = JsonDocument.Parse($"\"{result}\"").RootElement;
+            args.Result = result;
         }
 
         [TestMethod]

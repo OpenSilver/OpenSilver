@@ -76,7 +76,7 @@ namespace DotNetForHtml5.Compiler
                         continue;
                     }
 
-                    XAttribute xNameAttr = element.Attributes().FirstOrDefault(attr => IsAttributeTheXNameAttribute(attr));
+                    XAttribute xNameAttr = element.Attributes().FirstOrDefault(attr => IsXNameAttribute(attr) || IsNameAttribute(attr));
                     if (xNameAttr != null && GetRootOfCurrentNamescopeForCompilation(element).Parent == null)
                     {
                         string name = xNameAttr.Value;
@@ -159,15 +159,15 @@ namespace DotNetForHtml5.Compiler
             {
                 while (element.Parent != null)
                 {
-                    if (IsDataTemplate(element) || IsItemsPanelTemplate(element) || IsControlTemplate(element))
+                    XElement parent = element.Parent;
+                    if (IsDataTemplate(parent) || IsItemsPanelTemplate(parent) || IsControlTemplate(parent))
                     {
-                        return element;
+                        return parent;
                     }
-                    element = element.Parent;
+                    element = parent;
                 }
                 return element;
             }
-
 
 #if BRIDGE
             private bool IsClassTheApplicationClass(string className)

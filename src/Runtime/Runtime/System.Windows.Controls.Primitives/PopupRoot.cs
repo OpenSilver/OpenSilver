@@ -13,10 +13,15 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
 using CSHTML5.Internal;
+using DotNetForHtml5.Core;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Input;
+#else
 using Windows.Foundation;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -25,7 +30,7 @@ namespace System.Windows.Controls.Primitives
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
-    internal partial class PopupRoot : FrameworkElement
+    internal sealed class PopupRoot : FrameworkElement
     {
         /// <summary>
         /// Returns the Visual children count.
@@ -59,9 +64,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         internal string INTERNAL_UniqueIndentifier { get; set; }
 
         internal Popup INTERNAL_LinkedPopup { get; set; }
-
-        internal sealed override bool EnablePointerEventsCore
-            => !INTERNAL_LinkedPopup?.StayOpen ?? false;
 
         internal PopupRoot(string uniqueIdentifier, Window parentWindow)
         {
@@ -115,6 +117,75 @@ namespace Windows.UI.Xaml.Controls.Primitives
             parent.RemoveVisualChild(oldChild);
             parent.AddVisualChild(newChild);
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+
+            // Note: If a popup has StayOpen=True, the value of "StayOpen" of its parents is ignored.
+            // In other words, the parents of a popup that has StayOpen=True will always stay open
+            // regardless of the value of their "StayOpen" property.
+
+            HashSet<Popup> listOfPopupThatMustBeClosed = new HashSet<Popup>();
+            List<PopupRoot> popupRootList = new List<PopupRoot>();
+
+            foreach (object obj in INTERNAL_PopupsManager.GetAllRootUIElements())
+            {
+                if (obj is PopupRoot)
+                {
+                    PopupRoot root = (PopupRoot)obj;
+                    popupRootList.Add(root);
+
+                    if (root.INTERNAL_LinkedPopup != null)
+                        listOfPopupThatMustBeClosed.Add(root.INTERNAL_LinkedPopup);
+                }
+            }
+
+            // We determine which popup needs to stay open after this click
+            foreach (PopupRoot popupRoot in popupRootList)
+            {
+                if (popupRoot.INTERNAL_LinkedPopup != null)
+                {
+                    // We must prevent all the parents of a popup to be closed when:
+                    // - this popup is set to StayOpen
+                    // - or the click happend in this popup
+
+                    Popup popup = popupRoot.INTERNAL_LinkedPopup;
+
+                    if (popup.StayOpen)
+                    {
+                        do
+                        {
+                            if (!listOfPopupThatMustBeClosed.Contains(popup))
+                                break;
+
+                            listOfPopupThatMustBeClosed.Remove(popup);
+
+                            popup = popup.ParentPopup;
+
+                        } while (popup != null);
+                    }
+                }
+            }
+
+            foreach (Popup popup in listOfPopupThatMustBeClosed)
+            {
+                var args = new OutsideClickEventArgs();
+                popup.OnOutsideClick(args);
+                if (!args.Handled)
+                {
+                    popup.CloseFromAnOutsideClick();
+                }
+            }
         }
 
         protected override Size MeasureOverride(Size availableSize)

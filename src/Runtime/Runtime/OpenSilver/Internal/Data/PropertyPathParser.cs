@@ -24,40 +24,41 @@ namespace OpenSilver.Internal.Data
     }
 
     //Property path syntax: http://msdn.microsoft.com/en-us/library/cc645024(v=vs.95).aspx
-    internal struct PropertyPathParser
+    internal ref struct PropertyPathParser
     {
-        private string _path;
+        private ReadOnlySpan<char> _path;
         private readonly bool _isParsingBinding;
 
         internal PropertyPathParser(string path, bool isParsingBinding)
         {
-            _path = path;
+            _path = path.AsSpan();
             _isParsingBinding = isParsingBinding;
         }
 
         internal PropertyNodeType Step(out string typeName, out string propertyName, out string index)
         {
-            var type = PropertyNodeType.None;
             var path = _path;
-            if (string.IsNullOrEmpty(path) || path == ".")
+
+            if (path.Length == 0 || (path.Length == 1 && path[0] == '.'))
             {
                 typeName = null;
                 propertyName = null;
                 index = null;
-                return type;
+                return PropertyNodeType.None;
             }
 
-            int end = 0;
+            PropertyNodeType type;
             if (path[0] == '(')
             {
                 type = PropertyNodeType.AttachedProperty;
-                end = path.IndexOf(')');
+                int end = path.IndexOf(')');
                 if (end == -1)
                 {
                     throw new Exception($"Invalid property path : '{path}'.");
                 }
 
-                int typeEnd = path.LastIndexOf('.', end);
+                var slice = path.Slice(1, end - 1);
+                int typeEnd = slice.LastIndexOf('.');
                 if (typeEnd == -1)
                 {
                     if (_isParsingBinding)
@@ -66,13 +67,14 @@ namespace OpenSilver.Internal.Data
                     }
 
                     typeName = null;
-                    propertyName = path.Substring(1, end - 1);
+                    propertyName = slice.ToString();
                     index = null;
                 }
                 else
                 {
-                    typeName = path.Substring(1, typeEnd - 1);
-                    propertyName = path.Substring(typeEnd + 1, end - typeEnd - 1);
+                    typeEnd++;
+                    typeName = path.Slice(1, typeEnd - 1).ToString();
+                    propertyName = path.Slice(typeEnd + 1, end - typeEnd - 1).ToString();
                     index = null;
                 }
 
@@ -81,37 +83,42 @@ namespace OpenSilver.Internal.Data
                     end++;
                 }
 
-                path = path.Substring(end + 1);
+                path = path.Slice(end + 1);
             }
             else if (path[0] == '[')
             {
                 type = PropertyNodeType.Indexed;
-                end = path.IndexOf(']');
+                int end = path.IndexOf(']');
 
                 typeName = null;
                 propertyName = null;
-                index = path.Substring(1, end - 1);
-                path = path.Substring(end + 1);
+                index = path.Slice(1, end - 1).ToString();
+                path = path.Slice(end + 1);
                 if (path.Length > 0 && path[0] == '.')
-                    path = path.Substring(1);
+                {
+                    path = path.Slice(1);
+                }
             }
             else
             {
                 type = PropertyNodeType.Property;
-                char[] splitters = {'.', '['};
-                end = path.IndexOfAny(splitters);
-
-                if (end == -1) {
-                    propertyName = path;
-                    path = "";
+                int end = path.IndexOfAny(Splitters.Chars);
+                if (end == -1)
+                {
+                    propertyName = path.ToString();
+                    path = ReadOnlySpan<char>.Empty;
                 }
                 else
                 {
-                    propertyName = path.Substring(0, end);
+                    propertyName = path.Slice(0, end).ToString();
                     if (path[end] == '.')
-                        path = path.Substring(end + 1);
+                    {
+                        path = path.Slice(end + 1);
+                    }
                     else
-                        path = path.Substring(end);
+                    {
+                        path = path.Slice(end);
+                    }
                 }
 
                 typeName = null;
@@ -121,6 +128,11 @@ namespace OpenSilver.Internal.Data
             _path = path;
 
             return type;
+        }
+
+        private static class Splitters
+        {
+            public static readonly char[] Chars = { '.', '[' };
         }
     }
 }

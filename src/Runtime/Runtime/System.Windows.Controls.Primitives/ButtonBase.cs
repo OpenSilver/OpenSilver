@@ -520,9 +520,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
 #if MIGRATION
-        protected internal override void OnMouseLeave(MouseEventArgs eventArgs)
+        protected override void OnMouseLeave(MouseEventArgs eventArgs)
 #else
-        protected internal override void OnPointerExited(PointerRoutedEventArgs eventArgs)
+        protected override void OnPointerExited(PointerRoutedEventArgs eventArgs)
 #endif
         {
 #if MIGRATION

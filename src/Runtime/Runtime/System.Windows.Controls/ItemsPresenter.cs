@@ -200,16 +200,38 @@ namespace Windows.UI.Xaml.Controls
             base.OnApplyTemplate();
         }
 
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size availableSize)
         {
-            FrameworkElement child = this.TemplateChild;
-            if (child == null)
+            int count = VisualChildrenCount;
+
+            if (count > 0)
             {
-                return new Size();
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Measure(availableSize);
+                    return child.DesiredSize;
+                }
             }
 
-            child.Measure(availableSize);
-            return child.DesiredSize;
+            return new Size();
+        }
+
+        /// <inheritdoc />
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            int count = VisualChildrenCount;
+
+            if (count > 0)
+            {
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    child.Arrange(new Rect(finalSize));
+                }
+            }
+            return finalSize;
         }
     }
 }

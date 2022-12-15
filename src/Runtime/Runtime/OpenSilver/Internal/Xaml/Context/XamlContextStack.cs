@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace OpenSilver.Internal.Xaml.Context
 {
-    internal class XamlContextStack
+    internal sealed class XamlContextStack
     {
         public XamlContextStack()
         {

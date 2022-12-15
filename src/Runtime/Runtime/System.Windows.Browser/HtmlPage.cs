@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Browser;
+using CSHTML5.Types;
 
 namespace System.Windows.Browser
 {
@@ -33,12 +34,12 @@ namespace System.Windows.Browser
         /// <summary>
         /// Gets the browser's window object.
         /// </summary>
-        public static HtmlWindow Window => _initWindow ?? (_initWindow = new HtmlWindow());
+        public static HtmlWindow Window => _initWindow ??= new HtmlWindow();
 
         /// <summary>
         /// Gets the browser's document object.
         /// </summary>
-        public static HtmlDocument Document => _initDocument ?? (_initDocument = new HtmlDocument());
+        public static HtmlDocument Document => _initDocument ??= new HtmlDocument();
 
         [OpenSilver.NotImplemented]
         public static bool IsPopupWindowAllowed => false;
@@ -54,7 +55,7 @@ namespace System.Windows.Browser
         /// or &lt;embed&gt; tag on the host HTML page.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public static HtmlElement Plugin => _initPlugin ?? (_initPlugin = new HtmlElement());
+        public static HtmlElement Plugin => _initPlugin ??= new HtmlElement();
 
         [OpenSilver.NotImplemented]
         public static bool IsEnabled { get; private set; }
@@ -71,9 +72,9 @@ namespace System.Windows.Browser
             {
                 if (_browserInformation == null)
                 {
-                    string userAgent = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.userAgent"))
+                    string userAgent = OpenSilver.Interop.ExecuteJavaScriptString("navigator.userAgent", false)
                         ?? throw new InvalidOperationException("Cannot retrieve UserAgent");
-                    string platform = Convert.ToString(OpenSilver.Interop.ExecuteJavaScript("navigator.platform"));
+                    string platform = OpenSilver.Interop.ExecuteJavaScriptString("navigator.platform", false);
 
                     _browserInformation = new BrowserInformation(userAgent, platform);
                 }
@@ -96,7 +97,9 @@ namespace System.Windows.Browser
         /// </exception>
         public static void RegisterScriptableObject(string scriptKey, object instance)
         {
-            OpenSilver.Interop.ExecuteJavaScript("window[$0]={};", scriptKey);
+            string sScriptKey = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(scriptKey);
+
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"window[{sScriptKey}]={{}};");
 
             var methods = instance.GetType().GetMethods()
                 .Where(m => m.GetCustomAttributes(typeof(ScriptableMemberAttribute), false).Length > 0)
@@ -104,7 +107,8 @@ namespace System.Windows.Browser
 
             foreach (var method in methods)
             {
-                OpenSilver.Interop.ExecuteJavaScript("window[$0][$1] = function () { return $2(...arguments); }", scriptKey, method.Name, (Func<CSHTML5.Types.INTERNAL_JSObjectReference, object>)(jsObjectReference =>
+                string sMethodName = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(method.Name);
+                string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Func<INTERNAL_JSObjectReference, object>)(jsObjectReference =>
                 {
                     var parameters = method.GetParameters();
                     var args = new object[parameters.Length];
@@ -115,6 +119,8 @@ namespace System.Windows.Browser
                     }
                     return method.Invoke(instance, args);
                 }));
+
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"window[{sScriptKey}][{sMethodName}] = function () {{ return {sCallback}(...arguments); }}");
             }
 
             var events = instance.GetType().GetEvents()
@@ -124,13 +130,7 @@ namespace System.Windows.Browser
             foreach (var eventInfo in events)
             {
                 var es = new EventSubscriber(scriptKey, eventInfo.Name);
-#if BRIDGE
-                //Bridge.Net does not support EventHandlerType.
-                var eventHandlerType = eventInfo.AddMethod.GetParameters()[0].ParameterType;
-#else
                 var eventHandlerType = eventInfo.EventHandlerType;
-#endif
-
                 var methodName = "OnRaisedBridgeNet";
                 var method = eventHandlerType.GetMethod("Invoke");
                 if (method != null)

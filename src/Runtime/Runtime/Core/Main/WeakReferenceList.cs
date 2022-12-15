@@ -13,7 +13,7 @@ namespace OpenSilver.Internal
     ///   cache then the list is copied before it is modified and the readonly list is
     ///   released from the cache.
     /// </summary>
-    internal class WeakReferenceList : CopyOnWriteList, IEnumerable
+    internal sealed class WeakReferenceList : CopyOnWriteList, IEnumerable
     {
         public WeakReferenceList() : base(null)
         {

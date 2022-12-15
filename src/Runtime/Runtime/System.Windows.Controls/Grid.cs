@@ -1124,14 +1124,7 @@ namespace Windows.UI.Xaml.Controls
                         }
                     }
                     var columnDomElement = cell.ColumnDomElement;
-                    if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-                    {
-                        return ((dynamic)columnDomElement).offsetWidth;
-                    }
-                    else
-                    {
-                        return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(columnDomElement, "offsetWidth"));
-                    }
+                    return INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(columnDomElement, "offsetWidth");
                 }
                 else
                 {
@@ -1158,14 +1151,7 @@ namespace Windows.UI.Xaml.Controls
                 {
                     int rowIndex = _rowDefinitionsOrNull.IndexOf(rowDefinition);
                     var rowDomElement = _currentCellsStructure[rowIndex][0].RowDomElement;
-                    if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript)
-                    {
-                        return ((dynamic)rowDomElement).offsetHeight;
-                    }
-                    else
-                    {
-                        return Convert.ToDouble(INTERNAL_HtmlDomManager.GetDomElementAttribute(rowDomElement, "offsetHeight"));
-                    }
+                    return INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(rowDomElement, "offsetHeight");
                 }
                 else
                 {

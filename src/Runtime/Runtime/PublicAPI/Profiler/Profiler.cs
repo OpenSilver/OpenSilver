@@ -43,33 +43,21 @@ namespace CSHTML5
     public static class Profiler
     {
         // Idea for improvement: Add "results management" methods such as Clear or stuff like that.
-#if OPENSILVER
-        static Dictionary<string, PerformanceCounter> PerformanceCounters = new Dictionary<string, PerformanceCounter>();
+        private static readonly Dictionary<string, PerformanceCounter> PerformanceCounters = new Dictionary<string, PerformanceCounter>();
 
         static Profiler()
         {
-            OpenSilver.Interop.ExecuteJavaScript("window.ViewProfilerResults = $0", (Action)ViewProfilerResults);
+            string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action)ViewProfilerResults);
+            Interop.ExecuteJavaScriptVoid($"window.ViewProfilerResults = {sCallback}");
         }
-#endif
 
         /// <summary>
         /// Allows measuring the cumulative time between the start and the end of the measure. It returns a number that you need to pass to the "StopMeasuringTime()" method.
         /// </summary>
         /// <returns>A number that you need to pass to the "StopMeasuringTime()" method.</returns>
-#if !BRIDGE
-        [JSReplacement("performance.now()")]
-#else
-        [Template("performance.now()")]
-#endif
-#if OPENSILVER
         public static long StartMeasuringTime()
         {
-            return System.Diagnostics.Stopwatch.GetTimestamp();
-#else
-        public static double StartMeasuringTime()
-        {
-            return Convert.ToDouble(OpenSilver.Interop.ExecuteJavaScript("performance.now()")); 
-#endif
+            return Stopwatch.GetTimestamp();
         }
 
         /// <summary>
@@ -77,30 +65,16 @@ namespace CSHTML5
         /// </summary>
         /// <param name="measureDescription">An arbitrary text to describe the measure.</param>
         /// <param name="numberReturnedByTheStartMeasuringTimeMethod">The number returned by the call to "StartMeasuringTime()". It is used to calculate the time elapsed between the start and the end of the measure.</param>  
-#if !BRIDGE
-        [JSReplacement(@"document.addToPerformanceCounters($measureDescription, $numberReturnedByTheStartMeasuringTimeMethod)")]
-
-#else
-        [Template(@"document.addToPerformanceCounters({measureDescription}, {numberReturnedByTheStartMeasuringTimeMethod})")]
-#endif
-#if OPENSILVER
         public static void StopMeasuringTime(string measureDescription, long numberReturnedByTheStartMeasuringTimeMethod)
         {
             AddToPerformanceCounters(measureDescription, numberReturnedByTheStartMeasuringTimeMethod);
-#else
-        public static void StopMeasuringTime(string measureDescription, double numberReturnedByTheStartMeasuringTimeMethod)
-        {
-            OpenSilver.Interop.ExecuteJavaScript("document.addToPerformanceCounters($0, $1)", measureDescription, numberReturnedByTheStartMeasuringTimeMethod); 
-#endif
         }
 
-#if OPENSILVER
         private static void AddToPerformanceCounters(string measureDescription, long initialTime)
         {
-            long elapsedTime = (long)(System.Diagnostics.Stopwatch.GetTimestamp() - initialTime); 
-            PerformanceCounter counter;
-            PerformanceCounters.TryGetValue(measureDescription, out counter);
-            if(counter == null)
+            long elapsedTime = Stopwatch.GetTimestamp() - initialTime;
+            PerformanceCounters.TryGetValue(measureDescription, out PerformanceCounter counter);
+            if (counter == null)
             {
                 counter = new PerformanceCounter();
                 PerformanceCounters[measureDescription] = counter;
@@ -115,7 +89,7 @@ namespace CSHTML5
         public static void ViewProfilerResults()
         {
             //Ideas for improvements: Add parameter(s) to decide the output type (messageBox, file, Output, ...?)
-            if(PerformanceCounters.Count > 0)
+            if (PerformanceCounters.Count > 0)
             {
                 var sortedCounters = PerformanceCounters.OrderBy(x => x.Key);
                 string csvFormat = "Description,Total time in ms, Number of calls (OS)" + Environment.NewLine;
@@ -128,7 +102,7 @@ namespace CSHTML5
                     double time = ((double)(counter.Time)) / ticksPerMs;
                     //Write the information on the current call:
                     WriteLine("=== " + name + " ===");
-                    
+
                     WriteLine("Total time: " + time + "ms");
                     WriteLine("Number of calls: " + counter.Count);
                     if (counter.Count > 0)
@@ -146,53 +120,38 @@ namespace CSHTML5
 
         static void WriteLine(string text)
         {
-            if(OpenSilver.Interop.IsRunningInTheSimulator)
+            if (Interop.IsRunningInTheSimulator)
             {
-                System.Diagnostics.Debug.WriteLine(text);
+                Debug.WriteLine(text);
             }
             else
             {
                 Console.WriteLine(text);
             }
         }
-#endif
 
-#if !BRIDGE
-        [JSReplacement("console.time($label)")]
-#else
-        [Template("console.time({label})")]
-#endif
         public static void ConsoleTime(string label)
         {
-            OpenSilver.Interop.ExecuteJavaScript("console.time($0)", label);
+            Interop.ExecuteJavaScriptVoid(
+                $"console.time({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(label)})");
         }
 
-#if !BRIDGE
-        [JSReplacement("console.timeEnd($label)")]
-#else
-        [Template("console.timeEnd({label})")]
-#endif
         public static void ConsoleTimeEnd(string label)
         {
-            OpenSilver.Interop.ExecuteJavaScript("console.timeEnd($0)", label);
+            Interop.ExecuteJavaScriptVoid(
+                $"console.timeEnd({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(label)})");
         }
 
-#if !BRIDGE
-        [JSReplacement("console.timeLog($label)")]
-#else
-        [Template("console.timeLog({label})")]
-#endif
         public static void ConsoleTimeLog(string label)
         {
-            OpenSilver.Interop.ExecuteJavaScript("console.timeLog($0)", label);
+            Interop.ExecuteJavaScriptVoid(
+                $"console.timeLog({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(label)})");
         }
     }
 
-#if OPENSILVER
     class PerformanceCounter
     {
         public int Count { get; set; }
         public long Time { get; set; }
-    } 
-#endif
+    }
 }

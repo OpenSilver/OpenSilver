@@ -16,7 +16,7 @@ using System;
 namespace OpenSilver.Internal
 {
     // Event args for the (internal) InheritedPropertyChanged event
-    internal class InheritedPropertyChangedEventArgs : EventArgs
+    internal sealed class InheritedPropertyChangedEventArgs : EventArgs
     {
         internal InheritedPropertyChangedEventArgs(ref InheritablePropertyChangeInfo info)
         {

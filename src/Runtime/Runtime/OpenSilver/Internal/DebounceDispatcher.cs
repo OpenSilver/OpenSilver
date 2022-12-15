@@ -21,7 +21,7 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver.Internal
 {
-    internal class DebounceDispatcher
+    internal sealed class DebounceDispatcher
     {
         private DispatcherTimer _timer;
 

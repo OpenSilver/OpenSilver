@@ -19,7 +19,7 @@ namespace System.Windows.Documents
 namespace Windows.UI.Xaml.Documents
 #endif
 {
-    internal class INTERNAL_TextContainerParagraph : INTERNAL_TextContainer
+    internal sealed class INTERNAL_TextContainerParagraph : INTERNAL_TextContainer
     {
         public INTERNAL_TextContainerParagraph(Paragraph parent)
             : base(parent)

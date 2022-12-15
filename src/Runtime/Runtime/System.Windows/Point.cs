@@ -25,7 +25,7 @@ namespace Windows.Foundation
     /// Represents an x- and y-coordinate pair in two-dimensional space. Can also represent
     /// a logical point for certain property usages.
     /// </summary>
-    public partial struct Point : IFormattable
+    public struct Point : IFormattable
     {
         internal double _x;
         internal double _y;
@@ -48,9 +48,11 @@ namespace Windows.Foundation
 
         /// <summary>
         /// Parse - returns an instance converted from the provided string using
-        /// the culture "en-US"
+        /// the <see cref="CultureInfo.InvariantCulture"/>.
         /// </summary>
-        /// <param name="source"> string with Point data </param>
+        /// <param name="source">
+        /// string with Point data
+        /// </param>
         public static Point Parse(string source)
         {
             if (source != null)
@@ -81,14 +83,8 @@ namespace Windows.Foundation
         /// </returns>
         public double X
         {
-            get
-            {
-                return _x;
-            }
-            set
-            {
-                _x = value;
-            }
+            get => _x;
+            set => _x = value;
         }
 
         /// <summary>
@@ -100,14 +96,8 @@ namespace Windows.Foundation
         /// </returns>
         public double Y
         {
-            get
-            {
-                return _y;
-            }
-            set
-            {
-                _y = value;
-            }
+            get => _y;
+            set => _y = value;
         }
 
         /// <summary>
@@ -121,15 +111,7 @@ namespace Windows.Foundation
         /// true if obj is a <see cref="Point"/> and contains the same <see cref="X"/>
         /// and <see cref="Y"/> values as this <see cref="Point"/>; otherwise, false.
         /// </returns>
-        public override bool Equals(object o)
-        {
-            if ((null == o) || !(o is Point))
-            {
-                return false;
-            }
-
-            return this == (Point)o;
-        }
+        public override bool Equals(object o) => o is Point point && point == this;
 
         /// <summary>
         /// Compares two <see cref="Point"/> structures for equality.
@@ -141,10 +123,7 @@ namespace Windows.Foundation
         /// true if both <see cref="Point"/> structures contain the same <see cref="X"/>
         /// and <see cref="Y"/> values; otherwise, false.
         /// </returns>
-        public bool Equals(Point value)
-        {
-            return this == value;
-        }
+        public bool Equals(Point value) => this == value;
 
         /// <summary>
         /// Returns the hash code for this <see cref="Point"/>.
@@ -152,10 +131,7 @@ namespace Windows.Foundation
         /// <returns>
         /// The hash code for this <see cref="Point"/> structure.
         /// </returns>
-        public override int GetHashCode()
-        {
-            return X.GetHashCode() ^ Y.GetHashCode();
-        }
+        public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
 
         /// <summary>
         /// Creates a <see cref="string"/> representation of this <see cref="Point"/>.
@@ -165,9 +141,7 @@ namespace Windows.Foundation
         /// values of this <see cref="Point"/> structure.
         /// </returns>
         public override string ToString()
-        {
-            return ConvertToString(null /* format string */, null /* format provider */);
-        }
+            => ConvertToString(null /* format string */, null /* format provider */);
 
         /// <summary>
         /// Creates a <see cref="string"/> representation of this <see cref="Point"/>.
@@ -180,9 +154,7 @@ namespace Windows.Foundation
         /// values of this <see cref="Point"/> structure.
         /// </returns>
         public string ToString(IFormatProvider provider)
-        {
-            return ConvertToString(null /* format string */, provider);
-        }
+            => ConvertToString(null /* format string */, provider);
 
         /// <summary>
         /// Creates a string representation of this object based on the format string
@@ -194,9 +166,7 @@ namespace Windows.Foundation
         /// A string representation of this object.
         /// </returns>
         string IFormattable.ToString(string format, IFormatProvider provider)
-        {
-            return ConvertToString(format, provider);
-        }
+            => ConvertToString(format, provider);
 
         /// <summary>
         /// Compares two <see cref="Point"/> structures for equality.
@@ -212,10 +182,8 @@ namespace Windows.Foundation
         /// point1 and point2 are equal; otherwise, false.
         /// </returns>
         public static bool operator ==(Point point1, Point point2)
-        {
-            return point1.X == point2.X &&
-                   point1.Y == point2.Y;
-        }
+            => point1.X == point2.X &&
+               point1.Y == point2.Y;
 
         /// <summary>
         /// Compares two <see cref="Point"/> structures for inequality
@@ -232,9 +200,7 @@ namespace Windows.Foundation
         /// values.
         /// </returns>
         public static bool operator !=(Point point1, Point point2)
-        {
-            return !(point1 == point2);
-        }
+            => !(point1 == point2);
 
         /// <summary>
         /// Creates a string representation of this object based on the format string

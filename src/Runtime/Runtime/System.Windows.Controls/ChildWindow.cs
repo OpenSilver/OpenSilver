@@ -1148,8 +1148,8 @@ namespace Windows.UI.Xaml.Controls
             base.OnApplyTemplate();
 
             // We let clicks go through the OuterDomElement so the ChildWindow can be non-Modal:
-            CSHTML5.Interop.ExecuteJavaScript("$0.style.pointerEvents = 'none';", INTERNAL_OuterDomElement);
-
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement)}.style.pointerEvents = 'none';");
 
             UpdateIsModalVisualState();
 

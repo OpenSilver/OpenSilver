@@ -12,7 +12,7 @@
 
 namespace OpenSilver.Internal.Xaml.Context
 {
-    internal class XamlObjectFrame
+    internal sealed class XamlObjectFrame
     {
         private int _depth;
         private XamlObjectFrame _previous;

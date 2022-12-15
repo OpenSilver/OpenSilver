@@ -24,7 +24,7 @@ using Windows.UI.Xaml.Markup;
 
 namespace OpenSilver.Internal
 {
-    internal class NameScope : INameScope
+    internal sealed class NameScope : INameScope
     {
         private Dictionary<string, object> _nameMap;
 

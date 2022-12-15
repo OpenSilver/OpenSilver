@@ -30,7 +30,7 @@
                             <VisualStateGroup Name="CommonStates">
                                 <VisualState Name="Normal">
                                 </VisualState>
-                                <VisualState Name="PointerOver">
+                                <VisualState Name="MouseOver">
                                     <Storyboard>
                                         <DoubleAnimation Duration="0" Storyboard.TargetName="BackgroundAnimation" Storyboard.TargetProperty="Opacity" To="1"/>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background"

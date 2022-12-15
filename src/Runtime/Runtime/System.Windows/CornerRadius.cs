@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Globalization;
 
 #if MIGRATION
 namespace System.Windows
@@ -20,164 +21,163 @@ namespace Windows.UI.Xaml
 #endif
 {
     /// <summary>
-    /// [SECURITY CRITICAL] Describes the characteristics of a rounded corner, such
-    /// as can be applied to a Windows.UI.Xaml.Controls.Border.
+    /// Describes the characteristics of a rounded corner, such as can be applied to
+    /// a <see cref="Controls.Border"/>.
     /// </summary>
     public partial struct CornerRadius
     {
-        private double _topLeftRadius;
-        private double _bottomLeftRadius;
-        private double _topRightRadius;
-        private double _bottomRightRadius;
-
         /// <summary>
-        /// [SECURITY CRITICAL] Initializes a new Windows.UI.Xaml.CornerRadius structure,
-        /// applying the same uniform radius to all its corners.
+        /// Initializes a new <see cref="CornerRadius"/> structure, applying the same uniform
+        /// radius to all its corners.
         /// </summary>
         /// <param name="uniformRadius">
-        /// A uniform radius applied to all four Windows.UI.Xaml.CornerRadius properties
-        /// (Windows.UI.Xaml.CornerRadius.TopLeft, Windows.UI.Xaml.CornerRadius.TopRight,
-        /// Windows.UI.Xaml.CornerRadius.BottomRight, Windows.UI.Xaml.CornerRadius.BottomLeft).
+        /// A uniform radius applied to all four <see cref="CornerRadius"/> properties (<see cref="TopLeft"/>,
+        /// <see cref="TopRight"/>, <see cref="BottomRight"/>, <see cref="BottomLeft"/>).
         /// </param>
         public CornerRadius(double uniformRadius)
         {
-            _topLeftRadius = uniformRadius;
-            _bottomLeftRadius = uniformRadius;
-            _topRightRadius = uniformRadius;
-            _bottomRightRadius = uniformRadius;
+            TopLeft = BottomLeft = TopRight = BottomRight = uniformRadius;
         }
-     
+
         /// <summary>
-        /// [SECURITY CRITICAL] Initializes a new instance of the Windows.UI.Xaml.CornerRadius
-        /// structure, applying specific radius values to its corners.
+        /// Initializes a new instance of the <see cref="CornerRadius"/> structure, applying
+        /// specific radius values to its corners.
         /// </summary>
-        /// <param name="topLeft">Sets the initial Windows.UI.Xaml.CornerRadius.TopLeft.</param>
-        /// <param name="topRight">Sets the initial Windows.UI.Xaml.CornerRadius.TopRight.</param>
-        /// <param name="bottomRight">Sets the initial Windows.UI.Xaml.CornerRadius.BottomLeft.</param>
-        /// <param name="bottomLeft">Sets the initial Windows.UI.Xaml.CornerRadius.BottomRight.</param>
+        /// <param name="topLeft">
+        /// Sets the initial <see cref="TopLeft"/>.
+        /// </param>
+        /// <param name="topRight">
+        /// Sets the initial <see cref="TopRight"/>.
+        /// </param>
+        /// <param name="bottomRight">
+        /// Sets the initial <see cref="BottomLeft"/>.
+        /// </param>
+        /// <param name="bottomLeft">
+        /// Sets the initial <see cref="BottomRight"/>.
+        /// </param>
         public CornerRadius(double topLeft, double topRight, double bottomRight, double bottomLeft)
         {
-            _topLeftRadius = topLeft;
-            _bottomLeftRadius = bottomLeft;
-            _topRightRadius = topRight;
-            _bottomRightRadius = bottomRight;
+            TopLeft = topLeft;
+            BottomLeft = bottomLeft;
+            TopRight = topRight;
+            BottomRight = bottomRight;
         }
 
         /// <summary>
-        /// [SECURITY CRITICAL] Compares two Windows.UI.Xaml.CornerRadius structures
-        /// for inequality.
+        /// Gets or sets the radius of rounding, in pixels, of the bottom left corner of
+        /// the object where a <see cref="CornerRadius"/> is applied.
         /// </summary>
-        /// <param name="cr1">The first structure to compare.</param>
-        /// <param name="cr2">The other structure to compare.</param>
-        /// <returns>true if the two instances of Windows.UI.Xaml.CornerRadius are not equal; otherwise, false.</returns>
-        public static bool operator !=(CornerRadius cr1, CornerRadius cr2)
-        {
-            return (cr1.TopLeft != cr2.TopLeft || cr1.TopRight != cr2.TopRight || cr1.BottomRight != cr2.BottomRight || cr1.BottomLeft != cr2.BottomLeft);
-        }
-
-        /// <summary>
-        /// [SECURITY CRITICAL] Compares the value of two Windows.UI.Xaml.CornerRadius
-        /// structures for equality.
-        /// </summary>
-        /// <param name="cr1">The first structure to compare.</param>
-        /// <param name="cr2">The other structure to compare.</param>
         /// <returns>
-        /// true if the two instances of Windows.UI.Xaml.CornerRadius are equal; otherwise,
-        /// false.
+        /// A <see cref="double"/> that represents the radius of rounding, in pixels, of the bottom
+        /// left corner of the object where a <see cref="CornerRadius"/> is applied. The
+        /// default is 0.
+        /// </returns>
+        public double BottomLeft { get; set; }
+
+        /// <summary>
+        /// Gets or sets the radius of rounding, in pixels, of the bottom right corner of
+        /// the object where a <see cref="CornerRadius"/> is applied.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="double"/> that represents the radius of rounding, in pixels, of the bottom
+        /// right corner of the object where a <see cref="CornerRadius"/> is applied. The
+        /// default is 0.
+        /// </returns>
+        public double BottomRight { get; set; }
+
+        /// <summary>
+        /// Gets or sets the radius of rounding, in pixels, of the top left corner of the
+        /// object where a <see cref="CornerRadius"/> is applied.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="double"/> that represents the radius of rounding, in pixels, of the top
+        /// left corner of the object where a <see cref="CornerRadius"/> is applied. The
+        /// default is 0.
+        /// </returns>
+        public double TopLeft { get; set; }
+
+        /// <summary>
+        /// Gets or sets the radius of rounding, in pixels, of the top right corner of the
+        /// object where a <see cref="CornerRadius"/> is applied.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="double"/> that represents the radius of rounding, in pixels, of the top
+        /// right corner of the object where a <see cref="CornerRadius"/> is applied. The
+        /// default is 0.
+        /// </returns>
+        public double TopRight { get; set; }
+
+        /// <summary>
+        /// Compares this <see cref="CornerRadius"/> structure to another object for equality.
+        /// </summary>
+        /// <param name="obj">
+        /// The object to compare.
+        /// </param>
+        /// <returns>
+        /// true if the two objects are equal; otherwise, false.
+        /// </returns>
+        public override bool Equals(object obj)
+            => obj is CornerRadius cornerRadius && this == cornerRadius;
+
+        /// <summary>
+        /// Compares this <see cref="CornerRadius"/> structure to another <see cref="CornerRadius"/>
+        /// structure for equality.
+        /// </summary>
+        /// <param name="cornerRadius">
+        /// An instance of <see cref="CornerRadius"/> to compare for equality.
+        /// </param>
+        /// <returns>
+        /// true if the two instances of <see cref="CornerRadius"/> are equal; otherwise, false.
+        /// </returns>
+        public bool Equals(CornerRadius cornerRadius) => this == cornerRadius;
+
+        /// <summary>
+        /// Returns the hash code of the structure.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this <see cref="CornerRadius"/>.
+        /// </returns>
+        public override int GetHashCode()
+            => TopLeft.GetHashCode() ^ TopRight.GetHashCode() ^ BottomRight.GetHashCode() ^ BottomLeft.GetHashCode();
+
+        /// <summary>
+        /// Returns the string representation of the <see cref="CornerRadius"/> structure.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="string"/> that represents the <see cref="CornerRadius"/> value.
+        /// </returns>
+        public override string ToString() => CornerRadiusConverter.ToString(this, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Compares the value of two <see cref="CornerRadius"/> structures for equality.
+        /// </summary>
+        /// <param name="cr1">
+        /// The first structure to compare.
+        /// </param>
+        /// <param name="cr2">
+        /// The other structure to compare.
+        /// </param>
+        /// <returns>
+        /// true if the two instances of <see cref="CornerRadius"/> are equal; otherwise, false.
         /// </returns>
         public static bool operator ==(CornerRadius cr1, CornerRadius cr2)
-        {
-            return (cr1.TopLeft == cr2.TopLeft && cr1.TopRight == cr2.TopRight && cr1.BottomRight == cr2.BottomRight && cr1.BottomLeft == cr2.BottomLeft);
-        }
-        
-        /// <summary>
-        /// [SECURITY CRITICAL] Gets or sets the radius of rounding, in pixels, of the
-        /// bottom left corner of the object where a Windows.UI.Xaml.CornerRadius is
-        /// applied.
-        /// </summary>
-        public double BottomLeft
-        {
-            get { return _bottomLeftRadius; }
-            set { _bottomLeftRadius = value; }
-        }
+            => cr1.TopLeft == cr2.TopLeft &&
+               cr1.TopRight == cr2.TopRight &&
+               cr1.BottomRight == cr2.BottomRight &&
+               cr1.BottomLeft == cr2.BottomLeft;
 
         /// <summary>
-        /// [SECURITY CRITICAL] Gets or sets the radius of rounding, in pixels, of the
-        /// bottom right corner of the object where a Windows.UI.Xaml.CornerRadius is
-        /// applied.
+        /// Compares two <see cref="CornerRadius"/> structures for inequality.
         /// </summary>
-        public double BottomRight
-        {
-            get { return _bottomRightRadius; }
-            set { _bottomRightRadius = value; }
-        }
-
-        /// <summary>
-        /// [SECURITY CRITICAL] Gets or sets the radius of rounding, in pixels, of the
-        /// top left corner of the object where a Windows.UI.Xaml.CornerRadius is applied.
-        /// </summary>
-        public double TopLeft
-        {
-            get { return _topLeftRadius; }
-            set { _topLeftRadius = value; }
-        }
-
-        /// <summary>
-        /// [SECURITY CRITICAL] Gets or sets the radius of rounding, in pixels, of the
-        /// top right corner of the object where a Windows.UI.Xaml.CornerRadius is applied.
-        /// </summary>
-        public double TopRight
-        {
-            get { return _topRightRadius; }
-            set { _topRightRadius = value; }
-        }
-
-        /// <summary>
-        /// [SECURITY CRITICAL] Compares this Windows.UI.Xaml.CornerRadius structure
-        /// to another Windows.UI.Xaml.CornerRadius structure for equality.
-        /// </summary>
-        /// <param name="cornerRadius">An instance of Windows.UI.Xaml.CornerRadius to compare for equality.</param>
+        /// <param name="cr1">
+        /// The first structure to compare.
+        /// </param>
+        /// <param name="cr2">
+        /// The other structure to compare.
+        /// </param>
         /// <returns>
-        /// true if the two instances of Windows.UI.Xaml.CornerRadius are equal; otherwise,
-        /// false.
+        /// true if the two instances of <see cref="CornerRadius"/> are not equal; otherwise, false.
         /// </returns>
-        public bool Equals(CornerRadius cornerRadius)
-        {
-            return this == cornerRadius;
-        }
-    
-        /// <summary>
-        /// [SECURITY CRITICAL] Compares this Windows.UI.Xaml.CornerRadius structure
-        /// to another object for equality.
-        /// </summary>
-        /// <param name="obj">The object to compare.</param>
-        /// <returns>true if the two objects are equal; otherwise, false.</returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is CornerRadius)
-            {
-                return ((CornerRadius)obj) == this;
-            }
-            return false;
-        }
-       
-        /// <summary>
-        /// [SECURITY CRITICAL] Returns the hash code of the structure.
-        /// </summary>
-        /// <returns>A hash code for this Windows.UI.Xaml.CornerRadius.</returns>
-        public override int GetHashCode()
-        {
-            return TopLeft.GetHashCode() ^ TopRight.GetHashCode() ^ BottomRight.GetHashCode() ^ BottomLeft.GetHashCode();
-        }
-      
-        /// <summary>
-        /// [SECURITY CRITICAL] Returns the string representation of the Windows.UI.Xaml.CornerRadius
-        /// structure.
-        /// </summary>
-        /// <returns>A System.String that represents the Windows.UI.Xaml.CornerRadius value.</returns>
-        public override string ToString()
-        {
-            return CornerRadiusConverter.ToString(this, null);
-        }
+        public static bool operator !=(CornerRadius cr1, CornerRadius cr2) => !(cr1 == cr2);
     }
 }

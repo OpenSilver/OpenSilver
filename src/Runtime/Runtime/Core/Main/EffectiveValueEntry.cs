@@ -19,7 +19,7 @@ using Windows.UI.Xaml;
 
 namespace CSHTML5.Internal
 {
-    internal class EffectiveValueEntry
+    internal sealed class EffectiveValueEntry
     {
         private FullValueSource _source;
         private object _value;

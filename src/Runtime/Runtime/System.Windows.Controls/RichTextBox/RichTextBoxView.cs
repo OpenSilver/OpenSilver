@@ -220,11 +220,11 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill);
                 //Quill return color in 2 ways: single string , for example "#ff0000", or string array (["#ff0000","#ff00AA"])
                 if (format.Color is string)
                 {
-                    return new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString(format.Color.ToString()));
+                    return new SolidColorBrush(Color.INTERNAL_ConvertFromString(format.Color.ToString()));
                 }
                 else if (format.Color is string[] colors)
                 {
-                    return new SolidColorBrush((Color)Color.INTERNAL_ConvertFromString(colors[0]));
+                    return new SolidColorBrush(Color.INTERNAL_ConvertFromString(colors[0]));
                 }
 
                 return null;
@@ -410,9 +410,9 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill);
             {
                 _quillJSInitialized = true;
 
-                OpenSilver.Interop.ExecuteJavaScript(
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
                     $"let font = Quill.import('attributors/style/font');font.whitelist=[{GetSupportedFonts()}];Quill.register(font,true);");
-                OpenSilver.Interop.ExecuteJavaScript(
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
                     $"let size = Quill.import('attributors/style/size');size.whitelist=[{GetSupportedFontSizes()}];Quill.register(size,true);");
             }
         }

@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml
         AffectsRender = 0x10,
     }
 
-    internal class FrameworkPropertyMetadata : PropertyMetadata
+    internal sealed class FrameworkPropertyMetadata : PropertyMetadata
     {
         public bool AffectsArrange { get; set; }
         public bool AffectsMeasure { get; set; }
@@ -49,6 +49,12 @@ namespace Windows.UI.Xaml
             this(defaultValue, FrameworkPropertyMetadataOptions.None, null, null)
         {
             
+        }
+
+        public FrameworkPropertyMetadata(object defaultValue, PropertyChangedCallback propertyChangedCallback)
+            : this(defaultValue, FrameworkPropertyMetadataOptions.None, propertyChangedCallback)
+        {
+
         }
 
         public FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions flags) :
