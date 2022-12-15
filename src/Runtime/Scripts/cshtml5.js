@@ -653,18 +653,7 @@ document.measureTextBlock = function (uid, textWrapping, padding, width, maxWidt
     if (element && elToMeasure) {
         var computedStyle = getComputedStyle(elToMeasure);
 
-        var runElement = element.firstElementChild;
-        if (runElement != null) {
-            var child = elToMeasure;
-            if (child.hasChildNodes()) {
-                while (child.hasChildNodes()) {
-                    child = child.firstChild;
-                }
-                runElement.innerHTML = child.parentElement.innerHTML.length == 0 ? 'A' : child.parentElement.innerHTML;
-            } else {
-                runElement.innerHTML = 'A';
-            }
-        }
+        element.innerHTML = elToMeasure.innerHTML;
 
         element.style.fontSize = computedStyle.fontSize;
         element.style.fontWeight = computedStyle.fontWeight;
@@ -682,7 +671,11 @@ document.measureTextBlock = function (uid, textWrapping, padding, width, maxWidt
         element.style.width = width;
         element.style.maxWidth = maxWidth;
 
-        return element.offsetWidth + "|" + element.offsetHeight;
+        const size = element.offsetWidth + "|" + element.offsetHeight;
+
+        element.innerHTML = '';
+
+        return size;
     }
 
     return "0|0";
