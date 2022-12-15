@@ -196,8 +196,11 @@ namespace Windows.UI.Xaml.Controls
                     {
                         if (e.Key == Key.Enter)
                         {
-                            var iItem = (ComboBoxItem)(Items[focusedItemIndex]);
-                            NotifyComboBoxItemMouseUp(iItem);
+                            SelectedIndex = focusedItemIndex;
+                            if (IsDropDownOpen)
+                            {
+                                IsDropDownOpen = false;
+                            }
                             e.Handled = true;
                         }
                     };
