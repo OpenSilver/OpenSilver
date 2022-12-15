@@ -37,6 +37,7 @@ namespace Windows.UI.Xaml
         private WhenToCallPropertyChangedEnum _callPropertyChangedWhenLoadedIntoVisualTree;
         private PropertyChangedCallback _propertyChangedCallback;
         private MethodToUpdateDom _methodToUpdateDom;
+        private MethodToUpdateDom2 _methodToUpdateDom2;
         private CoerceValueCallback _coerceValueCallback;
 
         internal bool IsDefaultValueModified { get; private set; }
@@ -108,6 +109,20 @@ namespace Windows.UI.Xaml
                 this._methodToUpdateDom = value;
             }
         }
+
+        internal MethodToUpdateDom2 MethodToUpdateDom2
+        {
+            get
+            {
+                return this._methodToUpdateDom2;
+            }
+            set
+            {
+                this.CheckSealed();
+                this._methodToUpdateDom2 = value;
+            }
+        }
+
         /// <summary>
         /// Gets the method that will be called on update of value.
         /// </summary>
@@ -221,4 +236,5 @@ namespace Windows.UI.Xaml
     internal delegate CSSEquivalent CSSEquivalentGetter(DependencyObject d);
     internal delegate List<CSSEquivalent> CSSEquivalentsGetter(DependencyObject d);
     public delegate void MethodToUpdateDom(DependencyObject d, object newValue);
+    internal delegate void MethodToUpdateDom2(DependencyObject d, object oldValue, object newValue);
 }

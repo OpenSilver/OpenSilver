@@ -858,6 +858,19 @@ if(nextSibling != undefined) {
                         propertyMetadata.MethodToUpdateDom(storage.Owner, value);
                     }
 
+                    if (propertyMetadata.MethodToUpdateDom2 != null)
+                    {
+                        if (!valueWasRetrieved)
+                        {
+                            value = INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
+                            valueWasRetrieved = true;
+                        }
+
+                        // DependencyProperty.UnsetValue for the old value signify that
+                        // the old value should be ignored.
+                        propertyMetadata.MethodToUpdateDom2(storage.Owner, DependencyProperty.UnsetValue, value);
+                    }
+
                     //--------------------------------------------------
                     // Call PropertyChanged
                     //--------------------------------------------------

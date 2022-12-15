@@ -56,5 +56,7 @@ namespace System.Windows.Media.Effects
         internal void RaiseChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
         internal virtual void Render(UIElement renderTarget) { }
+
+        internal virtual void Clean(UIElement renderTarget) { }
     }
 }

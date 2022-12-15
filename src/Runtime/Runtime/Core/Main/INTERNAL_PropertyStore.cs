@@ -651,10 +651,9 @@ namespace CSHTML5.Internal
 
                 if (sender is UIElement && ((UIElement)sender)._isLoaded)
                 {
-                    if (typeMetadata.MethodToUpdateDom != null)
-                    {
-                        typeMetadata.MethodToUpdateDom(sender, newValue); // Note: this we call only if the element is in the visual tree.
-                    }
+                    // Note: this we call only if the element is in the visual tree.
+                    typeMetadata.MethodToUpdateDom?.Invoke(sender, newValue); 
+                    typeMetadata.MethodToUpdateDom2?.Invoke(sender, oldValue, newValue);
                 }
             }
 
