@@ -1789,14 +1789,15 @@ namespace System.ServiceModel
                             requestResponse = (char)(int.Parse(responseAsString)); //todo: support encodings
                         else if (requestResponseType == typeof(DateTime) || requestResponseType == typeof(DateTime?))
                             requestResponse = INTERNAL_DateTimeHelpers.ToDateTime(responseAsString); //todo: ensure this is the culture-invariant parsing!
+                        else if (requestResponseType.IsEnum)
+                            requestResponse = Enum.Parse(requestResponseType, responseAsString);
                         else if (requestResponseType == typeof(void))
                         {
                             // Do nothing so null object will be returned
                         }
                         else
-                            throw new NotSupportedException(
-                                string.Format("The following type is not supported in the current WCF implementation: '{0}'. \nPlease report this issue to support@cshtml5.com",
-                                              requestResponseType));
+                            throw new NotSupportedException($"The following type is not supported in the current WCF implementation: '{requestResponseType}', string value is {responseAsString}. " +
+                                $"\nPlease report this issue to support@cshtml5.com");
                     }
                     else
                     {
