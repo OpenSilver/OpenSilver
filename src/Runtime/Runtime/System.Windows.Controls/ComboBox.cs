@@ -15,6 +15,7 @@
 
 using DotNetForHtml5.Core;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 #if MIGRATION
@@ -195,8 +196,7 @@ namespace Windows.UI.Xaml.Controls
                     {
                         if (e.Key == Key.Enter)
                         {
-                            var index = (int)GetValue(SelectedIndexProperty);
-                            var iItem = (ComboBoxItem)(Items[index]);
+                            var iItem = (ComboBoxItem)(Items[focusedItemIndex]);
                             NotifyComboBoxItemMouseUp(iItem);
                             e.Handled = true;
                         }
@@ -289,8 +289,12 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private int focusedItemIndex = 0;
+
         internal override bool FocusItem(ItemInfo info)
         {
+            focusedItemIndex = info.Index;
+
             bool returnValue = base.FocusItem(info);
 
             if (!IsDropDownOpen)
