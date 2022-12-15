@@ -191,6 +191,16 @@ namespace Windows.UI.Xaml.Controls
                 if (_popupChild != null)
                 {
                     _popupChild.TextInput += new TextCompositionEventHandler(OnPopupTextInput);
+                    _popupChild.KeyUp += (sender, e) =>
+                    {
+                        if (e.Key == Key.Enter)
+                        {
+                            var index = (int)GetValue(SelectedIndexProperty);
+                            var iItem = (ComboBoxItem)(Items[index]);
+                            NotifyComboBoxItemMouseUp(iItem);
+                            e.Handled = true;
+                        }
+                    };
                 }
             }
 
