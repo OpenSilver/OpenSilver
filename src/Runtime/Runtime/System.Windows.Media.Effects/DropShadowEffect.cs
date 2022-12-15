@@ -188,5 +188,24 @@ namespace System.Windows.Media.Effects
                 }
             }
         }
+
+        internal override void Discard(UIElement renderTarget)
+        {
+            if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
+            {
+                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
+
+                if (renderTarget is TextBlock)
+                {
+                    domStyle.textShadow = "";
+                }
+                else
+                {
+                    domStyle.boxShadow = "";
+                    domStyle.borderCollapse = "";
+                    domStyle.borderSpacing = "";
+                }
+            }
+        }
     }
 }

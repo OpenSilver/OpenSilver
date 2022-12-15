@@ -519,10 +519,7 @@ namespace Windows.UI.Xaml
                 nameof(Effect),
                 typeof(Effect),
                 typeof(UIElement),
-                new PropertyMetadata(null, OnEffectChanged)
-                {
-                    MethodToUpdateDom = (d, e) => ((Effect)e)?.Render((UIElement)d)
-                });
+                new PropertyMetadata(null, OnEffectChanged));
 
         // todo: we may add the support for multiple effects on the same 
         // UIElement since it is possible in html (but not in wpf). If we 
@@ -553,6 +550,11 @@ namespace Windows.UI.Xaml
                 element._effectChangedListener = null;
             }
 
+            if (e.OldValue is Effect oldEffect && e.NewValue?.GetType() != oldEffect.GetType())
+            {
+                oldEffect.Discard(element);
+            }
+
             if (e.NewValue is Effect newEffect)
             {
                 element._effectChangedListener = new(element, newEffect)
@@ -561,6 +563,7 @@ namespace Windows.UI.Xaml
                     OnDetachAction = static (listener, source) => source.Changed -= listener.OnEvent,
                 };
                 newEffect.Changed += element._effectChangedListener.OnEvent;
+                newEffect.Render(element);
             }
         }
 

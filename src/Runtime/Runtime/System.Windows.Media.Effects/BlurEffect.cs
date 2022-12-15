@@ -76,5 +76,14 @@ namespace System.Windows.Media.Effects
                 domStyle.filter = $"blur({cssRadius.ToInvariantString()}px)";
             }
         }
+
+        internal override void Discard(UIElement renderTarget)
+        {
+            if (renderTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(renderTarget))
+            {
+                var domStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(renderTarget);
+                domStyle.filter = "";
+            }
+        }
     }
 }
