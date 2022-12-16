@@ -231,8 +231,9 @@
                 Value="4,1,0,0" />
         <Setter Property="BorderThickness"
                 Value="1" />
-        <Setter Property="BorderBrush">
-            <Setter.Value>
+        <Setter Property="BorderBrush"
+                Value="#FF617584">
+            <!--<Setter.Value>
                 <LinearGradientBrush EndPoint="0.5,1"
                                      StartPoint="0.5,0">
                     <GradientStop Color="#FFA3AEB9"
@@ -244,7 +245,7 @@
                     <GradientStop Color="#FF617584"
                                   Offset="1" />
                 </LinearGradientBrush>
-            </Setter.Value>
+            </Setter.Value>-->
         </Setter>
         <Setter Property="Template">
             <Setter.Value>
@@ -268,15 +269,15 @@
                                                          Duration="0"
                                                          To="1" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#7FFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#CCFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#F2FFFFFF" />
                                     </Storyboard>
@@ -292,35 +293,23 @@
                                                          Duration="0"
                                                          To="1" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#6BFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#C6FFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#EAFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#F4FFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
-                                                        Duration="0"
-                                                        To="#FF6DBDD1" />
-                                        <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
-                                                        Duration="0"
-                                                        To="#FF6DBDD1" />
-                                        <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
-                                                        Duration="0"
-                                                        To="#FF6DBDD1" />
-                                        <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
                                                         Duration="0"
                                                         To="#FF6DBDD1" />
                                     </Storyboard>
@@ -406,61 +395,37 @@
                         </VisualStateManager.VisualStateGroups>
                         <Grid HorizontalAlignment="Left"
                               VerticalAlignment="Top">
-                            <Rectangle x:Name="Background"
-                                       Width="14"
-                                       Height="14"
-                                       Stroke="{TemplateBinding BorderBrush}"
-                                       StrokeThickness="{TemplateBinding BorderThickness}"
-                                       Fill="#FFFFFFFF"
-                                       Margin="1" />
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- RadiusX="1"
-                                       RadiusY="1" -->
-                            <!-- #if WORKINPROGRESS -->
-                            <Rectangle x:Name="BackgroundOverlay"
-                                       Fill="#FFC4DBEE"
-                                       Opacity="0"
-                                       Width="14"
-                                       Height="14"
-                                       StrokeThickness="1"
-                                       Margin="1"
-                                       Stroke="#00000000" />
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- RadiusX="1"
-                                       RadiusY="1" -->
-                            <!-- #if WORKINPROGRESS -->
-                            <Rectangle x:Name="BoxMiddleBackground"
-                                       Width="10"
-                                       Height="10"
-                                       Fill="{TemplateBinding Background}"
-                                       Stroke="#00000000"
-                                       StrokeThickness="1" />
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- RadiusX="1"
-                                       RadiusY="1" -->
-                            <!-- #if WORKINPROGRESS -->
-                            <Rectangle x:Name="BoxMiddle"
-                                       Width="10"
-                                       Height="10"
-                                       StrokeThickness="1">
-                                <!-- #if WORKINPROGRESS -->
-                                <!-- RadiusX="1"
-                                       RadiusY="1" -->
-                                <!-- #endif -->
-                                <Rectangle.Stroke>
-                                    <LinearGradientBrush EndPoint=".5,1"
-                                                         StartPoint=".5,0">
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="1" />
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="0" />
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="0.375" />
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="0.375" />
-                                    </LinearGradientBrush>
-                                </Rectangle.Stroke>
-                                <Rectangle.Fill>
+                            <Border x:Name="Background"
+                                    Width="14"
+                                    Height="14"
+                                    CornerRadius="1"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="#FFFFFFFF"
+                                    Margin="1" />
+                            <Border x:Name="BackgroundOverlay"
+                                    Background="#FFC4DBEE"
+                                    Opacity="0"
+                                    Width="14"
+                                    Height="14"
+                                    CornerRadius="1"
+                                    BorderThickness="1"
+                                    Margin="1"
+                                    BorderBrush="#00000000" />
+                            <Border x:Name="BoxMiddleBackground"
+                                    Width="10"
+                                    Height="10"
+                                    CornerRadius="1"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="#00000000"
+                                    BorderThickness="1" />
+                            <Border x:Name="BoxMiddle"
+                                    Width="10"
+                                    Height="10"
+                                    CornerRadius="1"
+                                    BorderThickness="1"
+                                    BorderBrush="#FFFFFFFF">
+                                <Border.Background>
                                     <LinearGradientBrush StartPoint="0.62,0.15"
                                                          EndPoint="0.64,0.88">
                                         <GradientStop Color="#FFFFFFFF"
@@ -472,18 +437,15 @@
                                         <GradientStop Color="#D8FFFFFF"
                                                       Offset="1" />
                                     </LinearGradientBrush>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                            <Rectangle x:Name="BoxMiddleLine"
-                                       Width="10"
-                                       Height="10"
-                                       Stroke="{TemplateBinding BorderBrush}"
-                                       StrokeThickness="1"
-                                       Opacity=".2" />
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- RadiusX="1"
-                                       RadiusY="1" -->
-                            <!-- #endif -->
+                                </Border.Background>
+                            </Border>
+                            <Border x:Name="BoxMiddleLine"
+                                    Width="10"
+                                    Height="10"
+                                    CornerRadius="1"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1"
+                                    Opacity=".2" />
                             <Path x:Name="CheckIcon"
                                   Margin="1,1,0,1.5"
                                   Fill="#FF333333"
@@ -491,35 +453,27 @@
                                   Opacity="0"
                                   Width="10.5"
                                   Height="10"
-                                  Data="M102.03442,598.79645 L105.22962,597.78918 L106.78825,600.42358 C106.78825,600.42358 108.51028,595.74304 110.21724,593.60419 C112.00967,591.35822 114.89314,591.42316 114.89314,591.42316 C114.89314,591.42316 112.67844,593.42645 111.93174,594.44464 C110.7449,596.06293 107.15683,604.13837 107.15683,604.13837 z" />
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- FlowDirection="LeftToRight" -->
-                            <!-- #endif -->
-                            <Rectangle x:Name="IndeterminateIcon"
-                                       Height="2"
-                                       Fill="#FF333333"
-                                       Opacity="0"
-                                       Width="6" />
-                            <Rectangle x:Name="DisabledVisualElement"
-                                       Width="14"
-                                       Height="14"
-                                       Opacity="0"
-                                       Fill="#FFFFFFFF" />
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- RadiusX="1"
-                                       RadiusY="1" -->
-                            <!-- #endif -->
-                            <Rectangle x:Name="ContentFocusVisualElement"
-                                       Stroke="#FF6DBDD1"
-                                       StrokeThickness="1"
-                                       Opacity="0"
-                                       IsHitTestVisible="false"
-                                       Width="16"
-                                       Height="16" />
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- RadiusX="2"
-                                       RadiusY="2" -->
-                            <!-- #endif -->
+                                  Data="M102.03442,598.79645 L105.22962,597.78918 L106.78825,600.42358 C106.78825,600.42358 108.51028,595.74304 110.21724,593.60419 C112.00967,591.35822 114.89314,591.42316 114.89314,591.42316 C114.89314,591.42316 112.67844,593.42645 111.93174,594.44464 C110.7449,596.06293 107.15683,604.13837 107.15683,604.13837 z"
+                                  FlowDirection="LeftToRight" />
+                            <Border x:Name="IndeterminateIcon"
+                                    Height="2"
+                                    Background="#FF333333"
+                                    Opacity="0"
+                                    Width="6" />
+                            <Border x:Name="DisabledVisualElement"
+                                    CornerRadius="1"
+                                    Width="14"
+                                    Height="14"
+                                    Opacity="0"
+                                    Background="#FFFFFFFF" />
+                            <Border x:Name="ContentFocusVisualElement"
+                                    CornerRadius="2"
+                                    BorderBrush="#FF6DBDD1"
+                                    BorderThickness="1"
+                                    Opacity="0"
+                                    IsHitTestVisible="false"
+                                    Width="16"
+                                    Height="16" />
                             <Border x:Name="ValidationErrorElement"
                                     Margin="1"
                                     BorderThickness="1"
@@ -530,35 +484,41 @@
                                 <ToolTipService.ToolTip>
                                     <ToolTip x:Name="validationTooltip"
                                              Template="{StaticResource ValidationToolTipTemplate}"
-                                             DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">0
-                                        <!-- #if WORKINPROGRESS -->
-                                        <!-- Placement="Right"
-                                             PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" -->
-                                        <!-- #endif -->
-                                        <!-- #if WORKINPROGRESS -->
-                                        <!-- <ToolTip.Triggers>
-                                                 <EventTrigger RoutedEvent="Canvas.Loaded">
-                                                     <EventTrigger.Actions>
-                                                         <BeginStoryboard>
-                                                             <Storyboard>
-                                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetName="validationTooltip"
-                                                                                                Storyboard.TargetProperty="IsHitTestVisible">
-                                                                     <DiscreteObjectKeyFrame KeyTime="0">
-                                                                         <DiscreteObjectKeyFrame.Value>
-                                                                             <sys:Boolean>true</sys:Boolean>
-                                                                         </DiscreteObjectKeyFrame.Value>
-                                                                     </DiscreteObjectKeyFrame>
-                                                                 </ObjectAnimationUsingKeyFrames>
-                                                             </Storyboard>
-                                                         </BeginStoryboard>
-                                                     </EventTrigger.Actions>
-                                                 </EventTrigger>
-                                             </ToolTip.Triggers> -->
-                                        <!-- #endif  -->
+                                             DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                             Placement="Right"
+                                             PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                                        <ToolTip.Triggers>
+                                            <EventTrigger RoutedEvent="Canvas.Loaded">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="validationTooltip"
+                                                                                           Storyboard.TargetProperty="IsHitTestVisible">
+                                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                                    <DiscreteObjectKeyFrame.Value>
+                                                                        <sys:Boolean>true</sys:Boolean>
+                                                                    </DiscreteObjectKeyFrame.Value>
+                                                                </DiscreteObjectKeyFrame>
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                        </ToolTip.Triggers>
                                     </ToolTip>
                                 </ToolTipService.ToolTip>
-                                <Grid Width="12" Height="12" HorizontalAlignment="Right" Margin="1,-4,-4,0" VerticalAlignment="Top" Background="Transparent">
-                                    <Path Margin="1,3,0,0" Data="M0,0L8,0L8,8z" Fill="red"/>
+                                <Grid Width="10"
+                                      Height="10"
+                                      HorizontalAlignment="Right"
+                                      Margin="0,-4,-4,0"
+                                      VerticalAlignment="Top"
+                                      Background="Transparent">
+                                    <Path Margin="0,3,0,0"
+                                          Data="M 1,0 L5,0 A 2,2 90 0 1 7,2 L7,6 z"
+                                          Fill="#FFDC000C" />
+                                    <Path Margin="0,3,0,0"
+                                          Data="M 0,0 L2,0 L 7,5 L7,7"
+                                          Fill="#ffffff" />
                                 </Grid>
                             </Border>
 
@@ -590,27 +550,28 @@
                 Value="4,1,0,0" />
         <Setter Property="BorderThickness"
                 Value="1" />
-        <Setter Property="BorderBrush">
-            <Setter.Value>
-                <LinearGradientBrush EndPoint="0.5,1"
-                                     StartPoint="0.5,0">
-                    <GradientStop Color="#FFA3AEB9"
-                                  Offset="0" />
-                    <GradientStop Color="#FF8399A9"
-                                  Offset="0.375" />
-                    <GradientStop Color="#FF718597"
-                                  Offset="0.375" />
-                    <GradientStop Color="#FF617584"
-                                  Offset="1" />
-                </LinearGradientBrush>
-            </Setter.Value>
+        <Setter Property="BorderBrush"
+                Value="#FF617584">
+            <!--<Setter.Value>
+                    <LinearGradientBrush EndPoint="0.5,1"
+                                         StartPoint="0.5,0">
+                        <GradientStop Color="#FFA3AEB9"
+                                      Offset="0" />
+                        <GradientStop Color="#FF8399A9"
+                                      Offset="0.375" />
+                        <GradientStop Color="#FF718597"
+                                      Offset="0.375" />
+                        <GradientStop Color="#FF617584"
+                                      Offset="1" />
+                    </LinearGradientBrush>
+                </Setter.Value>-->
         </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="17" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <VisualStateManager.VisualStateGroups>
@@ -627,15 +588,15 @@
                                                          Duration="0"
                                                          To="1" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#7FFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#CCFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#F2FFFFFF" />
                                     </Storyboard>
@@ -651,35 +612,23 @@
                                                          Duration="0"
                                                          To="1" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#6BFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#C6FFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#EAFFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                         Duration="0"
                                                         To="#F4FFFFFF" />
                                         <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[3].(GradientStop.Color)"
-                                                        Duration="0"
-                                                        To="#FF6DBDD1" />
-                                        <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
-                                                        Duration="0"
-                                                        To="#FF6DBDD1" />
-                                        <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
-                                                        Duration="0"
-                                                        To="#FF6DBDD1" />
-                                        <ColorAnimation Storyboard.TargetName="BoxMiddle"
-                                                        Storyboard.TargetProperty="(Shape.Stroke).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
+                                                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
                                                         Duration="0"
                                                         To="#FF6DBDD1" />
                                     </Storyboard>
@@ -757,45 +706,37 @@
                         </VisualStateManager.VisualStateGroups>
                         <Grid HorizontalAlignment="Left"
                               VerticalAlignment="Top">
-                            <Ellipse x:Name="Background"
-                                     Width="14"
-                                     Height="14"
-                                     Stroke="{TemplateBinding BorderBrush}"
-                                     StrokeThickness="{TemplateBinding BorderThickness}"
-                                     Fill="#FFFFFFFF"
-                                     Margin="1" />
-                            <Ellipse x:Name="BackgroundOverlay"
-                                     Fill="#FFC4DBEE"
-                                     Opacity="0"
-                                     Width="14"
-                                     Height="14"
-                                     StrokeThickness="1"
-                                     Margin="1"
-                                     Stroke="#00000000" />
-                            <Ellipse x:Name="BoxMiddleBackground"
-                                     Width="10"
-                                     Height="10"
-                                     Fill="{TemplateBinding Background}"
-                                     Stroke="#00000000"
-                                     StrokeThickness="1" />
-                            <Ellipse x:Name="BoxMiddle"
-                                     Width="10"
-                                     Height="10"
-                                     StrokeThickness="1">
-                                <Ellipse.Stroke>
-                                    <LinearGradientBrush EndPoint=".5,1"
-                                                         StartPoint=".5,0">
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="1" />
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="0" />
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="0.375" />
-                                        <GradientStop Color="#FFFFFFFF"
-                                                      Offset="0.375" />
-                                    </LinearGradientBrush>
-                                </Ellipse.Stroke>
-                                <Ellipse.Fill>
+                            <Border x:Name="Background"
+                                    Width="15"
+                                    Height="15"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="#FFFFFFFF"
+                                    Margin="1"
+                                    CornerRadius="15" />
+                            <Border x:Name="BackgroundOverlay"
+                                    Background="#FFC4DBEE"
+                                    Opacity="0"
+                                    Width="15"
+                                    Height="15"
+                                    BorderThickness="1"
+                                    Margin="1"
+                                    BorderBrush="#00000000"
+                                    CornerRadius="15" />
+                            <Border x:Name="BoxMiddleBackground"
+                                    Width="11"
+                                    Height="11"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="#00000000"
+                                    BorderThickness="1"
+                                    CornerRadius="11" />
+                            <Border x:Name="BoxMiddle"
+                                    Width="11"
+                                    Height="11"
+                                    BorderThickness="1"
+                                    CornerRadius="11"
+                                    BorderBrush="#FFFFFFFF">
+                                <Border.Background>
                                     <LinearGradientBrush StartPoint="0.62,0.15"
                                                          EndPoint="0.64,0.88">
                                         <GradientStop Color="#FFFFFFFF"
@@ -807,80 +748,83 @@
                                         <GradientStop Color="#D8FFFFFF"
                                                       Offset="1" />
                                     </LinearGradientBrush>
-                                </Ellipse.Fill>
-                            </Ellipse>
-                            <Ellipse x:Name="BoxMiddleLine"
-                                     Width="10"
-                                     Height="10"
-                                     Stroke="#FF333333"
-                                     StrokeThickness="1"
-                                     Opacity=".2" />
-                            <Ellipse x:Name="CheckIcon"
-                                     Fill="#FF333333"
-                                     Width="4"
-                                     Height="4"
-                                     Opacity="0" />
-                            <Ellipse x:Name="DisabledVisualElement"
-                                     Width="14"
-                                     Height="14"
-                                     Opacity="0"
-                                     Fill="#FFFFFFFF" />
-                            <Ellipse x:Name="ContentFocusVisualElement"
-                                     Stroke="#FF6DBDD1"
-                                     StrokeThickness="1"
-                                     Opacity="0"
-                                     IsHitTestVisible="false"
-                                     Width="16"
-                                     Height="16" />
+                                </Border.Background>
+                            </Border>
+                            <Border x:Name="BoxMiddleLine"
+                                    Width="11"
+                                    Height="11"
+                                    BorderBrush="#FF333333"
+                                    BorderThickness="1"
+                                    Opacity=".2"
+                                    CornerRadius="11" />
+                            <Border x:Name="CheckIcon"
+                                    Background="#FF333333"
+                                    Width="5"
+                                    Height="5"
+                                    Opacity="0"
+                                    CornerRadius="5" />
+                            <Border x:Name="DisabledVisualElement"
+                                    Width="15"
+                                    Height="15"
+                                    Opacity="0"
+                                    Background="#FFFFFFFF"
+                                    CornerRadius="15" />
+                            <Border x:Name="ContentFocusVisualElement"
+                                    BorderBrush="#FF6DBDD1"
+                                    BorderThickness="1"
+                                    Opacity="0"
+                                    IsHitTestVisible="false"
+                                    Width="17"
+                                    Height="17"
+                                    CornerRadius="17" />
                             <Grid x:Name="ValidationErrorElement"
                                   Visibility="Collapsed"
                                   ToolTipService.PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}">
                                 <ToolTipService.ToolTip>
                                     <ToolTip x:Name="validationTooltip"
                                              Template="{StaticResource ValidationToolTipTemplate}"
-                                             DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
-                                        <!-- #if WORKINPROGRESS -->
-                                        <!-- Placement="Right"
-                                             PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" -->
-                                        <!-- #endif -->
-                                        <!-- #if WORKINPROGRESS -->
-                                        <!-- <ToolTip.Triggers>
-                                                 <EventTrigger RoutedEvent="Canvas.Loaded">
-                                                     <EventTrigger.Actions>
-                                                         <BeginStoryboard>
-                                                             <Storyboard>
-                                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetName="validationTooltip"
-                                                                                                Storyboard.TargetProperty="IsHitTestVisible">
-                                                                     <DiscreteObjectKeyFrame KeyTime="0">
-                                                                         <DiscreteObjectKeyFrame.Value>
-                                                                             <sys:Boolean>true</sys:Boolean>
-                                                                         </DiscreteObjectKeyFrame.Value>
-                                                                     </DiscreteObjectKeyFrame>
-                                                                 </ObjectAnimationUsingKeyFrames>
-                                                             </Storyboard>
-                                                         </BeginStoryboard>
-                                                     </EventTrigger.Actions>
-                                                 </EventTrigger>
-                                             </ToolTip.Triggers> -->
-                                        <!-- #endif -->
+                                             DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                             Placement="Right"
+                                             PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                                        <ToolTip.Triggers>
+                                            <EventTrigger RoutedEvent="Canvas.Loaded">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="validationTooltip"
+                                                                                           Storyboard.TargetProperty="IsHitTestVisible">
+                                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                                    <DiscreteObjectKeyFrame.Value>
+                                                                        <sys:Boolean>true</sys:Boolean>
+                                                                    </DiscreteObjectKeyFrame.Value>
+                                                                </DiscreteObjectKeyFrame>
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                        </ToolTip.Triggers>
                                     </ToolTip>
                                 </ToolTipService.ToolTip>
-                                <Ellipse Stroke="#FFDB000C"
-                                         StrokeThickness="1"
-                                         Width="14"
-                                         Height="14" />
-                                <Ellipse HorizontalAlignment="Right"
-                                         VerticalAlignment="Top"
-                                         Margin="0,-2,-1,0"
-                                         Fill="#FFDB000C"
-                                         Width="4"
-                                         Height="4" />
-                                <Ellipse HorizontalAlignment="Right"
-                                         VerticalAlignment="Top"
-                                         Margin="0,-5,-4,0"
-                                         Fill="Transparent"
-                                         Width="10"
-                                         Height="10" />
+                                <Border BorderBrush="#FFDB000C"
+                                        BorderThickness="1"
+                                        Width="15"
+                                        Height="15"
+                                        CornerRadius="15" />
+                                <Border HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-2,-1,0"
+                                        Background="#FFDB000C"
+                                        Width="5"
+                                        Height="5"
+                                        CornerRadius="5" />
+                                <Border HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-5,-4,0"
+                                        Background="Transparent"
+                                        Width="11"
+                                        Height="11"
+                                        CornerRadius="11" />
                             </Grid>
                         </Grid>
                         <ContentPresenter Grid.Column="1"
