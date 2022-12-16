@@ -2615,8 +2615,9 @@ namespace Windows.UI.Xaml.Controls
                 return false;
             }
 
+            int effectiveColumnSpan = Math.Min(columnSpan, ColumnDefinitions.Count - childColumn);
             bool onAutoColumnDefinition = false;
-            for (int i = 0; i < columnSpan; i++)
+            for (int i = 0; i < effectiveColumnSpan; i++)
             {
                 if (ColumnDefinitions[childColumn + i].Width.IsStar)
                 {
@@ -2656,8 +2657,9 @@ namespace Windows.UI.Xaml.Controls
                 return false;
             }
 
+            int effectiveRowSpan = Math.Min(rowSpan, RowDefinitions.Count - childRow);
             bool onAutoRowDefinition = false;
-            for (int i = 0; i < rowSpan; i++)
+            for (int i = 0; i < effectiveRowSpan; i++)
             {
                 if (RowDefinitions[childRow + i].Height.IsStar)
                 {
