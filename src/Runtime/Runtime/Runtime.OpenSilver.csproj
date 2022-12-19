@@ -170,6 +170,17 @@
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\DateTimeHelper.cs" />
 		<Compile Include="System.Windows.Controls\DragDecorator.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\DragValidator.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.DefinitionAbstraction.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.DoubleUtil.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.GridResizeBehavior.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.GridResizeDirection.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.ResizeBehavior.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.SplitBehavior.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.TestHook.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitterAutomationPeer.cs" />
+		<Compile Include="System.Windows.Controls\GridSplitter\PreviewControl.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\INTERNAL_TextContainerRichTextBox.cs" />
@@ -391,7 +402,6 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePicker.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Grid.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\GridSplitter.cs" />
 		<Compile Include="System.Windows.Controls\HeaderedItemsControl.cs" />
 		<Compile Include="System.Windows.Controls\ITimeFormat.cs" />
 		<Compile Include="System.Windows.Controls\IDefinitionBase.cs" />
@@ -827,16 +837,9 @@
 		<Compile Include="System.Windows.Controls\Expander.cs" />
 		<Compile Include="System.Windows.Controls\ExtendedRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Grid.cs" />
-		<Compile Include="System.Windows.Controls\GridSplitter.cs" />
-		<Compile Include="System.Windows.Controls\GridSplitter.Data.cs" />
-		<Compile Include="System.Windows.Controls\GridSplitter.Events.cs" />
-		<Compile Include="System.Windows.Controls\GridSplitter.Helper.cs" />
-		<Compile Include="System.Windows.Controls\GridSplitter.Options.cs" />
-		<Compile Include="System.Windows.Controls\GridSplitterGripper.cs" />
 		<Compile Include="System.Windows.Controls\Grid_CSSVersion.cs" />
 		<Compile Include="System.Windows.Controls\Grid_InternalCellDefinition.cs" />
 		<Compile Include="System.Windows.Controls\Grid_InternalHelpers.cs" />
-		<Compile Include="System.Windows.Controls\GripperHoverWrapper.cs" />
 		<Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
 		<Compile Include="System.Windows.Controls\HyperlinkButton.cs" />
 		<Compile Include="System.Windows.Controls\Image.cs" />
@@ -1182,10 +1185,6 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultGridSplitterStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultHyperlinkButtonStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
@@ -1290,6 +1289,9 @@
     <Content Include="DefaultStyles\INTERNAL_DefaultRichTextBoxStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Content>
+    <Content Include="DefaultStyles\INTERNAL_DefaultGridSplitterStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
 	</ItemGroup>
   <ItemGroup>
 	  <None Include="System.Windows.Controls\ListTimePickerPopup.xaml">
@@ -1305,6 +1307,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </None>
 	  <None Include="System.Windows.Controls\TimeUpDown.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
+	  <None Include="System.Windows.Controls\GridSplitter\GridSplitter.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </None>
 	</ItemGroup>
