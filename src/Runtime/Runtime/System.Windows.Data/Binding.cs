@@ -160,10 +160,8 @@ namespace Windows.UI.Xaml.Data
                 _bindsDirectlyToSource = original._bindsDirectlyToSource;
                 _validatesOnNotifyDataErrors = original._validatesOnNotifyDataErrors;
                 _validatesOnDataErrors = original._validatesOnDataErrors;
-
-                _wasModeSetByUserRatherThanDefaultValue = original._wasModeSetByUserRatherThanDefaultValue;
             }
-    }
+        }
 
         /// <summary>
         /// Gets or sets the converter object that is called by the binding engine to
@@ -226,25 +224,7 @@ namespace Windows.UI.Xaml.Data
         public BindingMode Mode
         {
             get { return _mode; }
-            set 
-            {
-                CheckSealed();
-                _wasModeSetByUserRatherThanDefaultValue = true;
-                _mode = value;
-            }
-        }
-
-        // This is used by the DataGrid due to its behavior when end-user explicitely specifies a
-        // "OneWay" binding for one of the columns or if we still have the default value. In fact,
-        // if the binding mode is "OneWay", we need to know if it is the default value or if that
-        // value has been explicitely set by the user. The behavior is different: the DataGrid will
-        // replace the default "OneWay" mode with "TwoWay" unless the user has explicitely set the
-        // mode to "OneWay".
-        private bool _wasModeSetByUserRatherThanDefaultValue = false;
-        
-        internal bool INTERNAL_WasModeSetByUserRatherThanDefaultValue()
-        {
-            return _wasModeSetByUserRatherThanDefaultValue;
+            set { CheckSealed(); _mode = value; }
         }
 
         /// <summary>
@@ -377,14 +357,12 @@ namespace Windows.UI.Xaml.Data
 
         /// <summary>
         /// Gets or sets a value that indicates whether the binding engine will report validation
-        /// errors from an System.ComponentModel.IDataErrorInfo implementation on the bound
-        /// data entity.
+        /// errors from an <see cref="IDataErrorInfo"/> implementation on the bound data entity.
         /// </summary>
         /// <returns>
-        /// true if the binding engine will report System.ComponentModel.IDataErrorInfo validation
-        /// errors; otherwise, false. The default is false.
+        /// true if the binding engine will report <see cref="IDataErrorInfo"/> validation errors;
+        /// otherwise, false. The default is false.
         /// </returns>
-        [OpenSilver.NotImplemented]
         public bool ValidatesOnDataErrors
         {
             get { return _validatesOnDataErrors; }

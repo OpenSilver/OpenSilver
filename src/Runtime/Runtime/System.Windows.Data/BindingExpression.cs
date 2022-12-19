@@ -319,7 +319,7 @@ namespace Windows.UI.Xaml.Data
         internal void ValueChanged()
         {
             UpdateNotifyDataErrors(_propertyPathWalker.FinalNode.Value);
-            UpdateValidationError(null);
+            UpdateValidationError(GetBaseValidationError());
 
             Refresh();
         }
@@ -706,6 +706,8 @@ namespace Windows.UI.Xaml.Data
             object convertedValue = value;
             Type expectedType = node.Type;
 
+            ValidationError vError = null;
+
             try
             {
                 if (expectedType != null && ParentBinding.Converter != null)
@@ -734,30 +736,65 @@ namespace Windows.UI.Xaml.Data
                         return;
                 }
 
-                // clearing invalid stuff first as node.SetValue triggers the INotifyDataErrorInfo.ErrorsChanged event
-                Validation.ClearInvalid(this);
                 node.SetValue(convertedValue);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                //If we have ValidatesOnExceptions set to true, we display a popup with the error close to the element.
+                ex = CriticalExceptions.Unwrap(ex);
+                if (CriticalExceptions.IsCriticalApplicationException(ex))
+                {
+                    throw;
+                }
+
                 if (ParentBinding.ValidatesOnExceptions)
                 {
-                    //We get the new Error (which is the innermost exception as far as I know):
-                    Exception currentException = e;
-
-                    while (currentException.InnerException != null)
+                    vError = new ValidationError(this)
                     {
-                        currentException = currentException.InnerException;
-                    }
-
-                    Validation.MarkInvalid(this, new ValidationError(this) { Exception = currentException, ErrorContent = currentException.Message });
+                        Exception = ex,
+                        ErrorContent = ex.Message,
+                    };
                 }
             }
             finally
             {
                 IsUpdating = oldIsUpdating;
             }
+
+            vError ??= GetBaseValidationError();
+            UpdateValidationError(vError);
+        }
+
+        private ValidationError GetBaseValidationError()
+        {
+            if (ParentBinding.ValidatesOnDataErrors &&
+                _propertyPathWalker.FinalNode.Source is IDataErrorInfo dataErrorInfo)
+            {
+                string name = _propertyPathWalker.FinalNode.PropertyName;
+                string error;
+                try
+                {
+                    error = dataErrorInfo[name];
+                }
+                catch (Exception ex)
+                {
+                    if (CriticalExceptions.IsCriticalApplicationException(ex))
+                    {
+                        throw;
+                    }
+
+                    error = null;
+                }
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    return new ValidationError(this)
+                    {
+                        ErrorContent = error,
+                    };
+                }
+            }
+
+            return null;
         }
 
         private void OnTargetLostFocus(object sender, RoutedEventArgs e)
