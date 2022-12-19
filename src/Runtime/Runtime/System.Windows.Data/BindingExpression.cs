@@ -62,6 +62,8 @@ namespace Windows.UI.Xaml.Data
         private bool _isUpdateOnLostFocus; // True if this binding expression updates on LostFocus
         private bool _needsUpdate; // True if this binding expression has a pending source update
         private FrameworkElement _mentor;
+        private ValidationError _baseValidationError;
+        private List<ValidationError> _notifyDataErrors;
 
         private DependencyPropertyChangedListener _targetPropertyListener;
         private DependencyPropertyChangedListener _dataContextListener;
@@ -299,6 +301,7 @@ namespace Windows.UI.Xaml.Data
             BindingSource = null;
             _propertyPathWalker.Update(null);
 
+            UpdateValidationError(null);
             UpdateNotifyDataErrorValidationErrors(null);
 
             if (_isUpdateOnLostFocus)
@@ -316,6 +319,7 @@ namespace Windows.UI.Xaml.Data
         internal void ValueChanged()
         {
             UpdateNotifyDataErrors(_propertyPathWalker.FinalNode.Value);
+            UpdateValidationError(null);
 
             Refresh();
         }
@@ -427,8 +431,7 @@ namespace Windows.UI.Xaml.Data
             }
             catch (Exception ex)
             {
-                if (ex is StackOverflowException || ex is OutOfMemoryException ||
-                    ex is ThreadAbortException || ex is SecurityException)
+                if (CriticalExceptions.IsCriticalApplicationException(ex))
                 {
                     throw;
                 }
@@ -488,21 +491,124 @@ namespace Windows.UI.Xaml.Data
             return list1;
         }
 
-        private void UpdateNotifyDataErrorValidationErrors(List<object> errors)
+        internal void UpdateValidationError(ValidationError validationError)
         {
-            if (errors == null || errors.Count == 0)
+            // the steps are carefully ordered to avoid going through a "no error"
+            // state while replacing one error with another
+            ValidationError oldValidationError = _baseValidationError;
+
+            _baseValidationError = validationError;
+
+            if (validationError != null)
             {
-                Validation.ClearInvalid(this);
-                return;
+                AddValidationError(validationError);
             }
 
-            foreach (object error in errors)
+            if (oldValidationError != null)
             {
-                if (error != null)
+                RemoveValidationError(oldValidationError);
+            }
+        }
+
+        private void UpdateNotifyDataErrorValidationErrors(List<object> errors)
+        {
+            List<object> toAdd;
+            List<ValidationError> toRemove;
+
+            GetValidationDelta(_notifyDataErrors, errors, out toAdd, out toRemove);
+
+            // add the new errors, then remove the old ones - this avoid a transient
+            // "no error" state
+            if (toAdd != null && toAdd.Count > 0)
+            {
+                List<ValidationError> notifyDataErrors = _notifyDataErrors;
+
+                if (notifyDataErrors == null)
                 {
-                    Validation.MarkInvalid(this, new ValidationError(this) { ErrorContent = error });
+                    notifyDataErrors = new List<ValidationError>();
+                    _notifyDataErrors = notifyDataErrors;
+                }
+
+                foreach (object o in toAdd)
+                {
+                    ValidationError veAdd = new ValidationError(this) { ErrorContent = o };
+                    notifyDataErrors.Add(veAdd);
+                    AddValidationError(veAdd);
                 }
             }
+
+            if (toRemove != null && toRemove.Count > 0)
+            {
+                List<ValidationError> notifyDataErrors = _notifyDataErrors;
+                foreach (ValidationError veRemove in toRemove)
+                {
+                    notifyDataErrors.Remove(veRemove);
+                    RemoveValidationError(veRemove);
+                }
+
+                if (notifyDataErrors.Count == 0)
+                {
+                    _notifyDataErrors = null;
+                }
+            }
+        }
+
+        private static void GetValidationDelta(List<ValidationError> previousErrors,
+            List<object> errors,
+            out List<object> toAdd,
+            out List<ValidationError> toRemove)
+        {
+            // determine the errors to add and the validation results to remove,
+            // taking duplicates into account
+            if (previousErrors == null || previousErrors.Count == 0)
+            {
+                toAdd = errors;
+                toRemove = null;
+            }
+            else if (errors == null || errors.Count == 0)
+            {
+                toAdd = null;
+                toRemove = new List<ValidationError>(previousErrors);
+            }
+            else
+            {
+                toAdd = new List<object>();
+                toRemove = new List<ValidationError>(previousErrors);
+
+                for (int i = errors.Count - 1; i >= 0; --i)
+                {
+                    object errorContent = errors[i];
+
+                    int j;
+                    for (j = toRemove.Count - 1; j >= 0; --j)
+                    {
+                        if (ItemsControl.EqualsEx(toRemove[j].ErrorContent, errorContent))
+                        {
+                            // this error appears on both lists - remove it from toRemove
+                            toRemove.RemoveAt(j);
+                            break;
+                        }
+                    }
+
+                    if (j < 0)
+                    {
+                        // this error didn't appear on toRemove - add it to toAdd
+                        toAdd.Add(errorContent);
+                    }
+                }
+            }
+        }
+
+        private void AddValidationError(ValidationError validationError)
+        {
+            // add the error to the target element
+            Validation.AddValidationError(validationError, Target, ParentBinding.NotifyOnValidationError);
+        }
+
+        private void RemoveValidationError(ValidationError validationError)
+        {
+            // remove the error from the target element
+            Validation.RemoveValidationError(validationError, Target, ParentBinding.NotifyOnValidationError);
         }
 
         private void OnSourceErrorsChanged(object sender, DataErrorsChangedEventArgs e)

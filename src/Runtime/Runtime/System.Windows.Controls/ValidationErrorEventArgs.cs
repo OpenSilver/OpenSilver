@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,7 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-#if MIGRATION
-#else
-using Windows.UI.Xaml;
-#endif
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -30,48 +20,42 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Provides information for the System.Windows.Controls.Validation.Error attached
-    /// event.
+    /// Provides data for the <see cref="FrameworkElement.BindingValidationError"/> event.
     /// </summary>
-    public partial class ValidationErrorEventArgs : RoutedEventArgs
+    public class ValidationErrorEventArgs : RoutedEventArgs
     {
-        private ValidationErrorEventAction _action;
-        private bool m_handled;
+        public ValidationErrorEventArgs() { }
 
-        /// <summary>
-        /// Gets a value that indicates whether the error is a new error or an existing
-        /// error that has now been cleared.
-        /// </summary>
-        public ValidationErrorEventAction Action
+        internal ValidationErrorEventArgs(ValidationError error, ValidationErrorEventAction action)
         {
-            get { return _action; }
-            internal set { _action = value; }
+            Error = error;
+            Action = action;
         }
 
+        /// <summary>
+        /// Gets the state of the validation error.
+        /// </summary>
+        /// <returns>
+        /// One of the enumeration values that indicates the state of the validation error.
+        /// </returns>
+        public ValidationErrorEventAction Action { get; }
 
-        private ValidationError _error;
 
         /// <summary>
-        /// Gets the error that caused this System.Windows.Controls.Validation.Error
+        /// Gets the validation error that caused the <see cref="FrameworkElement.BindingValidationError"/>
         /// event.
         /// </summary>
-        public ValidationError Error
-        {
-            get { return _error; }
-            internal set { _error = value; }
-        }
+        /// <returns>
+        /// A <see cref="ValidationError"/> object that contains the exception that caused the validation error.
+        /// </returns>
+        public ValidationError Error { get; }
 
-        public bool Handled
-        {
-            get { return m_handled; }
-            set { m_handled = value; }
-        }
-
-        ///// <summary>
-        ///// Invokes the specified handler in a type-specific way on the specified object.
-        ///// </summary>
-        ///// <param name="genericHandler">The generic handler to call in a type-specific way.</param>
-        ///// <param name="genericTarget">The object to invoke the handler on.</param>
-        //protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget);
+        /// <summary>
+        /// Gets or sets the value that marks the routed event as handled.
+        /// </summary>
+        /// <returns>
+        /// true if the event is handled; otherwise, false.
+        /// </returns>
+        public bool Handled { get; set; }
     }
 }

@@ -61,6 +61,7 @@
 		<Compile Include="Diagnostics\DebugInfo.cs" />
 		<Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
 		<Compile Include="OpenSilver\Internal\Clipboard.cs" />
+		<Compile Include="OpenSilver\Internal\CriticalExceptions.cs" />
 		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
 		<Compile Include="OpenSilver\Internal\DependentList.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />

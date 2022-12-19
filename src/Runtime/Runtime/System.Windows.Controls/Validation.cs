@@ -68,7 +68,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
             return (ReadOnlyObservableCollection<ValidationError>)element.GetValue(ErrorsProperty);
         }
@@ -80,7 +80,7 @@ namespace Windows.UI.Xaml.Controls
                 DependencyProperty.RegisterAttached("ErrorsInternal",
                         typeof(ValidationErrorCollection), typeof(Validation),
                         new PropertyMetadata(
-                                (ValidationErrorCollection)null,
+                                null,
                                 new PropertyChangedCallback(OnErrorsInternalChanged)));
 
         // Update HasErrors and Invalidate the public ValidationErrors property whose GetOverride will return
@@ -101,7 +101,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal static ValidationErrorCollection GetErrorsInternal(DependencyObject target)
         {
-            return (ValidationErrorCollection)target.GetValue(Validation.ValidationErrorsInternalProperty);
+            return (ValidationErrorCollection)target.GetValue(ValidationErrorsInternalProperty);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (element == null)
             {
-                throw new ArgumentNullException("element");
+                throw new ArgumentNullException(nameof(element));
             }
             return (bool)element.GetValue(HasErrorProperty);
         }
@@ -141,7 +141,9 @@ namespace Windows.UI.Xaml.Controls
         /// Clears the ValidationError that was set through a call
         /// to MarkInvalid or a previously failed validation of that BindingExpression.
         /// </summary>
-        /// <param name="bindingExpression">The object to turn valid.</param>
+        /// <param name="bindingExpression">
+        /// The object to turn valid.
+        /// </param>
         /// <exception cref="ArgumentNullException">
         /// bindingExpression is null.
         /// </exception>
@@ -149,48 +151,10 @@ namespace Windows.UI.Xaml.Controls
         {
             if (bindingExpression == null)
             {
-                throw new ArgumentNullException("bindingExpression");
+                throw new ArgumentNullException(nameof(bindingExpression));
             }
 
-            UIElement target = bindingExpression.Target as UIElement;
-            if (target != null)
-            {
-                if (target.INTERNAL_ValidationErrorsDictionary != null &&
-                    target.INTERNAL_ValidationErrorsDictionary.ContainsKey(bindingExpression))
-                {
-                    ValidationError error = target.INTERNAL_ValidationErrorsDictionary[bindingExpression];
-                    //remove the error from the Errors attached property
-                    ValidationErrorCollection errors = GetErrorsInternal(target);
-                    errors.Remove(error);
-                    target.INTERNAL_ValidationErrorsDictionary.Remove(bindingExpression);
-
-                    if (errors.Count == 0)
-                    {
-                        //We removed the last error on the Target:
-                        target.SetValue(Validation.HasErrorProperty, false);
-                    }
-
-                    //Raise the event saying that we removed a ValidationError
-                    if (bindingExpression.ParentBinding.NotifyOnValidationError)
-                    {
-                        for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = (VisualTreeHelper.GetParent(elt) as FrameworkElement))
-                        {
-                            elt.INTERNAL_RaiseBindingValidationErrorEvent(
-                                new ValidationErrorEventArgs()
-                                {
-                                    Action = ValidationErrorEventAction.Removed,
-                                    Error = error,
-                                    OriginalSource = target
-                                });
-                        }
-                    }
-
-                    if (target is Control c)
-                    {
-                        c.HideValidationError();
-                    }
-                }
-            }
+            bindingExpression.UpdateValidationError(null);
         }
 
         /// <summary>
@@ -211,221 +175,142 @@ namespace Windows.UI.Xaml.Controls
         {
             if (bindingExpression == null)
             {
-                throw new ArgumentNullException("bindingExpression");
+                throw new ArgumentNullException(nameof(bindingExpression));
             }
             if (validationError == null)
             {
-                throw new ArgumentNullException("validationError");
+                throw new ArgumentNullException(nameof(validationError));
             }
 
-            UIElement target = bindingExpression.Target as UIElement;
-            if (target != null)
-            {
-                // We remove any previous error because I don't see how we could have 
-                // multiple ones on a single Binding + it wouldn't fit in the Dictionary 
-                // as it is.
-                ClearInvalid(bindingExpression);
-
-                if (target.INTERNAL_ValidationErrorsDictionary == null)
-                {
-                    target.INTERNAL_ValidationErrorsDictionary = new Dictionary<BindingExpression, ValidationError>();
-                }
-                // Remember the ValidationError and the BindingExpression it came from
-                target.INTERNAL_ValidationErrorsDictionary.Add(bindingExpression, validationError);
-
-                bool wasValid;
-                ValidationErrorCollection validationErrors = GetErrorsInternal(target);
-
-                if (validationErrors == null)
-                {
-                    wasValid = true;
-                    validationErrors = new ValidationErrorCollection();
-                    validationErrors.Add(validationError);
-                    target.SetValue(Validation.ValidationErrorsInternalProperty, validationErrors);
-                }
-                else
-                {
-                    wasValid = validationErrors.Count == 0;
-                    validationErrors.Add(validationError);
-                }
-
-                if (wasValid)
-                {
-                    target.SetValue(Validation.HasErrorProperty, true);
-                }
-
-                //Raise the event saying that we added a ValidationError
-                if (bindingExpression.ParentBinding.NotifyOnValidationError)
-                {
-                    for (FrameworkElement elt = target as FrameworkElement; elt != null; elt = (VisualTreeHelper.GetParent(elt) as FrameworkElement))
-                    {
-                        elt.INTERNAL_RaiseBindingValidationErrorEvent(
-                            new ValidationErrorEventArgs()
-                            {
-                                Action = ValidationErrorEventAction.Added,
-                                Error = validationError,
-                                OriginalSource = target
-                            });
-                    }
-                }
-
-                if (target is Control c)
-                {
-                    c.ShowValidationError();
-                }
-            }
-
+            bindingExpression.UpdateValidationError(validationError);
         }
 
-        #region to be implemented
+        // add a validation error to the given element
+        internal static void AddValidationError(ValidationError validationError, DependencyObject targetElement, bool shouldRaiseEvent)
+        {
+            if (targetElement == null)
+                return;
 
-        ///// <summary>
-        ///// Identifies the System.Windows.Controls.Validation.Error attached event.
-        ///// </summary>
-        //public static readonly RoutedEventHandler ErrorEvent; //originally of type RoutedEvent (which doesn't exist here)
+            bool wasValid;
+            ValidationErrorCollection validationErrors = GetErrorsInternal(targetElement);
 
-        ///// <summary>
-        ///// Adds an event handler for the System.Windows.Controls.Validation.Error attached
-        ///// event to the specified object.
-        ///// </summary>
-        ///// <param name="element">
-        ///// The System.Windows.UIElement or System.Windows.ContentElement object to add
-        ///// handler to.
-        ///// </param>
-        ///// <param name="handler">The handler to add.</param>
-        //public static void AddErrorHandler(DependencyObject element, EventHandler<ValidationErrorEventArgs> handler)
-        //{
-        //    //assumption on the way we can make it work?
-        //    ValidationErrorEventHandler errorEventHandler = (ValidationErrorEventHandler)element.Getvalue(ErrorEventProperty);
-        //    ValidationErrorEventHandler += handler;
-        //}
+            if (validationErrors == null)
+            {
+                wasValid = true;
+                validationErrors = new ValidationErrorCollection();
+                validationErrors.Add(validationError);
+                targetElement.SetValue(ValidationErrorsInternalProperty, validationErrors);
+            }
+            else
+            {
+                wasValid = validationErrors.Count == 0;
+                validationErrors.Add(validationError);
+            }
 
-        ///// <summary>
-        ///// Adds an event handler for the System.Windows.Controls.Validation.Error attached
-        ///// event from the specified object.
-        ///// </summary>
-        ///// <param name="element">
-        ///// The System.Windows.UIElement or System.Windows.ContentElement object to remove
-        ///// handler from.
-        ///// </param>
-        ///// <param name="handler">The handler to remove.</param>
-        //public static void RemoveErrorHandler(DependencyObject element, EventHandler<ValidationErrorEventArgs> handler)
-        //{
-        //    //assumption on the way we can make it work?
-        //    ValidationErrorEventHandler errorEventHandler = (ValidationErrorEventHandler)element.Getvalue(ErrorEventProperty);
-        //    ValidationErrorEventHandler -= handler;
-        //}
+            if (wasValid)
+            {
+                targetElement.SetValue(HasErrorProperty, true);
+            }
 
-        ////[AttachedPropertyBrowsableForType(typeof(DependencyObject))]
-        //// Exceptions:
-        ////   System.ArgumentNullException:
-        ////     If element is null.
-        ///// <summary>
-        ///// Gets the value of the System.Windows.Controls.Validation.ErrorTemplate attached
-        ///// property of the specified element.
-        ///// </summary>
-        ///// <param name="element">
-        ///// The System.Windows.UIElement or System.Windows.ContentElement object to read
-        ///// the value from.
-        ///// </param>
-        ///// <returns>
-        ///// The System.Windows.Controls.ControlTemplate used to generate validation error
-        ///// feedback on the adorner layer.
-        ///// </returns>
-        //public static ControlTemplate GetErrorTemplate(DependencyObject element)
-        //{
-        //    return (ControlTemplate)element.GetValue(ErrorTemplateProperty);
-        //}
+            if (shouldRaiseEvent)
+            {
+                OnValidationError(targetElement, validationError, ValidationErrorEventAction.Added);
+            }
 
-        //// Exceptions:
-        ////   System.ArgumentNullException:
-        ////     If element is null.
-        ///// <summary>
-        ///// Sets the value of the System.Windows.Controls.Validation.ErrorTemplate attached
-        ///// property to the specified element.
-        ///// </summary>
-        ///// <param name="element">
-        ///// The System.Windows.UIElement or System.Windows.ContentElement object to set
-        ///// value on.
-        ///// </param>
-        ///// <param name="value">
-        ///// The System.Windows.Controls.ControlTemplate to use to generate validation
-        ///// error feedback on the adorner layer.
-        ///// </param>
-        //public static void SetErrorTemplate(DependencyObject element, ControlTemplate value)
-        //{
-        //    element.SetValue(ErrorTemplateProperty, value);
-        //}
+            if (wasValid)
+            {
+                ShowValidationError(targetElement, true);
+            }
+        }
 
-        ///// <summary>
-        ///// Identifies the System.Windows.Controls.Validation.ErrorTemplate attached
-        ///// property.
-        ///// </summary>
-        //public static readonly DependencyProperty ErrorTemplateProperty =
-        //    DependencyProperty.Register("ErrorTemplate", typeof(ControlTemplate), typeof(UIElement), new PropertyMetadata(null, ErrorTemplate_Changed));
+        // remove a validation error from the given element
+        internal static void RemoveValidationError(ValidationError validationError, DependencyObject targetElement, bool shouldRaiseEvent)
+        {
+            if (targetElement == null)
+                return;
 
+            ValidationErrorCollection validationErrors = GetErrorsInternal(targetElement);
+            if (validationErrors == null || validationErrors.Count == 0 || !validationErrors.Contains(validationError))
+                return;
 
-        #endregion
+            bool isValid = validationErrors.Count == 1;   // about to remove the last error
 
+            if (isValid)
+            {
+                // instead of removing the last error, just discard the error collection.
+                // This sends out only one property-change event, instead of two.
+                // Any bindings to Errors[x] will appreciate the economy.
+                targetElement.ClearValue(HasErrorProperty);
 
-        #region Not implemented stuff
+                targetElement.ClearValue(ValidationErrorsInternalProperty);
 
-        ///// <summary>
-        ///// Identifies the System.Windows.Controls.Validation.ValidationAdornerSiteFor attached
-        ///// property.
-        ///// </summary>
-        //public static readonly DependencyProperty ValidationAdornerSiteForProperty;
+                if (shouldRaiseEvent)
+                {
+                    OnValidationError(targetElement, validationError, ValidationErrorEventAction.Removed);
+                }
 
-        ///// <summary>
-        ///// Gets the value of the System.Windows.Controls.Validation.ValidationAdornerSiteFor
-        ///// attached property for the specified element.
-        ///// </summary>
-        ///// <param name="element">The element from which to get the System.Windows.Controls.Validation.ValidationAdornerSiteFor.</param>
-        ///// <returns>The value of the System.Windows.Controls.Validation.ValidationAdornerSiteFor.</returns>
-        //[AttachedPropertyBrowsableForType(typeof(DependencyObject))]
-        //public static DependencyObject GetValidationAdornerSiteFor(DependencyObject element);
+                ShowValidationError(targetElement, false);
+            }
+            else
+            {
+                // if it's not the last error, just remove it.
+                validationErrors.Remove(validationError);
 
-        ///// <summary>
-        ///// Sets the System.Windows.Controls.Validation.ValidationAdornerSiteFor attached
-        ///// property to the specified value on the specified element.
-        ///// </summary>
-        ///// <param name="element">The element on which to set the System.Windows.Controls.Validation.ValidationAdornerSiteFor.</param>
-        ///// <param name="value">
-        ///// The System.Windows.Controls.Validation.ValidationAdornerSiteFor of the specified
-        ///// element.
-        ///// </param>
-        //public static void SetValidationAdornerSiteFor(DependencyObject element, DependencyObject value);
+                if (shouldRaiseEvent)
+                {
+                    OnValidationError(targetElement, validationError, ValidationErrorEventAction.Removed);
+                }
+            }
+        }
 
+        private static void OnValidationError(DependencyObject source, ValidationError validationError, ValidationErrorEventAction action)
+        {
+            List<FrameworkElement> route = new List<FrameworkElement>(); 
+            for (UIElement e = source as UIElement; e != null; e = VisualTreeHelper.GetParent(e) as UIElement)
+            {
+                if (e is FrameworkElement fe)
+                {
+                    route.Add(fe);
+                }
+            }
 
-        ///// <summary>
-        ///// Identifies the System.Windows.Controls.Validation.ValidationAdornerSite attached
-        ///// property.
-        ///// </summary>
-        //public static readonly DependencyProperty ValidationAdornerSiteProperty;
+            if (route.Count == 0)
+            {
+                return;
+            }
 
-        ///// <summary>
-        ///// Gets the value of the System.Windows.Controls.Validation.ValidationAdornerSite
-        ///// attached property for the specified element.
-        ///// </summary>
-        ///// <param name="element">The element from which to get the System.Windows.Controls.Validation.ValidationAdornerSite.</param>
-        ///// <returns>The value of the System.Windows.Controls.Validation.ValidationAdornerSite.</returns>
-        //[AttachedPropertyBrowsableForType(typeof(DependencyObject))]
-        //public static DependencyObject GetValidationAdornerSite(DependencyObject element);
+            ValidationErrorEventArgs args = new ValidationErrorEventArgs(validationError, action)
+            {
+                OriginalSource = source,
+            };
 
-        ///// <summary>
-        ///// Sets the System.Windows.Controls.Validation.ValidationAdornerSite attached
-        ///// property to the specified value on the specified element.
-        ///// </summary>
-        ///// <param name="element">The element on which to set the System.Windows.Controls.Validation.ValidationAdornerSite.</param>
-        ///// <param name="value">
-        ///// The System.Windows.Controls.Validation.ValidationAdornerSite of the specified
-        ///// element.
-        ///// </param>
-        //public static void SetValidationAdornerSite(DependencyObject element, DependencyObject value);
+            foreach (FrameworkElement fe in route)
+            {
+                fe.OnBindingValidationError(args);
 
+                if (args.Handled)
+                {
+                    break;
+                }
+            }
+        }
 
+        private static void ShowValidationError(DependencyObject targetElement, bool show)
+        {
+            if (targetElement is not Control c)
+            {
+                return;
+            }
 
-        #endregion
+            if (show)
+            {
+                c.ShowValidationError();
+            }
+            else
+            {
+                c.HideValidationError();
+            }
+        }
     }
 
     /// <summary>

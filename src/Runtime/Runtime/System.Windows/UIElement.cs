@@ -260,11 +260,6 @@ namespace Windows.UI.Xaml
         internal Action INTERNAL_DeferredRenderingWhenControlBecomesVisible;
         internal Action INTERNAL_DeferredLoadingWhenControlBecomesVisible;
 
-        /// <summary>
-        /// Dictionary that helps link the validationErrors to the BindingExpressions for managing the errors.
-        /// </summary>
-        internal Dictionary<BindingExpression, ValidationError> INTERNAL_ValidationErrorsDictionary;
-
         public Size RenderSize { get { return VisualBounds.Size; } }
 
         public Size DesiredSize { get; private set; }

@@ -1441,56 +1441,16 @@ namespace Windows.UI.Xaml
 
 #region BindingValidationError event
 
-        internal bool INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
-
-        private List<EventHandler<ValidationErrorEventArgs>> _bindingValidationErrorHandlers;
-
         /// <summary>
         /// Occurs when a data validation error is reported by a binding source.
         /// </summary>
-        public event EventHandler<ValidationErrorEventArgs> BindingValidationError
+        public event EventHandler<ValidationErrorEventArgs> BindingValidationError;
+
+        internal void OnBindingValidationError(ValidationErrorEventArgs e)
         {
-            add
-            {
-                if (_bindingValidationErrorHandlers == null)
-                {
-                    _bindingValidationErrorHandlers = new List<EventHandler<ValidationErrorEventArgs>>();
-                }
-                _bindingValidationErrorHandlers.Add(value);
-
-                this.INTERNAL_AreThereAnyBindingValidationErrorHandlers = true;
-            }
-            remove
-            {
-                if (_bindingValidationErrorHandlers != null)
-                {
-                    _bindingValidationErrorHandlers.Remove(value);
-
-                    if (_bindingValidationErrorHandlers.Count == 0)
-                    {
-                        this.INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
-                    }
-                }
-                else
-                {
-                    this.INTERNAL_AreThereAnyBindingValidationErrorHandlers = false;
-                }
-            }
+            BindingValidationError?.Invoke(this, e);
         }
 
-        internal void INTERNAL_RaiseBindingValidationErrorEvent(ValidationErrorEventArgs eventArgs)
-        {
-            if (_bindingValidationErrorHandlers != null)
-            {
-                foreach (EventHandler<ValidationErrorEventArgs> eventHandler in _bindingValidationErrorHandlers)
-                {
-                    if (eventHandler != null)
-                    {
-                        eventHandler(this, eventArgs);
-                    }
-                }
-            }
-        }
 #endregion
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
