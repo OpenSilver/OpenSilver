@@ -271,7 +271,7 @@ namespace Windows.Foundation
 
         public static bool IsAuto(this Size size)
         {
-            return size.IsHeightAuto() && size.IsHeightAuto();
+            return size.IsHeightAuto() && size.IsWidthAuto();
         }
 
         public static Size Combine(this Size size, Size fallback)

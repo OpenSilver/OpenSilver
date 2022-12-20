@@ -1220,7 +1220,7 @@ namespace Windows.UI.Xaml
         internal sealed override void ArrangeCore(Rect finalRect)
         {
             bool isDefaultAlignment = HorizontalAlignment == HorizontalAlignment.Stretch && VerticalAlignment == VerticalAlignment.Stretch;
-            Size finalSize = isDefaultAlignment ? finalRect.Size : new Size(
+            Size finalSize = isDefaultAlignment ? finalRect.Size.Max(DesiredSize) : new Size(
                 HorizontalAlignment != HorizontalAlignment.Stretch ? Math.Min(DesiredSize.Width, finalRect.Width) : finalRect.Width,
                 VerticalAlignment != VerticalAlignment.Stretch ? Math.Min(DesiredSize.Height, finalRect.Height) : finalRect.Height);
 
