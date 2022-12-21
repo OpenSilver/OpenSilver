@@ -613,7 +613,7 @@ namespace Windows.UI.Xaml.Data
 
         private void OnSourceErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
-            if (e.PropertyName == _propertyPathWalker.FirstNode.PropertyName)
+            if (e.PropertyName == _propertyPathWalker.FinalNode.PropertyName)
             {
                 UpdateNotifyDataErrors(_dataErrorSource, e.PropertyName, DependencyProperty.UnsetValue);
             }
