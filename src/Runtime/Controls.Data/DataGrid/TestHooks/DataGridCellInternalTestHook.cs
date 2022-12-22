@@ -46,7 +46,7 @@ public sealed partial class DataGridCell
             }
 
             #region Internal Properties
-            internal Rectangle RightGridLine
+            internal FrameworkElement RightGridLine
             {
                 get
                 {
