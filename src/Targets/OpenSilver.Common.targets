@@ -213,26 +213,27 @@
 	  <!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
-    <PropertyGroup>
-      <IsCompilingTheBrowserProject Condition="'$(RazorCompileOnPublish)'!=''">True</IsCompilingTheBrowserProject>
-    </PropertyGroup>
+	<PropertyGroup>
+	  <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
+	  <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
+	</PropertyGroup>
     <Exec
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+      Condition="'$(IsBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
       Command="explorer.exe https://opensilver.net/permalinks/update/alpha7.aspx" Timeout="2000" ContinueOnError="True"></Exec>
     <Error
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
+      Condition="'$(IsBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
       Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha7.aspx"/>
     <Exec
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+      Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
       Command="explorer.exe https://opensilver.net/permalinks/update/alpha19.aspx" Timeout="2000" ContinueOnError="True"></Exec>
     <Error
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
+      Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;3"
       Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha19.aspx"/>
     <Exec
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
+      Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
       Command="explorer.exe https://opensilver.net/permalinks/update/alpha20.aspx" Timeout="2000" ContinueOnError="True"></Exec>
     <Error
-      Condition="'$(IsCompilingTheBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
+      Condition="'$(IsBrowserProject)'=='True' And $(OpenSilverType)&lt;4"
       Text="The version of OpenSilver that you are referencing - which is newer and contains many improvements - requires migration of your project. To fix this issue, please follow the steps described at: https://opensilver.net/permalinks/update/alpha20.aspx"/>
 
     <!--============================================================
@@ -276,11 +277,11 @@
       ============================================================-->
 
     <PropertyGroup>
-      <IsBrowserProject Condition="'$(UseRazorBuildServer)' == 'true'">true</IsBrowserProject>
-      <IsBrowserProject Condition="'$(UseRazorBuildServer)' == ''">false</IsBrowserProject>
+      <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
+      <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(IsBrowserProject)' == 'false'">
+    <ItemGroup Condition="'$(IsBrowserProject)' == 'False'">
       <EmbeddedResource Include="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
       <Content Remove="@(Content)" Condition="'%(Content.Extension)'=='.js' Or '%(Content.Extension)'=='.css' Or '%(Content.Extension)'=='.png' Or '%(Content.Extension)'=='.jpg' Or '%(Content.Extension)'=='.gif' Or '%(Content.Extension)'=='.ico' Or '%(Content.Extension)'=='.mp4' Or '%(Content.Extension)'=='.ogv' Or '%(Content.Extension)'=='.webm' Or '%(Content.Extension)'=='.3gp' Or '%(Content.Extension)'=='.mp3' Or '%(Content.Extension)'=='.ogg' Or '%(Content.Extension)'=='.txt' Or '%(Content.Extension)'=='.xml' Or '%(Content.Extension)'=='.ttf' Or '%(Content.Extension)'=='.woff' Or '%(Content.Extension)'=='.woff2' Or '%(Content.Extension)'=='.cur' Or '%(Content.Extension)'=='.json' Or '%(Content.Extension)'=='.config' Or '%(Content.Extension)'=='.ClientConfig' Or '%(Content.Extension)'=='.htm' Or '%(Content.Extension)'=='.html' Or '%(Content.Extension)'=='.svg' Or '%(Content.Extension)'=='.resx'"/>
       <EmbeddedResource Include="@(None)" Condition="'%(None.Extension)'=='.config' Or '%(None.Extension)'=='.ClientConfig'"/>
@@ -492,11 +493,11 @@
     <!--============================================================
       Setting the proper path for copying the resources:
       ============================================================-->
-    <PropertyGroup Condition="'$(IsBrowserProject)' == 'false'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
+    <PropertyGroup Condition="'$(IsBrowserProject)' == 'False'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
       <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
       <Cshtml5OutputRootPath>wwwroot\</Cshtml5OutputRootPath>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(IsBrowserProject)' == 'true'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
+    <PropertyGroup Condition="'$(IsBrowserProject)' == 'True'"> <!--'$(Cshtml5OutputRootPath)'=='' And-->
       <!-- Default output root path. This path can be either absolute, or relative to the "bin\Debug\" folder.. -->
       <Cshtml5OutputRootPath>..\..\..\wwwroot\</Cshtml5OutputRootPath>
     </PropertyGroup>
@@ -504,19 +505,19 @@
     <!--============================================================
       Copying the js/css libraries that come with OpenSilver:
       ============================================================-->
-    <ItemGroup Condition="'$(IsBrowserProject)' == 'true'">
+    <ItemGroup Condition="'$(IsBrowserProject)' == 'True'">
       <MySourceFiles Include="$(MSBuildThisFileDirectory)..\js_css\*"/>
     </ItemGroup>
     
-    <!--<Message  Condition="'$(IsBrowserProject)' == 'true' And '$(IsSecondPass)'=='True'"
+    <!--<Message  Condition="'$(IsBrowserProject)' == 'True' And '$(IsSecondPass)'=='True'"
                 Text="Copying resources from &quot;$(MSBuildThisFileDirectory)&quot; to &quot;$(BaseIntermediateOutputPath)..\wwwroot\libs\&quot;"
                 Importance="normal"/>-->
     
-    <Message  Condition="'$(IsBrowserProject)' == 'true'"
+    <Message  Condition="'$(IsBrowserProject)' == 'True'"
                 Text="Copying OpenSilver's required js/css libraries."
                 Importance="normal"/>
 
-    <Copy Condition="'$(IsBrowserProject)' == 'true'"
+    <Copy Condition="'$(IsBrowserProject)' == 'True'"
         SourceFiles="@(MySourceFiles)"
         SkipUnchangedFiles="true"
         DestinationFolder="$(BaseIntermediateOutputPath)..\wwwroot\libs\"
@@ -552,7 +553,7 @@
       Launch the second pass (only during Pass 1)
       ============================================================-->
     <MSBuild
-      Condition="'$(IsSecondPass)'!='True' And '$(IsBrowserProject)'!='true'"
+      Condition="'$(IsSecondPass)'!='True' And '$(IsBrowserProject)'!='True'"
       Projects="$(MSBuildProjectFile)"
       Properties="IsSecondPass=True;EnableBridgeCompilation=True"
       />
