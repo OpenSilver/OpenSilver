@@ -46,7 +46,7 @@ namespace Windows.UI.Xaml.Controls
 #region Constants
 
         private const string DATAGRIDCELL_elementRightGridLine = "RightGridLine";
-        private const string DATAGRIDCELL_elementRightGridLineBorder = "RightGridLine";
+        private const string DATAGRIDCELL_elementRightGridLineBorder = "RightGridLineBorder";
 
         #endregion Constants
 

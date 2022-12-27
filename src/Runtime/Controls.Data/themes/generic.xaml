@@ -261,7 +261,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Border x:Name="FocusVisual" BorderBrush="#FF6DBDD1" BorderThickness="1" Background="#66FFFFFF" HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch" IsHitTestVisible="false" Opacity="0" CornerRadius="1" />
+                                VerticalAlignment="Stretch" IsHitTestVisible="false" Opacity="0" />
 
                         <ContentPresenter
                             Content="{TemplateBinding Content}"
@@ -270,9 +270,9 @@
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             Margin="{TemplateBinding Padding}" />
 
-                        <Border x:Name="InvalidVisualElement" IsHitTestVisible="False" BorderThickness="1" BorderBrush="#FFDC000C" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0" CornerRadius="1" />
+                        <Border x:Name="InvalidVisualElement" IsHitTestVisible="False" BorderThickness="1" BorderBrush="#FFDC000C" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0" />
 
-                        <Border x:Name="RightGridLine" Grid.Column="1" VerticalAlignment="Stretch" Width="1" CornerRadius="1" />
+                        <Border x:Name="RightGridLineBorder" Grid.Column="1" VerticalAlignment="Stretch" Width="1" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
