@@ -1488,7 +1488,7 @@ document.ondblclick = null;
             }
         }
 
-        internal virtual void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
+        internal void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
         {
             int cChildren = this.VisualChildrenCount;
             for (int i = 0; i < cChildren; i++)

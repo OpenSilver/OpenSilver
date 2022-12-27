@@ -878,32 +878,6 @@ namespace Windows.UI.Xaml
 
         #endregion
 
-        #region ForceInherit property support
-
-        internal override void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
-        {
-            if (property == IsEnabledProperty)
-            {
-                IEnumerator enumerator = LogicalChildren;
-
-                if (enumerator != null)
-                {
-                    while (enumerator.MoveNext())
-                    {
-                        FrameworkElement child = enumerator.Current as FrameworkElement;
-                        if (child != null)
-                        {
-                            child.CoerceValue(property);
-                        }
-                    }
-                }
-            }
-
-            base.InvalidateForceInheritPropertyOnChildren(property);
-        }
-
-        #endregion ForceInherit property support
-
         #region Names handling
 
         /// <summary>
