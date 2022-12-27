@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows
@@ -22,6 +23,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Represents the duration of time that a <see cref="Media.Animation.Timeline"/> is active.
     /// </summary>
+    [TypeConverter(typeof(DurationConverter))]
     public struct Duration
     {
         private TimeSpan _timeSpan;

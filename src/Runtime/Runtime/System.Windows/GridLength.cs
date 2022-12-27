@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
@@ -24,6 +25,7 @@ namespace Windows.UI.Xaml
     /// Represents the length of elements that explicitly support <see cref="GridUnitType.Star"/>
     /// unit types.
     /// </summary>
+    [TypeConverter(typeof(GridLengthConverter))]
     public struct GridLength
     {
         private double _unitValue;      //  unit value storage

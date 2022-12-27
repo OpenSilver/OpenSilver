@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using OpenSilver.Internal;
 
@@ -24,6 +25,7 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width, height, and point origin of a rectangle.
     /// </summary>
+    [TypeConverter(typeof(RectConverter))]
     public struct Rect
     {
         internal double _x;

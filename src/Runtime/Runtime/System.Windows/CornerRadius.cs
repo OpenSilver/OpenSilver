@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
@@ -24,6 +25,7 @@ namespace Windows.UI.Xaml
     /// Describes the characteristics of a rounded corner, such as can be applied to
     /// a <see cref="Controls.Border"/>.
     /// </summary>
+    [TypeConverter(typeof(CornerRadiusConverter))]
     public partial struct CornerRadius
     {
         /// <summary>

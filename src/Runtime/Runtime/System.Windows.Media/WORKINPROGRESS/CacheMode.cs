@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -20,6 +21,7 @@ namespace Windows.UI.Xaml.Media
 #endif
 {
     [OpenSilver.NotImplemented]
+    [TypeConverter(typeof(CacheModeConverter))]
     public abstract partial class CacheMode : DependencyObject
     {
         /// <summary>

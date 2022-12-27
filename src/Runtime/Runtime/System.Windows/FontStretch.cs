@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 
 #if MIGRATION
@@ -24,6 +25,7 @@ namespace Windows.UI.Xaml
     /// Describes the degree to which a font has been stretched, compared to the normal
     /// aspect ratio of that font.
     /// </summary>
+    [TypeConverter(typeof(FontStretchConverter))]
     public struct FontStretch : IFormattable
     {
         private readonly int _stretch;

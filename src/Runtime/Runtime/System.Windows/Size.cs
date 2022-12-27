@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using OpenSilver.Internal;
 
@@ -24,6 +25,7 @@ namespace Windows.Foundation
     /// <summary>
     /// Describes the width and height of an object.
     /// </summary>
+    [TypeConverter(typeof(SizeConverter))]
     public struct Size
     {
         internal double _width;

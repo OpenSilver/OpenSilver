@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 
 #if MIGRATION
@@ -25,6 +26,7 @@ namespace Windows.UI.Xaml
     /// describe the <see cref="Left"/>, <see cref="Top"/>, <see cref="Right"/>, and 
     /// <see cref="Bottom"/> sides of the rectangle, respectively.
     /// </summary>
+    [TypeConverter(typeof(ThicknessConverter))]
     public struct Thickness
     {
         /// <summary>

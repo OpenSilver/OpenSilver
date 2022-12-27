@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -31,6 +32,7 @@ namespace Windows.UI.Xaml.Media
     /// objects can be used for clipping regions and as geometry definitions for
     /// rendering two-dimensional graphical data as a Path.
     /// </summary>
+    [TypeConverter(typeof(GeometryConverter))]
     public abstract partial class Geometry : DependencyObject
     {
         /// <summary>

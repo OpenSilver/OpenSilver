@@ -14,6 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
@@ -28,6 +29,7 @@ namespace Windows.UI.Xaml
     /// Implements a data structure for describing a property as a path below another
     /// property, or below an owning type. Property paths are used in data binding to objects.
     /// </summary>
+    [TypeConverter(typeof(PropertyPathConverter))]
     public sealed partial class PropertyPath : DependencyObject
     {
         private SourceValueInfo[] _arySVI;

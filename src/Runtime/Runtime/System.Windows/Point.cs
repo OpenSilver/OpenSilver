@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using OpenSilver.Internal;
 
@@ -25,6 +26,7 @@ namespace Windows.Foundation
     /// Represents an x- and y-coordinate pair in two-dimensional space. Can also represent
     /// a logical point for certain property usages.
     /// </summary>
+    [TypeConverter(typeof(PointConverter))]
     public struct Point : IFormattable
     {
         internal double _x;

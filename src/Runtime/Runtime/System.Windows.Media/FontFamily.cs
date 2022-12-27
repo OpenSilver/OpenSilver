@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -22,6 +23,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a family of related fonts.
     /// </summary>
+    [TypeConverter(typeof(FontFamilyConverter))]
     public partial class FontFamily
     {
         // Parameters:

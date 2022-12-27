@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 namespace System.Windows.Media.Animation
@@ -22,6 +23,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Specifies when a particular key frame should take place during an animation.
     /// </summary>
+    [TypeConverter(typeof(KeyTimeConverter))]
     public partial struct KeyTime
     {
         internal KeyTime(TimeSpan timeSpan)

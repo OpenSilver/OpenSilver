@@ -13,8 +13,11 @@
 
 #if MIGRATION
 
+using System.ComponentModel;
+
 namespace System.Windows
 {
+    [TypeConverter(typeof(TextDecorationCollectionConverter))]
     public sealed class TextDecorationCollection
     {
         internal TextDecorationCollection() { }

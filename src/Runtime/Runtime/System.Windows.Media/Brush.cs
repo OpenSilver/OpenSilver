@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using CSHTML5.Internal;
 
@@ -26,6 +27,7 @@ namespace Windows.UI.Xaml.Media
     /// Defines objects used to paint graphical objects. Classes that derive from
     /// Brush describe how the area is painted.
     /// </summary>
+    [TypeConverter(typeof(BrushConverter))]
     public partial class Brush : DependencyObject,
         IHasAccessToPropertiesWhereItIsUsed2,
 #pragma warning disable CS0618 // Type or member is obsolete

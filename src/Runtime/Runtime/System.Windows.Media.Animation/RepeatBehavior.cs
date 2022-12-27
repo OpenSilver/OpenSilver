@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Text;
 
 #if MIGRATION
@@ -26,6 +27,7 @@ namespace Windows.UI.Xaml.Media.Animation
     /// <summary>
     /// Describes how a <see cref="Timeline"/> repeats its simple duration.
     /// </summary>
+    [TypeConverter(typeof(RepeatBehaviorConverter))]
     public struct RepeatBehavior : IFormattable
     {
         private double _iterationCount;

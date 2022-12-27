@@ -11,11 +11,14 @@
 *  
 \*====================================================================================*/
 
+using System.ComponentModel;
+
 namespace System.Windows.Input
 {
     /// <summary>
     /// Represents the image used for the mouse pointer.
     /// </summary>
+    [TypeConverter(typeof(CursorConverter))]
     public sealed partial class Cursor : IDisposable
     {
         private static string[] HtmlCursors { get; }

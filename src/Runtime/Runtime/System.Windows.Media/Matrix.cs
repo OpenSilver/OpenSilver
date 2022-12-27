@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using OpenSilver.Internal;
@@ -30,6 +31,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a 3x3 affine transformation matrix used for transformations in two-dimensional
     /// space.
     /// </summary>
+    [TypeConverter(typeof(MatrixConverter))]
     public struct Matrix : IFormattable
     {
         // the transform is identity by default

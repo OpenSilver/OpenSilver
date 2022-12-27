@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using OpenSilver.Internal;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -29,6 +30,7 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
+    [TypeConverter(typeof(PointCollectionConverter))]
     public sealed partial class PointCollection : PresentationFrameworkCollection<Point>
     {
         private Shape _parentShape;

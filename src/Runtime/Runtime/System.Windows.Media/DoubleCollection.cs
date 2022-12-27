@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using OpenSilver.Internal;
 
@@ -24,6 +25,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents an ordered collection of Double values.
     /// </summary>
+    [TypeConverter(typeof(DoubleCollectionConverter))]
     public sealed class DoubleCollection : PresentationFrameworkCollection<double>
     {
         public DoubleCollection() : base(false) 

@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -26,6 +27,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Defines functionality that enables transformations in a two-dimensional plane.
     /// </summary>
+    [TypeConverter(typeof(TransformConverter))]
     public abstract partial class Transform : GeneralTransform
     {
         internal Transform() { }
