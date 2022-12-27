@@ -273,7 +273,11 @@ namespace Windows.UI.Xaml.Media
             //END OF JAVASCRIPT
 
             UpdateStartPosition(previousLastPoint);
-            UpdateStrokeThickness(this.ParentPath.StrokeThickness);
+
+            if (ParentPath != null)
+            {
+                UpdateStrokeThickness(ParentPath.StrokeThickness);
+            }            
 
             UpdateArcData();
 
@@ -309,7 +313,11 @@ namespace Windows.UI.Xaml.Media
                                             Point startingPoint)
         {
             UpdateStartPosition(startingPoint);
-            UpdateStrokeThickness(this.ParentPath.StrokeThickness);
+
+            if (ParentPath != null)
+            {
+                UpdateStrokeThickness(ParentPath.StrokeThickness);
+            }
 
             UpdateArcData();
 
