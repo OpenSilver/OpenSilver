@@ -249,7 +249,7 @@
                                 <vsm:VisualState x:Name="Invalid">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="InvalidVisualElement" Storyboard.TargetProperty="Opacity" Duration="0" To="1"/>
-                                        <ColorAnimation Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="(Fill).Color" Duration="0" To="#FFFFFFFF"/> 
+                                        <ColorAnimation Storyboard.TargetName="FocusVisual" Storyboard.TargetProperty="(Background).Color" Duration="0" To="#FFFFFFFF"/> 
                                     </Storyboard>
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
@@ -260,8 +260,8 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Rectangle Name="FocusVisual" Stroke="#FF6DBDD1" StrokeThickness="1" Fill="#66FFFFFF" HorizontalAlignment="Stretch" 
-                                   VerticalAlignment="Stretch" IsHitTestVisible="false" Opacity="0" />
+                        <Border x:Name="FocusVisual" BorderBrush="#FF6DBDD1" BorderThickness="1" Background="#66FFFFFF" HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch" IsHitTestVisible="false" Opacity="0" />
 
                         <ContentPresenter
                             Content="{TemplateBinding Content}"
@@ -270,9 +270,9 @@
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             Margin="{TemplateBinding Padding}" />
 
-                        <Rectangle x:Name="InvalidVisualElement" IsHitTestVisible="False" StrokeThickness="1" Stroke="#FFDC000C" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0"/>
+                        <Border x:Name="InvalidVisualElement" IsHitTestVisible="False" BorderThickness="1" BorderBrush="#FFDC000C" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0" />
 
-                        <Rectangle Name="RightGridLine" Grid.Column="1" VerticalAlignment="Stretch" Width="1" />
+                        <Border x:Name="RightGridLineBorder" Grid.Column="1" VerticalAlignment="Stretch" Width="1" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
