@@ -266,6 +266,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #else
             base.OnPointerPressed(eventArgs);
 #endif
+
+            if (eventArgs.Handled || ClickMode == ClickMode.Hover)
+            {
+                return;
+            }
+
             eventArgs.Handled = true;
 
 #if MIGRATION
@@ -291,17 +297,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
             //todo: investigate why we enter twice in this method for each click.
 
 #if MIGRATION
+            base.OnMouseLeftButtonUp(eventArgs);
+#else
+            base.OnPointerReleased(eventArgs);
+#endif
+
+            if (eventArgs.Handled || ClickMode == ClickMode.Hover)
+            {
+                return;
+            }
+
+#if MIGRATION
             if (this.IsMouseCaptured) // Avoids calling the OnPointerReleased method twice for each click (cf. todo above)
 #else
             if (this.IsPointerCaptured) // Avoids calling the OnPointerReleased method twice for each click (cf. todo above)
 #endif
             {
-
-#if MIGRATION
-                base.OnMouseLeftButtonUp(eventArgs);
-#else
-                base.OnPointerReleased(eventArgs);
-#endif
                 eventArgs.Handled = true;
 
                 StopPointerCapture();
