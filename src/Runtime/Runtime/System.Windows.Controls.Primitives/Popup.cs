@@ -140,12 +140,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 typeof(Popup),
                 new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
-        /// <summary>
-        /// This boolean determines whether the popup can force its content to catch clicks.
-        /// It will usually need to be true (for example to allow clicking on a ComboBoxItem).
-        /// It should be set to false in specific cases like non-modal childWindows where we do not want the Overlay to catch and prevent all click events outside of the childWindow itself.
-        /// Defaults to True.
-        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Unused. This will be removed in a later release.")]
         public bool INTERNAL_AllowDisableClickTransparency = true;
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
@@ -620,9 +616,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Calculate the position of the parent of the popup, in case that the popup is in the Visual Tree:
                 _referencePosition = CalculateReferencePosition(parentWindow) ?? new Point();
 
-                // We make it transparent to clicks only if either the popup has a false "IsHitTestVisible", or the content of the popup has a false "IsHitTestVisible":
-                bool transparentToClicks = (!this.IsHitTestVisible) || (child is FrameworkElement && !((FrameworkElement)child).IsHitTestVisible);
-
                 // Create a surrounding border to enable positioning and alignment:
                 _outerBorder = new NonLogicalContainer()
                 {
@@ -630,7 +623,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     Content = child,
                     HorizontalAlignment = this.HorizontalContentAlignment,
                     VerticalAlignment = this.VerticalContentAlignment,
-                    INTERNAL_ForceEnableAllPointerEvents = INTERNAL_AllowDisableClickTransparency && !transparentToClicks, // This is here because we set "pointerEvents='none' to the PopupRoot, so we need to re-enable pointer events in the children (unless we have calculated that the popup should be "transparentToClicks").
                 };
                 Binding b = new Binding("Width") { Source = this };
                 _outerBorder.SetBinding(Border.WidthProperty, b);

@@ -355,20 +355,6 @@ namespace Windows.UI.Xaml
         /// </summary>
         internal virtual FrameworkElement StateGroupsRoot => TemplateChild;
 
-        //--------------------------------------
-        // Note: this is a "partial" class. For anything related to Size and Alignment, please refer to the other file ("FrameworkElement_HandlingSizeAndAlignment.cs").
-        //--------------------------------------
-
-        // Note: this is used to be able to tell whether the style applied on 
-        // the FrameworkElement is an ImplicitStyle, which means that it must 
-        // be removed from the element when it is detached from the visual tree.
-        //internal bool INTERNAL_IsImplicitStyle = false;
-
-        // Note: this is used by the PopupRoot to ensure that the PopupRoot 
-        // has no pointer events while the container has. 
-        // todo: replace with another technique to achieve the same result.
-        internal bool INTERNAL_ForceEnableAllPointerEvents = false;
-
         [Obsolete]
         internal Style INTERNAL_defaultStyle;
 
@@ -505,9 +491,9 @@ namespace Windows.UI.Xaml
 
             object div1;
             var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            if (!this.IsUnderCustomLayout || INTERNAL_ForceEnableAllPointerEvents)
+            if (!this.IsUnderCustomLayout)
             {
-                object div2 = INTERNAL_HtmlDomManager.CreateFrameworkDomElementAndAppendIt(div1, this, INTERNAL_ForceEnableAllPointerEvents);
+                object div2 = INTERNAL_HtmlDomManager.CreateFrameworkDomElementAndAppendIt(div1, this, false);
                 domElementWhereToPlaceChildren = div2;
 
                 if (this.IsCustomLayoutRoot)
@@ -537,8 +523,6 @@ namespace Windows.UI.Xaml
             var div2style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", div1, this, out div2);
             div2style.width = "100%";
             div2style.height = "100%";
-            if (INTERNAL_ForceEnableAllPointerEvents)
-                div2style.pointerEvents = "all";
             domElementWhereToPlaceChildren = div2;
             return div1;
         }
