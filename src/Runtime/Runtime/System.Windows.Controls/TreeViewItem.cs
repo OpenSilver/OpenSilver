@@ -1679,6 +1679,14 @@ namespace Windows.UI.Xaml.Controls
                 object item = (parent != null) ?
                     parent.ItemContainerGenerator.ItemFromContainer(this) :
                     view.ItemContainerGenerator.ItemFromContainer(this);
+
+                // If the item is unset, it means the containers have not been
+                // generated yet. It means that this container's item is itself.
+                if (item == DependencyProperty.UnsetValue)
+                {
+                    item = this;
+                }
+
                 view.ChangeSelection(item, this, selected);
             }
         }
