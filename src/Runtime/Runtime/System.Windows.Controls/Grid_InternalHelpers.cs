@@ -346,9 +346,10 @@ namespace Windows.UI.Xaml.Controls
                 //we get the smallest star value in the columns:
                 foreach (ColumnDefinition col in columnDefinitionsOrNull)
                 {
-                    if (col.Width.IsStar && col.Width.Value < smallestColumnStarValue)
+                    var value = col.Width.Value;
+                    if (col.Width.IsStar && value < smallestColumnStarValue && value > 0)
                     {
-                        smallestColumnStarValue = col.Width.Value;
+                        smallestColumnStarValue = value;
                     }
                 }
 
@@ -371,9 +372,10 @@ namespace Windows.UI.Xaml.Controls
             {
                 foreach (RowDefinition row in rowDefinitionsOrNull)
                 {
-                    if (row.Height.IsStar && row.Height.Value < smallestRowStarValue)
+                    var value = row.Height.Value;
+                    if (row.Height.IsStar && value < smallestRowStarValue && value > 0)
                     {
-                        smallestRowStarValue = row.Height.Value;
+                        smallestRowStarValue = value;
                     }
                 }
 
