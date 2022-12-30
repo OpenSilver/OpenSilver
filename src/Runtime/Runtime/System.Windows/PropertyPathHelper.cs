@@ -33,6 +33,11 @@ namespace Windows.UI.Xaml
                 object currentItem = item;
                 for (int i = 0; i < splittedPath.Length; ++i)
                 {
+                    if (currentItem == null)
+                    {
+                        return DependencyProperty.UnsetValue;
+                    }
+
                     Type type = currentItem.GetType();
                     var memberArray = type.GetMember(splittedPath[i]);
                     if (memberArray != null && memberArray.Length > 0)
