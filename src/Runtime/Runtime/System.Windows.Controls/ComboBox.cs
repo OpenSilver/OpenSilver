@@ -14,6 +14,7 @@
 using DotNetForHtml5.Core;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 #if MIGRATION
@@ -507,6 +508,10 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnDropDownToggleClick(object sender, RoutedEventArgs e)
         {
+            if (!this.Items.Any())
+            {
+                _dropDownToggle.IsChecked = false;
+            }
             IsDropDownOpen = _dropDownToggle.IsChecked.GetValueOrDefault();
         }
 
