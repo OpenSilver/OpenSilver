@@ -26,10 +26,12 @@ using OpenSilver.Internal.Data;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Common;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Common;
 #endif
 
 #if MIGRATION
@@ -848,6 +850,10 @@ namespace Windows.UI.Xaml.Data
             if (value != null)
             {
                 return targetType.IsAssignableFrom(value.GetType());
+            }
+            else if (TypeHelper.IsNullableType(targetType))
+            {
+                return true;
             }
 
             return false;
