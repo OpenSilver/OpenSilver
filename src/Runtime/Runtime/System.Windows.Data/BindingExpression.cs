@@ -26,10 +26,12 @@ using OpenSilver.Internal.Data;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Common;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Common;
 #endif
 
 #if MIGRATION
@@ -685,16 +687,6 @@ namespace Windows.UI.Xaml.Data
             UpdateSourceObject(value);
         }
 
-        private static bool IsValueValidForSourceUpdate(object value, Type type)
-        {
-            if (value == null)
-            {
-                return !type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == NullableType);
-            }
-
-            return type.IsAssignableFrom(value.GetType());
-        }
-
         internal void UpdateSourceObject(object value)
         {
             if (_propertyPathWalker.IsPathBroken)
@@ -722,7 +714,7 @@ namespace Windows.UI.Xaml.Data
                         return;
                 }
 
-                if (!IsValueValidForSourceUpdate(convertedValue, expectedType))
+                if (!IsValidValue(convertedValue, expectedType))
                 {
                     IsUpdating = true;
 
@@ -843,14 +835,14 @@ namespace Windows.UI.Xaml.Data
             return UseDynamicConverter(value, targetType);
         }
 
-        private static bool IsValidValue(object value, Type targetType)
+        private static bool IsValidValue(object value, Type type)
         {
-            if (value != null)
+            if (value == null)
             {
-                return targetType.IsAssignableFrom(value.GetType());
+                return !type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == NullableType);
             }
 
-            return false;
+            return type.IsAssignableFrom(value.GetType());
         }
 
         private object UseDynamicConverter(object value, Type targetType)
