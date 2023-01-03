@@ -279,7 +279,19 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                return Parent.GetColumnActualWidth(this);
+                if (Parent != null)
+                {
+                    if (Parent.CustomLayout || Parent.IsUnderCustomLayout)
+                    {
+                        return _measureArrangeSize;
+                    }
+                    else
+                    {
+                        return Parent.GetColumnActualWidth(this);
+                    }
+                }
+
+                return double.NaN;
             }
         }
 

@@ -291,7 +291,19 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                return Parent.GetRowActualHeight(this);
+                if (Parent != null)
+                {
+                    if (Parent.CustomLayout || Parent.IsUnderCustomLayout)
+                    {
+                        return _measureArrangeSize;
+                    }
+                    else
+                    {
+                        return Parent.GetRowActualHeight(this);
+                    }
+                }
+
+                return double.NaN;
             }
         }
 
