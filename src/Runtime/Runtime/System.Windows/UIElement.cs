@@ -1578,7 +1578,8 @@ document.ondblclick = null;
 
                 LayoutManager.Current.RemoveArrange(this);
 
-                if (Visibility != Visibility.Visible) {
+                if (this.IsVisible == false)
+                {
                     IsRendered = false;
                     return;
                 }
