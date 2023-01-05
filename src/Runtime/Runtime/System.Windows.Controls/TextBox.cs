@@ -646,76 +646,93 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            if (e.Key == Key.Left || e.Key == Key.Right)
+            switch (e.Key)
             {
-                if (e.KeyModifiers == ModifierKeys.None)
-                {
-                    if (SelectionLength > 0)
+                case Key.Left:
+                case Key.Right:
+                    if (e.KeyModifiers == ModifierKeys.None)
                     {
-                        if (e.Key == Key.Left)
-                            Select(SelectionStart, 0);
+                        if (SelectionLength > 0)
+                        {
+                            if (e.Key == Key.Left)
+                                Select(SelectionStart, 0);
+                            else
+                                Select(SelectionStart + SelectionLength, 0);
+
+                            e.Handled = true;
+                        }
                         else
-                            Select(SelectionStart + SelectionLength, 0);
-
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        if (e.Key == Key.Left && SelectionStart > 0)
                         {
-                            Select(SelectionStart - 1, 0);
-                            e.Handled = true;
-                        }
-                        else if (e.Key == Key.Right && SelectionStart < Text.Length)
-                        {
-                            Select(SelectionStart + 1, 0);
-                            e.Handled = true;
+                            if (e.Key == Key.Left && SelectionStart > 0)
+                            {
+                                Select(SelectionStart - 1, 0);
+                                e.Handled = true;
+                            }
+                            else if (e.Key == Key.Right && SelectionStart < Text.Length)
+                            {
+                                Select(SelectionStart + 1, 0);
+                                e.Handled = true;
+                            }
                         }
                     }
-                }
-                else if (e.KeyModifiers == ModifierKeys.Shift)
-                {
-                    int caret = CaretPosition;
-                    int selectionStartWithDirection = SelectionStart;
-                    int selectionEndWithDirection = SelectionStart + SelectionLength;
+                    else if (e.KeyModifiers == ModifierKeys.Shift)
+                    {
+                        int caret = CaretPosition;
+                        int selectionStartWithDirection = SelectionStart;
+                        int selectionEndWithDirection = SelectionStart + SelectionLength;
 
-                    if (caret != selectionEndWithDirection)
-                    {
-                        // Selection direction is backward
-                        int tmp = selectionEndWithDirection;
-                        selectionEndWithDirection = selectionStartWithDirection;
-                        selectionStartWithDirection = tmp;
-                    }
+                        if (caret != selectionEndWithDirection)
+                        {
+                            // Selection direction is backward
+                            int tmp = selectionEndWithDirection;
+                            selectionEndWithDirection = selectionStartWithDirection;
+                            selectionStartWithDirection = tmp;
+                        }
 
-                    if (e.Key == Key.Left && selectionEndWithDirection > 0)
-                    {
-                        selectionEndWithDirection--;
-                        
-                        Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
-                        
-                        e.Handled = true;
+                        if (e.Key == Key.Left && selectionEndWithDirection > 0)
+                        {
+                            selectionEndWithDirection--;
+
+                            Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
+
+                            e.Handled = true;
+                        }
+                        else if (e.Key == Key.Right && selectionEndWithDirection < Text.Length)
+                        {
+                            selectionEndWithDirection++;
+                            Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
+
+                            e.Handled = true;
+                        }
                     }
-                    else if (e.Key == Key.Right && selectionEndWithDirection < Text.Length)
+                    else if (e.KeyModifiers == ModifierKeys.Control)
                     {
-                        selectionEndWithDirection++;
-                        Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
-                        
-                        e.Handled = true;
+                        // Not implemented
                     }
-                }
-                else if (e.KeyModifiers == ModifierKeys.Control)
-                {
+                    else if (e.KeyModifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                    {
+                        // Not implemented
+                    }
+                    break;
+
+                case Key.Up:
+                case Key.Down:
                     // Not implemented
-                }
-                else if (e.KeyModifiers == (ModifierKeys.Control | ModifierKeys.Shift))
-                {
-                    // Not implemented
-                }
-            }
+                    break;
 
-            if (e.Key == Key.Up || e.Key == Key.Down)
-            {
-                // Not implemented
+                case Key.Home:
+                case Key.End:
+                    if (_textViewHost != null)
+                    {
+                        int index = e.Key == Key.Home ? 0 : Text.Length;
+                        _textViewHost.View.NEW_GET_SELECTION(out int start, out int length);
+                        if (length > 0 || start != index)
+                        {
+                            _textViewHost.View.NEW_SET_SELECTION(index, index);
+                            e.Handled = true;
+                        }
+                    }
+                    break;
             }
         }
 #endif
