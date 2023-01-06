@@ -23,11 +23,14 @@ using System.Windows.Markup;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
+
 #if MIGRATION
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 #if MIGRATION
@@ -204,15 +207,26 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Border),
                 new PropertyMetadata((object)null)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
+                    GetCSSEquivalent = (instance) =>
                     {
-                        Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
+                        if (instance is ImageBrush imageBrush)
+                        {
+                            return null;
+                        }
+                        return new CSSEquivalent()
+                        {
+                            Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
+                        };
                     },
-                    MethodToUpdateDom = (d, e) =>
+                    MethodToUpdateDom = async (d, e) =>
                     {
                         var border = (Border)d;
                         if (e is ImageBrush imageBrush)
                         {
+                            if (imageBrush.ImageSource is WriteableBitmap)
+                            {
+                                await ((WriteableBitmap)imageBrush.ImageSource).WaitToInitialize();
+                            }
                             Panel.SetImageBrushRelatedBackgroundProperties(border, imageBrush);
                         }
                         UIElement.SetPointerEvents(border);

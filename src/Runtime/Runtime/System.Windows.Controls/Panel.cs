@@ -23,12 +23,16 @@ using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
+using System.Xml.Linq;
+
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 #if MIGRATION
@@ -266,16 +270,24 @@ namespace Windows.UI.Xaml.Controls
                 {
                     GetCSSEquivalent = (instance) =>
                     {
+                        if (instance is ImageBrush imageBrush)
+                        {
+                            return null;
+                        }
                         return new CSSEquivalent()
                         {
                             Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
                         };
                     },
-                    MethodToUpdateDom = (d, e) =>
+                    MethodToUpdateDom = async (d, e) =>
                     {
                         var panel = (Panel)d;
                         if (e is ImageBrush imageBrush)
                         {
+                            if (imageBrush.ImageSource is WriteableBitmap)
+                            {
+                                await ((WriteableBitmap)imageBrush.ImageSource).WaitToInitialize();
+                            }
                             SetImageBrushRelatedBackgroundProperties(panel, imageBrush);
                         }
                         UIElement.SetPointerEvents(panel);
@@ -301,7 +313,8 @@ namespace Windows.UI.Xaml.Controls
             }
 
             string domUid = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
-            string backProperties = $"e.style.backgroundSize = \"{cssSize}\";" +
+            string backProperties = $"e.style.background = \"{imageBrush.ConvertToCSSValues(imageBrush).FirstOrDefault()}\";" +
+                $"e.style.backgroundSize = \"{cssSize}\";" +
                 "e.style.backgroundRepeat = \"no-repeat\";" +
                 "e.style.backgroundPosition = \"center center\";";
 

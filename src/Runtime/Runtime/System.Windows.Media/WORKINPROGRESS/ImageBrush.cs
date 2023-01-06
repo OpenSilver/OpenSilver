@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using System.Threading.Tasks;
 
 #if MIGRATION
 using System.Windows.Media.Imaging;
@@ -57,6 +58,26 @@ namespace Windows.UI.Xaml.Media
                 else if (!string.IsNullOrEmpty(bitmapImage.INTERNAL_DataURL))
                 {
                     url = bitmapImage.INTERNAL_DataURL;
+                }
+
+                if (url != null)
+                {
+                    return new List<object>(1)
+                    {
+                        $"linear-gradient(to right,rgba(255,255,255,{(1.0 - Opacity).ToInvariantString()}) 0 100%),url({url})",
+                    };
+                }
+            }
+            else if (ImageSource is BitmapSource image)
+            {
+                string url = null;
+                if (image.INTERNAL_StreamSource != null)
+                {
+                    url = "data:image/png;base64," + image.INTERNAL_StreamAsBase64String;
+                }
+                else if (!string.IsNullOrEmpty(image.INTERNAL_DataURL))
+                {
+                    url = image.INTERNAL_DataURL;
                 }
 
                 if (url != null)
