@@ -38,59 +38,55 @@ namespace Windows.UI.Xaml.Media
 		}
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {
-            return (List<object>)INTERNAL_ToHtmlString(parent);
-        }
-
-        internal List<object> INTERNAL_ToHtmlString(DependencyObject parent)
-        {
-            if (ImageSource is BitmapImage bitmapImage)
+            string url = INTERNAL_ToHtmlString(parent);
+            if (url != null)
             {
-                string url = null;
-                if (bitmapImage.UriSource != null)
-                {
-                    Uri sourceUri = bitmapImage.UriSource;
-                    url = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, parent as UIElement);
-                }
-                else if (bitmapImage.INTERNAL_StreamSource != null)
-                {
-                    url = "data:image/png;base64," + bitmapImage.INTERNAL_StreamAsBase64String;
-                }
-                else if (!string.IsNullOrEmpty(bitmapImage.INTERNAL_DataURL))
-                {
-                    url = bitmapImage.INTERNAL_DataURL;
-                }
-
-                if (url != null)
-                {
-                    return new List<object>(1)
-                    {
-                        $"linear-gradient(to right,rgba(255,255,255,{(1.0 - Opacity).ToInvariantString()}) 0 100%),url({url})",
-                    };
-                }
-            }
-            else if (ImageSource is BitmapSource image)
-            {
-                string url = null;
-                if (image.INTERNAL_StreamSource != null)
-                {
-                    url = "data:image/png;base64," + image.INTERNAL_StreamAsBase64String;
-                }
-                else if (!string.IsNullOrEmpty(image.INTERNAL_DataURL))
-                {
-                    url = image.INTERNAL_DataURL;
-                }
-
-                if (url != null)
-                {
-                    return new List<object>(1)
-                    {
-                        $"linear-gradient(to right,rgba(255,255,255,{(1.0 - Opacity).ToInvariantString()}) 0 100%),url({url})",
-                    };
-                }
+                return new List<object>(1) { url };
             }
 
             return new List<object>();
         }
 
+        internal string INTERNAL_ToHtmlString(DependencyObject parent)
+        {
+            string url = null;
+            if (ImageSource is BitmapImage bitmapImage)
+            {
+                if (bitmapImage.UriSource != null)
+                {
+                    Uri sourceUri = bitmapImage.UriSource;
+                    url = INTERNAL_UriHelper.ConvertToHtml5Path(sourceUri.OriginalString, parent as UIElement);
+                }
+                else
+                {
+                    url = GetImageUrl(bitmapImage);
+                }
+            }
+            else if (ImageSource is BitmapSource image)
+            {
+                url = GetImageUrl(image);
+            }
+
+            if (url != null)
+            {
+                return $"linear-gradient(to right,rgba(255,255,255,{(1.0 - Opacity).ToInvariantString()}) 0 100%),url({url})";
+            }
+
+            return null;
+        }
+
+        private static string GetImageUrl(BitmapSource bitmapSource)
+        {
+            if (bitmapSource.INTERNAL_StreamSource != null)
+            {
+                return "data:image/png;base64," + bitmapSource.INTERNAL_StreamAsBase64String;
+            }
+            else if (!string.IsNullOrEmpty(bitmapSource.INTERNAL_DataURL))
+            {
+                return bitmapSource.INTERNAL_DataURL;
+            }
+
+            return null;
+        }
 	}
 }

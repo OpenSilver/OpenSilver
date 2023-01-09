@@ -23,8 +23,6 @@ using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
-using System.Xml.Linq;
-
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -313,7 +311,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             string domUid = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
-            string backProperties = $"e.style.background = \"{imageBrush.ConvertToCSSValues(imageBrush).FirstOrDefault()}\";" +
+            string backProperties = $"e.style.background = \"{imageBrush.INTERNAL_ToHtmlString(element)}\";" +
                 $"e.style.backgroundSize = \"{cssSize}\";" +
                 "e.style.backgroundRepeat = \"no-repeat\";" +
                 "e.style.backgroundPosition = \"center center\";";

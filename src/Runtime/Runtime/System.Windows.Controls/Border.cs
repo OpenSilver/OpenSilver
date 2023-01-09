@@ -23,7 +23,6 @@ using System.Windows.Markup;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
-
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
