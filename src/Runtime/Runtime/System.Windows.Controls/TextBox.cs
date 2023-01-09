@@ -431,13 +431,24 @@ namespace Windows.UI.Xaml.Controls
             tb.UpdateVisualStates();
         }
 
+        /// <summary>
+        /// Gets or sets a value that specifies whether the <see cref="TextBox"/> input 
+        /// interacts with a spell check engine.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="TextBox"/> input interacts with a spell check engine; 
+        /// otherwise, false. The default is false.
+        /// </returns>
         public bool IsSpellCheckEnabled
         {
             get { return (bool)GetValue(IsSpellCheckEnabledProperty); }
             set { SetValue(IsSpellCheckEnabledProperty, value); }
         }
 
-        private static readonly DependencyProperty IsSpellCheckEnabledProperty =
+        /// <summary>
+        /// Identifies the <see cref="IsSpellCheckEnabled"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsSpellCheckEnabledProperty =
             DependencyProperty.Register(
                 nameof(IsSpellCheckEnabled),
                 typeof(bool),
