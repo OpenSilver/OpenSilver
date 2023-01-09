@@ -430,6 +430,28 @@ namespace Windows.UI.Xaml.Controls
 
             tb.UpdateVisualStates();
         }
+
+        public bool IsSpellCheckEnabled
+        {
+            get { return (bool)GetValue(IsSpellCheckEnabledProperty); }
+            set { SetValue(IsSpellCheckEnabledProperty, value); }
+        }
+
+        private static readonly DependencyProperty IsSpellCheckEnabledProperty =
+            DependencyProperty.Register(
+                nameof(IsSpellCheckEnabled),
+                typeof(bool),
+                typeof(TextBox),
+                new PropertyMetadata(false, OnIsSpellCheckEnabledChanged));
+
+        private static void OnIsSpellCheckEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var tb = (TextBox)d;
+            if (tb._textViewHost != null)
+            {
+                tb._textViewHost.View.OnIsSpellCheckEnabledChanged((bool)e.NewValue);
+            }
+        }
         
         public string SelectedText
         {
