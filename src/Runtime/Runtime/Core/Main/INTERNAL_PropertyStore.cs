@@ -814,18 +814,7 @@ namespace CSHTML5.Internal
                         }
                         if (cssEquivalent.DomElement != null)
                         {
-                            if (newValue is ICanConvertToCSSValue)
-                            {
-                                cssEquivalent.Value = (finalInstance, value) => { return ((ICanConvertToCSSValue)value).ConvertToCSSValue(); };
-                            }
-                            if (cssEquivalent.Value == null && newValue is ICanConvertToCSSValues)
-                            {
-                                cssEquivalent.Values = (finalInstance, value) => { return ((ICanConvertToCSSValues)value).ConvertToCSSValues(sender); };
-                            }
-                            if (cssEquivalent.Value == null)
-                            {
-                                cssEquivalent.Value = (finalInstance, value) => { return value ?? ""; }; // Default value
-                            }
+                            cssEquivalent.Value ??= (finalInstance, value) => { return value ?? ""; }; // Default value
                             if (cssEquivalent.Values != null)
                             {
                                 List<object> cssValues = cssEquivalent.Values(sender, newValue);

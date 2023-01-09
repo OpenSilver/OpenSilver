@@ -27,10 +27,8 @@ namespace Windows.UI.Xaml.Media
     /// Paints an area with a solid color.
     /// </summary>
     [ContentProperty("Color")]
-    public sealed class SolidColorBrush : Brush, ICloneOnAnimation
+    public sealed class SolidColorBrush : Brush
     {
-        bool _isAlreadyAClone = false;
-
         /// <summary>
         /// Initializes a new instance of the SolidColorBrush class with no color.
         /// </summary>
@@ -107,15 +105,11 @@ namespace Windows.UI.Xaml.Media
             return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
         }
 
-        public object Clone()
-        {
-            return new SolidColorBrush(this.Color) { _isAlreadyAClone = true };
-        }
+        public object Clone() => new SolidColorBrush(Color);
 
-        public bool IsAlreadyAClone()
-        {
-            return _isAlreadyAClone;
-        }
+        [Obsolete("Unused.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool IsAlreadyAClone() => false;
 
         public override string ToString()
         {

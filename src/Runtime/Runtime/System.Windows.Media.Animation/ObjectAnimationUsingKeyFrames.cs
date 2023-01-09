@@ -111,44 +111,7 @@ namespace Windows.UI.Xaml.Media.Animation
         internal override void GetTargetInformation(IterationParameters parameters)
         {
             _parameters = parameters;
-            DependencyObject target;
-            PropertyPath propertyPath;
-            DependencyObject targetBeforePath;
-            GetPropertyPathAndTargetBeforePath(parameters, out targetBeforePath, out propertyPath);
-            DependencyObject parentElement = targetBeforePath; //this will be the parent of the clonable element (if any).
-            foreach (Tuple<DependencyObject, DependencyProperty, int?> element in GoThroughElementsToAccessProperty(propertyPath, targetBeforePath))
-            {
-                DependencyObject depObject = element.Item1;
-                DependencyProperty depProp = element.Item2;
-                int? index = element.Item3;
-                if (depObject is ICloneOnAnimation)
-                {
-                    if (!((ICloneOnAnimation)depObject).IsAlreadyAClone())
-                    {
-                        object clone = ((ICloneOnAnimation)depObject).Clone();
-                        if (index != null)
-                        {
-#if BRIDGE
-                            parentElement.GetType().GetProperty("Item").SetValue(parentElement, clone, new object[] { index });
-#else
-                            //JSIL does not support SetValue(object, object, object[])
-#endif
-                        }
-                        else
-                        {
-                            parentElement.SetValue(depProp, clone);
-                        }
-                    }
-                    break;
-                }
-                else
-                {
-                    parentElement = depObject;
-                }
-            }
-
-            GetTargetElementAndPropertyInfo(parameters, out target, out propertyPath);
-
+            GetTargetElementAndPropertyInfo(parameters, out DependencyObject target, out PropertyPath propertyPath);
             _propertyContainer = target;
             _targetProperty = propertyPath;
             _propDp = GetProperty(_propertyContainer, _targetProperty);

@@ -1077,9 +1077,6 @@
 		<Compile Include="System.Windows\GridUnitType.cs" />
 		<Compile Include="System.Windows\HorizontalAlignment.cs" />
 		<Compile Include="System.Windows\Host.cs" />
-		<Compile Include="System.Windows\ICanConvertToCSSValue.cs" />
-		<Compile Include="System.Windows\ICanConvertToCSSValues.cs" />
-		<Compile Include="System.Windows\ICloneOnAnimation.cs" />
 		<Compile Include="System.Windows\IHasAccessToPropertiesWhereItIsUsed.cs" />
 		<Compile Include="System.Windows\MessageBox.cs" />
 		<Compile Include="System.Windows\MessageBoxButton.cs" />
