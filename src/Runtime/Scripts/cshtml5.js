@@ -1332,14 +1332,6 @@ if (!Array.from) {
 // INITIALIZE
 //------------------------------
 
-
-//window.addEventListener('load', function () {
-//    if (typeof FastClick !== 'undefined') {
-//        new FastClick(document.body);
-//    }
-//}, false);
-
-
 var jsilConfig = {
     printStackTrace: false,
     libraryRoot: "Libraries/",
