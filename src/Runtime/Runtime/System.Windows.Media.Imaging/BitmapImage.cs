@@ -41,17 +41,17 @@ namespace Windows.UI.Xaml.Media.Imaging
             UriSource = uriSource;
         }
 
-        internal override Task<string> GetDataStringAsync()
+        internal override Task<string> GetDataStringAsync(UIElement parent)
         {
             if (UriSource != null)
             {
                 return Task.FromResult(
                     INTERNAL_UriHelper.ConvertToHtml5Path(
                         UriSource.OriginalString,
-                        InheritanceContext as UIElement));
+                        parent));
             }
 
-            return base.GetDataStringAsync();
+            return base.GetDataStringAsync(parent);
         }
 
         public string INTERNAL_NameOfAssemblyThatSetTheSourceUri; // Useful to convert relative URI to absolute URI.

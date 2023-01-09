@@ -219,10 +219,10 @@ namespace Windows.UI.Xaml.Media.Imaging
 
         internal override int PixelWidthInternal => _pixelWidth;
 
-        internal override async Task<string> GetDataStringAsync()
+        internal override async Task<string> GetDataStringAsync(UIElement parent)
         {
             await WaitToInitialize();
-            return await base.GetDataStringAsync();
+            return await base.GetDataStringAsync(parent);
         }
 
         private interface IWriteableBitmapImpl

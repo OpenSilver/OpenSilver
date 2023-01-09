@@ -132,11 +132,17 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Control), 
                 new PropertyMetadata((object)null)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Name = new List<string>(3) { "background", "backgroundColor", "backgroundColorAlpha" },
-                    },
+                    MethodToUpdateDom2 = UpdateDomOnBackgroundChanged,
                 });
+
+        private static void UpdateDomOnBackgroundChanged(DependencyObject d, object oldValue, object newValue)
+        {
+            var control = (Control)d;
+            if (!control.HasTemplate)
+            {
+                _ = Panel.RenderBackgroundAsync(control, (Brush)newValue);
+            }
+        }
 
         internal bool INTERNAL_IsLegacyVisualStates
         {
@@ -291,12 +297,29 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Control), 
                 new PropertyMetadata(new SolidColorBrush(Colors.Black))
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
-                    {
-                        Name = new List<string> { "color", "colorAlpha" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    }
+                    MethodToUpdateDom2 = UpdateDomOnForegroundChanged,
                 });
+
+        private static void UpdateDomOnForegroundChanged(DependencyObject d, object oldValue, object newValue)
+        {
+            var control = (Control)d;
+            var cssStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(control);
+            switch (newValue)
+            {
+                case SolidColorBrush solid:
+                    cssStyle.color = solid.INTERNAL_ToHtmlString();
+                    break;
+
+                case null:
+                    cssStyle.color = string.Empty;
+                    break;
+
+                default:
+                    // GradientBrush, ImageBrush and custom brushes are not supported.
+                    // Keep using old brush.
+                    break;
+            }
+        }
 
         //-----------------------
         // FONTFAMILY

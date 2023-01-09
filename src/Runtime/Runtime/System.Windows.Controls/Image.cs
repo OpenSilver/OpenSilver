@@ -161,7 +161,7 @@ namespace Windows.UI.Xaml.Controls
             if (Source != null)
             {
                 Loaded += Image_Loaded;
-                var imageSrc = await Source.GetDataStringAsync();
+                var imageSrc = await Source.GetDataStringAsync(this);
                 if (!string.IsNullOrEmpty(imageSrc))
                 {
                     INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc, true);

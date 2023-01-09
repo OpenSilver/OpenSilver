@@ -13,8 +13,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -30,7 +32,7 @@ namespace Windows.UI.Xaml.Media
     /// Paints an area with a radial gradient. A focal point defines the beginning
     /// of the gradient, and a circle defines the end point of the gradient.
     /// </summary>
-    public sealed partial class RadialGradientBrush : GradientBrush, ICanConvertToCSSValues
+    public sealed class RadialGradientBrush : GradientBrush
     {
         /// <summary>
         /// Initializes a new instance of the System.Windows.Media.RadialGradientBrush
@@ -148,6 +150,9 @@ namespace Windows.UI.Xaml.Media
                 typeof(RadialGradientBrush), 
                 new PropertyMetadata(0.5));
 
+        internal override Task<string> GetDataStringAsync(UIElement parent)
+            => Task.FromResult(INTERNAL_ToHtmlString(parent));
+
         private string GetGradientStopsString()
         {
             return string.Join(", ", 
@@ -155,10 +160,10 @@ namespace Windows.UI.Xaml.Media
                              .Select(gs => gs.Color.INTERNAL_ToHtmlString(this.Opacity) + gs.Offset * 100 + "%"));
         }
 
-        internal List<object> INTERNAL_ToHtmlString(DependencyObject parent)
+        internal string INTERNAL_ToHtmlString(DependencyObject parent)
         {
-      //      background-image: radial-gradient(50% 50% at 50% 100%,
-      //blue 0%, white 10%, purple 20%, purple 99%, black 100%);
+            // background-image: radial-gradient(50% 50% at 50% 100%,
+            // blue 0%, white 10%, purple 20%, purple 99%, black 100%);
             string gradientStopsString = GetGradientStopsString();
 
             string percentageSymbol = "%";
@@ -182,48 +187,22 @@ namespace Windows.UI.Xaml.Media
             {
                 gradientString = "repeating-" + gradientString;
             }
-            List<object> returnValues = new List<object>();
-            returnValues.Add("-webkit-" + gradientString);
-            returnValues.Add("-o-" + gradientString);
-            returnValues.Add("-moz-" + gradientString);
-            returnValues.Add(gradientString);
-            return returnValues;
+
+            return gradientString;
         }
 
+        [Obsolete("Unused.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {
-            return (List<object>)INTERNAL_ToHtmlString(parent);
+            string gradientString = INTERNAL_ToHtmlString(parent);
+            return new List<object>(4)
+            {
+                "-webkit-" + gradientString,
+                "-o-" + gradientString,
+                "-moz-" + gradientString,
+                gradientString,
+            };
         }
-
-        #region not implemented
-        
-        //// Returns:
-        ////     A modifiable clone of the current object. The cloned object's System.Windows.Freezable.IsFrozen
-        ////     property will be false even if the source's System.Windows.Freezable.IsFrozen
-        ////     property was true.
-        ///// <summary>
-        ///// Creates a modifiable clone of this System.Windows.Media.RadialGradientBrush,
-        ///// making deep copies of this object's values. When copying dependency properties,
-        ///// this method copies resource references and data bindings (but they might
-        ///// no longer resolve) but not animations or their current values.
-        ///// </summary>
-        ///// <returns></returns>
-        //public RadialGradientBrush Clone();
-
-        //// Returns:
-        ////     A modifiable clone of the current object. The cloned object's System.Windows.Freezable.IsFrozen
-        ////     property will be false even if the source's System.Windows.Freezable.IsFrozen
-        ////     property was true.
-        ///// <summary>
-        ///// Creates a modifiable clone of this System.Windows.Media.RadialGradientBrush
-        ///// object, making deep copies of this object's current values. Resource references,
-        ///// data bindings, and animations are not copied, but their current values are.
-        ///// </summary>
-        ///// <returns></returns>
-        //public RadialGradientBrush CloneCurrentValue();
-        //protected override Freezable CreateInstanceCore();
-
-
-        #endregion
     }
 }

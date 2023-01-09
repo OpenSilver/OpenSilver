@@ -14,7 +14,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CSHTML5.Internal;
+
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml.Controls;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -91,61 +98,79 @@ namespace Windows.UI.Xaml.Media
 
                 foreach (var dependencyProperty in item.Value)
                 {
-                    PropertyMetadata propertyMetadata = dependencyProperty.GetTypeMetaData(uiElement.GetType());
-                    if (propertyMetadata.GetCSSEquivalent != null) // If the parent has a CSSEquivalent, we use it, otherwise we use the parent PropertyChanged method.
+                    var parentCssEquivalents = new List<CSSEquivalent>();
+                    if (dependencyProperty == Border.BorderBrushProperty)
                     {
-                        var parentPropertyCSSEquivalent = propertyMetadata.GetCSSEquivalent(uiElement);
-                        if (parentPropertyCSSEquivalent != null)
+                        if (brush is LinearGradientBrush)
                         {
-                            result.Add(new()
+                            parentCssEquivalents.Add(new CSSEquivalent
                             {
-                                Name = parentPropertyCSSEquivalent.Name,
-                                ApplyAlsoWhenThereIsAControlTemplate = parentPropertyCSSEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
-                                Value = parentPropertyToValueToHtmlConverter(parentPropertyCSSEquivalent),
-                                DomElement = parentPropertyCSSEquivalent.DomElement ?? uiElement.INTERNAL_OuterDomElement,
-                                UIElement = uiElement
+                                Name = new List<string>(1) { "border-image-source" },
+                            });
+                            parentCssEquivalents.Add(new CSSEquivalent
+                            {
+                                Name = new List<string>(1) { "border-image-slice" },
+                                Value = (d, value) => { return "1"; },
+                            });
+                        }
+                        else
+                        {
+                            parentCssEquivalents.Add(new CSSEquivalent
+                            {
+                                Name = new List<string>(1) { "borderColor" },
+                                Value = (inst, value) => value ?? "transparent"
                             });
                         }
                     }
-                    else if (propertyMetadata.GetCSSEquivalents != null)
+                    else if (dependencyProperty == Border.BackgroundProperty ||
+                        dependencyProperty == Panel.BackgroundProperty ||
+                        dependencyProperty == Control.BackgroundProperty)
                     {
-                        var parentPropertyCSSEquivalents = propertyMetadata.GetCSSEquivalents(uiElement);
-                        foreach (var parentPropertyCSSEquivalent in parentPropertyCSSEquivalents)
+                        parentCssEquivalents.Add(new CSSEquivalent
                         {
-                            if (parentPropertyCSSEquivalent is null)
-                            {
-                                continue;
-                            }
-
-                            result.Add(new()
-                            {
-                                Name = parentPropertyCSSEquivalent.Name,
-                                ApplyAlsoWhenThereIsAControlTemplate = parentPropertyCSSEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
-                                Value = parentPropertyToValueToHtmlConverter(parentPropertyCSSEquivalent),
-                                DomElement = parentPropertyCSSEquivalent.DomElement ?? uiElement.INTERNAL_OuterDomElement,
-                                UIElement = uiElement
-                            });
-                        }
+                            Name = new List<string>(3) { "background", "backgroundColor", "backgroundColorAlpha" },
+                        });
+                    }
+                    else if (dependencyProperty == Control.ForegroundProperty)
+                    {
+                        parentCssEquivalents.Add(new CSSEquivalent
+                        {
+                            Name = new List<string>(2) { "color", "colorAlpha" },
+                            ApplyAlsoWhenThereIsAControlTemplate = true,
+                        });
                     }
                     else
                     {
-                        //we want to create a CSSEquivalent that will just make the UIElement call the property callback if any:
-                        if (propertyMetadata.PropertyChangedCallback != null)
+                        parentCssEquivalents.Add(new()
                         {
-                            result.Add(new()
-                            {
-                                UIElement = uiElement,
-                                CallbackMethod = propertyMetadata.PropertyChangedCallback,
-                                DependencyProperty = dependencyProperty
-                            });
-                        }
+                            UIElement = uiElement,
+                            CallbackMethod = dependencyProperty.GetMetadata(uiElement.GetType()).PropertyChangedCallback,
+                            DependencyProperty = dependencyProperty
+                        });
+                    }
+
+                    foreach (var cssEquivalent in parentCssEquivalents)
+                    {
+                        result.Add(new()
+                        {
+                            Name = cssEquivalent.Name,
+                            ApplyAlsoWhenThereIsAControlTemplate = cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
+                            Value = parentPropertyToValueToHtmlConverter(cssEquivalent),
+                            DomElement = cssEquivalent.DomElement ?? uiElement.INTERNAL_OuterDomElement,
+                            UIElement = uiElement,
+                            DependencyProperty = cssEquivalent.DependencyProperty,
+                            CallbackMethod = cssEquivalent.CallbackMethod,
+                        });
                     }
                 }
             }
             return result;
         }
 
-        #region Transform, RelativeTransform (Not supported yet)
+        internal virtual Task<string> GetDataStringAsync(UIElement parent)
+            => Task.FromResult(string.Empty);
+
+#region Transform, RelativeTransform (Not supported yet)
         /// <summary>Identifies the <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property. </summary>
         /// <returns>The <see cref="P:System.Windows.Media.Brush.RelativeTransform" /> dependency property identifier.</returns>
         [OpenSilver.NotImplemented]
@@ -172,6 +197,6 @@ namespace Windows.UI.Xaml.Media
             get { return (Transform)GetValue(TransformProperty); }
             set { SetValue(TransformProperty, value); }
         }
-        #endregion
+#endregion
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,12 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -32,7 +31,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Paints an area with a linear gradient.
     /// </summary>
-    public sealed partial class LinearGradientBrush : GradientBrush, ICanConvertToCSSValues
+    public sealed class LinearGradientBrush : GradientBrush
     {
         public LinearGradientBrush() { }
 
@@ -103,6 +102,9 @@ namespace Windows.UI.Xaml.Media
         {
             ((LinearGradientBrush)d).RecalculateAngle();
         }
+
+        internal override Task<string> GetDataStringAsync(UIElement parent)
+            => Task.FromResult(INTERNAL_ToHtmlString(parent));
 
         private void RecalculateAngle()
         {
@@ -400,7 +402,7 @@ namespace Windows.UI.Xaml.Media
             gradientStopsString = GetOffsetsString(startPointPercentage, endPointPercentage, startToEndPercentage, "%");
         }
 
-        internal List<object> INTERNAL_ToHtmlString(DependencyObject parent)
+        internal string INTERNAL_ToHtmlString(DependencyObject parent)
         {
             double alpha;
             string gradientStopsString;
@@ -435,11 +437,7 @@ namespace Windows.UI.Xaml.Media
 
             double angle = alpha * 180 / Math.PI;
 
-#if CSHTML5BLAZOR
-            if (!CSHTML5.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (!CSHTML5.Interop.IsRunningInTheSimulator)
-#endif
+            if (!OpenSilver.Interop.IsRunningInTheSimulator)
             {
                 // In the browsers, the angle goes in the opposite direction of that of the Simulator,
                 // and 0 degrees is not in the same position so we fix it:
@@ -448,12 +446,8 @@ namespace Windows.UI.Xaml.Media
 
             string gradientType = this.SpreadMethod == GradientSpreadMethod.Repeat ? "repeating-linear-gradient" : "linear-gradient";
             string baseString = gradientType + "(" + angle.ToInvariantString() + "deg, " + gradientStopsString + ")";
-            List<object> returnValues = new List<object>();
-            returnValues.Add("-webkit-" + baseString);
-            returnValues.Add("-o-" + baseString);
-            returnValues.Add("-moz-" + baseString);
-            returnValues.Add(baseString);
-            return returnValues;
+
+            return baseString;
         }
 
         private string GetOffsetsString(double startPointPercentage, double endPointPercentage, double startToEndPercentage, string percentageSymbol)
@@ -566,9 +560,18 @@ namespace Windows.UI.Xaml.Media
             return gradientStopsString;
         }
 
+        [Obsolete("Unused.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {
-            return (List<object>)INTERNAL_ToHtmlString(parent);
+            string baseString = INTERNAL_ToHtmlString(parent);
+            return new List<object>(4)
+            {
+                "-webkit-" + baseString,
+                "-o-" + baseString,
+                "-moz-" + baseString,
+                baseString,
+            };
         }
     }
 }

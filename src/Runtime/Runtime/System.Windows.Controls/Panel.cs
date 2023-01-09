@@ -26,11 +26,9 @@ using OpenSilver.Internal.Controls;
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 #else
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 #if MIGRATION
@@ -266,58 +264,23 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Panel),
                 new PropertyMetadata((object)null)
                 {
-                    GetCSSEquivalent = (instance) =>
-                    {
-                        if (instance is ImageBrush imageBrush)
-                        {
-                            return null;
-                        }
-                        return new CSSEquivalent()
-                        {
-                            Name = new List<string> { "background", "backgroundColor", "backgroundColorAlpha" },
-                        };
-                    },
-                    MethodToUpdateDom = async (d, e) =>
+                    MethodToUpdateDom = (d, e) =>
                     {
                         var panel = (Panel)d;
-                        if (e is ImageBrush imageBrush)
-                        {
-                            if (imageBrush.ImageSource is WriteableBitmap)
-                            {
-                                await ((WriteableBitmap)imageBrush.ImageSource).WaitToInitialize();
-                            }
-                            SetImageBrushRelatedBackgroundProperties(panel, imageBrush);
-                        }
-                        UIElement.SetPointerEvents(panel);
+                        _ = RenderBackgroundAsync(panel, (Brush)e);
+                        SetPointerEvents(panel);
                     },
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
                 });
 
-        /// <summary>
-        /// If the Background property of some controls (Panel, Border) is ImageBrush, 
-        /// to visualize similar as SilverLight for varisous Stretch values we need to set
-        /// HTML tag's background-size, background-repeat and background-position values.
-        /// </summary>
-        /// <param name="element">The UIElement to which we are setting background image</param>
-        /// <param name="imageBrush">The ImageBrush</param>
-        internal static void SetImageBrushRelatedBackgroundProperties(UIElement element, ImageBrush imageBrush)
+        internal static async Task RenderBackgroundAsync(UIElement uie, Brush brush)
         {
-            string cssSize = "auto";
-            switch (imageBrush.Stretch)
+            Debug.Assert(uie != null);
+
+            if (uie.INTERNAL_OuterDomElement is not null)
             {
-                case Stretch.Fill: cssSize = "100% 100%"; break;
-                case Stretch.Uniform: cssSize = "contain"; break;
-                case Stretch.UniformToFill: cssSize = "cover"; break;
+                string background = brush is not null ? await brush.GetDataStringAsync(uie) : string.Empty;
+                INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(uie).background = background;
             }
-
-            string domUid = ((INTERNAL_HtmlDomElementReference)element.INTERNAL_OuterDomElement).UniqueIdentifier;
-            string backProperties = $"e.style.background = \"{imageBrush.INTERNAL_ToHtmlString(element)}\";" +
-                $"e.style.backgroundSize = \"{cssSize}\";" +
-                "e.style.backgroundRepeat = \"no-repeat\";" +
-                "e.style.backgroundPosition = \"center center\";";
-
-            string javaScriptCodeToExecute = $"var e = document.getElementById(\"{domUid}\");if (e) {{ {backProperties} }};";
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
         /// <summary>

@@ -25,10 +25,10 @@ namespace Windows.UI.Xaml.Media
     /// Provides an object source type for Source and ImageSource.
     /// </summary>
     [TypeConverter(typeof(ImageSourceConverter))]
-    public abstract partial class ImageSource : DependencyObject
+    public abstract class ImageSource : DependencyObject
     {
         internal ImageSource() { }
 
-        internal abstract Task<string> GetDataStringAsync();
+        internal abstract Task<string> GetDataStringAsync(UIElement parent);
     }
 }

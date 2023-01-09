@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,11 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Markup;
-#if !MIGRATION
-using Windows.UI.Xaml.Controls;
-#endif
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -31,7 +27,7 @@ namespace Windows.UI.Xaml.Media
     /// Paints an area with a solid color.
     /// </summary>
     [ContentProperty("Color")]
-    public sealed partial class SolidColorBrush : Brush, ICanConvertToCSSValue, ICloneOnAnimation
+    public sealed class SolidColorBrush : Brush, ICloneOnAnimation
     {
         bool _isAlreadyAClone = false;
 
@@ -99,42 +95,13 @@ namespace Windows.UI.Xaml.Media
             }
             );
 
-
-        //todo: put back the Color_Changed method and use PropertiesWhereUsed to do something (only when there is no CSSEquivalent?) OR do something in the GetCSSEquivalents above.
-
-
-
-        //private static void Color_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    SolidColorBrush brush = (SolidColorBrush)d;
-        //    PropertyMetadata metaData = ColorProperty.GetTypeMetaData(typeof(SolidColorBrush));
-        //    List<CSSEquivalent> cssEquivalents = metaData.GetCSSEquivalents(brush);
-        //    Color newValue = (Color)e.NewValue;
-        //    foreach (CSSEquivalent cssEquivalent in cssEquivalents)
-        //    {
-        //        if (cssEquivalent.ApplyWhenControlHasTemplate) //Note: this is to handle the case of a Control with a ControlTemplate (some properties must not be applied on the control itself)
-        //        {
-        //            INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newValue.INTERNAL_ToHtmlString(brush.Opacity));
-        //        }
-        //    }
-        //}
-
-
         internal string INTERNAL_ToHtmlString()
         {
             return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
         }
 
-        ///// <summary>
-        ///// Intended to be called by objects that use the brush in order to apply the brush.
-        ///// </summary>
-        //public void Render(DependencyObject parentObjectWhereTheBrushIsUsed, DependencyProperty parentPropertyWhereTheBrushIsUsed)
-        //{
-        //    PropertyMetadata metaData = parentPropertyWhereTheBrushIsUsed.GetTypeMetaData(parentObjectWhereTheBrushIsUsed.GetType());
-        //    CSSEquivalent parentPropertyCSSEquivalent = metaData.GetCSSEquivalent(parentObjectWhereTheBrushIsUsed);
-        //    INTERNAL_HtmlDomManager.SetDomElementStyleProperty(parentPropertyCSSEquivalent.DomElement, parentPropertyCSSEquivalent.Name, this.INTERNAL_ToHtmlString());
-        //}
-
+        [Obsolete("Unused")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public object ConvertToCSSValue()
         {
             return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
@@ -150,10 +117,12 @@ namespace Windows.UI.Xaml.Media
             return _isAlreadyAClone;
         }
 
-
         public override string ToString()
         {
             return this.Color.ToString();
         }
+
+        internal override Task<string> GetDataStringAsync(UIElement parent)
+            => Task.FromResult(INTERNAL_ToHtmlString());
     }
 }

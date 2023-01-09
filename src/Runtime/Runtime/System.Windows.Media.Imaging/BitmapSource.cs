@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml.Media.Imaging
     /// <summary>
     /// Provides a source object for properties that use a bitmap.
     /// </summary>
-    public abstract partial class BitmapSource : ImageSource
+    public abstract class BitmapSource : ImageSource
     {
         bool _isStreamAsBase64StringValid = false;
 
@@ -107,7 +107,7 @@ namespace Windows.UI.Xaml.Media.Imaging
             INTERNAL_DataURL = dataUrl;
         }
 
-        internal override Task<string> GetDataStringAsync()
+        internal override Task<string> GetDataStringAsync(UIElement parent)
         {
             string data = string.Empty;
             if (INTERNAL_StreamSource != null)
