@@ -437,6 +437,9 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
             contentEditableDivStyle.background = "solid transparent";
             contentEditableDivStyle.cursor = "text";
 
+            // Disable spell check
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "spellcheck", false);
+
             // Apply TextAlignment
             UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);
 
