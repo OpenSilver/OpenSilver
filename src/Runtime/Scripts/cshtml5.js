@@ -1333,11 +1333,11 @@ if (!Array.from) {
 //------------------------------
 
 
-window.addEventListener('load', function () {
-    if (typeof FastClick !== 'undefined') {
-        new FastClick(document.body);
-    }
-}, false);
+//window.addEventListener('load', function () {
+//    if (typeof FastClick !== 'undefined') {
+//        new FastClick(document.body);
+//    }
+//}, false);
 
 
 var jsilConfig = {
