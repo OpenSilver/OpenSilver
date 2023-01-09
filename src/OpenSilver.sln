@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32002.261
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Runtime.OpenSilver", "Runtime\Runtime\Runtime.OpenSilver.csproj", "{945935AC-0649-4054-A3E3-9671441A3343}"
 EndProject
@@ -52,7 +52,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{99A3
 	ProjectSection(SolutionItems) = preProject
 		Runtime\Scripts\cshtml5.css = Runtime\Scripts\cshtml5.css
 		Runtime\Scripts\cshtml5.js = Runtime\Scripts\cshtml5.js
-		Runtime\Scripts\fastclick.js = Runtime\Scripts\fastclick.js
 		Runtime\Scripts\flatpickr.css = Runtime\Scripts\flatpickr.css
 		Runtime\Scripts\flatpickr.js = Runtime\Scripts\flatpickr.js
 		Runtime\Scripts\html2canvas.js = Runtime\Scripts\html2canvas.js

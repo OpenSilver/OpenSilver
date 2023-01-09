@@ -57,7 +57,6 @@
     <!-- CSHTML5 JS and CSS files -->
     <file src="../../src/Runtime/Scripts/cshtml5.css" target="js_css/cshtml5.css" />
     <file src="../../src/Runtime/Scripts/cshtml5.js" target="js_css/cshtml5.js" />
-    <file src="../../src/Runtime/Scripts/fastclick.js" target="js_css/fastclick.js" />
     <file src="../../src/Runtime/Scripts/flatpickr.css" target="js_css/flatpickr.css" />
     <file src="../../src/Runtime/Scripts/flatpickr.js" target="js_css/flatpickr.js" />
     <file src="../../src/Runtime/Scripts/velocity.js" target="js_css/velocity.js" />

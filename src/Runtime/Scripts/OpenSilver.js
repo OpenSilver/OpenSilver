@@ -36,7 +36,6 @@
     'libs/flatpickr.css',
     'libs/quill.core.css',
     'libs/cshtml5.js',
-    'libs/fastclick.js',
     'libs/velocity.js',
     'libs/flatpickr.js',
     'libs/ResizeSensor.js',
