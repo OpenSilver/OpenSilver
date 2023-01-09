@@ -16,6 +16,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
 #if MIGRATION
@@ -84,7 +85,7 @@ namespace Windows.UI.Xaml
         /// <param name="propertySetLocalValue">The function that sets the Local value on the given element.</param>
         /// <param name="propertyGetVisualState">The function that gets the VisualState value on the given element.</param>
         /// <ignore/>
-        [Obsolete("Please use PropertyPath(string) instead. This constructor will be removed in a future release.")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Please use PropertyPath(string) instead.")]
         public PropertyPath(string path, string dependencyPropertyName, Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> accessPropertyContainer,
             Action<DependencyObject, object> propertySetVisualState,
             Action<DependencyObject, object> propertySetAnimationValue,

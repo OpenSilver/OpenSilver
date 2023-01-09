@@ -15,6 +15,7 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Windows.Input;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -422,28 +423,28 @@ namespace Windows.UI.Xaml.Controls
 
         #region Obsoletes
 
-        [Obsolete("Use SelectedItemBackground instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush SelectedItemBackgroundBrush
         {
             get { return SelectedItemBackground; }
             set { SelectedItemBackground = value; }
         }
 
-        [Obsolete("Use SelectedItemForeground instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush SelectedItemForegroundBrush
         {
             get { return SelectedItemForeground; }
             set { SelectedItemForeground = value; }
         }
 
-        [Obsolete("Use RowBackground instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush UnselectedItemBackgroundBrush
         {
             get { return RowBackground; }
             set { RowBackground = value; }
         }
 
-        [Obsolete("Use UnselectedItemForeground instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush UnselectedItemForegroundBrush
         {
             get { return UnselectedItemForeground; }

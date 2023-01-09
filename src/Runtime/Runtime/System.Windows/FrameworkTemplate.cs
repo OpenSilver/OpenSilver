@@ -86,7 +86,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        [Obsolete("Deprecated. Please use the Template property instead.", true)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Please use the Template property instead.", true)]
         public void SetMethodToInstantiateFrameworkTemplate(Func<FrameworkElement, TemplateInstance> methodToInstantiateFrameworkTemplate)
         {
             throw new NotSupportedException("Deprecated. Please use the Template property instead.");

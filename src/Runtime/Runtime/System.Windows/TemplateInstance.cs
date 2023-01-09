@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -22,7 +23,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Defines a generated instance of a FrameworkTemplate.
     /// </summary>
-    [Obsolete("Deprecated. This will be removed in future releases.")]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
     public class TemplateInstance
     {
         /// <summary>

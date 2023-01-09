@@ -112,7 +112,7 @@ namespace Windows.UI.Xaml.Media
                 _ => "100% 100%",
             };
 
-        [Obsolete("Unused.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {

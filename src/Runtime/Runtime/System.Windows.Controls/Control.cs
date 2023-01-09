@@ -82,7 +82,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Derived classes can set this flag in their constructor to prevent the "Template" property from being applied.
         /// </summary>
-        [Obsolete("This value is ignored. ControlTemplate is always applied.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         protected bool INTERNAL_DoNotApplyControlTemplate = false;
 
         /// <summary>

@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -195,7 +196,7 @@ namespace Windows.UI.Text
         /// </summary>
         private int RealWeight => _weight + 400;
 
-        [Obsolete("Unused")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ushort Weight;
     }

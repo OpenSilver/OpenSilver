@@ -14,6 +14,7 @@
 
 
 using System;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -110,7 +111,7 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public abstract GeneralTransform Inverse { get; }
 
-        [Obsolete("Use TryTransform() instead.", true)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use TryTransform() instead.", true)]
         protected virtual Point INTERNAL_TransformPoint(Point point)
         {
             throw new NotImplementedException();

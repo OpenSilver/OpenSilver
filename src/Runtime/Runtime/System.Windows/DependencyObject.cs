@@ -302,7 +302,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         /// <param name="dependencyProperty">The identifier of the dependency property to set.</param>
         /// <param name="value">The new local value.</param>
-        [Obsolete("Use SetCurrentValue")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use SetCurrentValue instead.")]
         public void SetLocalValue(DependencyProperty dependencyProperty, object value)
         {
             this.SetCurrentValue(dependencyProperty, value);
@@ -315,7 +315,7 @@ namespace Windows.UI.Xaml
             INTERNAL_PropertyStore.SetValueCommon(storage, value, true);
         }
 
-        [Obsolete("Use CoerceValue")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue instead.")]
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
             INTERNAL_PropertyStorage storage;
@@ -498,7 +498,7 @@ namespace Windows.UI.Xaml
         /// Refreshes the value of the given DependencyProperty on this DependencyObject so that it fits the coercion that should be applied on it.
         /// </summary>
         /// <param name="dependencyProperty">The dependencyProperty whose value we want to refresh.</param>
-        [Obsolete("Use CoerceValue")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue.")]
         public void Coerce(DependencyProperty dependencyProperty)
         {
             this.CoerceValue(dependencyProperty);

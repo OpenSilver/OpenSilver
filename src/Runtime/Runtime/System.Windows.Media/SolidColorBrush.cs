@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -98,7 +99,7 @@ namespace Windows.UI.Xaml.Media
             return this.Color.INTERNAL_ToHtmlString(this.Opacity); //todo-perfs: every time, accessing the "Opacity" property may be slow.
         }
 
-        [Obsolete("Unused")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object ConvertToCSSValue()
         {
@@ -107,7 +108,7 @@ namespace Windows.UI.Xaml.Media
 
         public object Clone() => new SolidColorBrush(Color);
 
-        [Obsolete("Unused.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsAlreadyAClone() => false;
 

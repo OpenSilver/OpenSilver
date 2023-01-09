@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Globalization;
@@ -289,7 +290,7 @@ namespace Windows.UI.Xaml.Data
         /// Do not use this property.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This is unused and will be removed in future releases.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public TemplateInstance TemplateOwner { get; set; }
 
 #region Validation

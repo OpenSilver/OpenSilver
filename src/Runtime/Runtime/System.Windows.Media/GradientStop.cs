@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -95,7 +96,7 @@ namespace Windows.UI.Xaml.Media
 
         public object Clone() => new GradientStop { Color = Color, Offset = Offset };
 
-        [Obsolete("Unused.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsAlreadyAClone() => false;
     }

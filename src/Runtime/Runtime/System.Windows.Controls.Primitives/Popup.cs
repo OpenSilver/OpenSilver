@@ -21,6 +21,7 @@ using DotNetForHtml5.Core;
 using OpenSilver.Internal.Controls;
 using System.Collections;
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -141,7 +142,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Unused. This will be removed in a later release.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public bool INTERNAL_AllowDisableClickTransparency = true;
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()

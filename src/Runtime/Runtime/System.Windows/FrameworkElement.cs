@@ -355,7 +355,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         internal virtual FrameworkElement StateGroupsRoot => TemplateChild;
 
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         internal Style INTERNAL_defaultStyle;
 
         private ResourceDictionary _resources;
@@ -1350,7 +1350,7 @@ namespace Windows.UI.Xaml
 
 #endregion
 
-        [Obsolete("Use DefaultStyleKey")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use DefaultStyleKey instead.")]
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
         {
             INTERNAL_defaultStyle = defaultStyle;

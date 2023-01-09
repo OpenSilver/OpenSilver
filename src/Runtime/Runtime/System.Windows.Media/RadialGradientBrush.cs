@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -191,7 +192,7 @@ namespace Windows.UI.Xaml.Media
             return gradientString;
         }
 
-        [Obsolete("Unused.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {

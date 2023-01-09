@@ -14,11 +14,12 @@
 
 
 using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System.Windows.Markup
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete("This will be removed. Do not use.")]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum, AllowMultiple = false, Inherited = true)]
     public partial class MethodToTranslateXamlValueToCSharpAttribute : Attribute
     {

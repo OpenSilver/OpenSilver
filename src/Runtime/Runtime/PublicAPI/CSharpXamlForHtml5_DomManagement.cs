@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenSilver.Internal;
 #if MIGRATION
 using System.Windows;
 #else
@@ -71,7 +72,7 @@ public static partial class CSharpXamlForHtml5
         /// </summary>
         /// <param name="control">The UIElement</param>
         /// <param name="htmlReprensentation">The string that defines the html representation of the UIElement.</param>
-        [Obsolete("Use HtmlPresenter instead. This will be removed in future releases.")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use HtmlPresenter instead.")]
         public static void SetHtmlRepresentation(UIElement control, string htmlReprensentation)
         {
             control.INTERNAL_HtmlRepresentation = htmlReprensentation;

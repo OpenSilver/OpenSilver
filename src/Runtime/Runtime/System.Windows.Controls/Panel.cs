@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -156,7 +157,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ProgressiveRenderingChunkSize instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ProgressiveRenderingChunkSize instead.")]
         public bool EnableProgressiveRendering
         {
             get => ProgressiveRenderingChunkSize > 0;

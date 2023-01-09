@@ -64,6 +64,7 @@
 		<Compile Include="OpenSilver\Internal\CriticalExceptions.cs" />
 		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
 		<Compile Include="OpenSilver\Internal\DependentList.cs" />
+		<Compile Include="OpenSilver\Internal\Helper.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
 		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />

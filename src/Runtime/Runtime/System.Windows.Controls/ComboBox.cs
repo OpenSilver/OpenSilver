@@ -11,10 +11,11 @@
 *  
 \*====================================================================================*/
 
-using DotNetForHtml5.Core;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using DotNetForHtml5.Core;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -61,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
         private FrameworkElement _emptyContent;
         private ItemInfo _highlightedInfo;
 
-        [Obsolete("ComboBox does not support Native ComboBox. Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
         {
             get { return false; }
@@ -86,13 +87,13 @@ namespace Windows.UI.Xaml.Controls
             return (item is ComboBoxItem);
         }
 
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         protected override SelectorItem INTERNAL_GenerateContainer(object item)
         {
             return (SelectorItem)this.GetContainerFromItem(item);
         }
 
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         protected override DependencyObject GetContainerFromItem(object item)
         {
             ComboBoxItem comboBoxItem = item as ComboBoxItem ?? new ComboBoxItem();

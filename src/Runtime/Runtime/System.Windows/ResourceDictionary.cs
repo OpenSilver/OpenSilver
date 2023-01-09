@@ -48,7 +48,7 @@ namespace Windows.UI.Xaml
     {
         #region Data
 
-        [Obsolete("Don't use this.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public bool INTERNAL_HasImplicitStyles = false;
 
         private PrivateFlags _flags = 0;

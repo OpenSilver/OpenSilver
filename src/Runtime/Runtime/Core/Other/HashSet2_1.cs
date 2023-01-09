@@ -14,6 +14,7 @@
 
 
 using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace System.Collections.Generic
 {
@@ -30,7 +31,7 @@ namespace System.Collections.Generic
         }
     }
 #else
-    [Obsolete("Use System.Collections.Generic.HashSet instead.")]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Collections.Generic.HashSet instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class HashSet2<T> : ICollection<T>, IEnumerable<T>
 #if UNIMPLEMENTED_MEMBERS

@@ -560,7 +560,7 @@ namespace Windows.UI.Xaml.Media
             return gradientStopsString;
         }
 
-        [Obsolete("Unused.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public List<object> ConvertToCSSValues(DependencyObject parent)
         {

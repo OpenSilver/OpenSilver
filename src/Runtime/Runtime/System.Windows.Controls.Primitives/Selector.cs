@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -1361,7 +1362,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets or sets the bakground color of the selected Items.
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush SelectedItemBackground
         {
             get { return (Brush)this.GetValue(Selector.SelectedItemBackgroundProperty); }
@@ -1371,7 +1372,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the SelectedItemBackground dependency property
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public static readonly DependencyProperty SelectedItemBackgroundProperty =
             DependencyProperty.Register(
                 "SelectedItemBackground",
@@ -1382,7 +1383,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets or sets the foreground color of the selected Items.
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush SelectedItemForeground
         {
             get { return (Brush)this.GetValue(Selector.SelectedItemForegroundProperty); }
@@ -1392,7 +1393,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the SelectedItemForeground dependency property
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public static readonly DependencyProperty SelectedItemForegroundProperty =
             DependencyProperty.Register(
                 "SelectedItemForeground",
@@ -1403,7 +1404,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets or sets the bakground color of the Items that are not selected.
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush RowBackground
         {
             get { return (Brush)this.GetValue(Selector.RowBackgroundProperty); }
@@ -1413,7 +1414,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the RowBackground dependency property
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public static readonly DependencyProperty RowBackgroundProperty =
             DependencyProperty.Register(
                 "RowBackground",
@@ -1425,7 +1426,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets or sets the foreground color of the Items that are not selected.
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush UnselectedItemForeground
         {
             get { return (Brush)this.GetValue(Selector.UnselectedItemForegroundProperty); }
@@ -1435,7 +1436,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Identifies the UnselectedItemForeground dependency property
         /// </summary>
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public static readonly DependencyProperty UnselectedItemForegroundProperty =
             DependencyProperty.Register(
                 "UnselectedItemForeground",
@@ -1446,14 +1447,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <summary>
         /// Gets or sets the bakground color of the Items that are not selected.
         /// </summary>
-        [Obsolete("Use RowBackground instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public Brush UnselectedItemBackground
         {
             get { return this.RowBackground; }
             set { this.RowBackground = value; }
         }
 
-        [Obsolete("Unused.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         protected bool ChangingSelectionProgrammatically { get; set; }
 
         #endregion Obsolete

@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -63,7 +64,7 @@ namespace Windows.UI.Xaml.Media
 
         private HashSet<KeyValuePair<DependencyObject, DependencyProperty>> _propertiesWhereUsedObsolete;
 
-        [Obsolete("This property is unused and will be removed in later releases.")]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
                 => _propertiesWhereUsedObsolete ??= new();
 

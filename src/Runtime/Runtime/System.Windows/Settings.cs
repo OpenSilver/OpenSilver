@@ -13,10 +13,11 @@
 \*====================================================================================*/
 
 
-using CSHTML5.Internal;
 using System;
 using System.ComponentModel;
 using System.Net;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows;
@@ -136,7 +137,7 @@ namespace System
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ProgressiveRenderingChunkSize instead.")]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use ProgressiveRenderingChunkSize instead.")]
         public bool EnableProgressiveRendering
         {
             get => Panel.GlobalProgressiveRenderingChunkSize > 0;

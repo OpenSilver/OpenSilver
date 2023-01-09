@@ -659,21 +659,21 @@ parentElement.appendChild(child);";
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public static bool IsInternetExplorer()
         {
             return false;
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public static bool IsEdge()
         {
             return false;
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete]
+        [Obsolete(Helper.ObsoleteMemberMessage)]
         public static bool IsFirefox()
         {
             return false;

@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -26,7 +27,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    [Obsolete("This interface is no longer used and will be removed in later releases.")]
+    [Obsolete(Helper.ObsoleteMemberMessage)]
     public interface IHasAccessToPropertiesWhereItIsUsed
     {
         HashSet<KeyValuePair<DependencyObject, DependencyProperty>> PropertiesWhereUsed
