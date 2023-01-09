@@ -332,6 +332,14 @@ element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
             }
         }
 
+        internal void OnIsSpellCheckEnabledChanged(bool isSpellCheckEnabled)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv != null)
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(_contentEditableDiv, "spellcheck", isSpellCheckEnabled);
+            }
+        }
+
         internal void NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength)
         {
             //todo: fix the that happens (at least in chrome) that makes the index returned be 0 when the caret is on the last line when it's empty
@@ -436,6 +444,9 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
             contentEditableDivStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             contentEditableDivStyle.background = "solid transparent";
             contentEditableDivStyle.cursor = "text";
+
+            // Disable spell check
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "spellcheck", this.Host.IsSpellCheckEnabled);
 
             // Apply TextAlignment
             UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);
