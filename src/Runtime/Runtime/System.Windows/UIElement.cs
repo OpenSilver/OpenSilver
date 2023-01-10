@@ -1694,6 +1694,11 @@ document.ondblclick = null;
                 }
 
                 Size previousDesiredSizeInMeasure = this.DesiredSize;
+
+                //we always want to be arranged, ensure arrange request
+                //doing it before OnMeasure prevents unneeded requests from children in the queue
+                InvalidateArrange();
+
                 measureInProgress = true;
                 try
                 {
@@ -1706,8 +1711,6 @@ document.ondblclick = null;
 
                 if (previousDesiredSizeInMeasure != DesiredSize)
                 {
-                    this.InvalidateArrange();
-
                     if (VisualTreeHelper.GetParent(this) is UIElement parent && !parent.measureInProgress)
                     {
                         this.InvalidateParentMeasure();
