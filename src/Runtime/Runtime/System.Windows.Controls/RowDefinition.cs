@@ -266,11 +266,6 @@ namespace Windows.UI.Xaml.Controls
             }
 
             rowDefinition.Parent?.InvalidateMeasure();
-
-            if (rowDefinition.Parent?.IsUnderCustomLayout == true)
-            {
-                rowDefinition.Parent.InvalidateArrange();
-            }
         }
 
 

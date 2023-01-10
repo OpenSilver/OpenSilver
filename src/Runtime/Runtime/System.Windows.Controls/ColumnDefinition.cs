@@ -267,11 +267,6 @@ namespace Windows.UI.Xaml.Controls
             }
 
             columnDefinition.Parent?.InvalidateMeasure();
-
-            if (columnDefinition.Parent?.IsUnderCustomLayout == true)
-            {
-                columnDefinition.Parent.InvalidateArrange();
-            }            
         }
 
         #region ActualWidth / ActualHeight
