@@ -663,11 +663,7 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnKeyDown(e);
 
-#if CSHTML5BLAZOR
-            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#else
             if (OpenSilver.Interop.IsRunningInTheSimulator)
-#endif
             {
                 // Not implemented for the simulator
                 return;
@@ -771,69 +767,26 @@ namespace Windows.UI.Xaml.Controls
 #endif
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
-            if (e.Handled)
-                return;
-
             base.OnTextInput(e);
 
-#if CSHTML5BLAZOR
-            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-#endif
+            if (e.Handled)
             {
-                // Not implemented for the simulator
+                e.PreventDefault = true;
                 return;
             }
 
-            if (this.IsReadOnly)
-                return;
-
-            if (this.MaxLength != 0 && Text.Length - SelectionLength >= this.MaxLength)
-                return;
-
-            if (e.Text == "\r")
+            if (IsReadOnly ||
+                (!AcceptsReturn && (e.Text == "\r" || e.Text == "\n")) ||
+                (MaxLength != 0 && Text.Length - SelectionLength >= MaxLength))
             {
-                if (this.AcceptsReturn == false)
-                    return;
-
-                // Not implemented for multiple text lines
+                e.PreventDefault = true;
                 return;
             }
 
-            if (this.Text.Contains("\r") || this.Text.Contains("\n"))
-            {
-                // Not implemented for multiple text lines
-                return;
-            }
-
-            this.SelectedText = e.Text;
             e.Handled = true;
         }
-        internal void INTERNAL_CheckTextInputHandled(TextCompositionEventArgs e, object jsEventArg)
-        {
-#if CSHTML5BLAZOR
-            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#else
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                // Not implemented for the simulator
-                return;
-            }
 
-            bool multiLines = this.Text.Contains("\r") || this.Text.Contains("\n");
-            bool requireNewLine = e.Text == "\r" && this.AcceptsReturn;
-            if (e.Handled == false && (requireNewLine || multiLines))
-            {
-                // Not implemented for multiple text lines
-                return;
-            }
-
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.preventDefault()");
-        }
-
-        internal void INTERNAL_TextUpdated()
+        internal sealed override void OnTextInputInternal()
         {
             if (_textViewHost != null)
             {

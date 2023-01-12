@@ -63,5 +63,7 @@ namespace Windows.UI.Xaml.Input
 		/// The text in the composition, as a <see cref="Input.TextComposition"/> object.
 		/// </returns>
 		public TextComposition TextComposition { get; internal set; }
-	}
+
+        internal bool PreventDefault { get; set; }
+    }
 }

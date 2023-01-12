@@ -84,11 +84,11 @@ namespace Windows.UI.Xaml
                     break;
 
                 case "keypress":
-                    keyboardTarget.ProcessOnInput(jsEventArg);
+                    keyboardTarget.ProcessOnKeyPress(jsEventArg);
                     break;
 
                 case "input":
-                    keyboardTarget.ProcessOnTextUpdated(jsEventArg);
+                    keyboardTarget.ProcessOnInput(jsEventArg);
                     break;
             }
         }
@@ -412,7 +412,11 @@ namespace Windows.UI.Xaml
 #endif
         }
 
-        private void ProcessOnInput(object jsEventArg)
+        private void ProcessOnInput(object jsEventArg) => OnTextInputInternal();
+
+        internal virtual void OnTextInputInternal() { }
+
+        private void ProcessOnKeyPress(object jsEventArg)
         {
             if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.keyCode").ToString(), out int keyCode))
             {
@@ -432,18 +436,10 @@ namespace Windows.UI.Xaml
 
             RaiseEvent(e);
 
-            if (this is Controls.TextBox)
+            if (e.PreventDefault)
             {
-                (this as Controls.TextBox).INTERNAL_CheckTextInputHandled(e, jsEventArg);
-            }
-        }
-
-        // This callback will be triggered textinput is not handled
-        private void ProcessOnTextUpdated(object jsEventArg)
-        {
-            if (this is Controls.TextBox)
-            {
-                (this as Controls.TextBox).INTERNAL_TextUpdated();
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.preventDefault()");
             }
         }
 

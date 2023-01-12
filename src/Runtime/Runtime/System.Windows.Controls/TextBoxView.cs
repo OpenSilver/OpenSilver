@@ -32,12 +32,10 @@ namespace Windows.UI.Xaml.Controls
     internal sealed class TextBoxView : FrameworkElement, ITextBoxView
     {
         private object _contentEditableDiv;
-        private JavascriptCallback _gotFocusCallback;
 
         internal TextBoxView(TextBox host)
         {
             Host = host ?? throw new ArgumentNullException(nameof(host));
-            Unloaded += (o, e) => DisposeJsCallbacks();
         }
 
         internal TextBox Host { get; }
@@ -84,14 +82,6 @@ namespace Windows.UI.Xaml.Controls
             // changing the order, and text will only be added when the <input> has focus. On click,
             // the focus will be redirected to the <input>, unless the click was on an element that
             // absorbs pointer events.
-
-            DisposeJsCallbacks();
-
-            _gotFocusCallback = JavascriptCallback.Create(TextBoxView_GotFocus);
-
-            string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-            string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_gotFocusCallback);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.addEventListener('click', {sAction})");
 
             UpdateDomText(Host.Text);
         }
@@ -595,13 +585,6 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
         internal string GetText()
         {
             string text = INTERNAL_HtmlDomManager.GetTextBoxText(INTERNAL_InnerDomElement) ?? string.Empty;
-            if (!Host.AcceptsReturn)
-            {
-                // This is just in case the user managed to enter multi-line text in a single-line textbox.
-                // It can happen (due to a bug) when pasting multi-line text under Interned Explorer 10.
-                text = text.Replace('\n', '\0').Replace('\r', '\0');
-            }
-
             // This is the case when the text is changed by backspace or paste.
             InvalidateMeasure();
             return text;
@@ -628,48 +611,6 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
             InvalidateMeasure();
         }
 
-        private void TextBoxView_GotFocus(object e)
-        {
-            string sE = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e);
-            bool ignoreEvent = OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.checkForDivsThatAbsorbEvents({sE})");
-            if (!ignoreEvent)
-            {
-                if (_contentEditableDiv != null)
-                {
-                    string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($@"
-if({sE}.target != {sDiv}) {{
- {sDiv}.focus()
- if (document.createRange) {{
-  let r = document.createRange();
-  r.selectNodeContents({sDiv});
-  r.collapse(false);
-  let s = window.getSelection();
-  s.removeAllRanges();
-  s.addRange(r);
- }} else if (document.selection) {{
-  let r = document.body.createTextRange();
-  r.moveToElementText({sDiv});
-  r.collapse(false);
-  r.select();
- }}
-}}");
-                    // -- Firefox, Chrome, Opera, Safari, IE 9+
-                    //Create a range (a range is a like the selection but invisible)
-                    //Select the entire contents of the element with the range
-                    //collapse the range to the end point. false means collapse to end rather than the start
-                    //get the selection object (allows you to change selection)
-                    //remove any selections already made
-                    //make the range you have just created the visible selection
-                    // -- IE 8 and lower
-                    //Create a range (a range is a like the selection but invisible)
-                    //Select the entire contents of the element with the range
-                    //collapse the range to the end point. false means collapse to end rather than the start
-                    //Select the range (make it the visible selection
-                }
-            }
-        }
-
         private static string ScrollBarVisibilityToHtmlString(ScrollBarVisibility scrollVisibility)
         {
             switch (scrollVisibility)
@@ -692,12 +633,6 @@ if({sE}.target != {sDiv}) {{
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
             Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.TextWrapping, Margin, availableSize.Width);
             return TextSize;
-        }
-
-        private void DisposeJsCallbacks()
-        {
-            _gotFocusCallback?.Dispose();
-            _gotFocusCallback = null;
         }
     }
 }
