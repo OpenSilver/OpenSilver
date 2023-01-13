@@ -780,10 +780,13 @@ namespace System.Xaml
 				name = name.Substring(idx + 1);
 				// check if it is an attachable member first, either of this type or another type
 				// Should this also check the namespace to find the correct type?
-				if (typeName == xt.InternalXmlName)
-					xm = xt.GetMember(name);
-				else
-					xm = FindAttachableMember(r.Prefix, typeName, name);
+				xm = FindAttachableMember(r.Prefix, typeName, name);
+				if (xm == null)
+				{
+					var memberType = SchemaContext.GetXamlType(new XamlTypeName(r.LookupNamespace(r.Prefix), typeName, null));
+					if (xt.CanAssignTo(memberType))
+						xm = memberType.GetMember(name);
+				}
 			}
 			else
 			{
