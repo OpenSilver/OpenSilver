@@ -569,7 +569,7 @@ namespace System.Xaml
 			var al = new Dictionary<string, MethodInfo>();
 			//var rl = new Dictionary<string,MethodInfo> ();
 			var nl = new List<string>();
-			foreach (var mi in UnderlyingType.GetRuntimeMethods())
+			foreach (var mi in UnderlyingType.GetMethods())
 			{
 				if (!mi.IsStatic)
 					continue;
