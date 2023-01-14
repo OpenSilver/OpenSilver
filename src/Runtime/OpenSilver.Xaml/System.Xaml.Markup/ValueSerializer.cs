@@ -32,7 +32,7 @@ using System.Xaml.Schema;
 
 namespace System.Xaml.Markup
 {
-	public abstract class ValueSerializer
+    internal abstract class ValueSerializer
 	{
 		public static ValueSerializer GetSerializerFor(PropertyInfo descriptor)
 		{

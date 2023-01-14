@@ -32,7 +32,7 @@ using System.Xml;
 namespace System.Xaml.Markup
 {
 	[ContentProperty("Text")]
-	public sealed class XData
+    internal sealed class XData
 	{
 		string text;
 		XmlReader reader;

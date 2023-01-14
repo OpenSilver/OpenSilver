@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 namespace System.Xaml.Markup
 {
 	[AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-	public sealed class XamlDeferLoadAttribute : Attribute
+    internal sealed class XamlDeferLoadAttribute : Attribute
 	{
 		public XamlDeferLoadAttribute(string loaderType, string contentType)
 		{

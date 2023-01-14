@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml.Schema
 {
-	public class XamlMemberInvoker
+    internal class XamlMemberInvoker
 	{
 		static readonly XamlMemberInvoker unknown = new XamlMemberInvoker();
 		Type _targetType;

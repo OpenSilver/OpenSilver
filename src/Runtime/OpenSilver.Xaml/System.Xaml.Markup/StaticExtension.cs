@@ -31,7 +31,7 @@ namespace System.Xaml.Markup
 {
 	[MarkupExtensionReturnType(typeof(object))]
 	[TypeConverter(typeof(StaticExtensionConverter))]
-	public class StaticExtension : MarkupExtension
+    internal class StaticExtension : MarkupExtension
 	{
 		public StaticExtension()
 		{

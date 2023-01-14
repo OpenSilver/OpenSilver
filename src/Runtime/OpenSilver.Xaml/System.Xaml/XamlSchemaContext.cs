@@ -37,7 +37,7 @@ using Pair = System.Collections.Generic.KeyValuePair<string, string>;
 
 namespace System.Xaml
 {
-	public class XamlSchemaContext
+    internal class XamlSchemaContext
 	{
 		public XamlSchemaContext()
 			: this(null, null)

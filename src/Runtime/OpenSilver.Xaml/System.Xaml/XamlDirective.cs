@@ -31,7 +31,7 @@ using System.Xaml.Schema;
 
 namespace System.Xaml
 {
-	public class XamlDirective : XamlMember
+    internal class XamlDirective : XamlMember
 	{
 		class DirectiveMemberInvoker : XamlMemberInvoker
 		{

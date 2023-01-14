@@ -28,7 +28,7 @@ using System.Text;
 
 namespace System.Xaml.Markup
 {
-	public interface IValueSerializerContext : IServiceProvider, ITypeDescriptorContext
+    internal interface IValueSerializerContext : IServiceProvider, ITypeDescriptorContext
 	{
 		ValueSerializer GetValueSerializerFor(PropertyInfo descriptor);
 		ValueSerializer GetValueSerializerFor(Type type);

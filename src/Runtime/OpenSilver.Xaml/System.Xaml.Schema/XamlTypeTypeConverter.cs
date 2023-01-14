@@ -29,7 +29,7 @@ using System.Xaml.Markup;
 
 namespace System.Xaml.Schema
 {
-	public class XamlTypeTypeConverter : TypeConverter
+    internal class XamlTypeTypeConverter : TypeConverter
 	{
 		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
 		{

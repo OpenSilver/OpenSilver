@@ -27,7 +27,7 @@ using System.Text;
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Class)]
-	public sealed class RuntimeNamePropertyAttribute : Attribute
+    internal sealed class RuntimeNamePropertyAttribute : Attribute
 	{
 		public RuntimeNamePropertyAttribute(string name)
 		{

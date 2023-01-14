@@ -27,9 +27,6 @@
   </metadata>
   <files>
     <!-- OpenSilver runtime -->
-    <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.dll" target="lib/netstandard2.0/OpenSilver.Xaml.dll" />
-    <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.pdb" target="lib/netstandard2.0/OpenSilver.Xaml.pdb" />
-    <file src="../../src/Runtime/OpenSilver.Xaml/bin/OpenSilver/Debug/netstandard2.0/OpenSilver.Xaml.xml" target="lib/netstandard2.0/OpenSilver.Xaml.xml" />
     <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.dll" target="lib/netstandard2.0/OpenSilver.dll" />
     <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.pdb" target="lib/netstandard2.0/OpenSilver.pdb" />
     <file src="../../src/Runtime/Runtime/bin/OpenSilver/$Configuration$/netstandard2.0/OpenSilver.xml" target="lib/netstandard2.0/OpenSilver.xml" />

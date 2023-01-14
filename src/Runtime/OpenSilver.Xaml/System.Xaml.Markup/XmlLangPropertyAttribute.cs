@@ -27,7 +27,7 @@ using System.Text;
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public sealed class XmlLangPropertyAttribute : Attribute
+    internal sealed class XmlLangPropertyAttribute : Attribute
 	{
 		public XmlLangPropertyAttribute(string name)
 		{

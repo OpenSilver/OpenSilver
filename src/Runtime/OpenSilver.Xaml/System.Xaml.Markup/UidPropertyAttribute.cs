@@ -27,7 +27,7 @@ using System.Text;
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public sealed class UidPropertyAttribute : Attribute
+    internal sealed class UidPropertyAttribute : Attribute
 	{
 		public UidPropertyAttribute(string name)
 		{

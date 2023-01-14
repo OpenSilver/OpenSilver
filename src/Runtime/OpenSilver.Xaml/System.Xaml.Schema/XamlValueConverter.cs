@@ -29,7 +29,7 @@ using System.Text;
 
 namespace System.Xaml.Schema
 {
-	public class XamlValueConverter<TConverterBase> : IEquatable<XamlValueConverter<TConverterBase>>
+    internal class XamlValueConverter<TConverterBase> : IEquatable<XamlValueConverter<TConverterBase>>
 		where TConverterBase : class
 	{
 		public XamlValueConverter(Type converterType, XamlType targetType)

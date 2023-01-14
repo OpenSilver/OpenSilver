@@ -27,7 +27,7 @@ using System.Text;
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
-	public sealed class ValueSerializerAttribute : Attribute
+    internal sealed class ValueSerializerAttribute : Attribute
 	{
 		private Type _valueSerializerType;
 		private string _valueSerializerTypeName;

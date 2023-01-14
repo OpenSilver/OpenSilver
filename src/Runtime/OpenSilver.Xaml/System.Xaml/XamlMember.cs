@@ -32,7 +32,7 @@ using System.Xaml.Schema;
 
 namespace System.Xaml
 {
-	public class XamlMember : IEquatable<XamlMember>
+    internal class XamlMember : IEquatable<XamlMember>
 	{
 		FlagValue flags;
 		static class MemberFlags

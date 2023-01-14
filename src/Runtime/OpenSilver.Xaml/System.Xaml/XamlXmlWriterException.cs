@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 namespace System.Xaml
 {
 	[Serializable]
-	public class XamlXmlWriterException : XamlException
+    internal class XamlXmlWriterException : XamlException
 	{
 		public XamlXmlWriterException()
 			: this("XAML writer error")

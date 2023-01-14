@@ -24,10 +24,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Markup;
 
 namespace System.Xaml.Schema
 {
-	public class XamlTypeName
+    internal class XamlTypeName
 	{
 		public static XamlTypeName Parse(string typeName, IXamlNamespaceResolver namespaceResolver)
 		{

@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Markup;
 using System.Xaml.Schema;
 
 namespace System.Xaml

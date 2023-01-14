@@ -35,6 +35,10 @@ using System.Xaml.Markup;
 using System.Xaml.Schema;
 using System.Xml.Serialization;
 
+#if !MIGRATION
+using Windows.UI.Xaml.Markup;
+#endif
+
 namespace System.Xaml
 {
 	internal class ReferenceComparer : IEqualityComparer<object>
@@ -45,7 +49,7 @@ namespace System.Xaml
 		public int GetHashCode(object obj) => obj.GetHashCode();
 	}
 
-	public class XamlType : IEquatable<XamlType>
+    internal class XamlType : IEquatable<XamlType>
 	{
 		FlagValue flags;
 		static class TypeFlags

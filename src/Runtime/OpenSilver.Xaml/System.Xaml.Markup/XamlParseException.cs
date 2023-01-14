@@ -51,5 +51,14 @@ namespace System.Windows.Markup
             : base (message, innerException)
         {
         }
+
+        internal void SetLineInfo(int lineNumber, int linePosition)
+        {
+            LineNumber = lineNumber;
+            LinePosition = linePosition;
+        }
+
+        internal int LineNumber { get; private set; }
+        internal int LinePosition { get; private set; }
     }
 }

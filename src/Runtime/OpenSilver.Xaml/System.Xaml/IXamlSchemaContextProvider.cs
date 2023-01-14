@@ -23,7 +23,7 @@
 
 namespace System.Xaml
 {
-	public interface IXamlSchemaContextProvider
+    internal interface IXamlSchemaContextProvider
 	{
 		XamlSchemaContext SchemaContext { get; }
 	}

@@ -24,7 +24,7 @@
 namespace System.Xaml
 {
 	[Flags]
-	public enum AllowedMemberLocations
+	internal enum AllowedMemberLocations
 	{
 		None = 0,
 		Attribute = 1,

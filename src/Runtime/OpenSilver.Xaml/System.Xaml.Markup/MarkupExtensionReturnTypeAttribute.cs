@@ -28,7 +28,7 @@ using System.Text;
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-	public sealed class MarkupExtensionReturnTypeAttribute : Attribute
+    internal sealed class MarkupExtensionReturnTypeAttribute : Attribute
 	{
 		public MarkupExtensionReturnTypeAttribute()
 		{

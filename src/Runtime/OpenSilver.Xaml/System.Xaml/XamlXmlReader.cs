@@ -25,12 +25,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Markup;
 using System.Xaml.Schema;
 using System.Xml;
 
 namespace System.Xaml
 {
-	public class XamlXmlReader : XamlReader, IXamlLineInfo
+    internal class XamlXmlReader : XamlReader, IXamlLineInfo
 	{
 		#region constructors
 
@@ -979,7 +980,7 @@ namespace System.Xaml
 			yield return Node(XamlNodeType.EndObject, xt);
 		}
 
-		XamlException WithLineInfo(XamlException ex)
+        XamlParseException WithLineInfo(XamlParseException ex)
 		{
 			ex.SetLineInfo(LineNumber, LinePosition);
 			return ex;

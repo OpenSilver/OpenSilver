@@ -26,7 +26,7 @@ using System.Text;
 
 namespace System.Xaml.Markup
 {
-	public abstract class MemberDefinition
+    internal abstract class MemberDefinition
 	{
 		public abstract string Name { get; set; }
 	}

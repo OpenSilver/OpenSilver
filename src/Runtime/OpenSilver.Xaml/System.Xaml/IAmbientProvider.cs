@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-	public interface IAmbientProvider
+	internal interface IAmbientProvider
 	{
 		IEnumerable<Object> GetAllAmbientValues(params XamlType[] types);
 		IEnumerable<AmbientPropertyValue> GetAllAmbientValues(IEnumerable<XamlType> ceilingTypes, params XamlMember[] properties);

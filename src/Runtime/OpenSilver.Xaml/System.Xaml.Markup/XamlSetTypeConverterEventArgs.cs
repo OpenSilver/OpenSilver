@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml.Markup
 {
-	public class XamlSetTypeConverterEventArgs : XamlSetValueEventArgs
+    internal class XamlSetTypeConverterEventArgs : XamlSetValueEventArgs
 	{
 		public XamlSetTypeConverterEventArgs(XamlMember member, TypeConverter typeConverter, object value, ITypeDescriptorContext serviceProvider, CultureInfo cultureInfo)
 			: base(member, value)

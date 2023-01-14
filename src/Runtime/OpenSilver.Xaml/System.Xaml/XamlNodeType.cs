@@ -22,7 +22,7 @@
 //
 namespace System.Xaml
 {
-	public enum XamlNodeType
+    internal enum XamlNodeType
 	{
 		None,
 		StartObject,

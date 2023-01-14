@@ -27,7 +27,7 @@ using System.Text;
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-	public sealed class ConstructorArgumentAttribute : Attribute
+    internal sealed class ConstructorArgumentAttribute : Attribute
 	{
 		public ConstructorArgumentAttribute(string argumentName)
 		{

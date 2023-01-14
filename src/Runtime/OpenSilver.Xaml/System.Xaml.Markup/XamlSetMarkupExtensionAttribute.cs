@@ -27,7 +27,7 @@ using System.Text;
 namespace System.Xaml.Markup
 {
 	[AttributeUsageAttribute(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-	public sealed class XamlSetMarkupExtensionAttribute : Attribute
+    internal sealed class XamlSetMarkupExtensionAttribute : Attribute
 	{
 		public XamlSetMarkupExtensionAttribute(string xamlSetMarkupExtensionHandler)
 		{

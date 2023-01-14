@@ -28,7 +28,7 @@ using System.Windows.Markup;
 namespace System.Xaml.Markup
 {
 	[ContentProperty("Name")]
-	public class Reference : MarkupExtension
+    internal class Reference : MarkupExtension
 	{
 		public Reference()
 		{

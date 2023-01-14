@@ -32,9 +32,6 @@ namespace DotNetForHtml5.Compiler
         /// </summary>
         internal static IReadOnlyCollection<string> CoreAssembliesNames { get; } = new Collection<string>()
         {
-#if CSHTML5BLAZOR
-            Constants.OPENSILVER_XAML_ASSEMBLY_NAME,
-#endif
             GetCoreAssemblyName(),
         };
 

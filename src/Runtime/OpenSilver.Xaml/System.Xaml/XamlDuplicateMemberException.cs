@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-	public class XamlDuplicateMemberException : XamlException
+    internal class XamlDuplicateMemberException : XamlException
 	{
 		public XamlDuplicateMemberException()
 			: this("Duplicate members are found in the type")

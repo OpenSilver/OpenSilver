@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 namespace System.Xaml
 {
@@ -36,10 +34,6 @@ namespace System.Xaml
         /// <returns>
         /// The value to set on the property where the extension is applied.
         /// </returns>
-#if NETSTANDARD
         T ProvideValue(IServiceProvider serviceProvider);
-#else // BRIDGE
-        T ProvideValue(IServiceProvider serviceProvider);
-#endif
     }
 }

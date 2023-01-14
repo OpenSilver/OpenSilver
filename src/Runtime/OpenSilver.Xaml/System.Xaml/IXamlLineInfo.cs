@@ -23,7 +23,7 @@
 
 namespace System.Xaml
 {
-	public interface IXamlLineInfo
+	internal interface IXamlLineInfo
 	{
 		bool HasLineInfo { get; }
 		int LineNumber { get; }

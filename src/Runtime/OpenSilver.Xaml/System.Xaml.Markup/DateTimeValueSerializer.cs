@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml.Markup
 {
-	public class DateTimeValueSerializer : ValueSerializer
+    internal class DateTimeValueSerializer : ValueSerializer
 	{
 		const DateTimeStyles styles = DateTimeStyles.RoundtripKind | DateTimeStyles.NoCurrentDateDefault | DateTimeStyles.AllowLeadingWhite | DateTimeStyles.AllowTrailingWhite;
 

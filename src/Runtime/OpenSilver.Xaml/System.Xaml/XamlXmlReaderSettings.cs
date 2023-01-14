@@ -31,7 +31,7 @@ using System.Xml;
 
 namespace System.Xaml
 {
-	public class XamlXmlReaderSettings : XamlReaderSettings
+    internal class XamlXmlReaderSettings : XamlReaderSettings
 	{
 		Dictionary<string, string> _defaultNamespaces;
 

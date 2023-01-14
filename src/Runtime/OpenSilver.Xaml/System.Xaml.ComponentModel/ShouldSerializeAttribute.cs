@@ -9,7 +9,7 @@ namespace System.Xaml.ComponentModel
 	/// The method have to returns bool type and hasn't arguments.
 	/// </summary>
 	[EnhancedXaml]
-	public class ShouldSerializeAttribute : Attribute
+	internal class ShouldSerializeAttribute : Attribute
 	{
 		public ShouldSerializeAttribute(string methodName)
 		{

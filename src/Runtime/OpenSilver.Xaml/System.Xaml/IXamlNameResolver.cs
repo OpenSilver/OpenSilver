@@ -27,7 +27,7 @@ using System.Text;
 
 namespace System.Xaml
 {
-	public interface IXamlNameResolver
+    internal interface IXamlNameResolver
 	{
 		bool IsFixupTokenAvailable { get; }
 		event EventHandler OnNameScopeInitializationComplete;

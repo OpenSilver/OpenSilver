@@ -30,7 +30,7 @@ namespace System.Xaml.Markup
 {
 	[MarkupExtensionReturnType(typeof(Type))]
 	[TypeConverter(typeof(TypeExtensionConverter))]
-	public class TypeExtension : MarkupExtension
+    internal class TypeExtension : MarkupExtension
 	{
 		public TypeExtension()
 		{

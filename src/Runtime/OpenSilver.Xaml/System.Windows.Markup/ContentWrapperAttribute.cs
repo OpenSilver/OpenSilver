@@ -21,7 +21,7 @@ namespace System.Windows.Markup
     /// used to wrap foreign content.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    public sealed class ContentWrapperAttribute : Attribute
+    internal sealed class ContentWrapperAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentWrapperAttribute"/>

@@ -30,7 +30,7 @@ namespace System.Xaml
 	/// Options for member and type invokers.
 	/// </summary>
 	[EnhancedXaml, Flags]
-	public enum XamlInvokerOptions
+    internal enum XamlInvokerOptions
 	{
 		/// <summary>
 		/// Use reflection, which is much slower than compiled code on each call.
@@ -53,7 +53,7 @@ namespace System.Xaml
 		DeferCompile = 3
 	}
 
-	public class XamlSchemaContextSettings
+    internal class XamlSchemaContextSettings
 	{
 		public XamlSchemaContextSettings()
 		{

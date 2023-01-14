@@ -29,7 +29,7 @@ using System.Windows.Markup;
 
 namespace System.Xaml.Markup
 {
-	public class XamlSetMarkupExtensionEventArgs : XamlSetValueEventArgs
+    internal class XamlSetMarkupExtensionEventArgs : XamlSetValueEventArgs
 	{
 		public XamlSetMarkupExtensionEventArgs(XamlMember member, MarkupExtension value, IServiceProvider serviceProvider)
 			: base(member, null)

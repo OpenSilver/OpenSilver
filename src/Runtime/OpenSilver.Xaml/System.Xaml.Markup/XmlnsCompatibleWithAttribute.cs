@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-	public sealed class XmlnsCompatibleWithAttribute : Attribute
+    internal sealed class XmlnsCompatibleWithAttribute : Attribute
 	{
 		public XmlnsCompatibleWithAttribute(string oldNamespace, string newNamespace)
 		{

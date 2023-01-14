@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-	public class XamlNodeList
+    internal class XamlNodeList
 	{
 		readonly List<XamlNodeInfo> nodes;
 

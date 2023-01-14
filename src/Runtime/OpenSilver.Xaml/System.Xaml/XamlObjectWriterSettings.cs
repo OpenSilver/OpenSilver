@@ -25,11 +25,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using System.Xaml.Markup;
+
+#if !MIGRATION
+using Windows.UI.Xaml.Markup;
+#endif
 
 namespace System.Xaml
 {
-	public class XamlObjectWriterSettings : XamlWriterSettings
+    internal class XamlObjectWriterSettings : XamlWriterSettings
 	{
 		public XamlObjectWriterSettings()
 		{

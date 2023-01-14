@@ -28,7 +28,7 @@ using System.Xaml.Schema;
 
 namespace System.Xaml.Markup
 {
-	public class PropertyDefinition : MemberDefinition
+    internal class PropertyDefinition : MemberDefinition
 	{
 		public PropertyDefinition()
 		{

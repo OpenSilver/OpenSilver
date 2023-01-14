@@ -33,7 +33,7 @@ using System.Xaml.Markup;
 
 namespace System.Xaml.Schema
 {
-	public class XamlTypeInvoker
+    internal class XamlTypeInvoker
 	{
 		static readonly XamlTypeInvoker unknown = new XamlTypeInvoker();
 		public static XamlTypeInvoker UnknownInvoker => unknown;

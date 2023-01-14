@@ -24,7 +24,7 @@
 namespace System.Xaml.Markup
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, Inherited = true)]
-	public sealed class AmbientAttribute : Attribute
+	internal sealed class AmbientAttribute : Attribute
 	{
 	}
 }

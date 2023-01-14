@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml
 {
-	public class XamlWriterSettings
+    internal class XamlWriterSettings
 	{
 	}
 }

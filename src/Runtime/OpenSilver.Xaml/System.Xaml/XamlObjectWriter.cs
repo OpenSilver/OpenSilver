@@ -36,6 +36,10 @@ using System.Xaml.Schema;
 using System.Xml;
 using System.Xml.Serialization;
 
+#if !MIGRATION
+using Windows.UI.Xaml.Markup;
+#endif
+
 
 // To use this under .NET, compile sources as:
 //
@@ -68,7 +72,7 @@ State transition:
 
 namespace System.Xaml
 {
-    public class XamlObjectWriter : XamlWriter, IXamlLineInfoConsumer
+    internal class XamlObjectWriter : XamlWriter, IXamlLineInfoConsumer
     {
         public XamlObjectWriter(XamlSchemaContext schemaContext)
             : this(schemaContext, null)

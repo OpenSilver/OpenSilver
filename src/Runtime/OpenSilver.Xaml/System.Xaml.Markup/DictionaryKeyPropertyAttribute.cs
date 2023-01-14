@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 namespace System.Xaml.Markup
 {
 	[AttributeUsageAttribute(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-	public sealed class DictionaryKeyPropertyAttribute : Attribute
+    internal sealed class DictionaryKeyPropertyAttribute : Attribute
 	{
 		public DictionaryKeyPropertyAttribute(string name)
 		{

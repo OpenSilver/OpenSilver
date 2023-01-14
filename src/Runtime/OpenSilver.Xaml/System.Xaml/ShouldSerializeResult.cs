@@ -4,7 +4,7 @@ using System.Text;
 
 namespace System.Xaml
 {
-	public enum ShouldSerializeResult
+    internal enum ShouldSerializeResult
 	{
 		Default,
 		True,

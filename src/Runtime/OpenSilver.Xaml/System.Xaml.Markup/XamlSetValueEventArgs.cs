@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace System.Xaml.Markup
 {
-	public class XamlSetValueEventArgs : EventArgs
+    internal class XamlSetValueEventArgs : EventArgs
 	{
 		public XamlSetValueEventArgs(XamlMember member, object value)
 		{

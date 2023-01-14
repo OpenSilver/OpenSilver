@@ -32,8 +32,8 @@ namespace System.Xaml.Markup
 {
 	[MarkupExtensionReturnType(typeof(Array))]
 	[ContentProperty("Items")]
-	//[System.Runtime.CompilerServices.TypeForwardedFrom (Consts.AssemblyPresentationFramework_3_5)]
-	public class ArrayExtension : MarkupExtension
+    //[System.Runtime.CompilerServices.TypeForwardedFrom (Consts.AssemblyPresentationFramework_3_5)]
+    internal class ArrayExtension : MarkupExtension
 	{
 		public ArrayExtension()
 		{

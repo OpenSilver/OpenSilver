@@ -38,11 +38,7 @@ namespace System.Windows.Markup
         /// <returns>
         /// The object value to set on the property where the extension is applied.
         /// </returns>
-#if NETSTANDARD
         public abstract object ProvideValue(IServiceProvider serviceProvider);
-#else // BRIDGE
-        public abstract object ProvideValue(IServiceProvider serviceProvider);
-#endif
     }
 }
 
