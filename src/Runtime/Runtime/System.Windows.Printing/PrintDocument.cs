@@ -115,29 +115,11 @@ namespace Windows.UI.Xaml.Printing
         public void Print(string documentName)
         {
             elements.Clear();
+            BeginPrint?.Invoke(this, new BeginPrintEventArgs());
             if (PrintPage != null)
             {
                 // In Silverlight PrintPage event is used to get all elements that need to be printed.
                 GetElements();
-            }
-            else
-            {
-                // If PrintPage was not registered before, there is a chance that it can be registered in BeginPrint
-                if (BeginPrint != null)
-                {
-                    BeginPrint(this, new BeginPrintEventArgs());
-
-                    if (PrintPage != null)
-                    {
-                        GetElements();
-                    }
-                }
-
-                // If no element is selected to print then just call EndPrint
-                if (elements.Count == 0 && EndPrint != null)
-                {
-                    EndPrint(this, new EndPrintEventArgs());
-                }
             }
 
             if (elements.Count > 0)
@@ -165,7 +147,7 @@ namespace Windows.UI.Xaml.Printing
                 if (e.PageVisual != null)
                 {
                     elements.Add(e.PageVisual);
-
+                    SetValue(PrintedPageCountProperty, elements.Count);
                     if (!e.HasMorePages)
                         break;
                 }
@@ -261,11 +243,6 @@ namespace Windows.UI.Xaml.Printing
         /// <param name="documentName"></param>
         private void AddEventListeners(string documentName)
         {
-            Action beginCallback = () =>
-            {
-                BeginPrint?.Invoke(this, new BeginPrintEventArgs());
-            };
-
             Action endCallback = () =>
             {
                 EndPrint?.Invoke(this, new EndPrintEventArgs());
@@ -277,8 +254,7 @@ namespace Windows.UI.Xaml.Printing
 var title = document.title;
 
 window.addEventListener('beforeprint', (event) => {
-    document.title = $2;
-    var beginCallback = $0; beginCallback();
+    document.title = $1;
     addStyle();
     var elements = document.getElementsByClassName('print-section');
     let el = document.createElement('div');
@@ -298,7 +274,7 @@ window.addEventListener('beforeprint', (event) => {
 }, { once: true });
 
 window.addEventListener('afterprint', (event) => {
-    var endCallback = $1; endCallback();
+    var endCallback = $0; endCallback();
     document.getElementsByTagName('style')[0].remove();
     document.getElementById('print-container').remove();
     document.title = title;
@@ -339,7 +315,7 @@ function addStyle() {
 `;
     document.head.prepend(element);
 }
-", beginCallback, endCallback, documentName);
+", endCallback, documentName);
         }
 
         /// <summary>
