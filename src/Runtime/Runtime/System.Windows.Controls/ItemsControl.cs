@@ -946,17 +946,17 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnTextInput(e);
 
-            if (!string.IsNullOrEmpty(e.Text))
+            if (!string.IsNullOrEmpty(e.Text) && 
+                (e.OriginalSource == this || ItemsControlFromItemContainer(e.OriginalSource as DependencyObject) == this))
             {
                 TextSearch instance = TextSearch.EnsureInstance(this);
 
                 if (instance != null)
                 {
-                    instance.DoSearch(e.Text);                    
+                    instance.DoSearch(e.Text);
+                    e.Handled = true;
                 }
             }
-
-            e.Handled = true;
         }
 
         #region Obsolete
