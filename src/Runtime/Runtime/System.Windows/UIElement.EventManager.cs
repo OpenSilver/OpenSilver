@@ -162,9 +162,8 @@ namespace Windows.UI.Xaml
                     ProcessMouseButtonEvent(
                         jsEventArg,
                         PointerReleasedEvent);
-
-                    ProcessOnTapped(jsEventArg);
 #endif
+                    ProcessOnTapped(jsEventArg);
                     break;
 
                 case 2:
