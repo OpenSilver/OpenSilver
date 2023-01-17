@@ -95,28 +95,12 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnMouseMove(object jsEventArg)
         {
-            string eventType = OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.type", false);
-            if (!(ignoreMouseEvents && eventType == "mousemove"))
-            {
 #if MIGRATION
                 ProcessPointerEvent(jsEventArg, MouseMoveEvent);
 #else
                 ProcessPointerEvent(jsEventArg, PointerMovedEvent);
 #endif
             }
-
-            if (eventType == "touchend")
-            {
-                ignoreMouseEvents = true;
-                if (_ignoreMouseEventsTimer == null)
-                {
-                    _ignoreMouseEventsTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, 100) };
-                    _ignoreMouseEventsTimer.Tick += _ignoreMouseEventsTimer_Tick;
-                }
-                _ignoreMouseEventsTimer.Stop();
-                _ignoreMouseEventsTimer.Start();
-            }
-        }
 
         private void ProcessOnMouseDown(object jsEventArg)
         {
@@ -205,59 +189,34 @@ namespace Windows.UI.Xaml
             RoutedEvent routedEvent,
             bool refreshClickCount = false)
         {
-            string eventType = OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.type", false);
-            if (!(ignoreMouseEvents && eventType.StartsWith("mouse"))) //Ignore mousedown and mouseup if the touch equivalents have been handled.
-            {
+            string eventVariable = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
+            string eventType = OpenSilver.Interop.ExecuteJavaScriptString($"{eventVariable}.type", false);
+
 #if MIGRATION
-                MouseButtonEventArgs e = new MouseButtonEventArgs()
+            MouseButtonEventArgs e = new MouseButtonEventArgs()
 #else
-                PointerRoutedEventArgs e = new PointerRoutedEventArgs()
+            PointerRoutedEventArgs e = new PointerRoutedEventArgs()
 #endif
-                {
-                    RoutedEvent = routedEvent,
-                    OriginalSource = this,
-                    INTERNAL_OriginalJSEventArg = jsEventArg,
-                };
+            {
+                RoutedEvent = routedEvent,
+                OriginalSource = this,
+                INTERNAL_OriginalJSEventArg = jsEventArg,
+            };
 
-                if (refreshClickCount)
-                {
-                    e.RefreshClickCount(this);
-                }
-
-                if (e.CheckIfEventShouldBeTreated(this, jsEventArg))
-                {
-                    // Fill the position of the pointer and the key modifiers:
-                    e.FillEventArgs(this, jsEventArg);
-
-                    // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
-                    RaiseEvent(e);
-                }
-
-                if (eventType == "touchend") //prepare to ignore the mouse events since they were already handled as touch events
-                {
-                    ignoreMouseEvents = true;
-                    if (_ignoreMouseEventsTimer == null)
-                    {
-                        _ignoreMouseEventsTimer = new DispatcherTimer() { Interval = new TimeSpan(0, 0, 0, 0, 100) };
-                        _ignoreMouseEventsTimer.Tick += _ignoreMouseEventsTimer_Tick;
-                    }
-                    _ignoreMouseEventsTimer.Stop();
-                    _ignoreMouseEventsTimer.Start();
-                }
+            if (refreshClickCount)
+            {
+                e.RefreshClickCount(this);
             }
-        }
 
-        // This boolean is useful because we want to ignore mouse events when touch events have happened
-        // so the same user inputs are not handled twice. (Note: when using touch events, the browsers
-        // fire the touch events at the moment of the action, then throw the mouse events once touchend
-        // is fired)
-        private static bool ignoreMouseEvents = false;
-        private static DispatcherTimer _ignoreMouseEventsTimer = null;
-        
-        private void _ignoreMouseEventsTimer_Tick(object sender, object e)
-        {
-            ignoreMouseEvents = false;
-            _ignoreMouseEventsTimer.Stop();
+            // touchend event occurs only once as opposed to mouseup, so current UIElement is not the same as captured by touchstart event
+            if (eventType == "touchend" || e.CheckIfEventShouldBeTreated(this, jsEventArg))
+            {
+                // Fill the position of the pointer and the key modifiers:
+                e.FillEventArgs(this, jsEventArg);
+
+                // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
+                RaiseEvent(e);
+            }
         }
 
         /// <summary>
