@@ -193,37 +193,29 @@ namespace Windows.UI.Xaml
             string eventType = OpenSilver.Interop.ExecuteJavaScriptString($"{eventVariable}.type", false);
 
 #if MIGRATION
-                MouseButtonEventArgs e = new MouseButtonEventArgs()
+            MouseButtonEventArgs e = new MouseButtonEventArgs()
 #else
-                PointerRoutedEventArgs e = new PointerRoutedEventArgs()
+            PointerRoutedEventArgs e = new PointerRoutedEventArgs()
 #endif
-                {
-                    RoutedEvent = routedEvent,
-                    OriginalSource = this,
-                    INTERNAL_OriginalJSEventArg = jsEventArg,
-                };
+            {
+                RoutedEvent = routedEvent,
+                OriginalSource = this,
+                INTERNAL_OriginalJSEventArg = jsEventArg,
+            };
 
-                if (refreshClickCount)
-                {
-                    e.RefreshClickCount(this);
-                }
+            if (refreshClickCount)
+            {
+                e.RefreshClickCount(this);
+            }
 
             // touchend event occurs only once as opposed to mouseup, so current UIElement is not the same as captured by touchstart event
-                if (eventType == "touchend" || e.CheckIfEventShouldBeTreated(this, jsEventArg))
-                {
-                    // Fill the position of the pointer and the key modifiers:
-                    e.FillEventArgs(this, jsEventArg);
+            if (eventType == "touchend" || e.CheckIfEventShouldBeTreated(this, jsEventArg))
+            {
+                // Fill the position of the pointer and the key modifiers:
+                e.FillEventArgs(this, jsEventArg);
 
-                    // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
-                    RaiseEvent(e);
-                }
-
-            // ignore the mouse events since they were already handled as touch events
-        // so the same user inputs are not handled twice. (Note: when using touch events, the browsers
-            // fire the touch events at the moment of the action, then throw the mouse events once touchend is fired)
-            if (eventType == "touchend")
-        {
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"{eventVariable}.preventDefault()");
+                // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
+                RaiseEvent(e);
             }
         }
 

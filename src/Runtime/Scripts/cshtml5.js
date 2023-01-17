@@ -446,6 +446,14 @@ document._attachEventListeners = function (element, handler, isFocusable) {
         }
     }
 
+    function bubblingHandledEventHandler(e) {
+        if (!e.isHandled) {
+            e.isHandled = true;
+            handler(e);
+            e.preventDefault();
+        }
+    }
+
     const store = view._eventsStore = {};
     store.isFocusable = isFocusable;
     store.enableTouch = isTouchDevice();
@@ -458,7 +466,7 @@ document._attachEventListeners = function (element, handler, isFocusable) {
     view.addEventListener('mouseleave', store['mouseleave'] = handler);
     if (store.enableTouch) {
         view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
-        view.addEventListener('touchend', store['touchend'] = bubblingEventHandler);
+        view.addEventListener('touchend', store['touchend'] = bubblingHandledEventHandler);
         view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
     }
     if (isFocusable) {
