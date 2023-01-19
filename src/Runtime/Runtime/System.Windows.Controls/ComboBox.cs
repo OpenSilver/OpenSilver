@@ -108,7 +108,7 @@ namespace Windows.UI.Xaml.Controls
             DataTemplate selectionBoxItemTemplate;
 
             int index = SelectedIndex;
-            if (index == -1 || (IsDropDownOpen && SelectedItem is FrameworkElement))
+            if (index <= -1 || (IsDropDownOpen && SelectedItem is FrameworkElement))
             {
                 content = _emptyContent;
                 selectionBoxItem = null;
