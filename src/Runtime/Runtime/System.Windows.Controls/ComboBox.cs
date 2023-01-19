@@ -108,7 +108,7 @@ namespace Windows.UI.Xaml.Controls
             DataTemplate selectionBoxItemTemplate;
 
             int index = SelectedIndex;
-            if (index == -1 || (IsDropDownOpen && SelectedItem is FrameworkElement))
+            if (index <= -1 || (IsDropDownOpen && SelectedItem is FrameworkElement))
             {
                 content = _emptyContent;
                 selectionBoxItem = null;
@@ -116,8 +116,7 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                var defaultItem = index >= 0 && index < Items.Count ? Items[index] : null;
-                ComboBoxItem cbi = (ItemContainerGenerator.ContainerFromIndex(index) ?? defaultItem) as ComboBoxItem;
+                ComboBoxItem cbi = (ItemContainerGenerator.ContainerFromIndex(index) ?? Items[index]) as ComboBoxItem;
                 if (cbi != null)
                 {
                     content = selectionBoxItem = cbi.Content;
@@ -125,7 +124,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-                    object item = defaultItem;
+                    object item = Items[index];
                     content = selectionBoxItem = item;
                     if (item is UIElement)
                     {

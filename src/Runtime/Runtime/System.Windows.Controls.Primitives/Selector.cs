@@ -780,7 +780,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             int selectedIndex = SelectedIndex;
             if ((selectedIndex > Items.Count - 1)
-                || (selectedIndex == -1 && _selectedItems.Count > 0)
+                || (selectedIndex <= -1 && _selectedItems.Count > 0)
                 || (selectedIndex > -1
                     && (_selectedItems.Count == 0 || selectedIndex != _selectedItems[0].Index)))
             {
