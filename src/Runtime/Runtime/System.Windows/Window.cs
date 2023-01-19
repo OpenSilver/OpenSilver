@@ -415,19 +415,6 @@ namespace Windows.UI.Xaml
 
         }
 
-        private void CalculateWindowLayout()
-        {
-            if (Current.INTERNAL_VisualChildrenInformation == null)
-                return;
-
-            Rect windowBounds = this.Bounds;
-            double width = windowBounds.Width;
-            double height = windowBounds.Height;
-            Debug.WriteLine($"CalculateWindowLayout {width}, {height}");
-            Current.Measure(new Size(width, height));
-            Current.Arrange(windowBounds);
-        }
-
         protected override Size MeasureOverride(Size availableSize)
         {
             if (this.Content as FrameworkElement == null)

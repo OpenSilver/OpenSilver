@@ -196,9 +196,9 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this.INTERNAL_VisualChildrenInformation != null)
             {
-                foreach (var childInfo in this.INTERNAL_VisualChildrenInformation.Select(kp => kp.Value).ToArray())
+                foreach (var oldChild in this.INTERNAL_VisualChildrenInformation.Keys.ToArray())
                 {
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(childInfo.INTERNAL_UIElement, this);
+                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
                 }
             }
 
