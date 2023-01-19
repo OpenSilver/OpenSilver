@@ -405,18 +405,9 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
 
         private object AddContentEditableDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            bool isReadOnly = this.Host.IsReadOnly;
-            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object outerDiv);
-            string backgroundColor = "transparent"; //value when it is templated
+            bool isReadOnly = Host.IsReadOnly;
 
-            outerDivStyle.backgroundColor = backgroundColor;
-            outerDivStyle.height = "100%";
-
-            var middleDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object middleDiv);
-            middleDivStyle.width = "100%";
-            middleDivStyle.height = "100%";
-
-            var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", middleDiv, this, out object contentEditableDiv);
+            var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object contentEditableDiv);
             _contentEditableDiv = contentEditableDiv;
 
             contentEditableDivStyle.width = "100%";
@@ -579,7 +570,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
     }}
 }}, false);");
 
-            return outerDiv;
+            return contentEditableDiv;
         }
 
         internal string GetText()
