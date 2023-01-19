@@ -302,6 +302,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 {
                     // Show the popup:
                     popup.ShowPopupRootIfNotAlreadyVisible();
+                    if (popup.CustomLayout)
+                    {
+                        popup._popupRoot.Visibility = Visibility.Visible;
+                    }
                     popup.OnOpened();
                 }
                 else
@@ -346,6 +350,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                         //We put the popup at the calculated position:
                         popup.RefreshPopupPosition(placementTargetPosition, elementCurrentSize); //note: We might have a position bug here if parentposition is set, ie if popup is in the visual tree
+
+                        if (popup.CustomLayout)
+                        {
+                            popup._popupRoot.Visibility = Visibility.Visible;
+                        }
                     }
                     else
                     {
@@ -601,6 +610,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Set CustomLayout of the popup root:
                 if (CustomLayout)
                 {
+                    // Setting Visibility to Collapse as a fix to the issue where Popup shows briefly at 0,0
+                    // Will set to Visible where ShowPopupRootIfNotAlreadyVisible is called
+                    _popupRoot.Visibility = Visibility.Collapsed; 
                     _popupRoot.CustomLayout = true;
                     if (Child is FrameworkElement childFe)
                     {

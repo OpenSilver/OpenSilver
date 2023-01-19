@@ -116,7 +116,8 @@ namespace Windows.UI.Xaml.Controls
             }
             else
             {
-                ComboBoxItem cbi = (ItemContainerGenerator.ContainerFromIndex(index) ?? Items[index]) as ComboBoxItem;
+                var defaultItem = index >= 0 && index < Items.Count ? Items[index] : null;
+                ComboBoxItem cbi = (ItemContainerGenerator.ContainerFromIndex(index) ?? defaultItem) as ComboBoxItem;
                 if (cbi != null)
                 {
                     content = selectionBoxItem = cbi.Content;
@@ -124,7 +125,7 @@ namespace Windows.UI.Xaml.Controls
                 }
                 else
                 {
-                    object item = Items[index];
+                    object item = defaultItem;
                     content = selectionBoxItem = item;
                     if (item is UIElement)
                     {
