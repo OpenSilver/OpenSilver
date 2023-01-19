@@ -96,7 +96,6 @@ namespace Windows.UI.Xaml.Controls
         internal string INTERNAL_StringToSetVerticalGridLinesInCss = null;
         internal string INTERNAL_StringToSetHorizontalGridLinesInCss = null;
 
-        internal List<List<INTERNAL_CellDefinition>> _currentCellsStructure;
         internal object _innerDiv;
         internal object _currentDomTable;
         internal ColumnDefinitionCollection _columnDefinitionsOrNull;
@@ -125,28 +124,9 @@ namespace Windows.UI.Xaml.Controls
 
         void ColumnDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                ColumnDefinitions_CollectionChanged_CSSVersion(sender, e);
-            }
-            else
-            {
-                ColumnDefinitions_CollectionChanged_NonCSSVersion(sender, e);
-            }
-
+            ColumnDefinitions_CollectionChanged_CSSVersion(sender, e);
             InvalidateDefinitions();
         }
-
-        void ColumnDefinitions_CollectionChanged_NonCSSVersion(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (this._isLoaded)
-            {
-                this.RebuildDomStructure_NonCSSVersion(detachAndReattachTheChildrenIfNecessary: true); //todo: instead of calling this method, only make the actual change on the structure (adding/removing a column). Note: this can cause some chidren to move (when removing a column but when adding one as well if the children's Grid.Column attached property was bigger than the amount of columns).
-                this.LocallyManageChildrenChanged();
-            }
-        }
-
 
         /// <summary>
         /// Gets a list of RowDefinition objects defined on this instance of Grid.
@@ -166,465 +146,25 @@ namespace Windows.UI.Xaml.Controls
 
         void RowDefinitions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                RowDefinitions_CollectionChanged_CSSVersion(sender, e);
-            }
-            else
-            {
-                RowDefinitions_CollectionChanged_NonCSSVersion(sender, e);
-            }
-            
+            RowDefinitions_CollectionChanged_CSSVersion(sender, e);
             InvalidateDefinitions();
-        }
-
-        void RowDefinitions_CollectionChanged_NonCSSVersion(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (this._isLoaded)
-            {
-                this.RebuildDomStructure_NonCSSVersion(detachAndReattachTheChildrenIfNecessary: true); //todo: instead of calling this method, only make the actual change on the structure (adding/removing a row). Note: this can cause some chidren to move (when removing a row but when adding one as well if the children's Grid.Row attached property was bigger than the amount of rows).
-                this.LocallyManageChildrenChanged();
-            }
-        }
-
-        private void UpdateStructureWhenAddingRow(RowDefinition rowDefinition)
-        {
-            //NOTE: for now, we can only add rows at the end of the grid. (or we could rebuild the whole structure when adding a row in the middle)
-
-            //Add the row to the visual tree
-            //(for now) for each child, check if it moved (its Grid.Row was bigger or equal than the amount of rows of the grid, also consider span)
-            //(for later) keep a list of the chldren that have been restricted due to the lacking amount of rows and move those.
-        }
-
-        private void UpdateStructureWhenRemovingRow(RowDefinition rowDefinition)
-        {
-            //NOTE: for now, we can only remove rows at the end of the grid. (or we could rebuild the whole structure when adding a row in the middle)
-
-            //Remove the row from the visual tree
-            //go through all the children and check if they need to be restricted due to the row being removed
-            //move those children/reduce their span.
         }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                return CreateDomElement_CSSVersion(parentRef, out domElementWhereToPlaceChildren);
-            }
-            else
-            {
-#if !BRIDGE
-                object outerDiv = base.CreateDomElement(parentRef, out _innerDiv);
-#else
-                object outerDiv = CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out _innerDiv);
-#endif
-                domElementWhereToPlaceChildren = _innerDiv;
-                return outerDiv;
-            }
+            return CreateDomElement_CSSVersion(parentRef, out domElementWhereToPlaceChildren);
         }
 
         internal override void INTERNAL_UpdateDomStructureIfNecessary()
         {
             //Note: when arriving here, we have already checked that the Grid is in the Visual Tree.
-
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                Grid_InternalHelpers.RefreshAllColumnsVisibility_CSSVersion(this);
-            }
-            else
-            {
-                RebuildDomStructure_NonCSSVersion(detachAndReattachTheChildrenIfNecessary: false);
-            }
-        }
-
-        void RebuildDomStructure_NonCSSVersion(bool detachAndReattachTheChildrenIfNecessary)
-        {
-            // Calculate the new cells structure:    
-            List<List<INTERNAL_CellDefinition>> newCellsStructure = Grid_InternalHelpers.CalculateNewCellsStructure(_columnDefinitionsOrNull, _rowDefinitionsOrNull);
-
-            Dictionary<UIElement, INTERNAL_CellDefinition> childrenToUpdateIfStructureDifferent = Grid_InternalHelpers.HandleSpansInCellsStructureAndReturnRedirectedElements(newCellsStructure, Children);
-
-            // (Re)create the DOM elements if the structure has changed:
-            if (!AreCellsStructuresIdentical(_currentCellsStructure, newCellsStructure))
-            {
-                // Detach the children if necessary:
-                if (detachAndReattachTheChildrenIfNecessary)
-                {
-                    foreach (UIElement child in Children)
-                    {
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(child, this);
-                    }
-                }
-
-                //instead of removing the table and putting another one, identify the changes and only apply them?
-                //Note: the above comment was a todo but I think it's not as important anymore since this method is now only called when adding the Grid to the visual tree or when changing the amount of rows and columns (RowDefinitions and ColumnDefinition);
-
-                // Remove the former table if any:
-                if (_currentDomTable != null)
-                {
-                    INTERNAL_HtmlDomManager.RemoveFromDom(_currentDomTable);
-                    _currentDomTable = null;
-                }
-
-                // Remember the cell structure:
-                _currentCellsStructure = newCellsStructure;
-
-                List<ColumnDefinition> normalizedColumnDefinitions;
-                List<RowDefinition> normalizedRowDefinitions;
-                _currentDomTable = Grid_InternalHelpers.GenerateDomElementsForGrid_NonCSSVersion(this, newCellsStructure, _columnDefinitionsOrNull, _rowDefinitionsOrNull, _innerDiv, out normalizedColumnDefinitions, out normalizedRowDefinitions);
-
-                //Note: I moved this from the inside of the Grid_InternalHelpers.GenerateDomElementsForGrid_NonCSSVersion method since we need _currentDomTable to be set before calling the refreshes.
-                // Refresh rows heights and columns widths:
-                Grid_InternalHelpers.RefreshAllRowsHeight_NonCSSVersion(this, normalizedRowDefinitions);
-                Grid_InternalHelpers.RefreshAllColumnsWidth_NonCSSVersion(this, normalizedColumnDefinitions);
-
-                foreach (UIElement key in childrenToUpdateIfStructureDifferent.Keys)
-                {
-                    key.INTERNAL_SpanParentCell = childrenToUpdateIfStructureDifferent[key];
-                }
-
-                // Put the children back in the new cells structure if necessary
-                if (detachAndReattachTheChildrenIfNecessary)
-                {
-                    //todo-perf: when adding the columns and rows of the Grid, we currently remove and add back all the children many times.
-                    foreach (UIElement child in Children)
-                    {
-                        INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this);
-                    }
-                }
-            }
-        }
-
-        private void UpdateStructureWhenAddingChild(UIElement child)
-        {
-            int columnSpan = Grid.GetColumnSpan(child);
-            int rowSpan = Grid.GetRowSpan(child);
-
-            int childColumn = Grid.GetColumn(child);
-            int childRow = Grid.GetRow(child);
-            int maxColumn = ColumnDefinitions.Count - 1;
-            int maxRow = RowDefinitions.Count - 1;
-            if (childRow > maxRow)
-            {
-                childRow = maxRow;
-            }
-            if (childRow < 0)
-            {
-                childRow = 0;
-            }
-            if (childColumn > maxColumn)
-            {
-                childColumn = maxColumn;
-            }
-            if (childColumn < 0)
-            {
-                childColumn = 0;
-            }
-            var cell = _currentCellsStructure[childRow][childColumn]; //Note: row and column should always have a correct value.
-
-            if (cell.IsOverlapped)
-            {
-                //no changes since it will be "sucked in" the cell that overlaps this one.
-                child.INTERNAL_SpanParentCell = cell.ParentCell;
-                ++child.INTERNAL_SpanParentCell.numberOfChildren;
-            }
-            else
-            {
-                int childLastRow = childRow + Grid.GetRowSpan(child) - 1;
-                int childLastColumn = childColumn + Grid.GetColumnSpan(child) - 1;
-
-                if (childLastRow > maxRow)
-                {
-                    childLastRow = maxRow;
-                }
-                if (childLastRow < childRow)
-                {
-                    childLastRow = childRow;
-                }
-                if (childLastColumn > maxColumn)
-                {
-                    childLastColumn = maxColumn;
-                }
-                if (childLastColumn < childColumn)
-                {
-                    childLastColumn = childColumn;
-                }
-                INTERNAL_CellDefinition parentCell = null;
-                bool isFirst = true;
-                for (int row = childRow; row <= childLastRow; ++row)
-                {
-                    for (int column = childColumn; column <= childLastColumn; ++column)
-                    {
-                        var currentCell = _currentCellsStructure[row][column];
-                        if (currentCell.IsOverlapped || (currentCell.IsOccupied && !isFirst)) //note: the test on isFirst is for example for when we have 2 elements in one cell but the second that was added is the one that causes a span.
-                        {
-                            //no changes since it will either be "sucked in" the cell that overlaps this one or it is already the same overlapping happening on this cell..
-                            if (currentCell.IsOverlapped)
-                            {
-                                parentCell = currentCell.ParentCell;
-                            }
-                            else
-                            {
-                                parentCell = currentCell;
-                            }
-                            child.INTERNAL_SpanParentCell = parentCell;
-                            ++parentCell.numberOfChildren;
-                            break;
-                        }
-                        else
-                        {
-                            //the cell is not overlapped --> causes a change
-                        }
-                        isFirst = false;
-                    }
-                    if (parentCell != null)
-                    {
-                        break;
-                    }
-                }
-                if (parentCell == null) //none of the cells of the child are overlapped so we need to update the cells that are newly overlapped.
-                {
-                    MakeCellSpan(childRow, childColumn, childLastRow - childRow + 1, childLastColumn - childColumn + 1);
-                    ++cell.numberOfChildren;
-                }
-            }
-        }
-
-
-        private void MakeCellSpan(int cellRow, int cellColumn, int cellRowSpan, int cellColumnSpan)
-        {
-            bool isFirst = true;
-            INTERNAL_CellDefinition parentCell = null;
-            int cellLastRow = cellRow + cellRowSpan - 1;
-            int cellLastColumn = cellColumn + cellColumnSpan - 1;
-            for (int row = cellRow; row <= cellLastRow; ++row)
-            {
-                for (int column = cellColumn; column <= cellLastColumn; ++column)
-                {
-                    var cell2 = _currentCellsStructure[row][column];
-                    if (isFirst)
-                    {
-                        parentCell = cell2;
-                        cell2.IsOccupied = true;
-                        cell2.RowSpan = cellRowSpan;
-                        cell2.ColumnSpan = cellColumnSpan;
-                        if (cell2.ColumnDomElement != null)
-                        {
-                            var td = cell2.ColumnDomElement;
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "rowspan", cellRowSpan);
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "colspan", cellColumnSpan);
-
-                            string domElementStyleAppliedValue = null;
-
-                            //We update the size of the cell if it was not already a star sized cell:
-                            Grid_InternalHelpers.RefreshCellWithSpanHeight(this, cell2, ref domElementStyleAppliedValue);
-
-                            if (domElementStyleAppliedValue != null)
-                            {
-                                var domElementStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(cell2.DomElement);
-                                domElementStyle.height = domElementStyleAppliedValue;
-                            }
-
-                        }
-                        isFirst = false;
-                    }
-                    else
-                    {
-                        cell2.IsOverlapped = true;
-                        cell2.ParentCell = parentCell;
-                        if (cell2.ColumnDomElement != null)
-                        {
-                            var td = cell2.ColumnDomElement;
-                            INTERNAL_HtmlDomManager.RemoveFromDom(td); //Note: no need to handle the other children because when adding, arriving here means that there are no other children.
-                            cell2.ColumnDomElement = null;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void UpdateStructureWhenRemovingChild(UIElement child)
-        {
-            INTERNAL_CellDefinition cell;
-            if (child.INTERNAL_SpanParentCell != null)
-            {
-                cell = child.INTERNAL_SpanParentCell;
-                child.INTERNAL_SpanParentCell = null;
-            }
-            else
-            {
-                int childColumn = Grid.GetColumn(child);
-                int childRow = Grid.GetRow(child);
-                int maxColumn = ColumnDefinitions.Count - 1;
-                int maxRow = RowDefinitions.Count - 1;
-                if (childRow > maxRow)
-                {
-                    childRow = maxRow;
-                }
-                if (childRow < 0)
-                {
-                    childRow = 0;
-                }
-                if (childColumn > maxColumn)
-                {
-                    childColumn = maxColumn;
-                }
-                if (childColumn < 0)
-                {
-                    childColumn = 0;
-                }
-                cell = _currentCellsStructure[childRow][childColumn];
-            }
-            --cell.numberOfChildren;
-            if (cell.numberOfChildren == 0)
-            {
-                if (cell.RowSpan != 1 || cell.ColumnSpan != 1)
-                {
-                    RemoveCellSpan(cell);
-                }
-                cell.IsOccupied = false;
-            } //else nothing to do.
-
-        }
-
-        private void RemoveCellSpan(INTERNAL_CellDefinition cell)
-        {
-            int cellRow = cell.Row;
-            int cellColumn = cell.Column;
-            int cellRowSpan = cell.RowSpan;
-            int cellColumnSpan = cell.ColumnSpan;
-            int maxRow = cellRow + cell.RowSpan - 1;
-            int maxColumn = cellColumn + cell.ColumnSpan - 1;
-            bool isFirst = true;
-
-            List<ColumnDefinition> normalizedColumnDefinitions;
-            List<RowDefinition> normalizedRowDefinitions;
-            Grid_InternalHelpers.NormalizeWidthAndHeightPercentages(this, _columnDefinitionsOrNull, _rowDefinitionsOrNull, out normalizedColumnDefinitions, out normalizedRowDefinitions);
-            bool isTheOnlyRow = _rowDefinitionsOrNull.Count <= 1;
-            bool isTheOnlyColumn = _columnDefinitionsOrNull.Count <= 1;
-
-            for (int row = cellRow; row <= maxRow; ++row)
-            {
-                int columnDomIndex = 0; //this is the index of the column as seen in the DOM (it can be different from the column variable defined in the line below if we have a span in the way).
-                //Example: if we have a grid with 2 rows and 3 columns and 2 elements with rowspan = 2 in column 1 and 2, and we remove the second one,
-                //it's column index (as seen in the DOM) in the first row will be 2, and in the second row will be 1 because there is no tr for the column 1 due to the span of the other element.
-                // We therefore only count the non-overlapped columns.
-                for (int i = 0; i < cellColumn; ++i)
-                {
-                    var currentCell = _currentCellsStructure[row][i];
-                    if (!currentCell.IsOverlapped) //there is no td in the dom tree for each overlapped cell.
-                    {
-                        ++columnDomIndex;
-                    }
-                }
-                for (int column = cellColumn; column <= maxColumn; ++column)
-                {
-                    var currentCell = _currentCellsStructure[row][column];
-                    if (isFirst)
-                    {
-                        currentCell.RowSpan = 1;
-                        currentCell.ColumnSpan = 1;
-                        currentCell.IsOccupied = false; //I think this should be handled somewhere else but it's not wrong anyway so I keep it for now.
-                        if (currentCell.ColumnDomElement != null)
-                        {
-                            var td = currentCell.ColumnDomElement;
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "rowspan", 1);
-                            INTERNAL_HtmlDomManager.SetDomElementAttribute(td, "colspan", 1);
-                        }
-                        isFirst = false;
-                    }
-                    else
-                    {
-                        currentCell.IsOverlapped = false;
-                        currentCell.ParentCell = null;
-                        // Put the td back (at the right position)
-                        // apply the correct sizing on it
-
-                        // Create and append "<td>" element:
-                        var td = columnDomIndex == 0 ?
-                            INTERNAL_HtmlDomManager.CreateDomElementAndInsertIt("td", currentCell.RowDomElement, this, columnDomIndex, "beforeBegin") :
-                            INTERNAL_HtmlDomManager.CreateDomElementAndInsertIt("td", currentCell.RowDomElement, this, columnDomIndex - 1, "afterEnd");
-                       
-                        var tdStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(td);
-                        var columnDefinition = ColumnDefinitions[currentCell.Column];
-                        tdStyle.display = columnDefinition.Visibility == Visibility.Visible ? "table-cell" : "none";
-
-                        //no need to set colspan and rowspan since we know there are no children in the cell --> no span.
-
-                        Grid_InternalHelpers.ApplyGridLinesValues(this, row, column, tdStyle);
-
-                        //we create the div to contain the children:
-                        var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", td, this);
-                        var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-                        divStyle.position = "relative";
-
-                        //we fill the cell's definition in the structure:
-                        currentCell.DomElement = div;
-                        currentCell.ColumnDomElement = td;
-
-                        Grid_InternalHelpers.RefreshCellWidthAndHeight(this, currentCell, normalizedColumnDefinitions[column], isTheOnlyColumn, normalizedRowDefinitions[row], isTheOnlyRow);
-                    }
-                    if (!currentCell.IsOverlapped)
-                    {
-                        ++columnDomIndex;
-                    }
-                }
-            }
-        }
-
-        private bool AreCellsStructuresIdentical(List<List<INTERNAL_CellDefinition>> cellsStructure1, List<List<INTERNAL_CellDefinition>> cellsStructure2)
-        {
-            if (cellsStructure1 == null && cellsStructure2 != null)
-                return false;
-            if (cellsStructure1 != null && cellsStructure2 == null)
-                return false;
-            if (cellsStructure1 == null && cellsStructure2 == null)
-                return true;
-
-            if (cellsStructure1.Count != cellsStructure2.Count)
-                return false;
-
-            int listIndex = 0;
-            foreach (List<INTERNAL_CellDefinition> list1 in cellsStructure1)
-            {
-                List<INTERNAL_CellDefinition> list2 = cellsStructure2[listIndex];
-                if (list1.Count != list2.Count)
-                {
-                    return false;
-                }
-                int elementIndex = 0;
-                foreach (INTERNAL_CellDefinition cellDefinition1 in list1)
-                {
-                    if (!AreCellsDefinitionsIdentical(cellDefinition1, list2[elementIndex]))
-                    {
-                        return false;
-                    }
-                    ++elementIndex;
-                }
-                ++listIndex;
-            }
-            return true;
-        }
-
-        private bool AreCellsDefinitionsIdentical(INTERNAL_CellDefinition cellDefinition1, INTERNAL_CellDefinition cellDefinition2)
-        {
-            if (cellDefinition1.ColumnSpan != cellDefinition2.ColumnSpan)
-                return false;
-            if (cellDefinition1.IsOverlapped != cellDefinition2.IsOverlapped)
-                return false;
-            if (cellDefinition1.RowSpan != cellDefinition2.RowSpan)
-                return false;
-            return true;
+            Grid_InternalHelpers.RefreshAllColumnsVisibility_CSSVersion(this);
         }
 
         internal protected override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
 
-            _currentCellsStructure = null;
             _innerDiv = null;
             _currentDomTable = null;
         }
@@ -637,97 +177,7 @@ namespace Windows.UI.Xaml.Controls
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                LocallyManageChildrenChanged_CSSVersion();
-            }
-            else
-            {
-                bool thereAreRowDefinitions = (_rowDefinitionsOrNull != null && _rowDefinitionsOrNull.Count > 0);
-                bool thereAreColumnDefinitions = (_columnDefinitionsOrNull != null && _columnDefinitionsOrNull.Count > 0);
-                if (thereAreRowDefinitions || thereAreColumnDefinitions)
-                {
-                    int amountOfRows = 1;
-                    if (thereAreRowDefinitions)
-                        amountOfRows = _rowDefinitionsOrNull.Count;
-
-                    int amountOfColumns = 1;
-                    if (thereAreColumnDefinitions)
-                        amountOfColumns = _columnDefinitionsOrNull.Count;
-
-                    UIElement[,] lastElements = new UIElement[amountOfRows, amountOfColumns];
-                    foreach (UIElement uiElement in Children)
-                    {
-                        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                        {
-                            int elementRow;
-                            int elementColumn;
-                            if (uiElement.INTERNAL_SpanParentCell != null)
-                            {
-                                INTERNAL_CellDefinition cell = uiElement.INTERNAL_SpanParentCell;
-                                if (cell.ParentCell != null)
-                                {
-                                    cell = cell.ParentCell;
-                                }
-                                elementRow = cell.Row;
-                                elementColumn = cell.Column;
-                            }
-                            else
-                            {
-                                elementRow = GetRow(uiElement);
-                                if (elementRow >= amountOfRows)
-                                {
-                                    elementRow = amountOfRows - 1;
-                                }
-                                elementColumn = GetColumn(uiElement);
-                                if (elementColumn >= amountOfColumns)
-                                {
-                                    elementColumn = amountOfColumns - 1;
-                                }
-                            }
-                            if (lastElements[elementRow, elementColumn] != null)
-                            {
-                                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(
-                                    INTERNAL_VisualChildrenInformation[lastElements[elementRow, elementColumn]]
-                                    .INTERNAL_OptionalChildWrapper_OuterDomElement);
-                                style.position = "absolute";
-                            }
-                            var style2 = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(
-                                INTERNAL_VisualChildrenInformation[uiElement]
-                                .INTERNAL_OptionalChildWrapper_OuterDomElement);
-                            style2.position = "relative";
-                            //uiElement.INTERNAL_AdditionalOutsideDivForMargins.style.position = "relative";
-                            lastElements[elementRow, elementColumn] = uiElement;
-                        }
-                    }
-                }
-                else
-                {
-                    int i = 0;
-                    foreach (UIElement uiElement in Children)
-                    {
-                        if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
-                        {
-                            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(
-                                INTERNAL_VisualChildrenInformation[uiElement]
-                                .INTERNAL_OptionalChildWrapper_OuterDomElement);
-
-                            if (i < Children.Count - 1)
-                            {
-                                style.position = "absolute";
-                                //uiElement.INTERNAL_AdditionalOutsideDivForMargins.style.position = "absolute";
-                            }
-                            else
-                            {
-                                style.position = "relative";
-                                //uiElement.INTERNAL_AdditionalOutsideDivForMargins.style.position = "relative";
-                            }
-                        }
-                        ++i;
-                    }
-                }
-            }
+            LocallyManageChildrenChanged_CSSVersion();
 #if PERFSTAT
             Performance.Counter("Grid.LocallyManageChildrenChanged", t0);
 #endif
@@ -735,38 +185,14 @@ namespace Windows.UI.Xaml.Controls
 
         internal override void OnChildrenAdded(UIElement newChild, int index)
         {
-            if (!Grid_InternalHelpers.isCSSGridSupported())
-            {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                {
-                    this.UpdateStructureWhenAddingChild(newChild);
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
-                    this.LocallyManageChildrenChanged();
-                }
-            }
-            else
-            {
-                base.OnChildrenAdded(newChild, index);
-                this.LocallyManageChildrenChanged();
-            }
+            base.OnChildrenAdded(newChild, index);
+            this.LocallyManageChildrenChanged();
         }
 
         internal override void OnChildrenRemoved(UIElement oldChild, int index)
         {
-            if (!Grid_InternalHelpers.isCSSGridSupported())
-            {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                {
-                    this.UpdateStructureWhenRemovingChild(oldChild);
-                    INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
-                    this.LocallyManageChildrenChanged();
-                }
-            }
-            else
-            {
-                base.OnChildrenRemoved(oldChild, index);
-                this.LocallyManageChildrenChanged();
-            }
+            base.OnChildrenRemoved(oldChild, index);
+            this.LocallyManageChildrenChanged();
         }
 
         internal override void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
@@ -776,125 +202,17 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
-            if (!Grid_InternalHelpers.isCSSGridSupported())
-            {
-                this.UpdateStructureWhenRemovingChild(oldChild);
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, this);
-
-                this.UpdateStructureWhenAddingChild(newChild);
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, this, index);
-
-                this.LocallyManageChildrenChanged();
-            }
-            else
-            {
-                base.OnChildrenReplaced(oldChild, newChild, index);
-                this.LocallyManageChildrenChanged();
-            }
+            base.OnChildrenReplaced(oldChild, newChild, index);
+            this.LocallyManageChildrenChanged();
         }
 
         internal override void OnChildrenReset()
         {
-            if (!Grid_InternalHelpers.isCSSGridSupported())
+            base.OnChildrenReset();
+
+            if (this.HasChildren)
             {
-                if (this.INTERNAL_VisualChildrenInformation != null)
-                {
-                    foreach (var childInfo in this.INTERNAL_VisualChildrenInformation.Select(kp => kp.Value).ToArray())
-                    {
-                        UpdateStructureWhenRemovingChild(childInfo.INTERNAL_UIElement);
-                        INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(childInfo.INTERNAL_UIElement, this);
-                    }
-                }
-
-                if (!this.HasChildren)
-                {
-                    return;
-                }
-
-                for (int i = 0; i < this.Children.Count; ++i)
-                {
-                    this.UpdateStructureWhenAddingChild(this.Children[i]);
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.Children[i], this, i);
-                }
-
                 this.LocallyManageChildrenChanged();
-            }
-            else
-            {
-                base.OnChildrenReset();
-
-                if (this.HasChildren)
-                {
-                    this.LocallyManageChildrenChanged();
-                }
-            }
-        }
-
-        public override object GetDomElementWhereToPlaceChild(UIElement child)
-        {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                return base.GetDomElementWhereToPlaceChild(child); //it was not overriden when using the css version.
-            }
-            else
-            {
-                var spanParentCell = child.INTERNAL_SpanParentCell;
-                if (spanParentCell != null)
-                {
-                    if (spanParentCell.IsOverlapped)
-                    {
-                        spanParentCell = spanParentCell.ParentCell;
-                    }
-                    if (spanParentCell.DomElement != null)
-                    {
-                        return spanParentCell.DomElement;
-                    }
-                }
-                //Note: we only reach this line if at least one of the cells of the element (plural because of spans) is overlapped.
-                int columnIndex = GetColumn(child);
-                int rowIndex = GetRow(child);
-
-                if (rowIndex >= _currentCellsStructure.Count)
-                    rowIndex = _currentCellsStructure.Count - 1; // Note: this is apparently the behaviour of MS XAML.
-
-                var row = _currentCellsStructure[rowIndex];
-
-                if (columnIndex >= row.Count)
-                    columnIndex = row.Count - 1; // Note: this is apparently the behavious of MS XAML.
-
-                var cell = row[columnIndex];
-
-                return cell.DomElement;
-            }
-        }
-
-
-        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
-        {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                return base.CreateDomChildWrapper(parentRef, out domElementWhereToPlaceChild); //this was not overriden when using the css version of the grid.
-            }
-            else
-            {
-                // NOTE: The two following lines were commented and replaced by "CreateDomElementAppendItAndGetStyle" because of a bug of JSIL that resulted in bad JavaScript code:
-                object outerDiv;
-                var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
-                outerDivStyle.position = "absolute";
-                outerDivStyle.height = "100%";
-                outerDivStyle.width = "100%";
-
-                outerDivStyle.pointerEvents = "none";
-                object innerDiv;
-                var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out innerDiv);
-                innerDivStyle.position = "relative";
-                innerDivStyle.height = "100%";
-                innerDivStyle.width = "100%";
-
-                domElementWhereToPlaceChild = innerDiv;
-                return outerDiv;
             }
         }
 
@@ -928,31 +246,7 @@ namespace Windows.UI.Xaml.Controls
 
         static void Row_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                Row_Changed_CSSVersion(d, e);
-            }
-            else
-            {
-                //todo
-
-
-                //UIElement element = (UIElement)d;
-                //////int oldValue = (int)e.OldValue;
-                //int newValue = (int)e.NewValue;
-
-                ////if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
-                ////{
-                ////    if (UseCssGridLayout)
-                ////    {
-                ////        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(element).msGridRow = (newValue + 1).ToString();
-
-                ////        //element.INTERNAL_OuterDomElement.dataMsGridRow = (newValue + 1).ToString();
-                ////        //element.INTERNAL_OuterDomElement.setAttribute("data-ms-grid-row", (newValue + 1).ToString());
-                ////    }
-                ////}
-            }
+            Row_Changed_CSSVersion(d, e);
         }
 
         public static void SetRowSpan(UIElement element, int value)
@@ -970,31 +264,7 @@ namespace Windows.UI.Xaml.Controls
 
         static void RowSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                RowSpan_Changed_CSSVersion(d, e);
-            }
-            else
-            {
-                //todo
-
-
-                //UIElement element = (UIElement)d;
-                //////int oldValue = (int)e.OldValue;
-                //int newValue = (int)e.NewValue;
-
-                ////if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
-                ////{
-                ////    if (UseCssGridLayout)
-                ////    {
-                ////        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(element).msGridRowSpan = newValue.ToString();
-
-                ////        //element.INTERNAL_OuterDomElement.dataMsGridRowSpan = newValue.ToString();
-                ////        //element.INTERNAL_OuterDomElement.setAttribute("data-ms-grid-row-span", newValue.ToString());
-                ////    }
-                ////}
-            }
+            RowSpan_Changed_CSSVersion(d, e);
         }
 
         /// <summary>
@@ -1025,30 +295,7 @@ namespace Windows.UI.Xaml.Controls
 
         static void Column_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                Column_Changed_CSSVersion(d, e);
-            }
-            else
-            {
-                //todo
-
-                //UIElement element = (UIElement)d;
-                //////int oldValue = (int)e.OldValue;
-                //int newValue = (int)e.NewValue;
-
-                ////if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
-                ////{
-                ////    if (UseCssGridLayout)
-                ////    {
-                ////        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(element).msGridColumn = (newValue + 1).ToString();
-
-                ////        //element.INTERNAL_OuterDomElement.dataMsGridColumn = (newValue + 1).ToString();
-                ////        //element.INTERNAL_OuterDomElement.setAttribute("data-ms-grid-column", (newValue + 1).ToString());
-                ////    }
-                ////}
-            }
+            Column_Changed_CSSVersion(d, e);
         }
 
 
@@ -1067,31 +314,7 @@ namespace Windows.UI.Xaml.Controls
 
         static void ColumnSpan_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                ColumnSpan_Changed_CSSVersion(d, e);
-            }
-            else
-            {
-                //todo
-
-
-                //UIElement element = (UIElement)d;
-                //////int oldValue = (int)e.OldValue;
-                //int newValue = (int)e.NewValue;
-
-                ////if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
-                ////{
-                ////    if (UseCssGridLayout)
-                ////    {
-                ////        INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(element).msGridColumnSpan = newValue.ToString();
-
-                ////        //element.INTERNAL_OuterDomElement.dataMsGridColumnSpan = newValue.ToString();
-                ////        //element.INTERNAL_OuterDomElement.setAttribute("data-ms-grid-column-span", newValue.ToString());
-                ////    }
-                ////}
-            }
+            ColumnSpan_Changed_CSSVersion(d, e);
         }
 
         #endregion
@@ -1101,36 +324,7 @@ namespace Windows.UI.Xaml.Controls
             if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 return 0;
 
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                return GetColumnActualWidth_CSSVersion(columnDefinition);
-            }
-            else
-            {
-                if (this.INTERNAL_OuterDomElement != null
-                    && _columnDefinitionsOrNull != null)
-                {
-                    int columnIndex = _columnDefinitionsOrNull.IndexOf(columnDefinition);
-
-                    //we find a cell in the column that is neither overlapped nor has a span.
-                    INTERNAL_CellDefinition cell = _currentCellsStructure[0][columnIndex]; //in the case where there are no cells in the column that are limited to the column, we take the first one by default.
-                    foreach (List<INTERNAL_CellDefinition> cells in _currentCellsStructure)
-                    {
-                        INTERNAL_CellDefinition currentCell = cells[columnIndex];
-                        if (!currentCell.IsOverlapped && currentCell.ColumnSpan == 1)
-                        {
-                            cell = currentCell;
-                        }
-                    }
-                    var columnDomElement = cell.ColumnDomElement;
-                    return INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(columnDomElement, "offsetWidth");
-                }
-                else
-                {
-                    return 0;
-                }
-            }
+            return GetColumnActualWidth_CSSVersion(columnDefinition);
         }
 
         internal double GetRowActualHeight(RowDefinition rowDefinition)
@@ -1138,26 +332,7 @@ namespace Windows.UI.Xaml.Controls
             if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 return 0;
 
-            bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-            if (isCSSGrid)
-            {
-                return GetRowActualHeight_CSSVersion(rowDefinition);
-            }
-            else
-            {
-                //Note: in regards to spans, this one should be "correct" since the <tr> is shared between all the cells of the row (at least it is the correct tr, we still need to see if the result is correct).
-                if (this.INTERNAL_OuterDomElement != null
-                    && _rowDefinitionsOrNull != null)
-                {
-                    int rowIndex = _rowDefinitionsOrNull.IndexOf(rowDefinition);
-                    var rowDomElement = _currentCellsStructure[rowIndex][0].RowDomElement;
-                    return INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(rowDomElement, "offsetHeight");
-                }
-                else
-                {
-                    return 0;
-                }
-            }
+            return GetRowActualHeight_CSSVersion(rowDefinition);
         }
 
         // private

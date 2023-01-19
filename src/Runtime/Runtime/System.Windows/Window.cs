@@ -136,11 +136,8 @@ namespace Windows.UI.Xaml
             CSHTML5.Interop.ExecuteJavaScriptFastAsync("document.clearXamlRoot()");
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
-            if (Grid_InternalHelpers.isCSSGridSupported()) //todo: what about the old browsers where "CSS Grid" is not supported?
-            {
-                string sRootElement = INTERNAL_InteropImplementation.GetVariableStringForJS(rootDomElement);
-                CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.style.display = 'grid'");
-            }
+            string sRootElement = INTERNAL_InteropImplementation.GetVariableStringForJS(rootDomElement);
+            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.style.display = 'grid'");
 
             // Create the DIV that will correspond to the root of the window visual tree:
             object windowRootDiv;

@@ -64,19 +64,6 @@ namespace Windows.UI.Xaml.Shapes
         {
             SizeChanged += Shape_SizeChanged;
 
-            // Fix the issue with Grid implemented using html <table>, which is unable to force the size of its children:
-            if (!Grid_InternalHelpers.isCSSGridSupported())
-            {
-                Window.Current.SizeChanged += Current_SizeChanged; //this is to make sure that the canvas does not block redimensionning when changing the window size.
-                // Note: this still does not solve the issue we have when shrinking a parent element of the shape when the shape is stretched.
-                // To reproduce the issue:
-                // <Grid Width="300">
-                //   <Rectangle Width="Auto" Stretch="Fill"/>
-                // </Grid>
-                // Then, after this has been drawn, programmatically reduce the size of the border => the rectangle will not become smaller because 
-                // its inner html <canvas> has a fixed size and prevents its container from being smaller.
-            }
-
             IsVisibleChanged += (d,e) =>
             {
                 bool newValue = (bool)e.NewValue;

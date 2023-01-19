@@ -509,8 +509,6 @@ namespace Windows.UI.Xaml
                     // Apply CSS alignment and size:
                     //-----------------------------
 
-                    bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-
                     switch (newHorizontalAlignment)
                     {
                         case HorizontalAlignment.Left:
@@ -525,7 +523,7 @@ namespace Windows.UI.Xaml
                                 if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
                                 {
 
-                                    if (!isCSSGrid || !(fe is Grid))
+                                    if (fe is not Grid)
                                     {
                                         styleOfOuterDomElement.display = "table";
                                         if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
@@ -557,7 +555,7 @@ namespace Windows.UI.Xaml
                                 if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
                                 {
                                     styleOfOuterDomElement.display = "table";
-                                    if (!isCSSGrid || !(fe is Grid))
+                                    if (fe is not Grid)
                                     {
                                         if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
                                         {
@@ -583,7 +581,7 @@ namespace Windows.UI.Xaml
                                 if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
                                 {
                                     styleOfOuterDomElement.display = "table";
-                                    if (!isCSSGrid || !(fe is Grid))
+                                    if (fe is not Grid)
                                     {
                                         if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
                                         {
@@ -907,31 +905,17 @@ namespace Windows.UI.Xaml
                     // Apply CSS alignment and size:
                     //-----------------------------
 
-                    bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-                    bool isMsGrid = Grid_InternalHelpers.isMSGrid();
                     switch (newVerticalAlignment)
                     {
                         case VerticalAlignment.Top:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
                             {
-                                if (isCSSGrid)
+                                if (VisualTreeHelper.GetParent(fe) is Grid)
                                 {
-                                    if ((VisualTreeHelper.GetParent(fe) is Grid))
-                                    {
-                                        //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
-                                        var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
-                                        if (!isMsGrid)
-                                        {
-                                            boxSizingStyle.marginTop = "0px";
-                                            boxSizingStyle.marginBottom = "auto";
-                                            //styleOfOuterDomElement.marginTop = "0px";
-                                            //styleOfOuterDomElement.marginBottom = "auto";
-                                        }
-                                        else
-                                        {
-                                            boxSizingStyle.msGridRowAlign = "start";
-                                        }
-                                    }
+                                    //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
+                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
+                                    boxSizingStyle.marginTop = "0px";
+                                    boxSizingStyle.marginBottom = "auto";
                                 }
                                 styleOfWrapperElement.verticalAlign = "top";
                             }
@@ -940,22 +924,12 @@ namespace Windows.UI.Xaml
                         case VerticalAlignment.Center:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
                             {
-                                if (isCSSGrid && (VisualTreeHelper.GetParent(fe) is Grid))
+                                if (VisualTreeHelper.GetParent(fe) is Grid)
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
                                     var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
-                                    if (!isMsGrid)
-                                    {
-                                        boxSizingStyle.marginTop = "auto";
-                                        boxSizingStyle.marginBottom = "auto";
-
-                                        //styleOfOuterDomElement.marginTop = "auto";
-                                        //styleOfOuterDomElement.marginBottom = "auto";
-                                    }
-                                    else
-                                    {
-                                        boxSizingStyle.msGridRowAlign = "center";
-                                    }
+                                    boxSizingStyle.marginTop = "auto";
+                                    boxSizingStyle.marginBottom = "auto";
                                 }
                                 else
                                 {
@@ -969,22 +943,12 @@ namespace Windows.UI.Xaml
                         case VerticalAlignment.Bottom:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
                             { 
-                                if (isCSSGrid && (VisualTreeHelper.GetParent(fe) is Grid))
+                                if (VisualTreeHelper.GetParent(fe) is Grid)
                                 {
                                     //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
                                     var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
-                                    if (!isMsGrid)
-                                    {
-                                        boxSizingStyle.marginTop = "auto";
-                                        boxSizingStyle.marginBottom = "0px";
-                                        //styleOfOuterDomElement.marginTop = "auto";
-                                        //styleOfOuterDomElement.marginBottom = "0px";
-
-                                    }
-                                    else
-                                    {
-                                        boxSizingStyle.msGridRowAlign = "end";
-                                    }
+                                    boxSizingStyle.marginTop = "auto";
+                                    boxSizingStyle.marginBottom = "0px";
                                 }
                                 else
                                 {
@@ -998,7 +962,7 @@ namespace Windows.UI.Xaml
                         case VerticalAlignment.Stretch:
                             if (!isParentAWrapPanelOrAVerticalStackPanel)
                             {
-                                if (!(isCSSGrid && (VisualTreeHelper.GetParent(fe) is Grid)))
+                                if (VisualTreeHelper.GetParent(fe) is not Grid)
                                 {
                                     styleOfWrapperElement.verticalAlign = "middle"; // This is useful when the parent is a horizontal StackPanel
                                     styleOfOuterDomElement.height = "100%";  // Note: We never have both Stretch and a size in pixels, because of the "if" condition at the beginning of this method.
@@ -1275,12 +1239,10 @@ namespace Windows.UI.Xaml
                     }
                 }
                 */
-                bool isCSSGrid = Grid_InternalHelpers.isCSSGridSupported();
-                bool isMsGrid = Grid_InternalHelpers.isMSGrid();
                 // Note: this is used to avoid overwriting the value set for the vertical
                 // alignment when in a css Grid, but the msGrid uses another way to set it
                 // so we do not need to change what happens here in this case.
-                bool isInsideACSSBasedGrid = isCSSGrid && !isMsGrid && frameworkElement.INTERNAL_VisualParent is Grid; 
+                bool isInsideACSSBasedGrid = frameworkElement.INTERNAL_VisualParent is Grid; 
 
                 var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
                 var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);

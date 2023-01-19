@@ -152,8 +152,6 @@ namespace CSHTML5.Internal
                     // Remove the element from the parent's children collection:
                     parent.INTERNAL_VisualChildrenInformation.Remove(child);
 
-                    child.INTERNAL_SpanParentCell = null;
-
                     //Detach Element  
                     DetachVisualChidren(child);
 

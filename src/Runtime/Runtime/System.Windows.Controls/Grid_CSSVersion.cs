@@ -73,7 +73,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 // Set the "display" CSS property:
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_innerDiv);
-                style.display = !Grid_InternalHelpers.isMSGrid() ? style.display = "grid" : Grid_InternalHelpers.INTERNAL_CSSGRID_MS_PREFIX + "grid";
+                style.display = "grid";
             }
 
             // Normalize the sizes of the rows and columns:
@@ -135,23 +135,11 @@ namespace Windows.UI.Xaml.Controls
                     var style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(uiElement);
 
                     style.position = "relative";
-
-                    bool isMsGrid = Grid_InternalHelpers.isMSGrid();
-                    if (!isMsGrid)
-                    {
-                        style.gridRowStart = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
-                        style.gridColumnStart = (elementColumn + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
-                        style.gridRowEnd = (elementLastRow + 2).ToString(); //Note: +1 because rows start from 1 instead of 0 in js and another + 1 because the gridRowEnd seems to be the row BEFORE WHITCH the span ends.
-                        style.gridColumnEnd = (elementLastColumn + 2).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
-                    }
-                    else
-                    {
-                        //probably doesn't work, it probably requires to use msGridRow and msGridColumn and msGridRowSpan and msGridColumnSpan
-                        style.msGridRow = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
-                        style.msGridColumn = (elementColumn + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
-                        style.msGridRowSpan = (rowSpan).ToString(); //Note: +1 because rows start from 1 instead of 0 in js and another + 1 because the gridRowEnd seems to be the row BEFORE WHITCH the span ends.
-                        style.msGridColumnSpan = (columnSpan).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
-                    }
+                    style.gridRowStart = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
+                    style.gridColumnStart = (elementColumn + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
+                    style.gridRowEnd = (elementLastRow + 2).ToString(); //Note: +1 because rows start from 1 instead of 0 in js and another + 1 because the gridRowEnd seems to be the row BEFORE WHITCH the span ends.
+                    style.gridColumnEnd = (elementLastColumn + 2).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
+                    
                     //-------------------------until here-------------------------
 
                     style.pointerEvents = "none";
@@ -229,21 +217,12 @@ namespace Windows.UI.Xaml.Controls
                     rowSpan = 1;
 
                 var style = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(element);
-                bool isMsGrid = Grid_InternalHelpers.isMSGrid();
-                if (!isMsGrid)
-                {
-                    int lastRow = elementRow + rowSpan - 1; //note: there was a -1 here before but it seems to not give he result expected.
-                    MakeGridPositionCorrect(ref lastRow, maxRow);
+                
+                int lastRow = elementRow + rowSpan - 1; //note: there was a -1 here before but it seems to not give he result expected.
+                MakeGridPositionCorrect(ref lastRow, maxRow);
 
-                    style.gridRowStart = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
-                    style.gridRowEnd = (lastRow + 2).ToString(); //Note: +1 because rows start from 1 instead of 0 in js and another + 1 because the gridRowEnd seems to be the row BEFORE WHITCH the span ends.
-                }
-                else
-                {
-                    //probably doesn't work, it probably requires to use msGridRow
-                    style.msGridRow = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
-                    style.msGridRowSpan = (rowSpan).ToString();
-                }
+                style.gridRowStart = (elementRow + 1).ToString(); //Note: +1 because rows start from 1 instead of 0 in js.
+                style.gridRowEnd = (lastRow + 2).ToString(); //Note: +1 because rows start from 1 instead of 0 in js and another + 1 because the gridRowEnd seems to be the row BEFORE WHITCH the span ends.
             }
         }
 
@@ -269,17 +248,8 @@ namespace Windows.UI.Xaml.Controls
                     int lastColumn = elementColumn + columnSpan - 1; //note: there was a -1 here before but it seems to not give he result expected.
                     MakeGridPositionCorrect(ref lastColumn, maxColumn);
 
-                    bool isMsGrid = Grid_InternalHelpers.isMSGrid();
-                    if (!isMsGrid)
-                    {
-                        style.gridColumnStart = (elementColumn + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-                        style.gridColumnEnd = (lastColumn + 2).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
-                    }
-                    else
-                    {
-                        style.msGridColumn = (elementColumn + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-                        style.msGridColumnSpan = (columnSpan).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
-                    }
+                    style.gridColumnStart = (elementColumn + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
+                    style.gridColumnEnd = (lastColumn + 2).ToString(); //Note: +1 because columns start from 1 instead of 0 in js and another + 1 because the gridColumnEnd seems to be the column BEFORE WHITCH the span ends.
                 }
             }
         }
@@ -340,19 +310,8 @@ namespace Windows.UI.Xaml.Controls
             div1style.height = "100%";
             div1style.opacity = "0";
             div1style.position = "relative";
-
-            bool isMsGrid = Grid_InternalHelpers.isMSGrid();
-            if (!isMsGrid)
-            {
-                div1style.gridColumnStart = (columnIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-                div1style.gridRowStart = (rowIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-            }
-            else
-            {
-                div1style.msGridColumn = (columnIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-                div1style.msGridRow = (rowIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
-            }
-
+            div1style.gridColumnStart = (columnIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
+            div1style.gridRowStart = (rowIndex + 1).ToString(); //Note: +1 because columns start from 1 instead of 0 in js.
             return div1;
         }
     }

@@ -232,38 +232,12 @@ namespace Windows.UI.Xaml.Controls
             if (grid != null
                 && INTERNAL_VisualTreeManager.IsElementInVisualTree(grid))
             {
-                if (Grid_InternalHelpers.isCSSGridSupported())
-                {
-                    //-------------
-                    // CSS Grid
-                    //-------------
+                //-------------
+                // CSS Grid
+                //-------------
 
-                    // We refresh all the columns:
-                    Grid_InternalHelpers.RefreshAllColumnsWidth_CSSVersion(grid);
-                }
-                else
-                {
-                    //-------------
-                    // Non-CSS Grid
-                    //-------------
-
-                    bool isStar = (e.OldValue != null && ((GridLength)e.OldValue).IsStar) || (e.NewValue != null && ((GridLength)e.NewValue).IsStar);
-                    if (isStar)
-                    {
-                        // If we are dealing with a "Star" column, we need to refresh all the columns (because of the need to recalculate percentages normalization etc.):
-                        Grid_InternalHelpers.RefreshAllColumnsWidth_NonCSSVersion(grid);
-                    }
-                    else
-                    {
-                        // Only refresh the current column:
-                        if (grid._columnDefinitionsOrNull != null)
-                        {
-                            int columnIndex = grid._columnDefinitionsOrNull.IndexOf(columnDefinition);
-                            bool isTheOnlyColumn = grid._columnDefinitionsOrNull == null || grid._columnDefinitionsOrNull.Count < 2;
-                            Grid_InternalHelpers.RefreshColumnWidth_NonCSSVersion(grid, columnIndex, isTheOnlyColumn); //Note: we do not need to pass the normalized column definition because this method will only be called when we change the column's width without any star measurement involved (nor star before nor after).
-                        }
-                    }
-                }
+                // We refresh all the columns:
+                Grid_InternalHelpers.RefreshAllColumnsWidth_CSSVersion(grid);
             }
 
             columnDefinition.Parent?.InvalidateMeasure();

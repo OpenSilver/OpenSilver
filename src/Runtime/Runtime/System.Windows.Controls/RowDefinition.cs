@@ -230,39 +230,12 @@ namespace Windows.UI.Xaml.Controls
             if (grid != null
                 && INTERNAL_VisualTreeManager.IsElementInVisualTree(grid))
             {
-                if (Grid_InternalHelpers.isCSSGridSupported())
-                {
-                    //-------------
-                    // CSS Grid
-                    //-------------
+                //-------------
+                // CSS Grid
+                //-------------
 
-                    // We refresh all the rows:
-                    Grid_InternalHelpers.RefreshAllRowsHeight_CSSVersion(grid);
-                }
-                else
-                {
-                    //-------------
-                    // Non-CSS Grid
-                    //-------------
-
-                    bool isStar = (e.OldValue != null && ((GridLength)e.OldValue).IsStar) || (e.NewValue != null && ((GridLength)e.NewValue).IsStar);
-                    if (isStar)
-                    {
-                        // If we are dealing with a "Star" row, we need to refresh all the rows (because of the need to recalculate percentages normalization etc.):
-                        Grid_InternalHelpers.RefreshAllRowsHeight_NonCSSVersion(grid);
-                    }
-                    else
-                    {
-                        // Only refresh the current row:
-                        if (grid._columnDefinitionsOrNull != null)
-                        {
-                            int rowIndex = grid._rowDefinitionsOrNull.IndexOf(rowDefinition);
-                            bool isTheOnlyRow = grid._columnDefinitionsOrNull == null || grid._columnDefinitionsOrNull.Count < 2;
-                            Grid_InternalHelpers.RefreshRowHeight_NonCSSVersion(grid, rowIndex, isTheOnlyRow); // Note: we do not need to pass the normalized row definition because this method will only be called when we change the row's height without any star measurement involved (nor star before nor after).
-                        }
-                    }
-
-                }
+                // We refresh all the rows:
+                Grid_InternalHelpers.RefreshAllRowsHeight_CSSVersion(grid);
             }
 
             rowDefinition.Parent?.InvalidateMeasure();

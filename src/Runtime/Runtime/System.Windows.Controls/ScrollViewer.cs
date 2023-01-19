@@ -662,16 +662,8 @@ namespace Windows.UI.Xaml.Controls
 
                 if ((horizontalScrollBarVisibility == ScrollBarVisibility.Visible || horizontalScrollBarVisibility == ScrollBarVisibility.Auto) && double.IsNaN(this.Width)) //todo: update the ScrollViewer of its "width" changes.
                 {
-                    if (this.INTERNAL_VisualParent is Grid && !Grid_InternalHelpers.isCSSGridSupported()) //note: currently, only the non-CSS Grid uses the Dom element <table>
-                    {
-                        innerDivStyle.width = "0px"; //we set it that way so that we still have a scrollbar even when in a table (table is unable to limit the size of its content)
-                        innerDivStyle.overflowX = "visible"; //so that its content can still be seen
-                    }
-                    else
-                    {
-                        innerDivStyle.width = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
-                        innerDivStyle.minWidth = "100%"; // This fixes an issue where the background of the "InputProject" test project is correct only at the top of the page.
-                    }
+                    innerDivStyle.width = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
+                    innerDivStyle.minWidth = "100%"; // This fixes an issue where the background of the "InputProject" test project is correct only at the top of the page.
                 }
                 else
                 {
@@ -744,16 +736,8 @@ namespace Windows.UI.Xaml.Controls
                     && double.IsNaN(this.Height) //todo: update the ScrollViewer of its "height" changes.
                     )
                 {
-                    if (this.INTERNAL_VisualParent is Grid && !Grid_InternalHelpers.isCSSGridSupported()) //note: currently, only the non-CSS Grid uses the Dom element <table>
-                    {
-                        innerDivStyle.height = "0px"; //we set it that way so that we still have a scrollbar even when in a table (table is unable to limit the size of its content)
-                        innerDivStyle.overflowY = "visible"; //so that its content can still be seen
-                    }
-                    else
-                    {
-                        innerDivStyle.height = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
-                        innerDivStyle.minHeight = "100%"; // This fixes an issue where the background of the "InputProject" test project is correct only at the top of the page.
-                    }
+                    innerDivStyle.height = "auto"; // This makes it possible to center-align an item inside the ScrollViewer.
+                    innerDivStyle.minHeight = "100%"; // This fixes an issue where the background of the "InputProject" test project is correct only at the top of the page.
                 }
                 else
                 {

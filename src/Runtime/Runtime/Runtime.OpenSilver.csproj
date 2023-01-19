@@ -835,7 +835,6 @@
 		<Compile Include="System.Windows.Controls\ExtendedRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Grid.cs" />
 		<Compile Include="System.Windows.Controls\Grid_CSSVersion.cs" />
-		<Compile Include="System.Windows.Controls\Grid_InternalCellDefinition.cs" />
 		<Compile Include="System.Windows.Controls\Grid_InternalHelpers.cs" />
 		<Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
 		<Compile Include="System.Windows.Controls\HyperlinkButton.cs" />
