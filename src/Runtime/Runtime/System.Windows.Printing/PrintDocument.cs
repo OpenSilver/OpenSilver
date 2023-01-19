@@ -67,7 +67,7 @@ namespace Windows.UI.Xaml.Printing
         /// <summary>
         /// Gets the identifier for the <see cref="PrintedPageCount"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty PrintedPageCountProperty = 
+        public static readonly DependencyProperty PrintedPageCountProperty =
             DependencyProperty.Register(
                 nameof(PrintedPageCount),
                 typeof(int),
@@ -115,6 +115,7 @@ namespace Windows.UI.Xaml.Printing
         public void Print(string documentName)
         {
             elements.Clear();
+            SetValue(PrintedPageCountProperty, elements.Count);
             BeginPrint?.Invoke(this, new BeginPrintEventArgs());
             if (PrintPage != null)
             {
@@ -142,6 +143,7 @@ namespace Windows.UI.Xaml.Printing
             {
                 i++;
                 e.HasMorePages = false;
+                e.PageVisual = null;
                 PrintPage(this, e);
 
                 if (e.PageVisual != null)
@@ -249,17 +251,18 @@ namespace Windows.UI.Xaml.Printing
             };
 
             // Having all in one call makes it easier to copy and test it in separate HTML project.
-            _ = OpenSilver.Interop.ExecuteJavaScript(@"
+            _ = OpenSilver.Interop.ExecuteJavaScript(@" 
 // Backup title to restore later
 var title = document.title;
-
-window.addEventListener('beforeprint', (event) => {
-    document.title = $1;
+function BeforePrinting(event){
+	document.title = $1;
     addStyle();
     var elements = document.getElementsByClassName('print-section');
+    var printContainer = document.getElementById('print-container');
+    if(printContainer)
+        printContainer.remove();
     let el = document.createElement('div');
-    el.id = 'print-container';
-    el.style.display = 'none';
+    el.id = 'print-container';      
 
     for (var i = 0; i < elements.length; i++) {
         el.innerHTML = el.innerHTML + elements[i].outerHTML;
@@ -271,18 +274,41 @@ window.addEventListener('beforeprint', (event) => {
     for (var i = 0; i < new_elements.length; i++) {
         new_elements[i].classList.add('print-document-section-to-print');
     }
-}, { once: true });
+}
 
-window.addEventListener('afterprint', (event) => {
+function AfterPrinting(event)
+{
     var endCallback = $0; endCallback();
     document.getElementsByTagName('style')[0].remove();
     document.getElementById('print-container').remove();
-    document.title = title;
-}, { once: true });
+    document.title = title;    
+    window.OS_mediaQueryList.removeListener(PrintEventsForMediaQuery);
+}
+function PrintEventsForMediaQuery (mql) {
+            if (mql.matches) {
+                BeforePrinting(mql);
+            } else {
+                AfterPrinting(mql);
+            }
+        }
+
+
+if (window.matchMedia) {
+        window.OS_mediaQueryList = window.matchMedia('print');        
+        window.OS_mediaQueryList.addListener(PrintEventsForMediaQuery);
+    }
+else
+{	
+window.addEventListener('beforeprint', BeforePrinting , { once: true });
+window.addEventListener('afterprint', AfterPrinting , { once: true });
+}
 
 function addStyle() {
     var element = document.createElement('style')
     element.innerHTML += `
+ #print-container {
+        display: none;
+    }
 @media print {
     /* Added new class for PrintDocument */
     .print-document-section-to-print, .print-document-section-to-print * {
