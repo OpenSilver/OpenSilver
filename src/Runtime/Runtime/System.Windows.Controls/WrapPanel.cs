@@ -29,8 +29,6 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-
- 
     /// <summary>
     /// Positions child elements in sequential position from left to right, breaking
     /// content to the next line at the edge of the containing box. Subsequent ordering
@@ -59,13 +57,11 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class WrapPanel : Panel
     {
-        
         /// <summary>
         /// Initializes a new instance of the System.Windows.Controls.WrapPanel class.
         /// </summary>
         public WrapPanel() : base() { }
         
-       
         /// <summary>
         /// Gets or sets a value that specifies the dimension in which child content
         /// is arranged.
@@ -75,116 +71,84 @@ namespace Windows.UI.Xaml.Controls
             get { return (Orientation)GetValue(OrientationProperty); }
             set { SetValue(OrientationProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Orientation dependency property.
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(WrapPanel),
-                new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed)
-                { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
-        static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register(
+                nameof(Orientation),
+                typeof(Orientation),
+                typeof(WrapPanel),
+                new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
+                {
+                    MethodToUpdateDom2 = UpdateDomOnOrientationChanged
+                });
+
+        private static void UpdateDomOnOrientationChanged(DependencyObject d, object oldValue, object newValue)
         {
             var wrapPanel = (WrapPanel)d;
-            Orientation newValue = (Orientation)e.NewValue;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(wrapPanel))
+            var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(wrapPanel.INTERNAL_InnerDomElement);
+            switch ((Orientation)newValue)
             {
-                //todo: change all the wrappers of the children to set their style.display to inline-block
-                var el = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(wrapPanel);
-                switch(wrapPanel.HorizontalAlignment)
-                {
-                    case HorizontalAlignment.Left:
-                        el.textAlign = "left";
-                        break;
-                    case HorizontalAlignment.Right:
-                        el.textAlign = "right";
-                        break;
-                    case HorizontalAlignment.Center:
-                        el.textAlign = "center";
-                        break;
-                    default:
-                        el.textAlign = "left";
-                        break;
-                }
+                case Orientation.Horizontal:
+                    innerDivStyle.width = string.Empty;
+                    innerDivStyle.height = string.Empty;
+                    innerDivStyle.flexDirection = string.Empty;
+                    wrapPanel.SetDisplayOnChildWrappers("inline-flex");
+                    break;
+
+                case Orientation.Vertical:
+                    innerDivStyle.width = "fit-content";
+                    innerDivStyle.height = "calc(100%)";
+                    innerDivStyle.flexDirection = "column";
+                    wrapPanel.SetDisplayOnChildWrappers("block");
+                    break;
             }
         }
 
-
-
-        /*
-        // Summary:
-        //     Arranges the content of a System.Windows.Controls.WrapPanel element.
-        //
-        // Parameters:
-        //   finalSize:
-        //     The System.Windows.Size that this element should use to arrange its child
-        //     elements.
-        //
-        // Returns:
-        //     The System.Windows.Size that represents the arranged size of this System.Windows.Controls.WrapPanel
-        //     element and its children.
-        protected override Size ArrangeOverride(Size finalSize);
-        //
-        // Summary:
-        //     Measures the child elements of a System.Windows.Controls.WrapPanel in anticipation
-        //     of arranging them during the System.Windows.Controls.WrapPanel.ArrangeOverride(System.Windows.Size)
-        //     pass.
-        //
-        // Parameters:
-        //   constraint:
-        //     An upper limit System.Windows.Size that should not be exceeded.
-        //
-        // Returns:
-        //     The System.Windows.Size that represents the desired size of the element.
-        protected override Size MeasureOverride(Size constraint);
-         * */
-
-
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-            //divStyle.overflow = "auto";
-            divStyle.lineHeight = "0px";
-            divStyle.whiteSpace = "normal";
-            domElementWhereToPlaceChildren = div;
-            return div;
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
+            innerDivStyle.display = "flex";
+            innerDivStyle.flexWrap = "wrap";
+            if (Orientation == Orientation.Vertical)
+            {
+                innerDivStyle.width = "fit-content";
+                innerDivStyle.height = "calc(100%)";
+                innerDivStyle.flexDirection = "column";
+            }
+
+            domElementWhereToPlaceChildren = innerDiv;
+            return outerDiv;
         }
 
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index = -1)
         {
-            if (Orientation == Controls.Orientation.Horizontal)
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            divStyle.display = Orientation switch
             {
-                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
-                var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-                divStyle.display = "inline-block";
-                divStyle.lineHeight = "initial";
-                divStyle.verticalAlign = "middle";
+                Orientation.Horizontal => "inline-flex",
+                Orientation.Vertical => "block",
+                _ => throw new InvalidOperationException(),
+            };
+            domElementWhereToPlaceChild = div;
+            return div;
+        }
 
-                domElementWhereToPlaceChild = div;
-                return div;
-            }
-            else // Orientation == Controls.Orientation.Vertical
+        private void SetDisplayOnChildWrappers(string display)
+        {
+            foreach (UIElement child in Children)
             {
-                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
-                var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-                divStyle.lineHeight = "initial";
-                domElementWhereToPlaceChild = div;
-                return div;
+                if (child.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny is not null)
+                {
+                    var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(
+                        child.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny);
+                    wrapperDivStyle.display = display;
+                }
             }
         }
-        //internal override dynamic ShowChild(UIElement child)
-        //{
-        //    dynamic elementToReturn = base.ShowChild(child); //we need to return this so that a class that inherits from this but doesn't create a wrapper (or a different one) is correctly handled 
-
-        //    dynamic domChildWrapper = INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
-        //    var domChildWrapperStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domChildWrapper);
-        //    domChildWrapperStyle.display = "block"; //todo: verify that it is not necessary to revert to the previous value instead.
-        //    //domChildWrapperStyle.visibility = "visible";
-        //    domChildWrapperStyle.width = "";
-        //    domChildWrapperStyle.height = "";
-
-        //    return elementToReturn;
-        //}
     }
-
 }

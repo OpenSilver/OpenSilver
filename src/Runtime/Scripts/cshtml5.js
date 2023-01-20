@@ -234,14 +234,6 @@ document.setGridCollapsedDuetoHiddenColumn = function (id) {
     }
 }
 
-document.setDisplayTableCell = function (id) {
-    const element = document.getElementById(id);
-    if (!element || element.tagName == 'SPAN')
-        return;
-
-    element.style.display = 'table-cell';
-}
-
 document.getActualWidthAndHeight = function (element) {
     return (typeof element === 'undefined' || element === null) ? '0|0' : element['offsetWidth'].toFixed(3) + '|' + element['offsetHeight'].toFixed(3);
 }

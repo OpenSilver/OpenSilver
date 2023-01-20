@@ -768,18 +768,7 @@ namespace Windows.UI.Xaml
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
             {
                 // Get a reference to the most outer DOM element to show/hide:
-                object mostOuterDomElement = null;
-                if (VisualTreeHelper.GetParent(uiElement) is UIElement parent &&
-                    parent.INTERNAL_VisualChildrenInformation != null &&
-                    parent.INTERNAL_VisualChildrenInformation.ContainsKey(uiElement))
-                {
-                    mostOuterDomElement = parent.INTERNAL_VisualChildrenInformation[uiElement].INTERNAL_OptionalChildWrapper_OuterDomElement;
-                }
-                if (mostOuterDomElement == null)
-                {
-                    mostOuterDomElement = uiElement.INTERNAL_AdditionalOutsideDivForMargins ?? uiElement.INTERNAL_OuterDomElement;
-                }
-
+                object mostOuterDomElement = uiElement.INTERNAL_AdditionalOutsideDivForMargins ?? uiElement.INTERNAL_OuterDomElement;
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(mostOuterDomElement);
 
                 // Apply the visibility:

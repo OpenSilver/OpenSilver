@@ -454,21 +454,13 @@ namespace Windows.UI.Xaml
                 }
                 else // Otherwise we handle both alignment and Width/Height:
                 {
-                    bool isParentAHorizontalStackPanel = fe.INTERNAL_VisualParent is StackPanel && ((StackPanel)fe.INTERNAL_VisualParent).Orientation == Orientation.Horizontal; // If the element is inside a horizontal StackPanel, we ignore the "HorizontalAlignment" property, to ensure that we don't have issues with setting the CSS "display" property of the parent of the "wrapper" element.
-                    bool isParentAWrapPanel = fe.INTERNAL_VisualParent is WrapPanel; // If the element is inside a WrapPanel, we ignore the "HorizontalAlignment" property, to ensure that we don't have issues with setting the CSS "display" property of the parent of the "wrapper" element.
-                    bool isParentAWrapPanelOrAHorizontalStackPanel = isParentAHorizontalStackPanel || isParentAWrapPanel;
-                    var margin = fe.Margin;
-                    bool containsNegativeMargins = (margin.Left < 0d || margin.Top < 0d || margin.Right < 0d || margin.Bottom < 0d);
-
 #if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
 
                     //-----------------------------
                     // Gain access to the styles:
                     //-----------------------------
 
-                    var childOfOuterDomElement = INTERNAL_HtmlDomManager.GetFirstChildDomElement(fe.INTERNAL_OuterDomElement);
-                    var styleOfChildOfOuterDomElement = INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(childOfOuterDomElement) ? INTERNAL_HtmlDomManager.GetDomElementStyleForModification(childOfOuterDomElement) : null;
-                    var wrapperElement = fe.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny ?? fe.INTERNAL_AdditionalOutsideDivForMargins;
+                    var wrapperElement = fe.INTERNAL_AdditionalOutsideDivForMargins;
                     var styleOfWrapperElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(wrapperElement);
 
                     //-----------------------------
@@ -512,111 +504,24 @@ namespace Windows.UI.Xaml
                     switch (newHorizontalAlignment)
                     {
                         case HorizontalAlignment.Left:
-                            if (!isParentAWrapPanelOrAHorizontalStackPanel)
-                            {
-                                if (!containsNegativeMargins)
-                                {
-                                    styleOfWrapperElement.width = "100%";
-                                }
-                                styleOfOuterDomElement.marginLeft = "0px";
-                                styleOfOuterDomElement.marginRight = "auto";
-                                if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
-                                {
-
-                                    if (fe is not Grid)
-                                    {
-                                        styleOfOuterDomElement.display = "table";
-                                        if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
-                                        {
-                                            //Example of the note below:
-                                            //  <Border Width="100" Height="100" Background="#DDDDDD" x:Name="CenterAlignentBorder">
-                                            //      <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FFFFAAAA">
-                                            //          <TextBlock Text="Center"/>
-                                            //      </Border>
-                                            //  </Border>
-                                            if (styleOfChildOfOuterDomElement.display != "table" && //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
-                                                styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
-                                            {
-                                                // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"document.setDisplayTableCell(""{childOfOuterDomElement.UniqueIdentifier}"")");
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.justifyContent = "start";
                             styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? fe.Width.ToInvariantString() + "px" : "auto";
                             break;
                         case HorizontalAlignment.Center:
-                            if (!isParentAWrapPanelOrAHorizontalStackPanel)
-                            {
-                                styleOfWrapperElement.width = "auto"; // Note: in case of an object in a canvas, the "wrapperElement" is the same as the "OuterDomElement", so we need to execute this line before the line that sets the width of the OuterDomElement, otherwise the width is not correctly applied.
-                                styleOfOuterDomElement.marginLeft = "auto";
-                                styleOfOuterDomElement.marginRight = "auto";
-                                if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
-                                {
-                                    styleOfOuterDomElement.display = "table";
-                                    if (fe is not Grid)
-                                    {
-                                        if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
-                                        {
-                                            //Example of the note below: cf at the same place in case HorizontalAlignment.Left of the switch statement
-                                            if (styleOfChildOfOuterDomElement.display != "table" && //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
-                                                styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
-                                            {
-                                                // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"document.setDisplayTableCell(""{childOfOuterDomElement.UniqueIdentifier}"")");
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.justifyContent = "center";
                             styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? fe.Width.ToInvariantString() + "px" : "auto";
                             break;
                         case HorizontalAlignment.Right:
-                            if (!isParentAWrapPanelOrAHorizontalStackPanel)
-                            {
-                                styleOfWrapperElement.width = "auto";
-                                styleOfOuterDomElement.marginLeft = "auto";
-                                styleOfOuterDomElement.marginRight = "0px";
-                                if (!(fe is ScrollViewer) && !(fe is WrapPanel)) // Note: we don't know how to handle horizontal alignment properly for the ScrollViewer and the WrapPanel
-                                {
-                                    styleOfOuterDomElement.display = "table";
-                                    if (fe is not Grid)
-                                    {
-                                        if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(styleOfChildOfOuterDomElement))
-                                        {
-                                            //Example of the note below: cf at the same place in case HorizontalAlignment.Left of the switch statement
-                                            if (styleOfChildOfOuterDomElement.display != "table" && //Note: this test was added to prevent a bug that happened when both horizontal and vertical alignment were set, which lead to this line overriding the change of display that happened on a same dom element when the parent did not have a wrapper for its children (I think).
-                                                styleOfChildOfOuterDomElement.display != "none") // If Visibility is not 'Collapsed'
-                                            {
-                                                // Note: the "if != 'span'" condition below prevents adding "display: table-cell" to elements inside a TextBlock, such as <Run>, <Span>, <Bold>, etc.
-                                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"document.setDisplayTableCell(""{childOfOuterDomElement.UniqueIdentifier}"")");
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.justifyContent = "end";
                             styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? fe.Width.ToInvariantString() + "px" : "auto";
                             break;
                         case HorizontalAlignment.Stretch:
-                            if (!isParentAWrapPanelOrAHorizontalStackPanel)
-                            {
-                                if (!containsNegativeMargins)
-                                {
-                                    styleOfWrapperElement.width = "100%";
-                                }
-                                styleOfOuterDomElement.marginLeft = "0px"; // Default value
-                                styleOfOuterDomElement.marginRight = "0px"; // Default value
-                                if (fe is StackPanel && ((StackPanel)fe).Orientation == Orientation.Horizontal)
-                                {
-                                    styleOfOuterDomElement.display = "grid"; // Default value
-                                }
-                                else
-                                {
-                                    styleOfOuterDomElement.display = "block"; // Default value
-                                }
-                                styleOfOuterDomElement.width = "100%"; // Note: We never have both Stretch and a size in pixels, because of the "if" condition at the beginning of this method.
-                            }
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.justifyContent = "stretch";
+                            styleOfOuterDomElement.width = "100%";
                             break;
                         default:
                             break;
@@ -858,18 +763,14 @@ namespace Windows.UI.Xaml
                 }
                 else // Otherwise we handle both alignment and Width/Height:
                 {
-                    bool isParentAWrapPanelOrAVerticalStackPanel = fe.INTERNAL_VisualParent is WrapPanel || (fe.INTERNAL_VisualParent is StackPanel && ((StackPanel)fe.INTERNAL_VisualParent).Orientation == Orientation.Vertical); // If the element is inside a WrapPanel or a vertical StackPanel, we ignore the "VerticalAlignment" property, to ensure that we don't have issues with setting the CSS "display" property of the parent of the "wrapper" element.
-
 #if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
 
                     //-----------------------------
                     // Gain access to the styles:
                     //-----------------------------
 
-                    var wrapperElement = fe.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny ?? fe.INTERNAL_AdditionalOutsideDivForMargins;
+                    var wrapperElement = fe.INTERNAL_AdditionalOutsideDivForMargins;
                     var styleOfWrapperElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(wrapperElement);
-                    var parentOfTheWrapperElement = INTERNAL_HtmlDomManager.GetParentDomElement(wrapperElement);
-                    var styleOfParentOfTheWrapperElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(parentOfTheWrapperElement);
 
                     //-----------------------------
                     // Handle special cases:
@@ -908,94 +809,29 @@ namespace Windows.UI.Xaml
                     switch (newVerticalAlignment)
                     {
                         case VerticalAlignment.Top:
-                            if (!isParentAWrapPanelOrAVerticalStackPanel)
-                            {
-                                if (VisualTreeHelper.GetParent(fe) is Grid)
-                                {
-                                    //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
-                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
-                                    boxSizingStyle.marginTop = "0px";
-                                    boxSizingStyle.marginBottom = "auto";
-                                }
-                                styleOfWrapperElement.verticalAlign = "top";
-                            }
-                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? fe.Height.ToInvariantString() + "px" : "auto";
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.alignItems = "start";
+                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? $"{fe.Height.ToInvariantString()}px" : "auto";
                             break;
                         case VerticalAlignment.Center:
-                            if (!isParentAWrapPanelOrAVerticalStackPanel)
-                            {
-                                if (VisualTreeHelper.GetParent(fe) is Grid)
-                                {
-                                    //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
-                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
-                                    boxSizingStyle.marginTop = "auto";
-                                    boxSizingStyle.marginBottom = "auto";
-                                }
-                                else
-                                {
-                                    styleOfParentOfTheWrapperElement.display = "table";
-                                    styleOfWrapperElement.display = "table-cell";
-                                }
-                                styleOfWrapperElement.verticalAlign = "middle";
-                            }
-                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? fe.Height.ToInvariantString() + "px" : "auto";
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.alignItems = "center";
+                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? $"{fe.Height.ToInvariantString()}px" : "auto";
                             break;
                         case VerticalAlignment.Bottom:
-                            if (!isParentAWrapPanelOrAVerticalStackPanel)
-                            { 
-                                if (VisualTreeHelper.GetParent(fe) is Grid)
-                                {
-                                    //we get the box sizing element and set the top and bottom margin to auto (see if that could hinder the margins' functionning)
-                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
-                                    boxSizingStyle.marginTop = "auto";
-                                    boxSizingStyle.marginBottom = "0px";
-                                }
-                                else
-                                {
-                                    styleOfParentOfTheWrapperElement.display = "table";
-                                    styleOfWrapperElement.display = "table-cell";
-                                    styleOfWrapperElement.verticalAlign = "bottom";
-                                }
-                            }
-                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? fe.Height.ToInvariantString() + "px" : "auto";
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.alignItems = "end";
+                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? $"{fe.Height.ToInvariantString()}px" : "auto";
                             break;
                         case VerticalAlignment.Stretch:
-                            if (!isParentAWrapPanelOrAVerticalStackPanel)
-                            {
-                                if (VisualTreeHelper.GetParent(fe) is not Grid)
-                                {
-                                    styleOfWrapperElement.verticalAlign = "middle"; // This is useful when the parent is a horizontal StackPanel
-                                    styleOfOuterDomElement.height = "100%";  // Note: We never have both Stretch and a size in pixels, because of the "if" condition at the beginning of this method.
-                                }
-                                else
-                                {
-                                    var boxSizingStyle = INTERNAL_HtmlDomManager.GetFrameworkElementBoxSizingStyleForModification(fe);
-                                    boxSizingStyle.msGridRowAlign = "stretch";
-                                }
-                            }
+                            styleOfWrapperElement.display = "flex";
+                            styleOfWrapperElement.alignItems = "stretch";
+                            styleOfOuterDomElement.height = "100%";
                             break;
                         default:
                             throw new NotSupportedException();
                     }
                 }
-
-                //-----------------------------
-                // Handle the "Overflow" CSS property:
-                //-----------------------------
-
-                /*
-                 
-                // COMMENTED ON 2016.09.02 because it prevents properly displaying child elements with NEGATIVE MARGINS. To reproduce: put a border with negative margins inside another border.
-                 
-                if (!(frameworkElement is ScrollViewer) && !(frameworkElement is TextBox)) //Note: The ScrollViewer and the TextBox handle the "overflow" property by itself.
-                {
-                    // We always display the portions of the child exceeding the edges, unless the element has a fixed size in pixels AND it is not a canvas, or if the element is a TextBox:
-                    if (!double.IsNaN(frameworkElement.Height) && !(frameworkElement is Canvas))
-                        styleOfOuterDomElement.overflowY = "hidden"; //Note: This value means to crop the portion of the child exceeding the edges.
-                    else
-                        styleOfOuterDomElement.overflowY = ""; //Note: the default value is "visible"
-                }
-                 */
 
                 //-----------------------------
                 // Call code from derived class if any:
@@ -1216,128 +1052,57 @@ namespace Windows.UI.Xaml
 
         internal static void Margin_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-            var frameworkElement = (FrameworkElement)d;
-
-            Thickness newMargin = (Thickness)newValue;
-            if (!frameworkElement.IsUnderCustomLayout && INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement))
+            var fe = (FrameworkElement)d;            
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
             {
-                /*
-                // Display an error if the user is setting the Margin property AFTER adding the element to the Visual Tree.
-                // In fact, due to the optimization made in October 2016, when attaching to the Visual Tree, we create the DIV
-                // for margins ONLY if some margins have been set. So it is too late to add the DIV after attached to the visual
-                // tree.
-                if (oldMargin.Left == 0d && oldMargin.Top == 0d && oldMargin.Bottom == 0d && oldMargin.Right == 0d
-                    && (newMargin.Left != 0d || newMargin.Top != 0d || newMargin.Right != 0d || newMargin.Bottom != 0d))
+                var margin = (Thickness)newValue;
+                var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_AdditionalOutsideDivForMargins);
+                var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_OuterDomElement);
+                if (margin.Left >= 0)
                 {
-                    if (!_theWarningAboutMarginsHasAlreadyBeenDisplayed && CSHTML5.Interop.IsRunningInTheSimulator)
-                    {
-                        MessageBox.Show("TIP: For the most accurate result, please set the 'Margin' property BEFORE adding the element to the visual tree.");
-                        _theWarningAboutMarginsHasAlreadyBeenDisplayed = true;
-                    }
-                }
-                */
-                // Note: this is used to avoid overwriting the value set for the vertical
-                // alignment when in a css Grid, but the msGrid uses another way to set it
-                // so we do not need to change what happens here in this case.
-                bool isInsideACSSBasedGrid = frameworkElement.INTERNAL_VisualParent is Grid; 
-
-                var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
-                var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);
-                var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
-
-                // todo: if the container has a padding, add it to the margin?
-                // Note: positive margins are achieved by setting the "padding" of the outer
-                // "box-sizing" element. Negative margins are achieved by setting negative
-                // margins to the outer "box-sizing" AND positive "padding" to the element
-                // itself (to compensate for the fact that the CSS negative margins will
-                // "move" the element instead of making it bigger).
-
-                // ------------- LEFT ---------------
-                if (newMargin.Left >= 0)
-                {
-                    styleOfBoxSizingElement.paddingLeft = newMargin.Left.ToInvariantString() + "px";
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from negative margin to positive margin.
-                    styleOfBoxSizingElement.marginLeft = ""; 
+                    styleOfBoxSizingElement.paddingLeft = $"{margin.Left.ToInvariantString()}px";
+                    styleOfBoxSizingElement.marginLeft = string.Empty;
                 }
                 else
                 {
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingLeft = ""; 
-                    styleOfBoxSizingElement.marginLeft = newMargin.Left.ToInvariantString() + "px";
+                    styleOfBoxSizingElement.paddingLeft = string.Empty;
+                    styleOfBoxSizingElement.marginLeft = $"{margin.Left.ToInvariantString()}px";
                 }
 
-                // ------------- TOP ---------------
-                if (newMargin.Top >= 0)
+                if (margin.Top >= 0)
                 {
-                    styleOfBoxSizingElement.paddingTop = newMargin.Top.ToInvariantString() + "px";
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from negative margin to positive margin.
-                    styleOfOuterDomElement.marginTop = ""; 
+                    styleOfBoxSizingElement.paddingTop = $"{margin.Top.ToInvariantString()}px";
+                    styleOfOuterDomElement.marginTop = string.Empty;
                 }
                 else
                 {
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingTop = "";
-                    // In case of CSS-based Grid, we cannot mess with the margin proprty
-                    // because it is used for vertical alignment (margin "auto").
-                    if (!isInsideACSSBasedGrid || 
-                        frameworkElement.VerticalAlignment == VerticalAlignment.Top || 
-                        frameworkElement.VerticalAlignment == VerticalAlignment.Stretch) 
-                    {
-                        // Note: vertically we apply negative margins to the "outer dom element"
-                        // instead of the "box sizing" element in order to not mess with the CSS
-                        // Grid Layout vertical alignment, which uses the margins of the "box sizing"
-                        // to apply vertical alignment.
-                        styleOfOuterDomElement.marginTop = newMargin.Top.ToInvariantString() + "px"; 
-                    }
+                    styleOfBoxSizingElement.paddingTop = string.Empty;
+                    styleOfOuterDomElement.marginTop = $"{margin.Top.ToInvariantString()}px";
                 }
 
-                // ------------- RIGHT ---------------
-                if (newMargin.Right >= 0)
+                if (margin.Right >= 0)
                 {
-                    styleOfBoxSizingElement.paddingRight = newMargin.Right.ToInvariantString() + "px";
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from negative margin to positive margin.
-                    styleOfBoxSizingElement.marginRight = ""; 
+                    styleOfBoxSizingElement.paddingRight = $"{margin.Right.ToInvariantString()}px";
+                    styleOfBoxSizingElement.marginRight = string.Empty;
                 }
                 else
                 {
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingRight = ""; 
-                    styleOfBoxSizingElement.marginRight = newMargin.Right.ToInvariantString() + "px";
+                    styleOfBoxSizingElement.paddingRight = string.Empty;
+                    styleOfBoxSizingElement.marginRight = $"{margin.Right.ToInvariantString()}px";
+                    styleOfBoxSizingElement.width = "auto";
                 }
 
-                // ------------- BOTTOM ---------------
-                if (newMargin.Bottom >= 0)
+                if (margin.Bottom >= 0)
                 {
-                    styleOfBoxSizingElement.paddingBottom = newMargin.Bottom.ToInvariantString() + "px";
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from negative margin to positive margin.
-                    styleOfOuterDomElement.marginBottom = ""; 
+                    styleOfBoxSizingElement.paddingBottom = $"{margin.Bottom.ToInvariantString()}px";
+                    styleOfOuterDomElement.marginBottom = string.Empty;
                 }
                 else
                 {
-                    // This is to "undo" the value that was previously set in case we are
-                    // moving from positive margin to negative margin.
-                    styleOfBoxSizingElement.paddingBottom = "";
-                    // Note: vertically we apply negative margins to the "outer dom element"
-                    // instead of the "box sizing" element in order to not mess with the CSS
-                    // Grid Layout vertical alignment, which uses the margins of the "box sizing"
-                    // to apply vertical alignment.
-                    styleOfOuterDomElement.marginBottom = newMargin.Bottom.ToInvariantString() + "px"; 
+                    styleOfBoxSizingElement.paddingBottom = string.Empty;
+                    styleOfOuterDomElement.marginBottom = $"{margin.Bottom.ToInvariantString()}px";
                 }
             }
-
-#if PERFSTAT
-            Performance.Counter("Size/Alignment: Margin_Changed", t0);
-#endif
         }
 
         #endregion
@@ -1370,18 +1135,13 @@ namespace Windows.UI.Xaml
 
         private static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var frameworkElement = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double
-                && frameworkElement.IsUnderCustomLayout == false)
+            var fe = (FrameworkElement)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
             {
-                double newValue = (double)e.NewValue;
-                var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElementConcernedByTheCssProperty);
-                if (double.IsNaN(frameworkElement.Height) && style.display == "table")
-                    style.height = !double.IsNaN(newValue) && newValue > 0 ? newValue.ToInvariantString() + "px" : "initial";
-                else
-                    style.minHeight = !double.IsNaN(newValue) && newValue > 0 ? newValue.ToInvariantString() + "px" : "initial";
+                double minHeight = (double)e.NewValue;
+                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
+                style.minHeight = !double.IsNaN(minHeight) && minHeight > 0 ? $"{minHeight.ToInvariantString()}px" : string.Empty;
             }
         }
 
@@ -1415,15 +1175,13 @@ namespace Windows.UI.Xaml
 
         private static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var frameworkElement = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double
-                && frameworkElement.IsUnderCustomLayout == false)
+            var fe = (FrameworkElement)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
             {
-                double newValue = (double)e.NewValue;
-                var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElementConcernedByTheCssProperty);
-                style.minWidth = !double.IsNaN(newValue) && newValue > 0 ? newValue.ToInvariantString() + "px" : "initial";
+                double minWidth = (double)e.NewValue;
+                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
+                style.minWidth = !double.IsNaN(minWidth) && minWidth > 0 ? $"{minWidth.ToInvariantString()}px" : string.Empty;
             }
         }
 
@@ -1457,18 +1215,15 @@ namespace Windows.UI.Xaml
 
         private static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var frameworkElement = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double
-                && frameworkElement.IsUnderCustomLayout == false)
+            var fe = (FrameworkElement)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
             {
-                double newValue = (double)e.NewValue;
-                var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElementConcernedByTheCssProperty);
-
+                double maxHeight = (double)e.NewValue;
+                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
                 // Commented because at the time of writing "IsInfinity" was not implemented in JSIL:
                 //style.maxHeight = !double.IsInfinity(newValue) ? newValue.ToString() + "px" : "initial";
-                style.maxHeight = (newValue != double.MaxValue) ? newValue.ToInvariantString() + "px" : "initial";
+                style.maxHeight = (maxHeight != double.MaxValue) ? $"{maxHeight.ToInvariantString()}px" : string.Empty;
             }
         }
 
@@ -1502,18 +1257,15 @@ namespace Windows.UI.Xaml
 
         private static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var frameworkElement = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement)
-                && e.NewValue is double
-                && frameworkElement.IsUnderCustomLayout == false)
+            var fe = (FrameworkElement)d;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
             {
-                double newValue = (double)e.NewValue;
-                var domElementConcernedByTheCssProperty = frameworkElement.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? frameworkElement.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElementConcernedByTheCssProperty);
-
+                double maxWidth = (double)e.NewValue;
+                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
+                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
                 // Commented because at the time of writing "IsInfinity" was not implemented in JSIL:
                 //style.maxWidth = !double.IsInfinity(newValue) ? newValue.ToString() + "px" : "initial";
-                style.maxWidth = (newValue != double.MaxValue) ? newValue.ToInvariantString() + "px" : "initial";
+                style.maxWidth = (maxWidth != double.MaxValue) ? $"{maxWidth.ToInvariantString()}px" : string.Empty;
             }
         }
 
