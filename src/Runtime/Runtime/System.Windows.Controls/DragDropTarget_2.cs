@@ -13,9 +13,6 @@
 \*====================================================================================*/
 
 
-using CSHTML5;
-using CSHTML5.Internal;
-using System.Windows;
 using DotNetForHtml5.Core;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,10 +29,9 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.Foundation;
-using System.Windows.Controls;
 using System;
+using System.Windows;
 using Windows.UI.Xaml.Shapes;
-using Windows.UI.Xaml.Controls;
 using MS = System.Windows;
 #endif
 
@@ -529,7 +525,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
 
-#region Methods for sub-class to implement
+        #region Methods for sub-class to implement
 
         /// <summary>
         /// Inserts an item into an items control.
@@ -742,10 +738,10 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public event EventHandler<ItemDragEventArgs> ItemDroppedOnTarget;
 
-#endregion
+        #endregion
 
 
-#region Private helper methods
+        #region Private helper methods
         /// <summary>
         /// This method returns null if no DragDropTarget is under the pointer, else it returns the DragDropTarget under it (the first Parent found)
         /// </summary>
@@ -866,6 +862,6 @@ namespace Windows.UI.Xaml.Controls
         {
             (itemsControl as ItemsControl).GetItemsHost().Children.RemoveAt(index);
         }
-#endregion
+        #endregion
     }
 }

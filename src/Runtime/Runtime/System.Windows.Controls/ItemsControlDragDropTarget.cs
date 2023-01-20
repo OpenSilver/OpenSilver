@@ -19,10 +19,7 @@
 
 
 using System.Diagnostics.CodeAnalysis;
-using System.Windows.Controls.Primitives;
-
 #if MIGRATION
-using System.Windows.Shapes;
 #else
 using System;
 #endif
@@ -45,7 +42,7 @@ namespace Windows.UI.Xaml.Controls
         where TItemsControl : ItemsControl
         where TItemContainerType : FrameworkElement
     {
-#region public Duration ScrollItemAnimationDuration
+        #region public Duration ScrollItemAnimationDuration
         /// <summary>
         /// Gets or sets the duration to use to animate an item into view.
         /// </summary>
@@ -65,7 +62,7 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Duration),
                 typeof(ItemsControlDragDropTarget<TItemsControl, TItemContainerType>),
                 new PropertyMetadata(new Duration(TimeSpan.FromSeconds(0.15))));
-#endregion public Duration ScrollItemAnimationDuration
+        #endregion public Duration ScrollItemAnimationDuration
 
         /// <summary>
         /// Returns a value indicating whether an item can be added to the
@@ -223,10 +220,7 @@ namespace Windows.UI.Xaml.Controls
         protected override void ScrollIntoView(TItemsControl itemsControl, TItemContainerType itemContainer)
         {
             ScrollViewer scrollHost = itemsControl.GetScrollHost();
-            if (scrollHost != null)
-            {
-                scrollHost.ScrollIntoView(itemContainer, 10, 10, ScrollItemAnimationDuration);
-            }
+            scrollHost?.ScrollIntoView(itemContainer, 10, 10, ScrollItemAnimationDuration);
         }
     }
 }

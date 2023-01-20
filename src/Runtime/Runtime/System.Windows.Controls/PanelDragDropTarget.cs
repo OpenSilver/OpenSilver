@@ -15,7 +15,6 @@
 
 using System;
 
-
 #if MIGRATION
 namespace System.Windows.Controls
 #else
@@ -125,9 +124,9 @@ namespace Windows.UI.Xaml.Controls
         protected override Panel INTERNAL_ReturnNewTItemsControl()
         {
             return new StackPanel()
-                {
-                    Orientation = Orientation.Horizontal
-                };
+            {
+                Orientation = Orientation.Horizontal
+            };
         }
 
         [OpenSilver.NotImplemented]
