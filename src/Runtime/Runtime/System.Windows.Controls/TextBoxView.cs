@@ -245,30 +245,6 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
             }
         }
 
-        internal void OnHorizontalScrollBarVisibilityChanged(ScrollBarVisibility scrollVisibility)
-        {
-            if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(_contentEditableDiv))
-            {
-                string value = ScrollBarVisibilityToHtmlString(scrollVisibility);
-                if (value != null)
-                {
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).overflowX = value;
-                }
-            }
-        }
-
-        internal void OnVerticalScrollBarVisibilityChanged(ScrollBarVisibility scrollVisibility)
-        {
-            if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(_contentEditableDiv))
-            {
-                string value = ScrollBarVisibilityToHtmlString(scrollVisibility);
-                if (value != null)
-                {
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).overflowY = value;
-                }
-            }
-        }
-
         internal void OnMaxLengthChanged(int maxLength)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && 
@@ -428,13 +404,6 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
 
             // Apply Host.TextWrapping
             contentEditableDivStyle.whiteSpace = Host.TextWrapping == TextWrapping.NoWrap ? "nowrap" : "pre-wrap";
-
-            // Apply Host.HorizontalScrollBarVisibility
-            contentEditableDivStyle.overflowX = ScrollBarVisibilityToHtmlString(Host.HorizontalScrollBarVisibility) ?? "hidden";
-
-            // Apply Host.VerticalScrollBarVisibility
-            contentEditableDivStyle.overflowY = ScrollBarVisibilityToHtmlString(Host.VerticalScrollBarVisibility) ?? "hidden";
-            
             contentEditableDivStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             contentEditableDivStyle.background = "solid transparent";
             contentEditableDivStyle.cursor = "text";

@@ -52,6 +52,7 @@ namespace Windows.UI.Xaml.Controls
     {
         private bool _isProcessingInput;
         private int? _selectionIdxCache;
+        private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
         private ITextBoxViewHost<TextBoxView> _textViewHost;
 
@@ -286,9 +287,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnHorizontalScrollBarVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = (TextBox)d;
-            if (tb._textViewHost != null)
+            if (tb._scrollViewer != null)
             {
-                tb._textViewHost.View.OnHorizontalScrollBarVisibilityChanged((ScrollBarVisibility)e.NewValue);
+                tb._scrollViewer.HorizontalScrollBarVisibility = (ScrollBarVisibility)e.NewValue;
             }
         }
 
@@ -314,9 +315,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnVerticalScrollBarVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = (TextBox)d;
-            if (tb._textViewHost != null)
+            if (tb._scrollViewer != null)
             {
-                tb._textViewHost.View.OnVerticalScrollBarVisibilityChanged((ScrollBarVisibility)e.NewValue);
+                tb._scrollViewer.VerticalScrollBarVisibility = (ScrollBarVisibility)e.NewValue;
             }
         }
 
@@ -588,6 +589,7 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
+            _scrollViewer = null;
             if (_contentElement != null)
             {
                 ClearContentElement();
@@ -604,6 +606,9 @@ namespace Windows.UI.Xaml.Controls
 
             if (contentElement != null)
             {
+                _scrollViewer = contentElement as ScrollViewer;
+                InitializeScrollViewer();
+
                 _contentElement = contentElement;
                 InitializeContentElement();
             }
@@ -837,6 +842,15 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 GoToState(VisualStates.StateNormal);
+            }
+        }
+
+        private void InitializeScrollViewer()
+        {
+            if (_scrollViewer != null)
+            {
+                _scrollViewer.HorizontalScrollBarVisibility = HorizontalScrollBarVisibility;
+                _scrollViewer.VerticalScrollBarVisibility = VerticalScrollBarVisibility;
             }
         }
 
