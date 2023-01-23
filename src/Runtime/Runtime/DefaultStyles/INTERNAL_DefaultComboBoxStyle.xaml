@@ -109,6 +109,8 @@
                 Value="6,2,30,2" />
         <Setter Property="Cursor"
                 Value="Hand" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -214,17 +216,11 @@
                                 <ContentPresenter x:Name="ContentPresenter"
                                                   IsHitTestVisible="False"
                                                   Margin="{TemplateBinding Padding}"
-                                                  Content=""
-                                                  ContentTemplate="{x:Null}" />
-
-                                <!-- This empty TextBlock allows to ensure that the minimum vertical size of 
-                                the ComboBox corresponds to the value of the inherited FontSize property -->
-
-                                <TextBlock Text=" "
-                                           Opacity="0"
-                                           IsHitTestVisible="False"
-                                           IsTabStop="False"
-                                           Margin="{TemplateBinding Padding}" />
+                                                  ContentTemplate="{x:Null}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                    <TextBlock Text=" " />
+                                </ContentPresenter>
                             </Grid>
                         </Border>
                         <Border x:Name="DisabledVisualElement"
