@@ -276,6 +276,7 @@
 		<Compile Include="System.Windows.Navigation\NavigationMode.cs" />
 		<Compile Include="System.Windows.Printing\EndPrintEventArgs.cs" />
 		<Compile Include="System.Windows.Printing\PrintDocument.cs" />
+		<Compile Include="System.Windows.Printing\PrintDocument.PrintOperation.cs" />
 		<Compile Include="System.Windows.Printing\PrintPageEventArgs.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows.input\CursorConverter.cs" />
