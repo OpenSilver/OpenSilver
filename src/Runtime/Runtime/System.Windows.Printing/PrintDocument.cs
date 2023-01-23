@@ -54,20 +54,34 @@ namespace Windows.UI.Xaml.Printing
     /// </remarks>
     public partial class PrintDocument : DependencyObject
     {
-        private readonly List<UIElement> elements;
+        private static object _printDocumentNative;
+
+        static PrintDocument()
+        {
+            try
+            {
+                InitializePrintDocumentNative();
+            }
+            catch
+            {
+                // If this static constructor is called before the JSInterop is set up, then
+                // this will crash. Handle it and delay this object's construction to later.
+            }
+        }        
+
+        private PrintOperation _operation;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PrintDocument"/> class.
         /// </summary>
         public PrintDocument()
         {
-            elements = new List<UIElement>();
         }
 
         /// <summary>
         /// Gets the identifier for the <see cref="PrintedPageCount"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty PrintedPageCountProperty = 
+        public static readonly DependencyProperty PrintedPageCountProperty =
             DependencyProperty.Register(
                 nameof(PrintedPageCount),
                 typeof(int),
@@ -83,6 +97,7 @@ namespace Windows.UI.Xaml.Printing
         public int PrintedPageCount
         {
             get => (int)GetValue(PrintedPageCountProperty);
+            private set => SetValue(PrintedPageCountProperty, value);
         }
 
         /// <summary>
@@ -114,208 +129,11 @@ namespace Windows.UI.Xaml.Printing
         /// </exception>
         public void Print(string documentName)
         {
-            elements.Clear();
-            BeginPrint?.Invoke(this, new BeginPrintEventArgs());
-            if (PrintPage != null)
-            {
-                // In Silverlight PrintPage event is used to get all elements that need to be printed.
-                GetElements();
-            }
+            InitializePrintDocumentNative();
+            EndPendingOperation();
 
-            if (elements.Count > 0)
-            {
-                AddEventListeners(documentName);
-                LoadNotLoadedElements(() =>
-                {
-                    PrintPrivate();
-                });
-            }
-        }
-
-        private void GetElements()
-        {
-            PrintPageEventArgs e = new PrintPageEventArgs();
-
-            int i = 0;
-            // In Silverlight it will stop calling PrintPage after Print if HasMorePages is false AND PageVisual is null
-            while (true)
-            {
-                i++;
-                e.HasMorePages = false;
-                PrintPage(this, e);
-
-                if (e.PageVisual != null)
-                {
-                    elements.Add(e.PageVisual);
-                    SetValue(PrintedPageCountProperty, elements.Count);
-                    if (!e.HasMorePages)
-                        break;
-                }
-
-                // Avoid infinite loop
-                if (i > 1000)
-                    break;
-            }
-        }
-
-        private void PrintPrivate()
-        {
-            AddPrintSection();
-            OpenSilver.Interop.ExecuteJavaScriptVoid("window.print()");
-            RemovePrintSection(elements);
-        }
-
-        private void LoadNotLoadedElements(Action callback)
-        {
-            List<UIElement> NotLoadedElements = new List<UIElement>();
-            foreach (var e in elements)
-            {
-                if (!e._isLoaded)
-                {
-                    NotLoadedElements.Add(e);
-                }
-            }
-
-            if (NotLoadedElements.Count == 0)
-            {
-                callback();
-                return;
-            }
-
-            var temporaryPopup = new Popup() { VerticalOffset = 10000 };
-            temporaryPopup.IsOpen = true;
-
-            var stackPanel = new StackPanel();
-            foreach (var e in NotLoadedElements)
-            {
-                stackPanel.Children.Add(e);
-            }
-
-            stackPanel.Loaded += (s, e) =>
-            {
-                this.Dispatcher.BeginInvoke(() =>
-                {
-                    foreach (var el in NotLoadedElements)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(el.INTERNAL_OuterDomElement)}.classList.add(\"print-section\")");
-                    }
-
-                    string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action)(() =>
-                    {
-                        callback();
-                        temporaryPopup.IsOpen = false;
-                    }));
-                    // Even though the Loaded event is fired, sometimes we need to wait little bit more.
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"setTimeout({sCallback}, 100)");
-                });
-            };
-
-            // Put the container into the popup, and open the popup:
-            temporaryPopup.Child = stackPanel;
-            temporaryPopup.IsOpen = true;
-        }
-
-        private void AddPrintSection()
-        {
-            // Add 'print-section' class for elements we want to print
-            foreach (var e in elements)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e.INTERNAL_OuterDomElement)}.classList.add(\"print-section\")");
-            }
-        }
-
-        private void RemovePrintSection(List<UIElement> elements)
-        {
-            // Remove 'print-section' class for elements we want to print
-            foreach (var e in elements)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoid(
-                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(e.INTERNAL_OuterDomElement)}.classList.remove(\"print-section\")");
-            }
-            elements.Clear();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="documentName"></param>
-        private void AddEventListeners(string documentName)
-        {
-            Action endCallback = () =>
-            {
-                EndPrint?.Invoke(this, new EndPrintEventArgs());
-            };
-
-            // Having all in one call makes it easier to copy and test it in separate HTML project.
-            _ = OpenSilver.Interop.ExecuteJavaScript(@"
-// Backup title to restore later
-var title = document.title;
-
-window.addEventListener('beforeprint', (event) => {
-    document.title = $1;
-    addStyle();
-    var elements = document.getElementsByClassName('print-section');
-    let el = document.createElement('div');
-    el.id = 'print-container';
-    el.style.display = 'none';
-
-    for (var i = 0; i < elements.length; i++) {
-        el.innerHTML = el.innerHTML + elements[i].outerHTML;
-    }
-    
-    document.body.prepend(el);
-    
-    var new_elements = el.getElementsByClassName('print-section');
-    for (var i = 0; i < new_elements.length; i++) {
-        new_elements[i].classList.add('print-document-section-to-print');
-    }
-}, { once: true });
-
-window.addEventListener('afterprint', (event) => {
-    var endCallback = $0; endCallback();
-    document.getElementsByTagName('style')[0].remove();
-    document.getElementById('print-container').remove();
-    document.title = title;
-}, { once: true });
-
-function addStyle() {
-    var element = document.createElement('style')
-    element.innerHTML += `
-@media print {
-    /* Added new class for PrintDocument */
-    .print-document-section-to-print, .print-document-section-to-print * {
-        visibility: visible;
-    }
-
-    .print-document-section-to-print {
-        left: 0 !important;
-        top: 0 !important;
-        margin: 0 !important;
-        border: 0 !important;
-        padding: 0 !important;
-        height: 100%;
-        width: 100%;
-    }
-
-    /* Page break for all elements except the last one */
-    .print-document-section-to-print:not(:last-child) {
-        break-after: page !important;
-    }
-
-    #print-container {
-        display: inline !important;
-    }
-    
-    body>*:not(#print-container) {
-        display: none !important;
-    }
-}
-`;
-    document.head.prepend(element);
-}
-", endCallback, documentName);
+            _operation = new PrintOperation(this);
+            _operation.Print(documentName);
         }
 
         /// <summary>
@@ -353,6 +171,100 @@ function addStyle() {
         [OpenSilver.NotImplemented]
         public void PrintBitmap(string documentName)
         {
+        }
+
+        private void EndPendingOperation()
+        {
+            if (_operation is not null)
+            {
+                _operation.Dispose();
+                _operation = null;
+                PrintedPageCount = 0;
+            }
+        }
+
+        private static void InitializePrintDocumentNative()
+        {
+            _printDocumentNative ??= OpenSilver.Interop.ExecuteJavaScript(
+@"(function () {
+  function addStyle() {
+    var element = document.createElement('style')
+    element.innerHTML += `
+#print-container {
+  display: none;
+}
+@media print {
+  /* Added new class for PrintDocument */
+  .print-document-section-to-print, .print-document-section-to-print * {
+    visibility: visible;
+  }
+
+  .print-document-section-to-print {
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    padding: 0 !important;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Page break for all elements except the last one */
+  .print-document-section-to-print:not(:last-child) {
+    break-after: page !important;
+  }
+
+  #print-container {
+    display: inline !important;
+  }
+
+  body>*:not(#print-container) {
+    display: none !important;
+  }
+}`;
+    document.head.prepend(element);
+  };
+
+  function prepareDocument() {
+    addStyle();
+    var elements = document.getElementsByClassName('print-section');
+    let el = document.createElement('div');
+    el.id = 'print-container';      
+
+    for (var i = 0; i < elements.length; i++) {
+      el.innerHTML = el.innerHTML + elements[i].outerHTML;
+    }
+
+    document.body.prepend(el);
+
+    var new_elements = el.getElementsByClassName('print-section');
+    for (var i = 0; i < new_elements.length; i++) {
+      new_elements[i].classList.add('print-document-section-to-print');
+    }
+  };
+
+  return {
+  	print: function (title, callback) {
+      const t = document.title;
+      window.addEventListener('beforeprint', function (e) {
+        document.title = title;
+  	    prepareDocument();
+  	  }, { once: true });
+  	  var mql = window.matchMedia('print');
+  	  const endprint = function (event) {
+        if (!event.matches) {
+  		  callback();
+  		  document.getElementsByTagName('style')[0].remove();
+  		  document.getElementById('print-container').remove();
+  		  document.title = t;
+  		  mql.removeEventListener('change', endprint);
+        }
+      };
+  	  mql.addEventListener('change', endprint);
+  	  window.print();
+  	}
+  };
+})();");
         }
     }
 }

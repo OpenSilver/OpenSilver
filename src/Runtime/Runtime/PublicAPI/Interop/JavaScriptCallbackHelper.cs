@@ -31,10 +31,10 @@ namespace CSHTML5.Internal
             {
                 _action = action ?? throw new ArgumentNullException(nameof(action));
 
-                JSCallback = JavascriptCallback.Create(RunCallbackAndDispoe);
+                JSCallback = JavascriptCallback.Create(RunCallbackAndDispose);
             }
 
-            private void RunCallbackAndDispoe()
+            private void RunCallbackAndDispose()
             {
                 _action();
                 JSCallback.Dispose();
