@@ -70,10 +70,8 @@ namespace System.Windows.Markup
         {
             if (serviceProvider.GetService(typeof(IAmbientResourcesProvider)) is not IAmbientResourcesProvider ambientProvider)
             {
-                throw new InvalidOperationException(
-                    string.Format("Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.",
-                        GetType().Name,
-                        nameof(IAmbientResourcesProvider)));
+                resource = null;
+                return false;
             }
 
             IEnumerable<object> ambientValues = ambientProvider.GetAllAmbientValues();
