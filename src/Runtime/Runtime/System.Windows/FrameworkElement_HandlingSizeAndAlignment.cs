@@ -1661,57 +1661,6 @@ namespace Windows.UI.Xaml
             return new Size(0d, 0d);
         }
 
-        /// <summary>
-        /// Use this method for better performance in the Simulator compared to requesting the ActualWidth and ActualHeight separately.
-        /// </summary>
-        /// <returns>The actual size of the element.</returns>
-        internal Size INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect()
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this.INTERNAL_OuterDomElement != null)
-            {
-#if !CSHTML5NETSTANDARD
-                if (IsRunningInJavaScript())
-                {
-                    var rect = this.INTERNAL_OuterDomElement.getBoundingClientRect();
-                    double actualWidth = rect.width;
-                    double actualHeight = rect.height;
-                    return new Size(actualWidth, actualHeight);
-                }
-                else
-                {
-#endif
-                    try
-                    {
-                        // Hack to improve the Simulator performance by making only one interop call rather than two:
-                        string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(this.INTERNAL_OuterDomElement);
-                        string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
-                            $"(function() {{ var v = {sElement}.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) }})()");
-                        int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
-                        if (sepIndex > -1)
-                        {
-                            string actualWidthAsString = concatenated.Substring(0, sepIndex);
-                            string actualHeightAsString = concatenated.Substring(sepIndex + 1);
-                            double actualWidth = double.Parse(actualWidthAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                            double actualHeight = double.Parse(actualHeightAsString, CultureInfo.InvariantCulture); //todo: read note above
-                            return new Size(actualWidth, actualHeight);
-                        }
-                        else
-                        {
-                            return new Size(0d, 0d);
-                        }
-                    }
-                    catch
-                    {
-                        return new Size(0d, 0d);
-                    }
-#if !CSHTML5NETSTANDARD
-                }
-#endif
-            }
-            else
-                return new Size(0d, 0d);
-        }
-
         #endregion
 
 

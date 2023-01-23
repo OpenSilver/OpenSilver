@@ -1463,11 +1463,41 @@ document.ondblclick = null;
             return new MatrixTransform(new Matrix(1, 0, 0, 1, offsetLeft, offsetTop));
         }
 
+        /// <summary>
+        /// Use this method for better performance in the Simulator compared to 
+        /// requesting the ActualWidth and ActualHeight separately.
+        /// </summary>
+        /// <returns>
+        /// The actual size of the element.
+        /// </returns>
+        internal Size GetBoundingClientSize()
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
+            {
+                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
+                string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
+                    $"(function() {{ var v = {sElement}.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) }})()");
+                int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                if (sepIndex > -1)
+                {
+                    string widthStr = concatenated.Substring(0, sepIndex);
+                    string heightStr = concatenated.Substring(sepIndex + 1);
+                    if (double.TryParse(widthStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double width)
+                        && double.TryParse(heightStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double height))
+                    {
+                        return new Size(width, height);
+                    }
+                }
+            }
+
+            return new Size();
+        }
+
         //internal virtual void INTERNAL_Render()
         //{
         //}
 
-#region ForceInherit property support
+        #region ForceInherit property support
 
         internal static void SynchronizeForceInheritProperties(UIElement uie, DependencyObject parent)
         {

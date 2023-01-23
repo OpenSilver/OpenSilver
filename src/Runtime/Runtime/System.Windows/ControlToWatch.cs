@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,8 @@ namespace Windows.UI.Xaml
     {
         internal ControlToWatch(UIElement controlToWatch, Action<Point, Size> OnPositionOrSizeChangedCallback)
         {
+            Debug.Assert(controlToWatch != null);
+            Debug.Assert(OnPositionOrSizeChangedCallback != null);
             ControltoWatch = controlToWatch;
             OnPositionOrSizeChanged = OnPositionOrSizeChangedCallback;
         }

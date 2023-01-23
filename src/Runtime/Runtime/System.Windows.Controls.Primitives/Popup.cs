@@ -302,10 +302,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 {
                     // Show the popup:
                     popup.ShowPopupRootIfNotAlreadyVisible();
-                    if (popup.CustomLayout)
-                    {
-                        popup._popupRoot.Visibility = Visibility.Visible;
-                    }
                     popup.OnOpened();
                 }
                 else
@@ -331,30 +327,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                         popup._controlToWatch = Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
                         popup.ShowPopupRootIfNotAlreadyVisible();
-
-                        //We calculate the position at which the popup will be:
-
-                        //We get the position of the element to which the popup is attached:
-                        Point placementTargetPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(targetElement);
-
-                        //we get the size of the element:
-                        Size elementCurrentSize;
-                        if (targetElement is FrameworkElement)
-                        {
-                            elementCurrentSize = ((FrameworkElement)targetElement).INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect();
-                        }
-                        else
-                        {
-                            elementCurrentSize = new Size();
-                        }
-
-                        //We put the popup at the calculated position:
-                        popup.RefreshPopupPosition(placementTargetPosition, elementCurrentSize); //note: We might have a position bug here if parentposition is set, ie if popup is in the visual tree
-
-                        if (popup.CustomLayout)
-                        {
-                            popup._popupRoot.Visibility = Visibility.Visible;
-                        }
                     }
                     else
                     {
@@ -378,35 +350,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
             else if (PlacementTarget != null)
             {
-                //We change the position so that the popup goes to the correct relative position:
-                switch (Placement)
-                {
-                    case PlacementMode.Bottom:
-                        if (!double.IsNaN(placementTargetSize.Height))
-                        {
-                            placementTargetPosition.Y += placementTargetSize.Height;
-                        }
-                        break;
-                    //case PlacementMode.Right:
-                    //    break;
-                    //case PlacementMode.Mouse:
-                    //    break;
-                    //case PlacementMode.Left:
-                    //    break;
-                    //case PlacementMode.Top:
-                    //    break;
-                    default: //note: we currently consider Right as the default placement (only Bottom and Right are supported)
-                        if (!double.IsNaN(placementTargetSize.Width))
-                        {
-                            placementTargetPosition.X += placementTargetSize.Width;
-                        }
-                        break;
-                }
-
-                _referencePosition = placementTargetPosition;
+                _referencePosition = GetOffsetToPlacementTarget(placementTargetPosition, placementTargetSize);
                 RepositionPopup(HorizontalOffset, VerticalOffset);
 
-                if(StaysWithinScreenBounds)
+                if (StaysWithinScreenBounds)
                 {
                     INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this);
                 }
@@ -417,6 +364,24 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 INTERNAL_PopupMoved(this, new EventArgs());
         }
 
+        private Point GetOffsetToPlacementTarget(Point targetPosition, Size targetSize)
+        {
+            switch (Placement)
+            {
+                case PlacementMode.Bottom:
+                    targetPosition.Y += targetSize.Height;
+                    break;
+                case PlacementMode.Mouse: // Not implemented
+                case PlacementMode.Left: // Not implemented
+                case PlacementMode.Top: // Not implemented
+                case PlacementMode.Right:
+                default:
+                    targetPosition.X += targetSize.Width;
+                    break;
+            }
+
+            return targetPosition;
+        }
 
         //-----------------------
         // HORIZONTALOFFSET
@@ -612,7 +577,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 {
                     // Setting Visibility to Collapse as a fix to the issue where Popup shows briefly at 0,0
                     // Will set to Visible where ShowPopupRootIfNotAlreadyVisible is called
-                    _popupRoot.Visibility = Visibility.Collapsed; 
                     _popupRoot.CustomLayout = true;
                     if (Child is FrameworkElement childFe)
                     {
@@ -627,7 +591,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     _outerBorder.Content = null;
 
                 // Calculate the position of the parent of the popup, in case that the popup is in the Visual Tree:
-                _referencePosition = CalculateReferencePosition(parentWindow) ?? new Point();
+                _referencePosition = CalculateReferencePosition();
 
                 // Create a surrounding border to enable positioning and alignment:
                 _outerBorder = new NonLogicalContainer()
@@ -699,20 +663,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return parentWindow;
         }
 
-        private Point? CalculateReferencePosition(Window parentWindow)
+        private Point CalculateReferencePosition()
         {
-            UIElement placementTarget = this.PlacementTarget;
+            UIElement placementTarget = PlacementTarget;
             if (placementTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(placementTarget))
             {
-                GeneralTransform gt = placementTarget.TransformToVisual(parentWindow);
-                Point p = gt.Transform(new Point(0d, 0d));
+                Point p = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(placementTarget);
+                Size s = placementTarget.GetBoundingClientSize();
+                return GetOffsetToPlacementTarget(p, s);
             }
             else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                GeneralTransform gt = this.TransformToVisual(parentWindow);
-                Point p = gt.Transform(new Point(0d, 0d));
-                return p;
+                GeneralTransform gt = TransformToVisual(null);
+                return gt.Transform(new Point(0d, 0d));
             }
+
             return new Point();
         }
 
@@ -790,15 +755,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 Point placementTargetPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(targetElement);
 
                 //we get the size of the element:
-                Size elementCurrentSize;
-                if (targetElement is FrameworkElement)
-                {
-                    elementCurrentSize = ((FrameworkElement)targetElement).INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect();
-                }
-                else
-                {
-                    elementCurrentSize = new Size();
-                }
+                Size elementCurrentSize = targetElement.GetBoundingClientSize();
 
                 //We put the popup at the calculated position:
                 RefreshPopupPosition(placementTargetPosition, elementCurrentSize);

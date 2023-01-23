@@ -65,17 +65,7 @@ namespace Windows.UI.Xaml
             {
                 //get the element's new Position:
                 Point elementCurrentPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(controlToWatch.ControltoWatch);
-                Size elementCurrentSize;
-                FrameworkElement control = controlToWatch.ControltoWatch as FrameworkElement;
-                if (control != null)
-                {
-                    elementCurrentSize = control.INTERNAL_GetActualWidthAndHeightUsinggetboudingClientRect();
-                }
-                else
-                {
-                    elementCurrentSize = new Size();
-                }
-
+                Size elementCurrentSize = controlToWatch.ControltoWatch.GetBoundingClientSize();
                 if (elementCurrentPosition != controlToWatch.PreviousPosition ||
                     !INTERNAL_SizeComparisonHelpers.AreSizesEqual(elementCurrentSize, controlToWatch.PreviousSize))
                 {
