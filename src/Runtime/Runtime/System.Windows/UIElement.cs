@@ -90,6 +90,8 @@ namespace Windows.UI.Xaml
 
         internal bool IsConnectedToLiveTree { get; set; }
 
+        internal bool LoadingIsPending { get; set; }
+
 #region Visual Parent
 
         private DependencyObject _parent;

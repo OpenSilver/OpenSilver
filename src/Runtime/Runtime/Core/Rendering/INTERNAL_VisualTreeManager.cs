@@ -170,12 +170,36 @@ namespace CSHTML5.Internal
                                           parent.GetType().ToString()));
                     }
                 }
-                else if (parent.INTERNAL_VisualChildrenInformation != null
-                        && parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
+                else if (child.LoadingIsPending)
                 {
-                    // Remove the element from the parent's children collection:
-                    parent.INTERNAL_VisualChildrenInformation.Remove(child);
-                    DetachElement(child);
+                    if (parent.INTERNAL_VisualChildrenInformation != null
+                        && parent.INTERNAL_VisualChildrenInformation.ContainsKey(child))
+                    {
+                        // Remove the parent-specific wrapper around the child in the DOM (if any):
+                        var optionalChildWrapper_OuterDomElement = parent.INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
+                        if (optionalChildWrapper_OuterDomElement != null)
+                            INTERNAL_HtmlDomManager.RemoveFromDom(optionalChildWrapper_OuterDomElement);
+
+                        // Remove the element from the parent's children collection:
+                        parent.INTERNAL_VisualChildrenInformation.Remove(child);
+
+                        //Detach Element
+                        if (child.INTERNAL_VisualChildrenInformation == null)
+                        {
+                            DetachElement(child);
+                        }
+                        else
+                        {
+                            DetachVisualChidren(child);
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception(
+                            string.Format("Cannot detach the element '{0}' because it is not a child of the element '{1}'.",
+                                          child.GetType().ToString(),
+                                          parent.GetType().ToString()));
+                    }
                 }
             }
 #if PERFSTAT
@@ -239,6 +263,7 @@ namespace CSHTML5.Internal
 
             // Reset all visual-tree related information:
             element.IsConnectedToLiveTree = false;
+            element.LoadingIsPending = false;
             element.INTERNAL_OuterDomElement = null;
             element.INTERNAL_InnerDomElement = null;
             element.INTERNAL_VisualChildrenInformation = null;
@@ -349,7 +374,7 @@ if(nextSibling != undefined) {
             if (child != null && IsElementInVisualTree(parent))
             {
                 // Ensure that the child is not already attached:
-                if (!child.IsConnectedToLiveTree)
+                if (!child.IsConnectedToLiveTree && !child.LoadingIsPending)
                 {
                     string label = "";
                     if (EnablePerformanceLogging)
@@ -432,12 +457,11 @@ if(nextSibling != undefined) {
 
             object domElementWhereToPlaceChildStuff = (parent.GetDomElementWhereToPlaceChild(child) ?? parent.INTERNAL_InnerDomElement);
 
-            // A "wrapper for child" is sometimes needed between the child and the parent (for example in case of a grid). It is usually one or more DIVs that fit in-between the child and the parent, and that are used to position the child within the parent.
-            object innerDivOfWrapperForChild;
-            object wrapperForChild = parent.CreateDomChildWrapper(domElementWhereToPlaceChildStuff, out innerDivOfWrapperForChild, index);
-            bool comparison1 = (wrapperForChild == null); // Note: we need due to a bug of JSIL where translation fails if we do not use this temp variable.
-            bool comparison2 = (innerDivOfWrapperForChild == null); // Note: we need due to a bug of JSIL where translation fails if we do not use this temp variable.
-            bool doesParentRequireToCreateAWrapperForEachChild = (!comparison1 && !comparison2); // Note: The result is "True" for complex structures such as tables, false otherwise (cf. documentation in "INTERNAL_VisualChildInformation" class).
+            // A "wrapper for child" is sometimes needed between the child and the parent (for example in case of a grid).
+            // It is usually one or more DIVs that fit in-between the child and the parent, and that are used to position
+            // the child within the parent.
+            object wrapperForChild = parent.CreateDomChildWrapper(domElementWhereToPlaceChildStuff, out object innerDivOfWrapperForChild, index);
+            bool doesParentRequireToCreateAWrapperForEachChild = wrapperForChild is not null && innerDivOfWrapperForChild is not null;
 
             // Remember the information about the "VisualChildren"
             parent.INTERNAL_VisualChildrenInformation ??= new Dictionary<UIElement, INTERNAL_VisualChildInformation>();
@@ -448,6 +472,8 @@ if(nextSibling != undefined) {
                     INTERNAL_OptionalChildWrapper_OuterDomElement = wrapperForChild,
                     INTERNAL_OptionalChildWrapper_ChildWrapperInnerDomElement = innerDivOfWrapperForChild
                 });
+
+            child.LoadingIsPending = true;
 
 #if PERFSTAT
             Performance.Counter("VisualTreeManager: Prepare the parent", t0);
@@ -593,6 +619,7 @@ if(nextSibling != undefined) {
                     : domElementWhereToPlaceChildStuff));
 
             child.IsConnectedToLiveTree = true;
+            child.LoadingIsPending = false;
 
             // Set the "ParentWindow" property so that the element knows where to display popups:
             child.INTERNAL_ParentWindow = parent.INTERNAL_ParentWindow;
