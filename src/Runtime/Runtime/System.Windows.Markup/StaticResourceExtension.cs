@@ -13,6 +13,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Xaml;
 using OpenSilver.Internal.Xaml;
 
 #if !MIGRATION
@@ -68,13 +70,35 @@ namespace System.Windows.Markup
 
         private bool TryFindTheResource(IServiceProvider serviceProvider, out object resource)
         {
-            if (serviceProvider.GetService(typeof(IAmbientResourcesProvider)) is not IAmbientResourcesProvider ambientProvider)
+            if (serviceProvider.GetService(typeof(IAmbientResourcesProvider)) is IAmbientResourcesProvider ambientResourcesProvider)
+            {
+                return TryFindResourceFromCompiler(ambientResourcesProvider, out resource);
+            }
+            else if (serviceProvider.GetService(typeof(IAmbientProvider)) is IAmbientProvider ambientProvider)
+            {
+                if (serviceProvider.GetService(typeof(IXamlSchemaContextProvider)) is not IXamlSchemaContextProvider schemaContextProvider)
+                {
+                    throw new InvalidOperationException(
+                        string.Format("Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.",
+                            GetType().Name,
+                            nameof(IXamlSchemaContextProvider)));
+                }
+
+                return TryFindResourceFromParser(ambientProvider, schemaContextProvider, out resource);
+            }
+            else
             {
                 throw new InvalidOperationException(
-                    string.Format("Markup extension '{0}' requires '{1}' be implemented in the IServiceProvider for ProvideValue.",
+                    string.Format("Markup extension '{0}' requires '{1}' or '{2}' be implemented in the IServiceProvider for ProvideValue.",
                         GetType().Name,
-                        nameof(IAmbientResourcesProvider)));
+                        nameof(IAmbientResourcesProvider),
+                        nameof(IAmbientProvider)));
             }
+        }
+
+        private bool TryFindResourceFromCompiler(IAmbientResourcesProvider ambientProvider, out object resource)
+        {
+            Debug.Assert(ambientProvider != null);
 
             IEnumerable<object> ambientValues = ambientProvider.GetAllAmbientValues();
             foreach (object ambientValue in ambientValues)
@@ -87,6 +111,21 @@ namespace System.Windows.Markup
                     }
                 }
             }
+
+            resource = null;
+            return false;
+        }
+
+        private bool TryFindResourceFromParser(IAmbientProvider ambientProvider,
+            IXamlSchemaContextProvider schemaContextProvider,
+            out object resource)
+        {
+            // TODO
+
+            Debug.Assert(ambientProvider != null);            
+            
+            // return false so that it can attempt to find the resource in the 
+            // application's resources.
 
             resource = null;
             return false;
