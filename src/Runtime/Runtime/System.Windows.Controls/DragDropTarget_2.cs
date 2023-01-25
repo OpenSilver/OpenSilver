@@ -64,9 +64,7 @@ namespace Windows.UI.Xaml.Controls
         //variable used when dragging
         TItemsControlType _sourceItemsControl;
         TItemContainerType _sourceItemContainer; // Note: the item container can be for example a ListBoxItem (in case of a ListBox inside a ListBoxDragDropTarget), or the item directly (in case of a StackPanel inside a PanelDragDropTarget).
-        FrameworkElement _sourcePlaceholder; // This is a placeholder that we put in place of the source during the drag operation. In fact, the source is moved to a popup, so it leaves an empty space. The placeholder will occupy that empty space. This is useful to: 1) let the user drop over the source itself (cf. "ItemDroppedOnSource" event), and 2) prevent the other elements from being displaced during the drag operation.
         Popup _popup;
-        int _indexOfSourceContainerWithinItemsControl;
 
 
         //We store this DragDropTarget in the case that we drag from a DragDropTarget to another and we want to compare them
@@ -429,8 +427,7 @@ namespace Windows.UI.Xaml.Controls
                     TItemsControlType targetContainer = (TItemsControlType)dragDropTargetUnderPointer.Content; // Note: a "container" is for example a Panel in case of PanekDragDropTarget.
 
                     // Check if we are dropping on the source element itself (ie. from the source to the placeholder that we put in place of the source) (cf. "ItemDropOnSource" event):
-                    if (dragDropTargetUnderPointer.GetItemCount(targetContainer) > 0
-                        && ContainerFromIndex(targetContainer, _indexOfSourceContainerWithinItemsControl) == _sourcePlaceholder)
+                    if (dragDropTargetUnderPointer == this)
                     {
                         //---------------------------------
                         // IF WE ARE DROPPING THE SOURCE ON ITSELF
@@ -444,7 +441,8 @@ namespace Windows.UI.Xaml.Controls
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
 #if !(BRIDGE && MIGRATION)
-                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, new MS.DragEventArgs(dataObject, e));
+                            dragArgs = new MS.DragEventArgs(dataObject, e) { Handled = true };
+                            dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, dragArgs);
 #endif
                         }
                     }
