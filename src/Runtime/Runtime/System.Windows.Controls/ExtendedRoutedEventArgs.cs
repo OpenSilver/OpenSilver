@@ -28,6 +28,7 @@ namespace System.Windows
         /// event handling for a routed event as it travels the route.
         /// </summary>
         public bool Handled { get; set; }
-        //public object OriginalSource { get; }
+
+        public object OriginalSource { get; }
     }
 }

@@ -16,6 +16,8 @@
 using DotNetForHtml5.Core;
 using System.Collections.Generic;
 using System.Linq;
+using OpenSilver.Internal;
+using System.ComponentModel;
 #if MIGRATION
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
@@ -154,23 +156,14 @@ namespace Windows.UI.Xaml.Controls
 #endif
                 // Get the source DragDropTarget element that is under the pointer, if any:
                 DragDropTarget<TItemsControlType, TItemContainerType> sourceDragDropTarget = GetDragDropTargetUnderPointer(_pointerX, _pointerY, out _sourceItemContainer, out _);
-                if (sourceDragDropTarget is DragDropTarget<TItemsControlType, TItemContainerType> && sourceDragDropTarget != this)
+                if (sourceDragDropTarget is not null && sourceDragDropTarget != this)
                     throw new Exception("The DragDropTarget is not supposed to support dragging an outer DragDropTarget in case of nested DragDropTargets.");
 
                 // We do something only if the source exists (ie. if an item was found under the pointer):
                 if (_sourceItemContainer != null)
                 {
                     // Get a reference to the ItemsControl:
-                    if (_sourceItemContainer is TreeViewItem treeViewItem)
-                    {
-                        _sourceItemsControl = (TItemsControlType)(treeViewItem.ParentTreeViewItem as object) ??
-                            (TItemsControlType)(treeViewItem.ParentTreeView as object);
-                    }
-                    else
-                    {
-                        _sourceItemsControl = (TItemsControlType)this.Content; // Note: there is no risk of InvalidCastException because the type has been tested before, and the derived class (PanelDragDropTarget) also verifies the type in the "OnContentChanged" method.
-                    }
-
+                    _sourceItemsControl = GetItemsControlAncestor(_sourceItemContainer);
 
 #if MIGRATION
                     this.ReleaseMouseCapture();
@@ -274,8 +267,6 @@ namespace Windows.UI.Xaml.Controls
 
         private void MovePopupAndRaiseEvents(double horizontalChange, double verticalChange)
         {
-#if !(BRIDGE && MIGRATION)
-
             if (_popup != null)
             {
                 //popup moving with the pointer
@@ -350,7 +341,6 @@ namespace Windows.UI.Xaml.Controls
                 _iconArrow.Visibility = Visibility.Collapsed;
                 _iconStop.Visibility = Visibility.Visible;
             }
-#endif
         }
 
 #if MIGRATION
@@ -411,10 +401,12 @@ namespace Windows.UI.Xaml.Controls
 
             UIElement allowDropElementUnderPointer;
             // Get the DragDropTarget element that is under the pointer, if any:
-            DragDropTarget<TItemsControlType, TItemContainerType> dragDropTargetUnderPointer = GetDragDropTargetUnderPointer(_pointerX, _pointerY, out _, out allowDropElementUnderPointer);
+            DragDropTarget<TItemsControlType, TItemContainerType> dragDropTargetUnderPointer =
+                GetDragDropTargetUnderPointer(_pointerX, _pointerY, out _, out allowDropElementUnderPointer);
 
             bool moveItem = false;
-            MS.DragEventArgs dragArgs = null;
+            var dataObject = new MS.DataObject();
+            var dragArgs = new MS.DragEventArgs(dataObject, e);
             if (dragDropTargetUnderPointer != null)
             {
                 //---------------------------------
@@ -424,8 +416,6 @@ namespace Windows.UI.Xaml.Controls
                 // Check if drop is allowed:
                 if (dragDropTargetUnderPointer.AllowDrop && !_isDragCancelled)
                 {
-                    TItemsControlType targetContainer = (TItemsControlType)dragDropTargetUnderPointer.Content; // Note: a "container" is for example a Panel in case of PanekDragDropTarget.
-
                     // Check if we are dropping on the source element itself (ie. from the source to the placeholder that we put in place of the source) (cf. "ItemDropOnSource" event):
                     if (dragDropTargetUnderPointer == this)
                     {
@@ -433,17 +423,14 @@ namespace Windows.UI.Xaml.Controls
                         // IF WE ARE DROPPING THE SOURCE ON ITSELF
                         //---------------------------------
 
+                        dragArgs.Handled = true;
+
                         //Raise the "ItemDroppedOnSource" Event
                         if (dragDropTargetUnderPointer.ItemDroppedOnSource != null)
                         {
                             // Prepare the event args:
-                            MS.DataObject dataObject = new MS.DataObject();
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
-
-#if !(BRIDGE && MIGRATION)
-                            dragArgs = new MS.DragEventArgs(dataObject, e) { Handled = true };
                             dragDropTargetUnderPointer.ItemDroppedOnSource(dragDropTargetUnderPointer, dragArgs);
-#endif
                         }
                     }
                     //else we drop on another DragDropTarget
@@ -457,14 +444,10 @@ namespace Windows.UI.Xaml.Controls
                         if (dragDropTargetUnderPointer.Drop != null)
                         {
                             // Prepare the event args:
-                            MS.DataObject dataObject = new MS.DataObject();
                             dataObject.SetData("ItemDragEventArgs", new ItemDragEventArgs(selectionCollection));
 
                             // Raise the Drop event:
-#if !(BRIDGE && MIGRATION)
-                            dragArgs = new MS.DragEventArgs(dataObject, e);
                             dragDropTargetUnderPointer.Drop(this, dragArgs);
-#endif
                         }
 
                         moveItem = true;
@@ -475,24 +458,21 @@ namespace Windows.UI.Xaml.Controls
             // The event is triggered in Silverlight regardless of whether the target has AllowDrop=true
             ItemDroppedOnTarget?.Invoke(this, new ItemDragEventArgs(selectionCollection));
 
-            if (dragArgs is null || !dragArgs.Handled)
+            if (!dragArgs.Handled)
             {
                 if (moveItem)
                 {
-                    object item = _sourceItemContainer.GetValue(ItemContainerGenerator.ItemForItemContainerProperty);
+                    object item = ItemFromContainer(_sourceItemsControl, _sourceItemContainer);
                     RemoveItem(_sourceItemsControl, item);
                     // Put the source into the target:
                     dragDropTargetUnderPointer.AddItem((TItemsControlType)dragDropTargetUnderPointer.Content, item);
                 }
                 else if (allowDropElementUnderPointer != null)
                 {
-                    RemoveItem(_sourceItemsControl,
-                        _sourceItemContainer.GetValue(ItemContainerGenerator.ItemForItemContainerProperty));
+                    RemoveItem(_sourceItemsControl, ItemFromContainer(_sourceItemsControl, _sourceItemContainer));
                 }
-                if (dragArgs != null)
-                {
-                    dragArgs.Handled = true;
-                }
+                
+                dragArgs.Handled = true;
             }
 
             // Raise the "ItemDragCompleted" event:
@@ -686,7 +666,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         /// <param name="args">Information about the drag event.</param>
         /// <returns>The drop target of a drag event.</returns>
-        protected virtual TItemsControlType GetDropTarget(DragEventArgs args)
+        protected virtual TItemsControlType GetDropTarget(MS.DragEventArgs args)
         {
             return GetItemsControlAncestor((DependencyObject)args.OriginalSource);
         }
@@ -695,7 +675,12 @@ namespace Windows.UI.Xaml.Controls
         /// Create a new TItemsControlType
         /// </summary>
         /// <returns>A new TItemsControlType</returns>
-        protected abstract TItemsControlType INTERNAL_ReturnNewTItemsControl();
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual TItemsControlType INTERNAL_ReturnNewTItemsControl()
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion Methods for sub-class to implement
 
@@ -714,19 +699,19 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Raises the DragEnter event.
         /// </summary>
-        public event MS.DragEventHandler DragEnter;
+        public new event MS.DragEventHandler DragEnter;
         /// <summary>
         /// Raises the DragLeave event.
         /// </summary>
-        public event MS.DragEventHandler DragLeave;
+        public new event MS.DragEventHandler DragLeave;
         /// <summary>
         /// Raises the DragOver event.
         /// </summary>
-        public event MS.DragEventHandler DragOver;
+        public new event MS.DragEventHandler DragOver;
         /// <summary>
         /// Raises the Drop event
         /// </summary>
-        public event MS.DragEventHandler Drop;
+        public new event MS.DragEventHandler Drop;
         /// <summary>
         /// Raises the ItemDroppedOnSource event
         /// </summary>
@@ -766,17 +751,17 @@ namespace Windows.UI.Xaml.Controls
                 {
                     allowDropElementUnderPointer = element;
                 }
-                if (element is DragDropTarget<TItemsControlType, TItemContainerType>)
+                if (element is DragDropTarget<TItemsControlType, TItemContainerType> target)
                 {
                     //------------------
                     // FOUND
                     //------------------
-                    dragDropTargetUnder = (DragDropTarget<TItemsControlType, TItemContainerType>)element;
+                    dragDropTargetUnder = target;
                     break;
                 }
 
                 //Move up to the parent
-                element = (UIElement)element.INTERNAL_VisualParent;
+                element = (UIElement)VisualTreeHelper.GetParent(element);
             }
 
             if (dragDropTargetUnder != null && itemsControl != null)
@@ -845,21 +830,37 @@ namespace Windows.UI.Xaml.Controls
             return stackPanelInPopUp;
         }
 
-        private void InsertContainer(TItemsControlType itemsControl, int index, UIElement container)
+        /// <summary>
+        /// Retrieves the orientation of the items host in the items control.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <returns>The orientation of the items host in the items control.
+        /// </returns>
+        internal Orientation? GetOrientation(TItemsControlType itemsControl)
         {
-            (itemsControl as ItemsControl).GetItemsHost().Children.Insert(index, container);
+            Panel host = GetItemsHost(itemsControl);
+
+            VirtualizingStackPanel virtualizingStackPanel = host as VirtualizingStackPanel;
+            if (virtualizingStackPanel != null)
+            {
+                return virtualizingStackPanel.Orientation;
+            }
+
+            StackPanel stackPanel = host as StackPanel;
+            if (stackPanel != null)
+            {
+                return stackPanel.Orientation;
+            }
+
+            WrapPanel wrapPanel = host as WrapPanel;
+            if (wrapPanel != null)
+            {
+                return wrapPanel.Orientation;
+            }
+
+            return null;
         }
 
-        private void ReplaceContainer(TItemsControlType itemsControl, int index, UIElement container)
-        {
-            (itemsControl as ItemsControl).GetItemsHost().Children.RemoveAt(index);
-            (itemsControl as ItemsControl).GetItemsHost().Children.Insert(index, container);
-        }
-
-        private void RemoveContainer(TItemsControlType itemsControl, int index)
-        {
-            (itemsControl as ItemsControl).GetItemsHost().Children.RemoveAt(index);
-        }
         #endregion
     }
 }

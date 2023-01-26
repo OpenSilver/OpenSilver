@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using System;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -18,15 +19,39 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public sealed partial class ListBoxDragDropTarget : ItemsControlDragDropTarget<ListBox, ListBoxItem>
+    /// <summary>
+    /// A control that enables drag and drop operations on ListBox.
+    /// </summary>
+    /// <QualityBand>Experimental</QualityBand>
+    public class ListBoxDragDropTarget : ItemsControlDragDropTarget<ListBox, ListBoxItem>
     {
         /// <summary>
-        /// Gets a new instance of the item control.
+        /// Gets the ListBox that is the drag drop target.
         /// </summary>
-        /// <returns>The item control.</returns>
-        protected override ListBox INTERNAL_ReturnNewTItemsControl()
+        protected ListBox ListBox
         {
-            return new ListBox();
+            get { return Content as ListBox; }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the ListBoxDragDropTarget class.
+        /// </summary>
+        public ListBoxDragDropTarget()
+        {
+        }
+
+        /// <summary>
+        /// Ensures the content of control is a ListBox.
+        /// </summary>
+        /// <param name="oldContent">The old content.</param>
+        /// <param name="newContent">The new content.</param>
+        protected override void OnContentChanged(object oldContent, object newContent)
+        {
+            if (newContent != null && !(newContent is ListBox))
+            {
+                throw new ArgumentException("The content property must be a ListBox.");
+            }
+            base.OnContentChanged(oldContent, newContent);
         }
     }
 }

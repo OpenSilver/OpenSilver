@@ -83,12 +83,6 @@ namespace System.Windows
         public IDataObject Data { get; private set; }
 
         /// <summary>
-        /// Gets or sets a value that indicates the present state of the event handling
-        /// for a routed event as it travels the route.
-        /// </summary>
-        public bool Handled { get; set; }
-
-        /// <summary>
         /// Returns a drop point that is relative to a specified UIElement
         /// </summary>
         /// <param name="relativeTo">The UIElement for which to get a relative drop point.</param>
@@ -96,7 +90,6 @@ namespace System.Windows
 #if MIGRATION
         public Point GetPosition(UIElement relativeTo)
         {
-
             return MouseEventArgs.GetPosition(relativeTo);
         }
 #else

@@ -12,12 +12,19 @@
 *  
 \*====================================================================================*/
 
-
+using System;
 using System.Collections.Generic;
+using System.Linq;
+
 #if MIGRATION
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+using SW = Microsoft.Windows;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Media;
+using SW = System.Windows;
 #endif
 
 #if MIGRATION
@@ -26,12 +33,136 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public partial class TreeViewDragDropTarget : ItemsControlDragDropTarget<ItemsControl, TreeViewItem>
+    public class TreeViewDragDropTarget : ItemsControlDragDropTarget<ItemsControl, TreeViewItem>
     {
-        /// <inheritdoc/>
-        protected override ItemsControl INTERNAL_ReturnNewTItemsControl()
+        /// <summary>
+        /// Throws an exception if the content is not a TreeView.
+        /// </summary>
+        /// <param name="oldContent">The old content value.</param>
+        /// <param name="newContent">The new content value.</param>
+        protected override void OnContentChanged(object oldContent, object newContent)
         {
-            return new TreeViewItem();
+            if (newContent != null && !(newContent is TreeView))
+            {
+                throw new ArgumentException("The content property must of type TreeView.");
+            }
+
+            base.OnContentChanged(oldContent, newContent);
+        }
+
+        /// <summary>
+        /// Returns the items control ancestor of a dependency object.
+        /// </summary>
+        /// <param name="dependencyObject">The dependency object to retrieve the
+        /// element for.</param>
+        /// <returns>The items control ancestor of the dependency object.
+        /// </returns>
+        protected override ItemsControl GetItemsControlAncestor(DependencyObject dependencyObject)
+        {
+            TreeViewItem item = dependencyObject as TreeViewItem;
+            if (item == null)
+            {
+                // if element is within TreeViewItem, jump up to TreeViewItem that contains it.
+                item = dependencyObject.GetVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
+
+                // if not inside of a TreeViewItem it must be inside of a TreeView
+                if (item == null)
+                {
+                    return dependencyObject.GetVisualAncestors().OfType<TreeView>().FirstOrDefault();
+                }
+            }
+
+            // grab the TreeViewItem the element is inside of
+            TreeViewItem ancestor = item.GetVisualAncestors().OfType<TreeViewItem>().FirstOrDefault();
+            if (ancestor != null)
+            {
+                return ancestor;
+            }
+            return item.GetVisualAncestors().OfType<TreeView>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Retrieves the drop target of a drag event.
+        /// </summary>
+        /// <param name="args">Information about the drag event.</param>
+        /// <returns>The drop target of a drag event.</returns>
+        protected override ItemsControl GetDropTarget(SW.DragEventArgs args)
+        {
+            DependencyObject originalSource = (DependencyObject)args.OriginalSource;
+            ItemsControl dropTarget = GetItemsControlAncestor(originalSource);
+            if (dropTarget != null)
+            {
+                TreeViewItem targetItemContainer = GetItemContainerAncestor(dropTarget, (DependencyObject)args.OriginalSource);
+                Orientation? orientation = GetOrientation(dropTarget);
+
+                if (orientation != null && targetItemContainer != null)
+                {
+                    Rect treeViewItemRect = GetTreeViewItemRectExcludingChildren(targetItemContainer);
+#if MIGRATION
+                    Point relativePoint = args.GetPosition(targetItemContainer);
+#else
+                    Point relativePoint = args.GetPosition(targetItemContainer).Position;
+#endif
+                    double thirdWidth = treeViewItemRect.Width / 3.0;
+                    double thirdHeight = treeViewItemRect.Height / 3.0;
+
+                    // If dragging into center third of item then the drop target
+                    // is the tree view item being hovered over.
+                    if
+                        ((orientation == Orientation.Horizontal
+                            && relativePoint.X > thirdWidth && relativePoint.X < (treeViewItemRect.Width - thirdWidth))
+                        || (orientation == Orientation.Vertical
+                            && relativePoint.Y > thirdHeight && relativePoint.Y < (treeViewItemRect.Height - thirdHeight)))
+                    {
+                        return targetItemContainer;
+                    }
+                }
+            }
+
+            return base.GetDropTarget(args);
+        }
+
+        /// <summary>
+        /// Retrieves the location and dimensions of a TreeViewItem excluding
+        /// its children.
+        /// </summary>
+        /// <param name="treeViewItem">The tree view item.</param>
+        /// <returns>The location and dimensions of the TreeViewItem excluding
+        /// its children.</returns>
+        protected virtual Rect GetTreeViewItemRectExcludingChildren(TreeViewItem treeViewItem)
+        {
+            if (treeViewItem.IsExpanded)
+            {
+                FrameworkElement rootVisual = treeViewItem.GetVisualChildren().FirstOrDefault() as FrameworkElement;
+                if (rootVisual != null)
+                {
+                    FrameworkElement header =
+                        rootVisual
+                            .GetLogicalDescendents()
+                            .Where(element => element.Name == "Header").FirstOrDefault();
+                    if (header != null)
+                    {
+                        Rect rectangle = new Rect(0, 0, 0, 0);
+                        GeneralTransform generalTransform;
+                        try
+                        {
+                            generalTransform = header.TransformToVisual(treeViewItem);
+                        }
+                        catch (ArgumentException)
+                        {
+                            generalTransform = null;
+                        }
+                        Point origin;
+                        if (generalTransform != null && generalTransform.TryTransform(new Point(0, 0), out origin))
+                        {
+                            rectangle = new Rect(origin, new Size(header.ActualWidth, header.ActualHeight));
+                        }
+                        return rectangle;
+                    }
+                }
+            }
+
+            return new Rect(new Point(), new Size(treeViewItem.ActualWidth, treeViewItem.ActualHeight));
         }
 
         /// <inheritdoc/>
