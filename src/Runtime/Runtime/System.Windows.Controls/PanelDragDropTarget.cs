@@ -1,20 +1,9 @@
-﻿
-
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
 using System;
-
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -22,7 +11,11 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    public partial class PanelDragDropTarget : DragDropTarget<Panel, UIElement>
+    /// <summary>
+    /// A control that enables drag and drop operations on a Panel.
+    /// </summary>
+    /// <QualityBand>Experimental</QualityBand>
+    public class PanelDragDropTarget : DragDropTarget<Panel, UIElement>
     {
         /// <summary>
         /// Initializes a new instance of the PanelDragDropTarget class.
@@ -33,6 +26,16 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Removes data from an ItemsControl.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <param name="index">The index at which to remove an item.</param>
+        protected override void RemoveItemAtIndex(Panel itemsControl, int index)
+        {
+            itemsControl.Children.RemoveAt(index);
+        }
+
+        /// <summary>
         /// Adds an item to an items control.
         /// </summary>
         /// <param name="itemsControl">The items control.</param>
@@ -40,6 +43,31 @@ namespace Windows.UI.Xaml.Controls
         protected override void AddItem(Panel itemsControl, object data)
         {
             itemsControl.Children.Add((UIElement)data);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether an item can be added to the
+        /// items control.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <param name="data">The data to be added.</param>
+        /// <returns>A value indicating whether an item can be added to the
+        /// items control.</returns>
+        protected override bool CanAddItem(Panel itemsControl, object data)
+        {
+            return data is UIElement;
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether an item can be removed from the
+        /// items control.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <returns>A value indicating whether an item can be removed from the
+        /// items control.</returns>
+        protected override bool CanRemove(Panel itemsControl)
+        {
+            return true;
         }
 
         /// <summary>
@@ -59,14 +87,26 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Inserts an item into an items control.
+        /// Gets the number of items in an items control.
         /// </summary>
         /// <param name="itemsControl">The items control.</param>
-        /// <param name="index">The index at which to insert the item.</param>
-        /// <param name="data">The data to be inserted.</param>
-        protected override void InsertItem(Panel itemsControl, int index, object data)
+        /// <returns>The number of items in the items control.</returns>
+        protected override int GetItemCount(Panel itemsControl)
         {
-            itemsControl.Children.Insert(index, (UIElement)data);
+            return itemsControl.Children.Count;
+        }
+
+        /// <summary>
+        /// Retrieves the items host for a given items control.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <returns>The items host for a given items control.</returns>
+        protected override Panel GetItemsHost(Panel itemsControl)
+        {
+            // The items host is the panel itself.  This is not
+            // the case for ItemsControls which is why we have
+            // this overload.
+            return itemsControl;
         }
 
         /// <summary>
@@ -82,6 +122,55 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Inserts an item into an items control.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <param name="index">The index at which to insert the item.</param>
+        /// <param name="data">The data to be inserted.</param>
+        protected override void InsertItem(Panel itemsControl, int index, object data)
+        {
+            itemsControl.Children.Insert(index, (UIElement)data);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether a container belongs to an items 
+        /// control.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <param name="itemContainer">The item container.</param>
+        /// <returns>A value indicating whether a container belongs to an items 
+        /// control.</returns>
+        protected override bool IsItemContainerOfItemsControl(Panel itemsControl, DependencyObject itemContainer)
+        {
+            // In a panel the item container and the item are the same
+            // so in order to determine if a given element is the 
+            // item container we must simply test to see if it
+            // is in the Panel's children collection.
+            UIElement element = itemContainer as UIElement;
+            if (element != null)
+            {
+                return itemsControl.Children.Contains(element);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the item from an item container.
+        /// </summary>
+        /// <param name="itemsControl">The items control.</param>
+        /// <param name="itemContainer">The item container.</param>
+        /// <returns>The data contained by the item container.</returns>
+        protected override object ItemFromContainer(Panel itemsControl, UIElement itemContainer)
+        {
+            // In a panel the item is always the item container.
+            // This distinction only exists in the ItemsControl
+            // where there is an item (some data) and an 
+            // item container (a UI element that displays it on
+            // screen).
+            return itemContainer;
+        }
+
+        /// <summary>
         /// Removes an item from an items control.
         /// </summary>
         /// <param name="itemsControl">The items control.</param>
@@ -89,16 +178,6 @@ namespace Windows.UI.Xaml.Controls
         protected override void RemoveItem(Panel itemsControl, object data)
         {
             itemsControl.Children.Remove((UIElement)data);
-        }
-
-        /// <summary>
-        /// Removes data from an ItemsControl.
-        /// </summary>
-        /// <param name="itemsControl">The items control.</param>
-        /// <param name="index">The index at which to remove an item.</param>
-        protected override void RemoveItemAtIndex(Panel itemsControl, int index)
-        {
-            itemsControl.Children.RemoveAt(index);
         }
 
         /// <summary>
@@ -116,23 +195,6 @@ namespace Windows.UI.Xaml.Controls
             }
 
             base.OnContentChanged(oldContent, newContent);
-        }
-
-        /// <summary>
-        /// Create a new TItemsControlType
-        /// </summary>
-        /// <returns>A new TItemsControlType</returns>
-        protected override Panel INTERNAL_ReturnNewTItemsControl()
-        {
-            return new StackPanel()
-                {
-                    Orientation = Orientation.Horizontal
-                };
-        }
-
-        internal override int INTERNAL_GetNumberOfElementsBetweenItemsRootAndDragDropTarget()
-        {
-            return 2;
         }
     }
 }

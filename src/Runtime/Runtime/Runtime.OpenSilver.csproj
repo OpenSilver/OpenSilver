@@ -180,6 +180,8 @@
 		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitterAutomationPeer.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\PreviewControl.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
+		<Compile Include="System.Windows.Controls\ItemsControlDragDropTarget.cs" />
+		<Compile Include="System.Windows.Controls\ListBoxDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\PasswordBoxView.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\INTERNAL_TextContainerRichTextBox.cs" />
 		<Compile Include="System.Windows.Controls\RichTextBox\QuillJs\QuillDeltas.cs" />
@@ -258,9 +260,7 @@
 		<Compile Include="System.Windows.input\StylusPoint.cs" />
 		<Compile Include="System.Windows.input\StylusPointCollection.cs" />
 		<Compile Include="System.Windows.Interop\NavigationStateChangedEventArgs.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ItemsControlDragDropTarget.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ListBoxDragDropTarget.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TreeViewDragDropTarget.cs" />
+		<Compile Include="System.Windows.Controls\TreeViewDragDropTarget.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\EasingPointKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\BrushConverter.cs" />
 		<Compile Include="System.Windows.Media\Color.cs" />
