@@ -34,7 +34,8 @@ namespace Windows.UI.Xaml
         Size MeasureTextBlock(string uid,
                               TextWrapping wrapping, 
                               Thickness padding, 
-                              double maxWidth);
+                              double maxWidth,
+                              string emptyVal);
         
         void CreateMeasurementText(UIElement parent);
         
@@ -223,7 +224,8 @@ namespace Windows.UI.Xaml
         public Size MeasureTextBlock(string uid,
                                      TextWrapping wrapping, 
                                      Thickness padding, 
-                                     double maxWidth)
+                                     double maxWidth,
+                                     string emptyVal)
         {
             if (textBlockReference == null)
             {
@@ -255,7 +257,7 @@ namespace Windows.UI.Xaml
             else
                 savedTextBlockPadding = padding;
 
-            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"")";
+            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"",""{emptyVal}"")";
             string strTextSize = OpenSilver.Interop.ExecuteJavaScriptString(javaScriptCodeToExecute);
             Size measuredSize;
             int sepIndex = strTextSize != null ? strTextSize.IndexOf('|') : -1;
