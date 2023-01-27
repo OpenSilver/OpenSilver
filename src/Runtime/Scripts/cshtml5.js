@@ -655,13 +655,13 @@ document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMa
     }
 }
 
-document.measureTextBlock = function (uid, textWrapping, padding, width, maxWidth) {
+document.measureTextBlock = function (uid, textWrapping, padding, width, maxWidth, emptyVal) {
     var element = document.measureTextBlockElement;
     var elToMeasure = document.getElementById(uid);
     if (element && elToMeasure) {
         var computedStyle = getComputedStyle(elToMeasure);
 
-        element.innerHTML = elToMeasure.innerHTML;
+        element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
 
         element.style.fontSize = computedStyle.fontSize;
         element.style.fontWeight = computedStyle.fontWeight;

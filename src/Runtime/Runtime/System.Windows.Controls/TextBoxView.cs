@@ -622,7 +622,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
         protected override Size MeasureOverride(Size availableSize)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.TextWrapping, Margin, availableSize.Width);
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.TextWrapping, Margin, availableSize.Width, "A");
             return TextSize;
         }
     }
