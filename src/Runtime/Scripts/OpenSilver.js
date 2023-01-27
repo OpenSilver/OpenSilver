@@ -109,7 +109,9 @@ window.callJS = function (javaScriptToExecute) {
         //console.log("supported");
         return result;
     }
-    else {
+    else if (result == null && resultType == "object") {
+        return null;
+    } else {
         //console.log("not supported");
         if (resultType === 'undefined')
             return "[UNDEFINED]";
@@ -125,7 +127,9 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
         return BINDING.js_to_mono_obj(result);
     }
-    else {
+    else if (result == null && resultType == "object") {
+        return null;
+    } else {
         if (resultType === 'undefined')
             return BINDING.js_to_mono_obj("[UNDEFINED]");
         else
