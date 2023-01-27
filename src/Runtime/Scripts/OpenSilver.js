@@ -99,23 +99,14 @@ window.onCallBack = (function () {
 })();
 
 window.callJS = function (javaScriptToExecute) {
-    //console.log(javaScriptToExecute);
-
     var result = eval(javaScriptToExecute);
-    //console.log(result);
     var resultType = typeof result;
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-        //if (typeof result !== 'undefined' && typeof result !== 'function') {
-        //console.log("supported");
-        return result;
+       return result;
     }
-    else if (result == null && resultType == "object") {
+    else if (result == null) {
         return null;
-    } else {
-        //console.log("not supported");
-        if (resultType === 'undefined')
-            return "[UNDEFINED]";
-        else
+    } else {     
             return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
     }
 };
@@ -127,12 +118,9 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
         return BINDING.js_to_mono_obj(result);
     }
-    else if (result == null && resultType == "object") {
+    else if (result == null) {
         return null;
     } else {
-        if (resultType === 'undefined')
-            return BINDING.js_to_mono_obj("[UNDEFINED]");
-        else
             return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
 }; 
