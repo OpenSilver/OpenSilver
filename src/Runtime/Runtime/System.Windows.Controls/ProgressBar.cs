@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,19 +11,17 @@
 *  
 \*====================================================================================*/
 
+using System;
+
 #if MIGRATION
-using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Automation.Peers;
 #else
-using System;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Automation.Peers;
 #endif
-
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -32,85 +29,88 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+    /// <summary>
+    /// Represents a control that indicates the progress of an operation.
+    /// </summary>
+    [TemplatePart(Name = ProgressBarIndicatorName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ProgressBarTrackName, Type = typeof(FrameworkElement))]
+    [TemplateVisualState(Name = StateIndeterminate, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = StateDeterminate, GroupName = VisualStates.GroupCommon)]
     public partial class ProgressBar : RangeBase
     {
-        private Border _trackBorder;
-        private Rectangle _rectProgressIndicator;
+        private const string ProgressBarIndicatorName = "ProgressBarIndicator";
+        private const string ProgressBarTrackName = "ProgressBarTrack";
+        private const string StateIndeterminate = "Indeterminate";
+        private const string StateDeterminate = "Determinate";
 
+        private FrameworkElement _track;
+        private FrameworkElement _indicator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgressBar"/> class.
+        /// </summary>
+        public ProgressBar()
+        {
+            DefaultStyleKey = typeof(ProgressBar);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="IsIndeterminate"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsIndeterminateProperty =
+            DependencyProperty.Register(
+                nameof(IsIndeterminate),
+                typeof(bool),
+                typeof(ProgressBar),
+                new PropertyMetadata(false, IsIndeterminatePropertyChanged));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the progress bar reports generic
+        /// progress with a repeating pattern or reports progress based on the <see cref="RangeBase.Value"/>
+        /// property.
+        /// </summary>
+        /// <returns>
+        /// true if the progress bar reports generic progress with a repeating pattern; false
+        /// if the progress bar reports progress based on the <see cref="RangeBase.Value"/>
+        /// property. The default is false.
+        /// </returns>
         public bool IsIndeterminate
         {
             get { return (bool)GetValue(IsIndeterminateProperty); }
             set { SetValue(IsIndeterminateProperty, value); }
         }
 
-        public static readonly DependencyProperty IsIndeterminateProperty =
-            DependencyProperty.Register(
-                "IsIndeterminate", 
-                typeof(bool), 
-                typeof(ProgressBar), 
-                new PropertyMetadata(false, IsIndeterminatePropertyChanged));
-
-        private static void IsIndeterminatePropertyChanged(
-            DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void IsIndeterminatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var target = (ProgressBar)d;
-            target.OnIsIndeterminateChanged();
+            ((ProgressBar)d).UpdateVisualStates();
         }
 
-        public ProgressBar()
-        {
-            this.DefaultStyleKey = typeof(ProgressBar);
-            this.SizeChanged += OnSizeChanged;
-        }
-
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (_trackBorder != null && _rectProgressIndicator != null)
-            {
-                UpdateProgressRectangle();
-            }
-        }
-
+        /// <summary>
+        /// Builds the visual tree for the <see cref="ProgressBar"/> control when a new 
+        /// template is applied.
+        /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
         protected override void OnApplyTemplate()
 #endif
         {
-            /*
-             * Builds the visual tree for the ProgressBar control when a new template is applied. 
-             * (Overrides FrameworkElement.OnApplyTemplate().)
-             * */
             base.OnApplyTemplate();
-            //----------------------------
-            // Get a reference to the UI elements defined in the control template:
-            //----------------------------
 
-            if (_trackBorder != null)
+            if (_track != null)
             {
-                _trackBorder.SizeChanged -= new SizeChangedEventHandler(OnTrackSizeChanged);
+                _track.SizeChanged -= new SizeChangedEventHandler(OnTrackSizeChanged);
             }
 
-            _trackBorder = GetTemplateChild("ProgressBarTrack") as Border;
+            _indicator = GetTemplateChild(ProgressBarIndicatorName) as FrameworkElement;
+            _track = GetTemplateChild(ProgressBarTrackName) as FrameworkElement;
 
-            if (_trackBorder != null)
+            if (_indicator != null && _track != null)
             {
-                _trackBorder.SizeChanged += new SizeChangedEventHandler(OnTrackSizeChanged);
+                _track.SizeChanged += new SizeChangedEventHandler(OnTrackSizeChanged);
             }
 
-            _rectProgressIndicator = GetTemplateChild("ProgressBarIndicator") as Rectangle;
-
-            if (_trackBorder != null && _rectProgressIndicator != null)
-            {
-                if (IsIndeterminate)
-                {
-                    OnIsIndeterminateChanged();
-                }
-                else
-                {
-                    UpdateProgressRectangle();
-                }
-            }
+            UpdateVisualStates();
         }
 
         /// <summary>
@@ -123,62 +123,85 @@ namespace Windows.UI.Xaml.Controls
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ProgressBarAutomationPeer(this);
 
-        private void OnTrackSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateProgressRectangle();
-        }
-
-        private void UpdateProgressRectangle()
-        {
-            if (_trackBorder == null || _rectProgressIndicator == null) return;
-
-            var parent = VisualTreeHelper.GetParent(_rectProgressIndicator) as FrameworkElement;
-            if (parent == null) return;
-
-            double widthOffset = _rectProgressIndicator.Margin.Left + _rectProgressIndicator.Margin.Right + _rectProgressIndicator.StrokeThickness;
-            double minimum = Minimum;
-            double maximum = Maximum;
-
-            switch (parent)
-            {
-                case Border border:
-                    widthOffset += border.Padding.Left + border.Padding.Right;
-                    break;
-                case Control control:
-                    widthOffset += control.Padding.Left + control.Padding.Right;
-                    break;
-            }
-
-            _rectProgressIndicator.Width = (IsIndeterminate || maximum == minimum ? 1.0 : (Value - minimum) / (maximum - minimum)) * Math.Max(0.0, parent.ActualWidth - widthOffset);
-            _rectProgressIndicator.ScheduleRedraw();
-        }
-
+        /// <summary>
+        /// Called when value of the <see cref="RangeBase.Maximum"/> property changes.
+        /// </summary>
+        /// <param name="oldMaximum">
+        /// The previous value.
+        /// </param>
+        /// <param name="newMaximum">
+        /// The new value.
+        /// </param>
         protected override void OnMaximumChanged(double oldMaximum, double newMaximum)
         {
             base.OnMaximumChanged(oldMaximum, newMaximum);
-            UpdateProgressRectangle();
+            SetProgressBarIndicatorLength();
         }
 
+        /// <summary>
+        /// Called when value of the <see cref="RangeBase.Minimum"/> property changes.
+        /// </summary>
+        /// <param name="oldMinimum">
+        /// The previous value.
+        /// </param>
+        /// <param name="newMinimum">
+        /// The new value.
+        /// </param>
         protected override void OnMinimumChanged(double oldMinimum, double newMinimum)
         {
             base.OnMinimumChanged(oldMinimum, newMinimum);
-            UpdateProgressRectangle();
+            SetProgressBarIndicatorLength();
         }
 
+        /// <summary>
+        /// Called when value of the <see cref="RangeBase.Value"/> property changes.
+        /// </summary>
+        /// <param name="oldValue">
+        /// The previous value.
+        /// </param>
+        /// <param name="newValue">
+        /// The new value.
+        /// </param>
         protected override void OnValueChanged(double oldValue, double newValue)
         {
             base.OnValueChanged(oldValue, newValue);
-            UpdateProgressRectangle();
+            SetProgressBarIndicatorLength();
         }
 
-        private void OnIsIndeterminateChanged()
+        internal override void UpdateVisualStates()
         {
-            UpdateVisualState(true);
+            VisualStateManager.GoToState(this, IsIndeterminate ? StateIndeterminate : StateDeterminate, true);
         }
 
-        private void UpdateVisualState(bool useTransitions)
+        private void OnTrackSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            VisualStateManager.GoToState(this, IsIndeterminate ? "Indeterminate" : "Determinate", useTransitions);
+            SetProgressBarIndicatorLength();
+        }
+
+        private void SetProgressBarIndicatorLength()
+        {
+            if (_track != null && _indicator != null &&
+                VisualTreeHelper.GetParent(_indicator) is FrameworkElement parent)
+            {
+                double widthOffset = _indicator.Margin.Left + _indicator.Margin.Right;
+                double min = Minimum;
+                double max = Maximum;
+                double val = Value;
+
+                switch (parent)
+                {
+                    case Border border:
+                        widthOffset += border.Padding.Left + border.Padding.Right;
+                        break;
+                    case Control control:
+                        widthOffset += control.Padding.Left + control.Padding.Right;
+                        break;
+                }
+
+                double percent = IsIndeterminate || max == min ? 1.0 : (val - min) / (max - min);
+                double parentWidth = Math.Max(0, parent.ActualWidth - widthOffset);
+                _indicator.Width = percent * parentWidth;
+            }
         }
     }
 }
