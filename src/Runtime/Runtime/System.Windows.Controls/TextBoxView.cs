@@ -18,9 +18,12 @@ using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
 
-#if !MIGRATION
+#if MIGRATION
+using System.Windows.Input;
+#else
 using Windows.Foundation;
 using Windows.UI.Text;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -84,6 +87,11 @@ namespace Windows.UI.Xaml.Controls
             // absorbs pointer events.
 
             UpdateDomText(Host.Text);
+
+            if (FocusManager.GetFocusedElement() == Host)
+            {
+                INTERNAL_HtmlDomManager.SetFocusNative(_contentEditableDiv);
+            }
         }
 
         protected override void OnAfterApplyHorizontalAlignmentAndWidth()

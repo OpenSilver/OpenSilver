@@ -35,6 +35,11 @@ namespace System.Windows.Input
             => (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("document.modifiersPressed", false);
 
         internal static bool IsFocusable(Control control)
-            => control.IsConnectedToLiveTree && control.IsVisible && control.IsEnabled && control.IsTabStop;
+            => IsSubTreeFocusable(control) && IsKeyboardFocusable(control);
+
+        internal static bool IsKeyboardFocusable(Control control) => control.IsTabStop;
+
+        internal static bool IsSubTreeFocusable(UIElement uie)
+            => uie.IsConnectedToLiveTree && uie.IsVisible && (uie is not FrameworkElement fe || fe.IsEnabled);
     }
 }

@@ -750,15 +750,45 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool Focus()
         {
-            if (Keyboard.IsFocusable(this))
+            if (!Keyboard.IsSubTreeFocusable(this))
             {
-                INTERNAL_HtmlDomManager.SetFocus(this);
-                
-                FocusManager.SetFocusedElement(this.INTERNAL_ParentWindow, this);
-
-                return true; //todo: see if there is a way for this to fail, in which case we want to return false.
+                return false;
             }
-            return false;
+
+            return FocusElement(this) || FocusInTree(this);
+
+            static bool FocusElement(Control c)
+            {
+                if (Keyboard.IsKeyboardFocusable(c))
+                {
+                    FocusManager.SetFocusedElement(c.INTERNAL_ParentWindow, c);
+                    INTERNAL_HtmlDomManager.SetFocus(c);
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            static bool FocusInTree(UIElement uie)
+            {
+                int childrenCount = VisualTreeHelper.GetChildrenCount(uie);
+                for (int i = 0; i < childrenCount; i++)
+                {
+                    UIElement child = VisualTreeHelper.GetChild(uie, i) as UIElement;
+                    if (!Keyboard.IsSubTreeFocusable(child))
+                    {
+                        continue;
+                    }
+
+                    if ((child is Control c && FocusElement(c)) || FocusInTree(child))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
 
         private bool _useSystemFocusVisuals = false;

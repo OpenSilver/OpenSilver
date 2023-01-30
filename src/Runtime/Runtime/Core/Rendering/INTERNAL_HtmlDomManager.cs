@@ -18,6 +18,7 @@ using System.Text.Json;
 using System.Text;
 using OpenSilver.Internal;
 using System.Linq;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows;
@@ -121,14 +122,21 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 // todo: find a way to use a more generic method (see: IsRunningInTheSimulator)
                 if (!OpenSilver.Interop.IsRunningInTheSimulator)
                 {
-                    string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRefConcernedByFocus);
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"setTimeout(function() {{ {sElement}.focus(); }}, 1)");
+                    SetFocusNative(domElementRefConcernedByFocus);
                 }
                 else
                 {
                     SetFocus_SimulatorOnly(domElementRefConcernedByFocus);
                 }
             }
+        }
+
+        internal static void SetFocusNative(object domElementRef)
+        {
+            Debug.Assert(domElementRef != null);
+
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"setTimeout(function() {{ {sElement}.focus(); }}, 1)");
         }
 
         static void SetFocus_SimulatorOnly(object domElementRef)
