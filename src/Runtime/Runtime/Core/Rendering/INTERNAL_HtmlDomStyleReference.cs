@@ -211,6 +211,8 @@ namespace CSHTML5.Internal
         public string visibility { set { SetStylePropertyValue("visibility", value); } }
         public string clip { set { SetStylePropertyValue("clip", value); } }
 
+        public string wordBreak { set { SetStylePropertyValue("wordBreak", value); } }
+
         //-----------------------------------------------------------------------
         // Usage stats for To-Do Calendar (number of types each property is set):
         //-----------------------------------------------------------------------

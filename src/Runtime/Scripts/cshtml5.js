@@ -278,6 +278,8 @@ document.createTextBlockElement = function (id, parentElement, whiteSpace) {
         newElement.style['overflow'] = 'hidden';
         newElement.style['textAlign'] = 'left';
         newElement.style['boxSizing'] = 'border-box';
+        if (whiteSpace == "pre-wrap")
+            newElement.style['wordBreak'] = 'break-all';
     }
 }
 

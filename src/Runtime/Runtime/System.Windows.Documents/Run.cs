@@ -65,6 +65,9 @@ namespace Windows.UI.Xaml.Documents
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
             var span = INTERNAL_HtmlDomManager.CreateRunDomElementAndAppendIt(parentRef, this);
+            var style = CSHTML5.Internal.INTERNAL_HtmlDomManager.GetDomElementStyleForModification(span);
+            // Set overflow for scrolling
+            style.wordBreak = "inherit";            
             domElementWhereToPlaceChildren = span;
             return span;
         }
