@@ -270,16 +270,19 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
     return newElement;
 }
 
-document.createTextBlockElement = function (id, parentElement, whiteSpace) {
+document.createTextBlockElement = function (id, parentElement, wrap) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
 
     if (newElement) {
-        newElement.style['whiteSpace'] = whiteSpace;
         newElement.style['overflow'] = 'hidden';
         newElement.style['textAlign'] = 'left';
         newElement.style['boxSizing'] = 'border-box';
-        if (whiteSpace == "pre-wrap")
-            newElement.style['wordBreak'] = 'break-all';
+        if (wrap) {
+            newElement.style['overflowWrap'] = 'break-word';
+            newElement.style['whiteSpace'] = 'pre-wrap';
+        } else {
+            newElement.style['whiteSpace'] = 'pre';
+        }
     }
 }
 

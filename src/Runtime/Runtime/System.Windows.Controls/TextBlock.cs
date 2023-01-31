@@ -79,7 +79,7 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap");            
+            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.Wrap);            
             domElementWhereToPlaceChildren = div;
             return div;
         }
@@ -206,30 +206,31 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the TextWrapping dependency property.
         /// </summary>
         public static readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register("TextWrapping", typeof(TextWrapping), typeof(TextBlock),
+            DependencyProperty.Register(
+                nameof(TextWrapping),
+                typeof(TextWrapping),
+                typeof(TextBlock),
                 new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
-            {
-                GetCSSEquivalent = (instance) =>
                 {
-                    return new CSSEquivalent()
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        Value = (inst, value) =>
-                            {
-                                TextWrapping newTextWrapping = (TextWrapping)value;
-                                switch (newTextWrapping)
-                                {
-                                    case TextWrapping.Wrap:
-                                        return "pre-wrap"; //wrap + preserve whitespaces
-                                    case TextWrapping.NoWrap:
-                                    default:
-                                        return "pre"; //nowrap + preserve whitespaces
-                                }
-                            },
-                        Name = new List<string> { "whiteSpace" },
-                    };
-                }
-            }
-            );
+                        var tb = (TextBlock)d;
+                        var cssStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
+                        switch ((TextWrapping)newValue)
+                        {
+                            case TextWrapping.Wrap:
+                                cssStyle.whiteSpace = "pre-wrap";
+                                cssStyle.overflowWrap = "break-word";
+                                break;
+
+                            case TextWrapping.NoWrap:
+                            default:
+                                cssStyle.whiteSpace = "pre";
+                                cssStyle.overflowWrap = string.Empty;
+                                break;
+                        }
+                    },
+                });
 
         #endregion
 
