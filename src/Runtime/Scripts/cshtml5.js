@@ -1390,3 +1390,21 @@ const isTouchDevice = () => {
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0));
 }
+
+window.findFocusableElementsOpensilver = function (element) {
+    const elements = [];
+    if (element == undefined || element == null) {
+        element = document.body;
+    } else if (typeof element === 'string') {
+        element = document.getElementById(element);
+    }
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: function (node) { return (node.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP); } }, false);
+    let currentNode = walker.currentNode;
+    while (currentNode) {
+        if (currentNode.className && currentNode.id) {
+            elements.push(currentNode.id);
+        }
+        currentNode = walker.nextNode();
+    }
+    return JSON.stringify(elements);
+};

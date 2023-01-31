@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Linq;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -63,6 +64,8 @@ namespace Windows.UI.Xaml.Controls
     public partial class ChildWindow : ContentControl
     {
         #region Static Fields and Constants
+
+        internal static bool EnableFocusTrapForChildWindow;
 
         /// <summary>
         /// The name of the Chrome template part.
@@ -315,7 +318,7 @@ namespace Windows.UI.Xaml.Controls
 
 
 
-         #region public bool IsModal
+        #region public bool IsModal
 
         /// <summary>
         /// Gets or sets a value indicating whether the ChildWindow is modal.
@@ -673,7 +676,7 @@ namespace Windows.UI.Xaml.Controls
 
                 Point delta = new Point(posNow.X - this._clickPoint.X, posNow.Y - this._clickPoint.Y);
 
-                if(this._contentRootTransform != this.ContentRoot.RenderTransform) // Note: they can be different if this.ContentRoot.RenderTransform was set by the developper, in which case we want to use that value.
+                if (this._contentRootTransform != this.ContentRoot.RenderTransform) // Note: they can be different if this.ContentRoot.RenderTransform was set by the developper, in which case we want to use that value.
                 {
                     this._contentRootTransform = this.ContentRoot.RenderTransform as TranslateTransform; // todo: what if it is another type (CompositeTransform for example)
                 }
@@ -921,14 +924,19 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#if SILVERLIGHT
+
         /// <summary>
         /// Executed when the a key is presses when the window is open.
         /// </summary>
         /// <param name="sender">Sender object.</param>
         /// <param name="e">Key event args.</param>
+#if MIGRATION
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+#else
+        private void ChildWindow_KeyDown(object sender, KeyRoutedEventArgs e)
+#endif
         {
+#if SILVERLIGHT
             ChildWindow ew = sender as ChildWindow;
             Debug.Assert(ew != null, "ChildWindow instance is null.");
 
@@ -939,9 +947,41 @@ namespace Windows.UI.Xaml.Controls
             {
                 ew.Close();
                 e.Handled = true;
-            }
-        }
+            }          
+#else
+#if MIGRATION
+            var isTabPressed = e.Key == System.Windows.Input.Key.Tab;
+#else
+            var isTabPressed = e.Key == System.VirtualKey.Tab;
 #endif
+            if (!isTabPressed) return;
+            var focusedElement = FocusManager.GetFocusedElement();
+            var child = VisualTreeHelper.FindFocusableElements(this.Content as UIElement).ToList();
+            var firstElement = child.First() as Control;
+            var lastElement = child.Last() as Control;
+
+#if MIGRATION
+            if (e.KeyModifiers == System.Windows.Input.ModifierKeys.Shift)
+#else
+            if (e.KeyModifiers == System.VirtualKeyModifiers.Shift)
+#endif
+            {
+                if (focusedElement == firstElement)
+                {
+                    lastElement.Focus();
+                    e.Handled = true;
+                }
+            }
+            else
+            {
+                if (focusedElement == lastElement)
+                {
+                    firstElement.Focus();
+                    e.Handled = true;
+                }
+            }
+#endif
+        }
 
         /// <summary>
         /// Executed when the window loses focus.
@@ -1489,7 +1529,8 @@ namespace Windows.UI.Xaml.Controls
                 Application.Current.Exit += new EventHandler(this.Application_Exit);
                 Window.Current.SizeChanged += new WindowSizeChangedEventHandler(this.Page_Resized);
             }
-
+            if (EnableFocusTrapForChildWindow)
+                this.KeyDown += new KeyEventHandler(this.ChildWindow_KeyDown);
             this.SizeChanged += new SizeChangedEventHandler(this.ChildWindow_SizeChanged);
 #endif
         }
@@ -1742,6 +1783,6 @@ namespace Windows.UI.Xaml.Controls
 #endif
         }
 
-        #endregion Methods
+#endregion Methods
     }
 }

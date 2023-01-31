@@ -76,6 +76,12 @@ namespace System
         /// <remarks>Should probably be removed once we get the ResizeObserver fully working.</remarks>
         public bool UseResizeSensor { get; set; }
 
+        public bool EnableFocusTrapForChildWindow
+        {
+            get { return ChildWindow.EnableFocusTrapForChildWindow; }
+            set { ChildWindow.EnableFocusTrapForChildWindow = value; }
+        }
+
         public bool EnableInteropLogging
         {
             get { return INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging; }

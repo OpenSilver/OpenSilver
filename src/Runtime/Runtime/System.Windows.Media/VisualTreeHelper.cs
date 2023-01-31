@@ -21,6 +21,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Markup;
 using DotNetForHtml5.Core;
+using System.Windows.Input;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
@@ -106,7 +107,7 @@ namespace Windows.UI.Xaml.Media
             {
                 return uie.GetVisualChild(childIndex);
             }
-            
+
             throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
         }
 
@@ -142,6 +143,35 @@ namespace Windows.UI.Xaml.Media
             foreach (UIElement uie in INTERNAL_HtmlDomManager.FindElementsInHostCoordinates(intersectingPoint, subtree))
             {
                 if (uie.EnablePointerEvents)
+                {
+                    list.Add(uie);
+                }
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Retrieves a set of objects that are located within a specified point of an object's
+        /// coordinate space.
+        /// </summary>
+        /// <param name="intersectingPoint">
+        /// The point to use as the determination point.
+        /// </param>
+        /// <param name="subtree">
+        /// The object to search within.
+        /// </param>
+        /// <returns>
+        /// An enumerable set of System.Windows.UIElement objects that are determined to
+        /// be located in the visual tree composition at the specified point and within the
+        /// specified subtee.
+        /// </returns>
+        public static IEnumerable<UIElement> FindFocusableElements(UIElement subtree)
+        {
+            var list = new List<UIElement>();
+            foreach (UIElement uie in INTERNAL_HtmlDomManager.FindFocusableElementsInHost(subtree))
+            {
+                if (uie as Controls.Control != null && Keyboard.IsFocusable(uie as Controls.Control))
                 {
                     list.Add(uie);
                 }
