@@ -379,7 +379,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
         internal static object CreateTextBlockDomElementAndAppendIt(
             object parentRef,
             UIElement associatedUIElement,
-            string whiteSpace)
+            bool wrap)
         {
 #if PERFSTAT
             Performance.Counter("CreateTextBlockDomElementAndAppendIt", t0);
@@ -390,13 +390,13 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (parent != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", ""{whiteSpace}"")");
+                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {(wrap ? "true" : "false")})");
             }
             else
             {
                 string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", {sParentRef}, ""{whiteSpace}"")");
+                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", {sParentRef}, {(wrap ? "true" : "false")})");
             }
 
             _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
