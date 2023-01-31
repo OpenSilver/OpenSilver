@@ -120,13 +120,26 @@ namespace System.Windows.Markup
             IXamlSchemaContextProvider schemaContextProvider,
             out object resource)
         {
-            // TODO
+            Debug.Assert(ambientProvider != null);
+            Debug.Assert(schemaContextProvider != null);
 
-            Debug.Assert(ambientProvider != null);            
-            
-            // return false so that it can attempt to find the resource in the 
-            // application's resources.
+            var schemaContext = schemaContextProvider.SchemaContext;
+            var feXType = schemaContext.GetXamlType(typeof(FrameworkElement));
+            var feResourcesProperty = feXType.GetMember("Resources");
 
+            var types = new XamlType[1] { schemaContext.GetXamlType(typeof(ResourceDictionary)) };
+            var ambientValues = ambientProvider.GetAllAmbientValues(null, true, types, feResourcesProperty);
+
+            foreach (var ambientValue in ambientValues)
+            {
+                if (ambientValue.Value is ResourceDictionary rd)
+                {
+                    if (rd.TryGetResource(ResourceKey, out resource))
+                    {
+                        return true;
+                    }
+                }
+            }
             resource = null;
             return false;
         }

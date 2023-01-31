@@ -21,6 +21,7 @@ using System.Windows.Markup;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using System.ComponentModel;
+using System.Xaml.Markup;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -409,6 +410,7 @@ namespace Windows.UI.Xaml
         /// resource items as child object elements of a frameworkElement.Resources property
         /// element, through XAML implicit collection syntax.
         /// </summary>
+        [Ambient]
         public ResourceDictionary Resources
         {
             get
