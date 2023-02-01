@@ -382,6 +382,7 @@ namespace System.Xaml
                 object_states.Peek().IsValueProvidedByParent = true;
             state.Value = instance;
             state.IsInstantiated = true;
+            HandleBeginInit(instance);
             object_states.Push(state);
         }
 
