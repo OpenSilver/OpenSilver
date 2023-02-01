@@ -101,6 +101,7 @@ namespace Windows.UI.Xaml.Controls
             if (!e.Handled)
             {
                 e.Handled = true;
+                Focus();
                 ListBox parent = ParentListBox;
                 if (parent != null)
                 {

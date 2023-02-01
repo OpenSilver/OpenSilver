@@ -274,15 +274,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             eventArgs.Handled = true;
 
+            Focus();
+
 #if MIGRATION
-            this.CaptureMouse();
+            CaptureMouse();
 #else
-            this.CapturePointer();
+            CapturePointer();
 #endif
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Stop();
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Start();
 
-            this.IsPressed = true;
+            IsPressed = true;
 
             if (ClickMode == ClickMode.Press)
                 OnClick();
