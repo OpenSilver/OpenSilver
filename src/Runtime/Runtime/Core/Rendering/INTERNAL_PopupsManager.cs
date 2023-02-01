@@ -38,43 +38,21 @@ namespace DotNetForHtml5.Core // Important: do not rename this class without upd
 {
     internal static class INTERNAL_PopupsManager // Important! DO NOT RENAME this class without updating the Simulator as well! // Note: this class is "internal" but still visible to the Emulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
     {
-        static int CurrentPopupRootIndentifier = 0;
-        static Dictionary<string, object> PopupRootIdentifierToInstance = new Dictionary<string, object>();
+        private static int CurrentPopupRootIndentifier = 0;
+        private static readonly HashSet<PopupRoot> PopupRootIdentifierToInstance = new();
 
         public static PopupRoot CreateAndAppendNewPopupRoot(Popup popup, Window parentWindow)
         {
             // Generate a unique identifier for the PopupRoot:
-            CurrentPopupRootIndentifier++;
-            string uniquePopupRootIdentifier = "INTERNAL_Cshtml5_PopupRoot_" + CurrentPopupRootIndentifier.ToString();
+            string uniquePopupRootIdentifier = $"INTERNAL_Cshtml5_PopupRoot_{++CurrentPopupRootIndentifier}";
+
+            var popupRoot = new PopupRoot(uniquePopupRootIdentifier, parentWindow, popup);
 
             //--------------------------------------
             // Create a DIV for the PopupRoot in the DOM tree:
             //--------------------------------------
 
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-$@"
-var popupRoot = document.createElement('div');
-popupRoot.setAttribute('id', ""{uniquePopupRootIdentifier}"");
-popupRoot.style.position = 'absolute';
-popupRoot.style.width = '100%';
-popupRoot.style.height = '100%';
-popupRoot.style.overflowX = 'hidden';
-popupRoot.style.overflowY = 'hidden';
-popupRoot.style.pointerEvents = '{(popup.StayOpen ? "none" : "auto")}';
-{INTERNAL_InteropImplementation.GetVariableStringForJS(parentWindow.INTERNAL_RootDomElement)}.appendChild(popupRoot);");
-
-            //--------------------------------------
-            // Get the PopupRoot DIV:
-            //--------------------------------------
-
-            object popupRootDiv = new INTERNAL_HtmlDomElementReference(uniquePopupRootIdentifier, null);
-
-            //--------------------------------------
-            // Create the C# class that points to the PopupRoot DIV:
-            //--------------------------------------
-
-            var popupRoot = new PopupRoot(uniquePopupRootIdentifier, parentWindow);
-            popupRoot.INTERNAL_LinkedPopup = popup;
+            object popupRootDiv = INTERNAL_HtmlDomManager.CreatePopupRootDomElementAndAppendIt(popupRoot);
             popupRoot.INTERNAL_OuterDomElement
                 = popupRoot.INTERNAL_InnerDomElement
                 = popupRootDiv;
@@ -86,40 +64,33 @@ popupRoot.style.pointerEvents = '{(popup.StayOpen ? "none" : "auto")}';
             // Remember the PopupRoot for later use:
             //--------------------------------------
 
-            PopupRootIdentifierToInstance.Add(uniquePopupRootIdentifier, popupRoot);
+            PopupRootIdentifierToInstance.Add(popupRoot);
 
             return popupRoot;
         }
 
         public static void RemovePopupRoot(PopupRoot popupRoot)
         {
-            string uniquePopupRootIdentifier = popupRoot.INTERNAL_UniqueIndentifier;
-            if (PopupRootIdentifierToInstance.ContainsKey(uniquePopupRootIdentifier))
+            if (!PopupRootIdentifierToInstance.Remove(popupRoot))
             {
-                Window parentWindow = popupRoot.INTERNAL_ParentWindow;
-
-                //--------------------------------------
-                // Remove from the DOM:
-                //--------------------------------------
-
-                popupRoot.INTERNAL_DetachFromDomEvents();
-
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-$@"
-var popupRoot = document.getElementByIdSafe(""{uniquePopupRootIdentifier}"");
-{INTERNAL_InteropImplementation.GetVariableStringForJS(parentWindow.INTERNAL_RootDomElement)}.removeChild(popupRoot);");
-
-                popupRoot.INTERNAL_OuterDomElement = popupRoot.INTERNAL_InnerDomElement = null;
-                popupRoot.IsConnectedToLiveTree = false;
-
-                //--------------------------------------
-                // Remove from the list of popups:
-                //--------------------------------------
-
-                PopupRootIdentifierToInstance.Remove(uniquePopupRootIdentifier);
+                throw new InvalidOperationException(
+                    $"No PopupRoot with identifier '{popupRoot.INTERNAL_UniqueIndentifier}' was found.");
             }
-            else
-                throw new Exception("No PopupRoot with the following identifier was found: " + uniquePopupRootIdentifier + ". Please contact support.");
+
+            //--------------------------------------
+            // Remove from the DOM:
+            //--------------------------------------
+
+            popupRoot.INTERNAL_DetachFromDomEvents();
+
+            string sWindow = INTERNAL_InteropImplementation.GetVariableStringForJS(popupRoot.INTERNAL_ParentWindow.INTERNAL_RootDomElement);
+
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $@"var popupRoot = document.getElementById(""{popupRoot.INTERNAL_UniqueIndentifier}"");
+if (popupRoot) {sWindow}.removeChild(popupRoot);");
+
+            popupRoot.INTERNAL_OuterDomElement = popupRoot.INTERNAL_InnerDomElement = null;
+            popupRoot.IsConnectedToLiveTree = false;
         }
 
         public static IEnumerable GetAllRootUIElements() // IMPORTANT: This is called via reflection from the "Visual Tree Inspector" of the Simulator. If you rename or remove it, be sure to update the Simulator accordingly!
@@ -128,13 +99,7 @@ var popupRoot = document.getElementByIdSafe(""{uniquePopupRootIdentifier}"");
             yield return Window.Current;
 
             // And all the popups:
-            foreach (var popupRoot in
-#if BRIDGE
-                INTERNAL_BridgeWorkarounds.GetDictionaryValues_SimulatorCompatible(PopupRootIdentifierToInstance)
-#else
-                PopupRootIdentifierToInstance.Values
-#endif
-                )
+            foreach (PopupRoot popupRoot in PopupRootIdentifierToInstance)
             {
                 yield return popupRoot;
             }

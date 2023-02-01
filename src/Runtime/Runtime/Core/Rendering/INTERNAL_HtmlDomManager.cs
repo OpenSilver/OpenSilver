@@ -22,9 +22,11 @@ using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows;
+using System.Windows.Controls.Primitives;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
@@ -55,6 +57,17 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             }
 
             return _rootDomElement;
+        }
+
+        internal static UIElement GetElementById(string id)
+        {
+            if (_store.TryGetValue(id, out WeakReference<UIElement> weakRef)
+                && weakRef.TryGetTarget(out UIElement uie))
+            {
+                return uie;
+            }
+
+            return null;
         }
 
         public static void RemoveFromDom(object domNode, string commentForDebugging = null)
@@ -374,6 +387,22 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             Performance.Counter("CreateDomElementAndAppendIt", t0);
 #endif
             return CreateDomElementAndAppendIt_ForUseByTheSimulator(domElementTag, parentRef, associatedUIElement, index);
+        }
+
+        internal static object CreatePopupRootDomElementAndAppendIt(PopupRoot popupRoot)
+        {
+            Debug.Assert(popupRoot != null);
+
+            string uniqueIdentifier = popupRoot.INTERNAL_UniqueIndentifier;
+            string sRootElement = INTERNAL_InteropImplementation.GetVariableStringForJS(
+                popupRoot.INTERNAL_ParentWindow.INTERNAL_RootDomElement);
+            string sPointerEvents = popupRoot.INTERNAL_LinkedPopup.StayOpen ? "none" : "auto";
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"document.createPopupRootElement('{uniqueIdentifier}', {sRootElement}, '{sPointerEvents}');");
+
+            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(popupRoot));
+
+            return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null);
         }
 
         internal static object CreateTextBlockDomElementAndAppendIt(

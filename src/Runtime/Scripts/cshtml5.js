@@ -286,6 +286,20 @@ document.createTextBlockElement = function (id, parentElement, wrap) {
     }
 }
 
+document.createPopupRootElement = function (id, rootElement, pointerEvents) {
+    if (!rootElement) return;
+
+    const popupRoot = document.createElement('div');
+    popupRoot.setAttribute('id', id);
+    popupRoot.style.position = 'absolute';
+    popupRoot.style.width = '100%';
+    popupRoot.style.height = '100%';
+    popupRoot.style.overflowX = 'hidden';
+    popupRoot.style.overflowY = 'hidden';
+    popupRoot.style.pointerEvents = pointerEvents;
+    rootElement.appendChild(popupRoot);
+}
+
 document.createCanvasElement = function (id, parentElement) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
 
@@ -444,17 +458,21 @@ document._attachEventListeners = function (element, handler, isFocusable) {
     const view = typeof element === 'string' ? document.getElementById(element) : element;
     if (!view || view._eventsStore) return;
 
+    function directEventHandler(e) {
+        handler(this.id, e);
+    }
+
     function bubblingEventHandler(e) {
         if (!e.isHandled) {
             e.isHandled = true;
-            handler(e);
+            handler(this.id, e);
         }
     }
 
     function bubblingHandledEventHandler(e) {
         if (!e.isHandled) {
             e.isHandled = true;
-            handler(e);
+            handler(this.id, e);
             e.preventDefault();
         }
     }
@@ -467,8 +485,8 @@ document._attachEventListeners = function (element, handler, isFocusable) {
     view.addEventListener('mouseup', store['mouseup'] = bubblingEventHandler);
     view.addEventListener('mousemove', store['mousemove'] = bubblingEventHandler);
     view.addEventListener('wheel', store['wheel'] = bubblingEventHandler, { passive: true });
-    view.addEventListener('mouseenter', store['mouseenter'] = handler);
-    view.addEventListener('mouseleave', store['mouseleave'] = handler);
+    view.addEventListener('mouseenter', store['mouseenter'] = directEventHandler);
+    view.addEventListener('mouseleave', store['mouseleave'] = directEventHandler);
     if (store.enableTouch) {
         view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
         view.addEventListener('touchend', store['touchend'] = bubblingHandledEventHandler);
@@ -484,36 +502,8 @@ document._attachEventListeners = function (element, handler, isFocusable) {
     }
 }
 
-document._removeEventListeners = function (element) {
-    const view = typeof element === 'string' ? document.getElementById(element) : element;
-    if (!view || !view._eventsStore) return;
-
-    const store = view._eventsStore;
-    view.removeEventListener('mousedown', store['mousedown']);
-    view.removeEventListener('mouseup', store['mouseup']);
-    view.removeEventListener('mousemove', store['mousemove']);
-    view.removeEventListener('wheel', store['wheel']);
-    view.removeEventListener('mouseenter', store['mouseenter']);
-    view.removeEventListener('mouseleave', store['mouseleave']);
-    if (store.enableTouch) {
-        view.removeEventListener('touchstart', store['touchstart']);
-        view.removeEventListener('touchend', store['touchend']);
-        view.removeEventListener('touchmove', store['touchmove']);
-    }
-    if (store.isFocusable) {
-        view.removeEventListener('keypress', store['keypress']);
-        view.removeEventListener('input', store['input']);
-        view.removeEventListener('keydown', store['keydown']);
-        view.removeEventListener('keyup', store['keyup']);
-        view.removeEventListener('focusin', store['focusin']);
-        view.removeEventListener('focusout', store['focusout']);
-    }
-
-    delete view._eventsStore;
-}
-
-document.eventCallback = function (callbackId, arguments, sync) {
-    const argsArray = arguments;
+document.eventCallback = function (callbackId, args, sync) {
+    const argsArray = args;
     const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
     document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
     if (sync) {

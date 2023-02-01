@@ -100,9 +100,14 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal sealed override NativeEventsManager CreateEventsManager()
+        internal sealed override void AddEventListeners()
         {
-            return new NativeEventsManager(this, this, Host, true);
+            NativeEventsHelper.AddEventListeners(this, true);
+        }
+
+        internal sealed override void DispatchEvent(object jsEventArg)
+        {
+            NativeEventCallback(this, Host, jsEventArg);
         }
 
         internal override bool EnablePointerEventsCore => true;

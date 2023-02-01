@@ -60,15 +60,16 @@ window.onCallBack = (function () {
                 // if we deal with an array, we need to check
                 // that all the items are primitive types.
                 if (Array.isArray(args)) {
-                    callbackArgs = args;
+                    callbackArgs = [];
                     for (let i = 0; i < args.length; i++) {
                         let itemType = typeof args[i];
-                        if (!(args[i] === null || itemType === 'number' || itemType === 'string' || itemType === 'boolean' ||
+                        if ((args[i] === null || itemType === 'number' || itemType === 'string' || itemType === 'boolean' ||
                             // Check for TypedArray. This is used for reading binary data for FileReader for example
                             (ArrayBuffer.isView(args[i]) && !(args[i] instanceof DataView))
                         )) {
-                            callbackArgs = [];
-                            break;
+                            callbackArgs.push(args[i]);
+                        } else {
+                            callbackArgs.push(undefined);
                         }
                     }
                     break;

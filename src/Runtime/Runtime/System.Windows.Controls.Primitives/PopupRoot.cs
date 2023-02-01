@@ -65,10 +65,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal Popup INTERNAL_LinkedPopup { get; set; }
 
-        internal PopupRoot(string uniqueIdentifier, Window parentWindow)
+        internal PopupRoot(string uniqueIdentifier, Window parentWindow, Popup popup)
         {
             INTERNAL_UniqueIndentifier = uniqueIdentifier;
             INTERNAL_ParentWindow = parentWindow;
+            INTERNAL_LinkedPopup = popup;
 
             // Make sure that after the Loaded event of the PopupRoot, the parent Popup also raises the Loaded event:
             this.Loaded += PopupRoot_Loaded;

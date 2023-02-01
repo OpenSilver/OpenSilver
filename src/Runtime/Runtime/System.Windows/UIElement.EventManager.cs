@@ -33,8 +33,6 @@ namespace Windows.UI.Xaml
 {
     public partial class UIElement
     {
-        private NativeEventsManager _eventsManager;
-
         internal static void NativeEventCallback(UIElement mouseTarget, UIElement keyboardTarget, object jsEventArg)
         {
             string type = OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.type", false);
@@ -96,11 +94,11 @@ namespace Windows.UI.Xaml
         private void ProcessOnMouseMove(object jsEventArg)
         {
 #if MIGRATION
-                ProcessPointerEvent(jsEventArg, MouseMoveEvent);
+            ProcessPointerEvent(jsEventArg, MouseMoveEvent);
 #else
-                ProcessPointerEvent(jsEventArg, PointerMovedEvent);
+            ProcessPointerEvent(jsEventArg, PointerMovedEvent);
 #endif
-            }
+        }
 
         private void ProcessOnMouseDown(object jsEventArg)
         {

@@ -105,9 +105,9 @@ namespace Windows.UI.Xaml.Controls
             UpdateVisualStates();
         }
 
-        internal override NativeEventsManager CreateEventsManager()
+        internal override void AddEventListeners()
         {
-            return new NativeEventsManager(this, this, this, true);
+            NativeEventsHelper.AddEventListeners(this, true);
         }
 
         //-----------------------

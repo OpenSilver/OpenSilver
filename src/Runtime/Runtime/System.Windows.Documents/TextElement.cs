@@ -43,10 +43,9 @@ namespace Windows.UI.Xaml.Documents
             IsTabStop = false;
         }
 
-        internal override NativeEventsManager CreateEventsManager()
-        {
-            return null;
-        }
+        internal sealed override void AddEventListeners() { }
+
+        internal sealed override void DispatchEvent(object jsEventArg) { }
 
         internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
         {

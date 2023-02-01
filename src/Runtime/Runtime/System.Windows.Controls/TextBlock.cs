@@ -84,9 +84,9 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
-        internal sealed override NativeEventsManager CreateEventsManager()
+        internal sealed override void AddEventListeners()
         {
-            return new NativeEventsManager(this, this, this, false);
+            NativeEventsHelper.AddEventListeners(this, false);
         }
 
         internal override string GetPlainText() => Text;

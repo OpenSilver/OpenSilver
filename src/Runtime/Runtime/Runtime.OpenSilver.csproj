@@ -63,7 +63,6 @@
 		<Compile Include="OpenSilver\Internal\DependentList.cs" />
 		<Compile Include="OpenSilver\Internal\Helper.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
-		<Compile Include="OpenSilver\Internal\NativeEventsManager.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
