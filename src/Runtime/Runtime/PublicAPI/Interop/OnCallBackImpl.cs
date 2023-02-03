@@ -233,11 +233,6 @@ namespace CSHTML5.Internal
                 "If a callback returns a value(for example, a Func), verify that this callback is not invoked from the C# code in the UI thread.");
         }
 
-        private ref struct Test
-        {
-            private string _temp;
-        }
-
         private static object[] MakeArgumentsForCallback(
             int count,
             string idWhereCallbackArgsAreStored,
@@ -246,9 +241,18 @@ namespace CSHTML5.Internal
         {
             var result = new object[count];
 
+            INTERNAL_JSObjectReference arg = null;
             for (int i = 0; i < count; i++)
             {
-                var arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i);
+                if (arg is null)
+                {
+                    arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i);
+                }
+                else
+                {
+                    arg.ArrayIndex = i;
+                }
+
                 if (callbackGenericArgs != null
                     && i < callbackGenericArgs.Length
                     && callbackGenericArgs[i] != typeof(object)
@@ -262,6 +266,7 @@ namespace CSHTML5.Internal
                 else
                 {
                     result[i] = arg;
+                    arg = null;
                 }
             }
             return result;
