@@ -152,7 +152,10 @@ namespace Windows.UI.Xaml.Media.Animation
                     }
                     else
                     {
-                        Tuple<string, string> key = new Tuple<string, string>(Storyboard.GetTargetName(timeLine), Storyboard.GetTargetProperty(timeLine).Path);
+                        PropertyPath targetProperty = Storyboard.GetTargetProperty(timeLine);
+                        string targetName = Storyboard.GetTargetName(timeLine);
+
+                        Tuple<string, string> key = new Tuple<string, string>(targetName, targetProperty?.Path);
                         if (!INTERNAL_propertiesChanged.ContainsKey(key))
                         {
                             INTERNAL_propertiesChanged.Add(key, timeLine); //todo: the key is no longer sufficient because since we have BeginTime in Timeline, we can have multiple animations on a same property, that happen one after the other.
@@ -243,7 +246,7 @@ namespace Windows.UI.Xaml.Media.Animation
 
                         if (_guidToIterationParametersDict.Count == 0)
                         {
-                             OnIterationCompleted(this._parameters);
+                            OnIterationCompleted(this._parameters);
                         }
                     }
                 }
@@ -536,8 +539,8 @@ namespace Windows.UI.Xaml.Media.Animation
                 //I'm not sure this is useful but we never know.
                 _expectedAmountOfTimelineEndsDict[parameters.Guid] = Children.Count;
                 _guidToIterationParametersDict[parameters.Guid] = parameters;
-            }            
-            
+            }
+
             foreach (Timeline timeLine in Children)
             {
                 timeLine.Completed -= timeLine_Completed;
