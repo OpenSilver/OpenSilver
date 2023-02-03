@@ -116,16 +116,37 @@ namespace System.Windows.Markup
             return false;
         }
 
-        private bool TryFindResourceFromParser(IAmbientProvider ambientProvider,
-            IXamlSchemaContextProvider schemaContextProvider,
-            out object resource)
+        private bool TryFindResourceFromParser(IAmbientProvider ambientProvider, IXamlSchemaContextProvider schemaContextProvider, out object resource)
         {
-            // TODO
+            Debug.Assert(ambientProvider != null);
+            Debug.Assert(schemaContextProvider != null);
 
-            Debug.Assert(ambientProvider != null);            
-            
-            // return false so that it can attempt to find the resource in the 
-            // application's resources.
+            XamlSchemaContext schemaContext = schemaContextProvider.SchemaContext;
+
+            XamlType feXType = schemaContext.GetXamlType(typeof(FrameworkElement));
+            XamlType appXType = schemaContext.GetXamlType(typeof(Application));
+
+            XamlMember feResourcesProperty = feXType.GetMember("Resources");
+            XamlMember appResourcesProperty = appXType.GetMember("Resources");
+
+            XamlType[] types = new XamlType[1] { schemaContext.GetXamlType(typeof(ResourceDictionary)) };
+
+            var ambientValues = ambientProvider.GetAllAmbientValues(null,
+                                                                    false,
+                                                                    types,
+                                                                    feResourcesProperty,
+                                                                    appResourcesProperty);
+
+            foreach (var ambientValue in ambientValues)
+            {
+                if (ambientValue.Value is ResourceDictionary rd)
+                {
+                    if (rd.TryGetResource(ResourceKey, out resource))
+                    {
+                        return true;
+                    }
+                }
+            }
 
             resource = null;
             return false;
