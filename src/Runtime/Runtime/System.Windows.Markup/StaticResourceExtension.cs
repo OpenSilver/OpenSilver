@@ -116,19 +116,26 @@ namespace System.Windows.Markup
             return false;
         }
 
-        private bool TryFindResourceFromParser(IAmbientProvider ambientProvider,
-            IXamlSchemaContextProvider schemaContextProvider,
-            out object resource)
+        private bool TryFindResourceFromParser(IAmbientProvider ambientProvider, IXamlSchemaContextProvider schemaContextProvider, out object resource)
         {
             Debug.Assert(ambientProvider != null);
             Debug.Assert(schemaContextProvider != null);
 
-            var schemaContext = schemaContextProvider.SchemaContext;
-            var feXType = schemaContext.GetXamlType(typeof(FrameworkElement));
-            var feResourcesProperty = feXType.GetMember("Resources");
+            XamlSchemaContext schemaContext = schemaContextProvider.SchemaContext;
 
-            var types = new XamlType[1] { schemaContext.GetXamlType(typeof(ResourceDictionary)) };
-            var ambientValues = ambientProvider.GetAllAmbientValues(null, true, types, feResourcesProperty);
+            XamlType feXType = schemaContext.GetXamlType(typeof(FrameworkElement));
+            XamlType appXType = schemaContext.GetXamlType(typeof(Application));
+
+            XamlMember feResourcesProperty = feXType.GetMember("Resources");
+            XamlMember appResourcesProperty = appXType.GetMember("Resources");
+
+            XamlType[] types = new XamlType[1] { schemaContext.GetXamlType(typeof(ResourceDictionary)) };
+
+            var ambientValues = ambientProvider.GetAllAmbientValues(null,
+                                                                    false,
+                                                                    types,
+                                                                    feResourcesProperty,
+                                                                    appResourcesProperty);
 
             foreach (var ambientValue in ambientValues)
             {
@@ -140,6 +147,7 @@ namespace System.Windows.Markup
                     }
                 }
             }
+
             resource = null;
             return false;
         }

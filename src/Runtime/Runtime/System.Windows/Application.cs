@@ -29,6 +29,7 @@ using OpenSilver.Internal.Xaml;
 using System.Text.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Xaml.Markup;
 
 #if MIGRATION
 using System.ApplicationModel.Activation;
@@ -280,6 +281,7 @@ namespace Windows.UI.Xaml
         /// Gets a collection of application-scoped resources, such as styles, templates,
         /// and brushes.
         /// </summary>
+        [Ambient]
         public ResourceDictionary Resources
         {
             get
