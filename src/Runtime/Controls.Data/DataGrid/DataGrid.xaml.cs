@@ -2922,6 +2922,7 @@ namespace Windows.UI.Xaml.Controls
             if (_rowsPresenter != null)
             {
                 _rowsPresenter.OwningGrid = this;
+                _rowsPresenter.ProgressiveRenderingChunkSize = EffectiveProgressiveLoadingChunkSize;
                 InvalidateRowHeightEstimate();
                 UpdateRowDetailsHeightEstimate();
             }

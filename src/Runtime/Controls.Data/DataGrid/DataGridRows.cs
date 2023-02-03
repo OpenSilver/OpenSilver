@@ -874,6 +874,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public int? ProgressiveLoadingRowChunkSize { get; set; }
 
+        private int EffectiveProgressiveLoadingChunkSize => ProgressiveLoadingRowChunkSize ?? GlobalProgressiveLoadingChunkSize ?? 0;
+
         /// <summary>
         /// Fires when progressive loading starts and ends
         /// </summary>
@@ -903,7 +905,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            int chunkSize = ProgressiveLoadingRowChunkSize ?? GlobalProgressiveLoadingChunkSize ?? 0;
+            int chunkSize = EffectiveProgressiveLoadingChunkSize;
             int chunkSlots = chunkSize > 0 ? Math.Min(chunkSize, totalSlots) : totalSlots;
 
             int addedfRows = 0;
@@ -918,13 +920,6 @@ namespace Windows.UI.Xaml.Controls
             while (chunkSlots < totalSlots)
             {
                 await Task.Delay(1);
-
-                // this can happen if the DataGrid is detached during the delay.
-                if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                {
-                    OnProgressiveLoadingInProgressChanged(false);
-                    return;
-                }
 
                 // this can happen while refreshing rows while progressive loading rows
                 if (_pendingRefreshRowsArgs != null && _pendingRefreshRowsArgs.Length == 2)
