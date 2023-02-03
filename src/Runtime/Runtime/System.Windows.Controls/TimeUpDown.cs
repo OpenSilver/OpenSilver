@@ -925,7 +925,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Called by OnSpin when the spin direction is SpinDirection.Increase.
+        /// Called by OnSpin when the spin direction is SpinDirection.Decrease.
         /// </summary>
         protected override void OnDecrement()
         {
@@ -1363,10 +1363,11 @@ namespace Windows.UI.Xaml.Controls
         protected override void SelectAllText()
         {
             // TimeUpDown only selects all text when coming in from a tab.
-            if (!_isIgnoreSelectionOfAllText)
-            {
-                base.SelectAllText();
-            }
+            // but wrong detection of FocusedElement cause this always execute, just comment out to correct spin behaviour with specific caret position on TextBox.
+            //if (!_isIgnoreSelectionOfAllText)
+            //{
+            //    base.SelectAllText();
+            //}
         }
 
         /// <summary>
