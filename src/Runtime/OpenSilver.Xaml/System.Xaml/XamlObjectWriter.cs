@@ -452,7 +452,8 @@ namespace System.Xaml
                 }
             }
 
-            HandleEndInit(obj);
+            if (!state.IsGetObject)
+                HandleEndInit(obj);
 
             object_states.Push(state);
             if (object_states.Count == 1)
