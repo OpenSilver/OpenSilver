@@ -235,18 +235,7 @@ namespace Windows.UI.Xaml
             }
 
             string strPadding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
-            string strWidth = "";
-            string strMaxWidth = "";
-            if (double.IsNaN(maxWidth) || double.IsInfinity(maxWidth))
-            {
-                strWidth = "";
-                strMaxWidth = "";
-            }
-            else
-            {
-                strWidth = maxWidth.ToInvariantString() + "px";
-                strMaxWidth = maxWidth.ToInvariantString() + "px";
-            }
+            string strMaxWidth = double.IsNaN(maxWidth) || double.IsInfinity(maxWidth) ? string.Empty : $"{maxWidth.ToInvariantString()}px";
 
             if (savedWhiteSpace == whiteSpace)
                 whiteSpace = string.Empty;
@@ -258,7 +247,7 @@ namespace Windows.UI.Xaml
             else
                 savedTextBlockPadding = padding;
 
-            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{whiteSpace}"",""{overflowWrap}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"",""{emptyVal}"")";
+            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{whiteSpace}"",""{overflowWrap}"",""{strPadding}"",""{strMaxWidth}"",""{emptyVal}"")";
             string strTextSize = OpenSilver.Interop.ExecuteJavaScriptString(javaScriptCodeToExecute);
             Size measuredSize;
             int sepIndex = strTextSize != null ? strTextSize.IndexOf('|') : -1;

@@ -642,7 +642,7 @@ document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMa
     }
 }
 
-document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, width, maxWidth, emptyVal) {
+document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, maxWidth, emptyVal) {
     var element = document.measureTextBlockElement;
     var elToMeasure = document.getElementById(uid);
     if (element && elToMeasure) {
@@ -663,7 +663,6 @@ document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, wi
             element.style.padding = padding;
         }
 
-        element.style.width = width;
         element.style.maxWidth = maxWidth;
 
         const size = element.offsetWidth + "|" + element.offsetHeight;
