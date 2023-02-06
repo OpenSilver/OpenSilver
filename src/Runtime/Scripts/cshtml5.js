@@ -234,14 +234,6 @@ document.setGridCollapsedDuetoHiddenColumn = function (id) {
     }
 }
 
-document.setDisplayTableCell = function (id) {
-    const element = document.getElementById(id);
-    if (!element || element.tagName == 'SPAN')
-        return;
-
-    element.style.display = 'table-cell';
-}
-
 document.getActualWidthAndHeight = function (element) {
     return (typeof element === 'undefined' || element === null) ? '0|0' : element['offsetWidth'].toFixed(3) + '|' + element['offsetHeight'].toFixed(3);
 }
@@ -650,7 +642,7 @@ document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMa
     }
 }
 
-document.measureTextBlock = function (uid, textWrapping, padding, width, maxWidth, emptyVal) {
+document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, width, maxWidth, emptyVal) {
     var element = document.measureTextBlockElement;
     var elToMeasure = document.getElementById(uid);
     if (element && elToMeasure) {
@@ -663,9 +655,9 @@ document.measureTextBlock = function (uid, textWrapping, padding, width, maxWidt
         element.style.fontFamily = computedStyle.fontFamily;
         element.style.fontStyle = computedStyle.fontStyle;
 
-        if (textWrapping.length > 0) {
-            element.style.whiteSpace = textWrapping;
-        }
+        if (whiteSpace.length > 0)
+            element.style.whiteSpace = whiteSpace;
+        element.style.overflowWrap = overflowWrap;
         if (padding.length > 0) {
             element.style.boxSizing = "border-box";
             element.style.padding = padding;

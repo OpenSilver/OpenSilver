@@ -581,23 +581,10 @@ if(nextSibling != undefined) {
 
                 // Create and append the DIV for handling margins and append:
                 additionalOutsideDivForMargins = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", whereToPlaceDivForMargins, parent, index); //todo: check if the third parameter should be the child or the parent (make something with margins and put a mouseenter in the parent then see if the event is triggered).
-
-                // Style the DIV for handling margins:
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(additionalOutsideDivForMargins);
                 style.boxSizing = "border-box";
-                if (child is FrameworkElement &&
-                    (((FrameworkElement)child).HorizontalAlignment == HorizontalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Width)
-                    && !(child is Image && ((Image)child).Stretch == Stretch.None)))
-                {
-                    if (!containsNegativeMargins)
-                        style.width = "100%";
-                }
-                if (child is FrameworkElement &&
-                    (((FrameworkElement)child).VerticalAlignment == VerticalAlignment.Stretch && double.IsNaN(((FrameworkElement)child).Height)
-                    && !(child is Image && ((Image)child).Stretch == Stretch.None)))
-                {
-                    style.height = "100%";
-                } 
+                style.width = "100%";
+                style.height = "100%";
             }
 
 #if PERFSTAT

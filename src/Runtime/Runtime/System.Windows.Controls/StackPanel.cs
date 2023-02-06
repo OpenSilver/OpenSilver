@@ -50,8 +50,6 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class StackPanel : Panel
     {
-        Orientation? _renderedOrientation = null;
-
         /// <summary>
         /// Gets or sets the dimension by which child elements are stacked.
         /// </summary>
@@ -60,219 +58,116 @@ namespace Windows.UI.Xaml.Controls
             get { return (Orientation)GetValue(OrientationProperty); }
             set { SetValue(OrientationProperty, value); }
         }
+
         /// <summary>
         /// Identifies the Orientation dependency property
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(StackPanel),
-                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(Orientation),
+                typeof(Orientation),
+                typeof(StackPanel),
+                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
+                {
+                    MethodToUpdateDom2 = UpdateDomOnOrientationChanged,
+                });
 
-        static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void UpdateDomOnOrientationChanged(DependencyObject d, object oldValue, object newValue)
         {
             var stackPanel = (StackPanel)d;
-            Orientation newValue = (Orientation)e.NewValue;
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(stackPanel)
-                && stackPanel._renderedOrientation.HasValue
-                && stackPanel._renderedOrientation.Value != newValue)
+            if (stackPanel.IsUnderCustomLayout)
             {
-                //todo: refresh the whole stackpanel (so that we display the children in the right orientation)
+                return;
+            }
 
-#if !GD_WIP
-                throw new NotSupportedException("Changing the orientation of a StackPanel while it is in the visual tree is not yet supported.");
-#endif
+            var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(stackPanel.INTERNAL_InnerDomElement);
+            switch ((Orientation)newValue)
+            {
+                case Orientation.Vertical:
+                    innerDivStyle.display = "block";
+                    innerDivStyle.height = string.Empty;
+                    if (!stackPanel.CustomLayout)
+                    {
+                        stackPanel.SetDisplayOnChildWrappers("block");
+                    }
+                    break;
+
+                case Orientation.Horizontal:
+                    innerDivStyle.display = "flex";
+                    innerDivStyle.height = "100%";
+                    if (!stackPanel.CustomLayout)
+                    {
+                        stackPanel.SetDisplayOnChildWrappers("flex");
+                    }
+                    break;
             }
         }
 
-
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            //INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div).position = "absolute";
-            //div.style.position = "absolute";
-            //note: size must be set in the div part only (the rest will follow).
+            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object outerDiv);
 
-            _renderedOrientation = this.Orientation;
-
-            if (_renderedOrientation == Orientation.Horizontal)
+            if (IsUnderCustomLayout)
             {
-                //------v1------//
-
-                //wrapper for the whole stackpanel:
-                //<div>
-                //  <table style="height:inherit; border-collapse:collapse">
-                //    <tr>
-                //          ...
-                //    </tr>
-                //  </table>
-                //</div>
-
-                //var table = INTERNAL_HtmlDomManager.CreateDomElement("table");
-                //table.style.height = "inherit";
-                //table.style.borderCollapse = "collapse";
-
-                //var tr = INTERNAL_HtmlDomManager.CreateDomElement("tr");
-                //tr.style.padding = "0px";
-
-                //INTERNAL_HtmlDomManager.AppendChild(table, tr);
-                //INTERNAL_HtmlDomManager.AppendChild(div, table);
-
-
-                //domElementWhereToPlaceChildren = tr;
-
-                //------v2------//
-                //wrapper for the whole StackPanel - v2:
-                //  <div style="display:table-row">
-                //      <div style="margin-left: 0px; margin-right: auto; height: 100%">
-                //          ...
-                //      </div>
-                //  </div>
-
-
-                object outerDiv;
-                var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out outerDiv);
-
-                if (this.IsUnderCustomLayout)
-                {
-                    domElementWhereToPlaceChildren = outerDiv;
-
-                    return outerDiv;
-                }
-                else if (this.IsCustomLayoutRoot)
-                {
-                    outerDivStyle.position = "relative";
-                }
-
-                outerDivStyle.display = "table";
-                
-                object innerDiv;
-                var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out innerDiv);
-
-                innerDivStyle.marginLeft = "0px";
-                innerDivStyle.marginRight = "auto";
-                innerDivStyle.height = "100%";
-                innerDivStyle.display = "table";
-
-                domElementWhereToPlaceChildren = innerDiv;
-
+                domElementWhereToPlaceChildren = outerDiv;
                 return outerDiv;
             }
-            else
+            else if (IsCustomLayoutRoot)
             {
-#if !BRIDGE
-                return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-#else
-                return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
-#endif
+                outerDivStyle.position = "relative";
             }
+
+            var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
+            switch (Orientation)
+            {
+                case Orientation.Vertical:
+                    innerDivStyle.display = "block";
+                    innerDivStyle.height = string.Empty;
+                    break;
+
+                case Orientation.Horizontal:
+                    innerDivStyle.display = "flex";
+                    innerDivStyle.height = "100%";
+                    break;
+            }
+
+            domElementWhereToPlaceChildren = innerDiv;
+
+            return outerDiv;
         }
 
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
         {
-            if (this.IsUnderCustomLayout || this.IsCustomLayoutRoot)
+            if (IsUnderCustomLayout || IsCustomLayoutRoot)
             {
                 domElementWhereToPlaceChild = null;
                 return null;
             }
 
-            if (Orientation == Orientation.Horizontal)
+            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
+            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div).display = Orientation switch
             {
-                //------v1------//
+                Orientation.Vertical => "block",
+                Orientation.Horizontal => "flex",
+                _ => throw new InvalidOperationException(),
+            };
 
-
-                //NOTE: here, we are in a table
-
-                //wrapper for each child:
-                //<td style="padding:0px">
-                //  <div style="width: inherit;position:relative">
-                //      ...(child)
-                //  </div>
-                //</td>
-
-                //var td = INTERNAL_HtmlDomManager.CreateDomElement("td");
-                //td.style.position = "relative";
-                //td.style.padding = "0px";
-                ////var div = INTERNAL_HtmlDomManager.CreateDomElement("div");
-                ////div.style.height = "inherit"; //todo: find a way to make this div actually inherit the height of the td... (otherwise we cannot set its verticalAlignment)
-                ////div.style.position = "relative";
-                ////INTERNAL_HtmlDomManager.AppendChild(td, div);
-
-                //domElementWhereToPlaceChild = td;
-
-                //return td;
-
-
-
-
-                //------v2------// = better because we only use divs, it's more simple and verticalAlignment.Stretch works when the stackPanel's size is hard coded (but it still doesn't work when it's not).
-
-
-                //wrapper for each child - v2
-                //<div style="display: table-cell;height:inherit;>
-                // ...
-                //</div>
-
-                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
-                var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-                divStyle.position = "relative";
-                divStyle.display = "table-cell";
-                divStyle.height = "100%"; //this allow the stretched items to actually be stretched to the size of the tallest element when the stackpanel's size is only defined by this element.
-                divStyle.verticalAlign = "middle"; // We use this as a default value for elements that have a "stretch" vertical alignment
-
-                domElementWhereToPlaceChild = div;
-
-
-                return div;
-
-            }
-            else if (Orientation == Orientation.Vertical) //when we arrive here, it should always be true but we never know...
-            {
-                //NOTE: here, we are in a div
-
-
-                //wrapper for each child:
-                //<div style="width: inherit">... </div>
-
-                var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
-                var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-                divStyle.position = "relative";
-                divStyle.width = "100%"; // Makes it possible to do horizontal alignment of the element that will be the child of this div.
-
-                domElementWhereToPlaceChild = div;
-                return div;
-            }
-            else
-                throw new NotSupportedException();
+            domElementWhereToPlaceChild = div;
+            return div;
         }
 
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        private void SetDisplayOnChildWrappers(string display)
         {
-            _renderedOrientation = null;
-
-            base.INTERNAL_OnDetachedFromVisualTree();
+            foreach (UIElement child in Children)
+            {
+                if (child.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny is not null)
+                {
+                    var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(
+                        child.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny);
+                    wrapperDivStyle.display = display;
+                }
+            }
         }
-
-        //internal override dynamic ShowChild(UIElement child)
-        //{
-        //    dynamic elementToReturn = base.ShowChild(child); //we need to return this so that a class that inherits from this but doesn't create a wrapper (or a different one) is correctly handled 
-
-        //    dynamic domChildWrapper = INTERNAL_VisualChildrenInformation[child].INTERNAL_OptionalChildWrapper_OuterDomElement;
-        //    dynamic domChildWrapperStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domChildWrapper);
-        //    //domChildWrapperStyle.visibility = "visible";
-        //    domChildWrapperStyle.display = "block"; //todo: verify that it is not necessary to revert to the previous value instead.
-        //    if (Orientation == Orientation.Horizontal)
-        //    {
-        //        domChildWrapperStyle.height = "100%";
-        //        domChildWrapperStyle.width = "";
-        //    }
-        //    else
-        //    {
-        //        domChildWrapperStyle.height = "";
-        //        domChildWrapperStyle.width = "100%";
-        //    }
-
-        //    return elementToReturn;
-        //}
 
         private double GetCrossLength(Size size)
         {

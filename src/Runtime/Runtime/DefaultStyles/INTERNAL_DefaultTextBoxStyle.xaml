@@ -129,7 +129,7 @@
                             <Grid>
                                 <Border x:Name="ReadOnlyVisualElement" Opacity="0" Background="#5EC9C9C9"/>
                                 <Border x:Name="MouseOverBorder" BorderThickness="1" BorderBrush="Transparent">
-                                    <ContentPresenter x:Name="ContentElement" Margin="{TemplateBinding Padding}"/>
+                                    <ScrollViewer x:Name="ContentElement" Padding="{TemplateBinding Padding}" BorderThickness="0" IsTabStop="False"/>
                                 </Border>
                             </Grid>
                         </Border>

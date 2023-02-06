@@ -211,6 +211,10 @@ namespace CSHTML5.Internal
         public string visibility { set { SetStylePropertyValue("visibility", value); } }
         public string clip { set { SetStylePropertyValue("clip", value); } }
         public string overflowWrap { set { SetStylePropertyValue("overflowWrap", value); } }
+        public string alignItems { set { SetStylePropertyValue("alignItems", value); } }
+        public string justifyContent { set { SetStylePropertyValue("justifyContent", value); } }
+        public string flexWrap { set { SetStylePropertyValue("flexWrap", value); } }
+        public string flexDirection { set { SetStylePropertyValue("flexDirection", value); } }
 
         //-----------------------------------------------------------------------
         // Usage stats for To-Do Calendar (number of types each property is set):
