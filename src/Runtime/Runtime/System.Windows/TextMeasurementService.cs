@@ -30,13 +30,14 @@ namespace Windows.UI.Xaml
                      TextWrapping wrapping, 
                      Thickness padding, 
                      double maxWidth);
-        
+
         Size MeasureTextBlock(string uid,
-                              TextWrapping wrapping, 
-                              Thickness padding, 
+                              string whiteSpace,
+                              string overflowWrap,
+                              Thickness padding,
                               double maxWidth,
                               string emptyVal);
-        
+
         void CreateMeasurementText(UIElement parent);
         
         bool IsTextMeasureDivID(string id);
@@ -69,7 +70,7 @@ namespace Windows.UI.Xaml
         private string measureTextBoxElementID;
         private string measureTextBlockElementID;
 
-        private TextWrapping savedTextBlockTextWrapping;
+        private string savedWhiteSpace;
         private Thickness savedTextBlockPadding;
 
         public TextMeasurementService()
@@ -77,7 +78,7 @@ namespace Windows.UI.Xaml
             measureTextBoxElementID = "";
             measureTextBlockElementID = "";
 
-            savedTextBlockTextWrapping = TextWrapping.NoWrap;
+            savedWhiteSpace = "pre";
             savedTextBlockPadding = new Thickness(double.NegativeInfinity);
         }
 
@@ -222,8 +223,9 @@ namespace Windows.UI.Xaml
         }
 
         public Size MeasureTextBlock(string uid,
-                                     TextWrapping wrapping, 
-                                     Thickness padding, 
+                                     string whiteSpace,
+                                     string overflowWrap,
+                                     Thickness padding,
                                      double maxWidth,
                                      string emptyVal)
         {
@@ -232,7 +234,6 @@ namespace Windows.UI.Xaml
                 return new Size();
             }
 
-            string strTextWrapping = wrapping == TextWrapping.Wrap ? "pre-wrap" : "pre";
             string strPadding = $"{padding.Top.ToInvariantString()}px {padding.Right.ToInvariantString()}px {padding.Bottom.ToInvariantString()}px {padding.Left.ToInvariantString()}px";
             string strWidth = "";
             string strMaxWidth = "";
@@ -247,17 +248,17 @@ namespace Windows.UI.Xaml
                 strMaxWidth = maxWidth.ToInvariantString() + "px";
             }
 
-            if (savedTextBlockTextWrapping == wrapping)
-                strTextWrapping = "";
+            if (savedWhiteSpace == whiteSpace)
+                whiteSpace = string.Empty;
             else
-                savedTextBlockTextWrapping = wrapping;
+                savedWhiteSpace = whiteSpace;
 
             if (savedTextBlockPadding == padding)
                 strPadding = "";
             else
                 savedTextBlockPadding = padding;
 
-            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{strTextWrapping}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"",""{emptyVal}"")";
+            string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{whiteSpace}"",""{overflowWrap}"",""{strPadding}"",""{strWidth}"",""{strMaxWidth}"",""{emptyVal}"")";
             string strTextSize = OpenSilver.Interop.ExecuteJavaScriptString(javaScriptCodeToExecute);
             Size measuredSize;
             int sepIndex = strTextSize != null ? strTextSize.IndexOf('|') : -1;

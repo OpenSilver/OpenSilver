@@ -363,16 +363,17 @@ namespace Windows.UI.Xaml.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            //Size actualSize = this.INTERNAL_GetActualWidthAndHeight();
-            //return actualSize;
-            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
-
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
 
             if (noWrapSize == Size.Empty)
             {
-                noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, TextWrapping.NoWrap, Padding, Double.PositiveInfinity, "");
-                noWrapSize = noWrapSize.Add(BorderThicknessSize);
+                noWrapSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+                    uniqueIdentifier,
+                    "pre",
+                    string.Empty,
+                    Padding,
+                    double.PositiveInfinity,
+                    string.Empty);
             }
 
             if (TextWrapping == TextWrapping.NoWrap || noWrapSize.Width <= availableSize.Width)
@@ -381,8 +382,13 @@ namespace Windows.UI.Xaml.Controls
                 return noWrapSize;
             }
 
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, TextWrapping, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0), "");
-            TextSize = TextSize.Add(BorderThicknessSize);
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+                uniqueIdentifier,
+                TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
+                TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
+                Padding,
+                availableSize.Width,
+                string.Empty);
 
             _measuredSize = TextSize;
             return TextSize;

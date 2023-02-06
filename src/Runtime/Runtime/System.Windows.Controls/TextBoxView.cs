@@ -603,8 +603,14 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier;
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(uniqueIdentifier, Host.TextWrapping, Margin, availableSize.Width, "M");
+            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+                uniqueIdentifier,
+                Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
+                string.Empty,
+                Margin,
+                availableSize.Width,
+                "M");
             return TextSize;
         }
     }
