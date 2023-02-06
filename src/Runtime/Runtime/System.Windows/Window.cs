@@ -122,27 +122,23 @@ namespace Windows.UI.Xaml
         /// <param name="rootDomElement">The DOM element that will host the window</param>
         public void AttachToDomElement(object rootDomElement)
         {
-            if (this.INTERNAL_OuterDomElement != null
-                || this.INTERNAL_RootDomElement != null)
+            if (INTERNAL_OuterDomElement != null || INTERNAL_RootDomElement != null)
+            {
                 throw new InvalidOperationException("The method 'Window.AttachToDomElement' can be called only once.");
-
-            if (rootDomElement == null)
-                throw new ArgumentNullException("rootDomElement");
+            }
 
             //Note: The "rootDomElement" will contain one DIV for the root of the window visual tree, and other DIVs to host the popups.
-            this.INTERNAL_RootDomElement = rootDomElement;
+            INTERNAL_RootDomElement = rootDomElement ?? throw new ArgumentNullException(nameof(rootDomElement));
 
             // Reset the content of the root DIV:
-            CSHTML5.Interop.ExecuteJavaScriptFastAsync("document.clearXamlRoot()");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync("document.clearXamlRoot()");
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
             string sRootElement = INTERNAL_InteropImplementation.GetVariableStringForJS(rootDomElement);
-            CSHTML5.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.style.display = 'grid'");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sRootElement}.style.display = 'grid'");
 
             // Create the DIV that will correspond to the root of the window visual tree:
-            object windowRootDiv;
-
-            var windowRootDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", rootDomElement, this, out windowRootDiv);
+            var windowRootDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", rootDomElement, this, out object windowRootDiv);
 
             windowRootDivStyle.position = "absolute";
             windowRootDivStyle.width = "100%";
@@ -150,28 +146,45 @@ namespace Windows.UI.Xaml
             windowRootDivStyle.overflowX = "hidden";
             windowRootDivStyle.overflowY = "hidden";
 
-            this.INTERNAL_OuterDomElement = windowRootDiv;
-            this.INTERNAL_InnerDomElement = windowRootDiv;
+            string sRootDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(windowRootDiv);
+            string rootDivId = ((INTERNAL_HtmlDomElementReference)windowRootDiv).UniqueIdentifier;
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                @$"{sRootDiv}.addEventListener('keydown', function (e) {{
+    if (e.key === 'Tab') {{
+        const focusableElements = document.querySelectorAll('#{rootDivId} [tabindex]:not([tabindex=""-1""], [tabindex=""""])');
+        if (focusableElements.length === 0) return;
+        if (!e.shiftKey && e.target === focusableElements[focusableElements.length - 1]) {{
+            e.preventDefault();
+            focusableElements[0].focus();
+        }} else if (e.shiftKey && e.target === focusableElements[0]) {{
+            e.preventDefault();
+            focusableElements[focusableElements.length - 1].focus();
+        }}
+    }}
+}});");
 
-            this.INTERNAL_AttachToDomEvents();
+            INTERNAL_OuterDomElement = windowRootDiv;
+            INTERNAL_InnerDomElement = windowRootDiv;
+
+            INTERNAL_AttachToDomEvents();
 
             // Set the window as "loaded":
-            this._isLoaded = true;
-            this.IsConnectedToLiveTree = true;
-            this.UpdateIsVisible();
+            _isLoaded = true;
+            IsConnectedToLiveTree = true;
+            UpdateIsVisible();
 
             // Attach the window content, if any:
-            object content = this.Content;
+            object content = Content;
             if (content != null)
             {
                 OnContentChanged(null, content);
             }
 
             // Raise the "Loaded" event:
-            this.RaiseLoadedEvent();
-            this.InvalidateMeasure();
+            RaiseLoadedEvent();
+            InvalidateMeasure();
             
-            this.SizeChanged += WindowSizeChangedEventHandler;
+            SizeChanged += WindowSizeChangedEventHandler;
         }
 
         private void WindowSizeChangedEventHandler(object sender, WindowSizeChangedEventArgs e)

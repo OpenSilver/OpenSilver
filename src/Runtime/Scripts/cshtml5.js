@@ -289,6 +289,20 @@ document.createPopupRootElement = function (id, rootElement, pointerEvents) {
     popupRoot.style.overflowX = 'hidden';
     popupRoot.style.overflowY = 'hidden';
     popupRoot.style.pointerEvents = pointerEvents;
+    popupRoot.addEventListener('keydown', function (e) {
+        if (e.key === 'Tab') {
+            const focusableElements = document.querySelectorAll(`#${id} [tabindex]:not([tabindex="-1"], [tabindex=""])`);
+            if (focusableElements.length === 0) return;
+            if (!e.shiftKey && e.target === focusableElements[focusableElements.length - 1]) {
+                e.preventDefault();
+                focusableElements[0].focus();
+            } else if (e.shiftKey && e.target === focusableElements[0]) {
+                e.preventDefault();
+                focusableElements[focusableElements.length - 1].focus();
+            }
+        }
+    });
+
     rootElement.appendChild(popupRoot);
 }
 
