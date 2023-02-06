@@ -886,42 +886,82 @@ namespace Windows.UI.Xaml.Controls
         }
 
         private bool _isProgressiveLoadingInProgress;
-        private bool[] _pendingRefreshRowsArgs;
+        private bool[] _pendingRefreshRowsArgs;        
 
-        private async void AddSlots(int totalSlots)
+        internal class SlotCreationParams
+        {
+            internal int totalSlots;
+            internal IEnumerator<int> groupSlots;
+            internal int nextGroupSlot;
+            internal int chunkSize;
+            internal int chunkSlots;
+            internal int addedfRows;
+            internal int slot;
+        }
+
+        private SlotCreationParams _pausedSlotCreationParam = null;
+
+        private void AddSlots(int totalSlots)
         {
             this.SlotCount = 0;
             this.VisibleSlotCount = 0;
-            IEnumerator<int> groupSlots = null;
-            int nextGroupSlot = -1;
+
+            var scp = new SlotCreationParams();
+            scp.totalSlots = totalSlots;
+            scp.nextGroupSlot = -1;
+
             if (this.RowGroupHeadersTable.RangeCount > 0)
             {
-                groupSlots = this.RowGroupHeadersTable.GetIndexes().GetEnumerator();
-                if (groupSlots != null && groupSlots.MoveNext())
+                scp.groupSlots = this.RowGroupHeadersTable.GetIndexes().GetEnumerator();
+                if (scp.groupSlots != null && scp.groupSlots.MoveNext())
                 {
-                    nextGroupSlot = groupSlots.Current;
+                    scp.nextGroupSlot = scp.groupSlots.Current;
                 }
             }
 
-            int chunkSize = ProgressiveLoadingRowChunkSize ?? GlobalProgressiveLoadingChunkSize ?? 0;
-            int chunkSlots = chunkSize > 0 ? Math.Min(chunkSize, totalSlots) : totalSlots;
+            scp.chunkSize = ProgressiveLoadingRowChunkSize ?? GlobalProgressiveLoadingChunkSize ?? 0;
+            if (scp.groupSlots != null) // progressive loading for groups is not supported yet
+            {
+                scp.chunkSize = 0;
+            }
 
-            int addedfRows = 0;
-            int slot = 0;
-            AddSlotsInChunk(ref addedfRows, ref slot, ref nextGroupSlot, chunkSlots, groupSlots);
+            scp.chunkSlots = scp.chunkSize > 0 ? Math.Min(scp.chunkSize, totalSlots) : totalSlots;
+            scp.addedfRows = 0;
+            scp.slot = 0;
 
-            if (chunkSlots < totalSlots)
+            AddSlotsInChunk(ref scp.addedfRows, ref scp.slot, ref scp.nextGroupSlot, scp.chunkSlots, scp.groupSlots);
+
+            if (scp.chunkSlots < scp.totalSlots)
             {
                 OnProgressiveLoadingInProgressChanged(true);
             }
 
-            while (chunkSlots < totalSlots)
+            ContinueAddingSlots(scp);
+        }
+
+        private void OnDataGridLoaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= OnDataGridLoaded;
+
+            if (_pausedSlotCreationParam != null)
+            {
+                var i = _pausedSlotCreationParam;
+                _pausedSlotCreationParam = null;
+                ContinueAddingSlots(i);
+            }
+        }
+
+        private async void ContinueAddingSlots(SlotCreationParams scp)
+        {
+            while (scp.chunkSlots < scp.totalSlots)
             {
                 await Task.Delay(1);
 
                 // this can happen if the DataGrid is detached during the delay.
                 if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
+                    _pausedSlotCreationParam = scp;
+                    Loaded += OnDataGridLoaded;
                     OnProgressiveLoadingInProgressChanged(false);
                     return;
                 }
@@ -937,8 +977,8 @@ namespace Windows.UI.Xaml.Controls
                     return;
                 }
 
-                chunkSlots = Math.Min(SlotIsDisplayed(slot) ? chunkSlots + chunkSize : totalSlots, totalSlots);
-                AddSlotsInChunk(ref addedfRows, ref slot, ref nextGroupSlot, chunkSlots, groupSlots);
+                scp.chunkSlots = Math.Min(SlotIsDisplayed(scp.slot) ? scp.chunkSlots + scp.chunkSize : scp.totalSlots, scp.totalSlots);
+                AddSlotsInChunk(ref scp.addedfRows, ref scp.slot, ref scp.nextGroupSlot, scp.chunkSlots, scp.groupSlots);
             }
 
             if (_isProgressiveLoadingInProgress)
@@ -946,10 +986,10 @@ namespace Windows.UI.Xaml.Controls
                 OnProgressiveLoadingInProgressChanged(false);
             }
 
-            if (slot < totalSlots)
+            if (scp.slot < scp.totalSlots)
             {
-                this.SlotCount += totalSlots - slot;
-                this.VisibleSlotCount += totalSlots - slot;
+                this.SlotCount += scp.totalSlots - scp.slot;
+                this.VisibleSlotCount += scp.totalSlots - scp.slot;
                 OnAddedElement_Phase2(0, this._vScrollBar == null || this._vScrollBar.Visibility == Visibility.Visible /*updateVerticalScrollBarOnly*/);
                 OnElementsChanged(true /*grew*/);
             }
