@@ -52,14 +52,14 @@ namespace Windows.UI.Xaml.Controls
 
         /// <summary>
         /// The DependencyID for the PasswordChar property.
-        /// Default Value: '●'
+        /// Default Value: '•'
         /// </summary>
         public static readonly DependencyProperty PasswordCharProperty =
             DependencyProperty.Register(
                 nameof(PasswordChar), 
                 typeof(char), 
                 typeof(PasswordBox), 
-                new PropertyMetadata('●'));
+                new PropertyMetadata('•'));
 
         /// <summary>
         /// Character to display instead of the actual password.
@@ -318,14 +318,5 @@ namespace Windows.UI.Xaml.Controls
         }
 
 #endregion
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            Size BorderThicknessSize = new Size(BorderThickness.Left + BorderThickness.Right, BorderThickness.Top + BorderThickness.Bottom);
-            Size TextSize = Application.Current.TextMeasurementService.Measure(String.Empty, FontSize, FontFamily, FontStyle, FontWeight, /*FontStretch, */TextWrapping.NoWrap, Padding, (availableSize.Width - BorderThicknessSize.Width).Max(0));
-            TextSize.Width = TextSize.Width + BorderThicknessSize.Width;
-            TextSize.Height = TextSize.Height + BorderThicknessSize.Height;
-            return TextSize;
-        }
     }
 }

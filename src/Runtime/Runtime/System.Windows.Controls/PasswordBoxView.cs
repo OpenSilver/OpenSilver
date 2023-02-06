@@ -19,6 +19,7 @@ using OpenSilver.Internal.Controls;
 #if MIGRATION
 using System.Windows.Input;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -100,6 +101,20 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
+            int pwdLength = Host.Password.Length;
+            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+                uniqueIdentifier,
+                "pre",
+                string.Empty,
+                Margin,
+                availableSize.Width,
+                pwdLength > 0 ? new string('•', pwdLength) : "M");
+            return TextSize;
+        }
+
         internal sealed override void AddEventListeners()
         {
             NativeEventsHelper.AddEventListeners(this, true);
@@ -123,6 +138,7 @@ namespace Windows.UI.Xaml.Controls
         internal void OnPasswordChanged(string pwd)
         {
             UpdateDOMPassword(pwd);
+            InvalidateMeasure();
         }
 
         private void UpdateDOMPassword(string pwd)
@@ -149,6 +165,7 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.border = "transparent"; // This removes the border. We do not need it since we are templated
             passwordFieldStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             passwordFieldStyle.backgroundColor = "transparent";
+            passwordFieldStyle.fontFamily = "inherit"; // Not inherited by default for "input" DOM elements
             passwordFieldStyle.fontSize = "inherit"; // Not inherited by default for "input" DOM elements
             passwordFieldStyle.color = "inherit"; //This is to inherit the foreground value from parent div.
             passwordFieldStyle.width = "100%";
