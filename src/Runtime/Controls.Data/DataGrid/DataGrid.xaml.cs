@@ -1191,6 +1191,8 @@ namespace Windows.UI.Xaml.Controls
         private static void OnItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             DataGrid dataGrid = (DataGrid)d;
+            dataGrid._pausedSlotCreationParam = null;
+
             if (!dataGrid.AreHandlersSuspended())
             {
                 Debug.Assert(dataGrid.DataConnection != null);
@@ -2922,7 +2924,6 @@ namespace Windows.UI.Xaml.Controls
             if (_rowsPresenter != null)
             {
                 _rowsPresenter.OwningGrid = this;
-                _rowsPresenter.ProgressiveRenderingChunkSize = EffectiveProgressiveLoadingChunkSize;
                 InvalidateRowHeightEstimate();
                 UpdateRowDetailsHeightEstimate();
             }
