@@ -990,24 +990,6 @@ namespace Windows.UI.Xaml
 
         internal virtual object GetFocusTarget() => INTERNAL_OuterDomElement;
 
-        internal void AllowFocusEvents()
-        {
-            object target = GetFocusTarget();
-            if (target != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.enableFocus(\"{((INTERNAL_HtmlDomElementReference)target).UniqueIdentifier}\")");
-            }
-        }
-
-        internal void PreventFocusEvents()
-        {
-            object target = GetFocusTarget();
-            if (target != null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.disableFocus(\"{((INTERNAL_HtmlDomElementReference)target).UniqueIdentifier}\")");
-            }
-        }
-
         #endregion
 
         public virtual void INTERNAL_AttachToDomEvents()

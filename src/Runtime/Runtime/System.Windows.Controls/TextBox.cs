@@ -69,8 +69,6 @@ namespace Windows.UI.Xaml.Controls
 
         internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
 
-        internal sealed override bool INTERNAL_GetFocusInBrowser => true;
-
         /// <summary>
         /// Gets or sets the value that determines whether the text box allows and displays
         /// the newline or return characters.

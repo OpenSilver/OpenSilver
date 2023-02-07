@@ -48,8 +48,6 @@ namespace Windows.UI.Xaml.Controls
 
         internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
 
-        internal sealed override bool INTERNAL_GetFocusInBrowser => true;
-
         /// <summary>
         /// The DependencyID for the PasswordChar property.
         /// Default Value: '•'

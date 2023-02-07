@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -586,7 +587,6 @@ namespace Windows.UI.Xaml.Controls
 
         private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
-        internal virtual bool INTERNAL_GetFocusInBrowser => false;
         internal virtual void UpdateTabIndex(bool isTabStop, int tabIndex)
         {
             var domElementConcernedByFocus = GetFocusTarget();
@@ -594,16 +594,12 @@ namespace Windows.UI.Xaml.Controls
                 return;
             if (!isTabStop || !this.IsEnabled)
             {
-                this.PreventFocusEvents();
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementConcernedByFocus, "tabIndex", this.INTERNAL_GetFocusInBrowser ? "-1" : string.Empty);
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementConcernedByFocus, "tabIndex", "-1");
             }
             else
             {
                 //Note: according to W3C, tabIndex needs to be between 0 and 32767 on browsers: https://www.w3.org/TR/html401/interact/forms.html#adef-tabindex
                 //      also, the behaviour of the different browsers outside of these values can be different and therefore, we have to restrict the values.
-
-                this.AllowFocusEvents();
-
                 //We translate the TabIndexes to have a little margin with negative TabIndexes:
                 //this is because a negative tabIndex in html is equivalent to IsTabStop = false in CS.
                 //this way, we make sure to keep the order of elements with TabIndexes between -100 and TABINDEX_BROWSER_MAX_VALUE - 100
@@ -622,7 +618,9 @@ namespace Windows.UI.Xaml.Controls
 
                 //in the case where the control should not have an outline even when focused or when the control has a template that defines the VisualState "Focused", we remove the default outline that browsers put:
                 IList<VisualStateGroup> groups = this.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty) as Collection<VisualStateGroup>;
+#pragma warning disable CS0618 // Type or member is obsolete
                 if (!this.UseSystemFocusVisuals ||
+#pragma warning restore CS0618 // Type or member is obsolete
                     (groups != null && groups.Any(gr => ((IList<VisualState>)gr.States).Any(state => state.Name == "Focused"))))
                 {
 
@@ -791,17 +789,9 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private bool _useSystemFocusVisuals = false;
-        /// <summary>
-        /// Determines whether the control displays the browser's default outline when Focused.
-        /// This property is ignored for Controls with a Template that defines the "Focused" VisualState.
-        /// The default value is False.
-        /// </summary>
-        public bool UseSystemFocusVisuals
-        {
-            get { return _useSystemFocusVisuals; }
-            set { _useSystemFocusVisuals = value; } //todo: change the element in the visual tree?
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool UseSystemFocusVisuals { get; set; }
 
 #if MIGRATION
         public override void OnApplyTemplate()

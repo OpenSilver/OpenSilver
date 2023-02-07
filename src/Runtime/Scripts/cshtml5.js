@@ -209,20 +209,6 @@ document.getElementByIdSafe = function (id) {
     return element;
 }
 
-document.enableFocus = function (id) {
-    const element = document.getElementById(id);
-    if (!element) return;
-    element.onfocus = null;
-}
-
-document.disableFocus = function (id) {
-    const element = document.getElementById(id);
-    if (!element) return;
-    element.onfocus = function (e) {
-        e.target.blur();
-    };
-}
-
 document.setGridCollapsedDuetoHiddenColumn = function (id) {
     const element = document.getElementById(id);
     if (!element)
@@ -503,8 +489,8 @@ document._attachEventListeners = function (element, handler, isFocusable) {
         view.addEventListener('input', store['input'] = bubblingEventHandler);
         view.addEventListener('keydown', store['keydown'] = bubblingEventHandler);
         view.addEventListener('keyup', store['keyup'] = bubblingEventHandler);
-        view.addEventListener('focusin', store['focusin'] = bubblingEventHandler);
-        view.addEventListener('focusout', store['focusout'] = bubblingEventHandler);
+        view.addEventListener('focus', store['focus'] = directEventHandler);
+        view.addEventListener('blur', store['blur'] = directEventHandler);
     }
 }
 

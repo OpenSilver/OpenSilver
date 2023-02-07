@@ -73,12 +73,12 @@ namespace Windows.UI.Xaml
                     keyboardTarget.ProcessOnKeyUp(jsEventArg);
                     break;
 
-                case "focusin":
-                    keyboardTarget.ProcessOnFocusIn(jsEventArg);
+                case "focus":
+                    keyboardTarget.ProcessOnFocus(jsEventArg);
                     break;
 
-                case "focusout":
-                    keyboardTarget.ProcessOnFocusOut(jsEventArg);
+                case "blur":
+                    keyboardTarget.ProcessOnBlur(jsEventArg);
                     break;
 
                 case "keypress":
@@ -459,7 +459,7 @@ namespace Windows.UI.Xaml
             RaiseEvent(e);
         }
 
-        private void ProcessOnFocusIn(object jsEventArg)
+        private void ProcessOnFocus(object jsEventArg)
         {
             ProcessOnGotFocus(jsEventArg);
         }
@@ -481,7 +481,7 @@ namespace Windows.UI.Xaml
             RaiseEvent(e);
         }
 
-        private void ProcessOnFocusOut(object jsEventArg)
+        private void ProcessOnBlur(object jsEventArg)
         {
             ProcessOnLostFocus(jsEventArg);
         }
