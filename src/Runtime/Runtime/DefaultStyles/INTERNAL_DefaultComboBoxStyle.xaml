@@ -111,6 +111,10 @@
                 Value="Hand" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Left" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Auto" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -296,7 +300,8 @@
                                                       Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
-                                <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                <ScrollViewer x:Name="ScrollViewer"
+                                              MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                               BorderThickness="0"
                                               Padding="1">
                                     <ItemsPresenter x:Name="ItemsHost" />

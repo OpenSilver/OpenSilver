@@ -60,6 +60,7 @@ namespace Windows.UI.Xaml.Controls
         private ToggleButton _dropDownToggle;
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
+        private ScrollViewer _scrollHost;
         private ItemInfo _highlightedInfo;
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
@@ -214,6 +215,19 @@ namespace Windows.UI.Xaml.Controls
             if (_dropDownToggle != null)
             {
                 _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
+            }
+
+            _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
+            if (_scrollHost != null)
+            {
+                if (_scrollHost.ReadLocalValue(ScrollViewer.HorizontalScrollBarVisibilityProperty) == DependencyProperty.UnsetValue)
+                {
+                    _scrollHost.HorizontalScrollBarVisibility = ScrollViewer.GetHorizontalScrollBarVisibility(this);
+                }
+                if (_scrollHost.ReadLocalValue(ScrollViewer.VerticalScrollBarVisibilityProperty) == DependencyProperty.UnsetValue)
+                {
+                    _scrollHost.VerticalScrollBarVisibility = ScrollViewer.GetVerticalScrollBarVisibility(this);
+                }
             }
 
             UpdatePresenter();
