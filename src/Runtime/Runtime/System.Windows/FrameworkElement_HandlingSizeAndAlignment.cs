@@ -70,7 +70,9 @@ namespace Windows.UI.Xaml
                 // Height:
                 if (!double.IsNaN(element.Height))
                     style.height = element.Height.ToInvariantString() + "px";
-                else if (element.VerticalAlignment == VerticalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                else if (element.INTERNAL_VisualParent is Canvas)
+                    style.height = "max-content";
+                else if (element.VerticalAlignment == VerticalAlignment.Stretch)
                     style.height = "100%";
                 else
                     style.height = "auto";
@@ -78,7 +80,9 @@ namespace Windows.UI.Xaml
                 // Width:
                 if (!double.IsNaN(element.Width))
                     style.width = element.Width.ToInvariantString() + "px";
-                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch && !(element.INTERNAL_VisualParent is Canvas) && !(element is CheckBox))
+                else if (element.INTERNAL_VisualParent is Canvas)
+                    style.width = "max-content";
+                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch)
                     style.width = "100%";
                 else
                     style.width = "auto";
@@ -446,10 +450,16 @@ namespace Windows.UI.Xaml
                     && currentParent.INTERNAL_VisualParent as Viewbox != null; //todo: this test is unlikely to work with a custom Template on the ViewBox, use frameworkElement.LogicalParent (or something like that) once the logical tree branch will be integrated)
 
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
-                if (fe.INTERNAL_VisualParent is Canvas || isParentAViewBox) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
+                if (fe.INTERNAL_VisualParent is Canvas) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
                 {
                     styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? 
                         fe.Width.ToInvariantString() + "px" : 
+                        "max-content";
+                }
+                else if (isParentAViewBox)
+                {
+                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ?
+                        fe.Width.ToInvariantString() + "px" :
                         "auto";
                 }
                 else // Otherwise we handle both alignment and Width/Height:
@@ -757,7 +767,11 @@ namespace Windows.UI.Xaml
 
 
                 // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
-                if (fe.INTERNAL_VisualParent is Canvas || isParentAViewBox)
+                if (fe.INTERNAL_VisualParent is Canvas)
+                {
+                    styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? fe.Height.ToInvariantString() + "px" : "max-content";
+                }
+                else if (isParentAViewBox)
                 {
                     styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? fe.Height.ToInvariantString() + "px" : "auto";
                 }
