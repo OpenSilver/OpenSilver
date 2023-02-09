@@ -149,14 +149,14 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             Debug.Assert(domElementRef != null);
 
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"setTimeout(function() {{ {sElement}.focus(); }}, 1)");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"setTimeout(function() {{ {sElement}.focus({{ preventScroll: true }}); }}, 1)");
         }
 
         static void SetFocus_SimulatorOnly(object domElementRef)
         {
             ExecuteJavaScript($@"var domElement = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"");
                                         setTimeout(function() {{ 
-                                            domElement.focus();
+                                            domElement.focus({{ preventScroll: true }});
                                         }}, 1);");
         }
 
