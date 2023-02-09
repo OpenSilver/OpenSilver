@@ -140,6 +140,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void SetDisplayOnChildWrappers(string display)
         {
+            if (!HasChildren) return;
             foreach (UIElement child in Children)
             {
                 if (child.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny is not null)
