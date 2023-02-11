@@ -175,16 +175,29 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="HorizontalScrollBarVisibility"/> dependency property.
         /// </summary>
-        /// <returns>The identifier for the <see cref="HorizontalScrollBarVisibility"/> dependency property.</returns>
         public static readonly DependencyProperty HorizontalScrollBarVisibilityProperty =
             DependencyProperty.RegisterAttached(
                 nameof(HorizontalScrollBarVisibility),
                 typeof(ScrollBarVisibility),
                 typeof(ScrollViewer),
-                new FrameworkPropertyMetadata(ScrollBarVisibility.Disabled, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
+                new PropertyMetadata(ScrollBarVisibility.Disabled, OnScrollBarVisibilityChanged)
                 {
                     MethodToUpdateDom2 = UpdateDomOnHSBVisibilityChanged,
                 });
+
+        private static void OnScrollBarVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ScrollViewer scrollViewer)
+            {
+                scrollViewer.InvalidateMeasure();
+                if (scrollViewer.ScrollInfo != null)
+                {
+                    scrollViewer.ScrollInfo.CanHorizontallyScroll = scrollViewer.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled;
+                    scrollViewer.ScrollInfo.CanVerticallyScroll = scrollViewer.VerticalScrollBarVisibility != ScrollBarVisibility.Disabled;
+                }
+                scrollViewer.UpdateScrollbarVisibility();
+            }
+        }
 
         private static void UpdateDomOnHSBVisibilityChanged(DependencyObject d, object oldValue, object newValue)
         {
@@ -248,13 +261,12 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Identifies the <see cref="VerticalScrollBarVisibility"/> dependency property.
         /// </summary>
-        /// <returns>The identifier for the <see cref="VerticalScrollBarVisibility"/> dependency property.</returns>
         public static readonly DependencyProperty VerticalScrollBarVisibilityProperty =
             DependencyProperty.RegisterAttached(
                 nameof(VerticalScrollBarVisibility),
                 typeof(ScrollBarVisibility),
                 typeof(ScrollViewer),
-                new FrameworkPropertyMetadata(ScrollBarVisibility.Visible, FrameworkPropertyMetadataOptions.AffectsMeasure)
+                new PropertyMetadata(ScrollBarVisibility.Visible, OnScrollBarVisibilityChanged)
                 {
                     MethodToUpdateDom2 = UpdateDomOnVSBVisibilityChanged
                 });

@@ -177,8 +177,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal void OnAcceptsReturnChanged(bool acceptsReturn)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) &&
-                INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(_contentEditableDiv))
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv != null)
             {
                 //--- SIMULATOR ONLY: ---
                 // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
@@ -219,36 +218,19 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
             }
         }
 
-        internal void OnTextWrappingChanged(TextWrapping tw)
+        internal void OnTextWrappingChanged(TextWrapping textWrapping)
         {
-            if (INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(_contentEditableDiv))
+            if (_contentEditableDiv != null)
             {
-                switch (tw)
-                {
-                    case TextWrapping.NoWrap:
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).whiteSpace = "nowrap";
-                        break;
-
-                    case TextWrapping.Wrap:
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).whiteSpace = "pre-wrap";
-                        //todo: once we find how to make the note work, apply the same thing to the TextBlock.
-                        //Note: the following line would be useful to break the words when they are too long without spaces.
-                        //      unfortunately, it only works in chrome.
-                        //      The other browsers have wordBreak = "break-all" but that doesn't take into account the spaces to break the string.
-                        //          it means it will break words in two when it could have gone to the next line before starting the word that overflows in the line.
-                        //INTERNAL_HtmlDomManager.GetDomElementStyleForModification(textBox._contentEditableDiv).wordBreak = "break-word";
-                        break;
-
-                    default:
-                        break;
-                }
+                TextBlock.ApplyTextWrapping(
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv),
+                    textWrapping);
             }
         }
 
         internal void OnMaxLengthChanged(int maxLength)
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && 
-                INTERNAL_HtmlDomManager.IsNotUndefinedOrNull(_contentEditableDiv))
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv != null)
             {
                 //--- SIMULATOR ONLY: ---
                 // Set the "data-maxlength" property (that we have made up) so that the "keydown" JavaScript event can retrieve this value:
@@ -403,7 +385,7 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
             contentEditableDivStyle.height = "100%";
 
             // Apply Host.TextWrapping
-            contentEditableDivStyle.whiteSpace = Host.TextWrapping == TextWrapping.NoWrap ? "nowrap" : "pre-wrap";
+            TextBlock.ApplyTextWrapping(contentEditableDivStyle, Host.TextWrapping);
             contentEditableDivStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             contentEditableDivStyle.background = "solid transparent";
             contentEditableDivStyle.cursor = "text";
@@ -584,30 +566,13 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
             InvalidateMeasure();
         }
 
-        private static string ScrollBarVisibilityToHtmlString(ScrollBarVisibility scrollVisibility)
-        {
-            switch (scrollVisibility)
-            {
-                case ScrollBarVisibility.Disabled:
-                    return "hidden";
-                case ScrollBarVisibility.Auto:
-                    return "auto";
-                case ScrollBarVisibility.Hidden:
-                    return "hidden";
-                case ScrollBarVisibility.Visible:
-                    return "scroll";
-                default:
-                    return null;
-            }
-        }
-
         protected override Size MeasureOverride(Size availableSize)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
             Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
                 uniqueIdentifier,
                 Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
-                string.Empty,
+                Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
                 Margin,
                 availableSize.Width,
                 "M");

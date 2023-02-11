@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,10 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Markup;
-using OpenSilver.Internal;
+using System.Diagnostics;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -212,25 +208,28 @@ namespace Windows.UI.Xaml.Controls
                 typeof(TextBlock),
                 new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
-                    {
-                        var tb = (TextBlock)d;
-                        var cssStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(tb.INTERNAL_OuterDomElement);
-                        switch ((TextWrapping)newValue)
-                        {
-                            case TextWrapping.Wrap:
-                                cssStyle.whiteSpace = "pre-wrap";
-                                cssStyle.overflowWrap = "break-word";
-                                break;
-
-                            case TextWrapping.NoWrap:
-                            default:
-                                cssStyle.whiteSpace = "pre";
-                                cssStyle.overflowWrap = string.Empty;
-                                break;
-                        }
-                    },
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) => ApplyTextWrapping(
+                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(((TextBlock)d).INTERNAL_OuterDomElement),
+                        (TextWrapping)newValue),
                 });
+
+        internal static void ApplyTextWrapping(INTERNAL_HtmlDomStyleReference cssStyle, TextWrapping textWrapping)
+        {
+            Debug.Assert(cssStyle != null);
+            switch (textWrapping)
+            {
+                case TextWrapping.Wrap:
+                    cssStyle.whiteSpace = "pre-wrap";
+                    cssStyle.overflowWrap = "break-word";
+                    break;
+
+                case TextWrapping.NoWrap:
+                default:
+                    cssStyle.whiteSpace = "pre";
+                    cssStyle.overflowWrap = string.Empty;
+                    break;
+            }
+        }
 
         #endregion
 
