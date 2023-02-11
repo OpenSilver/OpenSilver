@@ -793,6 +793,14 @@ namespace Windows.UI.Xaml.Controls
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool UseSystemFocusVisuals { get; set; }
 
+        /// <summary>
+        /// If control has a scrollviewer in its style and has a custom keyboard 
+        /// scrolling behavior when HandlesScrolling should return true.
+        /// Then ScrollViewer will not handle keyboard input and leave it up to 
+        /// the control.
+        /// </summary>
+        internal virtual bool HandlesScrolling => false;
+
 #if MIGRATION
         public override void OnApplyTemplate()
 #else

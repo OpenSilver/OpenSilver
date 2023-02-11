@@ -12,16 +12,19 @@
 \*====================================================================================*/
 
 using System;
+using System.Windows.Input;
 using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 #else
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
+using Key = Windows.System.VirtualKey;
+using ModifierKeys = Windows.System.VirtualKeyModifiers;
 #endif
 
 #if MIGRATION
@@ -992,6 +995,64 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 e.Handled = true;
+            }
+        }
+
+        private bool TemplatedParentHandlesScrolling => TemplatedParent is Control c && c.HandlesScrolling;
+
+        /// <summary>
+        /// Responds to the KeyDown event. 
+        /// </summary> 
+        /// <param name="e">Provides data for KeyEventArgs.</param>
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (ScrollInfo != null && !e.Handled && !TemplatedParentHandlesScrolling)
+            {
+                // Parent is not going to handle scrolling; do so here 
+                bool control = ModifierKeys.Control == (Keyboard.Modifiers & ModifierKeys.Control);
+                bool handled = true;
+
+                switch (e.Key)
+                {
+                    case Key.Up:
+                        ScrollInfo.LineUp();
+                        break;
+                    case Key.Down:
+                        ScrollInfo.LineDown();
+                        break;
+                    case Key.Left:
+                        ScrollInfo.LineLeft();
+                        break;
+                    case Key.Right:
+                        ScrollInfo.LineRight();
+                        break;
+                    case Key.PageUp:
+                        ScrollInfo.PageUp();
+                        break;
+                    case Key.PageDown:
+                        ScrollInfo.PageDown();
+                        break;
+                    case Key.Home:
+                        if (!control)
+                            SetScrollOffset(Orientation.Horizontal, double.MinValue);
+                        else
+                            SetScrollOffset(Orientation.Vertical, double.MinValue);
+                        break;
+                    case Key.End:
+                        if (!control)
+                            SetScrollOffset(Orientation.Horizontal, double.MaxValue);
+                        else
+                            SetScrollOffset(Orientation.Vertical, double.MaxValue);
+                        break;
+                    default:
+                        handled = false;
+                        break;
+                }
+
+                if (handled)
+                    e.Handled = true;
             }
         }
 
