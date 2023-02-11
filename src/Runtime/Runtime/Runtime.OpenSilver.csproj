@@ -160,6 +160,7 @@
 		<Compile Include="System.Windows.Automation\DockPatternIdentifiers.cs" />
 		<Compile Include="System.Windows.Browser\EventSubscriber.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.InternalSelectedItemsStorage.cs" />
+		<Compile Include="System.Windows.Controls.Primitives\Selector.Navigation.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\Selector.SelectionChanger.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\Clipper.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LinearClipper.cs" />

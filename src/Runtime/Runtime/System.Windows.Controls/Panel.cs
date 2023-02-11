@@ -100,6 +100,17 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
+        /// Orientation of the panel if its layout is in one dimension.
+        /// Otherwise HasLogicalOrientation is false and LogicalOrientation should be ignored
+        /// </summary>
+        internal virtual Orientation LogicalOrientation => Orientation.Vertical;
+
+        /// <summary>
+        /// HasLogicalOrientation is true in case the panel layout is only one dimension (Stack panel).
+        /// </summary>
+        internal virtual bool HasLogicalOrientation => false;
+
+        /// <summary>
         /// The generator associated with this panel.
         /// </summary>
         internal IItemContainerGenerator Generator

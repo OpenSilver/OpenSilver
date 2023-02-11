@@ -495,27 +495,6 @@ namespace Windows.UI.Xaml.Controls
 
         #region Internal Methods
 
-        internal void ScrollIntoViewImpl(int index)
-        {
-            if (index >= 0 && index < Items.Count)
-            {
-                if (ItemsHost is VirtualizingPanel vp)
-                {
-                    vp.BringIndexIntoViewInternal(index);
-                    vp.UpdateLayout();
-                }
-                else
-                {
-                    if (ItemContainerGenerator.ContainerFromIndex(index) is ListBoxItem container
-                        && container.INTERNAL_OuterDomElement != null)
-                    {
-                        OpenSilver.Interop.ExecuteJavaScriptVoid(
-                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(container.INTERNAL_OuterDomElement)}.scrollIntoView({{ block: 'nearest' }})");
-                    }
-                }
-            }
-        }
-
         // adjust ItemInfos after a generator status change
         internal void AdjustItemInfoAfterGeneratorChange(ItemInfo info)
         {

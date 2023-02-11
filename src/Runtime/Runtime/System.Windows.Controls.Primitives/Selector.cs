@@ -404,6 +404,40 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private bool IsSynchronizedWithCurrentItemPrivate { get; set; }
 
         /// <summary>
+        /// Builds the visual tree for the <see cref="Selector"/> control
+        /// when a new template is applied.
+        /// </summary>
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+            ConnectToScrollHost();
+        }
+
+        private void ConnectToScrollHost()
+        {
+            if (HandlesScrolling)
+            {
+                ScrollViewer scrollHost = ScrollHost;
+                if (scrollHost != null)
+                {
+                    scrollHost.IsTabStop = false;
+                    if (scrollHost.ReadLocalValue(ScrollViewer.HorizontalScrollBarVisibilityProperty) == DependencyProperty.UnsetValue)
+                    {
+                        scrollHost.HorizontalScrollBarVisibility = ScrollViewer.GetHorizontalScrollBarVisibility(this);
+                    }
+                    if (scrollHost.ReadLocalValue(ScrollViewer.VerticalScrollBarVisibilityProperty) == DependencyProperty.UnsetValue)
+                    {
+                        scrollHost.VerticalScrollBarVisibility = ScrollViewer.GetVerticalScrollBarVisibility(this);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets whether the <see cref="Selector"/> contains items.
         /// </summary>
         protected new bool HasItems
@@ -560,25 +594,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             base.AdjustItemInfoOverride(e);
         }
 
-        internal override bool FocusItem(ItemInfo info)
-        {
-            if (info.Index == -1)
-            {
-                return false;
-            }
-
-            bool returnValue = false;
-
-            ScrollIntoViewImpl(info.Index);
-
-            if ((info.Container ?? ItemContainerGenerator.ContainerFromIndex(info.Index)) is ListBoxItem container)
-            {
-                returnValue = container.Focus();
-            }
-
-            return returnValue;
-        }
-
         /// <summary>
         /// Raises the SelectionChanged event
         /// </summary>
@@ -590,6 +605,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 this.SelectionChanged(this, e);
             }
         }
+
+        internal virtual ScrollViewer ScrollHost { get; }
 
         internal SelectionChanger SelectionChange { get; }
 

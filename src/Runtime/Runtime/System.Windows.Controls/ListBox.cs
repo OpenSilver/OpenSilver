@@ -16,20 +16,21 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Windows.Input;
 using OpenSilver.Internal;
+using System.Diagnostics;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using ModifierKeys = System.Windows.Input.ModifierKeys;
 #else
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
-using Windows.System;
+using Windows.UI.Xaml.Input;
 using ModifierKeys = Windows.System.VirtualKeyModifiers;
+using Key = Windows.System.VirtualKey;
+using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
 #endif
-
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -46,6 +47,7 @@ namespace Windows.UI.Xaml.Controls
     [TemplateVisualState(Name = "Valid", GroupName = "ValidationStates")]
     public partial class ListBox : Selector
     {
+        private ScrollViewer _scrollHost;
         private ItemInfo _anchorItem;
 
         /// <summary>
@@ -55,6 +57,10 @@ namespace Windows.UI.Xaml.Controls
         {
             DefaultStyleKey = typeof(ListBox);
         }
+
+        internal sealed override bool HandlesScrolling => true;
+
+        internal sealed override ScrollViewer ScrollHost => _scrollHost;
 
         /// <summary>
         /// Gets the list of currently selected items for the <see cref="ListBox"/>
@@ -146,6 +152,18 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            // _scrollHost must be set before calling base
+            _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
+
+            base.OnApplyTemplate();
+        }
+
         /// <summary>
         /// Creates or identifies the element used to display a specified item.
         /// </summary>
@@ -169,6 +187,106 @@ namespace Windows.UI.Xaml.Controls
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
             return item is ListBoxItem;
+        }
+
+        /// <summary>
+        /// Responds to the KeyDown event. 
+        /// </summary> 
+        /// <param name="e">Provides data for KeyEventArgs.</param>
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (!e.Handled)
+            {
+                bool handled = false;
+                int newFocusedIndex = -1;
+                switch (e.Key)
+                {
+                    case Key.Space:
+#if MIGRATION
+                        if (ModifierKeys.Alt != (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Alt))
+#else
+                        if (ModifierKeys.Menu != (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Menu))
+#endif
+                            && FocusManager.GetFocusedElement() is ListBoxItem listBoxItem)
+                        {
+                            MakeKeyboardSelection(listBoxItem);
+                            handled = true;
+                        }
+                        break;
+                    case Key.Home:
+                        newFocusedIndex = NavigateToStart();
+                        break;
+                    case Key.End:
+                        newFocusedIndex = NavigateToEnd();
+                        break;
+                    case Key.PageUp:
+                        newFocusedIndex = NavigateByPage(false);
+                        break;
+                    case Key.PageDown:
+                        newFocusedIndex = NavigateByPage(true);
+                        break;
+                    case Key.Left:
+                        if (IsVerticalOrientation())
+                        {
+                            ElementScrollViewerScrollInDirection(Key.Left);
+                        }
+                        else
+                        {
+                            newFocusedIndex = NavigateByLine(false);
+                        }
+                        break;
+                    case Key.Up:
+                        if (IsVerticalOrientation())
+                        {
+                            newFocusedIndex = NavigateByLine(false);
+                        }
+                        else
+                        {
+                            ElementScrollViewerScrollInDirection(Key.Up);
+                        }
+                        break;
+                    case Key.Right:
+                        if (IsVerticalOrientation())
+                        {
+                            ElementScrollViewerScrollInDirection(Key.Right);
+                        }
+                        else
+                        {
+                            newFocusedIndex = NavigateByLine(true);
+                        }
+                        break;
+                    case Key.Down:
+                        if (IsVerticalOrientation())
+                        {
+                            newFocusedIndex = NavigateByLine(true);
+                        }
+                        else
+                        {
+                            ElementScrollViewerScrollInDirection(Key.Down);
+                        }
+                        break;
+                    default:
+                        Debug.Assert(!handled);
+                        break;
+                }
+
+                if (newFocusedIndex >= 0 && newFocusedIndex < Items.Count)
+                {
+                    if (ItemContainerGenerator.ContainerFromIndex(newFocusedIndex) is ListBoxItem listBoxItem)
+                    {
+                        listBoxItem.Focus();
+                        MakeKeyboardSelection(listBoxItem);
+                    }
+
+                    handled = true;
+                }
+
+                if (handled)
+                {
+                    e.Handled = true;
+                }
+            }
         }
 
         /// <summary>

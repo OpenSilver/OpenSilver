@@ -157,6 +157,8 @@ namespace Windows.UI.Xaml.Controls
 
             this.IsFocused = true;
             this.UpdateVisualStates();
+            
+            ParentSelector?.NotifyListItemGotFocus(this);
         }
 
         protected override void OnLostFocus(RoutedEventArgs e)
@@ -165,6 +167,8 @@ namespace Windows.UI.Xaml.Controls
 
             this.IsFocused = false;
             this.UpdateVisualStates();
+
+            ParentSelector?.NotifyListItemLostFocus(this);
         }
 
         internal ListBox ParentListBox

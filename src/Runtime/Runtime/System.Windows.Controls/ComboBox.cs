@@ -61,7 +61,6 @@ namespace Windows.UI.Xaml.Controls
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
         private ScrollViewer _scrollHost;
-        private ItemInfo _highlightedInfo;
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
@@ -77,6 +76,10 @@ namespace Windows.UI.Xaml.Controls
         {
             this.DefaultStyleKey = typeof(ComboBox);
         }
+
+        internal sealed override bool HandlesScrolling => true;
+
+        internal sealed override ScrollViewer ScrollHost => _scrollHost;
 
         protected override DependencyObject GetContainerForItemOverride()
         {
@@ -155,8 +158,6 @@ namespace Windows.UI.Xaml.Controls
         protected override void OnApplyTemplate()
 #endif
         {
-            base.OnApplyTemplate();
-
             if (_popup != null)
             {
                 _popup.PlacementTarget = null;
@@ -169,6 +170,11 @@ namespace Windows.UI.Xaml.Controls
                 _popupChild.TextInput -= new TextCompositionEventHandler(OnPopupTextInput);
                 _popupChild = null;
             }
+
+            // _scrollHost must be set before calling base
+            _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
+            
+            base.OnApplyTemplate();
 
             _popup = GetTemplateChild("Popup") as Popup;
           
@@ -217,19 +223,6 @@ namespace Windows.UI.Xaml.Controls
                 _dropDownToggle.Click += new RoutedEventHandler(OnDropDownToggleClick);
             }
 
-            _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
-            if (_scrollHost != null)
-            {
-                if (_scrollHost.ReadLocalValue(ScrollViewer.HorizontalScrollBarVisibilityProperty) == DependencyProperty.UnsetValue)
-                {
-                    _scrollHost.HorizontalScrollBarVisibility = ScrollViewer.GetHorizontalScrollBarVisibility(this);
-                }
-                if (_scrollHost.ReadLocalValue(ScrollViewer.VerticalScrollBarVisibilityProperty) == DependencyProperty.UnsetValue)
-                {
-                    _scrollHost.VerticalScrollBarVisibility = ScrollViewer.GetVerticalScrollBarVisibility(this);
-                }
-            }
-
             UpdatePresenter();
         }
 
@@ -242,47 +235,141 @@ namespace Windows.UI.Xaml.Controls
                 return;
             }
 
+            if (IsDropDownOpen)
+            {
+                HandlePopupKeyDown(e);
+            }
+            else
+            {
+                HandleComboBoxKeyDown(e);
+            }
+        }
+
+        private void HandlePopupKeyDown(KeyEventArgs e)
+        {
+            bool handled = false;
+            int newFocusedIndex = -1;
             switch (e.Key)
             {
-                case Key.Up:
-                    if (IsDropDownOpen)
-                    {
-                        NavigateToPrev();
-                    }
-                    else
-                    {
-                        SelectPrev();
-                    }
-                    break;
-
-                case Key.Down:
-                    if (IsDropDownOpen)
-                    {
-                        NavigateToNext();
-                    }
-                    else
-                    {
-                        SelectNext();
-                    }
-                    break;
-
-                case Key.Escape:
-                    if (IsDropDownOpen)
-                    {
-                        KeyboardCloseDropDown(false);
-                    }
-                    break;
-
                 case Key.Enter:
-                    if (IsDropDownOpen)
+                    KeyboardCloseDropDown(true);
+                    break;
+                case Key.Escape:
+                    KeyboardCloseDropDown(false);
+                    break;
+                case Key.Home:
+                    newFocusedIndex = NavigateToStart();
+                    break;
+                case Key.End:
+                    newFocusedIndex = NavigateToEnd();
+                    break;
+                case Key.PageUp:
+                    newFocusedIndex = NavigateByPage(false);
+                    break;
+                case Key.PageDown:
+                    newFocusedIndex = NavigateByPage(true);
+                    break;
+                case Key.Left:
+                    if (IsVerticalOrientation())
                     {
-                        KeyboardCloseDropDown(true);
+                        ElementScrollViewerScrollInDirection(Key.Left);
                     }
                     else
                     {
-                        IsDropDownOpen = true;
+                        newFocusedIndex = NavigateByLine(false);
                     }
                     break;
+                case Key.Up:
+                    if (IsVerticalOrientation())
+                    {
+                        newFocusedIndex = NavigateByLine(false);
+                    }
+                    else
+                    {
+                        ElementScrollViewerScrollInDirection(Key.Up);
+                    }
+                    break;
+                case Key.Right:
+                    if (IsVerticalOrientation())
+                    {
+                        ElementScrollViewerScrollInDirection(Key.Right);
+                    }
+                    else
+                    {
+                        newFocusedIndex = NavigateByLine(true);
+                    }
+                    break;
+                case Key.Down:
+                    if (IsVerticalOrientation())
+                    {
+                        newFocusedIndex = NavigateByLine(true);
+                    }
+                    else
+                    {
+                        ElementScrollViewerScrollInDirection(Key.Down);
+                    }
+                    break;
+                default:
+                    Debug.Assert(!handled);
+                    break;
+            }
+
+            if (newFocusedIndex >= 0 && newFocusedIndex < Items.Count)
+            {
+                FocusItemInternal(newFocusedIndex);
+                handled = true;
+            }
+
+            if (handled)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void HandleComboBoxKeyDown(KeyEventArgs e)
+        {
+            bool handled = false;
+            int newSelectedIndex = -1;
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    IsDropDownOpen = true;
+                    handled = true;
+                    break;
+                case Key.End:
+                    SelectedIndex = Items.Count - 1;
+                    break;
+                case Key.Home:
+                    newSelectedIndex = 0;
+                    break;
+                case Key.Up:
+                case Key.Left:
+                    if ((!IsVerticalOrientation() || e.Key == Key.Up) && SelectedIndex >= 0)
+                    {
+                        newSelectedIndex = GetNextSelectableIndex(SelectedIndex - 1, -1, -1);
+                    }
+                    break;
+                case Key.Down:
+                case Key.Right:
+                    if ((!IsVerticalOrientation() || e.Key == Key.Down) && SelectedIndex < Items.Count)
+                    {
+                        newSelectedIndex = GetNextSelectableIndex(SelectedIndex + 1, 1, Items.Count);
+                    }
+                    break;
+                default:
+                    Debug.Assert(!handled);
+                    break;
+            }
+
+            if (newSelectedIndex >= 0 && newSelectedIndex < Items.Count)
+            {
+                SelectionChange.SelectJustThisItem(ItemInfoFromIndex(newSelectedIndex), true);
+                handled = true;
+            }
+
+            if (handled)
+            {
+                e.Handled = true;
             }
         }
 
@@ -357,8 +444,6 @@ namespace Windows.UI.Xaml.Controls
         {
             bool returnValue = base.FocusItem(info);
 
-            _highlightedInfo = info.Container is ComboBoxItem ? info : null;
-
             if (!IsDropDownOpen)
             {
                 int index = info.Index;
@@ -393,7 +478,7 @@ namespace Windows.UI.Xaml.Controls
             ItemInfo infoToSelect = null;
             if (commitSelection)
             {
-                infoToSelect = _highlightedInfo;
+                infoToSelect = ItemInfoFromIndex(FocusedIndex);
             }
 
             IsDropDownOpen = openDropDown;
@@ -402,115 +487,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 SelectionChange.SelectJustThisItem(infoToSelect, true /* assumeInItemsCollection */);
             }
-        }
-
-        private void SelectPrev()
-        {
-            if (Items.Count > 0)
-            {
-                int selectedIndex = InternalSelectedIndex;
-
-                // Search backwards from SelectedIndex - 1 but don't start before the beginning.
-                // If SelectedIndex is less than 0, there is nothing to select before this item.
-                if (selectedIndex > 0)
-                {
-                    SelectItemHelper(selectedIndex - 1, -1, -1);
-                }
-            }
-        }
-
-        private void SelectNext()
-        {
-            int count = Items.Count;
-            if (count > 0)
-            {
-                int selectedIndex = InternalSelectedIndex;
-
-                // Search forwards from SelectedIndex + 1 but don't start past the end.
-                // If SelectedIndex is before the last item then there is potentially
-                // something afterwards that we could select.
-                if (selectedIndex < count - 1)
-                {
-                    SelectItemHelper(selectedIndex + 1, 1, count);
-                }
-            }
-        }
-
-        private void NavigateToPrev()
-        {
-            if (Items.Count > 0)
-            {
-                int focusedIndex = _highlightedInfo != null ? _highlightedInfo.Index : -1;
-                if (focusedIndex > 0)
-                {
-                    ItemInfo info = GetNextItemInfoHelper(focusedIndex - 1, -1, -1);
-                    if (info != null)
-                    {
-                        FocusItem(info);
-                    }
-                }
-            }
-        }
-
-        private void NavigateToNext()
-        {
-            int count = Items.Count;
-            if (count > 0)
-            {
-                int focusedIndex = _highlightedInfo != null ? _highlightedInfo.Index : -1;
-                if (focusedIndex < count - 1)
-                {
-                    ItemInfo info = GetNextItemInfoHelper(focusedIndex + 1, 1, count);
-                    if (info != null)
-                    {
-                        FocusItem(info);
-                    }
-                }
-            }
-        }
-
-        private void SelectItemHelper(int startIndex, int increment, int stopIndex)
-        {
-            ItemInfo info = GetNextItemInfoHelper(startIndex, increment, stopIndex);
-            if (info != null)
-            {
-                SelectionChange.SelectJustThisItem(info, true /* assumeInItemsCollection */);
-            }
-        }
-
-        // Walk in the specified direction until we get to a selectable
-        // item or to the stopIndex.
-        // NOTE: stopIndex is not inclusive (it should be one past the end of the range)
-        private ItemInfo GetNextItemInfoHelper(int startIndex, int increment, int stopIndex)
-        {
-            Debug.Assert((increment > 0 && startIndex <= stopIndex) || (increment < 0 && startIndex >= stopIndex), "Infinite loop detected");
-
-            for (int i = startIndex; i != stopIndex; i += increment)
-            {
-                // If the item is selectable and the wrapper is selectable, select it.
-                // Need to check both because the user could set any combination of
-                // IsSelectable and IsEnabled on the item and wrapper.
-                object item = Items[i];
-                DependencyObject container = ItemContainerGenerator.ContainerFromIndex(i);
-                if (IsSelectableHelper(item) && IsSelectableHelper(container))
-                {
-                    return NewItemInfo(item, container, i);
-                }
-            }
-
-            return null;
-        }
-
-        private bool IsSelectableHelper(object o)
-        {
-            // If o is not a DependencyObject, it is just a plain
-            // object and must be selectable and enabled.
-            if (o is not FrameworkElement fe)
-            {
-                return true;
-            }
-            // It's selectable if IsSelectable is true and IsEnabled is true.
-            return (bool)fe.GetValue(IsEnabledProperty);
         }
 
         private void OnPopupTextInput(object sender, TextCompositionEventArgs e) => OnTextInput(e);

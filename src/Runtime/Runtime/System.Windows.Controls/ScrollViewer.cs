@@ -609,6 +609,33 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        /// <summary> 
+        /// Scrolls the view in the specified direction.
+        /// </summary> 
+        /// <param name="key">Key corresponding to the direction.</param>
+        /// <remarks>Similar to WPF's corresponding ScrollViewer method.</remarks>
+        internal void ScrollInDirection(Key key)
+        {
+            if (ScrollInfo != null)
+            {
+                switch (key)
+                {
+                    case Key.Up:
+                        ScrollInfo.LineUp();
+                        break;
+                    case Key.Down:
+                        ScrollInfo.LineDown();
+                        break;
+                    case Key.Left:
+                        ScrollInfo.LineLeft();
+                        break;
+                    case Key.Right:
+                        ScrollInfo.LineRight();
+                        break;
+                }
+            }
+        }
+
         /// <summary>
         /// Identifies the <see cref="ScrollableHeight"/> dependency property.
         /// </summary>

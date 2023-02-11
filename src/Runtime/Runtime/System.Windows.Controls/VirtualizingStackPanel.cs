@@ -81,6 +81,10 @@ namespace Windows.UI.Xaml.Controls
             set { this.SetValue(OrientationProperty, value); }
         }
 
+        internal sealed override Orientation LogicalOrientation => Orientation;
+
+        internal sealed override bool HasLogicalOrientation => true;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="VirtualizingStackPanel"/>
         /// class.

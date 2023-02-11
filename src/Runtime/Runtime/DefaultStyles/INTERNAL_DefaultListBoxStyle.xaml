@@ -62,9 +62,12 @@
                 Value="False" />
         <Setter Property="BorderThickness"
                 Value="1" />
-        <!--<Setter Property="TabNavigation" Value="Once"/>
-    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>-->
+        <Setter Property="TabNavigation"
+                Value="Once" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Auto" />
         <Setter Property="BorderBrush">
             <Setter.Value>
                 <LinearGradientBrush EndPoint="0.5,1"
@@ -128,9 +131,7 @@
                                           BorderBrush="Transparent"
                                           BorderThickness="0"
                                           Background="{TemplateBinding Background}"
-                                          Padding="{TemplateBinding Padding}"
-                                          VerticalScrollBarVisibility="Auto"
-                                          HorizontalScrollBarVisibility="Auto">
+                                          Padding="{TemplateBinding Padding}">
                                 <ItemsPresenter />
                             </ScrollViewer>
                         </Border>
@@ -176,7 +177,7 @@
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1"/>
-        <!--<Setter Property="TabNavigation" Value="Local" />-->
+        <Setter Property="TabNavigation" Value="Local" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>

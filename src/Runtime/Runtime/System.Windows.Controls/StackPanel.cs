@@ -50,6 +50,10 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class StackPanel : Panel
     {
+        internal sealed override Orientation LogicalOrientation => Orientation;
+
+        internal sealed override bool HasLogicalOrientation => true;
+
         /// <summary>
         /// Gets or sets the dimension by which child elements are stacked.
         /// </summary>
