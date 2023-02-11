@@ -253,6 +253,7 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTextWrappingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = (TextBox)d;
+            tb.CoerceValue(HorizontalScrollBarVisibilityProperty);
             if (tb._textViewHost != null)
             {
                 tb._textViewHost.View.OnTextWrappingChanged((TextWrapping)e.NewValue);
@@ -280,7 +281,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(HorizontalScrollBarVisibility),
                 typeof(ScrollBarVisibility),
                 typeof(TextBox),
-                new PropertyMetadata(ScrollBarVisibility.Hidden, OnHorizontalScrollBarVisibilityChanged));
+                new PropertyMetadata(ScrollBarVisibility.Hidden, OnHorizontalScrollBarVisibilityChanged, CoerceHorizontalScrollBarVisibility));
 
         private static void OnHorizontalScrollBarVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -289,6 +290,16 @@ namespace Windows.UI.Xaml.Controls
             {
                 tb._scrollViewer.HorizontalScrollBarVisibility = (ScrollBarVisibility)e.NewValue;
             }
+        }
+
+        private static object CoerceHorizontalScrollBarVisibility(DependencyObject d, object baseValue)
+        {
+            var tb = (TextBox)d;
+            if (tb.TextWrapping == TextWrapping.Wrap)
+            {
+                return ScrollBarVisibility.Disabled;
+            }
+            return baseValue;
         }
 
         /// <summary>
