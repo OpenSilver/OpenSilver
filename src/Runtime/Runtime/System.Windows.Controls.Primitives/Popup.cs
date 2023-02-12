@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 using System;
 using System.ComponentModel;
@@ -44,40 +42,29 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Displays content on top of existing content, within the bounds of the application window.
     /// </summary>
     [ContentProperty("Child")]
-    public partial class Popup : FrameworkElement
+    public class Popup : FrameworkElement
     {
         // Note for proper placement of the popup:
         //      - The HorizontalOffset and VerticalOffset define the placement of the Popup relative to the reference point.
         //      - The reference point is determined by the Placement and placement target. If the PlacementTarget property is not set, the placement target is the popup's parent. If the popup does not have a parent, then it is the top-left corner of the window (In wpf, it is the top-left corner of the screen but we're in a browser so we cannot do that).
         // Therefore, in order to correctly place the Popup, Horizontal and VerticalOffset should only be user-defined, and the only coordinates that should be internally set are those of the reference point.
 
-        static int _currentZIndex = 0; //This int is to be able to put newly created popups in front of the former ones, as well as allowing to click on a Modal ChildWindow to put it in front of the others.
-        PopupRoot _popupRoot;
+        private static int _currentZIndex = 0; //This int is to be able to put newly created popups in front of the former ones, as well as allowing to click on a Modal ChildWindow to put it in front of the others.
+        private PopupRoot _popupRoot;
 
         // Note: we use a ContentPresenter because we need a container that does not force its child
         // to be a logical child (since Popup.Child is already a logical child of the Popup).
-        NonLogicalContainer _outerBorder; // Used for positioning and alignment.
+        private NonLogicalContainer _outerBorder; // Used for positioning and alignment.
 
-        bool _isVisible;
-        Point _referencePosition = new Point(); // This is the (X,Y) position of the reference point defined in the "Note for proper placement of the popup" above.
+        private Point _referencePosition = new Point(); // This is the (X,Y) position of the reference point defined in the "Note for proper placement of the popup" above.
 
-
-
-        ControlToWatch _controlToWatch; //Note: this is set when the popup is attached to an UIElement, so that we can remove it from the timer for refreshing the position of the popup when needed.
+        private ControlToWatch _controlToWatch; //Note: this is set when the popup is attached to an UIElement, so that we can remove it from the timer for refreshing the position of the popup when needed.
 
         internal event EventHandler INTERNAL_PopupMoved;
 
-
         internal Popup ParentPopup { get; private set; }
 
-
-        internal PopupRoot PopupRoot
-        {
-            get
-            {
-                return _popupRoot;
-            }
-        }
+        internal PopupRoot PopupRoot => _popupRoot;
 
         /// <summary>
         /// Occurs when the <see cref="IsOpen"/> property changes to true.
@@ -201,12 +188,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(Child), 
                 typeof(UIElement), 
                 typeof(Popup), 
-                new PropertyMetadata(null, Child_Changed)
-                { 
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
-                });
+                new PropertyMetadata(null, OnChildChanged));
 
-        private static void Child_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnChildChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
             var newContent = (UIElement)e.NewValue;
@@ -224,21 +208,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 }
             }
 
-            if (popup._isVisible)
+            if (popup._outerBorder != null)
             {
                 popup._outerBorder.Content = newContent;
             }
-            else
-            {
-                //-----------------------------------------------------
-                // There is no need to update the content here because
-                // it will automatically be updated when the popup
-                // becomes visible (cf. method
-                // "ShowPopupRootIfNotAlreadyVisible").
-                //-----------------------------------------------------
-            }
         }
-
 
         //-----------------------
         // ISOPEN
@@ -261,12 +235,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(IsOpen), 
                 typeof(bool), 
                 typeof(Popup), 
-                new PropertyMetadata(false, IsOpen_Changed)
-                { 
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
-                });
+                new PropertyMetadata(false, OnIsOpenChanged));
 
-        private static void IsOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
             bool isOpen = (bool)e.NewValue;
@@ -394,12 +365,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(HorizontalOffset), 
                 typeof(double), 
                 typeof(Popup),
-                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalOffset_Changed)
-                { 
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
-                });
+                new PropertyMetadata(0d, OnHorizontalOffsetChanged));
 
-        private static void HorizontalOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnHorizontalOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
             popup.RepositionPopup((double)e.NewValue, popup.VerticalOffset); //todo: the first parameter might need to be changed to a popup._relativePosition which takes into consideration the Placement, PlacementTarget and whether the Popup is in the Visual Tree.
@@ -426,12 +394,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(VerticalOffset), 
                 typeof(double), 
                 typeof(Popup),
-                new FrameworkPropertyMetadata(0d, FrameworkPropertyMetadataOptions.AffectsArrange, VerticalOffset_Changed)
-                { 
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
-                });
+                new PropertyMetadata(0d, OnVerticalOffsetChanged));
 
-        private static void VerticalOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnVerticalOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
             popup.RepositionPopup(popup.HorizontalOffset, (double)e.NewValue);
@@ -441,7 +406,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             if (_outerBorder != null)
             {
-                _outerBorder.Margin = new Thickness(_referencePosition.X + horizontalOffset + _positionFixing.X, _referencePosition.Y + verticalOffset + _positionFixing.Y, 0d, 0d);
+                _outerBorder.Margin = new Thickness(
+                    _referencePosition.X + horizontalOffset + _positionFixing.X,
+                    _referencePosition.Y + verticalOffset + _positionFixing.Y,
+                    0d,
+                    0d);
             }
         }
 
@@ -473,23 +442,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Identifies the HorizontalContentAlignment dependency property.
+        /// Identifies the <see cref="HorizontalContentAlignment"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty HorizontalContentAlignmentProperty =
             DependencyProperty.Register(
                 nameof(HorizontalContentAlignment), 
                 typeof(HorizontalAlignment), 
                 typeof(Popup), 
-                new PropertyMetadata(HorizontalAlignment.Left, HorizontalContentAlignment_Changed)
-                { 
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
-                });
+                new PropertyMetadata(HorizontalAlignment.Left, OnHorizontalContentAlignmentChanged));
 
-        private static void HorizontalContentAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnHorizontalContentAlignmentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
             if (popup._outerBorder != null)
+            {
                 popup._outerBorder.HorizontalAlignment = (HorizontalAlignment)e.NewValue;
+            }
         }
 
         //-----------------------
@@ -506,23 +474,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Identifies the VerticalContentAlignment dependency property.
+        /// Identifies the <see cref="VerticalContentAlignment"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty VerticalContentAlignmentProperty =
             DependencyProperty.Register(
                 nameof(VerticalContentAlignment), 
                 typeof(VerticalAlignment), 
                 typeof(Popup),
-                new FrameworkPropertyMetadata(VerticalAlignment.Top, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalContentAlignment_Changed)
-                { 
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet 
-                });
+                new PropertyMetadata(VerticalAlignment.Top, OnVerticalContentAlignmentChanged));
 
-        private static void VerticalContentAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnVerticalContentAlignmentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var popup = (Popup)d;
             if (popup._outerBorder != null)
+            {
                 popup._outerBorder.VerticalAlignment = (VerticalAlignment)e.NewValue;
+            }
         }
 
         /// <summary>
@@ -548,13 +515,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         private void ShowPopupRootIfNotAlreadyVisible()
         {
-            if (!_isVisible)
+            if (_popupRoot == null)
             {
                 //---------------------
                 // Show the PopupRoot:
                 //---------------------
-
-                var child = this.Child;
 
                 // Get the window that is supposed to contain the popup:
                 Window parentWindow = GetParentWindowOfPopup();
@@ -576,28 +541,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 UpdatePopupParent();
 
-                // Clear the previous content if any:
-                if (_outerBorder != null)
-                    _outerBorder.Content = null;
-
                 // Calculate the position of the parent of the popup, in case that the popup is in the Visual Tree:
                 _referencePosition = CalculateReferencePosition();
 
                 // Create a surrounding border to enable positioning and alignment:
-                _outerBorder = new NonLogicalContainer()
-                {
-                    Margin = new Thickness(_referencePosition.X + this.HorizontalOffset, _referencePosition.Y + this.VerticalOffset, 0d, 0d),
-                    Content = child,
-                    HorizontalAlignment = this.HorizontalContentAlignment,
-                    VerticalAlignment = this.VerticalContentAlignment,
-                };
-                Binding b = new Binding("Width") { Source = this };
-                _outerBorder.SetBinding(Border.WidthProperty, b);
-                Binding b2 = new Binding("Height") { Source = this };
-                _outerBorder.SetBinding(Border.HeightProperty, b2);
-
-                Binding b3 = new Binding("MaxHeight") { Source = this };
-                _outerBorder.SetBinding(Border.MaxHeightProperty, b3);
+                _outerBorder = CreateContainer();
+                
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
                 _outerBorder.Loaded += (s, e) =>
                 {
@@ -606,19 +555,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 };
 
                 _popupRoot.Content = _outerBorder;
-                _isVisible = true;
+
                 // Show the popup in front of any potential previously displayed popup:
                 PutPopupInFront();
-            }
-            else
-            {
-                // The popup is already visible.
             }
         }
 
         private void HidePopupRootIfVisible()
         {
-            if (_isVisible)
+            if (_popupRoot != null)
             {
                 //---------------------
                 // If the popup being closed is the one with the highest zIndex, we decrement it to reduce the chances of reaching the maximum value:
@@ -635,22 +580,39 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 var popupRoot = _popupRoot;
                 popupRoot.Content = null;
                 INTERNAL_PopupsManager.RemovePopupRoot(popupRoot);
-                popupRoot.INTERNAL_LinkedPopup = null;
                 _popupRoot = null;
-                _isVisible = false;
+                _outerBorder.Content = null;
+                _outerBorder = null;
             }
-            else
+        }
+
+        private NonLogicalContainer CreateContainer()
+        {
+            var container = new NonLogicalContainer()
             {
-                // The popup is already hidden.
-            }
+                Margin = new Thickness(_referencePosition.X + HorizontalOffset, _referencePosition.Y + VerticalOffset, 0d, 0d),
+                Content = Child,
+                HorizontalAlignment = HorizontalContentAlignment,
+                VerticalAlignment = VerticalContentAlignment,
+            };
+
+            container.SetBinding(WidthProperty,
+                new Binding { Path = new PropertyPath(WidthProperty), Source = this });
+            container.SetBinding(HeightProperty,
+                new Binding { Path = new PropertyPath(HeightProperty), Source = this });
+            container.SetBinding(MaxHeightProperty,
+                new Binding { Path = new PropertyPath(MaxHeightProperty), Source = this });
+
+            return container;
         }
 
         private Window GetParentWindowOfPopup()
         {
-            // If the popup has a placement target, and the latter is in the visual tree, we get the window from there. Otherwise, if the popup itself is inthe visual tree, "Popup.INTERNAL_ParentWindow" should be populated. Otherwise, we use the default window (MainWindow) to display the popup.
-            Window parentWindow = (this.PlacementTarget != null ? this.PlacementTarget.INTERNAL_ParentWindow : null) ?? this.INTERNAL_ParentWindow ?? Application.Current.MainWindow;
-
-            return parentWindow;
+            // If the popup has a placement target, and the latter is in the visual tree,
+            // we get the window from there. Otherwise, if the popup itself is inthe visual
+            // tree, "Popup.INTERNAL_ParentWindow" should be populated. Otherwise, we use
+            // the default window (MainWindow) to display the popup.
+            return PlacementTarget?.INTERNAL_ParentWindow ?? INTERNAL_ParentWindow ?? Application.Current.MainWindow;
         }
 
         private Point CalculateReferencePosition()
