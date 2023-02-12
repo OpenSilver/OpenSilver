@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 #if MIGRATION
 using System.Windows.Threading;
 #else
@@ -32,18 +26,24 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal partial class PositionsWatcher
+    internal sealed class PositionsWatcher
     {
-        private List<ControlToWatch> _controlsToWatch = new List<ControlToWatch>();
-        private DispatcherTimer _timer = new DispatcherTimer();
-        internal TimeSpan _watchInterval = new TimeSpan(0, 0, 0, 0, 500);
+        private readonly List<ControlToWatch> _controlsToWatch = new List<ControlToWatch>();
+        private readonly DispatcherTimer _timer = new DispatcherTimer();
+        private TimeSpan _interval = TimeSpan.FromMilliseconds(500);
 
-        internal TimeSpan INTERNAL_WatchInterval
+        internal PositionsWatcher()
         {
-            get { return _watchInterval; }
+            _timer.Interval = Interval;
+            _timer.Tick += OnTick;
+        }
+
+        internal TimeSpan Interval
+        {
+            get { return _interval; }
             set
             {
-                _watchInterval = value;
+                _interval = value;
                 if (_timer != null)
                 {
                     _timer.Interval = value;
@@ -51,64 +51,31 @@ namespace Windows.UI.Xaml
             }
         }
 
-
-        internal PositionsWatcher()
-        {
-            _timer.Interval = INTERNAL_WatchInterval;
-            _timer.Tick += _timer_Tick;
-        }
-
-        void _timer_Tick(object sender, object e)
-        {
-            ControlToWatch[] snapshot = _controlsToWatch.ToArray();
-            foreach (ControlToWatch controlToWatch in snapshot)
-            {
-                //get the element's new Position:
-                Point elementCurrentPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(controlToWatch.ControltoWatch);
-                Size elementCurrentSize = controlToWatch.ControltoWatch.GetBoundingClientSize();
-                if (elementCurrentPosition != controlToWatch.PreviousPosition ||
-                    !INTERNAL_SizeComparisonHelpers.AreSizesEqual(elementCurrentSize, controlToWatch.PreviousSize))
-                {
-                    controlToWatch.OnPositionOrSizeChanged(elementCurrentPosition, elementCurrentSize);
-                    controlToWatch.PreviousPosition = elementCurrentPosition;
-                    controlToWatch.PreviousSize = elementCurrentSize;
-                }
-            }
-        }
-
         internal ControlToWatch AddControlToWatch(UIElement elementToWatch, Action<Point, Size> callback)
         {
-            ControlToWatch returnvalue = new ControlToWatch(elementToWatch, callback);
-
-            Size elementCurrentSize;
-            FrameworkElement control = elementToWatch as FrameworkElement;
-            if (control != null)
-            {
-                elementCurrentSize = control.INTERNAL_GetActualWidthAndHeight();
-            }
-            else
-            {
-                elementCurrentSize = new Size();
-            }
-
-            Point elementCurrentPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(elementToWatch);
-            returnvalue.PreviousPosition = elementCurrentPosition;
-            returnvalue.PreviousSize = elementCurrentSize;
-
-            _controlsToWatch.Add(returnvalue);
+            var ctw = new ControlToWatch(elementToWatch, callback);
+            _controlsToWatch.Add(ctw);
             if (!_timer.IsEnabled)
             {
                 _timer.Start();
             }
-            return returnvalue; //note: we need to return the value to be able to remove it afterwards.
+            return ctw;
         }
 
-        internal void RemoveControlToWatch(ControlToWatch controlToStopWatching)
+        internal void RemoveControlToWatch(ControlToWatch control)
         {
-            _controlsToWatch.Remove(controlToStopWatching);
+            _controlsToWatch.Remove(control);
             if (_controlsToWatch.Count == 0)
             {
                 _timer.Stop();
+            }
+        }
+
+        private void OnTick(object sender, object e)
+        {
+            foreach (ControlToWatch ctw in _controlsToWatch.ToArray())
+            {
+                ctw.InvokeCallback();
             }
         }
     }

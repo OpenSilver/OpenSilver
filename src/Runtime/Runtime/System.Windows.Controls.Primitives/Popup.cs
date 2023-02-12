@@ -289,6 +289,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     if (popup.IsOpen)
                     {
                         popup.Unloaded += new RoutedEventHandler(CloseOnUnloaded);
+                        popup.IsVisibleChanged += new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);
                     }
                 }
                 else
@@ -302,11 +303,31 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     popup.OnClosed();
                     popup.HidePopupRootIfVisible();
                     popup.Unloaded -= new RoutedEventHandler(CloseOnUnloaded);
+                    popup.IsVisibleChanged -= new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);
                 }
             }
         }
 
         private static void CloseOnUnloaded(object sender, RoutedEventArgs e) => ((Popup)sender).IsOpen = false;
+
+        private static void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            Popup popup = (Popup)sender;
+            PopupRoot popupRoot = popup._popupRoot;
+            if (popupRoot is not null)
+            {
+                bool isVisible = (bool)e.NewValue;
+                if (isVisible)
+                {
+                    popupRoot.Visibility = Visibility.Visible;
+                    popup._controlToWatch?.InvokeCallback();
+                }
+                else
+                {
+                    popupRoot.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
 
         private void RefreshPopupPosition(Point placementTargetPosition, Size placementTargetSize)
         {
@@ -705,11 +726,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 Canvas.SetZIndex(_popupRoot, ++_currentZIndex);
             }
         }
+        
         [OpenSilver.NotImplemented]
         public void SetWindow(Window associatedWindow)
         {
 
         }
+
         protected override Size MeasureOverride(Size availableSize)
         {
             return new Size();
@@ -717,18 +740,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            UIElement targetElement = this.PlacementTarget;
-
-            if (targetElement != null)
-            {
-                Point placementTargetPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(targetElement);
-
-                //we get the size of the element:
-                Size elementCurrentSize = targetElement.GetBoundingClientSize();
-
-                //We put the popup at the calculated position:
-                RefreshPopupPosition(placementTargetPosition, elementCurrentSize);
-            }
+            _controlToWatch?.InvokeCallback();
 
             if (_popupRoot != null)
             {

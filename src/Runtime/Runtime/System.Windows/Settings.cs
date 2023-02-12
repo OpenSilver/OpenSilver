@@ -152,8 +152,8 @@ namespace System
         /// </summary>
         public TimeSpan PopupMoveDelay
         {
-            get { return Window.Current.INTERNAL_PositionsWatcher.INTERNAL_WatchInterval; }
-            set { Window.Current.INTERNAL_PositionsWatcher.INTERNAL_WatchInterval = value; }
+            get { return Window.Current.INTERNAL_PositionsWatcher.Interval; }
+            set { Window.Current.INTERNAL_PositionsWatcher.Interval = value; }
         }
 
         /// <summary>
