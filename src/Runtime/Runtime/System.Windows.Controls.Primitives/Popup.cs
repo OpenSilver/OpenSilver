@@ -80,28 +80,18 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Occurs when the System.Windows.Controls.Primitives.Popup.IsOpen property changes to true.
+        /// Occurs when the <see cref="IsOpen"/> property changes to true.
         /// </summary>
         public event EventHandler Opened;
-        void OnOpened()
-        {
-            if(Opened != null)
-            {
-                Opened(this, new EventArgs());
-            }
-        }
+
+        private void OnOpened() => Opened?.Invoke(this, EventArgs.Empty);
 
         /// <summary>
-        /// Occurs when the System.Windows.Controls.Primitives.Popup.IsOpen property changes to false.
+        /// Occurs when the <see cref="IsOpen"/> property changes to false.
         /// </summary>
         public event EventHandler Closed;
-        void OnClosed()
-        {
-            if (Closed != null)
-            {
-                Closed(this, new EventArgs());
-            }
-        }
+
+        private void OnClosed() => Closed?.Invoke(this, EventArgs.Empty);
 
         /// <summary>
         /// Gets or Sets the UIElement that the Popup will stick to. A null value will make the Popup stay at its originally defined position.
@@ -144,17 +134,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage)]
         public bool INTERNAL_AllowDisableClickTransparency = true;
-
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            base.INTERNAL_OnDetachedFromVisualTree();
-
-            //--------------------------------
-            // Hide the PopupRoot when the Popup is removed from the visual tree:
-            //--------------------------------
-
-            this.HidePopupRootIfVisible();
-        }
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new PopupRootAutomationPeer(this);
@@ -291,53 +270,43 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             var popup = (Popup)d;
             bool isOpen = (bool)e.NewValue;
-            if (popup.PlacementTarget == null)
-            {
-                //------------------------
-                // The Popup is not in the Visual Tree.
-                //------------------------
 
-                // Show the popup if it was not already visible, or hide it if it was visible:
+            UIElement targetElement = popup.PlacementTarget;
+            if (targetElement == null || INTERNAL_VisualTreeManager.IsElementInVisualTree(targetElement))
+            {
                 if (isOpen)
                 {
-                    // Show the popup:
+                    if (targetElement != null)
+                    {
+                        popup._controlToWatch = Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(
+                            targetElement, popup.RefreshPopupPosition);
+                    }
+
                     popup.ShowPopupRootIfNotAlreadyVisible();
                     popup.OnOpened();
+
+                    // The popup can be closed during during the Opened event
+                    if (popup.IsOpen)
+                    {
+                        popup.Unloaded += new RoutedEventHandler(CloseOnUnloaded);
+                    }
                 }
                 else
                 {
-                    popup.OnClosed();
-                    // Hide the popup:
-                    popup.HidePopupRootIfVisible();
-                }
-            }
-            else
-            {
-                //------------------------
-                // The Popup is in the Visual Tree.
-                //------------------------
-
-                UIElement targetElement = popup.PlacementTarget;
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(targetElement))
-                {
-                    //the popup needs to be placed to a position relative to the popup.PlacementTarget element
-                    if (isOpen)
+                    if (targetElement != null)
                     {
-                        popup.OnOpened();
-
-                        popup._controlToWatch = Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(targetElement, popup.RefreshPopupPosition);
-                        popup.ShowPopupRootIfNotAlreadyVisible();
-                    }
-                    else
-                    {
-                        popup.OnClosed();
                         Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(popup._controlToWatch);
                         popup._controlToWatch = null;
-                        popup.HidePopupRootIfVisible();
                     }
+
+                    popup.OnClosed();
+                    popup.HidePopupRootIfVisible();
+                    popup.Unloaded -= new RoutedEventHandler(CloseOnUnloaded);
                 }
             }
         }
+
+        private static void CloseOnUnloaded(object sender, RoutedEventArgs e) => ((Popup)sender).IsOpen = false;
 
         private void RefreshPopupPosition(Point placementTargetPosition, Size placementTargetSize)
         {
