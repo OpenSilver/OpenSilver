@@ -72,23 +72,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
             INTERNAL_LinkedPopup = popup;
 
             // Make sure that after the Loaded event of the PopupRoot, the parent Popup also raises the Loaded event:
-            this.Loaded += PopupRoot_Loaded;
+            Loaded += PopupRoot_Loaded;
         }
 
         private void PopupRoot_Loaded(object sender, RoutedEventArgs e)
         {
-            // Make sure that the Loaded event of the Popup is raised (this is useful if the <Popup> control is never added to the visual tree, such as for tooltips).
-            if (this.INTERNAL_LinkedPopup != null
-                && !this.INTERNAL_LinkedPopup.IsConnectedToLiveTree) // We check that the <Popup> has no visual parent. In fact, if it had a visual parent, it means that it is in the visual tree (for example if the <Popup> was declared in XAML), and therefore the Loaded event has already been called once.
-            {
-                this.INTERNAL_LinkedPopup.RaiseLoadedEvent();
-                this.INTERNAL_LinkedPopup.InvalidateMeasure();
-            }
-            if (INTERNAL_ParentWindow != null && this.IsCustomLayoutRoot)
+            if (INTERNAL_ParentWindow != null && IsCustomLayoutRoot)
             {
                 Rect windowBounds = INTERNAL_ParentWindow.Bounds;
-                this.Measure(new Size(windowBounds.Width, windowBounds.Height));
-                this.Arrange(windowBounds);
+                Measure(new Size(windowBounds.Width, windowBounds.Height));
+                Arrange(windowBounds);
             }
         }
 

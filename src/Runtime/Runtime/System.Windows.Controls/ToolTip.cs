@@ -104,7 +104,7 @@ namespace Windows.UI.Xaml.Controls
 
                     _parentPopup.DataContext = _owner?.DataContext;
 
-                    _parentPopup.Loaded += new RoutedEventHandler(ParentPopupLoaded);
+                    _parentPopup.Opened += new EventHandler(OnParentPopupOpened);
                 }
 
                 PlacementMode placement = EffectivePlacement;
@@ -184,7 +184,7 @@ namespace Windows.UI.Xaml.Controls
                     "_opensilver.mousePositionX.toString() + \",\" + _opensilver.mousePositionY.toString()"));
         }
 
-        private void ParentPopupLoaded(object sender, RoutedEventArgs e)
+        private void OnParentPopupOpened(object sender, EventArgs e)
         {
             if (EffectivePlacement == PlacementMode.Mouse)
             {
