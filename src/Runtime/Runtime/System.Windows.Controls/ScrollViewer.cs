@@ -784,7 +784,7 @@ namespace Windows.UI.Xaml.Controls
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
                 {
                     string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.clientWidth");
+                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.clientWidth");
                 }
 
                 return 0.0;
