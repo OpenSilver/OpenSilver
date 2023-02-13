@@ -304,7 +304,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
-            innerDivStyle.display = "table";
+            innerDivStyle.display = "block";
             innerDivStyle.height = "100%";
             innerDivStyle.width = "100%";
 
