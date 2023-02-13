@@ -173,22 +173,22 @@ namespace Windows.UI.Xaml.Controls
 
             // _scrollHost must be set before calling base
             _scrollHost = GetTemplateChild("ScrollViewer") as ScrollViewer;
-            
+
             base.OnApplyTemplate();
 
             _popup = GetTemplateChild("Popup") as Popup;
-          
+
             //this will enable virtualization in combo box without templating the whole style
             if (_popup != null)
             {
                 //reason for following if condition is backward compatibility, till now we had to define template and manually set custom layout of popup to true
                 //and thus we don't need to set custom layout for combo box to make this work.
-                if (this.CustomLayout)
+                if (CustomLayout)
                 {
                     _popup.CustomLayout = true;
                 }
-                _popup.MaxHeight = this.MaxDropDownHeight;
-                
+                _popup.MaxHeight = MaxDropDownHeight;
+
                 //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
                 _popup.PlacementTarget = this;
                 _popup.Placement = PlacementMode.Bottom;
@@ -457,7 +457,7 @@ namespace Windows.UI.Xaml.Controls
 
                 returnValue = true;
             }
-            
+
             return returnValue;
         }
 
@@ -556,87 +556,112 @@ namespace Windows.UI.Xaml.Controls
             get { return (bool)GetValue(IsDropDownOpenProperty); }
             set { SetValue(IsDropDownOpenProperty, value); }
         }
+
         /// <summary>
-        /// Identifies the IsDropDownOpen dependency property.
+        /// Identifies the <see cref="IsDropDownOpen"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsDropDownOpenProperty =
-            DependencyProperty.Register("IsDropDownOpen", typeof(bool), typeof(ComboBox), new PropertyMetadata(false, IsDropDownOpen_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(IsDropDownOpen),
+                typeof(bool),
+                typeof(ComboBox),
+                new PropertyMetadata(false, OnIsDropDownOpenChanged)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
+                });
 
-        private static void IsDropDownOpen_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsDropDownOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var comboBox = (ComboBox)d;
-
-            // IMPORTANT: we must NOT require that the element be in the visual tree because the DropDown may be closed even when the ComboBox is not in the visual tree (for example, after it has been removed from the visual tree)
-            if (e.NewValue is bool)
+            bool isDropDownOpen = (bool)e.NewValue;
+            if (isDropDownOpen)
             {
-                bool isDropDownOpen = (bool)e.NewValue;
+                //-----------------------------
+                // Show the Popup
+                //-----------------------------
 
-                if (isDropDownOpen)
+                // Show the popup:
+                if (comboBox._popup != null)
                 {
-                    //-----------------------------
-                    // Show the Popup
-                    //-----------------------------
+                    // add removed
 
-                    // Show the popup:
-                    if (comboBox._popup != null)
+                    comboBox._popup.IsOpen = true;
+
+                    // Make sure the Width of the popup is at least the same as the popup
+                    if (comboBox._popup.Child is FrameworkElement child)
                     {
-                        // add removed
-
-                        comboBox._popup.IsOpen = true;
-
-                        // Make sure the Width of the popup is at least the same as the popup
-                        if (comboBox._popup.Child is FrameworkElement child)
-                        {
-                            child.MinWidth = comboBox._popup.ActualWidth;
-                        }
+                        child.MinWidth = comboBox._popup.ActualWidth;
                     }
-
-                    // Ensure that the toggle button is checked:
-                    if (comboBox._dropDownToggle != null
-                        && comboBox._dropDownToggle.IsChecked == false)
-                    {
-                        comboBox._dropDownToggle.IsChecked = true;
-                    }
-
-                    comboBox.UpdatePresenter();
-
-                    // Raise the Opened event:
-#if MIGRATION
-                    comboBox.OnDropDownOpened(new EventArgs());
-#else
-                    comboBox.OnDropDownOpened(new RoutedEventArgs());
-#endif
-
-                    comboBox.EnsurePopupIsWithinBoundaries();
                 }
-                else
+
+                // Ensure that the toggle button is checked:
+                if (comboBox._dropDownToggle != null
+                    && comboBox._dropDownToggle.IsChecked == false)
                 {
-                    //-----------------------------
-                    // Hide the Popup
-                    //-----------------------------
+                    comboBox._dropDownToggle.IsChecked = true;
+                }
 
-                    // Close the popup:
-                    if (comboBox._popup != null)
-                        comboBox._popup.IsOpen = false;
+                comboBox.UpdatePresenter();
 
-                    // Ensure that the toggle button is unchecked:
-                    if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
-                    {
-                        comboBox._dropDownToggle.IsChecked = false;
-                    }
-
-                    comboBox.UpdatePresenter();
-
-                    // Raise the Closed event:
+                // Raise the Opened event:
 #if MIGRATION
-                    comboBox.OnDropDownClosed(new EventArgs());
+                comboBox.OnDropDownOpened(EventArgs.Empty);
 #else
-                    comboBox.OnDropDownClosed(new RoutedEventArgs());
+                comboBox.OnDropDownOpened(new RoutedEventArgs());
 #endif
+
+                if (FocusManager.HasFocus(comboBox, false))
+                {
+                    comboBox.ScrollTo(comboBox.SelectedIndex);
+                }
+
+                comboBox.EnsurePopupIsWithinBoundaries();
+            }
+            else
+            {
+                //-----------------------------
+                // Hide the Popup
+                //-----------------------------
+
+                // Close the popup:
+                if (comboBox._popup != null)
+                    comboBox._popup.IsOpen = false;
+
+                // Ensure that the toggle button is unchecked:
+                if (comboBox._dropDownToggle != null && comboBox._dropDownToggle.IsChecked == true)
+                {
+                    comboBox._dropDownToggle.IsChecked = false;
+                }
+
+                comboBox.UpdatePresenter();
+
+                // Raise the Closed event:
+#if MIGRATION
+                comboBox.OnDropDownClosed(EventArgs.Empty);
+#else
+                comboBox.OnDropDownClosed(new RoutedEventArgs());
+#endif
+
+                if (FocusManager.HasFocus(comboBox, true))
+                {
+                    comboBox.ScrollTo(-1);
                 }
             }
         }
+
+        private void ScrollTo(int index)
+        {
+            if (index > -1)
+            {
+                UpdateLayout();
+                FocusItemInternal(index);
+                ScrollIntoViewImpl(index);
+            }
+            else
+            {
+                Focus();
+            }
+        }        
 
         private async void EnsurePopupIsWithinBoundaries()
         {
