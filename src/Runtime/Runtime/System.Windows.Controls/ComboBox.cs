@@ -565,10 +565,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(IsDropDownOpen),
                 typeof(bool),
                 typeof(ComboBox),
-                new PropertyMetadata(false, OnIsDropDownOpenChanged)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                });
+                new PropertyMetadata(false, OnIsDropDownOpenChanged, CoerceIsDropDownOpen));
 
         private static void OnIsDropDownOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -647,6 +644,28 @@ namespace Windows.UI.Xaml.Controls
                     comboBox.ScrollTo(-1);
                 }
             }
+        }
+
+        private static object CoerceIsDropDownOpen(DependencyObject d, object value)
+        {
+            if ((bool)value)
+            {
+                ComboBox cb = (ComboBox)d;
+                if (!cb.IsLoaded)
+                {
+                    cb.Loaded += new RoutedEventHandler(OpenOnLoad);
+                    return false;
+                }
+            }
+
+            return value;
+        }
+        
+        private static void OpenOnLoad(object sender, RoutedEventArgs e)
+        {
+            var cb = (ComboBox)sender;
+            cb.Loaded -= new RoutedEventHandler(OpenOnLoad);
+            cb.Dispatcher.BeginInvoke(() => cb.CoerceValue(IsDropDownOpenProperty));
         }
 
         private void ScrollTo(int index)
