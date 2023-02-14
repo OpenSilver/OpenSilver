@@ -49,6 +49,14 @@ namespace OpenSilver.Compiler
             _monoCecilVersion.LoadAssembly(assemblyPath, loadReferencedAssembliesToo, skipReadingAttributesFromAssemblies);
         }
 
+        public void SetCompilerType(CompilerTypesEnum compierType)
+        {
+            if (MarshalledObject == null)
+                throw new Exception("MarshalledObject is null. It should not be null to set Compiler Type.");
+
+            MarshalledObject.CompilerType = compierType;
+        }
+
         public string GetContentPropertyName(string namespaceName, string localTypeName, string assemblyNameIfAny = null)
             => _monoCecilVersion.GetContentPropertyName(namespaceName, localTypeName, assemblyNameIfAny);
 

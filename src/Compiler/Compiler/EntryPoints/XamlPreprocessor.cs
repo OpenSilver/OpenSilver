@@ -147,14 +147,36 @@ namespace OpenSilver.Compiler
                             if (reflectionOnSeparateAppDomain == null)
                                 throw new Exception("ReflectionOnSeparateAppDomainHandler.Current is null. It should not be null because it was supposed to be populated by the 'BeforeXamlPreprocessor' task. Please verify that the MSBuild Targets are up to date.");
 
-                            // Convert XAML to CS:
-                            string generatedCode = ConvertingXamlToCSharp.Convert(xaml, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass: !isSecondPass, isSLMigration: isSLMigration, outputRootPath: outputRootPath, outputAppFilesPath: outputAppFilesPath, outputLibrariesPath: outputLibrariesPath, outputResourcesPath: outputResourcesPath, logger: logger);
+                            string generatedCode = "";
 
-                            // Add the header that contains the file hash so as to avoid re-processing the file if not needed:
-                            generatedCode = CreateHeaderContainingHash(generatedCode, xaml, isSecondPass)
-                                + Environment.NewLine
-                                + Environment.NewLine
-                                + generatedCode;
+                            if (outputFile.EndsWith(".cs"))
+                            {
+                                // Convert XAML to CS:
+                                reflectionOnSeparateAppDomain.SetCompilerType(CompilerTypesEnum.CSharp);
+                                generatedCode = ConvertingXamlToCSharp.Convert(xaml, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass: !isSecondPass, isSLMigration: isSLMigration, outputRootPath: outputRootPath, outputAppFilesPath: outputAppFilesPath, outputLibrariesPath: outputLibrariesPath, outputResourcesPath: outputResourcesPath, logger: logger);
+
+                                // Add the header that contains the file hash so as to avoid re-processing the file if not needed:
+                                generatedCode = CreateHeaderContainingHash(generatedCode, xaml, isSecondPass)
+                                    + Environment.NewLine
+                                    + Environment.NewLine
+                                    + generatedCode;
+                            }
+                            else if (outputFile.EndsWith(".vb"))
+                            {
+                                // Convert XAML to VB:
+                                reflectionOnSeparateAppDomain.SetCompilerType(CompilerTypesEnum.VBNet);
+                                generatedCode = ConvertingXamlToVB.Convert(xaml, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass: !isSecondPass, isSLMigration: isSLMigration, outputRootPath: outputRootPath, outputAppFilesPath: outputAppFilesPath, outputLibrariesPath: outputLibrariesPath, outputResourcesPath: outputResourcesPath, logger: logger);
+
+                                // Add the header that contains the file hash so as to avoid re-processing the file if not needed:
+                                generatedCode = CreateVBHeaderContainingHash(generatedCode, xaml, isSecondPass)
+                                    + Environment.NewLine
+                                    + Environment.NewLine
+                                    + generatedCode;
+                            } else
+                            {
+                                logger.WriteMessage("Unknown outputfile extension.");
+                                return false;
+                            }
 
                             // Create output directory:
                             Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
@@ -278,6 +300,14 @@ namespace OpenSilver.Compiler
             string fileHash = GetHashString(originalXaml);
             string passNumber = (isSecondPass ? "2" : "1");
             string header = string.Format("// <CSHTML5><XamlHash>{0}</XamlHash><PassNumber>{1}</PassNumber><CompilationDate>{2}</CompilationDate></CSHTML5>", fileHash, passNumber, DateTime.Now.ToString());
+
+            return header;
+        }
+        static string CreateVBHeaderContainingHash(string generatedCode, string originalXaml, bool isSecondPass)
+        {
+            string fileHash = GetHashString(originalXaml);
+            string passNumber = (isSecondPass ? "2" : "1");
+            string header = string.Format("' <CSHTML5><XamlHash>{0}</XamlHash><PassNumber>{1}</PassNumber><CompilationDate>{2}</CompilationDate></CSHTML5>", fileHash, passNumber, DateTime.Now.ToString());
 
             return header;
         }
