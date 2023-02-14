@@ -216,6 +216,10 @@ namespace CSHTML5.Internal
         public string justifyContent { set { SetStylePropertyValue("justifyContent", value); } }
         public string flexWrap { set { SetStylePropertyValue("flexWrap", value); } }
         public string flexDirection { set { SetStylePropertyValue("flexDirection", value); } }
+        public string flex { set { SetStylePropertyValue("flex", value); } }
+        public string flexGrow { set { SetStylePropertyValue("flexGrow", value); } }
+        public string flexShrink { set { SetStylePropertyValue("flexShrink", value); } }
+        public string flexBasis { set { SetStylePropertyValue("flexBasis", value); } }
 
         //-----------------------------------------------------------------------
         // Usage stats for To-Do Calendar (number of types each property is set):
