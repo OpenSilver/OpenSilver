@@ -127,16 +127,6 @@ document.refreshKeyModifiers = function (evt) {
     document.modifiersPressed = value;
 }
 
-_opensilver = {
-    mousePositionX: 0.0,
-    mousePositionY: 0.0
-};
-
-document.addEventListener('mousemove', function (e) {
-    _opensilver.mousePositionX = e.pageX;
-    _opensilver.mousePositionY = e.pageY;
-});
-
 document.onkeydown = function (evt) {
     evt = evt || window.event;
     document.refreshKeyModifiers(evt);

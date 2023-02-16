@@ -110,7 +110,7 @@ namespace Windows.UI.Xaml.Controls
                 PlacementMode placement = EffectivePlacement;
                 if (placement == PlacementMode.Mouse)
                 {
-                    Point position = GetMousePosition();
+                    Point position = ToolTipService.MousePosition;
                     position.X = Math.Max(position.X + HorizontalOffset, 0.0) + 10.0;
                     position.Y = Math.Max(position.Y + VerticalOffset, 0.0) + 10.0;
 
@@ -122,7 +122,7 @@ namespace Windows.UI.Xaml.Controls
                     _parentPopup.HorizontalOffset = HorizontalOffset;
                     _parentPopup.VerticalOffset = VerticalOffset;
                     _parentPopup.Placement = placement;
-                    _parentPopup.PlacementTarget = EffectivePlacementTarget;                    
+                    _parentPopup.PlacementTarget = EffectivePlacementTarget;
                 }
 
                 _parentPopup.IsOpen = true;
@@ -175,13 +175,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 _parentPopup.DataContext = e.NewValue;
             }
-        }
-
-        private static Point GetMousePosition()
-        {
-            return Point.Parse(
-                OpenSilver.Interop.ExecuteJavaScriptString(
-                    "_opensilver.mousePositionX.toString() + \",\" + _opensilver.mousePositionY.toString()"));
         }
 
         private void OnParentPopupOpened(object sender, EventArgs e)
