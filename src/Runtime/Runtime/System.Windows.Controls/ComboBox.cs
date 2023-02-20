@@ -215,6 +215,7 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
+                _contentPresenter.ClipToBounds = true;
             }
 
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
