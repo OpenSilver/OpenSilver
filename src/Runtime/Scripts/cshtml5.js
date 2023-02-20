@@ -734,7 +734,7 @@ getTextAreaInnerText = function (domElement, forceNewLineFirst) {
         if (currentNode.nodeType == Node.TEXT_NODE) {
             if (currentNode.textContent != "") { //Note: we added this test because IE sometimes adds an empty text node which should not count for anything as far as I know.
                 if (forceNewLineFirst) {
-                    resultString += "\r\n";
+                    resultString += "\n";
                 }
                 var textToAdd = currentNode.textContent;
                 if (textToAdd.endsWith("\n")) {
@@ -746,7 +746,7 @@ getTextAreaInnerText = function (domElement, forceNewLineFirst) {
                         textToAdd = textToAdd.substring(0, textToAdd.length - 1);
                     }
                     //We also replace the '\n' with "\r\n":
-                    textToAdd = textToAdd.replace(new RegExp("\n", 'g'), "\r\n");
+                    textToAdd = textToAdd.replace(new RegExp("\n", 'g'), "\n");
                 }
                 resultString += textToAdd;
                 forceNewLineFirst = false;
@@ -756,19 +756,19 @@ getTextAreaInnerText = function (domElement, forceNewLineFirst) {
             var nodeName = currentNode.nodeName;
             if (nodeName == "BR") {
                 if (forceNewLineFirst) {
-                    resultString += "\r\n";
+                    resultString += "\n";
                 }
                 forceNewLineFirst = true;
             }
             else //we consider it's a <div> or a <p>:
             {
                 if (forceNewLineFirst) {
-                    resultString += "\r\n";
+                    resultString += "\n";
                     forceNewLineFirst = false;
                 }
-                if (currentNode.previousSibling != undefined && !resultString.endsWith("\r\n")) {
+                if (currentNode.previousSibling != undefined && !resultString.endsWith("\n")) {
                     //The element is not the first in its parent and there is no new line to put it, so we add one:
-                    resultString += "\r\n";
+                    resultString += "\n";
                 }
 
                 resultString += getTextAreaInnerText(currentNode, forceNewLineFirst);
@@ -784,98 +784,94 @@ getTextAreaInnerText = function (domElement, forceNewLineFirst) {
     return resultString;
 }
 
-
-//this counts the amount of characters before the ones (start and end) defined by the range object.
-// it does so by defining:
-//      -globalIndexes.startIndex and globalIndexes.endIndex: the indexes as in c# of the positions defined by the range
-//      -globalIndexes.isStartFound and globalIndexes.isEndFound: a boolean stating whether the index has been found yet ot not (used within this method to know when to stop changing the indexes).
-document.getRangeGlobalStartAndEndIndexes = function getRangeGlobalStartAndEndIndexes(currentParent, isFirstChild, charactersWentThrough, range, globalIndexes) {
-    //we go down the tree until we find multiple children or until there is no children left:
-    while (currentParent.hasChildNodes()) {
-        //a div/p/br tag means a new line if it is not the first child of its parent:
-        if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-            charactersWentThrough += 2; //corresponds to counting the characters for the new line (that are not otherwise included in the count)
-            isFirstChild = true;
-        }
-        //we stop as soon as we find an element that has more than one childNode, so we can go through all the children afterwards.
-        if (currentParent.childNodes.length > 1) {
-            break;
-        }
-        currentParent = currentParent.childNodes[0];
-    }
-    if (currentParent.hasChildNodes()) { //this being true means that we stopped in the previous loop because it had multiple children. We need to go through them for the count of characters:
-        var i = 0;
-        var amountOfChildren = currentParent.childNodes.length;
-        //recursively go through the children:
-        for (i = 0; i < amountOfChildren; ++i) {
-            var temp = currentParent.childNodes[i];
-            charactersWentThrough = getRangeGlobalStartAndEndIndexes(temp, i == 0, charactersWentThrough, range, globalIndexes);
-            if (globalIndexes.isStartFound && globalIndexes.isEndFound) {
+document.getTextBoxSelection = (function () {
+    //this counts the amount of characters before the ones (start and end) defined by the range object.
+    // it does so by defining:
+    //      -globalIndexes.startIndex and globalIndexes.endIndex: the indexes as in c# of the positions defined by the range
+    //      -globalIndexes.isStartFound and globalIndexes.isEndFound: a boolean stating whether the index has been found yet ot not (used within this method to know when to stop changing the indexes).
+    function getRangeGlobalStartAndEndIndexes(currentParent, isFirstChild, charactersWentThrough, selection, range, globalIndexes) {
+        //we go down the tree until we find multiple children or until there is no children left:
+        while (currentParent.hasChildNodes()) {
+            //a div/p/br tag means a new line if it is not the first child of its parent:
+            if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
+                charactersWentThrough += 1; //corresponds to counting the characters for the new line (that are not otherwise included in the count)
+                isFirstChild = true;
+            }
+            //we stop as soon as we find an element that has more than one childNode, so we can go through all the children afterwards.
+            if (currentParent.childNodes.length > 1) {
                 break;
             }
+            currentParent = currentParent.childNodes[0];
         }
-    }
-    else {
-        //we stopped because we are at the end of a branch in the tree view --> count the characters in the line:
-        //if the end of the branch is a new line, count it:
-        if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-            charactersWentThrough += 2;
-        }
-        else {
-            if (currentParent.length) {
-                //we get the basic informations about the text:
-                var textContent = currentParent.textContent;
-                var splittedText = textContent.split("\n"); //this is to know if the piece of text contains one or more lines.
-                var firstText = splittedText[0];
-                var splittedLength = splittedText.length;
-                var needsCompensation = firstText[firstText.length - 1] != "\r"; //this allows to compensate the cases where new lines are written as "\n" only instead of "\r\n" (1 character instead of 2)
-                var wholeLength = textContent.length; //this will be the length of the whole text in this dom element, including possible compensation for the amount of characters used for a new line.
-                if (needsCompensation && splittedLength > 1) {
-                    wholeLength += splittedLength - 1;
+        if (currentParent.hasChildNodes()) { //this being true means that we stopped in the previous loop because it had multiple children. We need to go through them for the count of characters:
+            var i = 0;
+            var amountOfChildren = currentParent.childNodes.length;
+            //recursively go through the children:
+            for (i = 0; i < amountOfChildren; ++i) {
+                var temp = currentParent.childNodes[i];
+                charactersWentThrough = getRangeGlobalStartAndEndIndexes(temp, i == 0, charactersWentThrough, selection, range, globalIndexes);
+                if (globalIndexes.isCaretFound && globalIndexes.isStartFound && globalIndexes.isEndFound) {
+                    break;
                 }
-                if (currentParent == range.startContainer) {
-                    if (splittedText.length > 1 && needsCompensation) {
-                        //when we are at the element containing the position defined in the range and we need adjustments due to the new lines, count the amount of adjustments neede:
-                        var i = 0; //this will  be the amount of new lines before the given position.
-                        var actualLengthToRangeOffset = 0; //this is the length of the text as is in the browser.
-                        //go through the different lines of text while counting the characters and amount of new lines:
-                        for (i = 0; i < splittedLength; ++i) {
-                            if (actualLengthToRangeOffset + splittedText[i].length >= range.startOffset) {
-                                break;
-                            }
-                            actualLengthToRangeOffset += 1 + splittedText[i].length; //1 --> "\n" that was removed when splitting
-                        }
-                        globalIndexes.startIndex = charactersWentThrough + range.startOffset + i; //Note: + i because we count 1 additional character ('\r') per new line met before reaching the offset.
-                    }
-                    else { //if there is no need for compensation on the length taken by the new lines, simply add the offset defined in the range:
-                        globalIndexes.startIndex = charactersWentThrough + range.startOffset; //no need to compensate for a new line since it already is 2 characters or there is only one line.
-                    }
-                    //remember that the index was found:
-                    globalIndexes.isStartFound = true;
-                }
-                if (currentParent == range.endContainer) {
-                    if (splittedText.length > 1 && needsCompensation) {
-                        var i = 0;
-                        var actualLengthToRangeOffset = 0; //this is the length of the text as is in the browser.
-                        for (i = 0; i < splittedLength; ++i) {
-                            if (actualLengthToRangeOffset + splittedText[i].length >= range.endOffset) {
-                                break;
-                            }
-                            actualLengthToRangeOffset += 1 + splittedText[i].length; //1 --> \n that was removed
-                        }
-                        globalIndexes.endIndex = charactersWentThrough + range.endOffset + i; //Note: + i because we count 1 additional character ('\r') per new line met before reaching the offset.
-                    }
-                    else {
-                        globalIndexes.endIndex = charactersWentThrough + range.endOffset; //no need to compensate for a new line since it already is 2 characters or there is only one line.
-                    }
-                    globalIndexes.isEndFound = true;
-                }
-                charactersWentThrough += wholeLength; //move forward in the count of characters.
             }
+        } else {
+            //we stopped because we are at the end of a branch in the tree view --> count the characters in the line:
+            //if the end of the branch is a new line, count it:
+            if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
+                charactersWentThrough += 1;
+            }
+            else {
+                if (currentParent.length) {
+                    //we get the basic informations about the text:
+                    var textContent = currentParent.textContent;
+                    var wholeLength = textContent.length;
+                    if (currentParent === selection.focusNode) {
+                        globalIndexes.caretIndex = charactersWentThrough + selection.focusOffset;
+                        globalIndexes.isCaretFound = true;
+                    }
+                    if (currentParent === range.startContainer) {
+                        globalIndexes.startIndex = charactersWentThrough + range.startOffset;
+                        globalIndexes.isStartFound = true;
+                    }
+                    if (currentParent === range.endContainer) {
+                        globalIndexes.endIndex = charactersWentThrough + range.endOffset;
+                        globalIndexes.isEndFound = true;
+                    }
+                    charactersWentThrough += wholeLength; //move forward in the count of characters.
+                } else {
+                    if (currentParent.tagName === 'BR') {
+                        if (currentParent.parentElement === selection.focusNode) {
+                            globalIndexes.caretIndex = charactersWentThrough;
+                            globalIndexes.isCaretFound = true;
+                        }
+                        if (currentParent.parentElement === range.startContainer) {
+                            globalIndexes.startIndex = charactersWentThrough;
+                            globalIndexes.isStartFound = true;
+                        }
+                        if (currentParent.parentElement === range.endContainer) {
+                            globalIndexes.endIndex = charactersWentThrough;
+                            globalIndexes.isEndFound = true;
+                        }
+                    }
+                }
+            }
+            return charactersWentThrough;
         }
-        return charactersWentThrough;
     }
-}
+
+    return function (element) {
+        const sel = window.getSelection();
+        const gi = {};
+        if (sel.rangeCount === 0) {
+            gi.caretIndex = 0;
+            gi.startIndex = 0;
+            gi.endIndex = 0;
+        } else {
+            getRangeGlobalStartAndEndIndexes(element, true, 0, sel, sel.getRangeAt(0), gi);
+        }
+        return JSON.stringify(gi);
+    }
+})();
 
 //this method goes through every branch of the visual tree starting from the given element and counts the characters until the given indexes are met.
 //It then fills nodesAndOffsets with the nodes and offsets to apply on the range defined in the calling method.
@@ -1008,17 +1004,6 @@ document.getRangeStartAndEnd = function getRangeStartAndEnd(currentParent, isFir
         }
     }
     return charactersWentThrough;
-}
-
-document.getCaretPosition = function getCaretCharacterOffsetWithin(element) {
-    var caretOffset = 0;
-    var sel = window.getSelection();
-    var range = sel.getRangeAt(0);
-    var preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(element);
-    preCaretRange.setEnd(sel.focusNode, sel.focusOffset);
-    caretOffset = preCaretRange.toString().length;
-    return caretOffset;
 }
 
 document.doesElementInheritDisplayNone = function getRangeStartAndEnd(domElement) {

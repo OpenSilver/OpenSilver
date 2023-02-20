@@ -268,30 +268,21 @@ element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
             }
         }
 
-        internal void NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength)
+        internal void NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out int caretIndex)
         {
-            //todo: fix the that happens (at least in chrome) that makes the index returned be 0 when the caret is on the last line when it's empty
-            //what I think happens: the range gives the index of the <br> in the childNodes of _contentEditableDiv which makes it not find the range.startContainer, which is actually _contentEditableDiv.
-            //todo: (probably in the documant.getRangeStartAndEnd and document.getRangeGlobalStartAndEndIndexes methods), fix the bad count of characters in the simulator when copy/pasting a multiline text.
-
             if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 selectionStartIndex = 0;
                 selectionLength = 0;
+                caretIndex = 0;
                 return;
             }
 
             string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
             GlobalIndexes globalIndexes = JsonSerializer.Deserialize<GlobalIndexes>(
-                OpenSilver.Interop.ExecuteJavaScriptString(
-$@"(function(e){{
- var s = window.getSelection();
- var gi = {{}};
- if (s.rangeCount == 0) {{ gi.startIndex = 0; gi.endIndex = 0; }} 
- else {{ document.getRangeGlobalStartAndEndIndexes(e, true, 0, s.getRangeAt(0), gi); }}
- return JSON.stringify(gi);
-}}({sDiv}))"));
+                OpenSilver.Interop.ExecuteJavaScriptString($"document.getTextBoxSelection({sDiv});"));
 
+            caretIndex = globalIndexes.IsCaretFound ? globalIndexes.CaretIndex : 0;
             selectionStartIndex = globalIndexes.IsStartFound ? globalIndexes.StartIndex : 0;
             int selectionLastIndex = globalIndexes.IsEndFound ? globalIndexes.EndIndex : (globalIndexes.IsStartFound ? globalIndexes.StartIndex : 0);
             selectionLength = selectionLastIndex - selectionStartIndex;
@@ -299,11 +290,17 @@ $@"(function(e){{
 
         private struct GlobalIndexes
         {
+            [JsonPropertyName("caretIndex")]
+            public int CaretIndex { get; set; }
+
             [JsonPropertyName("startIndex")]
             public int StartIndex { get; set; }
 
             [JsonPropertyName("endIndex")]
             public int EndIndex { get; set; }
+
+            [JsonPropertyName("isCaretFound")]
+            public bool IsCaretFound { get; set; }
 
             [JsonPropertyName("isStartFound")]
             public bool IsStartFound { get; set; }
@@ -327,18 +324,6 @@ var nodesAndOffsets = {{}}; //this will hold the nodes and offsets useful to set
 document.getRangeStartAndEnd({sDiv}, true, 0, {startIndex.ToInvariantString()}, {endIndex.ToInvariantString()}, nodesAndOffsets, false, false)
 sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset'], nodesAndOffsets['endParent'], nodesAndOffsets['endOffset'])
 ");
-        }
-
-        internal int GetCaretPosition()
-        {
-
-            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                return 0;
-            }
-
-            return OpenSilver.Interop.ExecuteJavaScriptInt32(
-                $"document.getCaretPosition({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv)})");
         }
 
         private object AddContentEditableDomElement(object parentRef, out object domElementWhereToPlaceChildren)

@@ -478,24 +478,22 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                int selectionStartIndex; int selectionLength;
                 if (_textViewHost != null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out selectionStartIndex, out selectionLength);
+                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out _);
                     return Text.Substring(selectionStartIndex, selectionLength);
                 }
 
-                return "";
+                return string.Empty;
             }
             set
             {
-                int selectionStartIndex; int selectionLength;
                 if (_textViewHost != null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out selectionStartIndex, out selectionLength);
-                    string text = this.Text.Substring(0, selectionStartIndex) + value + this.Text.Substring(selectionStartIndex + selectionLength);
+                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out _);
+                    string text = Text.Substring(0, selectionStartIndex) + value + Text.Substring(selectionStartIndex + selectionLength);
                     _selectionIdxCache = selectionStartIndex + value.Length;
-                    this.Text = text;
+                    Text = text;
                     _selectionIdxCache = null;
                 }
             }
@@ -506,10 +504,9 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                int selectionStartIndex; int selectionLength;
                 if (_textViewHost != null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out selectionStartIndex, out selectionLength);
+                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out _, out _);
                     return selectionStartIndex;
                 }
 
@@ -522,10 +519,7 @@ namespace Windows.UI.Xaml.Controls
                     throw new ArgumentOutOfRangeException("SelectionStart cannot be lower than 0");
                 }
 
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_SET_SELECTION(value, value + SelectionLength);
-                }
+                _textViewHost?.View.NEW_SET_SELECTION(value, value + SelectionLength);
             }
         }
 
@@ -533,10 +527,9 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                int selectionStartIndex; int selectionLength;
                 if (_textViewHost != null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out selectionStartIndex, out selectionLength);
+                    _textViewHost.View.NEW_GET_SELECTION(out _, out int selectionLength, out _);
                     return selectionLength;
                 }
 
@@ -549,10 +542,7 @@ namespace Windows.UI.Xaml.Controls
                     throw new ArgumentOutOfRangeException("SelectionLength cannot be lower than 0");
                 }
 
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_SET_SELECTION(SelectionStart, SelectionStart + value);
-                }
+                _textViewHost?.View.NEW_SET_SELECTION(SelectionStart, SelectionStart + value);
             }
         }
 
@@ -562,7 +552,10 @@ namespace Windows.UI.Xaml.Controls
             get
             {
                 if (_textViewHost != null)
-                    return _textViewHost.View.GetCaretPosition();
+                {
+                    _textViewHost.View.NEW_GET_SELECTION(out _, out _, out int caretIndex);
+                    return caretIndex;
+                }
 
                 return 0;
             }
