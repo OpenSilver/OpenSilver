@@ -99,28 +99,8 @@ namespace Windows.UI.Xaml.Controls
             // It is important that the "ContentEditable" div has the same CSS size properties as the outer div, so that the overflow and scrolling work properly:
             if (_contentEditableDiv != null) //this can be true in the case where a template has been defined, in which case we wait for the template to be created before adding the text area.
             {
-                var outerDomStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
                 var contentEditableStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv);
-                if (Host.HorizontalContentAlignment == HorizontalAlignment.Stretch)
-                {
-                    contentEditableStyle.width = "100%";
-                    contentEditableStyle.maxWidth = outerDomStyle.maxWidth;
-                }
-                else //it is top, bottom or center so we don't want to stretch, but we want it to be limited as much as the outerDomElement
-                {
-                    if (double.IsNaN(Width))
-                    {
-                        if (!double.IsNaN(MaxWidth))
-                        {
-                            contentEditableStyle.maxWidth = outerDomStyle.maxWidth;
-                        }//else, neither Width or maxWidth are set so we let it be.
-                    }
-                    else
-                    {
-                        double contentEditableMaxWidth = Math.Max(0, Width - Host.BorderThickness.Left - Host.BorderThickness.Right);
-                        contentEditableStyle.maxWidth = contentEditableMaxWidth.ToInvariantString() + "px";  //note: this might be incorrect as it does not take into consideration any padding, margin, or other elements that happens between outerDomElement and contentEditableDiv.
-                    }
-                }
+                contentEditableStyle.width = Host.TextWrapping == TextWrapping.Wrap ? "100%" : "max-content";
             }
         }
 
@@ -129,27 +109,8 @@ namespace Windows.UI.Xaml.Controls
             // It is important that the "ContentEditable" div has the same CSS size properties as the outer div, so that the overflow and scrolling work properly:
             if (_contentEditableDiv != null) //this can be true in the case where a template has been defined, in which case we wait for the template to be created before adding the text area.
             {
-                var outerDomStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(this);
                 var contentEditableStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv);
-                if (Host.VerticalContentAlignment == VerticalAlignment.Stretch)
-                {
-                    contentEditableStyle.height = "100%";
-                    contentEditableStyle.maxHeight = outerDomStyle.maxHeight;
-                }
-                else
-                {
-                    if (double.IsNaN(Height))
-                    {
-                        if (!double.IsNaN(MaxHeight))
-                        {
-                            contentEditableStyle.maxHeight = outerDomStyle.maxHeight;
-                        }//else, neither Height or maxHeight are set so we let it be.
-                    }
-                    else
-                    {
-                        contentEditableStyle.maxHeight = outerDomStyle.height; //note: this might be incorrect as it does not take into consideration any padding or margin that happens between outerDomElement and contentEditableDiv.
-                    }
-                }
+                contentEditableStyle.height = "max-content";
             }
         }
 
@@ -222,10 +183,16 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
         {
             if (_contentEditableDiv != null)
             {
-                TextBlock.ApplyTextWrapping(
+                ApplyTextWrapping(
                     INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv),
                     textWrapping);
             }
+        }
+
+        private static void ApplyTextWrapping(INTERNAL_HtmlDomStyleReference cssStyle, TextWrapping textWrapping)
+        {
+            TextBlock.ApplyTextWrapping(cssStyle, textWrapping);
+            cssStyle.width = textWrapping == TextWrapping.Wrap ? "100%" : "max-content";
         }
 
         internal void OnMaxLengthChanged(int maxLength)
@@ -381,17 +348,16 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
             var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object contentEditableDiv);
             _contentEditableDiv = contentEditableDiv;
 
-            contentEditableDivStyle.width = "100%";
-            contentEditableDivStyle.height = "100%";
+            contentEditableDivStyle.height = "max-content";
 
             // Apply Host.TextWrapping
-            TextBlock.ApplyTextWrapping(contentEditableDivStyle, Host.TextWrapping);
+            ApplyTextWrapping(contentEditableDivStyle, Host.TextWrapping);
             contentEditableDivStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
             contentEditableDivStyle.background = "solid transparent";
             contentEditableDivStyle.cursor = "text";
 
             // Disable spell check
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "spellcheck", this.Host.IsSpellCheckEnabled);
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "spellcheck", Host.IsSpellCheckEnabled);
 
             // Apply TextAlignment
             UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);
@@ -400,8 +366,8 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "contentEditable", isContentEditable);
             this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
 
-            contentEditableDivStyle.minWidth = "14px";
-            contentEditableDivStyle.minHeight = (Math.Floor(this.Host.FontSize * 1.5 * 1000) / 1000).ToInvariantString() + "px"; // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 decimals at the most. //Note: setting "minHeight" is for FireFox only, because other browsers don't seem to need it. The "1.5" factor is here to ensure that the resulting Height is the same as that of the PasswordBox.
+            contentEditableDivStyle.minWidth = "max(14px, 100%)";
+            contentEditableDivStyle.minHeight = $"max({(Math.Floor(Host.FontSize * 1.5 * 1000) / 1000).ToInvariantString()}px, 100%)";
 
             domElementWhereToPlaceChildren = contentEditableDiv;
 

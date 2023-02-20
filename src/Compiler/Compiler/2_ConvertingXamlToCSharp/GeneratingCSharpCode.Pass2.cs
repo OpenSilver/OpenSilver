@@ -369,7 +369,7 @@ namespace DotNetForHtml5.Compiler
 
                         parameters.StringBuilder.AppendLine(
                             string.Format(
-                                "{1} {0} = {3}.XamlContext_PushScope({4}, {2});",
+                                "{1} {0} = {3}.XamlContext_WriteStartObject({4}, {2});",
                                 elementUniqueNameOrThisKeyword,
                                 elementTypeInCSharp,
                                 SystemTypesHelper.ConvertFromInvariantString(directContent, elementTypeInCSharp.Substring("global::".Length)),
@@ -395,7 +395,7 @@ namespace DotNetForHtml5.Compiler
                         );
 
                         parameters.StringBuilder.AppendLine(
-                            string.Format("var {0} = {2}.XamlContext_PushScope({3}, {1});", 
+                            string.Format("var {0} = {2}.XamlContext_WriteStartObject({3}, {1});", 
                                 elementUniqueNameOrThisKeyword, 
                                 preparedValue,
                                 RuntimeHelperClass,
@@ -418,7 +418,7 @@ namespace DotNetForHtml5.Compiler
 
                         parameters.StringBuilder.AppendLine(
                             string.Format(
-                                "var {0} = {3}.XamlContext_PushScope({4}, (({1})new {2}()).CreateComponent());",
+                                "var {0} = {3}.XamlContext_WriteStartObject({4}, (({1})new {2}()).CreateComponent());",
                                 elementUniqueNameOrThisKeyword,
                                 $"{IXamlComponentFactoryClass}<{elementTypeInCSharp}>",
                                 XamlResourcesHelper.GenerateClassNameFromComponentUri(absoluteSourceUri),
@@ -432,7 +432,7 @@ namespace DotNetForHtml5.Compiler
                         //------------------------------------------------
                         // Add the type constructor:
                         //------------------------------------------------
-                        parameters.StringBuilder.AppendLine(string.Format("var {0} = {2}.XamlContext_PushScope({3}, new {1}());", 
+                        parameters.StringBuilder.AppendLine(string.Format("var {0} = {2}.XamlContext_WriteStartObject({3}, new {1}());", 
                             elementUniqueNameOrThisKeyword, 
                             elementTypeInCSharp,
                             RuntimeHelperClass,
@@ -442,7 +442,7 @@ namespace DotNetForHtml5.Compiler
                 
                 if (!flag)
                 {
-                    parameters.StringBuilder.AppendLine($"_ = {RuntimeHelperClass}.XamlContext_PushScope({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword});");
+                    parameters.StringBuilder.AppendLine($"_ = {RuntimeHelperClass}.XamlContext_WriteStartObject({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword});");
                 }
 
                 // Set templated parent if any
@@ -724,7 +724,7 @@ namespace DotNetForHtml5.Compiler
 
             private void OnWriteEndObject(GeneratorContext parameters)
             {
-                parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_PopScope({parameters.CurrentXamlContext});");
+                parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_WriteEndObject({parameters.CurrentXamlContext});");
             }
 
             private void OnWriteStartMember(GeneratorContext parameters)

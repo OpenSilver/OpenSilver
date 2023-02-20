@@ -304,7 +304,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
-            innerDivStyle.display = "table";
+            innerDivStyle.display = "block";
             innerDivStyle.height = "100%";
             innerDivStyle.width = "100%";
 
@@ -784,7 +784,7 @@ namespace Windows.UI.Xaml.Controls
                 if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
                 {
                     string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                    OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.clientWidth");
+                    return OpenSilver.Interop.ExecuteJavaScriptDouble($"{sDomElement}.clientWidth");
                 }
 
                 return 0.0;

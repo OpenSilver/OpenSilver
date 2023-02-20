@@ -154,7 +154,41 @@ namespace OpenSilver.Internal.Xaml
 
             template.Template = new TemplateContent(xamlContext, factory);
         }
-    
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static T XamlContext_WriteStartObject<T>(XamlContext context, T instance)
+        {
+            Debug.Assert(context != null);
+
+            context.PushScope();
+            context.CurrentInstance = instance;
+
+            // Silverlight does not call BeginInit/EndInit on the root instance of the xaml page.
+            if (context.Depth > 1 && instance is ISupportInitialize init)
+            {
+                init.BeginInit();
+            }
+
+            return instance;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void XamlContext_WriteEndObject(XamlContext context)
+        {
+            Debug.Assert(context != null);
+
+            object currentInstance = context.CurrentInstance;
+
+            // Silverlight does not call BeginInit/EndInit on the root instance of the xaml page.
+            if (context.Depth > 1 && currentInstance is ISupportInitialize init)
+            {
+                init.EndInit();
+            }
+
+            context.PopScope();
+        }
+
+        [Obsolete("Use RuntimeHelpers.XamlContext_WriteStartObject instead.", true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static T XamlContext_PushScope<T>(XamlContext context, T instance)
         {
@@ -166,6 +200,7 @@ namespace OpenSilver.Internal.Xaml
             return instance;
         }
 
+        [Obsolete("Use RuntimeHelpers.XamlContext_WriteEndObject instead.", true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void XamlContext_PopScope(XamlContext context)
         {
@@ -173,7 +208,7 @@ namespace OpenSilver.Internal.Xaml
             
             context.PopScope();
         }
-        
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void XamlContext_SetConnectionId(XamlContext context, int connectionId, object instance)
         {

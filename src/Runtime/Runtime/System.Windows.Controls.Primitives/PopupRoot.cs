@@ -72,23 +72,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
             INTERNAL_LinkedPopup = popup;
 
             // Make sure that after the Loaded event of the PopupRoot, the parent Popup also raises the Loaded event:
-            this.Loaded += PopupRoot_Loaded;
+            Loaded += PopupRoot_Loaded;
         }
 
         private void PopupRoot_Loaded(object sender, RoutedEventArgs e)
         {
-            // Make sure that the Loaded event of the Popup is raised (this is useful if the <Popup> control is never added to the visual tree, such as for tooltips).
-            if (this.INTERNAL_LinkedPopup != null
-                && !this.INTERNAL_LinkedPopup.IsConnectedToLiveTree) // We check that the <Popup> has no visual parent. In fact, if it had a visual parent, it means that it is in the visual tree (for example if the <Popup> was declared in XAML), and therefore the Loaded event has already been called once.
-            {
-                this.INTERNAL_LinkedPopup.RaiseLoadedEvent();
-                this.INTERNAL_LinkedPopup.InvalidateMeasure();
-            }
-            if (INTERNAL_ParentWindow != null && this.IsCustomLayoutRoot)
+            if (INTERNAL_ParentWindow != null && IsCustomLayoutRoot)
             {
                 Rect windowBounds = INTERNAL_ParentWindow.Bounds;
-                this.Measure(new Size(windowBounds.Width, windowBounds.Height));
-                this.Arrange(windowBounds);
+                Measure(new Size(windowBounds.Width, windowBounds.Height));
+                Arrange(windowBounds);
             }
         }
 
@@ -100,24 +93,25 @@ namespace Windows.UI.Xaml.Controls.Primitives
             get { return (UIElement)GetValue(ContentProperty); }
             set { SetValue(ContentProperty, value); }
         }
+
         /// <summary>
         /// Identifies the PopupRoot.Content dependency property.
         /// </summary>
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(UIElement), typeof(PopupRoot), new PropertyMetadata(null, Content_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            DependencyProperty.Register(
+                nameof(Content),
+                typeof(UIElement),
+                typeof(PopupRoot),
+                new PropertyMetadata(null, OnContentChanged));
 
-
-        static void Content_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            UIElement parent = (UIElement)d;
-            UIElement oldChild = (UIElement)e.OldValue;
-            UIElement newChild = (UIElement)e.NewValue;
-
-            INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldChild, parent);
-            parent.RemoveVisualChild(oldChild);
-            parent.AddVisualChild(newChild);
-            INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, parent);
+            PopupRoot popupRoot = (PopupRoot)d;
+            popupRoot.TemplateChild = null;
+            if (popupRoot.IsConnectedToLiveTree)
+            {
+                popupRoot.InvalidateMeasureInternal();
+            }
         }
 
 #if MIGRATION
@@ -191,24 +185,58 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            if (this.Content == null || this.INTERNAL_ParentWindow == null)
-                return availableSize;
-
-            Rect windowBounds = INTERNAL_ParentWindow.Bounds;
-            availableSize = new Size(windowBounds.Width, windowBounds.Height);
-            this.Content.Measure(availableSize);
+            int count = VisualChildrenCount;
+            if (count > 0 && INTERNAL_ParentWindow != null)
+            {
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    Rect windowBounds = INTERNAL_ParentWindow.Bounds;
+                    availableSize = new Size(windowBounds.Width, windowBounds.Height);
+                    child.Measure(availableSize);
+                }
+            }
             return availableSize;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            if (this.Content == null)
-                return finalSize;
-
-            Rect windowBounds = INTERNAL_ParentWindow.Bounds;
-            finalSize = new Size(windowBounds.Width, windowBounds.Height);
-            this.Content.Arrange(new Rect(finalSize));
+            int count = VisualChildrenCount;
+            if (count > 0 && INTERNAL_ParentWindow != null)
+            {
+                UIElement child = GetVisualChild(0);
+                if (child != null)
+                {
+                    Rect windowBounds = INTERNAL_ParentWindow.Bounds;
+                    finalSize = new Size(windowBounds.Width, windowBounds.Height);
+                    child.Arrange(new Rect(finalSize));
+                }
+            }
             return finalSize;
+        }
+
+        internal override FrameworkTemplate TemplateCache
+        {
+            get => DefaultTemplate;
+            set { }
+        }
+
+        internal override FrameworkTemplate TemplateInternal => DefaultTemplate;
+
+        private static UseContentTemplate DefaultTemplate { get; } = new UseContentTemplate();
+
+        private sealed class UseContentTemplate : FrameworkTemplate
+        {
+            public UseContentTemplate()
+            {
+                Seal();
+            }
+
+            internal override bool BuildVisualTree(FrameworkElement container)
+            {
+                container.TemplateChild = ((PopupRoot)container).Content as FrameworkElement;
+                return false;
+            }
         }
     }
 }

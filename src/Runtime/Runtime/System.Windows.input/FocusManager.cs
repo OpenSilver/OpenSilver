@@ -1,4 +1,24 @@
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System;
+using System.Diagnostics;
+
+#if MIGRATION
+using System.Windows.Media;
+#else
+using Windows.UI.Xaml.Media;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Input
@@ -48,6 +68,30 @@ namespace Windows.UI.Xaml.Input
         internal static void SetFocusedElement(DependencyObject scope, UIElement focusedElement)
         {
             scope.SetValue(FocusedElementProperty, focusedElement);
+        }
+
+        internal static bool HasFocus(UIElement uie, bool useLogicalTree = false)
+        {
+            Debug.Assert(uie != null);
+
+            UIElement focused = GetFocusedElement() as UIElement;
+            while (focused != null)
+            {
+                if (focused == uie)
+                {
+                    return true;
+                }
+
+                UIElement parent = VisualTreeHelper.GetParent(focused) as UIElement;
+                if (parent == null && useLogicalTree)
+                {
+                    parent = (focused as FrameworkElement)?.Parent as UIElement;
+                }
+
+                focused = parent;
+            }
+
+            return false;
         }
     }
 }

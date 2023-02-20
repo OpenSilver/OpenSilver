@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,13 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DotNetForHtml5.Core;
+
 #if !MIGRATION
 using Windows.Foundation;
 #endif
-
 
 #if MIGRATION
 namespace System.Windows
@@ -30,19 +25,44 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
-    internal partial class ControlToWatch
+    internal sealed class ControlToWatch
     {
-        internal ControlToWatch(UIElement controlToWatch, Action<Point, Size> OnPositionOrSizeChangedCallback)
+        private readonly UIElement _control;
+        private readonly Action<Point, Size> _callback;
+        private Size _previousSize;
+        private Point _previousPosition;
+
+        internal ControlToWatch(UIElement control, Action<Point, Size> callback)
         {
-            Debug.Assert(controlToWatch != null);
-            Debug.Assert(OnPositionOrSizeChangedCallback != null);
-            ControltoWatch = controlToWatch;
-            OnPositionOrSizeChanged = OnPositionOrSizeChangedCallback;
+            Debug.Assert(control != null);
+            Debug.Assert(callback != null);
+
+            _control = control;
+            _callback = callback;
+
+            Initialize();
         }
 
-        internal UIElement ControltoWatch;
-        internal Size PreviousSize;
-        internal Point PreviousPosition;
-        internal Action<Point, Size> OnPositionOrSizeChanged;
+        internal void InvokeCallback()
+        {
+            Point position = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
+            Size size = _control.GetBoundingClientSize();
+            if (position != _previousPosition || size != _previousSize)
+            {
+                _callback(position, size);
+                _previousPosition = position;
+                _previousSize = size;
+            }
+        }
+
+        private void Initialize()
+        {
+            _previousPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
+            _previousSize = _control switch
+            {
+                FrameworkElement fe => fe.INTERNAL_GetActualWidthAndHeight(),
+                _ => new Size(),
+            };
+        }
     }
 }

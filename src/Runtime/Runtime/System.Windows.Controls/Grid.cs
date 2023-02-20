@@ -377,6 +377,15 @@ namespace Windows.UI.Xaml.Controls
 
         GridFlags m_gridFlags = GridFlags.None;
 
+        [Flags]
+        private enum CellUnitTypes : byte
+        {
+            None = 0x00,
+            Auto = 0x01,
+            Star = 0x02,
+            Pixel = 0x04,
+        };
+
         struct CellCache
         {
             internal UIElement m_child;
@@ -386,20 +395,20 @@ namespace Windows.UI.Xaml.Controls
 
             // Union of the different height unit types across the row
             // definitions within the row span of this cell.
-            internal GridUnitType m_rowHeightTypes;
+            internal CellUnitTypes m_rowHeightTypes;
 
             // Union of the different width unit types across the column
             // definitions within the column span of this cell.
-            internal GridUnitType m_columnWidthTypes;
+            internal CellUnitTypes m_columnWidthTypes;
 
-            internal static bool IsStar(GridUnitType unitTypes)
+            internal static bool IsStar(CellUnitTypes unitTypes)
             {
-                return (unitTypes & GridUnitType.Star) == GridUnitType.Star;
+                return (unitTypes & CellUnitTypes.Star) == CellUnitTypes.Star;
             }
 
-            internal static bool IsAuto(GridUnitType unitTypes)
+            internal static bool IsAuto(CellUnitTypes unitTypes)
             {
-                return (unitTypes & GridUnitType.Auto) == GridUnitType.Auto;
+                return (unitTypes & CellUnitTypes.Auto) == CellUnitTypes.Auto;
             }
         };
 
@@ -541,14 +550,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         // Gets the union of the length types for a given range of definitions.
-        GridUnitType GetLengthTypeForRange(
+        CellUnitTypes GetLengthTypeForRange(
             IEnumerable<IDefinitionBase> definitions,
             int start,
             int count)
         {
             Debug.Assert((count > 0) && ((start + count) <= definitions.Count()));
 
-            GridUnitType unitTypes = GridUnitType.Auto;
+            CellUnitTypes unitTypes = CellUnitTypes.None;
             int index = start + count - 1;
 
             do
@@ -557,13 +566,13 @@ namespace Windows.UI.Xaml.Controls
                 switch (def.GetEffectiveUnitType())
                 {
                     case GridUnitType.Auto:
-                        unitTypes |= GridUnitType.Auto;
+                        unitTypes |= CellUnitTypes.Auto;
                         break;
                     case GridUnitType.Pixel:
-                        unitTypes |= GridUnitType.Pixel;
+                        unitTypes |= CellUnitTypes.Pixel;
                         break;
                     case GridUnitType.Star:
-                        unitTypes |= GridUnitType.Star;
+                        unitTypes |= CellUnitTypes.Star;
                         break;
                 }
             } while (index > 0 && --index >= start);
@@ -1218,8 +1227,8 @@ namespace Windows.UI.Xaml.Controls
         }
         void MeasureCell(
             UIElement child,
-            GridUnitType rowHeightTypes,
-            GridUnitType columnWidthTypes,
+            CellUnitTypes rowHeightTypes,
+            CellUnitTypes columnWidthTypes,
             bool forceRowToInfinity,
             double rowSpacing,
             double columnSpacing)

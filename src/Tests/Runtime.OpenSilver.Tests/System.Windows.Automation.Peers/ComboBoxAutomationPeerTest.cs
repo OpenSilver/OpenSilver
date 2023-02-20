@@ -48,14 +48,16 @@ namespace Windows.UI.Xaml.Automation.Peers.Tests
         [TestMethod]
         public void IExpandCollapseProvider_Expand_Should_Set_IsDropDownOpen_True()
         {
-            var comboBox = new ComboBox();
-            var peer = new ComboBoxAutomationPeer(comboBox);
-            var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
-
-            provider.Should().NotBeNull();
-            comboBox.IsDropDownOpen.Should().BeFalse();
-            provider.Expand();
-            comboBox.IsDropDownOpen.Should().BeTrue();
+            using (var wrapper = new FocusableControlWrapper<ComboBox>(new ComboBox()))
+            {
+                ComboBox comboBox = wrapper.Control;
+                var peer = new ComboBoxAutomationPeer(comboBox);
+                var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
+                provider.Should().NotBeNull();
+                comboBox.IsDropDownOpen.Should().BeFalse();
+                provider.Expand();
+                comboBox.IsDropDownOpen.Should().BeTrue();
+            }
         }
 
         [TestMethod]
@@ -73,28 +75,33 @@ namespace Windows.UI.Xaml.Automation.Peers.Tests
         [TestMethod]
         public void IExpandCollapseProvider_Collapse_Should_Set_IsDropDownOpen_False()
         {
-            var comboBox = new ComboBox
+            using (var wrapper = new FocusableControlWrapper<ComboBox>(new ComboBox()))
             {
-                IsDropDownOpen = true,
+                ComboBox comboBox = wrapper.Control;
+                comboBox.IsDropDownOpen = true;
+                var peer = new ComboBoxAutomationPeer(comboBox);
+                var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
+                provider.Should().NotBeNull();
+                comboBox.IsDropDownOpen.Should().BeTrue();
+                provider.Collapse();
+                comboBox.IsDropDownOpen.Should().BeFalse();
             };
-            var peer = new ComboBoxAutomationPeer(comboBox);
-            var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
-            provider.Should().NotBeNull();
-            comboBox.IsDropDownOpen.Should().BeTrue();
-            provider.Collapse();
-            comboBox.IsDropDownOpen.Should().BeFalse();
+            
         }
 
         [TestMethod]
         public void IExpandCollapseProvider_ExpandCollapseState_Should_Map_To_IsDropDownOpen()
         {
-            var comboBox = new ComboBox();
-            var peer = new ComboBoxAutomationPeer(comboBox);
-            var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
-            provider.Should().NotBeNull();
-            provider.ExpandCollapseState.Should().Be(ExpandCollapseState.Collapsed);
-            comboBox.IsDropDownOpen = true;
-            provider.ExpandCollapseState.Should().Be(ExpandCollapseState.Expanded);
+            using (var wrapper = new FocusableControlWrapper<ComboBox>(new ComboBox()))
+            {
+                ComboBox comboBox = wrapper.Control;
+                var peer = new ComboBoxAutomationPeer(comboBox);
+                var provider = peer.GetPattern(PatternInterface.ExpandCollapse) as IExpandCollapseProvider;
+                provider.Should().NotBeNull();
+                provider.ExpandCollapseState.Should().Be(ExpandCollapseState.Collapsed);
+                comboBox.IsDropDownOpen = true;
+                provider.ExpandCollapseState.Should().Be(ExpandCollapseState.Expanded);
+            }
         }
 
         [TestMethod]

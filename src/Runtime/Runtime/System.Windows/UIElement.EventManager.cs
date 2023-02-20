@@ -19,9 +19,11 @@ using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Input;
+using System.Windows.Controls;
 using System.Windows.Threading;
 #else
 using Windows.System;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 #endif
 
@@ -118,12 +120,14 @@ namespace Windows.UI.Xaml
                     ProcessMouseButtonEvent(
                         jsEventArg,
                         MouseLeftButtonDownEvent,
-                        refreshClickCount: true);
+                        refreshClickCount: true,
+                        closeToolTips: true);
 #else
                     ProcessMouseButtonEvent(
                         jsEventArg,
                         PointerPressedEvent,
-                        refreshClickCount: true);
+                        refreshClickCount: true,
+                        closeToolTips: true);
 #endif
                     break;
 
@@ -132,7 +136,8 @@ namespace Windows.UI.Xaml
                     ProcessMouseButtonEvent(
                         jsEventArg,
                         MouseRightButtonDownEvent,
-                        refreshClickCount: true);
+                        refreshClickCount: true,
+                        closeToolTips: true);
 #endif
                     break;
             }
@@ -155,11 +160,15 @@ namespace Windows.UI.Xaml
 #if MIGRATION
                     ProcessMouseButtonEvent(
                         jsEventArg,
-                        MouseLeftButtonUpEvent);
+                        MouseLeftButtonUpEvent,
+                        refreshClickCount: false,
+                        closeToolTips: false);
 #else
                     ProcessMouseButtonEvent(
                         jsEventArg,
-                        PointerReleasedEvent);
+                        PointerReleasedEvent,
+                        refreshClickCount: false,
+                        closeToolTips: false);
 #endif
                     ProcessOnTapped(jsEventArg);
                     break;
@@ -185,7 +194,8 @@ namespace Windows.UI.Xaml
         private void ProcessMouseButtonEvent(
             object jsEventArg,
             RoutedEvent routedEvent,
-            bool refreshClickCount = false)
+            bool refreshClickCount,
+            bool closeToolTips)
         {
             string eventVariable = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
             string eventType = OpenSilver.Interop.ExecuteJavaScriptString($"{eventVariable}.type", false);
@@ -211,6 +221,11 @@ namespace Windows.UI.Xaml
             {
                 // Fill the position of the pointer and the key modifiers:
                 e.FillEventArgs(this, jsEventArg);
+
+                if (closeToolTips)
+                {
+                    ToolTipService.OnMouseButtonDown(e);
+                }
 
                 // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
                 RaiseEvent(e);
@@ -423,6 +438,8 @@ namespace Windows.UI.Xaml
 
             // Add the key modifier to the eventArgs:
             e.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
+
+            ToolTipService.OnKeyDown(e);
 
             RaiseEvent(e);
 

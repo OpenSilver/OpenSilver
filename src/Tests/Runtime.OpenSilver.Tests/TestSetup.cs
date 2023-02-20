@@ -25,8 +25,10 @@ using System.Threading;
 
 #if MIGRATION
 using System.Windows;
+using System.Windows.Controls;
 #else
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 #endif
 
 namespace Runtime.OpenSilver.Tests
@@ -77,7 +79,7 @@ namespace Runtime.OpenSilver.Tests
                     // document.getElementByIdSafe(\"id1\").getBoundingClientRect().left) + '|' +
                     // (document.getElementByIdSafe(\"id31\").getBoundingClientRect().top -
                     // document.getElementByIdSafe(\"id1\").getBoundingClientRect().top)",108)
-                    else if (Regex.Matches(param, @"document.callScriptSafe\(""\d+"",""\(.+getBoundingClientRect\(\).left - .+.getBoundingClientRect\(\).left\) \+ '\|' \+ \(.+getBoundingClientRect\(\).top - .+.getBoundingClientRect\(\).top\)"",\d+\)").Count == 1)
+                    else if (Regex.Matches(param, @"\(.+getBoundingClientRect\(\).left - .+.getBoundingClientRect\(\).left\) \+ '\|' \+ \(.+getBoundingClientRect\(\).top - .+.getBoundingClientRect\(\).top\)").Count == 1)
                     {
                         return JsonDocument.Parse(@"""0|0""").RootElement;
                     }
@@ -88,7 +90,10 @@ namespace Runtime.OpenSilver.Tests
             INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler;
 
             // Instantiating Application because it sets itself as Application.Current
-            _ = new Application();
+            _ = new Application
+            {
+                RootVisual = new Grid(),
+            };
         }
 
         public static void AttachVisualChild(UIElement element)

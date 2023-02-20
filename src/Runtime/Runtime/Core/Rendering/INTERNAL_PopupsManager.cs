@@ -91,6 +91,7 @@ if (popupRoot) {sWindow}.removeChild(popupRoot);");
 
             popupRoot.INTERNAL_OuterDomElement = popupRoot.INTERNAL_InnerDomElement = null;
             popupRoot.IsConnectedToLiveTree = false;
+            popupRoot.INTERNAL_LinkedPopup = null;
         }
 
         public static IEnumerable GetAllRootUIElements() // IMPORTANT: This is called via reflection from the "Visual Tree Inspector" of the Simulator. If you rename or remove it, be sure to update the Simulator accordingly!
