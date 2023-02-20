@@ -215,6 +215,8 @@ namespace Windows.UI.Xaml.Controls
                 }
 
                 _emptyContent = _contentPresenter.Content as FrameworkElement;
+                //this will prevent overflowing the text beyond
+                _contentPresenter.MaxWidth = this.Width - this.Padding.Right;
             }
 
             _dropDownToggle = GetTemplateChild("DropDownToggle") as ToggleButton;
