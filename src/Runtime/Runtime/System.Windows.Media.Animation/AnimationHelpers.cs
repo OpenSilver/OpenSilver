@@ -71,6 +71,7 @@ queue:""{visualStateGroupName}""
             {
                 var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(callbackForWhenfinished);
                 sb.Append($"options.complete = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsCallback)};");
+                sb.Append($"options.callbackId = {jsCallback.Id};");
             }
 
             if (easingFunction != null)
@@ -91,6 +92,16 @@ queue:""{visualStateGroupName}""
             sb.Append($"}})({sElement});");
 
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(sb.ToString());
+        }
+
+        internal static void StopVelocity(string domElement, string visualStateGroupName)
+        {
+            var id = Convert.ToInt32(OpenSilver.Interop.ExecuteJavaScript(@"document.getActiveAnimationCallbackId($0);", visualStateGroupName));
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"Velocity({domElement}, ""stop"", ""{visualStateGroupName}"");");
+            if (id != -1)
+            {
+                JavascriptCallback.Get(id)?.Dispose();
+            }
         }
 
         internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value)

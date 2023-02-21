@@ -273,7 +273,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                 if (cssEquivalent.DomElement != null)
                                 {
                                     string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
-                                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"Velocity({sDomElement}, ""stop"", ""{specificGroupName}"");");
+                                    AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                                 }
                             }
                         }
@@ -286,7 +286,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             if (equivalent.DomElement != null)
                             {
                                 string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
-                                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"Velocity({sDomElement}, ""stop"", ""{specificGroupName}"");");
+                                AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                             }
                         }
                     }

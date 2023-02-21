@@ -436,7 +436,8 @@ namespace Windows.UI.Xaml.Media.Animation
                             if (cssEquivalent.DomElement != null)
                             {
                                 cssEquivalentExists = true;
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
+                                AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                             }
                         }
                     }
@@ -450,7 +451,8 @@ namespace Windows.UI.Xaml.Media.Animation
                         if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
                         {
                             cssEquivalentExists = true;
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                            string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
+                            AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                         }
                     }
                 }
