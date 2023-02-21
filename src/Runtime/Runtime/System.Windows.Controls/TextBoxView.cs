@@ -490,10 +490,7 @@ element_OutsideEventHandler.addEventListener('paste', function(e) {{
 
         internal string GetText()
         {
-            string text = INTERNAL_HtmlDomManager.GetTextBoxText(INTERNAL_InnerDomElement) ?? string.Empty;
-            // This is the case when the text is changed by backspace or paste.
-            InvalidateMeasure();
-            return text;
+            return INTERNAL_HtmlDomManager.GetTextBoxText(INTERNAL_InnerDomElement) ?? string.Empty;
         }
 
         private void UpdateDomText(string text)

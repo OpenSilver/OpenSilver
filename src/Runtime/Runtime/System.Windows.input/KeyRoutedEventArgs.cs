@@ -59,6 +59,10 @@ namespace Windows.UI.Xaml.Input
             set => HandledImpl = value;
         }
 
+        internal bool Cancellable { get; set; } = true;
+
+        internal bool PreventDefault => Handled && Cancellable;
+
         // Returns:
         //     A system value that indicates the code for the key referenced by the event.
         /// <summary>

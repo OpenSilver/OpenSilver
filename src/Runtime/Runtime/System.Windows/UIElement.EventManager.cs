@@ -443,7 +443,7 @@ namespace Windows.UI.Xaml
 
             RaiseEvent(e);
 
-            if (e.Handled)
+            if (e.PreventDefault)
             {
                 OpenSilver.Interop.ExecuteJavaScriptVoid($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.preventDefault()");
             }

@@ -28,6 +28,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
+using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
 #endif
 
 #if MIGRATION
@@ -662,7 +663,6 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
         }
 
-#if MIGRATION
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Handled)
@@ -670,108 +670,9 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnKeyDown(e);
 
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                // Not implemented for the simulator
-                return;
-            }
-
-            if (this.Text.Contains("\r") || this.Text.Contains("\n"))
-            {
-                // Not implemented for multiple text lines
-                return;
-            }
-
-            switch (e.Key)
-            {
-                case Key.Left:
-                case Key.Right:
-                    if (e.KeyModifiers == ModifierKeys.None)
-                    {
-                        if (SelectionLength > 0)
-                        {
-                            if (e.Key == Key.Left)
-                                Select(SelectionStart, 0);
-                            else
-                                Select(SelectionStart + SelectionLength, 0);
-
-                            e.Handled = true;
-                        }
-                        else
-                        {
-                            if (e.Key == Key.Left && SelectionStart > 0)
-                            {
-                                Select(SelectionStart - 1, 0);
-                                e.Handled = true;
-                            }
-                            else if (e.Key == Key.Right && SelectionStart < Text.Length)
-                            {
-                                Select(SelectionStart + 1, 0);
-                                e.Handled = true;
-                            }
-                        }
-                    }
-                    else if (e.KeyModifiers == ModifierKeys.Shift)
-                    {
-                        int caret = CaretPosition;
-                        int selectionStartWithDirection = SelectionStart;
-                        int selectionEndWithDirection = SelectionStart + SelectionLength;
-
-                        if (caret != selectionEndWithDirection)
-                        {
-                            // Selection direction is backward
-                            int tmp = selectionEndWithDirection;
-                            selectionEndWithDirection = selectionStartWithDirection;
-                            selectionStartWithDirection = tmp;
-                        }
-
-                        if (e.Key == Key.Left && selectionEndWithDirection > 0)
-                        {
-                            selectionEndWithDirection--;
-
-                            Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
-
-                            e.Handled = true;
-                        }
-                        else if (e.Key == Key.Right && selectionEndWithDirection < Text.Length)
-                        {
-                            selectionEndWithDirection++;
-                            Select(selectionStartWithDirection, selectionEndWithDirection - selectionStartWithDirection);
-
-                            e.Handled = true;
-                        }
-                    }
-                    else if (e.KeyModifiers == ModifierKeys.Control)
-                    {
-                        // Not implemented
-                    }
-                    else if (e.KeyModifiers == (ModifierKeys.Control | ModifierKeys.Shift))
-                    {
-                        // Not implemented
-                    }
-                    break;
-
-                case Key.Up:
-                case Key.Down:
-                    // Not implemented
-                    break;
-
-                case Key.Home:
-                case Key.End:
-                    if (_textViewHost != null)
-                    {
-                        int index = e.Key == Key.Home ? 0 : Text.Length;
-                        _textViewHost.View.NEW_GET_SELECTION(out int start, out int length);
-                        if (length > 0 || start != index)
-                        {
-                            _textViewHost.View.NEW_SET_SELECTION(index, index);
-                            e.Handled = true;
-                        }
-                    }
-                    break;
-            }
+            HandleKeyDown(e);
         }
-#endif
+
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
             base.OnTextInput(e);
@@ -800,6 +701,7 @@ namespace Windows.UI.Xaml.Controls
                 _isProcessingInput = true;
                 try
                 {
+                    _textViewHost.View.InvalidateMeasure();
                     SetCurrentValue(TextProperty, _textViewHost.View.GetText());
                 }
                 finally
