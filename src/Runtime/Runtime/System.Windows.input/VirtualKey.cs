@@ -667,9 +667,16 @@ namespace Windows.System
     {
         internal static bool IsUnknownKey(int intValue)
         {
-            if (intValue != 188 && (intValue < 0 || intValue > 165))
+            if (intValue < 0 || intValue > 165)
             {
+#if MIGRATION
                 return true;
+#else
+                if (intValue != 188 && intValue != 190)
+                {
+                    return true;
+                }
+#endif
             }
             HashSet<int> unknownKeys = new HashSet<int>() { 7, 10, 11, 14, 15, 22, 26, 58, 59, 60, 61, 62, 63, 64, 94, 136, 137, 138, 139, 140, 141, 142, 143, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159 };
             if (unknownKeys.Contains(intValue))
