@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSHTML5.Internal;
 
 
 #if MIGRATION
@@ -52,6 +53,16 @@ namespace Windows.UI.Xaml.Controls
         {
             SelectedValue = null;
         }
+
+        public sealed override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            var outerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            var innerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", outerDiv, this);
+            domElementWhereToPlaceChildren = innerDiv;
+            return outerDiv;
+        }
+
+        internal sealed override bool EnablePointerEventsCore => true;
 
         #region SelectedValue
 
