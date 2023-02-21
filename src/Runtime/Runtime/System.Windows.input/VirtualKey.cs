@@ -667,7 +667,7 @@ namespace Windows.System
     {
         internal static bool IsUnknownKey(int intValue)
         {
-            if (intValue != 188 && intValue != 190 && (intValue < 0 || intValue > 165))
+            if (intValue != 188 && (intValue < 0 || intValue > 165))
             {
                 return true;
             }
@@ -677,15 +677,15 @@ namespace Windows.System
                 return true;
             }
             return false;
-      }
+        }
 
 #if MIGRATION
-       internal static Key GetKeyFromKeyCode(int keyCode)
+        internal static Key GetKeyFromKeyCode(int keyCode)
 #else
         internal static VirtualKey GetKeyFromKeyCode(int keyCode)
 #endif
-      {
-            if(keyCode == 59) // The keyCode for the period in Firefox is 59 while it is 190 for IE, Chrome and Edge.
+        {
+            if (keyCode == 59) // The keyCode for the period in Firefox is 59 while it is 190 for IE, Chrome and Edge.
             {
                 keyCode = 190;
             }
