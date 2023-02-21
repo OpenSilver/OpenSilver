@@ -36,174 +36,146 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    /// <summary>
-    /// Represents a service that provides static methods to display a tooltip.
+    /// <summary> 
+    ///     Service class that provides the system implementation for displaying ToolTips.
     /// </summary>
     public static class ToolTipService
     {
+        #region Constants
+
         private const int TOOLTIPSERVICE_betweenShowDelay = 100; // 100 milliseconds
         private const int TOOLTIPSERVICE_initialShowDelay = 400; // 400 milliseconds
         private const int TOOLTIPSERVICE_showDuration = 5000;    // 5000 milliseconds 
 
-        private static readonly DispatcherTimer _openTimer;
-        private static readonly DispatcherTimer _closeTimer;
+        #endregion Constants
+
+        #region Data 
+
         private static ToolTip _currentToolTip;
+        private static DispatcherTimer _closeTimer;
         private static object _lastEnterSource;
         private static DateTime _lastToolTipOpenedTime = DateTime.MinValue;
+        private static DispatcherTimer _openTimer;
         private static UIElement _owner;
         private static FrameworkElement _rootVisual;
 
-        static ToolTipService()
-        {
-            _openTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(TOOLTIPSERVICE_initialShowDelay)
-            };
-            _openTimer.Tick += OpenAutomaticToolTip;
+        #endregion Data 
 
-            _closeTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(TOOLTIPSERVICE_showDuration)
-            };
-            _closeTimer.Tick += CloseAutomaticToolTip;
-        }
+        static readonly DependencyProperty AssignedToolTipProperty =
+            DependencyProperty.Register("AssignedToolTip", typeof(ToolTip), typeof(UIElement), null);
 
-        private static readonly DependencyProperty ToolTipInternalProperty =
-            DependencyProperty.RegisterAttached(
-                "ToolTipInternal",
-                typeof(ToolTip),
-                typeof(ToolTipService),
-                null);
-
-        /// <summary>
-        /// Identifies the ToolTipService.Placement XAML attached property.
-        /// </summary>
+        #region Placement Property
         public static readonly DependencyProperty PlacementProperty =
-            DependencyProperty.RegisterAttached(
-                "Placement",
-                typeof(PlacementMode),
-                typeof(ToolTipService),
-                new PropertyMetadata(PlacementMode.Mouse));
+                        DependencyProperty.RegisterAttached(
+                        "Placement",            // Name 
+                        typeof(PlacementMode),  // Type
+                        typeof(ToolTipService), // Owner 
+                        new PropertyMetadata(PlacementMode.Mouse, OnPlacementPropertyChanged));
 
-        /// <summary>
-        /// Gets the ToolTipService.Placement XAML attached property value for the specified target element.
-        /// </summary>
-        /// <param name="element">
-        /// The target element for the attached property value.
-        /// </param>
-        /// <returns>
-        /// The relative position of the specified tooltip.
-        /// </returns>
         public static PlacementMode GetPlacement(DependencyObject element)
         {
             if (element == null)
             {
-                throw new ArgumentNullException(nameof(element));
+                throw new ArgumentNullException("element");
             }
-
-            return (PlacementMode)element.GetValue(PlacementProperty);
+            return (PlacementMode)element.GetValue(ToolTipService.PlacementProperty);
         }
 
-        /// <summary>
-        /// Sets the ToolTipService.Placement XAML attached property value for the specified target element.
-        /// </summary>
-        /// <param name="element">
-        /// The target element for the attached property value.
-        /// </param>
-        /// <param name="value">
-        /// One of the PlacementMode values, which specifies where the tooltip should appear relative 
-        /// to the control that is the placement target.
-        /// </param>
         public static void SetPlacement(DependencyObject element, PlacementMode value)
         {
             if (element == null)
             {
-                throw new ArgumentNullException(nameof(element));
+                throw new ArgumentNullException("element");
             }
 
-            element.SetValue(PlacementProperty, value);
+            element.SetValue(ToolTipService.PlacementProperty, value);
         }
 
-        /// <summary>
-        /// Identifies the ToolTipService.PlacementTarget XAML attached property.
-        /// </summary>
-        public static readonly DependencyProperty PlacementTargetProperty =
-            DependencyProperty.RegisterAttached(
-                "PlacementTarget",
-                typeof(UIElement),
-                typeof(ToolTipService),
-                new PropertyMetadata((object)null));
+        private static void OnPlacementPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
 
-        /// <summary>
-        /// Gets the visual element that the tooltip is positioned relative to.
-        /// </summary>
-        /// <param name="element">
-        /// The tooltip to retrieve the visual element of.
-        /// </param>
-        /// <returns>
-        /// The visual element that the tooltip is positioned relative to.
-        /// </returns>
+        #endregion Placement Property
+
+        #region Placement Target Property
+        public static readonly DependencyProperty PlacementTargetProperty =
+                        DependencyProperty.RegisterAttached(
+                        "PlacementTarget",      // Name 
+                        typeof(UIElement),      // Type
+                        typeof(ToolTipService), // Owner 
+                        new PropertyMetadata(OnPlacementTargetPropertyChanged));
+
         public static UIElement GetPlacementTarget(DependencyObject element)
         {
-            return (UIElement)element.GetValue(PlacementTargetProperty);
+            if (element == null)
+                throw new ArgumentNullException("element");
+
+            return (UIElement)element.GetValue(ToolTipService.PlacementTargetProperty);
         }
 
-        /// <summary>
-        /// Sets the position of the specified ToolTipService.ToolTip relative to the 
-        /// specified value element.
-        /// </summary>
-        /// <param name="element">
-        /// The tooltip to set the position of.
-        /// </param>
-        /// <param name="value">
-        /// The visual element to set the tooltip for.
-        /// </param>
         public static void SetPlacementTarget(DependencyObject element, UIElement value)
         {
-            element.SetValue(PlacementTargetProperty, value);
+            if (element == null)
+            {
+                throw new ArgumentNullException("element");
+            }
+
+            element.SetValue(ToolTipService.PlacementTargetProperty, value);
         }
 
+        private static void OnPlacementTargetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+
+        #endregion Placement Target Property
+
+        #region ToolTip Property
         /// <summary>
-        /// Identifies the ToolTipService.ToolTip XAML attached property.
+        ///     The DependencyProperty for the ToolTip property. 
         /// </summary>
         public static readonly DependencyProperty ToolTipProperty =
-            DependencyProperty.RegisterAttached(
-                "ToolTip",
-                typeof(object),
-                typeof(ToolTipService),
-                new PropertyMetadata(null, OnToolTipChanged));
+                        DependencyProperty.RegisterAttached(
+                        "ToolTip",              // Name 
+                        typeof(object),         // Type
+                        typeof(ToolTipService), // Owner 
+                        new PropertyMetadata(OnToolTipPropertyChanged));
 
-        /// <summary>
-        /// Gets the value of the ToolTipService.ToolTip XAML attached property for an object.
+        /// <summary> 
+        ///     Gets the value of the ToolTip property on the specified object.
         /// </summary>
-        /// <param name="element">The object from which the property value is read.</param>
-        /// <returns>The object's tooltip content.</returns>
+        /// <param name="element">The object on which to query the ToolTip property.</param> 
+        /// <returns>The value of the ToolTip property.</returns> 
         public static object GetToolTip(DependencyObject element)
         {
             if (element == null)
             {
-                throw new ArgumentNullException(nameof(element));
+                throw new ArgumentNullException("element");
             }
-
-            return element.GetValue(ToolTipProperty);
+            return element.GetValue(ToolTipService.ToolTipProperty);
         }
 
         /// <summary>
-        /// Sets the value of the ToolTipService.ToolTip XAML attached property.
+        ///     Sets the ToolTip property on the specified object. 
         /// </summary>
-        /// <param name="element">The object to set tooltip content on.</param>
-        /// <param name="value">The value to set for tooltip content.</param>
+        /// <param name="element">The object on which to set the ToolTip property.</param>
+        /// <param name="value"> 
+        ///     The value of the ToolTip property. If the value is of type ToolTip, then
+        ///     that is the ToolTip that will be used (without any modification). If the value
+        ///     is of any other type, then that value will be used as the content for a ToolTip 
+        ///     provided by this service, and the other attached properties of this service 
+        ///     will be used to configure the ToolTip.
+        /// </param> 
         public static void SetToolTip(DependencyObject element, object value)
         {
             if (element == null)
             {
-                throw new ArgumentNullException(nameof(element));
+                throw new ArgumentNullException("element");
             }
 
-            element.SetValue(ToolTipProperty, value);
+            element.SetValue(ToolTipService.ToolTipProperty, value);
         }
 
-        private static void OnToolTipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnToolTipPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement owner = (UIElement)d;
 
@@ -212,6 +184,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 UnregisterToolTip(owner);
             }
+
             if (toolTip == null)
             {
                 return;
@@ -221,6 +194,10 @@ namespace Windows.UI.Xaml.Controls
 
             SetRootVisual();
         }
+
+        #endregion ToolTip Property
+
+        #region Internal Properties 
 
         /// <summary>
         /// Place the ToolTip relative to this point 
@@ -235,7 +212,7 @@ namespace Windows.UI.Xaml.Controls
             get
             {
                 SetRootVisual();
-                return _rootVisual;
+                return ToolTipService._rootVisual;
             }
         }
 
@@ -244,12 +221,16 @@ namespace Windows.UI.Xaml.Controls
         /// </summary> 
         internal static ToolTip CurrentToolTip
         {
-            get { return _currentToolTip; }
+            get { return ToolTipService._currentToolTip; }
         }
+
+        #endregion Internal Properties 
+
+        #region Internal Methods
 
         internal static void OnOwnerMouseEnterInternal(object sender, object source)
         {
-            if (_lastEnterSource != null && ReferenceEquals(_lastEnterSource, source))
+            if ((ToolTipService._lastEnterSource != null) && object.ReferenceEquals(ToolTipService._lastEnterSource, source))
             {
                 // ToolTipService had processed this event once before, when it fired on the child
                 // skip it now 
@@ -257,9 +238,9 @@ namespace Windows.UI.Xaml.Controls
             }
 
             UIElement senderElement = (UIElement)sender;
-            if (_currentToolTip != null)
+            if (ToolTipService._currentToolTip != null)
             {
-                if (senderElement.GetValue(ToolTipInternalProperty) != _currentToolTip)
+                if (senderElement.GetValue(AssignedToolTipProperty) != ToolTipService._currentToolTip)
                 {
                     // first close the previous ToolTip if entering nested elements with tooltips 
                     CloseAutomaticToolTip(null, EventArgs.Empty);
@@ -271,15 +252,15 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            _owner = senderElement;
-            _lastEnterSource = source;
+            ToolTipService._owner = senderElement;
+            ToolTipService._lastEnterSource = source;
 
-            Debug.Assert(_currentToolTip == null);
+            Debug.Assert(ToolTipService._currentToolTip == null);
 
             SetRootVisual();
 
-            TimeSpan sinceLastOpen = DateTime.Now - _lastToolTipOpenedTime;
-            if (TimeSpan.Compare(sinceLastOpen, TimeSpan.FromMilliseconds(TOOLTIPSERVICE_betweenShowDelay)) <= 0)
+            TimeSpan sinceLastOpen = DateTime.Now - ToolTipService._lastToolTipOpenedTime;
+            if (TimeSpan.Compare(sinceLastOpen, new TimeSpan(0, 0, 0, 0, TOOLTIPSERVICE_betweenShowDelay)) <= 0)
             {
                 // open the ToolTip immediately 
                 OpenAutomaticToolTip(null, EventArgs.Empty);
@@ -287,22 +268,32 @@ namespace Windows.UI.Xaml.Controls
             else
             {
                 // open the ToolTip after the InitialShowDelay interval expires
-                _openTimer.Start();
+                if (ToolTipService._openTimer == null)
+                {
+                    ToolTipService._openTimer = new DispatcherTimer();
+                    ToolTipService._openTimer.Tick += OpenAutomaticToolTip;
+                }
+                ToolTipService._openTimer.Interval = new TimeSpan(0, 0, 0, 0, TOOLTIPSERVICE_initialShowDelay);
+                ToolTipService._openTimer.Start();
             }
         }
 
         internal static void OnOwnerMouseLeave(object sender, MouseEventArgs e)
         {
-            if (_currentToolTip == null)
+            if (ToolTipService._currentToolTip == null)
             {
                 // ToolTip had not been opened yet 
-                _openTimer.Stop();
-                _owner = null;
-                _lastEnterSource = null;
+                ToolTipService._openTimer.Stop();
+                ToolTipService._owner = null;
+                ToolTipService._lastEnterSource = null;
                 return;
             }
             CloseAutomaticToolTip(null, EventArgs.Empty);
         }
+
+        #endregion Internal Methods 
+
+        #region Private Methods
 
         // This method should be executed on the UI thread 
 #if MIGRATION
@@ -311,77 +302,83 @@ namespace Windows.UI.Xaml.Controls
         private static void CloseAutomaticToolTip(object sender, object e)
 #endif
         {
-            _closeTimer.Stop();
+            ToolTipService._closeTimer.Stop();
 
-            _currentToolTip.IsOpen = false;
-            _currentToolTip = null;
-            _owner = null;
-            _lastEnterSource = null;
+            ToolTipService._currentToolTip.PlacementOverride = null;
+            ToolTipService._currentToolTip.PlacementTargetOverride = null;
+            ToolTipService._currentToolTip.IsOpen = false;
+            ToolTipService._currentToolTip = null;
+            ToolTipService._owner = null;
+            ToolTipService._lastEnterSource = null;
 
             // set last opened timestamp only if the ToolTip is opened by a mouse movement 
-            _lastToolTipOpenedTime = DateTime.Now;
+            ToolTipService._lastToolTipOpenedTime = DateTime.Now;
+
         }
 
         internal static ToolTip ConvertToToolTip(object o)
         {
             ToolTip toolTip = o as ToolTip;
-            if (toolTip == null && o is FrameworkElement fe)
-            {
-                toolTip = fe.Parent as ToolTip;
-            }
+            if (toolTip == null && o is FrameworkElement)
+                toolTip = ((FrameworkElement)o).Parent as ToolTip;
 
-            toolTip ??= new ToolTip { Content = o };
+            if (toolTip == null)
+                toolTip = new ToolTip { Content = o };
 
             return toolTip;
         }
 
-        private static void OnOwnerMouseEnter(object sender, MouseEventArgs e)
-        {
-#if MIGRATION
-            MousePosition = e.GetPosition(null);
-#else
-            MousePosition = e.GetCurrentPoint(null).Position;
-#endif
-
-            OnOwnerMouseEnterInternal(sender, e.OriginalSource);
-        }
-
         private static bool IsSpecialKey(Key key)
         {
-            switch (key)
+            Key[] specialKeys =
             {
 #if MIGRATION
-                case Key.Alt:
+                Key.Alt,
 #else
-                case Key.Menu:
+                Key.Menu,
 #endif
-                case Key.Back:
-                case Key.Delete:
-                case Key.Down:
-                case Key.End:
-                case Key.Home:
-                case Key.Insert:
-                case Key.Left:
-                case Key.PageDown:
-                case Key.PageUp:
-                case Key.Right:
-                case Key.Space:
-                case Key.Up:
-                    return true;
+                Key.Back,
+                Key.Delete,
+                Key.Down,
+                Key.End,
+                Key.Home,
+                Key.Insert,
+                Key.Left,
+                Key.PageDown,
+                Key.PageUp,
+                Key.Right,
+                Key.Space,
+                Key.Up
+            };
 
-                default:
-                    return false;
+            for (int i = 0; i < specialKeys.Length; i++)
+            {
+                if (key == specialKeys[i])
+                {
+                    return true;
+                }
             }
+            return false;
         }
 
-        internal static void OnKeyDown(KeyEventArgs e)
+        private static void OnOwnerKeyDown(object sender, KeyEventArgs e)
         {
-            // close the opened ToolTip or cancel mouse hover 
-            if (_currentToolTip == null)
+            if ((ToolTipService._lastEnterSource != null) && object.ReferenceEquals(ToolTipService._lastEnterSource, e.OriginalSource))
             {
-                _openTimer.Stop();
-                _owner = null;
-                _lastEnterSource = null;
+                return;
+            }
+
+            if (ToolTipService._owner != sender)
+            {
+                return;
+            }
+
+            // close the opened ToolTip or cancel mouse hover 
+            if (ToolTipService._currentToolTip == null)
+            {
+                ToolTipService._openTimer.Stop();
+                ToolTipService._owner = null;
+                ToolTipService._lastEnterSource = null;
                 return;
             }
 
@@ -393,14 +390,35 @@ namespace Windows.UI.Xaml.Controls
             CloseAutomaticToolTip(null, EventArgs.Empty);
         }
 
-        internal static void OnMouseButtonDown(MouseButtonEventArgs e)
+        private static void OnOwnerMouseEnter(object sender, MouseEventArgs e)
         {
-            // close the opened ToolTip or cancel mouse hover
-            if (_currentToolTip == null)
+            // cache mouse position relative to the plug-in
+#if MIGRATION
+            ToolTipService.MousePosition = e.GetPosition(null);
+#else
+            ToolTipService.MousePosition = e.GetCurrentPoint(null).Position;
+#endif
+            OnOwnerMouseEnterInternal(sender, e.OriginalSource);
+        }
+
+        private static void OnOwnerMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if ((ToolTipService._lastEnterSource != null) && object.ReferenceEquals(ToolTipService._lastEnterSource, e.OriginalSource))
             {
-                _openTimer.Stop();
-                _owner = null;
-                _lastEnterSource = null;
+                return;
+            }
+
+            if (ToolTipService._owner != sender)
+            {
+                return;
+            }
+
+            // close the opened ToolTip or cancel mouse hover
+            if (ToolTipService._currentToolTip == null)
+            {
+                ToolTipService._openTimer.Stop();
+                ToolTipService._owner = null;
+                ToolTipService._lastEnterSource = null;
                 return;
             }
 
@@ -410,9 +428,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnRootMouseMove(object sender, MouseEventArgs e)
         {
 #if MIGRATION
-            MousePosition = e.GetPosition(null);
+            ToolTipService.MousePosition = e.GetPosition(null);
 #else
-            MousePosition = e.GetCurrentPoint(null).Position;
+            ToolTipService.MousePosition = e.GetCurrentPoint(null).Position;
 #endif
         }
 
@@ -422,21 +440,37 @@ namespace Windows.UI.Xaml.Controls
         private static void OpenAutomaticToolTip(object sender, object e)
 #endif
         {
-            _openTimer.Stop();
+            ToolTipService._openTimer.Stop();
 
-            Debug.Assert(_owner != null, "ToolTip owner was not set prior to starting the open timer");
+            Debug.Assert(ToolTipService._owner != null, "ToolTip owner was not set prior to starting the open timer");
 
-            _currentToolTip = (ToolTip)_owner.GetValue(ToolTipInternalProperty);
+            ToolTipService._currentToolTip = (ToolTip)ToolTipService._owner.GetValue(AssignedToolTipProperty);
 
-            if (_currentToolTip != null)
+            if (ToolTipService._currentToolTip != null)
             {
-                _currentToolTip.IsOpen = true;
+                ToolTipService._currentToolTip.PlacementOverride = ToolTipService.GetPlacement(_owner);
+                ToolTipService._currentToolTip.PlacementTargetOverride = ToolTipService.GetPlacementTarget(_owner) ?? _owner;
+                ToolTipService._currentToolTip.IsOpen = true;
 
                 // start the timer which closes the ToolTip
-                _closeTimer.Start();
+                if (ToolTipService._closeTimer == null)
+                {
+                    ToolTipService._closeTimer = new DispatcherTimer();
+                    ToolTipService._closeTimer.Tick += CloseAutomaticToolTip;
+                }
+                ToolTipService._closeTimer.Interval = new TimeSpan(0, 0, 0, 0, TOOLTIPSERVICE_showDuration);
+                ToolTipService._closeTimer.Start();
             }
         }
-
+        /*
+        private static void PositiveValueValidation(DependencyObject d, DependencyPropertyChangedEventArgs e) 
+        { 
+            if ((int)e.NewValue <= 0)
+            { 
+                throw new ArgumentException(Resource.ToolTipService_SetTimeoutProperty_InvalidValue, "e");
+            }
+        } 
+		 */
         private static void RegisterToolTip(UIElement owner, object toolTip)
         {
             Debug.Assert(owner != null, "ToolTip must have an owner");
@@ -445,27 +479,31 @@ namespace Windows.UI.Xaml.Controls
 #if MIGRATION
             owner.MouseEnter += new MouseEventHandler(OnOwnerMouseEnter);
             owner.MouseLeave += new MouseEventHandler(OnOwnerMouseLeave);
+            owner.MouseLeftButtonDown += new MouseButtonEventHandler(OnOwnerMouseLeftButtonDown);
 #else
             owner.PointerEntered += new MouseEventHandler(OnOwnerMouseEnter);
             owner.PointerExited += new MouseEventHandler(OnOwnerMouseLeave);
+            owner.PointerPressed += new MouseButtonEventHandler(OnOwnerMouseLeftButtonDown);
 #endif
+
+            owner.KeyDown += new KeyEventHandler(OnOwnerKeyDown);
             var converted = ConvertToToolTip(toolTip);
-            owner.SetValue(ToolTipInternalProperty, converted);
-            converted.SetOwner(owner);
+            owner.SetValue(AssignedToolTipProperty, converted);
+            converted.TooltipParent = owner as FrameworkElement;
         }
 
         private static void SetRootVisual()
         {
-            if (_rootVisual == null && Application.Current != null)
+            if ((ToolTipService._rootVisual == null) && (Application.Current != null))
             {
-                _rootVisual = Application.Current.RootVisual as FrameworkElement;
-                if (_rootVisual != null)
+                ToolTipService._rootVisual = Application.Current.RootVisual as FrameworkElement;
+                if (ToolTipService._rootVisual != null)
                 {
                     // keep caching mouse position because we can't query it from Silverlight 
 #if MIGRATION
-                    _rootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
+                    ToolTipService._rootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
 #else
-                    _rootVisual.PointerMoved += new MouseEventHandler(OnRootMouseMove);
+                    ToolTipService._rootVisual.PointerMoved += new MouseEventHandler(OnRootMouseMove);
 #endif
                 }
             }
@@ -475,7 +513,7 @@ namespace Windows.UI.Xaml.Controls
         {
             Debug.Assert(owner != null, "owner element is required");
 
-            if (owner.GetValue(ToolTipInternalProperty) == null)
+            if (owner.GetValue(AssignedToolTipProperty) == null)
             {
                 return;
             }
@@ -483,36 +521,41 @@ namespace Windows.UI.Xaml.Controls
 #if MIGRATION
             owner.MouseEnter -= new MouseEventHandler(OnOwnerMouseEnter);
             owner.MouseLeave -= new MouseEventHandler(OnOwnerMouseLeave);
+            owner.MouseLeftButtonDown -= new MouseButtonEventHandler(OnOwnerMouseLeftButtonDown);
 #else
             owner.PointerEntered -= new MouseEventHandler(OnOwnerMouseEnter);
             owner.PointerExited -= new MouseEventHandler(OnOwnerMouseLeave);
+            owner.PointerPressed -= new MouseButtonEventHandler(OnOwnerMouseLeftButtonDown);
 #endif
+            owner.KeyDown -= new KeyEventHandler(OnOwnerKeyDown);
 
-            ToolTip toolTip = (ToolTip)owner.GetValue(ToolTipInternalProperty);
-            toolTip.SetOwner(null);
+            ToolTip toolTip = (ToolTip)owner.GetValue(AssignedToolTipProperty);
+            toolTip.TooltipParent = null;
             if (toolTip.IsOpen)
             {
-                if (toolTip == _currentToolTip)
+                if (toolTip == ToolTipService._currentToolTip)
                 {
                     // unregistering a currently open automatic toltip
                     // thus need to stop the timer 
-                    _closeTimer.Stop();
-                    _currentToolTip = null;
-                    _owner = null;
-                    _lastEnterSource = null;
+                    ToolTipService._closeTimer.Stop();
+                    ToolTipService._currentToolTip = null;
+                    ToolTipService._owner = null;
+                    ToolTipService._lastEnterSource = null;
                 }
 
                 toolTip.IsOpen = false;
             }
 
-            owner.ClearValue(ToolTipInternalProperty);
+            owner.ClearValue(AssignedToolTipProperty);
         }
+
+        #endregion  Private Methods       
 
         // Only used by HtmlCanvasElement
         internal static void OpenToolTipAt(ToolTip toolTip, Point position)
         {
             if (_currentToolTip == null)
-            { 
+            {
                 _openTimer.Stop();
 
                 _currentToolTip = toolTip;

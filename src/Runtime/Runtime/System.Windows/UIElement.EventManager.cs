@@ -222,11 +222,6 @@ namespace Windows.UI.Xaml
                 // Fill the position of the pointer and the key modifiers:
                 e.FillEventArgs(this, jsEventArg);
 
-                if (closeToolTips)
-                {
-                    ToolTipService.OnMouseButtonDown(e);
-                }
-
                 // Raise the event (if it was not already marked as "handled" by a child element in the visual tree):
                 RaiseEvent(e);
             }
@@ -438,8 +433,6 @@ namespace Windows.UI.Xaml
 
             // Add the key modifier to the eventArgs:
             e.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
-
-            ToolTipService.OnKeyDown(e);
 
             RaiseEvent(e);
 
