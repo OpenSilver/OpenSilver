@@ -152,11 +152,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 {
                     // We must prevent all the parents of a popup to be closed when:
                     // - this popup is set to StayOpen
-                    // - or the click happend in this popup
+                    // - or the click happened in this popup
 
                     Popup popup = popupRoot.INTERNAL_LinkedPopup;
 
-                    if (popup.StayOpen)
+                    if (popup.StayOpen || ((UIElement)e.OriginalSource)?.INTERNAL_VisualParent == popupRoot)
                     {
                         do
                         {
