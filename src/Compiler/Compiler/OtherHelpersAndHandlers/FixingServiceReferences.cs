@@ -513,6 +513,11 @@ namespace DotNetForHtml5.Compiler
                             trimmedParamName = trimmedParamName.Remove(0, 4).Trim();
                         }
 
+                        if (trimmedParamName.StartsWith("ref "))
+                        {
+                            trimmedParamName = trimmedParamName.Remove(0, 4);
+                        }
+
                         if (trimmedParamName == "null") continue;
 
                         string parameterDefinition = parameterNamesToTheirDefinitions.ContainsKey(trimmedParamName) ?
