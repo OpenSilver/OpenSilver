@@ -54,8 +54,10 @@ namespace TestApplication.OpenSilver.Tests.DragDropTarget
 
             foreach (var selection in selections)
             {
-                if (selection.Item is Item item)
+                if (selection.Item is Item)
                 {
+                    var item = (Item)selection.Item;
+
                     // do not allow drop "1" item.
                     if (item.Name == "1")
                     {

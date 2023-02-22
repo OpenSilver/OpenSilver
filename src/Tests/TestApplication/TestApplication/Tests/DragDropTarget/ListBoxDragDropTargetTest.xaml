@@ -5,8 +5,8 @@
           xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
           xmlns:ia="http://schemas.microsoft.com/expression/2010/interactions"
           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
-    <TabControl>
-        <TabItem Header="Visual Elements">
+    <sdk:TabControl>
+        <sdk:TabItem Header="Visual Elements">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -54,8 +54,8 @@
                     </controlsToolkit:ListBoxDragDropTarget>
                 </Border>
             </Grid>
-        </TabItem>
-        <TabItem Name="DataElementsTab" Header="Data Elements">
+        </sdk:TabItem>
+        <sdk:TabItem Name="DataElementsTab" Header="Data Elements">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -89,6 +89,6 @@
                     </controlsToolkit:ListBoxDragDropTarget>
                 </Border>
             </Grid>
-        </TabItem>
-    </TabControl>
+        </sdk:TabItem>
+    </sdk:TabControl>
 </sdk:Page>
