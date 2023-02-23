@@ -196,6 +196,28 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+
+            if (Pointer.INTERNAL_captured == this)
+            {
+#if MIGRATION
+                ReleaseMouseCapture();
+#else
+                ReleasePointerCapture();
+#endif
+            }
+        }
+
         /// <inheritdoc />
 #if MIGRATION
         protected override void OnLostMouseCapture(MouseEventArgs e)
