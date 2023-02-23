@@ -29,6 +29,7 @@ namespace Windows.UI.Xaml.Media.Animation
 {
     public abstract partial class AnimationTimeline : Timeline
     {
+        private List<JavascriptCallback> _velocityCallbacks;
         internal string _targetName;
         internal PropertyPath _targetProperty;
         internal DependencyObject _propertyContainer;
@@ -117,10 +118,30 @@ namespace Windows.UI.Xaml.Media.Animation
                 {
                     UnApply();
                 }
+                ReleaseCallbacks();
             }
         }
 
         internal virtual void StopAnimation() { }
+
+        internal void RegisterCallback(JavascriptCallback callback)
+        {
+            _velocityCallbacks ??= new List<JavascriptCallback>();
+            _velocityCallbacks.Add(callback);
+        }
+
+        private void ReleaseCallbacks()
+        {
+            if (_velocityCallbacks != null)
+            {
+                foreach (JavascriptCallback callback in _velocityCallbacks)
+                {
+                    callback.Dispose();
+                }
+
+                _velocityCallbacks = null;
+            }
+        }
 
         private void UnApply()
         {

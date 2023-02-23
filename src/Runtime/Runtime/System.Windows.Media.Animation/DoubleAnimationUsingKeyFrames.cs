@@ -310,8 +310,7 @@ namespace Windows.UI.Xaml.Media.Animation
             return new Duration(LargestTimeSpanKeyTime);
         }
 
-
-        static void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
+        private void StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, double? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
         {
             if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
             {
@@ -344,6 +343,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
 
                         AnimationHelpers.CallVelocity(
+                            this,
                             cssEquivalent.DomElement,
                             Duration,
                             easingFunction,

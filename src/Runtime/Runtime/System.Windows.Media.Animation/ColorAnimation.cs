@@ -208,7 +208,7 @@ namespace Windows.UI.Xaml.Media.Animation
             return () => OnAnimationCompleted(parameters, isLastLoop, value, target, propertyPath, callBackGuid);
         }
 
-        static bool TryStartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
+        private bool TryStartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration Duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
         {
             if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
             {
@@ -288,6 +288,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
 
                         AnimationHelpers.CallVelocity(
+                            this,
                             cssEquivalent.DomElement,
                             Duration,
                             easingFunction,

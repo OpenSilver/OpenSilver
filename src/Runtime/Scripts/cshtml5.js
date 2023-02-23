@@ -484,21 +484,6 @@ document._attachEventListeners = function (element, handler, isFocusable) {
     }
 }
 
-document.getActiveAnimationCallbackId = function (groupName) {
-    var result = -1;
-    for (let i = 0; i < Velocity.State.calls.length; i++) {
-        var options = Velocity.State.calls[i];
-        if (options && Array.isArray(options)) {
-            var queue = options[2].queue;
-            if (queue === groupName) {
-                result = options[2].callbackId;
-                return result;
-            }
-        }
-    }
-    return result;
-}
-
 document.eventCallback = function (callbackId, args, sync) {
     const argsArray = args;
     const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;

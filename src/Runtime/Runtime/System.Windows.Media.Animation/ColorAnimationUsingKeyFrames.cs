@@ -263,7 +263,7 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        static bool StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
+        private bool StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
         {
             if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
             {
@@ -343,6 +343,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
 
                         AnimationHelpers.CallVelocity(
+                            this,
                             cssEquivalent.DomElement,
                             duration,
                             easingFunction,
