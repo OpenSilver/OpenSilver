@@ -1,27 +1,20 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation. 
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved. 
 
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-using CSHTML5;
 using System;
+using System.Diagnostics;
+
 #if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
+using System.Windows.Media;
 #else
-using Windows.UI.Input;
+using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -30,139 +23,102 @@ namespace System.Windows.Controls.Primitives
 namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
-    /// <summary>
+    /// <summary> 
     /// Represents a control that can be dragged by the user.
     /// </summary>
-    public sealed partial class Thumb : Control
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StatePressed, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+    public sealed class Thumb : Control
     {
-        #region IsDragging
-        /// <summary>
-        /// Gets whether the Thumb control has logical focus and mouse capture 
-        /// and the left mouse button is pressed. 
-        /// </summary>
-        public bool IsDragging
-        {
-            get { return (bool)GetValue(IsDraggingProperty); }
-            internal set { SetValue(IsDraggingProperty, value); }
-        }
-
         /// <summary> 
-        /// Identifies the IsDragging dependency property. 
-        /// </summary>
-        public static readonly DependencyProperty IsDraggingProperty = DependencyProperty.Register("IsDragging", typeof(bool), typeof(Thumb), new PropertyMetadata(OnIsDraggingPropertyChanged));
-
-        /// <summary> 
-        /// IsDraggingProperty property changed handler.
+        /// Initializes a new instance of the <see cref="Thumb"/> class.
         /// </summary> 
-        /// <param name="d">Thumb that changed IsDragging.</param>
-        /// <param name="e">DependencyPropertyChangedEventArgs.</param>
-        private static void OnIsDraggingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public Thumb()
         {
-            Thumb thumb = d as Thumb;
-            thumb.OnDraggingChanged();
+            DefaultStyleKey = typeof(Thumb);
+            IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
         }
 
         /// <summary>
-        /// This method is invoked when the IsDragging property changes. 
-        /// </summary>
-        private void OnDraggingChanged()
-        {
-            UpdateVisualState(true);
-        }
-
-        #endregion IsDragging
-
-        #region IsFocused 
-        // copy-pasted from Slider.cs
-
-        /// <summary>
-        /// Gets a value that determines whether this element has logical focus.
-        /// </summary> 
-        public bool IsFocused
-        {
-            get { return (bool)GetValue(IsFocusedProperty); }
-            internal set { SetValue(IsFocusedProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the IsFocused dependency property.
-        /// </summary> 
-        public static readonly DependencyProperty IsFocusedProperty = DependencyProperty.Register("IsFocused", typeof(bool), typeof(Thumb), new PropertyMetadata(OnIsFocusedPropertyChanged));
-
-        /// <summary>
-        /// IsFocusedProperty property changed handler. 
-        /// </summary> 
-        /// <param name="d">Thumb that changed IsFocused.</param>
-        /// <param name="e">DependencyPropertyChangedEventArgs.</param> 
-        private static void OnIsFocusedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Thumb t = d as Thumb;
-            if (t.ElementRoot != null)
-            {
-                t.UpdateVisualState(true);
-            }
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            if (Interaction.AllowGotFocus(e))
-            {
-                Interaction.OnGotFocusBase();
-            }
-            // we're not calling base on purpose
-            // SL2 does not fire the GotFocus event on Thumbs
-        }
-
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            if (Interaction.AllowLostFocus(e))
-            {
-                Interaction.OnLostFocusBase();
-            }
-            // we're not calling base on purpose
-            // SL2 does not fire the GotFocus event on Thumbs
-        }
-
-        #endregion IsFocused 
-
-        #region Events
-        /// <summary> 
-        /// Identifies the DragStarted routed event. 
+        /// Occurs when a <see cref="Thumb"/> control receives logical focus and 
+        /// mouse capture.
         /// </summary>
         public event DragStartedEventHandler DragStarted;
 
         /// <summary>
-        /// Identifies the DragDelta routed event. 
-        /// </summary>
+        /// Occurs one or more times as the mouse pointer is moved when a <see cref="Thumb"/>
+        /// control has logical focus and mouse capture.
+        /// </summary> 
         public event DragDeltaEventHandler DragDelta;
 
         /// <summary> 
-        /// Occurs when the Thumb control loses mouse capture.
-        /// </summary> 
-        public event DragCompletedEventHandler DragCompleted;
-        #endregion Events
-
-        #region Visual state management
-        /// <summary>
-        /// Gets or sets the helper that provides all of the standard
-        /// interaction functionality.
+        /// Occurs when the <see cref="Thumb"/> control loses mouse capture.
         /// </summary>
-        private InteractionHelper Interaction { get; set; }
+        public event DragCompletedEventHandler DragCompleted;
 
-        #endregion
-
-        #region Constructor
         /// <summary>
-        /// Initializes a new instance of the Thumb class. 
+        /// Identifies the <see cref="IsDragging"/> dependency property.
         /// </summary> 
-        public Thumb()
+        public static readonly DependencyProperty IsDraggingProperty =
+            DependencyProperty.Register(
+                nameof(IsDragging),
+                typeof(bool),
+                typeof(Thumb),
+                new PropertyMetadata(OnIsDraggingPropertyChanged));
+
+        /// <summary> 
+        /// Gets whether the <see cref="Thumb"/> control has focus and
+        /// mouse capture.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="Thumb"/> control has focus and mouse
+        /// capture; otherwise false. The default is false.
+        /// </returns>
+        public bool IsDragging
         {
-            this.DefaultStyleKey = typeof(Thumb);
-            Interaction = new InteractionHelper(this);
+            get { return (bool)GetValue(IsDraggingProperty); }
+            private set { SetValue(IsDraggingProperty, value); }
+        }
+
+        private static void OnIsDraggingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((Thumb)d).OnDraggingChanged();
+        }
+
+        private void OnDraggingChanged()
+        {
+            UpdateVisualState();
+        }
+
+        /// <summary>
+        /// Gets the identifier for the <see cref="IsFocused"/> dependency property. 
+        /// </summary> 
+        public static readonly DependencyProperty IsFocusedProperty =
+            DependencyProperty.Register(
+                nameof(IsFocused),
+                typeof(bool),
+                typeof(Thumb),
+                null);
+
+        /// <summary>
+        /// Gets whether the thumb has focus.
+        /// </summary> 
+        /// <remarks>
+        /// true to indicate the thumb has focus; otherwise false. The default is false.
+        /// </remarks> 
+        public bool IsFocused
+        {
+            get { return (bool)GetValue(IsFocusedProperty); }
+            private set { SetValue(IsFocusedProperty, value); }
         }
 
         /// <summary> 
-        /// Apply a template to the thumb.
+        /// Builds the visual tree for the <see cref="Thumb"/> control when 
+        /// a new template is applied.
         /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
@@ -171,176 +127,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
         {
             base.OnApplyTemplate();
-
-            // Get the parts 
-            ElementRoot = GetTemplateChild(ElementRootName) as FrameworkElement;
-
-            // Get the states
-            Interaction.OnApplyTemplateBase();
-        }
-        #endregion Constructor
-
-        #region Mouse Handlers 
-        /// <summary>
-        /// Handle the MouseLeftButtonDown event.
-        /// </summary> 
-        /// <param name="e">MouseButtonEventArgs.</param>         
-#if MIGRATION
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs e)
-#endif
-        {
-            if (!IsDragging && Interaction.AllowMouseLeftButtonDown(e))
-            {
-                e.Handled = true;
-
-#if MIGRATION
-                CaptureMouse();
-#else
-                CapturePointer();
-#endif
-                IsDragging = true;
-
-#if MIGRATION
-                _origin = _previousPosition = e.GetPosition((UIElement)this.Parent);
-#else
-                _origin = _previousPosition = e.GetCurrentPoint((UIElement)this.Parent);
-#endif
-                // Raise the DragStarted event
-                bool success = false;
-                try
-                {
-                    DragStartedEventHandler handler = DragStarted;
-                    if (handler != null)
-                    {
-#if MIGRATION
-                        handler(this, new DragStartedEventArgs(_origin.X, _origin.Y));
-#else
-                        handler(this, new DragStartedEventArgs(_origin.Position.X, _origin.Position.Y));
-#endif
-                    }
-                    success = true;
-                }
-                finally
-                {
-                    // Cancel the drag if the DragStarted handler failed
-                    if (!success)
-                    {
-                        CancelDrag();
-                    }
-                    Interaction.OnMouseLeftButtonDownBase();
-                }
-            }
+            UpdateVisualState(false);
         }
 
         /// <summary>
-        /// Handle the MouseLeftButtonUp event. 
-        /// </summary>
-        /// <param name="e">MouseButtonEventArgs.</param>
-#if MIGRATION
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs e)
-#endif
-        {
-            if (IsDragging && Interaction.AllowMouseLeftButtonUp(e))
-            {
-                e.Handled = true;
-                IsDragging = false;
-#if MIGRATION
-                ReleaseMouseCapture();
-#else
-                ReleasePointerCapture();
-#endif
-                RaiseDragCompleted(false);
-
-                Interaction.OnMouseLeftButtonUpBase();
-            }
-        }
-
-        /// <summary> 
-        /// Handle the MouseEnter event. 
-        /// </summary>
-        /// <param name="e">MouseEventArgs.</param> 
-#if MIGRATION
-        protected override void OnMouseEnter(MouseEventArgs e)
-#else
-        protected override void OnPointerEntered(PointerRoutedEventArgs e)
-#endif
-
-        {
-            if (Interaction.AllowMouseEnter(e))
-                Interaction.OnMouseEnterBase();
-        }
-
-        /// <summary> 
-        /// Handle the MouseLeave event.
-        /// </summary>
-        /// <param name="e">MouseEventArgs.</param> 
-#if MIGRATION
-        protected override void OnMouseLeave(MouseEventArgs e)
-#else
-        protected override void OnPointerExited(PointerRoutedEventArgs e)
-#endif
-        {
-            if (Interaction.AllowMouseLeave(e))
-                Interaction.OnMouseLeaveBase();
-        }
-
-        /// <summary> 
-        /// Handle the MouseMove event.
-        /// </summary>
-        /// <param name="e">MouseEventArgs.</param> 
-#if MIGRATION
-        protected override void OnMouseMove(MouseEventArgs e)
-#else
-        protected override void OnPointerMoved(PointerRoutedEventArgs e)
-#endif
-        {
-            if (IsDragging)
-            {
-#if MIGRATION
-                Point position = e.GetPosition((UIElement)this.Parent);
-#else
-                PointerPoint position = e.GetCurrentPoint((UIElement)this.Parent);
-#endif
-                if (position != _previousPosition)
-                {
-                    //                    e.Handled = true; 
-
-                    // Raise the DragDelta event
-                    DragDeltaEventHandler handler = DragDelta;
-                    if (handler != null)
-                    {
-#if MIGRATION
-                        handler(this, new DragDeltaEventArgs(position.X - _previousPosition.X, position.Y - _previousPosition.Y));
-#else
-                        handler(this, new DragDeltaEventArgs(position.Position.X - _previousPosition.Position.X, position.Position.Y - _previousPosition.Position.Y));
-#endif
-                    }
-
-                    _previousPosition = position;
-                }
-            }
-        }
-        #endregion Mouse Handlers
-
-        #region Change State 
-
-        /// <summary>
-        /// Change to the correct visual state for the thumb. 
-        /// </summary> 
-        internal void UpdateVisualState(bool useTransitions)
-        {
-            // all states are managed by the default InteractionHelper
-            Interaction.UpdateVisualStateBase(useTransitions);
-        }
-        #endregion Change State
-
-        #region Drag Cancel/Complete 
-        /// <summary> 
-        /// Cancel a drag operation if it is currently in progress.
+        /// Cancels a drag operation for the <see cref="Thumb"/>.
         /// </summary> 
         public void CancelDrag()
         {
@@ -351,75 +142,275 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+        /// <inheritdoc />
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+            if (e.Handled)
+            {
+                return;
+            }
+
+            if (!IsDragging && IsEnabled)
+            {
+                e.Handled = true;
+
+#if MIGRATION
+                CaptureMouse();
+#else
+                CapturePointer();
+#endif
+                IsDragging = true;
+
+                Debug.Assert(Parent is UIElement);
+
+#if MIGRATION
+                _origin = _previousPosition = e.GetPosition((UIElement)Parent);
+#else
+                _origin = _previousPosition = e.GetCurrentPoint((UIElement)Parent).Position;
+#endif
+
+                // Raise the DragStarted event 
+                bool success = false;
+                try
+                {
+                    DragStarted?.Invoke(this, new DragStartedEventArgs(_origin.X, _origin.Y));
+                    success = true;
+                }
+                finally
+                {
+                    // Cancel the drag if the DragStarted handler failed
+                    if (!success)
+                    {
+                        CancelDrag();
+                    }
+                }
+            }
+        }
+
+        /// <inheritdoc />
+#if MIGRATION
+        protected override void OnLostMouseCapture(MouseEventArgs e)
+#else
+        protected override void OnPointerCaptureLost(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnLostMouseCapture(e);
+#else
+            base.OnPointerCaptureLost(e);
+#endif
+
+            RaiseDragCompleted(false);
+            IsDragging = false;
+        }
+
+        /// <inheritdoc />
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
+
+            if (IsEnabled)
+            {
+                _isMouseOver = true;
+                UpdateVisualState();
+            }
+        }
+
+        /// <inheritdoc />
+#if MIGRATION
+        protected override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected override void OnPointerExited(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
+
+            if (IsEnabled)
+            {
+                _isMouseOver = false;
+                UpdateVisualState();
+            }
+        }
+
+        /// <inheritdoc />
+#if MIGRATION
+        protected override void OnMouseMove(MouseEventArgs e)
+#else
+        protected override void OnPointerMoved(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseMove(e);
+#else
+            base.OnPointerMoved(e);
+#endif
+
+            if (IsDragging)
+            {
+                Debug.Assert(Parent is UIElement);
+
+#if MIGRATION
+                Point position = e.GetPosition((UIElement)Parent);
+#else
+                Point position = e.GetCurrentPoint((UIElement)Parent).Position;
+#endif
+
+                if (position != _previousPosition)
+                {
+                    // Raise the DragDelta event 
+                    DragDelta?.Invoke(this, new DragDeltaEventArgs(position.X - _previousPosition.X, position.Y - _previousPosition.Y));
+
+                    _previousPosition = position;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+            FocusChanged(HasFocus());
+        }
+
+        /// <inheritdoc />
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            FocusChanged(HasFocus());
+        }
+
+        /// <inheritdoc />
+        protected override AutomationPeer OnCreateAutomationPeer()
+        {
+            return new ThumbAutomationPeer(this);
+        }
+
+        private void FocusChanged(bool hasFocus)
+        {
+            IsFocused = hasFocus;
+            UpdateVisualState();
+        }
+
+        /// <summary> 
+        /// Change to the correct visual state for the thumb.
+        /// </summary>
+        internal void UpdateVisualState()
+        {
+            UpdateVisualState(true);
+        }
+
+        /// <summary>
+        /// Change to the correct visual state for the thumb. 
+        /// </summary>
+        /// <param name="useTransitions">
+        /// true to use transitions when updating the visual state, false to 
+        /// snap directly to the new visual state.
+        /// </param>
+        internal void UpdateVisualState(bool useTransitions)
+        {
+            if (!IsEnabled)
+            {
+                GoToState(useTransitions, VisualStates.StateDisabled);
+            }
+            else if (IsDragging)
+            {
+                GoToState(useTransitions, VisualStates.StatePressed);
+            }
+            else if (_isMouseOver)
+            {
+                GoToState(useTransitions, VisualStates.StateMouseOver);
+            }
+            else
+            {
+                GoToState(useTransitions, VisualStates.StateNormal);
+            }
+
+            if (IsFocused && IsEnabled)
+            {
+                GoToState(useTransitions, VisualStates.StateFocused);
+            }
+            else
+            {
+                GoToState(useTransitions, VisualStates.StateUnfocused);
+            }
+        }
+
+        internal bool GoToState(bool useTransitions, string stateName)
+        {
+            Debug.Assert(stateName != null);
+            return VisualStateManager.GoToState(this, stateName, useTransitions);
+        }
+
+        private bool HasFocus()
+        {
+            for (DependencyObject doh = FocusManager.GetFocusedElement() as DependencyObject;
+                doh != null;
+                doh = VisualTreeHelper.GetParent(doh))
+            {
+                if (ReferenceEquals(doh, this))
+                    return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Raise the DragCompleted event.
         /// </summary> 
-        /// <param name="canceled">
+        /// <param name="canceled"> 
         /// A Boolean value that indicates whether the drag operation was
         /// canceled by a call to the CancelDrag method. 
-        /// </param> 
+        /// </param>
         private void RaiseDragCompleted(bool canceled)
         {
-            DragCompletedEventHandler handler = DragCompleted;
-            if (handler != null)
+            DragCompleted?.Invoke(this, new DragCompletedEventArgs(
+                _previousPosition.X - _origin.X,
+                _previousPosition.Y - _origin.Y,
+                canceled));
+        }
+
+        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (!IsEnabled)
             {
-#if MIGRATION
-                DragCompletedEventArgs args = new DragCompletedEventArgs(
-                    _previousPosition.X - _origin.X,
-                    _previousPosition.Y - _origin.Y,
-                    canceled);
-#else
-                DragCompletedEventArgs args = new DragCompletedEventArgs(
-                    _previousPosition.Position.X - _origin.Position.X,
-                    _previousPosition.Position.Y - _origin.Position.Y,
-                    canceled);
-#endif
-                handler(this, args);
+                _isMouseOver = false;
             }
-        }
-        #endregion Drag Cancel/Complete
-
-        protected override AutomationPeer OnCreateAutomationPeer()
-        {
-            throw new NotImplementedException();
+            UpdateVisualState();
         }
 
-        #region Template Parts
         /// <summary>
-        /// Root of the thumb template. 
-        /// </summary> 
-        internal FrameworkElement ElementRoot { get; set; }
-        internal const string ElementRootName = "RootElement";
-        #endregion Template Parts 
+        /// Whether the mouse is currently over the control 
+        /// </summary>
+        private bool _isMouseOver;
 
-        #region Member Variables 
-        /// <summary>
-        /// Whether the mouse is currently over the control
-        /// </summary> 
-        internal bool IsMouseOver
-        {
-            get { return Interaction.IsMouseOver; }
-        }
+        /// <summary> 
+        /// Origin of the thumb's drag operation.
+        /// </summary>
+        private Point _origin;
 
-#if MIGRATION
-        /// <summary>
-        /// Origin of the thumb's drag operation. 
-        /// </summary> 
-        internal Point _origin;
         /// <summary> 
         /// Last position of the thumb while during a drag operation.
-        /// </summary>
-        internal Point _previousPosition;
-#else
-        /// <summary>
-        /// Origin of the thumb's drag operation. 
         /// </summary> 
-        internal PointerPoint _origin;
-        /// <summary> 
-        /// Last position of the thumb while during a drag operation.
-        /// </summary>
-        internal PointerPoint _previousPosition;
-#endif
-        #endregion Member Variables
+        private Point _previousPosition;
     }
 }
