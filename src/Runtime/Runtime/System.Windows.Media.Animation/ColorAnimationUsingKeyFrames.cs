@@ -263,7 +263,7 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        static bool StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
+        private bool StartAnimation(DependencyObject target, CSSEquivalent cssEquivalent, Color? from, object to, Duration duration, EasingFunctionBase easingFunction, string visualStateGroupName, DependencyProperty dependencyProperty, Action callbackForWhenfinished = null)
         {
             if (cssEquivalent.Name != null && cssEquivalent.Name.Count != 0)
             {
@@ -343,6 +343,7 @@ namespace Windows.UI.Xaml.Media.Animation
                         }
 
                         AnimationHelpers.CallVelocity(
+                            this,
                             cssEquivalent.DomElement,
                             duration,
                             easingFunction,
@@ -436,7 +437,8 @@ namespace Windows.UI.Xaml.Media.Animation
                             if (cssEquivalent.DomElement != null)
                             {
                                 cssEquivalentExists = true;
-                                CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", cssEquivalent.DomElement, specificGroupName);
+                                string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(cssEquivalent.DomElement);
+                                AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                             }
                         }
                     }
@@ -450,7 +452,8 @@ namespace Windows.UI.Xaml.Media.Animation
                         if (equivalent.DomElement != null && equivalent.CallbackMethod == null)
                         {
                             cssEquivalentExists = true;
-                            CSHTML5.Interop.ExecuteJavaScriptAsync(@"Velocity($0, ""stop"", $1);", equivalent.DomElement, specificGroupName);
+                            string sDomElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(equivalent.DomElement);
+                            AnimationHelpers.StopVelocity(sDomElement, specificGroupName);
                         }
                     }
                 }

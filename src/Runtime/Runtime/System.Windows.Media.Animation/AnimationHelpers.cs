@@ -37,6 +37,7 @@ namespace Windows.UI.Xaml.Media.Animation
     internal static class AnimationHelpers
     {
         internal static void CallVelocity(
+            AnimationTimeline animation,
             object domElement,
             Duration Duration,
             EasingFunctionBase easingFunction,
@@ -69,8 +70,9 @@ queue:""{visualStateGroupName}""
 
             if (callbackForWhenfinished != null)
             {
-                var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(callbackForWhenfinished);
+                var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(callbackForWhenfinished);                
                 sb.Append($"options.complete = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsCallback)};");
+                animation.RegisterCallback(jsCallback);
             }
 
             if (easingFunction != null)
@@ -91,6 +93,11 @@ queue:""{visualStateGroupName}""
             sb.Append($"}})({sElement});");
 
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(sb.ToString());
+        }
+
+        internal static void StopVelocity(string domElement, string visualStateGroupName)
+        {
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"Velocity({domElement}, ""stop"", ""{visualStateGroupName}"");");
         }
 
         internal static void ApplyValue(DependencyObject target, PropertyPath propertyPath, object value)
