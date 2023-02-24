@@ -113,7 +113,6 @@ namespace Windows.UI.Xaml
         public string Title { get; set; }
         #endregion
 
-        internal PositionsWatcher INTERNAL_PositionsWatcher = new PositionsWatcher(); //Note: this is to handle the changes of position of elements (for example for when we want a popup to stick to a given UIElement - see Popup.PlacementTarget).
         internal object INTERNAL_RootDomElement;
 
         /// <summary>

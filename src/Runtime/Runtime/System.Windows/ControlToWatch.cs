@@ -28,11 +28,13 @@ namespace Windows.UI.Xaml
     internal sealed class ControlToWatch
     {
         private readonly UIElement _control;
-        private readonly Action<Point, Size> _callback;
-        private Size _previousSize;
-        private Point _previousPosition;
+        private readonly Action<ControlToWatch> _callback;
+        private Rect _bounds;
 
-        internal ControlToWatch(UIElement control, Action<Point, Size> callback)
+        internal UIElement Control => _control;
+        internal Rect Bounds => _bounds;
+
+        internal ControlToWatch(UIElement control, Action<ControlToWatch> callback)
         {
             Debug.Assert(control != null);
             Debug.Assert(callback != null);
@@ -47,22 +49,24 @@ namespace Windows.UI.Xaml
         {
             Point position = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
             Size size = _control.GetBoundingClientSize();
-            if (position != _previousPosition || size != _previousSize)
+            Rect bounds = new(position, size);
+            if (_bounds != bounds)
             {
-                _callback(position, size);
-                _previousPosition = position;
-                _previousSize = size;
+                _bounds = bounds;
+                _callback(this);
             }
         }
 
         private void Initialize()
         {
-            _previousPosition = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
-            _previousSize = _control switch
+            Point position = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(_control);
+            Size size = _control switch
             {
                 FrameworkElement fe => fe.INTERNAL_GetActualWidthAndHeight(),
                 _ => new Size(),
             };
+
+            _bounds = new Rect(position, size);
         }
     }
 }

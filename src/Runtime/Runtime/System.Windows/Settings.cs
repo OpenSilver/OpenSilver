@@ -22,10 +22,12 @@ using OpenSilver.Internal;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 #endif
 
 namespace System
@@ -152,8 +154,8 @@ namespace System
         /// </summary>
         public TimeSpan PopupMoveDelay
         {
-            get { return Window.Current.INTERNAL_PositionsWatcher.Interval; }
-            set { Window.Current.INTERNAL_PositionsWatcher.Interval = value; }
+            get { return PopupService.PositionsWatcher.Interval; }
+            set { PopupService.PositionsWatcher.Interval = value; }
         }
 
         /// <summary>

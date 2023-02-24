@@ -103,36 +103,17 @@ namespace Windows.UI.Xaml.Controls
                     };
 
                     _parentPopup.DataContext = _owner?.DataContext;
-
-                    _parentPopup.Opened += new EventHandler(OnParentPopupOpened);
                 }
 
-                PlacementMode placement = EffectivePlacement;
-                if (placement == PlacementMode.Mouse)
-                {
-                    Point position = ToolTipService.MousePosition;
-                    position.X = Math.Max(position.X + HorizontalOffset, 0.0) + 10.0;
-                    position.Y = Math.Max(position.Y + VerticalOffset, 0.0) + 10.0;
-
-                    _parentPopup.HorizontalOffset = position.X;
-                    _parentPopup.VerticalOffset = position.Y;
-                }
-                else
-                {
-                    _parentPopup.HorizontalOffset = HorizontalOffset;
-                    _parentPopup.VerticalOffset = VerticalOffset;
-                    _parentPopup.Placement = placement;
-                    _parentPopup.PlacementTarget = EffectivePlacementTarget;
-                }
-
+                _parentPopup.HorizontalOffset = HorizontalOffset;
+                _parentPopup.VerticalOffset = VerticalOffset;
+                _parentPopup.Placement = EffectivePlacement;
+                _parentPopup.PlacementTarget = EffectivePlacementTarget;
                 _parentPopup.IsOpen = true;
 
                 VisualStateManager.GoToState(this, VisualStates.StateToolTipOpen, true);
 
-                if (Opened != null)
-                {
-                    Opened(this, new RoutedEventArgs { OriginalSource = this });
-                }
+                Opened?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
             }
             else
             {
@@ -141,10 +122,7 @@ namespace Windows.UI.Xaml.Controls
                     VisualStateManager.GoToState(this, VisualStates.StateToolTipClosed, true);
                     _parentPopup.IsOpen = false;
 
-                    if (Closed != null)
-                    {
-                        Closed(this, new RoutedEventArgs { OriginalSource = this });
-                    }
+                    Closed?.Invoke(this, new RoutedEventArgs { OriginalSource = this });
                 }
             }
         }
@@ -174,14 +152,6 @@ namespace Windows.UI.Xaml.Controls
             if (_parentPopup != null)
             {
                 _parentPopup.DataContext = e.NewValue;
-            }
-        }
-
-        private void OnParentPopupOpened(object sender, EventArgs e)
-        {
-            if (EffectivePlacement == PlacementMode.Mouse)
-            {
-                INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds((Popup)sender);
             }
         }
 

@@ -55,16 +55,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
         // Note: we use a ContentPresenter because we need a container that does not force its child
         // to be a logical child (since Popup.Child is already a logical child of the Popup).
         private NonLogicalContainer _outerBorder; // Used for positioning and alignment.
-
-        private Point _referencePosition = new Point(); // This is the (X,Y) position of the reference point defined in the "Note for proper placement of the popup" above.
-
-        private ControlToWatch _controlToWatch; //Note: this is set when the popup is attached to an UIElement, so that we can remove it from the timer for refreshing the position of the popup when needed.
-
-        internal event EventHandler INTERNAL_PopupMoved;
+        private ControlToWatch _controlToWatch;
 
         internal Popup ParentPopup { get; private set; }
 
         internal PopupRoot PopupRoot => _popupRoot;
+
+        public Popup()
+        {
+            PopupService.SetRootVisual();
+        }
 
         /// <summary>
         /// Occurs when the <see cref="IsOpen"/> property changes to true.
@@ -100,7 +100,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 new PropertyMetadata((object)null));
 
         /// <summary>
-        /// Gets or sets the position of the Popup relative to the UIElement it is attached to. NOTE: The only currently supported positions are Right and Bottom.
+        /// Gets or sets the position of the Popup relative to the UIElement it is attached to.
         /// </summary>
         public PlacementMode Placement
         {
@@ -116,7 +116,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(Placement), 
                 typeof(PlacementMode), 
                 typeof(Popup),
-                new FrameworkPropertyMetadata(PlacementMode.Right, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
+                new PropertyMetadata(PlacementMode.Right, OnPlacementChanged));
+
+        private static void OnPlacementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((Popup)d).Reposition();
+        }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage)]
@@ -212,6 +217,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 popup._outerBorder.Content = newContent;
             }
+
+            popup.Reposition();
         }
 
         //-----------------------
@@ -242,40 +249,24 @@ namespace Windows.UI.Xaml.Controls.Primitives
             var popup = (Popup)d;
             bool isOpen = (bool)e.NewValue;
 
-            UIElement targetElement = popup.PlacementTarget;
-            if (targetElement == null || INTERNAL_VisualTreeManager.IsElementInVisualTree(targetElement))
+            if (isOpen)
             {
-                if (isOpen)
+                popup.ShowPopupRootIfNotAlreadyVisible();
+                popup.OnOpened();
+
+                // The popup can be closed during during the Opened event
+                if (popup.IsOpen)
                 {
-                    if (targetElement != null)
-                    {
-                        popup._controlToWatch = Window.Current.INTERNAL_PositionsWatcher.AddControlToWatch(
-                            targetElement, popup.RefreshPopupPosition);
-                    }
-
-                    popup.ShowPopupRootIfNotAlreadyVisible();
-                    popup.OnOpened();
-
-                    // The popup can be closed during during the Opened event
-                    if (popup.IsOpen)
-                    {
-                        popup.Unloaded += new RoutedEventHandler(CloseOnUnloaded);
-                        popup.IsVisibleChanged += new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);
-                    }
+                    popup.Unloaded += new RoutedEventHandler(CloseOnUnloaded);
+                    popup.IsVisibleChanged += new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);
                 }
-                else
-                {
-                    if (targetElement != null)
-                    {
-                        Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(popup._controlToWatch);
-                        popup._controlToWatch = null;
-                    }
-
-                    popup.OnClosed();
-                    popup.HidePopupRootIfVisible();
-                    popup.Unloaded -= new RoutedEventHandler(CloseOnUnloaded);
-                    popup.IsVisibleChanged -= new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);
-                }
+            }
+            else
+            {
+                popup.OnClosed();
+                popup.HidePopupRootIfVisible();
+                popup.Unloaded -= new RoutedEventHandler(CloseOnUnloaded);
+                popup.IsVisibleChanged -= new DependencyPropertyChangedEventHandler(OnIsVisibleChanged);
             }
         }
 
@@ -291,57 +282,13 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 if (isVisible)
                 {
                     popupRoot.Visibility = Visibility.Visible;
-                    popup._controlToWatch?.InvokeCallback();
+                    popup.Reposition();
                 }
                 else
                 {
                     popupRoot.Visibility = Visibility.Collapsed;
                 }
             }
-        }
-
-        private void RefreshPopupPosition(Point placementTargetPosition, Size placementTargetSize)
-        {
-            //we check if there is a placementTarget, if yes, if it is no longer in the visual tree, we remove it from the PositionsWatcher:
-            if (PlacementTarget != null && !INTERNAL_VisualTreeManager.IsElementInVisualTree(PlacementTarget))
-            {
-                Window.Current.INTERNAL_PositionsWatcher.RemoveControlToWatch(_controlToWatch);
-                _controlToWatch = null;
-                HidePopupRootIfVisible();
-            }
-            else if (PlacementTarget != null)
-            {
-                _referencePosition = GetOffsetToPlacementTarget(placementTargetPosition, placementTargetSize);
-                RepositionPopup(HorizontalOffset, VerticalOffset);
-
-                if (StaysWithinScreenBounds)
-                {
-                    INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this);
-                }
-            }
-
-            // Raise the internal "PopupMoved" event, which is useful for example to hide the validation popups of TextBoxes in case the user scrolls and the TextBox is no longer visible on screen (cf. ZenDesk 628):
-            if (INTERNAL_PopupMoved != null)
-                INTERNAL_PopupMoved(this, new EventArgs());
-        }
-
-        private Point GetOffsetToPlacementTarget(Point targetPosition, Size targetSize)
-        {
-            switch (Placement)
-            {
-                case PlacementMode.Bottom:
-                    targetPosition.Y += targetSize.Height;
-                    break;
-                case PlacementMode.Mouse: // Not implemented
-                case PlacementMode.Left: // Not implemented
-                case PlacementMode.Top: // Not implemented
-                case PlacementMode.Right:
-                default:
-                    targetPosition.X += targetSize.Width;
-                    break;
-            }
-
-            return targetPosition;
         }
 
         //-----------------------
@@ -365,13 +312,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(HorizontalOffset), 
                 typeof(double), 
                 typeof(Popup),
-                new PropertyMetadata(0d, OnHorizontalOffsetChanged));
-
-        private static void OnHorizontalOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var popup = (Popup)d;
-            popup.RepositionPopup((double)e.NewValue, popup.VerticalOffset); //todo: the first parameter might need to be changed to a popup._relativePosition which takes into consideration the Placement, PlacementTarget and whether the Popup is in the Visual Tree.
-        }
+                new PropertyMetadata(0d, OnOffsetChanged));
 
         //-----------------------
         // VERTICALOFFSET
@@ -394,38 +335,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(VerticalOffset), 
                 typeof(double), 
                 typeof(Popup),
-                new PropertyMetadata(0d, OnVerticalOffsetChanged));
+                new PropertyMetadata(0d, OnOffsetChanged));
 
-        private static void OnVerticalOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var popup = (Popup)d;
-            popup.RepositionPopup(popup.HorizontalOffset, (double)e.NewValue);
-        }
-
-        private void RepositionPopup(double horizontalOffset, double verticalOffset)
-        {
-            if (_outerBorder != null)
-            {
-                _outerBorder.Margin = new Thickness(
-                    _referencePosition.X + horizontalOffset + _positionFixing.X,
-                    _referencePosition.Y + verticalOffset + _positionFixing.Y,
-                    0d,
-                    0d);
-            }
-        }
-
-        private Point _positionFixing = new Point();
-        /// <summary>
-        /// Use this for temporary changes in position of the Popup (for example, when scrolling)
-        /// </summary>
-        internal Point PositionFixing
-        {
-            get { return _positionFixing; }
-            set
-            {
-                _positionFixing = value;
-                RepositionPopup(HorizontalOffset, VerticalOffset);
-            }
+            ((Popup)d).Reposition();
         }
 
         //-----------------------
@@ -511,7 +425,164 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 typeof(Popup), 
                 new PropertyMetadata(false));
 
-#endregion
+        #endregion
+
+        /// <summary>
+        /// Reposition the Popup
+        /// </summary>
+        internal void Reposition()
+        {
+            if (IsOpen)
+            {
+                UpdatePosition();
+            }
+        }
+
+        private void UpdatePosition()
+        {
+            if (_popupRoot == null || _outerBorder == null)
+                return;
+
+            if (PlacementTarget is FrameworkElement target && INTERNAL_VisualTreeManager.IsElementInVisualTree(target))
+            {
+                Rect targetBounds = new Rect(0, 0, 0, 0);
+                if (Placement != PlacementMode.Mouse)
+                {
+                    try
+                    {
+                        targetBounds = target
+                            .TransformToVisual(null)
+                            .TransformBounds(new Rect(0, 0, target.ActualWidth, target.ActualHeight));
+                    }
+                    catch { }
+                }
+
+                PerformPlacement(targetBounds);
+            }
+            else
+            {
+                Point point;
+                if (Placement == PlacementMode.Mouse)
+                {
+                    point = PopupService.MousePosition;
+                }
+                else if (VisualTreeHelper.GetParent(this) != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+                {
+                    point = TransformToVisual(null).Transform(new Point(0, 0));
+                }
+                else
+                {
+                    point = new Point(0, 0);
+                }
+
+                SetContainerPosition(point.X + HorizontalOffset, point.Y + VerticalOffset);
+            }
+        }
+
+        private void PerformPlacement(Rect targetBounds)
+        {
+            if (_popupRoot == null || _outerBorder == null)
+                return;
+
+            var mode = Placement;
+            var root = Application.Current.Host.Content;
+            if (root == null)
+                return;
+            if (Child is not FrameworkElement child)
+                return;
+
+            var bounds = new Point(root.ActualWidth, root.ActualHeight);
+            var childSize = new Size(child.ActualWidth, child.ActualHeight);
+
+            Point point = mode == PlacementMode.Mouse ?
+                PopupService.MousePosition :
+                new Point(targetBounds.Left, targetBounds.Top);
+
+            switch (mode)
+            {
+                case PlacementMode.Top:
+                    point.Y = targetBounds.Top - childSize.Height;
+                    break;
+                case PlacementMode.Bottom:
+                    point.Y = targetBounds.Bottom;
+                    break;
+                case PlacementMode.Left:
+                    point.X = targetBounds.Left - childSize.Width;
+                    break;
+                case PlacementMode.Right:
+                    point.X = targetBounds.Right;
+                    break;
+                case PlacementMode.Mouse:
+                    point.Y += 11.0;
+                    break;
+                default:
+                    throw new NotSupportedException($"PlacementMode '{mode}' is not supported");
+            }
+
+            if ((point.Y + childSize.Height) > bounds.Y)
+            {
+                if (mode == PlacementMode.Bottom)
+                    point.Y = targetBounds.Top - childSize.Height;
+                else
+                    point.Y = bounds.Y - childSize.Height;
+            }
+            else if (point.Y < 0)
+            {
+                if (mode == PlacementMode.Top)
+                    point.Y = targetBounds.Bottom;
+                else
+                    point.Y = 0;
+            }
+
+            if ((point.X + childSize.Width) > bounds.X)
+            {
+                if (mode == PlacementMode.Right)
+                    point.X = targetBounds.Left - childSize.Width;
+                else
+                    point.X = bounds.X - childSize.Width;
+            }
+            else if (point.X < 0)
+            {
+                if (mode == PlacementMode.Left)
+                    point.X = targetBounds.Right;
+                else
+                    point.X = 0;
+            }
+
+            if (StaysWithinScreenBounds)
+            {
+                if ((point.Y + childSize.Height) > bounds.Y)
+                {
+                    point.Y = bounds.Y - childSize.Height;
+                }
+                else if (point.Y < 0)
+                {
+                    point.Y = 0;
+                }
+
+                if ((point.X + childSize.Width) > bounds.X)
+                {
+                    point.X = bounds.X - childSize.Width;
+                }
+                else if (point.X < 0)
+                {
+                    point.X = 0;
+                }
+            }
+
+            SetContainerPosition(point.X + HorizontalOffset, point.Y + VerticalOffset);
+        }
+
+        private void SetContainerPosition(double xOffset, double yOffset)
+        {
+            Debug.Assert(_outerBorder != null);
+            
+            _outerBorder.Margin = new Thickness(
+                xOffset,
+                yOffset,
+                0,
+                0);
+        }
 
         private void ShowPopupRootIfNotAlreadyVisible()
         {
@@ -541,9 +612,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 UpdatePopupParent();
 
-                // Calculate the position of the parent of the popup, in case that the popup is in the Visual Tree:
-                _referencePosition = CalculateReferencePosition();
-
                 // Create a surrounding border to enable positioning and alignment:
                 _outerBorder = CreateContainer();
                 
@@ -556,15 +624,53 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 _popupRoot.Content = _outerBorder;
 
+                UpdatePosition();
+
+                if (_controlToWatch != null)
+                {
+                    PopupService.PositionsWatcher.RemoveControlToWatch(_controlToWatch);
+                }
+
+                UIElement target = PlacementTarget;
+                if (target != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(target)
+                    && Placement != PlacementMode.Mouse)
+                {
+                    _controlToWatch = PopupService.PositionsWatcher.AddControlToWatch(target, OnTargetPositionChanged);
+                }
+
                 // Show the popup in front of any potential previously displayed popup:
                 PutPopupInFront();
             }
+        }
+
+        private void OnTargetPositionChanged(ControlToWatch ctw)
+        {
+            if (ctw != _controlToWatch)
+            {
+                PopupService.PositionsWatcher.RemoveControlToWatch(ctw);
+                return;
+            }
+
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(ctw.Control))
+            {
+                PopupService.PositionsWatcher.RemoveControlToWatch(ctw);
+                _controlToWatch = null;
+                Reposition();
+                return;
+            }
+            
+            PerformPlacement(ctw.Bounds);
         }
 
         private void HidePopupRootIfVisible()
         {
             if (_popupRoot != null)
             {
+                if (_controlToWatch != null)
+                {
+                    PopupService.PositionsWatcher.RemoveControlToWatch(_controlToWatch);
+                }
+
                 //---------------------
                 // If the popup being closed is the one with the highest zIndex, we decrement it to reduce the chances of reaching the maximum value:
                 //---------------------
@@ -590,7 +696,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             var container = new NonLogicalContainer()
             {
-                Margin = new Thickness(_referencePosition.X + HorizontalOffset, _referencePosition.Y + VerticalOffset, 0d, 0d),
                 Content = Child,
                 HorizontalAlignment = HorizontalContentAlignment,
                 VerticalAlignment = VerticalContentAlignment,
@@ -615,24 +720,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             return PlacementTarget?.INTERNAL_ParentWindow ?? INTERNAL_ParentWindow ?? Application.Current.MainWindow;
         }
 
-        private Point CalculateReferencePosition()
-        {
-            UIElement placementTarget = PlacementTarget;
-            if (placementTarget != null && INTERNAL_VisualTreeManager.IsElementInVisualTree(placementTarget))
-            {
-                Point p = INTERNAL_PopupsManager.GetUIElementAbsolutePosition(placementTarget);
-                Size s = placementTarget.GetBoundingClientSize();
-                return GetOffsetToPlacementTarget(p, s);
-            }
-            else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                GeneralTransform gt = TransformToVisual(null);
-                return gt.Transform(new Point(0d, 0d));
-            }
-
-            return new Point();
-        }
-
         public event EventHandler ClosedDueToOutsideClick;
 
         internal void CloseFromAnOutsideClick()
@@ -651,7 +738,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal void UpdatePopupParent()
         {
-            UIElement element = PlacementTarget ?? (UIElement)VisualTreeHelper.GetParent(this);
+            UIElement element = PlacementTarget ?? VisualTreeHelper.GetParent(this) as UIElement;
 
             if (element == null)
             {
@@ -715,7 +802,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void EnsurePopupStaysWithinScreenBounds(double forcedWidth = double.NaN, double forcedHeight = double.NaN)
         {
-            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(this, forcedWidth, forcedHeight);
+            StaysWithinScreenBounds = true;
+            Reposition();
         }
     }
 

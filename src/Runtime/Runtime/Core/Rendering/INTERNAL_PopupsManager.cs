@@ -143,67 +143,6 @@ if (popupRoot) {sWindow}.removeChild(popupRoot);");
             return new Point();
         }
 
-        public static void EnsurePopupStaysWithinScreenBounds(Popup popup, double forcedWidth = double.NaN, double forcedHeight = double.NaN)
-        {
-            if (popup.IsOpen
-                && popup.PopupRoot != null
-                && popup.PopupRoot.Content is FrameworkElement)
-            {
-                // Determine the size of the popup:
-                FrameworkElement content = (FrameworkElement)popup.PopupRoot.Content;
-                double popupActualWidth = !double.IsNaN(forcedWidth) ? forcedWidth : content.ActualWidth;
-                double popupActualHeight = !double.IsNaN(forcedHeight) ? forcedHeight : content.ActualHeight;
-                if (!double.IsNaN(popupActualWidth)
-                    && !double.IsNaN(popupActualHeight)
-                    && popupActualWidth > 0
-                    && popupActualHeight > 0)
-                {
-                    Point popupPosition = new Point(0, 0);
-                    if (popup.IsConnectedToLiveTree)
-                    {
-                        popupPosition = popup.TransformToVisual(Application.Current.RootVisual).Transform(popupPosition);
-                    }
-
-                    // Determine the size of the window:
-                    Rect windowBounds = Window.Current.Bounds;
-                    double popupX = popup.HorizontalOffset + popupPosition.X;
-                    double popupY = popup.VerticalOffset + popupPosition.Y;
-
-                    // Calculate the area of the popup that is outside the screen bounds:
-                    // Note: when adding widthOfLeftOverflow and heightOfTopOverflow, I guessed the X and Y of windowBounds were 0 because of the way widthOfRightOverflow and heightOfBottomOverflow was calculated.
-                    double widthOfRightOverflow = (popupX + popupActualWidth) - windowBounds.Width;
-                    double widthOfLeftOverflow = -popupX; // Note: this would be -(popupX - windowBounds.X)
-                    double heightOfBottomOverflow = (popupY + popupActualHeight) - windowBounds.Height;
-                    double heightOfTopOverflow = -popupY; // Note: this would be -(popupY - windowBounds.Y)
-                    double totalWidthOverflow = widthOfRightOverflow + widthOfLeftOverflow;
-                    double totalHeightOverflow = heightOfBottomOverflow + heightOfTopOverflow;
-
-                    //Arbitrary decision here: If the popup is too big to fit on screen, we align it with the left and the top of the screen (depending on whether it is too wide, too high, or both), and generally give priority to fixing left and top overflow.
-                    Point positionFixing = new Point();
-                    // Adjust the position of the popup to remain on-screen:
-                    if(totalWidthOverflow > 0 || widthOfLeftOverflow > 0)
-                    {
-                        //align to the left:
-                        positionFixing.X = widthOfLeftOverflow;
-                    }
-                    else if (widthOfRightOverflow > 0)
-                    {
-                        positionFixing.X = - widthOfRightOverflow;
-                    }
-                    if(totalHeightOverflow > 0 || heightOfTopOverflow > 0)
-                    {
-                        positionFixing.Y = heightOfTopOverflow;
-                    }
-                    else if (heightOfBottomOverflow > 0)
-                    {
-                        positionFixing.Y = - heightOfBottomOverflow; //todo: same as for HorizontalOffset.
-                    }
-
-                    popup.PositionFixing = positionFixing;
-                }
-            }
-        }
-
         /// <summary>
         /// Determines whether the parent of a popup is visible on screen, and if it is the foremost element (ie. not covered by another element). This is useful for example to hide the TextBox validation tooltips when they become hidden after scrolling (cf. ZenDesk 628).
         /// </summary>

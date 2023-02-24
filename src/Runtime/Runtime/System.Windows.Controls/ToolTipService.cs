@@ -51,7 +51,6 @@ namespace Windows.UI.Xaml.Controls
         private static object _lastEnterSource;
         private static DateTime _lastToolTipOpenedTime = DateTime.MinValue;
         private static UIElement _owner;
-        private static FrameworkElement _rootVisual;
 
         static ToolTipService()
         {
@@ -218,25 +217,6 @@ namespace Windows.UI.Xaml.Controls
             }
 
             RegisterToolTip(owner, toolTip);
-
-            SetRootVisual();
-        }
-
-        /// <summary>
-        /// Place the ToolTip relative to this point 
-        /// </summary>
-        internal static Point MousePosition { get; set; }
-
-        /// <summary>
-        /// VisualRoot - the main page
-        /// </summary> 
-        internal static FrameworkElement RootVisual
-        {
-            get
-            {
-                SetRootVisual();
-                return _rootVisual;
-            }
         }
 
         /// <summary> 
@@ -275,8 +255,6 @@ namespace Windows.UI.Xaml.Controls
             _lastEnterSource = source;
 
             Debug.Assert(_currentToolTip == null);
-
-            SetRootVisual();
 
             TimeSpan sinceLastOpen = DateTime.Now - _lastToolTipOpenedTime;
             if (TimeSpan.Compare(sinceLastOpen, TimeSpan.FromMilliseconds(TOOLTIPSERVICE_betweenShowDelay)) <= 0)
@@ -338,9 +316,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnOwnerMouseEnter(object sender, MouseEventArgs e)
         {
 #if MIGRATION
-            MousePosition = e.GetPosition(null);
+            PopupService.MousePosition = e.GetPosition(null);
 #else
-            MousePosition = e.GetCurrentPoint(null).Position;
+            PopupService.MousePosition = e.GetCurrentPoint(null).Position;
 #endif
 
             OnOwnerMouseEnterInternal(sender, e.OriginalSource);
@@ -407,15 +385,6 @@ namespace Windows.UI.Xaml.Controls
             CloseAutomaticToolTip(null, EventArgs.Empty);
         }
 
-        private static void OnRootMouseMove(object sender, MouseEventArgs e)
-        {
-#if MIGRATION
-            MousePosition = e.GetPosition(null);
-#else
-            MousePosition = e.GetCurrentPoint(null).Position;
-#endif
-        }
-
 #if MIGRATION
         private static void OpenAutomaticToolTip(object sender, EventArgs e)
 #else
@@ -452,23 +421,6 @@ namespace Windows.UI.Xaml.Controls
             var converted = ConvertToToolTip(toolTip);
             owner.SetValue(ToolTipInternalProperty, converted);
             converted.SetOwner(owner);
-        }
-
-        private static void SetRootVisual()
-        {
-            if (_rootVisual == null && Application.Current != null)
-            {
-                _rootVisual = Application.Current.RootVisual as FrameworkElement;
-                if (_rootVisual != null)
-                {
-                    // keep caching mouse position because we can't query it from Silverlight 
-#if MIGRATION
-                    _rootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
-#else
-                    _rootVisual.PointerMoved += new MouseEventHandler(OnRootMouseMove);
-#endif
-                }
-            }
         }
 
         private static void UnregisterToolTip(UIElement owner)

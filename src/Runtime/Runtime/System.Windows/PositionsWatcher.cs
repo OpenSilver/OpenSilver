@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows.Threading;
@@ -28,8 +29,8 @@ namespace Windows.UI.Xaml
 {
     internal sealed class PositionsWatcher
     {
-        private readonly List<ControlToWatch> _controlsToWatch = new List<ControlToWatch>();
-        private readonly DispatcherTimer _timer = new DispatcherTimer();
+        private readonly HashSet<ControlToWatch> _controlsToWatch = new();
+        private readonly DispatcherTimer _timer = new();
         private TimeSpan _interval = TimeSpan.FromMilliseconds(500);
 
         internal PositionsWatcher()
@@ -51,7 +52,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal ControlToWatch AddControlToWatch(UIElement elementToWatch, Action<Point, Size> callback)
+        internal ControlToWatch AddControlToWatch(UIElement elementToWatch, Action<ControlToWatch> callback)
         {
             var ctw = new ControlToWatch(elementToWatch, callback);
             _controlsToWatch.Add(ctw);

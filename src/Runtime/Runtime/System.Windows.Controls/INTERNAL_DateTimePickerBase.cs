@@ -86,6 +86,7 @@ namespace Windows.UI.Xaml.Controls
             if (_popup != null)
             {
                 _popup.StayOpen = false;
+                _popup.StaysWithinScreenBounds = true;
                 _popup.Child = _calendarOrClock;
                 _popup.IsOpen = false;
                 _popup.ClosedDueToOutsideClick += Popup_ClosedDueToOutsideClick;
@@ -131,11 +132,9 @@ namespace Windows.UI.Xaml.Controls
 
         #region DropDownHandler
 
-        protected async void OpenDropDown()
+        protected void OpenDropDown()
         {
             _popup.IsOpen = true;
-            await Task.Delay(TimeSpan.FromSeconds(0.5));
-            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
         }
 
         protected void CloseDropDown()

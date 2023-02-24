@@ -13,8 +13,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using DotNetForHtml5.Core;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -192,7 +190,7 @@ namespace Windows.UI.Xaml.Controls
                 //todo: once we will have made the following properties (PlacementTarget and Placement) Dependencyproperties, unset it here and set it in the default style.
                 _popup.PlacementTarget = this;
                 _popup.Placement = PlacementMode.Bottom;
-                _popup.INTERNAL_PopupMoved += _popup_INTERNAL_PopupMoved;
+                _popup.StaysWithinScreenBounds = true;
 
                 // Make sure the popup gets closed when the user clicks outside the combo box, and listen to the Closed event in order to update the drop-down toggle:
                 _popup.StayOpen = false;
@@ -492,11 +490,6 @@ namespace Windows.UI.Xaml.Controls
 
         private void OnPopupTextInput(object sender, TextCompositionEventArgs e) => OnTextInput(e);
 
-        private void _popup_INTERNAL_PopupMoved(object sender, EventArgs e)
-        {
-            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
-        }
-
         private void OnDropDownToggleClick(object sender, RoutedEventArgs e)
         {
             IsDropDownOpen = _dropDownToggle.IsChecked.GetValueOrDefault();
@@ -612,8 +605,6 @@ namespace Windows.UI.Xaml.Controls
                 {
                     comboBox.ScrollTo(comboBox.SelectedIndex);
                 }
-
-                comboBox.EnsurePopupIsWithinBoundaries();
             }
             else
             {
@@ -681,12 +672,6 @@ namespace Windows.UI.Xaml.Controls
             {
                 Focus();
             }
-        }        
-
-        private async void EnsurePopupIsWithinBoundaries()
-        {
-            await Task.Delay(TimeSpan.FromSeconds(0.5));
-            INTERNAL_PopupsManager.EnsurePopupStaysWithinScreenBounds(_popup);
         }
 
         /// <summary>
