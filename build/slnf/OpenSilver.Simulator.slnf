@@ -6,6 +6,7 @@
       "Compiler\\Compiler.ProgressDialog\\Compiler.ProgressDialog.OpenSilver.csproj",
       "Compiler\\Compiler.TypeScriptDefToCSharp\\Compiler.TypeScriptDefToCSharp.OpenSilver.csproj",
       "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
+      "Compiler\\Compiler.ResourcesExtractor\\Compiler.ResourcesExtractor.OpenSilver.csproj",
       "Simulator\\Simulator\\Simulator.OpenSilver.csproj"
     ]
   }

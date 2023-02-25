@@ -32,9 +32,13 @@ jobs:
           ./restore-packages-opensilver.bat
           nuget restore src/OpenSilver.sln -v quiet
       - name: Build Compiler
-        run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=SL -clp:ErrorsOnly -restore
+        run: |
+          msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore;
+          msbuild src/Compiler/Compiler.ResourcesExtractor/Compiler.ResourcesExtractor.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore;
       - name: Copy Compiler Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
+        run: |
+          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
+          cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.${{env.current-release-version}}/tools/;
       - name: Copy Targets
         run: |
           cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.current-release-version}}/build/;
