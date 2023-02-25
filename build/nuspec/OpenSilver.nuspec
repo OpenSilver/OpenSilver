@@ -68,8 +68,9 @@
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
 
     <!-- OpenSilver compiler -->
-    <file src="../../src/Compiler/Compiler/bin/OpenSilver/$Configuration$/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
     <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
+    <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
     <file src="../../src/Compiler/Compiler.ProgressDialog/bin/OpenSilver/Release/net461/OpenSilver.Compiler.ProgressDialog.dll" target="tools/OpenSilver.Compiler.ProgressDialog.dll" />
     <file src="../../src/Compiler/Compiler.TypeScriptDefToCSharp/bin/OpenSilver/Release/net461/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" target="tools/OpenSilver.Compiler.TypeScriptDefToCSharp.dll" />
 

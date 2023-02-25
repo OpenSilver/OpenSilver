@@ -17,6 +17,7 @@
 
 using DotNetBrowser;
 using DotNetBrowser.WPF;
+using OpenSilver;
 using System;
 using System.Collections.Generic;
 using System.Windows;

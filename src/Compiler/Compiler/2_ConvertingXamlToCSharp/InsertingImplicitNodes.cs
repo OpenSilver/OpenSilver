@@ -16,8 +16,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using OpenSilver.Compiler.Common;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static class InsertingImplicitNodes
     {
@@ -25,17 +26,20 @@ namespace DotNetForHtml5.Compiler
         // any property defined by the user.
         public const string InitializedFromStringAttribute = "__.InitializeFromString.__";
 
-        public static void InsertImplicitNodes(XDocument doc, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        public static void InsertImplicitNodes(XDocument doc,
+            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            ConversionSettings settings)
         {
             var indexesMapper = new Stack<List<int>>();
-            TraverseNextElement(doc.Root, 0, indexesMapper, reflectionOnSeparateAppDomain);
+            TraverseNextElement(doc.Root, 0, indexesMapper, reflectionOnSeparateAppDomain, settings);
         }
 
         private static void TraverseNextElement(
             XElement currentElement, 
             int currentElementIndex, 
             /*Stack<Dictionary<int, int>> indexesMapper*/ Stack<List<int>> indexesMapper, 
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            ConversionSettings settings)
         {
             bool skipTraversalOfChildren = false;
 
@@ -86,8 +90,12 @@ namespace DotNetForHtml5.Compiler
                 if (nodesThatAreNotPropertiesOfTheObject.Count > 0)
                 {
                     // Find out the name of the default children property (aka "ContentProperty") of the current element:
-                    string namespaceName, localName, assemblyNameIfAny;
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(currentElement.Name, out namespaceName, out localName, out assemblyNameIfAny);
+                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                        currentElement.Name,
+                        settings.EnableImplicitAssemblyRedirection,
+                        out string namespaceName,
+                        out string localName,
+                        out string assemblyNameIfAny);
                     var contentPropertyName = reflectionOnSeparateAppDomain.GetContentPropertyName(namespaceName, localName, assemblyNameIfAny);
                     XElement contentWrapper = currentElement;
                     
@@ -127,10 +135,12 @@ namespace DotNetForHtml5.Compiler
                     string contentValue = directTextContent.Value;
 
                     // Get information about the element namespace and assembly
-                    string namespaceName, localName, assemblyNameIfAny;
                     GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
-                        currentElement.Name, out namespaceName, out localName, out assemblyNameIfAny
-                    );
+                        currentElement.Name,
+                        settings.EnableImplicitAssemblyRedirection,
+                        out string namespaceName,
+                        out string localName,
+                        out string assemblyNameIfAny);
 
                     string elementTypeInCSharp = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
                             namespaceName, localName, assemblyNameIfAny, false
@@ -145,7 +155,7 @@ namespace DotNetForHtml5.Compiler
                         // becomes "Double x = 50;"
                     }
                     else if (reflectionOnSeparateAppDomain.IsTypeAnEnum(namespaceName, localName, assemblyNameIfAny) ||
-                             CoreTypesHelper.IsSupportedCoreType(elementTypeInCSharp.Substring("global::".Length), assemblyNameIfAny))
+                             settings.CoreTypesConverter.IsSupportedCoreType(elementTypeInCSharp.Substring("global::".Length), assemblyNameIfAny))
                     {
                         // Add the attribute that will tell the compiler to later
                         // intialize the type by converting from the string using the
@@ -292,7 +302,7 @@ namespace DotNetForHtml5.Compiler
                 int i = 0;
                 foreach (var childElements in children)
                 {
-                    TraverseNextElement(childElements, i, indexesMapper, reflectionOnSeparateAppDomain);
+                    TraverseNextElement(childElements, i, indexesMapper, reflectionOnSeparateAppDomain, settings);
                     ++i;
                 }
                 indexesMapper.Pop();

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,13 +12,12 @@
 *  
 \*====================================================================================*/
 
-
-
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using OpenSilver.Compiler.Common;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal interface IXamlReader
     {

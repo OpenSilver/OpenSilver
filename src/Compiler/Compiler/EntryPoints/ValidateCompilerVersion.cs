@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,17 +12,14 @@
 *  
 \*====================================================================================*/
 
-
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Threading;
+using OpenSilver.Compiler.Common;
+using ILogger = OpenSilver.Compiler.Common.ILogger;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     public class ValidateCompilerVersion : Task
     {

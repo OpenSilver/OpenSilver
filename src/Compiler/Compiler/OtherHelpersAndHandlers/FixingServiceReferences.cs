@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,16 +12,13 @@
 *  
 \*====================================================================================*/
 
-
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static class FixingServiceReferences
     {

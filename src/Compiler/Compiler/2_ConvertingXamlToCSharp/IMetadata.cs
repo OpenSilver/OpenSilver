@@ -14,7 +14,7 @@
 
 using System;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal interface IMetadata
     {
@@ -29,36 +29,35 @@ namespace DotNetForHtml5.Compiler
         string SystemWindowsMediaAnimationNS { get; }
     }
 
-    internal static class Metadata
+    internal static class Metadatas
     {
-        public static SLMetadata Silverlight { get; } = new SLMetadata();
-
+        public static IMetadata Silverlight { get; } = new SLMetadata();
         public static IMetadata UWP { get; } = new UWPMetadata();
+    }
 
-        internal class SLMetadata : IMetadata
-        {
-            public string FieldModifier { get; } = "internal";
+    internal class SLMetadata : IMetadata
+    {
+        public string FieldModifier { get; } = "internal";
 
-            public string SystemWindowsDLL { get; } = "System.Windows";
+        public string SystemWindowsDLL { get; } = "System.Windows";
 
-            public string SystemWindowsNS { get; } = "System.Windows";
-            public string SystemWindowsDataNS { get; } = "System.Windows.Data";
-            public string SystemWindowsControlsNS { get; } = "System.Windows.Controls";
-            public string SystemWindowsMediaNS { get; } = "System.Windows.Media";
-            public string SystemWindowsMediaAnimationNS { get; } = "System.Windows.Media.Animation";
-        }
+        public string SystemWindowsNS { get; } = "System.Windows";
+        public string SystemWindowsDataNS { get; } = "System.Windows.Data";
+        public string SystemWindowsControlsNS { get; } = "System.Windows.Controls";
+        public string SystemWindowsMediaNS { get; } = "System.Windows.Media";
+        public string SystemWindowsMediaAnimationNS { get; } = "System.Windows.Media.Animation";
+    }
 
-        private class UWPMetadata : IMetadata
-        {
-            public string FieldModifier { get; } = "protected";
+    internal class UWPMetadata : IMetadata
+    {
+        public string FieldModifier { get; } = "protected";
 
-            public string SystemWindowsDLL => throw new NotSupportedException();
+        public string SystemWindowsDLL { get; } = string.Empty;
 
-            public string SystemWindowsNS { get; } = "Windows.UI.Xaml";
-            public string SystemWindowsDataNS { get; } = "Windows.UI.Xaml.Data";
-            public string SystemWindowsControlsNS { get; } = "Windows.UI.Xaml.Controls";
-            public string SystemWindowsMediaNS { get; } = "Windows.UI.Xaml.Media";
-            public string SystemWindowsMediaAnimationNS { get; } = "Windows.UI.Xaml.Media.Animation";
-        }
+        public string SystemWindowsNS { get; } = "Windows.UI.Xaml";
+        public string SystemWindowsDataNS { get; } = "Windows.UI.Xaml.Data";
+        public string SystemWindowsControlsNS { get; } = "Windows.UI.Xaml.Controls";
+        public string SystemWindowsMediaNS { get; } = "Windows.UI.Xaml.Media";
+        public string SystemWindowsMediaAnimationNS { get; } = "Windows.UI.Xaml.Media.Animation";
     }
 }

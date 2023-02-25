@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,20 +12,18 @@
 *  
 \*====================================================================================*/
 
-
-
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Resources;
 using System.Text;
 using System.Threading;
+using OpenSilver.Compiler.Common;
+using ILogger = OpenSilver.Compiler.Common.ILogger;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     public class ResXProcessor : Task
     {
@@ -47,7 +44,6 @@ namespace DotNetForHtml5.Compiler
         {
             return Execute(SourceFile, OutputFile, SourceFileRelativePath, RootNamespace, new LoggerThatUsesTaskOutput(this));
         }
-
 
         public static bool Execute(string sourceFile, string outputFile, string sourceFileRelativePath, string rootNamespace, ILogger logger)
         {

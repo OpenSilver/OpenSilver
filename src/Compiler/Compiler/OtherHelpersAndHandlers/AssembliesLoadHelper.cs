@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,17 +12,13 @@
 *  
 \*====================================================================================*/
 
-
-
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static class AssembliesLoadHelper
     {
@@ -69,23 +64,7 @@ namespace DotNetForHtml5.Compiler
 
         internal static string GetCoreAssemblyName()
         {
-#if SILVERLIGHTCOMPATIBLEVERSION
-#if CSHTML5BLAZOR
-            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
-#elif BRIDGE
-            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
-#else
-            return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION;
-#endif
-#else
-#if CSHTML5BLAZOR
             return Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
-#elif BRIDGE
-            return Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE;
-#else
-            return Constants.NAME_OF_CORE_ASSEMBLY;
-#endif
-#endif
         }
     }
 }

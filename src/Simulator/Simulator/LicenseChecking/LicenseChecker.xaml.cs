@@ -33,13 +33,13 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using DotNetBrowser;
 using DotNetBrowser.WPF;
-using DotNetForHtml5.Compiler;
 using System.Xml.Serialization;
 using System.IO;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
 using System.Net;
 using DotNetBrowser.Events;
+using OpenSilver;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
 {

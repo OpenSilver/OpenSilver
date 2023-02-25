@@ -17,30 +17,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static partial class GeneratingCSharpCode
     {
         private class GeneratorPass1 : ICodeGenerator
         {
             private readonly XamlReader _reader;
-            private readonly IMetadata _metadata;
+            private readonly ConversionSettings _settings;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
             private readonly ReflectionOnSeparateAppDomainHandler _reflectionOnSeparateAppDomain;
-            private readonly bool _isSLMigration;
-
+            
             public GeneratorPass1(XDocument doc,
                 string assemblyNameWithoutExtension,
                 string fileNameWithPathRelativeToProjectRoot,
                 ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
-                bool isSLMigration)
+                ConversionSettings settings)
             {
                 _reader = new XamlReader(doc);
-                _metadata = isSLMigration ? Metadata.Silverlight : Metadata.UWP;
+                _settings = settings;
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
-                _isSLMigration = isSLMigration;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
             }
 
@@ -48,11 +46,9 @@ namespace DotNetForHtml5.Compiler
 
             private string GenerateImpl()
             {
-                // Get general information about the class:
-                string className, namespaceStringIfAny, baseType;
-                bool hasCodeBehind;
                 GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
-                    out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
+                    out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
+                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
 
                 List<string> resultingFieldsForNamedElements = new List<string>();
                 List<string> resultingMethods = new List<string>();
@@ -62,27 +58,20 @@ namespace DotNetForHtml5.Compiler
                     if (_reader.NodeType != XamlNodeType.StartObject)
                         continue;
 
-                    XElement element = _reader.ObjectData.Element;
-
-                    // Get the namespace, local name, and optional assembly that correspond to the element
-                    string namespaceName, localTypeName, assemblyNameIfAny;
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
-                    string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                        namespaceName, localTypeName, assemblyNameIfAny, true);
-
                     if (!hasCodeBehind)
                     {
                         // No code behind, no need to create fields for elementd with an x:Name
                         continue;
                     }
 
+                    XElement element = _reader.ObjectData.Element;
                     XAttribute xNameAttr = element.Attributes().FirstOrDefault(attr => IsXNameAttribute(attr) || IsNameAttribute(attr));
                     if (xNameAttr != null && GetRootOfCurrentNamescopeForCompilation(element).Parent == null)
                     {
                         string name = xNameAttr.Value;
                         if (!string.IsNullOrWhiteSpace(name))
                         {
-                            string fieldModifier = _isSLMigration ? "internal" : "protected";
+                            string fieldModifier = _settings.Metadata.FieldModifier;
                             XAttribute fieldModifierAttr = element.Attribute(xNamespace + "FieldModifier");
                             if (fieldModifierAttr != null)
                             {
@@ -92,7 +81,11 @@ namespace DotNetForHtml5.Compiler
                             // add '@' to handle cases where x:Name is a forbidden word (for instance 'this'
                             // or any other c# keyword)
                             string fieldName = "@" + name;
-                            resultingFieldsForNamedElements.Add(string.Format("{0} {1} {2};", fieldModifier, elementTypeInCSharp, fieldName));
+                            resultingFieldsForNamedElements.Add(
+                                string.Format("{0} {1} {2};",
+                                    fieldModifier,
+                                    GetCSharpEquivalentOfXamlTypeAsString(element.Name, true),
+                                    fieldName));
                         }
                     }
                 }
@@ -101,7 +94,7 @@ namespace DotNetForHtml5.Compiler
                 {
                     // Create the "IntializeComponent()" method:
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"global::{_metadata.SystemWindowsNS}.Application",
+                        $"global::{_settings.Metadata.SystemWindowsNS}.Application",
                         string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
@@ -114,12 +107,7 @@ namespace DotNetForHtml5.Compiler
                                                                className,
                                                                namespaceStringIfAny,
                                                                baseType,
-#if BRIDGE
-                                                           addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
-#else
-                                                           addApplicationEntryPoint: false
-#endif
-);
+                                                               addApplicationEntryPoint: false);
 
                     string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
 
@@ -129,7 +117,7 @@ namespace DotNetForHtml5.Compiler
                         "throw new global::System.NotImplementedException();",
                         "throw new global::System.NotImplementedException();",
                         Enumerable.Empty<string>(),
-                        $"global::{_metadata.SystemWindowsNS}.UIElement",
+                        $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -147,7 +135,7 @@ namespace DotNetForHtml5.Compiler
                         "throw new global::System.NotImplementedException();",
                         "throw new global::System.NotImplementedException();",
                         Enumerable.Empty<string>(),
-                        $"global::{_metadata.SystemWindowsNS}.UIElement",
+                        $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -169,12 +157,29 @@ namespace DotNetForHtml5.Compiler
                 return element;
             }
 
-#if BRIDGE
-            private bool IsClassTheApplicationClass(string className)
+            private string GetCSharpEquivalentOfXamlTypeAsString(
+                XName xName,
+                bool ifTypeNotFoundTryGuessing,
+                out string namespaceName,
+                out string typeName,
+                out string assemblyName)
             {
-                return className == $"global::{_metadata.SystemWindowsNS}.Application";
-            } 
-#endif
+                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    xName,
+                    _settings.EnableImplicitAssemblyRedirection,
+                    out namespaceName,
+                    out typeName,
+                    out assemblyName);
+
+                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                    namespaceName,
+                    typeName,
+                    assemblyName,
+                    ifTypeNotFoundTryGuessing);
+            }
+
+            private string GetCSharpEquivalentOfXamlTypeAsString(XName xName, bool ifTypeNotFoundTryGuessing = false)
+                => GetCSharpEquivalentOfXamlTypeAsString(xName, ifTypeNotFoundTryGuessing, out _, out _, out _);
         }
     }
 }

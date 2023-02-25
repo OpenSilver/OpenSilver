@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,22 +12,17 @@
 *  
 \*====================================================================================*/
 
+using System;
+using System.Globalization;
+using System.Threading;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
+using OpenSilver.Compiler.Common;
+using ILogger = OpenSilver.Compiler.Common.ILogger;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
-    //[LoadInSeparateAppDomain]
-    //[Serializable]
-    public class AfterXamlPreprocessor : Task // AppDomainIsolatedTask
+    public class AfterXamlPreprocessor : Task
     {
         [Required]
         public bool IsSecondPass { get; set; }
@@ -38,10 +32,10 @@ namespace DotNetForHtml5.Compiler
 
         public override bool Execute()
         {
-            return Execute(IsSecondPass, Flags, new LoggerThatUsesTaskOutput(this));
+            return ExecuteImpl(IsSecondPass, Flags, new LoggerThatUsesTaskOutput(this));
         }
 
-        public static bool Execute(bool isSecondPass, string flagsString, ILogger logger)
+        private static bool ExecuteImpl(bool isSecondPass, string flagsString, ILogger logger)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;

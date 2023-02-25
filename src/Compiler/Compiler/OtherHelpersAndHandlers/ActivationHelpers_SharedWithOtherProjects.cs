@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,17 +12,11 @@
 *  
 \*====================================================================================*/
 
-
-
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DotNetForHtml5
+namespace OpenSilver
 {
     internal static class ActivationHelpers
     {
@@ -51,14 +44,8 @@ namespace DotNetForHtml5
 
         internal static string GetActivationAppPath()
         {
-#if BRIDGE
-            // the activation app should be in the package, in the same directory as the assembly of the simulator
-            string assemblyPath = Path.GetDirectoryName(PathsHelper.GetPathOfThisVeryAssembly());
-            return Path.Combine(assemblyPath, "CSharpXamlForHtml5.Activation.exe");
-#else
             // otherwise we use the activation app of internal stuff
             return PathsHelper.GetActivationAppPath();
-#endif
         }
 
         internal static void DisplayActivationApp(string activationAppPath, string missingFeatureId, string messageForMissingFeature)

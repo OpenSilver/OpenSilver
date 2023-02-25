@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,16 +12,10 @@
 *  
 \*====================================================================================*/
 
-
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
+using ILogger = OpenSilver.Compiler.Common.ILogger;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static class ConvertingXamlToCSharp
     {
@@ -40,6 +33,8 @@ namespace DotNetForHtml5.Compiler
             string outputResourcesPath,
             ILogger logger)
         {
+            ConversionSettings settings = isSLMigration ? ConversionSettings.Silverlight : ConversionSettings.UWP;
+
             // Process the "HtmlPresenter" nodes in order to "escape" its content, because the content is HTML and it could be badly formatted and not be parsable using XDocument.Parse.
             xaml = ProcessingHtmlPresenterNodes.Process(xaml);
 
@@ -52,9 +47,9 @@ namespace DotNetForHtml5.Compiler
             // Insert implicit nodes in XAML:
             if (!isFirstPass) // Note: we skip this step during the 1st pass because some types are not known yet, so we cannot determine the default "ContentProperty".
             {
-                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain);
+                InsertingImplicitNodes.InsertImplicitNodes(doc, reflectionOnSeparateAppDomain, settings);
 
-                FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain);
+                FixingPropertiesOrder.FixPropertiesOrder(doc, reflectionOnSeparateAppDomain, settings);
 
                 // Process the "ContentPresenter" nodes in order to transform "<ContentPresenter />" into "<ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />"
                 ProcessingContentPresenterNodes.Process(doc, reflectionOnSeparateAppDomain);
@@ -63,10 +58,7 @@ namespace DotNetForHtml5.Compiler
                 ProcessingColorAnimationNodes.Process(doc, reflectionOnSeparateAppDomain);
 
                 // Convert markup extensions into XDocument nodes:
-                InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain);
-
-                // Fix names of visual states (for instance "PointerOver" in UWP becomes "MouseOver" in Silverlight and WPF).
-                FixingVisualStatesName.Fix(doc, isSLMigration);
+                InsertingMarkupNodesInXaml.InsertMarkupNodes(doc, reflectionOnSeparateAppDomain, settings);
             }
 
             // Generate unique names for XAML elements:
@@ -81,9 +73,42 @@ global::CSHTML5.Internal.StartupAssemblyInfo.OutputResourcesPath = @""{3}"";
 ", outputRootPath, outputAppFilesPath, outputLibrariesPath, outputResourcesPath);
 
             // Generate C# code from the tree:
-            return GeneratingCSharpCode.GenerateCSharpCode(doc, sourceFile, fileNameWithPathRelativeToProjectRoot, assemblyNameWithoutExtension, reflectionOnSeparateAppDomain, isFirstPass, isSLMigration, codeToPutInTheInitializeComponentOfTheApplicationClass, logger);
+            return GeneratingCSharpCode.GenerateCSharpCode(
+                doc,
+                sourceFile,
+                fileNameWithPathRelativeToProjectRoot,
+                assemblyNameWithoutExtension,
+                reflectionOnSeparateAppDomain,
+                isFirstPass,
+                settings,
+                codeToPutInTheInitializeComponentOfTheApplicationClass,
+                logger);
 
         }
+    }
 
+    internal sealed class ConversionSettings
+    {
+        public static ConversionSettings Silverlight { get; } =
+            new ConversionSettings
+            {
+                Metadata = Metadatas.Silverlight,
+                CoreTypesConverter = CoreTypesConverters.Silverlight,
+                EnableImplicitAssemblyRedirection = true,
+            };
+
+        public static ConversionSettings UWP { get; } =
+            new ConversionSettings
+            {
+                Metadata = Metadatas.UWP,
+                CoreTypesConverter = CoreTypesConverters.UWP,
+                EnableImplicitAssemblyRedirection = false,
+            };
+
+        public IMetadata Metadata { get; private set; }
+
+        public ICoreTypesConverter CoreTypesConverter { get; private set; }
+
+        public bool EnableImplicitAssemblyRedirection { get; private set; }
     }
 }

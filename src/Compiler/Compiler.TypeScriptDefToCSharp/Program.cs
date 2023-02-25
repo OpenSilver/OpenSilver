@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,20 +12,16 @@
 *  
 \*====================================================================================*/
 
-
-
-using DotNetForHtml5.Compiler;
 using DotNetForHtml5.Compiler.ProgressDialog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Windows.Threading;
 using System.Xml.Linq;
 using TinyPG;
 using TypeScriptDefToCSharp.Model;
+using ILogger = OpenSilver.Compiler.Common.ILogger;
 
 namespace TypeScriptDefToCSharp
 {

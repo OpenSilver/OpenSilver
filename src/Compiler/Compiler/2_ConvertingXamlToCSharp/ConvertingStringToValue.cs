@@ -14,7 +14,7 @@
 
 using System;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static class ConvertingStringToValue
     {

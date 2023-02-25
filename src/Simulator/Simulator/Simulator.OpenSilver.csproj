@@ -52,7 +52,7 @@
     <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\Constants.cs">
       <Link>Constants.cs</Link>
     </Compile>
-    <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\PathsHelper.cs">
+    <Compile Include="..\..\Compiler\Compiler.Common\Helpers\PathsHelper.cs">
       <Link>SupportClasses\PathsHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\Compiler\Compiler\OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs">

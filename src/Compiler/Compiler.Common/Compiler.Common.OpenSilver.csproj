@@ -5,11 +5,11 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <AssemblyName>OpenSilver.Compiler.Common</AssemblyName>
-    <RootNamespace>DotNetForHtml5.Compiler.Common</RootNamespace>
+    <RootNamespace>OpenSilver.Compiler.Common</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.0.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.0.0" />
   </ItemGroup>
 
 </Project>

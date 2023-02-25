@@ -12,44 +12,51 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static class FixingPropertiesOrder
     {
-        public static void FixPropertiesOrder(XDocument doc, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        public static void FixPropertiesOrder(XDocument doc,
+            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            ConversionSettings settings)
         {
-            FixSelectorItemsSourceOrder(doc.Root, reflectionOnSeparateAppDomain);
+            FixSelectorItemsSourceOrder(doc.Root, reflectionOnSeparateAppDomain, settings);
         }
 
-        public static void FixSelectorItemsSourceOrder(XElement currentElement, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        public static void FixSelectorItemsSourceOrder(XElement currentElement,
+            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            ConversionSettings settings)
         {
             // Check if the current element is an object (rather than a property):
             bool isElementAnObjectRatherThanAProperty = !currentElement.Name.LocalName.Contains(".");
-            if(isElementAnObjectRatherThanAProperty)
+            if (isElementAnObjectRatherThanAProperty)
             {
                 //check if the element has a attribute called ItemsSource:
                 XAttribute itemsSourceAttribute = currentElement.Attribute(XName.Get("ItemsSource"));
                 bool hasItemsSourceProperty = itemsSourceAttribute != null;
 
                 //if the element has an attribute called ItemsSource, we check if it represents an object of a type that inherits from Selector:
-                if(hasItemsSourceProperty)
+                if (hasItemsSourceProperty)
                 {
                     // Get the namespace, local name, and optional assembly that correspond to the element:
-                    string namespaceName, localTypeName, assemblyNameIfAny;
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(currentElement.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
-                    string selectorNamespaceName, selectorLocalTypeName, selectorAssemblyNameIfAny;
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName("Selector", out selectorNamespaceName, out selectorLocalTypeName, out selectorAssemblyNameIfAny);
+                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                        currentElement.Name,
+                        settings.EnableImplicitAssemblyRedirection,
+                        out string namespaceName,
+                        out string localTypeName,
+                        out string assemblyNameIfAny);
+                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                        "Selector",
+                        settings.EnableImplicitAssemblyRedirection,
+                        out string selectorNamespaceName,
+                        out string selectorLocalTypeName,
+                        out string selectorAssemblyNameIfAny);
                     bool typeInheritsFromSelector = reflectionOnSeparateAppDomain.IsTypeAssignableFrom(namespaceName, localTypeName, assemblyNameIfAny, selectorNamespaceName, selectorLocalTypeName, selectorAssemblyNameIfAny);
                     //Type elementType = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlType(namespaceName, localTypeName, assemblyNameIfAny);
                     //if the type inherits from the element, we want to put the itemsSource attribute to the end:
-                    if(typeInheritsFromSelector)
+                    if (typeInheritsFromSelector)
                     {
                         itemsSourceAttribute.Remove();
                         currentElement.Add(itemsSourceAttribute);
@@ -58,15 +65,14 @@ namespace DotNetForHtml5.Compiler
             }//else we do nothing
 
             //we move on to the children of the element.
-            if(currentElement.HasElements)
+            if (currentElement.HasElements)
             {
-                foreach(XElement child in currentElement.Elements())
+                foreach (XElement child in currentElement.Elements())
                 {
-                    FixSelectorItemsSourceOrder(child, reflectionOnSeparateAppDomain);
+                    FixSelectorItemsSourceOrder(child, reflectionOnSeparateAppDomain, settings);
                 }
             }
         }
 
     }
 }
-

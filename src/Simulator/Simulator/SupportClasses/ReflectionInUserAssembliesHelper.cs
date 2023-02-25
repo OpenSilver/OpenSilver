@@ -13,15 +13,13 @@
 *  
 \*====================================================================================*/
 
-
-
 using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Linq;
 using System.Collections.Generic;
-using DotNetForHtml5.Compiler;
+using OpenSilver;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -161,8 +159,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                      || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE, StringComparison.CurrentCultureIgnoreCase)
                      || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION, StringComparison.CurrentCultureIgnoreCase)
                      || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE, StringComparison.CurrentCultureIgnoreCase)
-                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR, StringComparison.CurrentCultureIgnoreCase)
-                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR, StringComparison.CurrentCultureIgnoreCase))
+                     || string.Equals(a.GetName().Name, Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR, StringComparison.CurrentCultureIgnoreCase))
                      select a).FirstOrDefault();
                 if (coreAssembly != null)
                 {

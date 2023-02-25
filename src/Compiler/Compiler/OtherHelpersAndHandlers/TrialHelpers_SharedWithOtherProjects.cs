@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware (OpenSilver.net, CSHTML5.com)
@@ -13,24 +12,14 @@
 *  
 \*====================================================================================*/
 
-
-
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DotNetForHtml5
+namespace OpenSilver
 {
     internal static class TrialHelpers
     {
-#if BRIDGE
-        public const int TRIAL_DURATION_IN_DAYS = 14;
-#else
         public const int TRIAL_DURATION_IN_DAYS = 60;
-#endif
 
         public const string TRIAL_VERSION_IDENTIFIER = "0005"; // Modify this string to reset the trial period of end-users, so that they can start a new trial.
         // Versions history:

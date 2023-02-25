@@ -2,14 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <Configurations>SL;UWP</Configurations>
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
     <AssemblyName>OpenSilver.Compiler</AssemblyName>
-    <RootNamespace>DotNetForHtml5.Compiler</RootNamespace>
-    <DefineConstants>$(DefineConstants);CSHTML5BLAZOR;TRACE;DEBUG</DefineConstants>
-    <DefineConstants Condition="'$(Configuration)' == 'SL' ">$(DefineConstants);SILVERLIGHTCOMPATIBLEVERSION;MIGRATION</DefineConstants>
+    <RootNamespace>OpenSilver.Compiler</RootNamespace>
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
     <Optimize>true</Optimize>
   </PropertyGroup>
 
@@ -39,7 +37,6 @@
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\CoreTypesHelper.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\FixingPropertiesOrder.cs" />
-    <Compile Include="2_ConvertingXamlToCSharp\FixingVisualStatesName.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ProcessingHtmlPresenterNodes.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ProcessingColorAnimationNodes.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ProcessingContentPresenterNodes.cs" />
@@ -49,33 +46,27 @@
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingCSharpCode.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GettingInformationAboutAXamlType.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\GeneratingUniqueNames.cs" />
-    <Compile Include="2_ConvertingXamlToCSharp\PostOrderTreeTraversal.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\InsertingImplicitNodes.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingXamlToCSharp.cs" />
-    <Compile Include="6_CreatingAndCopyingSupportHtmlAndJavaScriptFiles\ExtractingAndCopyingResources.cs" />
     <Compile Include="EntryPoints\XamlPreprocessor.cs" />
     <Compile Include="EntryPoints\BeforeXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\AfterXamlPreprocessor.cs" />
     <Compile Include="EntryPoints\ResXProcessor.cs" />
     <Compile Include="EntryPoints\ResourcesProcessor.cs" />
-    <Compile Include="EntryPoints\ResourcesExtractorAndCopier.cs" />
     <Compile Include="EntryPoints\ServiceReferenceFixer.cs" />
     <Compile Include="EntryPoints\TypeScriptDefToCSharp.cs" />
     <Compile Include="OtherHelpersAndHandlers\OpenSilverHelper.cs" />
-    <Compile Include="OtherHelpersAndHandlers\PathsHelper.cs" />
     <Compile Include="OtherHelpersAndHandlers\ActivationHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\FixingServiceReferences.cs" />
     <Compile Include="OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" />
-    <Compile Include="OtherHelpersAndHandlers\ExecutionTimeMeasuring.cs" />
     <Compile Include="OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\Constants.cs" />
-    <Compile Include="OtherHelpersAndHandlers\ReflectionOnSeparateAppDomainHandler.cs" />
     <Compile Include="OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
-    <Compile Include="OtherHelpersAndHandlers\XamlParseException.cs" />
-    <Compile Include="Loggers\LoggerBase.cs" />
-    <Compile Include="Loggers\LoggerThatUsesTaskOutput.cs" />
+    <Compile Include="Reflection\IMarshalledObject.cs" />
+    <Compile Include="Reflection\MarshalledObject.cs" />
+    <Compile Include="Reflection\ReflectionOnSeparateAppDomainHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Compiler.licenseheader" />

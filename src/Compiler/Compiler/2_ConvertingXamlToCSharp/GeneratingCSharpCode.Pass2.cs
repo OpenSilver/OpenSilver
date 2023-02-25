@@ -21,8 +21,10 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using OpenSilver.Internal;
+using OpenSilver.Compiler.Common;
+using ILogger = OpenSilver.Compiler.Common.ILogger;
 
-namespace DotNetForHtml5.Compiler
+namespace OpenSilver.Compiler
 {
     internal static partial class GeneratingCSharpCode
     {
@@ -167,13 +169,12 @@ namespace DotNetForHtml5.Compiler
             private const string TemplateOwnerValuePlaceHolder = "TemplateOwnerValuePlaceHolder";
 
             private readonly XamlReader _reader;
-            private readonly IMetadata _metadata;
+            private readonly ConversionSettings _settings;
 
             private readonly string _sourceFile;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
             private readonly ReflectionOnSeparateAppDomainHandler _reflectionOnSeparateAppDomain;
-            private readonly bool _isSLMigration;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
 
@@ -182,17 +183,16 @@ namespace DotNetForHtml5.Compiler
                 string fileNameWithPathRelativeToProjectRoot,
                 string assemblyNameWithoutExtension,
                 ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
-                bool isSLMigration,
+                ConversionSettings settings,
                 string codeToPutInTheInitializeComponentOfTheApplicationClass,
                 ILogger logger)
             {
                 _reader = new XamlReader(doc);
-                _metadata = isSLMigration ? Metadata.Silverlight : Metadata.UWP;
+                _settings = settings;
                 _sourceFile = sourceFile;
                 _fileNameWithPathRelativeToProjectRoot = fileNameWithPathRelativeToProjectRoot;
                 _assemblyNameWithoutExtension = assemblyNameWithoutExtension;
                 _reflectionOnSeparateAppDomain = reflectionOnSeparateAppDomain;
-                _isSLMigration = isSLMigration;
                 _codeToPutInTheInitializeComponentOfTheApplicationClass = codeToPutInTheInitializeComponentOfTheApplicationClass;
                 _logger = logger;
             }
@@ -203,17 +203,17 @@ namespace DotNetForHtml5.Compiler
             {
                 parameters.GenerateFieldsForNamedElements = 
                     !_reflectionOnSeparateAppDomain.IsAssignableFrom(
-                        _metadata.SystemWindowsNS, "ResourceDictionary",
+                        _settings.Metadata.SystemWindowsNS, "ResourceDictionary",
                         _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName) 
                     &&
                     !_reflectionOnSeparateAppDomain.IsAssignableFrom(
-                        _metadata.SystemWindowsNS, "Application",
+                        _settings.Metadata.SystemWindowsNS, "Application",
                         _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName);
 
                 parameters.PushScope(
                     new RootScope(GetUniqueName(_reader.Document.Root),
                         _reflectionOnSeparateAppDomain.IsAssignableFrom(
-                            _metadata.SystemWindowsNS, "FrameworkElement",
+                            _settings.Metadata.SystemWindowsNS, "FrameworkElement",
                             _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
                     )
                 );
@@ -249,16 +249,15 @@ namespace DotNetForHtml5.Compiler
                 }
 
                 // Get general information about the class:
-                string className, namespaceStringIfAny, baseType;
-                bool hasCodeBehind;
                 GetClassInformationFromXaml(_reader.Document, _reflectionOnSeparateAppDomain,
-                    out className, out namespaceStringIfAny, out baseType, out hasCodeBehind);
+                    out string className, out string namespaceStringIfAny, out bool hasCodeBehind);
+                string baseType = GetCSharpEquivalentOfXamlTypeAsString(_reader.Document.Root.Name, true);
 
                 if (hasCodeBehind)
                 {
                     string connectMethod = parameters.ComponentConnector.ToString();
                     string initializeComponentMethod = CreateInitializeComponentMethod(
-                        $"global::{_metadata.SystemWindowsNS}.Application",
+                        $"global::{_settings.Metadata.SystemWindowsNS}.Application",
                         IsClassTheApplicationClass(baseType) ? _codeToPutInTheInitializeComponentOfTheApplicationClass : string.Empty,
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot,
@@ -271,12 +270,7 @@ namespace DotNetForHtml5.Compiler
                                                                className,
                                                                namespaceStringIfAny,
                                                                baseType,
-#if BRIDGE
-                                                           addApplicationEntryPoint: IsClassTheApplicationClass(baseType)
-#else
-                                                           addApplicationEntryPoint: false
-#endif
-);
+                                                               addApplicationEntryPoint: false);
 
                     string componentTypeFullName = GetFullTypeName(namespaceStringIfAny, className);
 
@@ -286,7 +280,7 @@ namespace DotNetForHtml5.Compiler
                         parameters.CurrentScope.ToString(),
                         $"return ({componentTypeFullName})global::CSHTML5.Internal.TypeInstantiationHelper.Instantiate(typeof({componentTypeFullName}));",
                         parameters.ResultingMethods,
-                        $"global::{_metadata.SystemWindowsNS}.UIElement",
+                        $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -306,7 +300,7 @@ namespace DotNetForHtml5.Compiler
                         parameters.CurrentScope.ToString(),
                         string.Join(Environment.NewLine, $"var {rootElementName} = new {baseType}();", $"LoadComponentImpl({rootElementName});", $"return {rootElementName};"),
                         parameters.ResultingMethods,
-                        $"global::{_metadata.SystemWindowsNS}.UIElement",
+                        $"global::{_settings.Metadata.SystemWindowsNS}.UIElement",
                         _assemblyNameWithoutExtension,
                         _fileNameWithPathRelativeToProjectRoot);
 
@@ -318,19 +312,16 @@ namespace DotNetForHtml5.Compiler
             {
                 XElement element = _reader.ObjectData.Element;
 
-                // Get the namespace, local name, and optional assembly that correspond to the element:
-                string namespaceName, localTypeName, assemblyNameIfAny;
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
-
                 // Get information about which element holds the namescope of the current element. For example, if the current element is inside a DataTemplate, the DataTemplate is the root of the namescope of the current element. If the element is not inside a DataTemplate or ControlTemplate, the root of the XAML is the root of the namescope of the current element.
                 XElement elementThatIsRootOfTheCurrentNamescope = GetRootOfCurrentNamescopeForRuntime(element);
-                bool isElementInRootNamescope = (elementThatIsRootOfTheCurrentNamescope.Parent == null);
+                bool isElementInRootNamescope = elementThatIsRootOfTheCurrentNamescope.Parent == null;
 
                 // Check if the element is the root element:
-                string elementTypeInCSharp =
-                    _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                        namespaceName, localTypeName, assemblyNameIfAny
-                    );
+                string elementTypeInCSharp = GetCSharpEquivalentOfXamlTypeAsString(
+                    element.Name,
+                    out string namespaceName,
+                    out string localTypeName,
+                    out string assemblyNameIfAny);
 
                 bool isRootElement = IsElementTheRootElement(element);
                 bool isKnownSystemType = SystemTypesHelper.IsSupportedSystemType(
@@ -386,7 +377,7 @@ namespace DotNetForHtml5.Compiler
 
                         string stringValue = element.Attribute(InsertingImplicitNodes.InitializedFromStringAttribute).Value;
 
-                        bool isKnownCoreType = CoreTypesHelper.IsSupportedCoreType(
+                        bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
                             elementTypeInCSharp.Substring("global::".Length), assemblyNameIfAny
                         );
 
@@ -405,7 +396,7 @@ namespace DotNetForHtml5.Compiler
 
                     }
                     else if (element.Attribute("Source") != null && _reflectionOnSeparateAppDomain.IsAssignableFrom(
-                        _metadata.SystemWindowsNS, "ResourceDictionary", element.Name.NamespaceName, element.Name.LocalName))
+                        _settings.Metadata.SystemWindowsNS, "ResourceDictionary", element.Name.NamespaceName, element.Name.LocalName))
                     {
                         //------------------------------------------------
                         // Add the type initialization from "Source" URI:
@@ -448,13 +439,13 @@ namespace DotNetForHtml5.Compiler
                 // Set templated parent if any
                 if (parameters.CurrentScope is FrameworkTemplateScope scope)
                 {
-                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
+                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                     {
                         parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {scope.TemplateOwner});");
                     }
                 }
 
-                if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsMediaAnimationNS, "Timeline", element.Name.NamespaceName, element.Name.LocalName))
+                if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsMediaAnimationNS, "Timeline", element.Name.NamespaceName, element.Name.LocalName))
                 {
                     parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.XamlContext_SetAnimationContext({parameters.CurrentXamlContext}, {elementUniqueNameOrThisKeyword});");
                 }
@@ -490,7 +481,7 @@ namespace DotNetForHtml5.Compiler
                                 // Add the code to register the name, etc.
                                 if (isElementInRootNamescope && parameters.GenerateFieldsForNamedElements)
                                 {
-                                    string fieldModifier = _metadata.FieldModifier;
+                                    string fieldModifier = _settings.Metadata.FieldModifier;
                                     XAttribute attr = element.Attribute(xNamespace + "FieldModifier");
                                     if (attr != null)
                                     {
@@ -506,11 +497,11 @@ namespace DotNetForHtml5.Compiler
 
                                 if (isXNameAttr)
                                 {
-                                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "DependencyObject",
+                                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "DependencyObject",
                                         element.Name.NamespaceName, element.Name.LocalName))
                                     {
                                         parameters.StringBuilder.AppendLine(
-                                            $"{elementUniqueNameOrThisKeyword}.SetValue(global::{_metadata.SystemWindowsNS}.FrameworkElement.NameProperty, \"{name}\");");                                        
+                                            $"{elementUniqueNameOrThisKeyword}.SetValue(global::{_settings.Metadata.SystemWindowsNS}.FrameworkElement.NameProperty, \"{name}\");");                                        
                                     }
                                 }
                                 else
@@ -525,12 +516,12 @@ namespace DotNetForHtml5.Compiler
                                 //todo: throw an exception when both "x:Name" and "Name" are specified in the XAML.
 
                             }
-                            else if (IsEventTriggerRoutedEventProperty(element.Name, attributeLocalName))
+                            else if (IsEventTriggerRoutedEventProperty(elementTypeInCSharp, attributeLocalName))
                             {
                                 // TODO Check that 'attributeLocalName' is effectively the LoadedEvent routed event.
                                 // Silverlight only allows the FrameworkElement.LoadedEvent as value for the EventTrigger.RoutedEvent
                                 // property, so for now we assume the xaml is always valid.
-                                parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent = global::{_metadata.SystemWindowsNS}.FrameworkElement.LoadedEvent;");
+                                parameters.StringBuilder.AppendLine($"{elementUniqueNameOrThisKeyword}.RoutedEvent = global::{_settings.Metadata.SystemWindowsNS}.FrameworkElement.LoadedEvent;");
                             }
                             else if (string.IsNullOrEmpty(attribute.Name.NamespaceName))
                             {
@@ -575,7 +566,7 @@ namespace DotNetForHtml5.Compiler
 
                                             // Generate the code for instantiating the attribute value:
                                             string codeForInstantiatingTheAttributeValue;
-                                            if (elementTypeInCSharp == $"global::{_metadata.SystemWindowsNS}.Setter")
+                                            if (elementTypeInCSharp == $"global::{_settings.Metadata.SystemWindowsNS}.Setter")
                                             {
                                                 //we get the parent Style node (since there is a Style.Setters node that is added, the parent style node is )
                                                 if (element.Parent != null && element.Parent.Parent != null && element.Parent.Parent.Name.LocalName == "Style")
@@ -614,7 +605,7 @@ namespace DotNetForHtml5.Compiler
                                                 else
                                                     throw new XamlParseException(@"""<Setter/>"" tags can only be declared inside a <Style/>.");
                                             }
-                                            else if (elementTypeInCSharp == $"global::{_metadata.SystemWindowsDataNS}.Binding"
+                                            else if (elementTypeInCSharp == $"global::{_settings.Metadata.SystemWindowsDataNS}.Binding"
                                                 && memberName == "Path")
                                             {
                                                 if (TryResolvePathForBinding(attributeValue, element, out string resolvedPath))
@@ -639,7 +630,7 @@ namespace DotNetForHtml5.Compiler
                                                         element
                                                     );
                                             }
-                                            else if (elementTypeInCSharp == $"global::{_metadata.SystemWindowsNS}.TemplateBindingExtension"
+                                            else if (elementTypeInCSharp == $"global::{_settings.Metadata.SystemWindowsNS}.TemplateBindingExtension"
                                                 && memberName == "Path")
                                             {
                                                 ResolvePathForTemplateBinding(attributeValue, element, out string typeName, out string propertyName);
@@ -702,9 +693,7 @@ namespace DotNetForHtml5.Compiler
                             string[] splitted = attribute.Name.LocalName.Split('.');
                             string classLocalNameForAttachedProperty = splitted[0];
                             XName elementNameForAttachedProperty = attribute.Name.Namespace + classLocalNameForAttachedProperty;
-                            string attachedPropertyTypeNamespaceName, attachedPropertyTypeLocalName, attachedPropertyTypeAssemblyNameIfAny;
-                            GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(elementNameForAttachedProperty, out attachedPropertyTypeNamespaceName, out attachedPropertyTypeLocalName, out attachedPropertyTypeAssemblyNameIfAny);
-                            string classFullNameForAttachedProperty = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(attachedPropertyTypeNamespaceName, attachedPropertyTypeLocalName, attachedPropertyTypeAssemblyNameIfAny);
+                            string classFullNameForAttachedProperty = GetCSharpEquivalentOfXamlTypeAsString(elementNameForAttachedProperty);
                             string propertyName = splitted[1];
 
                                 // Generate the code for instantiating the attribute value:
@@ -737,7 +726,7 @@ namespace DotNetForHtml5.Compiler
                 string propertyName = member.Name.LocalName.Substring(idx + 1);
 
                 if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                    _reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkTemplate", member.Name.NamespaceName, typeName))
+                    _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkTemplate", member.Name.NamespaceName, typeName))
                 {
                     if (member.Elements().Count() > 1)
                     {
@@ -749,7 +738,7 @@ namespace DotNetForHtml5.Compiler
                     FrameworkTemplateScope scope = new FrameworkTemplateScope(
                         frameworkTemplateName,
                         GetUniqueName(member.Elements().First()),
-                        _metadata);
+                        _settings.Metadata);
 
                     parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplateContent({frameworkTemplateName}, {parameters.CurrentXamlContext}, {scope.MethodName});");
 
@@ -762,8 +751,7 @@ namespace DotNetForHtml5.Compiler
                 XElement element = _reader.MemberData.Member;
 
                 // Get the namespace, local name, and optional assembly that correspond to the element:
-                string namespaceName, localTypeName, assemblyNameIfAny;
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(element.Name, out namespaceName, out localTypeName, out assemblyNameIfAny);
+                GetClrNamespaceAndLocalName(element.Name, out _, out _, out string assemblyNameIfAny);
 
                 // Get information about the parent element (to which the property applies) and the element itself:
                 var parentElement = element.Parent;
@@ -773,7 +761,7 @@ namespace DotNetForHtml5.Compiler
                 XName elementName = element.Name.Namespace + typeName; // eg. if the element is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
 
                 bool isFrameworkTemplateContentProperty = propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                   _reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkTemplate", element.Name.NamespaceName, typeName);
+                   _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkTemplate", element.Name.NamespaceName, typeName);
 
                 if (isFrameworkTemplateContentProperty)
                 {
@@ -784,12 +772,12 @@ namespace DotNetForHtml5.Compiler
                 {
                     XElement child = _reader.MemberData.Value;
 
-                    bool isAttachedProperty = GettingInformationAboutXamlTypes.IsPropertyAttached(element, _reflectionOnSeparateAppDomain); //(parentElement.Name != elementName) && !GettingInformationAboutXamlTypes.IsTypeAssignableFrom(parentElement.Name, elementName, reflectionOnSeparateAppDomain); // Note: the comparison includes the namespace. // eg. <Grid><VisualStateManager.VisualStateGroups>...</VisualStateManager.VisualStateGroups></Grid> should return "true", while <n:MyUserControl><UserControl.Resources>...</n:MyUserControl></UserControl.Resources> should return "false".
+                    bool isAttachedProperty = IsPropertyAttached(element);
 
                     // Check if the property is a collection, in which case we must use ".Add(...)", otherwise a simple "=" is enough:
-                    if (GettingInformationAboutXamlTypes.IsPropertyOrFieldACollection(element, _reflectionOnSeparateAppDomain, isAttachedProperty)
+                    if (IsPropertyOrFieldACollection(element, isAttachedProperty)
                         && (element.Elements().Count() != 1
-                        || (!GettingInformationAboutXamlTypes.IsTypeAssignableFrom(element.Elements().First().Name, element.Name, _reflectionOnSeparateAppDomain, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
+                        || (!IsTypeAssignableFrom(element.Elements().First().Name, element.Name, isAttached: isAttachedProperty)) // To handle the case where the user explicitly declares the collection element. Example: <Application.Resources><ResourceDictionary><Child x:Key="test"/></ResourceDictionary></Application.Resources> (rather than <Application.Resources><Child x:Key="test"/></Application.Resources>), in which case we need to do "=" instead pf "Add()"
                         && !IsBinding(element.Elements().First())
                         && element.Elements().First().Name.LocalName != "StaticResourceExtension"
                         && element.Elements().First().Name.LocalName != "StaticResource"
@@ -819,18 +807,16 @@ namespace DotNetForHtml5.Compiler
                             codeToAccessTheEnumerable = parentElementUniqueNameOrThisKeyword + "." + propertyName;
                         }
 
-                        if (GettingInformationAboutXamlTypes.IsPropertyOrFieldADictionary(element, _reflectionOnSeparateAppDomain, isAttachedProperty))
+                        if (IsPropertyOrFieldADictionary(element, isAttachedProperty))
                         {
-                            bool isImplicitStyle;
-                            bool isImplicitDataTemplate;
-                            string childKey = GetElementXKey(child, out isImplicitStyle, out isImplicitDataTemplate);
+                            string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                             if (isImplicitStyle)
                             {
                                 parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add(typeof({childKey}), {GetUniqueName(child)});");
                             }
                             else if (isImplicitDataTemplate)
                             {
-                                string key = $"new global::{_metadata.SystemWindowsNS}.DataTemplateKey(typeof({childKey}))";
+                                string key = $"new global::{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof({childKey}))";
 
                                 parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){codeToAccessTheEnumerable}).Add({key}, {GetUniqueName(child)});");
                             }
@@ -851,8 +837,11 @@ namespace DotNetForHtml5.Compiler
                         //------------------------
 
                         string childUniqueName = GetUniqueName(child);
-                        if (!GettingInformationAboutXamlTypes.IsElementAMarkupExtension(child, _reflectionOnSeparateAppDomain)
-                            || (child.Name.LocalName == "RelativeSource")) // Note about "RelativeSource": even though it inherits from "MarkupExtension", we do not was to consider "RelativeSource" as a markup extension for the compilation because it is only meant to be used WITHIN another markup extension (sort of a "nested" markup extension), such as in: "{Binding Background, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                        // Note about "RelativeSource": even though it inherits from "MarkupExtension", we do not was
+                        // to consider "RelativeSource" as a markup extension for the compilation because it is only
+                        // meant to be used WITHIN another markup extension (sort of a "nested" markup extension),
+                        // such as in: "{Binding Background, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                        if (!IsElementAMarkupExtension(child) || (child.Name.LocalName == "RelativeSource"))
                         {
                             if (isAttachedProperty)
                             {
@@ -879,18 +868,12 @@ namespace DotNetForHtml5.Compiler
                                 //------------------------------
 
                                 string[] splittedLocalName = element.Name.LocalName.Split('.');
-                                string propertyKey = GettingInformationAboutXamlTypes.GetKeyNameOfProperty(
-                                    parent, splittedLocalName[1], _reflectionOnSeparateAppDomain
-                                );
-                                string propertyKeyString = propertyKey ?? "null";
-                                string elementTypeInCSharp;
-                                string propertyNamespaceName, propertyLocalTypeName, propertyAssemblyName;
-                                bool isTypeString, isTypeEnum;
+                                string propertyNamespaceName, propertyLocalTypeName;
 
                                 // Attached property
                                 if (isAttachedProperty)
                                 {
-                                    elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                                    string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
                                         element.Name.NamespaceName, splittedLocalName[0], assemblyNameIfAny
                                     );
 
@@ -900,9 +883,9 @@ namespace DotNetForHtml5.Compiler
                                         splittedLocalName[0],
                                         out propertyNamespaceName,
                                         out propertyLocalTypeName,
-                                        out propertyAssemblyName,
-                                        out isTypeString,
-                                        out isTypeEnum,
+                                        out _,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny,
                                         isAttached: true
                                     );
@@ -922,19 +905,15 @@ namespace DotNetForHtml5.Compiler
                                 }
                                 else
                                 {
-                                    elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                                        parent.Name.NamespaceName, parent.Name.LocalName, assemblyNameIfAny
-                                    );
-
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
                                         out propertyNamespaceName,
                                         out propertyLocalTypeName,
-                                        out propertyAssemblyName,
-                                        out isTypeString,
-                                        out isTypeEnum,
+                                        out _,
+                                        out _,
+                                        out _,
                                         assemblyNameIfAny,
                                         isAttached: false
                                     );
@@ -999,8 +978,8 @@ namespace DotNetForHtml5.Compiler
 
                                 // Check if the property is of type "Binding" (or "BindingBase"), in which 
                                 // case we should directly assign the value instead of calling "SetBinding"
-                                bool isPropertyOfTypeBinding = propertyTypeFullName == $"global::{_metadata.SystemWindowsDataNS}.Binding" ||
-                                    propertyTypeFullName == $"global::{_metadata.SystemWindowsDataNS}.BindingBase";
+                                bool isPropertyOfTypeBinding = propertyTypeFullName == $"global::{_settings.Metadata.SystemWindowsDataNS}.Binding" ||
+                                    propertyTypeFullName == $"global::{_settings.Metadata.SystemWindowsDataNS}.BindingBase";
 
                                 if (isPropertyOfTypeBinding || !isDependencyProperty)
                                 {
@@ -1008,8 +987,13 @@ namespace DotNetForHtml5.Compiler
                                 }
                                 else
                                 {
-                                    parameters.StringBuilder.AppendLine(string.Format("global::{3}.BindingOperations.SetBinding({0}, {1}, {2});",
-                                        parentElementUniqueNameOrThisKeyword, propertyDeclaringTypeName + "." + propertyName + "Property", GetUniqueName(child), _metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
+                                    parameters.StringBuilder.AppendLine(
+                                        string.Format(
+                                            "global::{3}.BindingOperations.SetBinding({0}, {1}, {2});",
+                                            parentElementUniqueNameOrThisKeyword,
+                                            propertyDeclaringTypeName + "." + propertyName + "Property",
+                                            GetUniqueName(child),
+                                            _settings.Metadata.SystemWindowsDataNS)); //we add the container itself since we couldn't add it inside the while
                                 }
                             }
                             else if (child.Name.LocalName == "TemplateBindingExtension")
@@ -1051,7 +1035,7 @@ namespace DotNetForHtml5.Compiler
                                 // Other (custom MarkupExtensions)
                                 //------------------------------
 
-                                string propertyKey = GettingInformationAboutXamlTypes.GetKeyNameOfProperty(
+                                string propertyKey = GetKeyNameOfProperty(
                                     parent, element.Name.LocalName.Split('.')[1], _reflectionOnSeparateAppDomain
                                 );
                                 string propertyKeyString = propertyKey ?? "null";
@@ -1064,17 +1048,15 @@ namespace DotNetForHtml5.Compiler
 
                                     string[] splittedLocalName = element.Name.LocalName.Split('.');
 
-                                    string propertyNamespaceName, propertyLocalTypeName, propertyAssemblyName;
-                                    bool isTypeString, isTypeEnum;
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldTypeInfo(
                                         propertyName,
                                         element.Name.NamespaceName,
                                         splittedLocalName[0],
-                                        out propertyNamespaceName,
-                                        out propertyLocalTypeName,
-                                        out propertyAssemblyName,
-                                        out isTypeString,
-                                        out isTypeEnum,
+                                        out string propertyNamespaceName,
+                                        out string propertyLocalTypeName,
+                                        out string propertyAssemblyName,
+                                        out bool isTypeString,
+                                        out bool isTypeEnum,
                                         assemblyNameIfAny,
                                         true
                                     );
@@ -1103,25 +1085,19 @@ namespace DotNetForHtml5.Compiler
                                 }
                                 else
                                 {
-                                    string propertyNamespaceName, propertyLocalTypeName, propertyAssemblyName;
-                                    bool isTypeString, isTypeEnum;
-
                                     // Todo: remove what is irrelevant below:
                                     // Note: the code was copy-pasted from the Binding section from here.
                                     // It is because we need to call SetBinding if a Custom marckup
                                     // expression returns a Binding.
-                                    string propertyDeclaringTypeName;
-                                    string propertyTypeNamespace;
-                                    string propertyTypeName;
                                     _reflectionOnSeparateAppDomain.GetPropertyOrFieldInfo(
                                         propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
-                                        out propertyDeclaringTypeName,
-                                        out propertyTypeNamespace,
-                                        out propertyTypeName,
-                                        out isTypeString,
-                                        out isTypeEnum,
+                                        out string propertyDeclaringTypeName,
+                                        out string propertyTypeNamespace,
+                                        out string propertyTypeName,
+                                        out bool isTypeString,
+                                        out bool isTypeEnum,
                                         assemblyNameIfAny,
                                         false
                                     );
@@ -1130,9 +1106,9 @@ namespace DotNetForHtml5.Compiler
                                         propertyName,
                                         parent.Name.Namespace.NamespaceName,
                                         parent.Name.LocalName,
-                                        out propertyNamespaceName,
-                                        out propertyLocalTypeName,
-                                        out propertyAssemblyName,
+                                        out string propertyNamespaceName,
+                                        out string propertyLocalTypeName,
+                                        out string propertyAssemblyName,
                                         out isTypeString,
                                         out isTypeEnum,
                                         assemblyNameIfAny
@@ -1149,7 +1125,7 @@ namespace DotNetForHtml5.Compiler
 
                                     if (isDependencyProperty)
                                     {
-                                        string bindingBaseTypeString = $"global::{_metadata.SystemWindowsDataNS}.Binding";
+                                        string bindingBaseTypeString = $"global::{_settings.Metadata.SystemWindowsDataNS}.Binding";
 
                                         //todo: make this more readable by cutting it into parts ?
                                         parameters.StringBuilder.AppendLine(
@@ -1171,7 +1147,7 @@ else
                                                           "global::" + (!string.IsNullOrEmpty(propertyNamespaceName) ? propertyNamespaceName + "." : "") + propertyLocalTypeName,//6
                                                           parentElementUniqueNameOrThisKeyword,//7
                                                           propertyDeclaringTypeName + "." + propertyName + "Property", //8
-                                                          _metadata.SystemWindowsDataNS, //9
+                                                          _settings.Metadata.SystemWindowsDataNS, //9
                                                           IMarkupExtensionClass));
                                     }
                                     else
@@ -1200,18 +1176,16 @@ else
 
                 string targetUniqueName = GetUniqueName(target);
 
-                if (GettingInformationAboutXamlTypes.IsElementADictionary(target, _reflectionOnSeparateAppDomain))
+                if (IsElementADictionary(target))
                 {
-                    bool isImplicitStyle;
-                    bool isImplicitDataTemplate;
-                    string childKey = GetElementXKey(child, out isImplicitStyle, out isImplicitDataTemplate);
+                    string childKey = GetElementXKey(child, out bool isImplicitStyle, out bool isImplicitDataTemplate);
                     if (isImplicitStyle)
                     {
                         parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add(typeof({childKey}), {GetUniqueName(child)});");
                     }
                     else if (isImplicitDataTemplate)
                     {
-                        string key = $"new global::{_metadata.SystemWindowsNS}.DataTemplateKey(typeof({childKey}))";
+                        string key = $"new global::{_settings.Metadata.SystemWindowsNS}.DataTemplateKey(typeof({childKey}))";
 
                         parameters.StringBuilder.AppendLine($"((global::System.Collections.IDictionary){targetUniqueName}).Add({key}, {GetUniqueName(child)});");
                     }
@@ -1260,7 +1234,7 @@ else
                         string propertyName = currentElement.Parent.Name.LocalName.Substring(index + 1);
 
                         if (propertyName == "ContentPropertyUsefulOnlyDuringTheCompilation" &&
-                            _reflectionOnSeparateAppDomain.IsAssignableFrom(_metadata.SystemWindowsNS, "FrameworkTemplate",
+                            _reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkTemplate",
                             namespaceName, typeName))
                         {
                             return currentElement;
@@ -1280,7 +1254,7 @@ else
 
             private bool IsClassTheApplicationClass(string className)
             {
-                return className == $"global::{_metadata.SystemWindowsNS}.Application";
+                return className == $"global::{_settings.Metadata.SystemWindowsNS}.Application";
             }
 
             private string GenerateCodeForSetterProperty(XElement styleElement, string attributeValue)
@@ -1308,9 +1282,15 @@ else
                 {
                     string[] splittedAttachedProperty = propertyName.Split('.');
                     string propertyFullXamlTypeName = namespaceName + (hasNamespace ? ":" : "") + splittedAttachedProperty[0];
-                    string elementNamespaceName, elementLocalTypeName, assemblyIfAny;
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(propertyFullXamlTypeName, styleElement, out elementNamespaceName, out elementLocalTypeName, out assemblyIfAny);
-                    elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(elementNamespaceName, elementLocalTypeName);
+                    GetClrNamespaceAndLocalName(propertyFullXamlTypeName,
+                        styleElement,
+                        out string elementNamespaceName,
+                        out string elementLocalTypeName,
+                        out string _);
+                    elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                        elementNamespaceName,
+                        elementLocalTypeName);
+
                     dependencyPropertyName = splittedAttachedProperty[1] + "Property";
                 }
                 else
@@ -1370,31 +1350,43 @@ else
                     attributeTypeString = attributeToLookAt.Value.Split('.')[0];
                 }
 
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(attributeTypeString, currentXElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
+                GetClrNamespaceAndLocalName(attributeTypeString, currentXElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
                 return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: false);
             }
 
             private string GetCSharpFullTypeNameFromTargetTypeString(XElement styleElement, bool isDataType = false)
             {
-                string namespaceName;
-                string localTypeName;
-                string assemblyNameIfAny;
                 var targetTypeAttribute = styleElement.Attribute(isDataType ? "DataType" : "TargetType");
                 if (targetTypeAttribute == null)
                     throw new XamlParseException(isDataType ? "DataTemplate must declare a DataType or have a key." : "Style must declare a TargetType.");
-                string targetTypeString = targetTypeAttribute.Value;
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(targetTypeString, styleElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
-                string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: false);
+
+                GetClrNamespaceAndLocalName(targetTypeAttribute.Value,
+                    styleElement,
+                    out string namespaceName,
+                    out string localTypeName,
+                    out string assemblyNameIfAny);
+                string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                    namespaceName,
+                    localTypeName,
+                    assemblyNameIfAny,
+                    ifTypeNotFoundTryGuessing: false);
+
                 return elementTypeInCSharp;
             }
 
             private string GetCSharpFullTypeName(string typeString, XElement elementWhereTheTypeIsUsed)
             {
-                string namespaceName;
-                string localTypeName;
-                string assemblyNameIfAny;
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(typeString, elementWhereTheTypeIsUsed, out namespaceName, out localTypeName, out assemblyNameIfAny);
-                string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: false);
+                GetClrNamespaceAndLocalName(typeString,
+                    elementWhereTheTypeIsUsed,
+                    out string namespaceName,
+                    out string localTypeName,
+                    out string assemblyNameIfAny);
+                string elementTypeInCSharp = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                    namespaceName,
+                    localTypeName,
+                    assemblyNameIfAny,
+                    ifTypeNotFoundTryGuessing: false);
+
                 return elementTypeInCSharp;
             }
 
@@ -1467,10 +1459,11 @@ else
                 string value,
                 XElement elementWhereTheTypeIsUsed)
             {
-                string namespaceName, localTypeName, assemblyNameIfAny;
-                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
-                    xName, out namespaceName, out localTypeName, out assemblyNameIfAny
-                );
+                GetClrNamespaceAndLocalName(
+                    xName,
+                    out string namespaceName,
+                    out string localTypeName,
+                    out string assemblyNameIfAny);
 
                 string valueNamespaceName, valueLocalTypeName, valueAssemblyName;
                 bool isValueString, isValueEnum;
@@ -1566,7 +1559,7 @@ else
                         valueTypeFullName.Substring("global::".Length), valueAssemblyName
                     );
 
-                    bool isKnownCoreType = CoreTypesHelper.IsSupportedCoreType(
+                    bool isKnownCoreType = _settings.CoreTypesConverter.IsSupportedCoreType(
                         valueTypeFullName.Substring("global::".Length), valueAssemblyName
                     );
 
@@ -1601,7 +1594,7 @@ else
                     || parentXName.LocalName == "HyperlinkButton";
 
                 // We change relative paths into absolute paths in case of <Image> controls and other controls that have the "Source" property:
-                if ((valueTypeFullName == $"global::{_metadata.SystemWindowsMediaNS}.ImageSource"
+                if ((valueTypeFullName == $"global::{_settings.Metadata.SystemWindowsMediaNS}.ImageSource"
                     || valueTypeFullName == "global::System.Uri"
                     || (propertyName == "FontFamily" && path.Contains('.')))
                     && !IsFrameOrUriMappingSpecialCase
@@ -1737,10 +1730,11 @@ else
                     }
 
                     XNamespace xmlNamespace = xmlPrefix == null ? element.GetDefaultNamespace() : element.GetNamespaceOfPrefix(xmlPrefix);
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    GetClrNamespaceAndLocalName(
                         XName.Get(typeName, xmlNamespace.NamespaceName),
-                        out string namespaceName, out string localTypeName, out string assemblyName
-                    );
+                        out string namespaceName,
+                        out string localTypeName,
+                        out string assemblyName);
 
                     string assemblyQualifiedName = _reflectionOnSeparateAppDomain.GetAssemblyQualifiedNameOfXamlType(
                         namespaceName, localTypeName, assemblyName
@@ -1785,27 +1779,21 @@ else
                     }
 
                     XNamespace xmlNamespace = xmlPrefix == null ? element.GetDefaultNamespace() : element.GetNamespaceOfPrefix(xmlPrefix);
-                    GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
-                        XName.Get(type, xmlNamespace.NamespaceName),
-                        out string namespaceName, out string localTypeName, out string assemblyName
-                    );
-
                     try
                     {
-                        typeName = _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
-                            namespaceName, localTypeName, assemblyName);
+                        typeName = GetCSharpEquivalentOfXamlTypeAsString(XName.Get(type, xmlNamespace.NamespaceName));
                     }
                     catch { }
                 }
             }
 
-            private static string ConvertFromInvariantString(string value, string type, bool isKnownCoreType, bool isKnownSystemType)
+            private string ConvertFromInvariantString(string value, string type, bool isKnownCoreType, bool isKnownSystemType)
             {
                 string preparedValue;
 
                 if (isKnownCoreType)
                 {
-                    preparedValue = CoreTypesHelper.ConvertFromInvariantString(
+                    preparedValue = _settings.CoreTypesConverter.ConvertFromInvariantString(
                         value, type.Substring("global::".Length)
                     );
                 }
@@ -1823,7 +1811,7 @@ else
                 return preparedValue;
             }
 
-            private static string ConvertFromInvariantString(
+            private string ConvertFromInvariantString(
                 string propertyDeclaringType,
                 string propertyName,
                 string value,
@@ -1842,46 +1830,8 @@ else
                 );
             }
 
-            private bool IsEventTriggerRoutedEventProperty(XName xName, string propertyName)
-            {
-                if (xName.LocalName != "EventTrigger" || propertyName != "RoutedEvent")
-                {
-                    return false;
-                }
-
-                if (xName.NamespaceName.StartsWith("clr-namespace:"))
-                {
-                    GettingInformationAboutXamlTypes.ParseClrNamespaceDeclaration(xName.NamespaceName, out string ns, out string assembly);
-#if MIGRATION
-                    return ns == _metadata.SystemWindowsNS && (assembly == _metadata.SystemWindowsDLL || assembly == GetCurrentCoreAssemblyName());
-#else
-                    return ns == _metadata.SystemWindowsNS && assembly == GetCurrentCoreAssemblyName();
-#endif
-                }
-
-                return DefaultXamlNamespaces.Contains(xName.Namespace);
-            }
-
-            private static string GetCurrentCoreAssemblyName()
-            {
-#if MIGRATION
-
-#if CSHTML5BLAZOR
-                return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR;
-#elif BRIDGE
-                return Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE;
-#endif
-
-#else
-
-#if CSHTML5BLAZOR
-                return Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR;
-#elif BRIDGE
-                return Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE;
-#endif
-
-#endif
-            }
+            private bool IsEventTriggerRoutedEventProperty(string typeFullName, string propertyName)
+                => propertyName == "RoutedEvent" && typeFullName == $"global::{_settings.Metadata.SystemWindowsNS}.EventTrigger";
 
             private static bool IsReservedAttribute(string attributeName)
             {
@@ -1898,6 +1848,148 @@ else
             {
                 return string.Concat("@\"", stringValue.Replace("\"", "\"\""), "\"");
             }
+
+            private bool IsPropertyAttached(XElement propertyElement)
+            {
+                GetClrNamespaceAndLocalName(propertyElement.Name, out string namespaceName, out string localName, out string assemblyNameIfAny);
+                if (localName.Contains("."))
+                {
+                    var split = localName.Split('.');
+                    var typeLocalName = split[0];
+                    var propertyOrFieldName = split[1];
+                    GetClrNamespaceAndLocalName(propertyElement.Parent.Name, out string parentNamespaceName, out string parentLocalTypeName, out string parentAssemblyIfAny);
+                    return _reflectionOnSeparateAppDomain.IsPropertyAttached(propertyOrFieldName, namespaceName, typeLocalName, parentNamespaceName, parentLocalTypeName, assemblyNameIfAny);
+                }
+
+                return false;
+            }
+
+            private bool IsPropertyOrFieldACollection(XElement propertyElement, bool isAttachedProperty)
+            {
+                if (isAttachedProperty)
+                {
+                    string methodName = "Get" + propertyElement.Name.LocalName.Split('.')[1]; // In case of attached property, we check the return type of the method "GetPROPERTYNAME()". For example, in case of "Grid.Row", we check the return type of the method "Grid.GetRow()".
+                    XName elementName = propertyElement.Name.Namespace + propertyElement.Name.LocalName.Split('.')[0]; // eg. if the propertyElement is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
+                    GetClrNamespaceAndLocalName(elementName, out string namespaceName, out string localName, out string assemblyNameIfAny);
+                    return _reflectionOnSeparateAppDomain.DoesMethodReturnACollection(methodName, namespaceName, localName, assemblyNameIfAny);
+                }
+                else
+                {
+                    var propertyOrFieldName = propertyElement.Name.LocalName.Split('.')[1];
+                    var parentElement = propertyElement.Parent;
+                    GetClrNamespaceAndLocalName(parentElement.Name, out string parentNamespaceName, out string parentLocalName, out string parentAssemblyNameIfAny);
+                    return _reflectionOnSeparateAppDomain.IsPropertyOrFieldACollection(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
+                }
+            }
+
+            private bool IsPropertyOrFieldADictionary(
+                XElement propertyElement,
+                bool isAttachedProperty)
+            {
+                if (isAttachedProperty)
+                {
+                    string methodName = "Get" + propertyElement.Name.LocalName.Split('.')[1]; // In case of attached property, we check the return type of the method "GetPROPERTYNAME()". For example, in case of "Grid.Row", we check the return type of the method "Grid.GetRow()".
+                    XName elementName = propertyElement.Name.Namespace + propertyElement.Name.LocalName.Split('.')[0]; // eg. if the propertyElement is <VisualStateManager.VisualStateGroups>, this will be "DefaultNamespace+VisualStateManager"
+                    GetClrNamespaceAndLocalName(elementName, out string namespaceName, out string localName, out string assemblyNameIfAny);
+                    return _reflectionOnSeparateAppDomain.DoesMethodReturnADictionary(methodName, namespaceName, localName, assemblyNameIfAny);
+                }
+                else
+                {
+                    var propertyOrFieldName = propertyElement.Name.LocalName.Split('.')[1];
+                    var parentElement = propertyElement.Parent;
+                    GetClrNamespaceAndLocalName(parentElement.Name, out string parentNamespaceName, out string parentLocalName, out string parentAssemblyNameIfAny);
+                    return _reflectionOnSeparateAppDomain.IsPropertyOrFieldADictionary(propertyOrFieldName, parentNamespaceName, parentLocalName, parentAssemblyNameIfAny);
+                }
+            }
+
+            private bool IsElementADictionary(XElement element)
+            {
+                GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
+                return _reflectionOnSeparateAppDomain.IsElementADictionary(elementNameSpace, elementLocalName, assemblyNameIfAny);
+            }
+
+            private bool IsElementAMarkupExtension(XElement element)
+            {
+                GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
+                return _reflectionOnSeparateAppDomain.IsElementAMarkupExtension(elementNameSpace, elementLocalName, assemblyNameIfAny);
+            }
+
+            private bool IsTypeAssignableFrom(XName elementOfTypeToAssignFrom, XName elementOfTypeToAssignTo, bool isAttached = false)
+            {
+                GetClrNamespaceAndLocalName(elementOfTypeToAssignFrom, out string nameSpaceOfTypeToAssignFrom, out string nameOfTypeToAssignFrom, out string assemblyNameOfTypeToAssignFrom);
+                GetClrNamespaceAndLocalName(elementOfTypeToAssignTo, out string nameSpaceOfTypeToAssignTo, out string nameOfTypeToAssignTo, out string assemblyNameOfTypeToAssignTo);
+                return _reflectionOnSeparateAppDomain.IsTypeAssignableFrom(nameSpaceOfTypeToAssignFrom, nameOfTypeToAssignFrom, assemblyNameOfTypeToAssignFrom, nameSpaceOfTypeToAssignTo, nameOfTypeToAssignTo, assemblyNameOfTypeToAssignTo, isAttached);
+            }
+
+            private void GetClrNamespaceAndLocalName(
+                string typeAsStringInsideAXamlAttribute,
+                XElement elementWhereTheTypeIsUsed,
+                out string namespaceName,
+                out string localName,
+                out string assemblyNameIfAny)
+            {
+                XNamespace xNamespace = null;
+                if (typeAsStringInsideAXamlAttribute.Contains(':'))
+                {
+                    string[] splitted = typeAsStringInsideAXamlAttribute.Split(':');
+                    string prefix = splitted[0];
+                    typeAsStringInsideAXamlAttribute = splitted[1];
+                    xNamespace = elementWhereTheTypeIsUsed.GetNamespaceOfPrefix(prefix);
+                }
+                if (xNamespace == null)
+                {
+                    xNamespace = elementWhereTheTypeIsUsed.GetDefaultNamespace();
+                }
+
+                XName name = xNamespace + typeAsStringInsideAXamlAttribute;
+
+                GetClrNamespaceAndLocalName(name, out namespaceName, out localName, out assemblyNameIfAny);
+            }
+
+            private string GetKeyNameOfProperty(XElement element, string propertyName, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+            {
+                GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
+                return reflectionOnSeparateAppDomain.GetKeyNameOfProperty(elementNameSpace, elementLocalName, assemblyNameIfAny, propertyName);
+            }
+
+            private void GetClrNamespaceAndLocalName(XName xName, out string namespaceName, out string localName, out string assemblyNameIfAny)
+                => GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    xName,
+                    _settings.EnableImplicitAssemblyRedirection,
+                    out namespaceName,
+                    out localName,
+                    out assemblyNameIfAny);
+
+            private string GetCSharpEquivalentOfXamlTypeAsString(
+                XName xName,
+                bool ifTypeNotFoundTryGuessing,
+                out string namespaceName,
+                out string typeName,
+                out string assemblyName)
+            {
+                GettingInformationAboutXamlTypes.GetClrNamespaceAndLocalName(
+                    xName,
+                    _settings.EnableImplicitAssemblyRedirection,
+                    out namespaceName,
+                    out typeName,
+                    out assemblyName);
+
+                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsString(
+                    namespaceName,
+                    typeName,
+                    assemblyName,
+                    ifTypeNotFoundTryGuessing);
+            }
+
+            private string GetCSharpEquivalentOfXamlTypeAsString(
+                XName xName,
+                out string namespaceName,
+                out string typeName,
+                out string assemblyName)
+                => GetCSharpEquivalentOfXamlTypeAsString(xName, false, out namespaceName, out typeName, out assemblyName);
+
+            private string GetCSharpEquivalentOfXamlTypeAsString(XName xName, bool ifTypeNotFoundTryGuessing = false)
+                => GetCSharpEquivalentOfXamlTypeAsString(xName, ifTypeNotFoundTryGuessing, out _, out _, out _);
         }
     }
 }

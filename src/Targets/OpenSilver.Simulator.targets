@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	
-	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.dll" TaskName="DotNetForHtml5.Compiler.ResourcesExtractorAndCopier" />
+	<UsingTask AssemblyFile="$(MSBuildThisFileDirectory)..\tools\OpenSilver.Compiler.Resources.dll" TaskName="OpenSilver.Compiler.Resources.ResourcesExtractorAndCopier" />
 
 	<PropertyGroup>
 		<CoreBuildDependsOn>
@@ -11,16 +11,13 @@
 	</PropertyGroup>
 	
 	<Target Name="ResourcesExtractor">
-		<!-- TODO: remove IsBridgeBasedVersion from this task, it is unused -->
 		<ResourcesExtractorAndCopier
 			SourceAssembly="$(OutputPath)\$(AssemblyName).exe"
 			OutputRootPath="wwwroot\"
 			OutputResourcesPath="resources\"
 			AssembliesToIgnore="mscorlib|System.Core|Microsoft.CSharp"
 			SupportedExtensions=".js|.css|.png|.jpg|.gif|.ico|.mp4|.ogv|.webm|.3gp|.mp3|.ogg|.txt|.xml|.ttf|.woff|.cur|.config|.ClientConfig|.htm|.html|.svg"
-			IsBridgeBasedVersion="true"
 			CoreAssemblyFiles="$(OutputPath)\OpenSilver.dll">
-			
 			<Output TaskParameter="CopiedResXFiles" PropertyName="CopiedResXFiles"/>
 			<Output TaskParameter="IsSuccess" PropertyName="ResourceExtractorAndCopierIsSuccess"/>
 		</ResourcesExtractorAndCopier>
