@@ -24,15 +24,17 @@ namespace DotNetForHtml5
     {
         void ExecuteJavaScript(string javaScriptToExecute);
 
-        object ExecuteJavaScriptWithResult(string javaScriptToExecute);        
+        object ExecuteJavaScriptWithResult(string javaScriptToExecute);
     }
 
-    public interface IJavaScriptExecutionHandler2 : IJavaScriptExecutionHandler
+    public interface IWebAssemblyExecutionHandler : IJavaScriptExecutionHandler
     {
         TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
+        TResult InvokeUnmarshalled<T0, T1, TResult>(string identifier, T0 arg0, T1 arg1);
+        TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2);
     }
 
-    internal sealed class JSRuntimeWrapper : IJavaScriptExecutionHandler2
+    internal sealed class JSRuntimeWrapper : IWebAssemblyExecutionHandler
     {
         private readonly IJavaScriptExecutionHandler _jsRuntime;
 
@@ -48,6 +50,12 @@ namespace DotNetForHtml5
             => _jsRuntime.ExecuteJavaScriptWithResult(javaScriptToExecute);
 
         public TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0)
+            => throw new NotSupportedException();
+
+        public TResult InvokeUnmarshalled<T0, T1, TResult>(string identifier, T0 arg0, T1 arg1)
+            => throw new NotSupportedException();
+
+        public TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2)
             => throw new NotSupportedException();
     }
 }

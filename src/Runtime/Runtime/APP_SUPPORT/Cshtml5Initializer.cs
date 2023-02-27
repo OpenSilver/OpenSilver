@@ -19,9 +19,11 @@ namespace DotNetForHtml5
 {
     public static class Cshtml5Initializer
     {
-        public static void Initialize(IJavaScriptExecutionHandler2 executionHandler)
+        public static int PendingJsBufferSize { get; set; } = 1024 * 1024 * 2; // 2 MB
+
+        public static void Initialize(IWebAssemblyExecutionHandler executionHandler)
         {
-            INTERNAL_Simulator.JavaScriptExecutionHandler2 = executionHandler;
+            INTERNAL_Simulator.WebAssemblyExecutionHandler = executionHandler;
 #if MIGRATION
             EmulatorWithoutJavascript.StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(typeof(System.Windows.Controls.Button).Assembly);
 #else
@@ -38,7 +40,7 @@ namespace DotNetForHtml5
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void Initialize(IJavaScriptExecutionHandler executionHandler)
         {
-            IJavaScriptExecutionHandler2 jsRuntime = executionHandler as IJavaScriptExecutionHandler2
+            IWebAssemblyExecutionHandler jsRuntime = executionHandler as IWebAssemblyExecutionHandler
                 ?? new JSRuntimeWrapper(executionHandler);
 
             Initialize(jsRuntime);

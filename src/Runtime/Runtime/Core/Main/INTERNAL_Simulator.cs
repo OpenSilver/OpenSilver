@@ -80,20 +80,20 @@ namespace DotNetForHtml5.Core
 #if CSHTML5NETSTANDARD
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler
         {
-            get => JavaScriptExecutionHandler2;
+            get => WebAssemblyExecutionHandler;
             set
             {
-                IJavaScriptExecutionHandler2 jsRuntime = null;
+                IWebAssemblyExecutionHandler jsRuntime = null;
                 if (value is not null)
                 {
-                    jsRuntime = value as IJavaScriptExecutionHandler2 ?? new JSRuntimeWrapper(value);
+                    jsRuntime = value as IWebAssemblyExecutionHandler ?? new JSRuntimeWrapper(value);
                 }
                 
-                JavaScriptExecutionHandler2 = jsRuntime;
+                WebAssemblyExecutionHandler = jsRuntime;
             }
         } // Intended to be injected when the app is initialized.
 
-        internal static IJavaScriptExecutionHandler2 JavaScriptExecutionHandler2
+        internal static IWebAssemblyExecutionHandler WebAssemblyExecutionHandler
         {
             get;
             set;
