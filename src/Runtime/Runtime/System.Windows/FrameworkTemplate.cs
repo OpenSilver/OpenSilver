@@ -15,6 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Markup;
+using System.Xaml.Markup;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Xaml.Context;
 
@@ -42,6 +43,7 @@ namespace Windows.UI.Xaml
             CanBeInheritanceContext = false;
         }
 
+        [Ambient]
         internal TemplateContent Template
         {
             get { return _template; }

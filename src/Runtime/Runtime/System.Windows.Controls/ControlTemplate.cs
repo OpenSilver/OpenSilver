@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.Xaml.Markup;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -40,6 +41,7 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Gets or sets the type to which the ControlTemplate is applied.
         /// </summary>
+        [Ambient]
         public Type TargetType { get; set; }
     }
 }

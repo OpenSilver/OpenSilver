@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Input;
+using System.Windows.Markup;
 
 #if MIGRATION
 using System.Windows;
@@ -375,6 +376,7 @@ namespace System.ComponentModel
 #endif
                 [typeof(CacheMode)] = new CacheModeConverter(),
                 [typeof(FontStretch)] = new FontStretchConverter(),
+                [typeof(DependencyProperty)] = new DependencyPropertyConverter(),
             };
         }
 

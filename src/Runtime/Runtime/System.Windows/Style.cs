@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Markup;
+using System.Xaml.Markup;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -107,6 +108,7 @@ namespace Windows.UI.Xaml
         /// <remarks>
         ///     By default, the target type is FrameworkElement
         /// </remarks>
+        [Ambient]
         public Type TargetType
         {
             get
