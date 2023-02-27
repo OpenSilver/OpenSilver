@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,8 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -73,124 +69,17 @@ namespace Windows.UI.Xaml.Controls
                 typeof(StackPanel),
                 new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
                 {
-                    MethodToUpdateDom2 = UpdateDomOnOrientationChanged,
+                    MethodToUpdateDom2 = StackPanelHelper.OnOrientationChanged,
                 });
-
-        private static void UpdateDomOnOrientationChanged(DependencyObject d, object oldValue, object newValue)
-        {
-            var stackPanel = (StackPanel)d;
-            if (stackPanel.IsUnderCustomLayout)
-            {
-                return;
-            }
-
-            var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(stackPanel.INTERNAL_InnerDomElement);
-            switch ((Orientation)newValue)
-            {
-                case Orientation.Vertical:
-                    innerDivStyle.display = "block";
-                    innerDivStyle.height = string.Empty;
-                    if (!stackPanel.CustomLayout)
-                    {
-                        stackPanel.UpdateChildWrappers(true);
-                    }
-                    break;
-
-                case Orientation.Horizontal:
-                    innerDivStyle.display = "flex";
-                    innerDivStyle.height = "100%";
-                    if (!stackPanel.CustomLayout)
-                    {
-                        stackPanel.UpdateChildWrappers(false);
-                    }
-                    break;
-            }
-        }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object outerDiv);
-
-            if (IsUnderCustomLayout)
-            {
-                domElementWhereToPlaceChildren = outerDiv;
-                return outerDiv;
-            }
-            else if (IsCustomLayoutRoot)
-            {
-                outerDivStyle.position = "relative";
-            }
-
-            var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
-            switch (Orientation)
-            {
-                case Orientation.Vertical:
-                    innerDivStyle.display = "block";
-                    innerDivStyle.height = string.Empty;
-                    break;
-
-                case Orientation.Horizontal:
-                    innerDivStyle.display = "flex";
-                    innerDivStyle.height = "100%";
-                    break;
-            }
-
-            domElementWhereToPlaceChildren = innerDiv;
-
-            return outerDiv;
+            return StackPanelHelper.CreateDomElement(this, parentRef, out domElementWhereToPlaceChildren);
         }
 
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
         {
-            if (IsUnderCustomLayout || IsCustomLayoutRoot)
-            {
-                domElementWhereToPlaceChild = null;
-                return null;
-            }
-
-            var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this, index);
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-            switch (Orientation)
-            {
-                case Orientation.Vertical:
-                    style.display = "block";
-                    break;
-
-                case Orientation.Horizontal:
-                    style.display = "flex";
-                    style.flex = "0 0 auto";
-                    break;
-
-                default:
-                    throw new InvalidOperationException();
-            }
-
-            domElementWhereToPlaceChild = div;
-            return div;
-        }
-
-        private void UpdateChildWrappers(bool isVertical)
-        {
-            if (!HasChildren) return;
-            foreach (UIElement child in Children)
-            {
-                if (child.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny is not null)
-                {
-                    var wrapperDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(
-                        child.INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny);
-
-                    if (isVertical)
-                    {
-                        wrapperDivStyle.display = "block";
-                        wrapperDivStyle.flex = string.Empty;
-                    }
-                    else
-                    {
-                        wrapperDivStyle.display = "flex";
-                        wrapperDivStyle.flex = "0 0 auto";
-                    }
-                }
-            }
+            return StackPanelHelper.CreateDomChildWrapper(this, parentRef, out domElementWhereToPlaceChild, index);
         }
 
         private double GetCrossLength(Size size)

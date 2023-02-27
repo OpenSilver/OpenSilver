@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Controls
     /// Arranges and virtualizes content on a single line that is oriented either horizontally
     /// or vertically.
     /// </summary>
-    public partial class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
+    public class VirtualizingStackPanel : VirtualizingPanel, IScrollInfo
     {
         private const double LineDelta = 14.7;
         private const double Wheelitude = 3;
@@ -68,7 +68,10 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Orientation), 
                 typeof(Orientation), 
                 typeof(VirtualizingStackPanel), 
-                new PropertyMetadata(Orientation.Vertical, OrientationChanged));
+                new PropertyMetadata(Orientation.Vertical, OrientationChanged)
+                {
+                    MethodToUpdateDom2 = StackPanelHelper.OnOrientationChanged,
+                });
 
         /// <summary>
         /// Gets or sets a value that describes the horizontal or vertical orientation of
@@ -911,5 +914,15 @@ namespace Windows.UI.Xaml.Controls
                 ScrollOwner.InvalidateScrollInfo();
         }
         #endregion "IScrollInfo"
+
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            return StackPanelHelper.CreateDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+        }
+
+        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
+        {
+            return StackPanelHelper.CreateDomChildWrapper(this, parentRef, out domElementWhereToPlaceChild, index);
+        }
     }
 }
