@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -145,6 +146,8 @@ namespace Windows.UI.Xaml
                 Binding binding = value as Binding;
                 if (binding == null)
                 {
+                    var converter = TypeConverterHelper.GetConverter(dp.PropertyType);
+
                     // Special case :
                     // In xaml, setting a color via StaticResource to the value of a
                     // style setter converts the color to a SolidColorBrush as shown in
@@ -158,8 +161,16 @@ namespace Windows.UI.Xaml
                     // workaround.
                     if (dp.PropertyType == typeof(Brush) && value is Color color)
                     {
-                        // do not use Value to avoid unecessary checks.
+                        // do not use Value to avoid unnecessary checks.
                         _value = new SolidColorBrush(color);
+                    }
+                    else if (value is string stringValue && stringValue.Trim().ToLower() == "auto" && dp.PropertyType == typeof(double))
+                    {
+                        _value = double.NaN;
+                    }
+                    else if (converter != null)
+                    {
+                        _value = converter.ConvertFrom(value);
                     }
                     else if (!isObjectType)
                     {
