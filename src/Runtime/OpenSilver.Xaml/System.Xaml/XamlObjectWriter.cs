@@ -30,6 +30,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Xaml.Schema;
@@ -697,7 +698,13 @@ namespace System.Xaml
             {
 
                 if (xt.IsDictionary)
+                {
+                    if (keyObj is null && obj is Style style)
+                    {
+                        keyObj = style.TargetType;
+                    }
                     mt.Invoker.AddToDictionary(parent, GetCorrectlyTypedValue(null, xt.KeyType, keyObj), GetCorrectlyTypedValue(null, xt.ItemType, obj));
+                }                    
                 else // collection. Note that state.Type isn't usable for PositionalParameters to identify collection kind.
                     mt.Invoker.AddToCollection(parent, GetCorrectlyTypedValue(null, xt.ItemType, obj, true));
                 return true;
