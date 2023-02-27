@@ -38,6 +38,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 #if !MIGRATION
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Markup;
 #endif
 

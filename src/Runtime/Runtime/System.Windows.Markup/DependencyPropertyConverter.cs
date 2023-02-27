@@ -3,8 +3,14 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Windows.Controls;
 using System.Xaml;
+
+#if MIGRATION
+using System.Windows.Controls;
+#else
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+#endif
 
 namespace System.Windows.Markup
 {
