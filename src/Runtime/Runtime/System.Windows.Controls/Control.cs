@@ -78,18 +78,11 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private bool _isDisabled = false;
-
         /// <summary>
         /// Derived classes can set this flag in their constructor to prevent the "Template" property from being applied.
         /// </summary>
         [Obsolete(Helper.ObsoleteMemberMessage)]
         protected bool INTERNAL_DoNotApplyControlTemplate = false;
-
-        /// <summary>
-        /// Derived classes can set this flag to True in their constructor in order to disable the "GoToState" calls of this class related to PointerOver/Pressed/Disabled, and handle them by themselves. An example is the ToggleButton control, which contains states such as "CheckedPressed", "CheckedPointerOver", etc.
-        /// </summary>
-        protected bool DisableBaseControlHandlingOfVisualStates = false;
 
         //-----------------------
         // ISENABLED (OVERRIDE)
@@ -102,7 +95,6 @@ namespace Windows.UI.Xaml.Controls
             //OnTabIndexPropertyChanged(TabIndex);
             UpdateTabIndex(IsTabStop, TabIndex);
 
-            _isDisabled = !isEnabled; // We remember the value so that when we update the visual states, we know whether we should go to the "Disabled" state or not.
             UpdateVisualStates();
         }
 
@@ -142,25 +134,6 @@ namespace Windows.UI.Xaml.Controls
             if (!control.HasTemplate)
             {
                 _ = Panel.RenderBackgroundAsync(control, (Brush)newValue);
-            }
-        }
-
-        internal bool INTERNAL_IsLegacyVisualStates
-        {
-            get
-            {
-                if (StateGroupsRoot == null)
-                {
-                    return false;
-                }
-
-                IList<VisualStateGroup> groups = (Collection<VisualStateGroup>)this.GetValue(VisualStateManager.VisualStateGroupsProperty);
-                if (groups == null)
-                {
-                    return false;
-                }
-
-                return groups.Any(gr => ((IList<VisualState>)gr.States).Any(state => state.Name == VisualStates.StateMouseOver));
             }
         }
 
@@ -809,194 +782,52 @@ namespace Windows.UI.Xaml.Controls
         {
             base.OnApplyTemplate();
 
-            if (!DisableBaseControlHandlingOfVisualStates)
+            if (_visualStatesUpdater != null)
             {
-                // Go to the default state ("Normal" visual state):
-                UpdateVisualStates();
+                _visualStatesUpdater.Dispose();
+                _visualStatesUpdater = null;
+            }
 
-                bool hasMouseOverState = false;
-                bool hasPressedState = false;
-                bool hasFocusedState = false;
-                Collection<VisualStateGroup> groups = (Collection<VisualStateGroup>)this.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty);
-                if (groups != null)
-                {
-                    foreach (VisualStateGroup group in groups)
-                    {
-                        foreach (VisualState state in group.States)
-                        {
-#if MIGRATION
-                            if (state.Name == "MouseOver")
-#else
-                            if (state.Name == "PointerOver")
-#endif
-                            {
-                                hasMouseOverState = true;
-                            }
-                            else if (state.Name == "Pressed")
-                            {
-                                hasPressedState = true;
-                            }
-                            else if (state.Name == "Focused")
-                            {
-                                hasFocusedState = true;
-                            }
-                        }
-                    }
-                }
-
-
-
-                // Listen to the Pointer events:
-                if (hasMouseOverState)
-                {
-                    // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
-#if MIGRATION
-                    this.MouseEnter -= Control_MouseEnter;
-                    this.MouseEnter += Control_MouseEnter;
-                    this.MouseLeave -= Control_MouseLeave;
-                    this.MouseLeave += Control_MouseLeave;
-#else
-            this.PointerEntered -= Control_PointerEntered;
-            this.PointerEntered += Control_PointerEntered;
-            this.PointerExited -= Control_PointerExited;
-            this.PointerExited += Control_PointerExited;
-#endif
-                }
-
-                if (hasPressedState)
-                {
-                    // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
-#if MIGRATION
-                    this.MouseLeftButtonDown -= Control_MouseLeftButtonDown;
-                    this.MouseLeftButtonDown += Control_MouseLeftButtonDown;
-                    this.MouseLeftButtonUp -= Control_MouseLeftButtonUp;
-                    this.MouseLeftButtonUp += Control_MouseLeftButtonUp;
-#else
-            this.PointerPressed -= Control_PointerPressed;
-            this.PointerPressed += Control_PointerPressed;
-            this.PointerReleased -= Control_PointerReleased;
-            this.PointerReleased += Control_PointerReleased;
-#endif
-                }
-
-                if (hasFocusedState)
-                {
-                    // Note: We unregster the event before registering it because, in case the user removes the control from the visual tree and puts it back, the "OnApplyTemplate" is called again.
-                    //#if MIGRATION
-                    //                    this.MouseLeftButtonDown -= Control_MouseLeftButtonDown;
-                    //                    this.MouseLeftButtonDown += Control_MouseLeftButtonDown;
-                    //                    this.MouseLeftButtonUp -= Control_MouseLeftButtonUp;
-                    //                    this.MouseLeftButtonUp += Control_MouseLeftButtonUp;
-                    //#else
-                    this.GotFocus -= Control_GotFocus;
-                    this.GotFocus += Control_GotFocus;
-                    this.LostFocus -= Control_LostFocus;
-                    this.LostFocus += Control_LostFocus;
-                    //#endif
-                }
+            if (EnableBaseControlHandlingOfVisualStates)
+            {
+                _visualStatesUpdater = new VisualStateUpdater(this);
             }
         }
 
-        bool _isFocused = false;
-        void Control_LostFocus(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Called before the <see cref="UIElement.GotFocus"/> event occurs.
+        /// </summary>
+        /// <param name="e">
+        /// The data for the event.
+        /// </param>
+        protected override void OnGotFocus(RoutedEventArgs e)
         {
-            _isFocused = false;
-            UpdateVisualStatesForFocus();
-
-            if (!this._isInvalid)
-                return;
-            this.UpdateValidationState();
-        }
-
-        void Control_GotFocus(object sender, RoutedEventArgs e)
-        {
+            base.OnGotFocus(e);
             _isFocused = true;
-            UpdateVisualStatesForFocus();
 
-            if (!this._isInvalid)
-                return;
-            this.UpdateValidationState();
-        }
-
-        bool _isPointerOver = false;
-        bool _isPressed = false;
-
-#if MIGRATION
-        void Control_MouseEnter(object sender, Input.MouseEventArgs e)
-#else
-void Control_PointerEntered(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPointerOver = true;
-            UpdateVisualStates();
-        }
-
-#if MIGRATION
-        void Control_MouseLeave(object sender, Input.MouseEventArgs e)
-#else
-void Control_PointerExited(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPointerOver = false;
-            UpdateVisualStates();
-        }
-
-#if MIGRATION
-        void Control_MouseLeftButtonDown(object sender, Input.MouseButtonEventArgs e)
-#else
-void Control_PointerPressed(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPressed = true;
-            UpdateVisualStates();
-        }
-
-#if MIGRATION
-        void Control_MouseLeftButtonUp(object sender, Input.MouseButtonEventArgs e)
-#else
-void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
-#endif
-        {
-            _isPressed = false;
-            UpdateVisualStates();
-        }
-
-        internal virtual void UpdateVisualStates()
-        {
-            if (!DisableBaseControlHandlingOfVisualStates)
+            if (_isInvalid)
             {
-                if (_isDisabled)
-                    VisualStateManager.GoToState(this, "Disabled", true);
-                else if (_isPressed)
-                    VisualStateManager.GoToState(this, "Pressed", true);
-                else if (_isPointerOver)
-#if MIGRATION
-                    VisualStateManager.GoToState(this, "MouseOver", true);
-#else
-                    VisualStateManager.GoToState(this, "PointerOver", true);
-#endif
-                else
-                    VisualStateManager.GoToState(this, "Normal", true);
-
-
+                UpdateValidationState();
             }
         }
 
-        void UpdateVisualStatesForFocus()
+        /// <summary>
+        /// Called before the <see cref="UIElement.LostFocus"/> event occurs.
+        /// </summary>
+        /// <param name="e">
+        /// The data for the event.
+        /// </param>
+        protected override void OnLostFocus(RoutedEventArgs e)
         {
-            if (!DisableBaseControlHandlingOfVisualStates)
+            base.OnLostFocus(e);
+            _isFocused = false;
+
+            if (_isInvalid)
             {
-                if (_isFocused)
-                {
-                    VisualStateManager.GoToState(this, "Focused", true);
-                }
-                else
-                {
-                    VisualStateManager.GoToState(this, "Unfocused", true);
-                }
+                UpdateValidationState();
             }
         }
-
+        
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
 #if !BRIDGE
@@ -1031,37 +862,6 @@ void Control_PointerReleased(object sender, Input.PointerRoutedEventArgs e)
             get
             {
                 return this.TemplateCache != null;
-            }
-        }
-
-        internal void GoToState(string state)
-        {
-            VisualStateManager.GoToState(this, state, true);
-        }
-
-        private bool _isInvalid;
-
-        internal void ShowValidationError()
-        {
-            this._isInvalid = true;
-            this.UpdateValidationState();
-        }
-
-        internal void HideValidationError()
-        {
-            this._isInvalid = false;
-            this.UpdateValidationState();
-        }
-
-        internal void UpdateValidationState()
-        {
-            if (this._isInvalid)
-            {
-                VisualStateManager.GoToState(this, _isFocused ? "InvalidFocused" : "InvalidUnfocused", true);
-            }                
-            else
-            {
-                VisualStateManager.GoToState(this, "Valid", true);
             }
         }
 
