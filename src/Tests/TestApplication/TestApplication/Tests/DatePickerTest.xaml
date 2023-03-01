@@ -1,0 +1,15 @@
+﻿<sdk:Page x:Class="TestApplication.Tests.DatePickerTest" 
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           mc:Ignorable="d"
+           xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <sdk:Label Content="Selected date:"/>
+            <sdk:Label Content="{Binding ElementName=MyDatePicker, Path=SelectedDate}" Margin="10,0,0,0"/>
+        </StackPanel>
+        <sdk:DatePicker Name="MyDatePicker" Width="200" Margin="0,10,0,0"/>
+    </StackPanel>
+</sdk:Page>
