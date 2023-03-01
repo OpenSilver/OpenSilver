@@ -30,7 +30,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Markup;
 using System.Xaml.Markup;
 using System.Xaml.Schema;
@@ -38,7 +37,6 @@ using System.Xml;
 using System.Xml.Serialization;
 
 #if !MIGRATION
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Markup;
 #endif
 
@@ -674,7 +672,7 @@ namespace System.Xaml
                 ms.Value = GetCorrectlyTypedValue(null, xm.Type, obj);
             else if (ReferenceEquals(xm, XamlLanguage.Name) || xm == xt.GetAliasedProperty(XamlLanguage.Name))
                 ms.Value = GetCorrectlyTypedValue(xm, XamlLanguage.String, obj);
-            else if (ReferenceEquals(xm, XamlLanguage.Key) || xm == xt.GetAliasedProperty(XamlLanguage.Key))
+            else if (ReferenceEquals(xm, XamlLanguage.Key))
             {
                 var keyValue = GetCorrectlyTypedValue(null, xt.KeyType, obj);
                 state.KeyValue = keyValue;
@@ -697,15 +695,13 @@ namespace System.Xaml
                 ReferenceEquals(xm, XamlLanguage.PositionalParameters) ||
                 ReferenceEquals(xm, XamlLanguage.Arguments))
             {
-
                 if (xt.IsDictionary)
                 {
-                    if (keyObj is null && obj is Style style)
-                    {
-                        keyObj = style.TargetType;
-                    }
-                    mt.Invoker.AddToDictionary(parent, GetCorrectlyTypedValue(null, xt.KeyType, keyObj), GetCorrectlyTypedValue(null, xt.ItemType, obj));
-                }                    
+                    var key = keyObj;
+                    if (key == null && obj != null)
+                        key = GetKeyFromInstance(obj, sctx.GetXamlType(obj.GetType()));
+                    mt.Invoker.AddToDictionary(parent, GetCorrectlyTypedValue(null, xt.KeyType, key), GetCorrectlyTypedValue(null, xt.ItemType, obj));
+                }
                 else // collection. Note that state.Type isn't usable for PositionalParameters to identify collection kind.
                     mt.Invoker.AddToCollection(parent, GetCorrectlyTypedValue(null, xt.ItemType, obj, true));
                 return true;
@@ -714,6 +710,16 @@ namespace System.Xaml
                 return false;
         }
 
+        object GetKeyFromInstance(object instance, XamlType instanceType)
+        {
+            XamlMember keyProperty = instanceType.GetAliasedProperty(XamlLanguage.Key);
+            if (keyProperty == null || instance == null)
+            {
+                throw WithLineInfo(new XamlObjectWriterException(string.Format("Missing key value on '{0}' object.", instanceType.Name)));
+            }
+            object key = keyProperty.Invoker.GetValue(instance);
+            return key;
+        }
 
         // It expects that it is not invoked when there is no value to 
         // assign.
@@ -734,11 +740,6 @@ namespace System.Xaml
                 if (ReferenceEquals(xt, null))
                     return value;
 
-                // Not sure if this is really required though...
-                var vt = sctx.GetXamlType(value.GetType());
-                if (vt.CanAssignTo(xt))
-                    return value;
-
                 // FIXME: this could be generalized by some means, but I cannot find any.
                 if (xt.UnderlyingType == typeof(XamlType) && value is string)
                     value = ResolveTypeFromName((string)value);
@@ -749,9 +750,6 @@ namespace System.Xaml
                 if (ReferenceEquals(xt, XamlLanguage.Type) && value is string)
                     value = new TypeExtension((string)value);
 
-                if (IsAllowedType(xt, value))
-                    return value;
-
                 var xtc = xm?.TypeConverter ?? xt.TypeConverter;
                 if (xtc != null && value != null)
                 {
@@ -760,6 +758,9 @@ namespace System.Xaml
                         value = tc.ConvertFrom(service_provider, CultureInfo.InvariantCulture, value);
                     return value;
                 }
+
+                if (IsAllowedType(xt, value))
+                    return value;
             }
             catch (Exception ex)
             {

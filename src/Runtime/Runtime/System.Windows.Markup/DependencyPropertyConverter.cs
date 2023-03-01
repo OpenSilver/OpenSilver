@@ -11,19 +11,13 @@
 *  
 \*====================================================================================*/
 
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Xaml;
 
-#if MIGRATION
-using System.Windows.Controls;
-#else
+#if !MIGRATION
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 #endif
 
 namespace System.Windows.Markup
@@ -31,7 +25,7 @@ namespace System.Windows.Markup
     /// <summary>
     /// Class for converting a given DependencyProperty to and from a string
     /// </summary>
-    public sealed class DependencyPropertyConverter : TypeConverter
+    internal sealed class DependencyPropertyConverter : TypeConverter
     {
         #region Public Methods
 
@@ -76,12 +70,12 @@ namespace System.Windows.Markup
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             if (source == null)
             {
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             }
 
             DependencyProperty property = ResolveProperty(context, source);
@@ -148,51 +142,30 @@ namespace System.Windows.Markup
                 throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. The source is not a string.");
             }
 
-            // Still don't have a Type so we need to loop up the chain and grab either Style.TargetType,
-            // DataTemplate.DataType, or ControlTemplate.TargetType
+            // Still don't have a Type so we need to loop up the chain and grab Style.TargetType,
             if (type == null)
             {
                 if (serviceProvider.GetService(typeof(IXamlSchemaContextProvider)) is not IXamlSchemaContextProvider ixscp)
                 {
                     throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. IXamlSchemaContextProvider is null.");
                 }
+
                 XamlSchemaContext schemaContext = ixscp.SchemaContext;
-
                 XamlType styleXType = schemaContext.GetXamlType(typeof(Style));
-                XamlType frameworkTemplateXType = schemaContext.GetXamlType(typeof(FrameworkTemplate));
-                XamlType dataTemplateXType = schemaContext.GetXamlType(typeof(DataTemplate));
-                XamlType controlTemplateXType = schemaContext.GetXamlType(typeof(ControlTemplate));
-
-                List<XamlType> ceilingTypes = new()
-                {
-                    //styleXType,
-                    frameworkTemplateXType,
-                    dataTemplateXType,
-                    controlTemplateXType
-                };
-
-                // We don't look for DataTemplate's DataType since we want to use the TargetTypeInternal instead
-                XamlMember styleTargetType = styleXType.GetMember("TargetType");
-                XamlMember templateProperty = frameworkTemplateXType.GetMember("Template");
-                XamlMember controlTemplateTargetType = controlTemplateXType.GetMember("TargetType");
+                var ceilingTypes = new List<XamlType>(1) { styleXType };
+                XamlMember styleTargetType = styleXType.GetMember(nameof(Style.TargetType));
 
                 if (serviceProvider.GetService(typeof(IAmbientProvider)) is not IAmbientProvider ambientProvider)
                 {
                     throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. IAmbientProvider is null.");
                 }
-                AmbientPropertyValue firstAmbientValue = ambientProvider.GetFirstAmbientValue(ceilingTypes, styleTargetType, templateProperty, controlTemplateTargetType);
 
+                AmbientPropertyValue firstAmbientValue = ambientProvider.GetFirstAmbientValue(ceilingTypes, styleTargetType);
                 if (firstAmbientValue != null)
                 {
                     if (firstAmbientValue.Value is Type ambientType)
                     {
                         type = ambientType;
-                    }
-                    else if (firstAmbientValue.Value is TemplateContent tempContent)
-                    {
-                        // todo: implement OwnerTemplate or look for DataTemplate's DataType
-                        //type = tempContent.OwnerTemplate.TargetTypeInternal;
-                        throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}. Getting type from DataTemplate is not implemented yet.");
                     }
                     else
                     {
@@ -203,45 +176,10 @@ namespace System.Windows.Markup
 
             if (type != null && property != null)
             {
-                return FromName(property, type);
+                return DependencyProperty.FromName(property, type);
             }
 
             throw new NotSupportedException($"Cannot convert {source} to {typeof(DependencyProperty).FullName}.");
         }
-
-        /// <summary>
-        /// Find a property from name
-        /// </summary>
-        /// <remarks>
-        ///     Search includes base classes of the provided type as well
-        /// </remarks>
-        /// <param name="name">Name of the property</param>
-        /// <param name="ownerType">Owner type of the property</param>
-        /// <returns>Dependency property</returns>
-        private static DependencyProperty FromName(string name, Type ownerType)
-        {
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (ownerType is null)
-            {
-                throw new ArgumentNullException(nameof(ownerType));
-            }
-
-            DependencyProperty dp = null;
-
-            while ((dp == null) && (ownerType != null))
-            {
-                dp = ownerType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                              .Where(x => x.FieldType == typeof(DependencyProperty))
-                              .Select(x => (DependencyProperty)x.GetValue(null))
-                              .FirstOrDefault(x => x.Name == name);
-                ownerType = ownerType.BaseType;
-            }
-
-            return dp;
-        }
     }
 }
-

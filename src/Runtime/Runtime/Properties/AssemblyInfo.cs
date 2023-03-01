@@ -16,7 +16,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Xaml.Markup;
 
 #if !CSHTML5BLAZOR
 // General Information about an assembly is controlled through the following 
@@ -99,8 +98,6 @@ using System.Xaml.Markup;
 
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "System.Windows.Controls")] // This is used for example when migrating Silverlight apps, for example with the DockPanel control that was in the Toolkit.
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit", "System.Windows.Controls.Primitives")]
-
-[assembly: XmlnsCompatibleWith("clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit", "http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit")]
 
 #else
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "System.Windows.Controls")]

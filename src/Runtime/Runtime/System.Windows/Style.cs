@@ -34,7 +34,8 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Contains property setters that can be shared between instances of a type.
     /// </summary>
-    [ContentProperty("Setters")]
+    [DictionaryKeyProperty(nameof(TargetType))]
+    [ContentProperty(nameof(Setters))]
     public partial class Style : DependencyObject //was sealed but we unsealed it because telerik has xaml files with styles as their roots (and the file we generate from xaml files create a type that inherits the type of the root of the xaml).
     {
         #region Data
