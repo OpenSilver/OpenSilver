@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -38,7 +39,17 @@ namespace Windows.UI.Xaml.Shapes
 			DependencyProperty.Register(nameof(FillRule),
 										typeof(FillRule),
 										typeof(Polygon),
-										new PropertyMetadata(FillRule.EvenOdd));
+										new PropertyMetadata(FillRule.EvenOdd)
+                                        {
+                                            MethodToUpdateDom = (d, e) =>
+                                            {
+                                                var polygon = (Polygon)d;
+                                                if (!polygon.RenderSvg)
+                                                    return;
+
+                                                polygon.SetSvgAttribute("fill-rule", polygon.FillRule.ToString().ToLower());
+                                            }
+                                        });
 
 		/// <summary>
 		/// Identifies the <see cref="Polygon.Points"/> dependency property.
@@ -47,7 +58,17 @@ namespace Windows.UI.Xaml.Shapes
 			DependencyProperty.Register(nameof(Points),
 										typeof(PointCollection),
 										typeof(Polygon),
-										new PropertyMetadata(null, Points_Changed));
+										new PropertyMetadata(null, Points_Changed)
+                                        {
+                                            MethodToUpdateDom = (d, e) =>
+                                            {
+                                                var polygon = (Polygon)d;
+                                                if (!polygon.RenderSvg)
+                                                    return;
+
+                                                polygon.SetSvgAttribute("points", string.Join(" ", polygon.Points.Select(x => $"{x.X},{x.Y}")));
+                                            }
+                                        });
 
 		private static void Points_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -106,7 +127,13 @@ namespace Windows.UI.Xaml.Shapes
 
 		public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
 		{
-			return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
+            if (RenderSvg)
+            {
+                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgOuterDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+                return INTERNAL_SvgShapesDrawHelpers.CreateSvgPolygonDomElement(this, svg);
+            }
+
+            return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
 		}
 		
 		override internal protected void Redraw()

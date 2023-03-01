@@ -43,8 +43,7 @@ namespace CSHTML5.Internal
 
         internal static object CreateSvgEllipseDomElement(Shape shape, object parentRef)
         {
-            var circle = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("ellipse", parentRef, shape);
-            UpdateDefaultColorsToNone(shape, circle);
+            var circle = CreateSimpleSvgDomElement(shape, parentRef, "ellipse");
 
             // todo: handle NaN value of Width or Height
             // todo: make all calls at once
@@ -60,18 +59,25 @@ namespace CSHTML5.Internal
 
         internal static object CreateSvgLineDomElement(Shape shape, object parentRef)
         {
-            var line = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("line", parentRef, shape);
-            UpdateDefaultColorsToNone(shape, line);
-
-            return line;
+            return CreateSimpleSvgDomElement(shape, parentRef, "line");
         }
 
         internal static object CreateSvgPolylineDomElement(Shape shape, object parentRef)
         {
-            var polyline = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("polyline", parentRef, shape);
-            UpdateDefaultColorsToNone(shape, polyline);
+            return CreateSimpleSvgDomElement(shape, parentRef, "polyline");
+        }
 
-            return polyline;
+        internal static object CreateSvgPolygonDomElement(Shape shape, object parentRef)
+        {
+            return CreateSimpleSvgDomElement(shape, parentRef, "polygon");
+        }
+
+        private static object CreateSimpleSvgDomElement(Shape shape, object parentRef, string elementName)
+        {
+            var domElement = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt(elementName, parentRef, shape);
+            UpdateDefaultColorsToNone(shape, domElement);
+
+            return domElement;
         }
 
         // need to clear colors, because default in SVG is black

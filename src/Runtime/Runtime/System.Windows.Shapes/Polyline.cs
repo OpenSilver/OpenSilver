@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(FillRule),
                 typeof(FillRule),
                 typeof(Polyline),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender)
+                new FrameworkPropertyMetadata(FillRule.EvenOdd, FrameworkPropertyMetadataOptions.AffectsRender)
                 {
                     MethodToUpdateDom = (d, e) =>
                     {
