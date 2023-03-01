@@ -40,9 +40,8 @@ namespace Windows.UI.Xaml.Shapes
         {
             if (RenderSvg)
             {
-                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgDomElement(this, parentRef, out domElementWhereToPlaceChildren);
-                var line = INTERNAL_SvgShapesDrawHelpers.CreateSvgLineDomElement(this, svg);
-                return line;
+                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgOuterDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+                return INTERNAL_SvgShapesDrawHelpers.CreateSvgLineDomElement(this, svg);
             }
 
             return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);

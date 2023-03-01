@@ -1,5 +1,6 @@
 using CSHTML5.Internal;
 using System;
+using System.Linq;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -32,7 +33,18 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(FillRule),
                 typeof(FillRule),
                 typeof(Polyline),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var polyline = (Polyline)d;
+                        if (!polyline.RenderSvg)
+                            return;
+
+                        polyline.SetSvgAttribute("fill-rule", polyline.FillRule.ToString().ToLower());
+                    }
+                });
+
         /// <summary>
         /// Identifies the <see cref="Points"/> dependency property.
         /// </summary>
@@ -41,7 +53,17 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Points),
                 typeof(PointCollection),
                 typeof(Polyline),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnPointsChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnPointsChanged)
+                {
+                    MethodToUpdateDom = (d, e) => 
+                    {
+                        var polyline = (Polyline)d;
+                        if (!polyline.RenderSvg)
+                            return;
+
+                        polyline.SetSvgAttribute("points", string.Join(" ", polyline.Points.Select(x => $"{x.X},{x.Y}")));
+                    }
+                });
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Polyline"/> class.
@@ -100,14 +122,14 @@ namespace Windows.UI.Xaml.Shapes
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var line = (Polyline)d;
-            if (line == null) return;
+            if (line.RenderSvg)
+                return;
 
             if (e.OldValue != null && e.OldValue is PointCollection)
                 ((PointCollection)(e.OldValue)).SetParentShape(null);
 
             if (e.NewValue != null && e.NewValue is PointCollection)
                 ((PointCollection)(e.NewValue)).SetParentShape(line);
-
 
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(line))
             {
@@ -116,9 +138,14 @@ namespace Windows.UI.Xaml.Shapes
             }
         }
 
-
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            if (RenderSvg)
+            {
+                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgOuterDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+                return INTERNAL_SvgShapesDrawHelpers.CreateSvgPolylineDomElement(this, svg);
+            }
+
             return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
         }
 

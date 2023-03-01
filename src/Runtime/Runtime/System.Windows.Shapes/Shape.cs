@@ -115,7 +115,7 @@ namespace Windows.UI.Xaml.Shapes
 
                         if (shape.RenderSvg)
                         {
-                            string fill = shape.Fill is not null ? await shape.Fill.GetDataStringAsync(shape) : string.Empty;
+                            string fill = shape.Fill is not null ? await shape.Fill.GetDataStringAsync(shape) : "none";
                             shape.SetSvgAttribute("fill", fill);
                         }
 
@@ -240,7 +240,7 @@ namespace Windows.UI.Xaml.Shapes
             if (!shape.RenderSvg) 
                 return;
 
-            string stroke = shape.Stroke is not null ? await shape.Stroke.GetDataStringAsync(shape) : string.Empty;
+            string stroke = shape.Stroke is not null ? await shape.Stroke.GetDataStringAsync(shape) : "none";
             shape.SetSvgAttribute("stroke", stroke);
         }
 

@@ -12,12 +12,13 @@
 \*====================================================================================*/
 
 using System.Windows;
+using System.Windows.Shapes;
 
 namespace CSHTML5.Internal
 {
     internal static class INTERNAL_SvgShapesDrawHelpers
     {
-        internal static object CreateSvgDomElement(FrameworkElement element, object parentRef, out object domElementWhereToPlaceChildren)
+        internal static object CreateSvgOuterDomElement(FrameworkElement element, object parentRef, out object domElementWhereToPlaceChildren)
         {
             domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("svg", parentRef, element);
 
@@ -40,25 +41,50 @@ namespace CSHTML5.Internal
             return domElementWhereToPlaceChildren;
         }
 
-        internal static object CreateSvgEllipseDomElement(FrameworkElement element, object parentRef)
+        internal static object CreateSvgEllipseDomElement(Shape shape, object parentRef)
         {
-            var circle = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("ellipse", parentRef, element);
+            var circle = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("ellipse", parentRef, shape);
+            UpdateDefaultColorsToNone(shape, circle);
 
             // todo: handle NaN value of Width or Height
             // todo: make all calls at once
 
             // set radiuses of the ellipse and correct center
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(circle, "rx", element.Width / 2);
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(circle, "ry", element.Height / 2);
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(circle, "rx", shape.Width / 2);
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(circle, "ry", shape.Height / 2);
             INTERNAL_HtmlDomManager.SetDomElementAttribute(circle, "cx", "50%");
             INTERNAL_HtmlDomManager.SetDomElementAttribute(circle, "cy", "50%");
 
             return circle;
         }
 
-        internal static object CreateSvgLineDomElement(FrameworkElement element, object parentRef)
+        internal static object CreateSvgLineDomElement(Shape shape, object parentRef)
         {
-            return INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("line", parentRef, element);
+            var line = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("line", parentRef, shape);
+            UpdateDefaultColorsToNone(shape, line);
+
+            return line;
+        }
+
+        internal static object CreateSvgPolylineDomElement(Shape shape, object parentRef)
+        {
+            var polyline = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("polyline", parentRef, shape);
+            UpdateDefaultColorsToNone(shape, polyline);
+
+            return polyline;
+        }
+
+        // need to clear colors, because default in SVG is black
+        private static void UpdateDefaultColorsToNone(Shape shape, object domElement)
+        {
+            if (shape.Fill is null)
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(domElement, "fill", "none");
+            }
+            if (shape.Stroke is null)
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(domElement, "stroke", "none");
+            }
         }
     }
 }
