@@ -1214,10 +1214,17 @@ namespace Windows.UI.Xaml
                 double newWidth = containingRect.Width + Margin.Left + Margin.Right;
                 double newHeight = containingRect.Height + Margin.Top + Margin.Bottom;
 
-                if (newWidth >= 0 && newHeight >= 0)
-                    containingRect = new Rect(newLeft, newTop, newWidth, newHeight);
-                else
-                    throw new ArgumentException("Width or Height cannot be lower than 0");
+                if (newWidth < 0)
+                {
+                    newLeft += newWidth;
+                    newWidth = Math.Abs(newWidth);
+                }
+                if (newHeight < 0)
+                {
+                    newTop += newHeight;
+                    newHeight = Math.Abs(newHeight);
+                }
+                containingRect = new Rect(newLeft, newTop, newWidth, newHeight);
             }
 
             Point alignedOffset = GetAlignmentOffset(finalRect, containingRect.Size, HorizontalAlignment, VerticalAlignment);
