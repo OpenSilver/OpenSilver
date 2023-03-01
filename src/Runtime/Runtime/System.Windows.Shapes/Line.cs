@@ -38,6 +38,13 @@ namespace Windows.UI.Xaml.Shapes
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            if (RenderSvg)
+            {
+                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+                var line = INTERNAL_SvgShapesDrawHelpers.CreateSvgLineDomElement(this, svg);
+                return line;
+            }
+
             return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
 
             //domElementWhereToPlaceChildren = null;
@@ -68,7 +75,17 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(X1), 
                 typeof(double), 
                 typeof(Line), 
-                new PropertyMetadata(0d, X1_Changed));
+                new PropertyMetadata(0d, X1_Changed)
+                { 
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var line = (Line)d;
+                        if (!line.RenderSvg)
+                            return;
+
+                        line.SetSvgAttribute("x1", line.X1.ToInvariantString());
+                    }
+                });
 
         private static void X1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -94,7 +111,17 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(X2), 
                 typeof(double), 
                 typeof(Line), 
-                new PropertyMetadata(0d, X2_Changed));
+                new PropertyMetadata(0d, X2_Changed)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var line = (Line)d;
+                        if (!line.RenderSvg)
+                            return;
+
+                        line.SetSvgAttribute("x2", line.X2.ToInvariantString());
+                    }
+                });
 
         private static void X2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -120,7 +147,17 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Y1), 
                 typeof(double), 
                 typeof(Line), 
-                new PropertyMetadata(0d, Y1_Changed));
+                new PropertyMetadata(0d, Y1_Changed)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var line = (Line)d;
+                        if (!line.RenderSvg)
+                            return;
+
+                        line.SetSvgAttribute("y1", line.Y1.ToInvariantString());
+                    }
+                });
 
         private static void Y1_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -146,7 +183,17 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Y2), 
                 typeof(double), 
                 typeof(Line), 
-                new PropertyMetadata(0d, Y2_Changed));
+                new PropertyMetadata(0d, Y2_Changed)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var line = (Line)d;
+                        if (!line.RenderSvg)
+                            return;
+
+                        line.SetSvgAttribute("y2", line.Y2.ToInvariantString());
+                    }
+                });
 
         private static void Y2_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

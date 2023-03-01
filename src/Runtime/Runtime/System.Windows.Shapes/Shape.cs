@@ -438,6 +438,7 @@ namespace Windows.UI.Xaml.Shapes
             if (!shape.RenderSvg)
                 return;
 
+            // todo: compare with Silverlight
             shape.SetSvgAttribute("stroke-dasharray", string.Join(" ", shape.StrokeDashArray));
         }
 
@@ -1239,7 +1240,7 @@ context.restore();
             return new Size();
         }
 
-        private void SetSvgAttribute(string attribute, string value)
+        protected void SetSvgAttribute(string attribute, string value)
         {
             INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, attribute, value);
         }

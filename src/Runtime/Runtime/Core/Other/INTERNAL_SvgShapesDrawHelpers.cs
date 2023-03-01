@@ -55,5 +55,10 @@ namespace CSHTML5.Internal
 
             return circle;
         }
+
+        internal static object CreateSvgLineDomElement(FrameworkElement element, object parentRef)
+        {
+            return INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("line", parentRef, element);
+        }
     }
 }
