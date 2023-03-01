@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 using System;
 
 #if MIGRATION
@@ -136,6 +137,12 @@ namespace Windows.UI.Xaml.Shapes
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            if (RenderSvg)
+            {
+                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgOuterDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+                return INTERNAL_SvgShapesDrawHelpers.CreateSvgRectangleDomElement(this, svg);
+            }
+
             return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
 
             //domElementWhereToPlaceChildren = null;
@@ -227,7 +234,17 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(RadiusX), 
                 typeof(double), 
                 typeof(Rectangle), 
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var rectangle = (Rectangle)d;
+                        if (!rectangle.RenderSvg)
+                            return;
+
+                        rectangle.SetSvgAttribute("rx", rectangle.RadiusX.ToInvariantString());
+                    }
+                });
 
         /// <summary>
         /// Gets or sets the y-axis radius of the ellipse that is used to round the corners
@@ -248,6 +265,16 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(RadiusY), 
                 typeof(double), 
                 typeof(Rectangle), 
-                new PropertyMetadata(0d));
+                new PropertyMetadata(0d)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var rectangle = (Rectangle)d;
+                        if (!rectangle.RenderSvg)
+                            return;
+
+                        rectangle.SetSvgAttribute("ry", rectangle.RadiusY.ToInvariantString());
+                    }
+                });
     }
 }
