@@ -48,6 +48,13 @@ namespace Windows.UI.Xaml.Shapes
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            if (RenderSvg)
+            {
+                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+                var ellipse = INTERNAL_SvgShapesDrawHelpers.CreateSvgEllipseDomElement(this, svg);
+                return ellipse;
+            }
+
             return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
 
             //domElementWhereToPlaceChildren = null;

@@ -55,6 +55,7 @@
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
+		<Compile Include="Core\Other\INTERNAL_SvgShapesDrawHelpers.cs" />
 		<Compile Include="Diagnostics\DebugInfo.cs" />
 		<Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
 		<Compile Include="OpenSilver\Internal\Clipboard.cs" />

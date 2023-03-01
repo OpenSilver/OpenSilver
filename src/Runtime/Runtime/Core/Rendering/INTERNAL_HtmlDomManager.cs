@@ -596,6 +596,21 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
+        internal static object CreateSvgDomElementAndAppendIt(string tagName, object parentRef, UIElement associatedUIElement)
+        {
+#if PERFSTAT
+            Performance.Counter("CreateSvgDomElementAndAppendIt", t0);
+#endif
+            var id = NewId();
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            var sParentRef = parent?.UniqueIdentifier ?? INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.createSvgElement('{tagName}', '{id}', {sParentRef}, -1)");
+            _store.Add(id, new WeakReference<UIElement>(associatedUIElement));
+
+            return new INTERNAL_HtmlDomElementReference(id, parent);
+        }
+
         public static object CreateDomElementAndInsertIt(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition) //associatedUIElement is the UIElement of which the current dom element is a part.
         {
 #if PERFSTAT

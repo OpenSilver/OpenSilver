@@ -53,6 +53,14 @@ namespace Windows.UI.Xaml.Shapes
 
         internal bool _suspendRendering = false;
 
+        protected bool RenderSvg => UseSvgRenderer.HasValue ? UseSvgRenderer.Value : Application.Current.Host.Settings.RenderSvgShapes;
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether to render the shape as SVG.
+        /// Use this setting to override global <see cref="Settings.RenderSvgShapes"/>.
+        /// </summary>
+        public bool? UseSvgRenderer { get; set; }
+
         #endregion
 
         #region Constructor
@@ -62,6 +70,10 @@ namespace Windows.UI.Xaml.Shapes
         /// </summary>
         protected Shape()
         {
+            // todo: perhaps need to track SizeChanged and update width/height of svg
+            if (RenderSvg)
+                return;
+
             SizeChanged += Shape_SizeChanged;
 
             IsVisibleChanged += (d,e) =>
@@ -97,9 +109,17 @@ namespace Windows.UI.Xaml.Shapes
                 typeof(Shape),
                 new PropertyMetadata(null, Fill_Changed)
                 {
-                    MethodToUpdateDom = (d, e) =>
+                    MethodToUpdateDom = async (d, e) =>
                     {
-                        UIElement.SetPointerEvents((Shape)d);
+                        var shape = (Shape)d;
+
+                        if (shape.RenderSvg)
+                        {
+                            string fill = shape.Fill is not null ? await shape.Fill.GetDataStringAsync(shape) : string.Empty;
+                            shape.SetSvgAttribute("fill", fill);
+                        }
+
+                        SetPointerEvents(shape);
                     },
                 });
 
@@ -107,6 +127,13 @@ namespace Windows.UI.Xaml.Shapes
         {
             ((Shape)d).ScheduleRedraw();
         }
+
+        // todo: implement GeometryTransform
+        /// <summary>
+        /// Gets a value that represents a <see cref="Transform"/> that is applied to the geometry of a <see cref="Shape"/> prior to when it is drawn.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public virtual Transform GeometryTransform { get; }
 
         /// <summary>
         /// Gets or sets a Stretch enumeration value that describes how the shape fills
@@ -131,7 +158,7 @@ namespace Windows.UI.Xaml.Shapes
         internal protected static void Stretch_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //note: Stretch is actually more implemented in the Redraw method of the classes that inherit from shape (Line, Ellipse, Path, Rectangle)
-
+            // todo: apply stretch for svg
             var shape = (Shape)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
             {
@@ -200,11 +227,21 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Stroke), 
                 typeof(Brush), 
                 typeof(Shape),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed) { MethodToUpdateDom2 = UpdateStroke });
 
         private static void Stroke_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((Shape)d).ManageStrokeChanged();
+        }
+
+        private static async void UpdateStroke(DependencyObject d, object oldValue, object newValue)
+        {
+            var shape = (Shape)d;
+            if (!shape.RenderSvg) 
+                return;
+
+            string stroke = shape.Stroke is not null ? await shape.Stroke.GetDataStringAsync(shape) : string.Empty;
+            shape.SetSvgAttribute("stroke", stroke);
         }
 
         /// <summary>
@@ -224,11 +261,21 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeThickness), 
                 typeof(double), 
                 typeof(Shape),
-                new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, StrokeThickness_Changed));
+                new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, StrokeThickness_Changed)
+                { MethodToUpdateDom2 = UpdateStrokeThickness });
 
         private static void StrokeThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((Shape)d).ManageStrokeThicknessChanged();
+        }
+
+        private static void UpdateStrokeThickness(DependencyObject d, object oldValue, object newValue)
+        {
+            var shape = (Shape)d;
+            if (!shape.RenderSvg)
+                return;
+
+            shape.SetSvgAttribute("stroke-width", shape.StrokeThickness.ToInvariantString());
         }
 
         /// <summary>
@@ -249,7 +296,31 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeStartLineCap), 
                 typeof(PenLineCap), 
                 typeof(Shape), 
-                new PropertyMetadata(PenLineCap.Flat));
+                new PropertyMetadata(PenLineCap.Flat) { MethodToUpdateDom2 = UpdateLineCap });
+
+        private static void UpdateLineCap(DependencyObject d, object oldValue, object newValue)
+        {
+            var shape = (Shape)d;
+            if (!shape.RenderSvg)
+                return;
+
+            string lineCap = "butt";
+            // todo: handle a case when StrokeStartLineCap != StrokeEndLineCap
+            if (shape.StrokeStartLineCap == shape.StrokeEndLineCap)
+            {
+                if (shape.StrokeStartLineCap == PenLineCap.Round)
+                {
+                    lineCap = "round";
+                }
+                if (shape.StrokeStartLineCap == PenLineCap.Square)
+                {
+                    lineCap = "square";
+                }
+                // todo: support PenLineCap.Triangle
+            }
+
+            shape.SetSvgAttribute("stroke-linecap", lineCap);
+        }
 
         /// <summary>
         /// Gets or sets a PenLineCap enumeration value that describes the Shape at the
@@ -269,7 +340,7 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeEndLineCap), 
                 typeof(PenLineCap), 
                 typeof(Shape), 
-                new PropertyMetadata(PenLineCap.Flat));
+                new PropertyMetadata(PenLineCap.Flat) { MethodToUpdateDom2 = UpdateLineCap });
 
         /// <summary>
         /// Gets or sets a PenLineJoin enumeration value that specifies the type of join
@@ -289,7 +360,16 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeLineJoin), 
                 typeof(PenLineJoin), 
                 typeof(Shape), 
-                new PropertyMetadata(PenLineJoin.Miter));
+                new PropertyMetadata(PenLineJoin.Miter) { MethodToUpdateDom2 = UpdateLineJoin });
+
+        private static void UpdateLineJoin(DependencyObject d, object oldValue, object newValue)
+        {
+            var shape = (Shape)d;
+            if (!shape.RenderSvg)
+                return;
+
+            shape.SetSvgAttribute("stroke-linejoin", shape.StrokeLineJoin.ToString().ToLower());
+        }
 
         /// <summary>
         /// Gets or sets a limit on the ratio of the miter length to half the StrokeThickness
@@ -310,7 +390,16 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeMiterLimit), 
                 typeof(double), 
                 typeof(Shape), 
-                new PropertyMetadata(10d));
+                new PropertyMetadata(10d) { MethodToUpdateDom2 = UpdateMiterLimit });
+
+        private static void UpdateMiterLimit(DependencyObject d, object oldValue, object newValue)
+        {
+            var shape = (Shape)d;
+            if (!shape.RenderSvg)
+                return;
+
+            shape.SetSvgAttribute("stroke-miterlimit", shape.StrokeMiterLimit.ToInvariantString());
+        }
 
         /// <summary>
         /// Gets or sets a collection of Double values that indicates the pattern of
@@ -341,11 +430,23 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeDashArray), 
                 typeof(DoubleCollection), 
                 typeof(Shape), 
-                new PropertyMetadata(null, StrokeDashArray_Changed));
+                new PropertyMetadata(null, StrokeDashArray_Changed) { MethodToUpdateDom2 = UpdateDashArray });
+
+        private static void UpdateDashArray(DependencyObject d, object oldValue, object newValue)
+        {
+            var shape = (Shape)d;
+            if (!shape.RenderSvg)
+                return;
+
+            shape.SetSvgAttribute("stroke-dasharray", string.Join(" ", shape.StrokeDashArray));
+        }
 
         private static void StrokeDashArray_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Shape shape = (Shape)d;
+            if (shape.RenderSvg)
+                return;
+
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
             {
                 shape.ScheduleRedraw();
@@ -370,11 +471,23 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(StrokeDashOffset), 
                 typeof(double), 
                 typeof(Shape), 
-                new PropertyMetadata(0d, StrokeDashOffset_Changed));
+                new PropertyMetadata(0d, StrokeDashOffset_Changed) { MethodToUpdateDom2 = UpdateDashOffset });
+
+        private static void UpdateDashOffset(DependencyObject d, object oldValue, object newValue)
+        {
+            var shape = (Shape)d;
+            if (!shape.RenderSvg)
+                return;
+
+            shape.SetSvgAttribute("stroke-dashoffset", shape.StrokeDashOffset.ToInvariantString());
+        }
 
         private static void StrokeDashOffset_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Shape shape = (Shape)d;
+            if (shape.RenderSvg)
+                return;
+
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(shape))
             {
                 if (shape._canvasDomElement != null)
@@ -413,6 +526,9 @@ namespace Windows.UI.Xaml.Shapes
 
         internal protected virtual void ManageStrokeThicknessChanged()
         {
+            if (RenderSvg)
+                return;
+
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 var context = INTERNAL_HtmlDomManager.Get2dCanvasContext(_canvasDomElement);
@@ -440,7 +556,7 @@ namespace Windows.UI.Xaml.Shapes
         /// </summary>
         internal void ScheduleRedraw()
         {
-            if (_suspendRendering)
+            if (_suspendRendering || RenderSvg)
                 return;
 
             if (!_redrawPending) // This ensures that the "BeginInvoke" method is only called once, and it is not called again until its delegate has been executed.
@@ -1106,7 +1222,7 @@ context.restore();
             get { return (PenLineCap)GetValue(StrokeDashCapProperty); }
             set { SetValue(StrokeDashCapProperty, value); }
         }
-
+        // todo: implement StrokeDashCap
         /// <summary>
         /// Identifies the <see cref="Shape.StrokeDashCap"/> dependency property.
         /// </summary>
@@ -1123,5 +1239,9 @@ context.restore();
             return new Size();
         }
 
+        private void SetSvgAttribute(string attribute, string value)
+        {
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, attribute, value);
+        }
     }
 }

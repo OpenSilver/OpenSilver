@@ -146,6 +146,11 @@ namespace System
             set => Panel.GlobalProgressiveRenderingChunkSize = 1;
         }
 
+        /// <summary>
+        /// Render <see cref="Windows.Shapes.Shape"/> as SVG instead of rendering on js canvas.
+        /// </summary>
+        public bool RenderSvgShapes { get; set; }
+
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
 
         /// <summary>

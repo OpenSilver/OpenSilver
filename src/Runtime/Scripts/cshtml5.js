@@ -238,6 +238,30 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
     return newElement;
 }
 
+document.createSvgElement = function (tagName, id, parentElement, index) {
+    const element = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+
+    element.setAttribute("id", id);
+
+    if (typeof parentElement == 'string') {
+        parentElement = document.getElementById(parentElement);
+    }
+
+    if (parentElement == null) {
+        console.log('createSvgElement is failed becaused of the removed parent.');
+        return null;
+    }
+
+    if (index < 0 || index >= parentElement.children.length) {
+        parentElement.appendChild(element);
+    }
+    else {
+        var nextSibling = parentElement.children[index];
+        parentElement.insertBefore(element, nextSibling);
+    }
+    return element;
+}
+
 document.createTextBlockElement = function (id, parentElement, wrap) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
 
