@@ -109,14 +109,13 @@ namespace Windows.UI.Xaml.Shapes
                 typeof(Shape),
                 new PropertyMetadata(null, Fill_Changed)
                 {
-                    MethodToUpdateDom = async (d, e) =>
+                    MethodToUpdateDom = (d, e) =>
                     {
                         var shape = (Shape)d;
 
                         if (shape.RenderSvg)
                         {
-                            string fill = shape.Fill is not null ? await shape.Fill.GetDataStringAsync(shape) : "none";
-                            shape.SetSvgAttribute("fill", fill);
+                            shape.SetBrush(shape.Fill, "fill");
                         }
 
                         SetPointerEvents(shape);
@@ -126,6 +125,59 @@ namespace Windows.UI.Xaml.Shapes
         private static void Fill_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((Shape)d).ScheduleRedraw();
+        }
+
+        private void SetBrush(Brush brush, string attribute)
+        {
+            string brushValue = string.Empty;
+
+            if (brush is null)
+            {
+                brushValue = "none";
+            }
+
+            if (brush is SolidColorBrush solidColorBrush)
+            {
+                brushValue = solidColorBrush.INTERNAL_ToHtmlString();
+            }
+
+            if (brush is LinearGradientBrush linearGradientBrush)
+            {
+                var defs = INTERNAL_SvgShapesDrawHelpers.CreateSvgDefsDomElement(this, INTERNAL_InnerDomElement);
+                var gradient = INTERNAL_SvgShapesDrawHelpers.CreateSvgDomElement(this, defs, "linearGradient");
+                string gradientId = ((INTERNAL_HtmlDomElementReference)gradient).UniqueIdentifier;
+
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(@$"
+{gradientId}.setAttribute('x1', '{ConvertGradientPointToSvgValue(linearGradientBrush, linearGradientBrush.StartPoint.X)}');
+{gradientId}.setAttribute('x2', '{ConvertGradientPointToSvgValue(linearGradientBrush, linearGradientBrush.EndPoint.X)}');
+{gradientId}.setAttribute('y1', '{ConvertGradientPointToSvgValue(linearGradientBrush, linearGradientBrush.StartPoint.Y)}');
+{gradientId}.setAttribute('y2', '{ConvertGradientPointToSvgValue(linearGradientBrush, linearGradientBrush.EndPoint.Y)}');
+");
+
+                foreach (var item in linearGradientBrush.GradientStops)
+                {
+                    OpenSilver.Interop.ExecuteJavaScriptAsync(@$"
+const element = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+element.setAttribute('offset', '{ConvertGradientPointToSvgValue(linearGradientBrush, item.Offset)}');
+element.setAttribute('stop-color', '{item.Color.INTERNAL_ToHtmlString(brush.Opacity)}');
+{gradientId}.appendChild(element);
+");
+                }
+
+                brushValue = $"url('#{gradientId}')";
+            }
+
+            if (brush is RadialGradientBrush radialGradientBrush)
+            {
+            }
+
+            // todo: support other brushes
+            SetSvgAttribute(attribute, brushValue);
+        }
+
+        private string ConvertGradientPointToSvgValue(LinearGradientBrush gradientBrush, double point)
+        {
+            return gradientBrush.MappingMode == BrushMappingMode.RelativeToBoundingBox ? $"{(point * 100).ToInvariantString()}%" : point.ToInvariantString();
         }
 
         // todo: implement GeometryTransform
@@ -227,21 +279,21 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Stroke), 
                 typeof(Brush), 
                 typeof(Shape),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed) { MethodToUpdateDom2 = UpdateStroke });
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Stroke_Changed)
+                { 
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var shape = (Shape)d;
+                        if (!shape.RenderSvg)
+                            return;
+
+                        shape.SetBrush(shape.Stroke, "stroke");
+                    }
+                });
 
         private static void Stroke_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((Shape)d).ManageStrokeChanged();
-        }
-
-        private static async void UpdateStroke(DependencyObject d, object oldValue, object newValue)
-        {
-            var shape = (Shape)d;
-            if (!shape.RenderSvg) 
-                return;
-
-            string stroke = shape.Stroke is not null ? await shape.Stroke.GetDataStringAsync(shape) : "none";
-            shape.SetSvgAttribute("stroke", stroke);
         }
 
         /// <summary>

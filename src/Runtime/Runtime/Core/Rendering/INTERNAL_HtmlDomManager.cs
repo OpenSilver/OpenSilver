@@ -596,7 +596,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateSvgDomElementAndAppendIt(string tagName, object parentRef, UIElement associatedUIElement)
+        internal static object CreateSvgDomElementAndAppendIt(string tagName, object parentRef, UIElement associatedUIElement, int index = -1)
         {
 #if PERFSTAT
             Performance.Counter("CreateSvgDomElementAndAppendIt", t0);
@@ -605,7 +605,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             var sParentRef = parent?.UniqueIdentifier ?? INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
 
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.createSvgElement('{tagName}', '{id}', {sParentRef}, -1)");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.createSvgElement('{tagName}', '{id}', {sParentRef}, {index})");
             _store.Add(id, new WeakReference<UIElement>(associatedUIElement));
 
             return new INTERNAL_HtmlDomElementReference(id, parent);

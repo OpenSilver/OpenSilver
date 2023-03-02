@@ -102,5 +102,15 @@ namespace CSHTML5.Internal
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(domElement, "stroke", "none");
             }
         }
+
+        internal static object CreateSvgDefsDomElement(Shape shape, object parentRef)
+        {
+            return INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt("defs", parentRef, shape, 0);
+        }
+
+        internal static object CreateSvgDomElement(Shape shape, object parentRef, string elementName)
+        {
+            return INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt(elementName, parentRef, shape, 0);
+        }
     }
 }
