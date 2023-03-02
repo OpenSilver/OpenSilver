@@ -51,18 +51,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public ButtonBase()
         {
             _canExecuteChangedHandler = new EventHandler(OnCanExecuteChanged);
-            UseSystemFocusVisuals = true;
 
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Interval = new TimeSpan(0, 0, 5); // See comment where this variable is defined.
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Tick += TimerToReleaseCaptureAutomaticallyIfNoMouseUpEvent_Tick;
             IsEnabledChanged += OnIsEnabledChanged;
-#if MIGRATION
-            base.MouseLeftButtonDown += (s, e) => { }; // cf. note below
-            base.MouseLeftButtonUp += (s, e) => { }; // cf. note below
-#else
-            base.PointerPressed += (s, e) => { }; // Note: even though the logic for PointerPressed is located in the overridden method "OnPointerPressed" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM "mousedown" event (cf. see the "Add" accessor of the "PointerPressed" event definition).
-            base.PointerReleased += (s, e) => { }; // Note: even though the logic for PointerReleased is located in the overridden method "OnPointerPressed" (below), we still need to register this event so that the underlying UIElement can listen to the HTML DOM "mouseup" event (cf. see the "Add" accessor of the "PointerReleased" event definition).
-#endif
         }
 
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -619,6 +611,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
             else
             {
                 GoToState(VisualStates.StateNormal);
+            }
+
+            if (IsFocused)
+            {
+                GoToState(VisualStates.StateFocused);
+            }
+            else
+            {
+                GoToState(VisualStates.StateUnfocused);
             }
         }
     }

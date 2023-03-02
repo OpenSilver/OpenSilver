@@ -42,23 +42,27 @@ namespace Windows.UI.Xaml.Controls
     [TemplatePart(Name = "ContentPresenterBorder", Type = typeof(FrameworkElement))]
     [TemplatePart(Name = "DropDownToggle", Type = typeof(ToggleButton))]
     [TemplatePart(Name = "ScrollViewer", Type = typeof(ScrollViewer))]
-    [TemplateVisualState(Name = "InvalidUnfocused", GroupName = "ValidationStates")]
-    [TemplateVisualState(Name = "InvalidFocused", GroupName = "ValidationStates")]
-    [TemplateVisualState(Name = "Normal", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "MouseOver", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "Disabled", GroupName = "CommonStates")]
-    [TemplateVisualState(Name = "Unfocused", GroupName = "FocusStates")]
-    [TemplateVisualState(Name = "Focused", GroupName = "FocusStates")]
-    [TemplateVisualState(Name = "FocusedDropDown", GroupName = "FocusStates")]
-    [TemplateVisualState(Name = "Valid", GroupName = "ValidationStates")]
+    [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = FocusedDropDownState, GroupName = VisualStates.GroupFocus)]
     public class ComboBox : Selector
     {
+        private const string FocusedDropDownState = "FocusedDropDown";
+
         private Popup _popup;
         private UIElement _popupChild;
         private ToggleButton _dropDownToggle;
         private ContentPresenter _contentPresenter;
         private FrameworkElement _emptyContent;
         private ScrollViewer _scrollHost;
+        private bool _isMouseOver;
+        private bool _isFocused;
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Use 'CSHTML5.Native.Html.Controls.NativeComboBox' instead.")]
         public bool UseNativeComboBox
@@ -72,7 +76,16 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ComboBox()
         {
-            this.DefaultStyleKey = typeof(ComboBox);
+            DefaultStyleKey = typeof(ComboBox);
+            IsEnabledChanged += (o, e) =>
+            {
+                if (!(bool)e.NewValue)
+                {
+                    _isMouseOver = false;
+                }
+
+                UpdateVisualStates();
+            };
         }
 
         internal sealed override bool HandlesScrolling => true;
@@ -404,6 +417,76 @@ namespace Windows.UI.Xaml.Controls
             IsDropDownOpen = true;
         }
 
+        /// <summary>
+        /// Provides handling for the <see cref="UIElement.MouseEnter"/> event that occurs
+        /// when the mouse pointer enters this control.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
+            _isMouseOver = true;
+            UpdateVisualStates();
+        }
+
+        /// <summary>
+        /// Provides handling for the <see cref="UIElement.MouseLeave"/> event that occurs
+        /// when the mouse pointer leaves the combo box.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+#if MIGRATION
+        protected override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeave(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+            _isMouseOver = false;
+            UpdateVisualStates();
+        }
+
+        /// <summary>
+        /// Provides handling for the <see cref="UIElement.GotFocus"/> event.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+            _isFocused = true;
+            UpdateVisualStates();
+        }
+
+        /// <summary>
+        /// Provides handling for the <see cref="UIElement.LostFocus"/> event.
+        /// </summary>
+        /// <param name="e">
+        /// The event data.
+        /// </param>
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            _isFocused = false;
+            UpdateVisualStates();
+        }
+
         /// <inheritdoc />
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
@@ -636,6 +719,8 @@ namespace Windows.UI.Xaml.Controls
                     comboBox.ScrollTo(-1);
                 }
             }
+
+            comboBox.UpdateVisualStates();
         }
 
         private static object CoerceIsDropDownOpen(DependencyObject d, object value)
@@ -761,6 +846,35 @@ namespace Windows.UI.Xaml.Controls
         {
             get { return (bool)this.GetValue(IsSelectionBoxHighlightedProperty); }
             private set { this.SetValue(IsSelectionBoxHighlightedProperty, value); }
+        }
+
+        internal override void UpdateVisualStates()
+        {
+            if (!IsEnabled)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateDisabled, false);
+            }
+            else if (_isMouseOver)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateNormal, false);
+            }
+
+            if (IsDropDownOpen)
+            {
+                VisualStateManager.GoToState(this, FocusedDropDownState, false);
+            }
+            else if (_isFocused)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
+            }
         }
     }
 }

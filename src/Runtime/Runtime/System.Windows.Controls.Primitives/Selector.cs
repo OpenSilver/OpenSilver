@@ -464,6 +464,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
             SetSynchronizationWithCurrentItem();
         }
 
+        /// <summary>
+        /// Prepares the specified element to display the specified item.
+        /// </summary>
+        /// <param name="element">
+        /// The element used to display the specified item.
+        /// </param>
+        /// <param name="item">
+        /// The item to display
+        /// </param>
         protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
         {
             base.PrepareContainerForItemOverride(element, item);
@@ -475,6 +484,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
+        /// <summary>
+        /// Removes any bindings and templates applied to the item container for the specified
+        /// content.
+        /// </summary>
+        /// <param name="element">
+        /// The combo box item used to display the specified content.
+        /// </param>
+        /// <param name="item">
+        /// The item content.
+        /// </param>
         protected override void ClearContainerForItemOverride(DependencyObject element, object item)
         {
             base.ClearContainerForItemOverride(element, item);
@@ -482,6 +501,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (element is SelectorItem container)
             {
                 container.ParentSelector = null;
+                container.ClearContentControl(item);
             }
         }
 

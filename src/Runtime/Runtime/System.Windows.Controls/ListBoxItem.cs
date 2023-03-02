@@ -48,7 +48,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public ListBoxItem()
         {
-            DisableBaseControlHandlingOfVisualStates = true;
             IsEnabledChanged += (o, e) => UpdateVisualStates();
             DefaultStyleKey = typeof(ListBoxItem);
         }

@@ -218,6 +218,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets or sets the suggested height of a FrameworkElement.
         /// </summary>
+        [TypeConverter(typeof(LengthConverter))]
         public double Height
         {
             get { return (double)GetValue(HeightProperty); }
@@ -309,6 +310,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets or sets the width of a FrameworkElement.
         /// </summary>
+        [TypeConverter(typeof(LengthConverter))]
         public double Width
         {
             get { return (double)GetValue(WidthProperty); }

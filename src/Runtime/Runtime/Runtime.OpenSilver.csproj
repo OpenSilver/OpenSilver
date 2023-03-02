@@ -167,6 +167,7 @@
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LinearClipper.cs" />
 		<Compile Include="System.Windows.Controls\CalendarDayButton.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventArgs.cs" />
+		<Compile Include="System.Windows.Controls\Control.VisualStates.cs" />
 		<Compile Include="System.Windows.Controls\DateTimeHelper.cs" />
 		<Compile Include="System.Windows.Controls\DragDecorator.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\DragValidator.cs" />
@@ -303,6 +304,7 @@
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
+		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />
 		<Compile Include="System.Windows\PropertyPathConverter.cs" />
 		<Compile Include="System.Windows\RectConverter.cs" />
