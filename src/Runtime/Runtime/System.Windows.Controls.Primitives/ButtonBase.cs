@@ -54,7 +54,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Interval = new TimeSpan(0, 0, 5); // See comment where this variable is defined.
             _timerToReleaseCaptureAutomaticallyIfNoMouseUpEvent.Tick += TimerToReleaseCaptureAutomaticallyIfNoMouseUpEvent_Tick;
-            IsEnabledChanged += OnIsEnabledChanged;
+            IsEnabledChanged += new DependencyPropertyChangedEventHandler(OnIsEnabledChanged);
+            Loaded += (o, e) => UpdateVisualStates();
         }
 
         private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -247,6 +248,20 @@ namespace Windows.UI.Xaml.Controls.Primitives
             OnClick();
         }
 
+        /// <summary>
+        /// Builds the visual tree for the <see cref="ButtonBase" /> control when 
+        /// a new template is applied.
+        /// </summary>
+#if MIGRATION
+        public override void OnApplyTemplate()
+#else
+        protected override void OnApplyTemplate()
+#endif
+        {
+            base.OnApplyTemplate();
+            UpdateVisualStates();
+        }
+        
 #if MIGRATION
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
 #else
