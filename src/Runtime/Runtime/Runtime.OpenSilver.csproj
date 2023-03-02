@@ -304,6 +304,7 @@
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
+		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />
 		<Compile Include="System.Windows\PropertyPathConverter.cs" />
 		<Compile Include="System.Windows\RectConverter.cs" />
