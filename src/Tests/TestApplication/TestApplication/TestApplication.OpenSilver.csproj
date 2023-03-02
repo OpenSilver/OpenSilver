@@ -22,6 +22,7 @@
     <Compile Include="Tests\DragDropTarget\ListBoxDragDropTargetTest.xaml.cs" />
     <Compile Include="Tests\DragDropTarget\PanelDragDropTargetTest.xaml.cs" />
     <Compile Include="Tests\DragDropTarget\TreeViewDragDropTargetTest.xaml.cs" />
+    <Compile Include="Tests\DatePickerTest.xaml.cs" />
     <Compile Include="Tests\Events\TextInputTest.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -375,6 +376,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Content>
     <Content Include="Tests\DataGrids\DataGridColumn_VisibilityTest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
+    <Content Include="Tests\DatePickerTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Content>
