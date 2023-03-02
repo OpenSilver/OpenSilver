@@ -77,6 +77,11 @@ namespace CSHTML5.Internal
             return CreateSimpleSvgDomElement(shape, parentRef, "rect");
         }
 
+        internal static object CreateSvgPathDomElement(Shape shape, object parentRef)
+        {
+            return CreateSimpleSvgDomElement(shape, parentRef, "path");
+        }
+
         private static object CreateSimpleSvgDomElement(Shape shape, object parentRef, string elementName)
         {
             var domElement = INTERNAL_HtmlDomManager.CreateSvgDomElementAndAppendIt(elementName, parentRef, shape);

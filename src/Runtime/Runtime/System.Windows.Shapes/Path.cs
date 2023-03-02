@@ -65,6 +65,12 @@ namespace Windows.UI.Xaml.Shapes
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
+            if (RenderSvg)
+            {
+                var svg = INTERNAL_SvgShapesDrawHelpers.CreateSvgOuterDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+                return INTERNAL_SvgShapesDrawHelpers.CreateSvgPathDomElement(this, svg);
+            }
+
             return INTERNAL_ShapesDrawHelpers.CreateDomElementForPathAndSimilar(this, parentRef, out _canvasDomElement, out domElementWhereToPlaceChildren);
         }
         /// <summary>
@@ -84,11 +90,24 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Data), 
                 typeof(Geometry), 
                 typeof(Path),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Data_Changed));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, Data_Changed)
+                {
+                    MethodToUpdateDom = (d, e) =>
+                    {
+                        var path = (Path)d;
+                        if (!path.RenderSvg)
+                            return;
+
+                        path.SetSvgAttribute("d", path.Data?.ToString() ?? string.Empty);
+                    }
+                });
 
         private static void Data_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Path path = (Path)d;
+
+            if (path.RenderSvg)
+                return;
 
             if (null != e.OldValue)
             {

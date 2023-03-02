@@ -40,6 +40,7 @@ namespace Windows.UI.Xaml.Media
             ParseStringToStreamGeometryContext(context, pathString/*, formatProvider*/, ref fillRule);
             var geometry = context.GetPathGeometry();
             geometry.FillRule = fillRule;
+            geometry.OriginalData = pathString;
             return geometry;
         }
 

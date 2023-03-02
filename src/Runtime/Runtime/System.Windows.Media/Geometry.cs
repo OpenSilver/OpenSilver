@@ -43,6 +43,8 @@ namespace Windows.UI.Xaml.Media
 
         internal Geometry() { }
 
+        internal string OriginalData { get; set; }
+
         internal Path ParentPath { get; private set; }
 
         internal virtual void SetParentPath(Path path)
@@ -100,5 +102,11 @@ namespace Windows.UI.Xaml.Media
 
         [OpenSilver.NotImplemented]
         public Rect Bounds { get; private set; }
+
+        public override string ToString()
+        {
+            // todo: convert properly to path string if Geometry is created with C# code
+            return OriginalData ?? base.ToString();
+        }
     }
 }
