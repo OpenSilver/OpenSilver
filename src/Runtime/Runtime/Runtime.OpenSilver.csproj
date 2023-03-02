@@ -233,6 +233,8 @@
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
+		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
+		<Compile Include="System.Windows.Markup\SetterValueConverter.cs" />
 		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Wasm.cs" />
 		<Compile Include="System.Windows.Media.Imaging\WriteableBitmap.Simulator.cs" />
@@ -304,6 +306,7 @@
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
+		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />
 		<Compile Include="System.Windows\PropertyPathConverter.cs" />
 		<Compile Include="System.Windows\RectConverter.cs" />

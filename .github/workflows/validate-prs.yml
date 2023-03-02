@@ -25,27 +25,43 @@ jobs:
         run: |
           ./restore-packages-opensilver.bat
           nuget restore src/OpenSilver.sln -v quiet
-      - name: Build Compiler SL Configuration
-        run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=SL -clp:ErrorsOnly -restore
-      - name: Build Compiler UWP Configuration
-        run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=UWP -clp:ErrorsOnly -restore
+      - name: Build Compiler
+        run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore
+      - name: Build ResourcesExtractor
+        run: msbuild src/Compiler/Compiler.ResourcesExtractor/Compiler.ResourcesExtractor.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore;
       - name: Copy Compiler SL Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/SL/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.1.1.0/tools/;
+        run: |
+          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
+          cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
       - name: Copy Compiler UWP Assemblies
-        run: cp src/Compiler/Compiler/bin/OpenSilver/UWP/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.UWPCompatible.1.1.0/tools/;
+        run: |
+          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
+          cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
+      - name: Copy Targets
+        run: |
+          cp src/Targets/OpenSilver.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
+          cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.${{env.actual-version}}/build/;
+          cp src/Targets/OpenSilver.UwpCompatible.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
+          cp src/Targets/OpenSilver.Common.targets src/packages/OpenSilver.UWPCompatible.${{env.actual-version}}/build/;
       # There is the TestApplication for SL version in the Solution, so we need to build the latest SL package
       - name: Build OpenSilver
         working-directory: build
         run: msbuild slnf/OpenSilver.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+      - name: Build Simulator
+        working-directory: build
+        run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
       - name: Pack OpenSilver
         working-directory: build
         run: |
           mkdir temp; echo "OpenSilver ${{ env.actual-version }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
           nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=${{ env.actual-version }};Configuration=SL;Target=OpenSilver"
+          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -BasePath "$pwd" -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ env.actual-version }};"
       - name: Replace existing package with actual one
         run: |
           Remove-Item -Path "$($env:USERPROFILE)\.nuget\packages\OpenSilver\${{ env.actual-version }}" -Force -Recurse
+          Remove-Item -Path "$($env:USERPROFILE)\.nuget\packages\OpenSilver.Simulator\${{ env.actual-version }}" -Force -Recurse
           dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj package OpenSilver -v ${{ env.actual-version }} -s "$(Get-Location)\build\output\OpenSilver"
+          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Simulator\TestApplication.OpenSilver.Simulator.csproj package OpenSilver.Simulator -v ${{ env.actual-version }} -s "$(Get-Location)\build\output\OpenSilver"
       - name: Drop all bin and obj folders
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash
