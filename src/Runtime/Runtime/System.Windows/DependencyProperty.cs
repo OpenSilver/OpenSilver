@@ -301,5 +301,17 @@ namespace Windows.UI.Xaml
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
+
+        /// <summary>
+        /// Find a property from name
+        /// </summary>
+        /// <remarks>
+        /// Search includes base classes of the provided type as well
+        /// </remarks>
+        /// <param name="name">Name of the property</param>
+        /// <param name="ownerType">Owner type of the property</param>
+        /// <returns>Dependency property</returns>
+        internal static DependencyProperty FromName(string name, Type ownerType)
+            => INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(ownerType, name);
     }
 }

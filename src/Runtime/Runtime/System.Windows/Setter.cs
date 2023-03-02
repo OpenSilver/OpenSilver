@@ -13,6 +13,10 @@
 \*====================================================================================*/
 
 using System;
+using System.ComponentModel;
+using System.Windows.Markup;
+using System.Xaml.Markup;
+using System.Globalization;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -31,12 +35,16 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Applies a value to a property in a Style.
     /// </summary>
-    public sealed partial class Setter : SetterBase
+    public sealed class Setter : SetterBase, ISupportInitialize
     {
 #region Data
 
         private DependencyProperty _property;
         private object _value;
+
+        private object _unresolvedValue = null;
+        private ITypeDescriptorContext _serviceProvider = null;
+        private CultureInfo _cultureInfoForTypeConverter = null;
 
 #endregion
 
@@ -72,6 +80,8 @@ namespace Windows.UI.Xaml
         /// Gets or sets the property to apply the <see cref="Setter.Value"/> to.
         /// The default is null.
         /// </summary>
+        [Ambient]
+        [TypeConverter(typeof(DependencyPropertyConverter))]
         public DependencyProperty Property
         {
             get
@@ -90,6 +100,7 @@ namespace Windows.UI.Xaml
         /// Gets or sets the value to apply to the property that is specified 
         /// by the <see cref="Setter"/>.
         /// </summary>
+        [TypeConverter(typeof(SetterValueConverter))]
         public object Value
         {
             get
@@ -142,26 +153,9 @@ namespace Windows.UI.Xaml
 
             if (isObjectType || !DependencyProperty.IsValueTypeValid(value, dp.PropertyType))
             {
-                Binding binding = value as Binding;
-                if (binding == null)
+                if (value is not Binding binding)
                 {
-                    // Special case :
-                    // In xaml, setting a color via StaticResource to the value of a
-                    // style setter converts the color to a SolidColorBrush as shown in
-                    // the following code.
-                    //   <Color x:Key="color">#FFFF0000</Color>
-                    //   <Style x:Key="style" TargetType="Control">
-                    //      <Setter Property="Foreground" Value="{StaticResource color}" />
-                    //   </Style>
-                    // Note: this behavior is not reproduced when a style is constructed
-                    // directly in C# (Silverlight), but it will work anyway with this
-                    // workaround.
-                    if (dp.PropertyType == typeof(Brush) && value is Color color)
-                    {
-                        // do not use Value to avoid unecessary checks.
-                        _value = new SolidColorBrush(color);
-                    }
-                    else if (!isObjectType)
+                    if (!isObjectType)
                     {
                         throw new ArgumentException(
                             string.Format("'{0}' is not a valid value for the '{1}.{2}' property on a Setter.",
@@ -194,6 +188,34 @@ namespace Windows.UI.Xaml
             }
         }
 
-#endregion
+#endregion        
+
+        internal void ReceiveTypeConverter(ITypeDescriptorContext serviceProvider, CultureInfo culture, object unresolvedValue)
+        {
+            _serviceProvider = serviceProvider;
+            _cultureInfoForTypeConverter = culture;
+            _unresolvedValue = unresolvedValue;
+        }
+
+        void ISupportInitialize.BeginInit() { }
+
+        void ISupportInitialize.EndInit()
+        {
+            if (_unresolvedValue != null)
+            {
+                try
+                {
+                    Value = SetterValueConverter.ResolveValue(_serviceProvider,
+                        Property, _cultureInfoForTypeConverter, _unresolvedValue);
+                }
+                finally
+                {
+                    _unresolvedValue = null;
+                }
+            }
+
+            _serviceProvider = null;
+            _cultureInfoForTypeConverter = null;
+        }
     }
 }
