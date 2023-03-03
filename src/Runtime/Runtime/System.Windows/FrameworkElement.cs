@@ -1179,56 +1179,55 @@ namespace Windows.UI.Xaml
         }
         internal sealed override void ArrangeCore(Rect finalRect)
         {
-            bool isDefaultAlignment = HorizontalAlignment == HorizontalAlignment.Stretch && VerticalAlignment == VerticalAlignment.Stretch;
-            Size finalSize = isDefaultAlignment ? finalRect.Size.Max(DesiredSize) : new Size(
-                HorizontalAlignment != HorizontalAlignment.Stretch ? Math.Min(DesiredSize.Width, finalRect.Width) : finalRect.Width,
-                VerticalAlignment != VerticalAlignment.Stretch ? Math.Min(DesiredSize.Height, finalRect.Height) : finalRect.Height);
+            var minSize = new Size(MinWidth, MinHeight);
+            var maxSize = new Size(MaxWidth, MaxHeight);
+            var size = new Size(Width, Height);
+            Thickness margin = Margin;
+            HorizontalAlignment ha = HorizontalAlignment;
+            VerticalAlignment va = VerticalAlignment;
 
-            if (!this.IsCustomLayoutRoot)
+            bool isDefaultAlignment = ha == HorizontalAlignment.Stretch && va == VerticalAlignment.Stretch;
+            var finalSize = isDefaultAlignment ? finalRect.Size.Max(DesiredSize) : new Size(
+                ha != HorizontalAlignment.Stretch ? Math.Min(DesiredSize.Width, finalRect.Width) : finalRect.Width,
+                va != VerticalAlignment.Stretch ? Math.Min(DesiredSize.Height, finalRect.Height) : finalRect.Height);
+
+            if (!IsCustomLayoutRoot)
             {
-                finalSize.Width = Math.Max(0, finalSize.Width - Margin.Left - Margin.Right);
-                finalSize.Height = Math.Max(0, finalSize.Height - Margin.Top - Margin.Bottom);
+                finalSize.Width = Math.Max(0, finalSize.Width - margin.Left - margin.Right);
+                finalSize.Height = Math.Max(0, finalSize.Height - margin.Top - margin.Bottom);
             }
 
-            Size MinSize = new Size(MinWidth, MinHeight);
-            Size MaxSize = new Size(MaxWidth, MaxHeight);
-            Size size = new Size(Width, Height);
-
-            finalSize = size.Combine(finalSize).Bounds(MinSize, MaxSize);
+            finalSize = size.Combine(finalSize).Bounds(minSize, maxSize);
 
             Size arrangedSize = ArrangeOverride(finalSize);
 
-            double w = Math.Max(0, Math.Min(finalSize.Width, arrangedSize.Width));
-            double h = Math.Max(0, Math.Min(finalSize.Height, arrangedSize.Height));
-            arrangedSize = new Size(w, h);
-
-            arrangedSize = size.Combine(arrangedSize).Bounds(MinSize, MaxSize);
-
-            Rect containingRect = new Rect(arrangedSize);
-
-            // Add Margin
-            if (!this.IsCustomLayoutRoot)
+            var offset = new Point();
+            if (!IsCustomLayoutRoot)
             {
-                double newLeft = containingRect.Left - Margin.Left;
-                double newTop = containingRect.Top - Margin.Top;
-                double newWidth = containingRect.Width + Margin.Left + Margin.Right;
-                double newHeight = containingRect.Height + Margin.Top + Margin.Bottom;
+                var clientSize = new Size(
+                    Math.Max(0, finalRect.Width - margin.Left - margin.Right),
+                    Math.Max(0, finalRect.Height - margin.Top - margin.Bottom));
 
-                if (newWidth >= 0 && newHeight >= 0)
-                    containingRect = new Rect(newLeft, newTop, newWidth, newHeight);
-                else
-                    throw new ArgumentException("Width or Height cannot be lower than 0");
+                var clippedInkSize = new Size(
+                    Math.Min(arrangedSize.Width, maxSize.Width),
+                    Math.Min(arrangedSize.Height, maxSize.Height));
+
+                offset = ComputeAlignmentOffset(clientSize, clippedInkSize);
             }
 
-            Point alignedOffset = GetAlignmentOffset(finalRect, containingRect.Size, HorizontalAlignment, VerticalAlignment);
+            offset.X += finalRect.X + margin.Left;
+            offset.Y += finalRect.Y + margin.Top;
 
-            Point visualOffset = new Point(alignedOffset.X - containingRect.Location.X, alignedOffset.Y - containingRect.Location.Y);
+            arrangedSize = new Size(
+                Math.Max(0, Math.Min(finalSize.Width, arrangedSize.Width)),
+                Math.Max(0, Math.Min(finalSize.Height, arrangedSize.Height)));
+            arrangedSize = size.Combine(arrangedSize).Bounds(minSize, maxSize);
 
-            VisualBounds = new Rect(visualOffset, arrangedSize);
+            VisualBounds = new Rect(offset, arrangedSize);
 
             // Call SizeChanged event handlers
-            if (!this.IsCustomLayoutRoot)
-                this.HandleSizeChanged(new Size(VisualBounds.Width, VisualBounds.Height));
+            if (!IsCustomLayoutRoot)
+                HandleSizeChanged(new Size(VisualBounds.Width, VisualBounds.Height));
 
             if (isFirstRendering)
             {
@@ -1237,34 +1236,57 @@ namespace Windows.UI.Xaml
             }
         }
 
-        private static Point GetAlignmentOffset(Rect container, Size alignedRectSize, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)
+        private Point ComputeAlignmentOffset(Size clientSize, Size inkSize)
         {
-            double alignedLeft = container.Left;
-            double alignedTop = container.Top;
+            Point offset = new Point();
 
-            if (horizontalAlignment == HorizontalAlignment.Right)
+            HorizontalAlignment ha = HorizontalAlignment;
+            VerticalAlignment va = VerticalAlignment;
+
+            //this is to degenerate Stretch to Top-Left in case when clipping is about to occur
+            //if we need it to be Center instead, simply remove these 2 ifs
+            if (ha == HorizontalAlignment.Stretch
+                && inkSize.Width > clientSize.Width)
             {
-                alignedLeft = container.Left + container.Width - alignedRectSize.Width;
+                ha = HorizontalAlignment.Left;
             }
 
-            if (horizontalAlignment == HorizontalAlignment.Center ||
-                (horizontalAlignment == HorizontalAlignment.Stretch && container.Width > alignedRectSize.Width))
+            if (va == VerticalAlignment.Stretch
+                && inkSize.Height > clientSize.Height)
             {
-                alignedLeft = container.Left + (container.Width - alignedRectSize.Width) / 2;
+                va = VerticalAlignment.Top;
+            }
+            //end of degeneration of Stretch to Top-Left
+
+            if (ha == HorizontalAlignment.Center
+                || ha == HorizontalAlignment.Stretch)
+            {
+                offset.X = (clientSize.Width - inkSize.Width) * 0.5;
+            }
+            else if (ha == HorizontalAlignment.Right)
+            {
+                offset.X = clientSize.Width - inkSize.Width;
+            }
+            else
+            {
+                offset.X = 0;
             }
 
-            if (verticalAlignment == VerticalAlignment.Bottom)
+            if (va == VerticalAlignment.Center
+                || va == VerticalAlignment.Stretch)
             {
-                alignedTop = container.Top + container.Height - alignedRectSize.Height;
+                offset.Y = (clientSize.Height - inkSize.Height) * 0.5;
+            }
+            else if (va == VerticalAlignment.Bottom)
+            {
+                offset.Y = clientSize.Height - inkSize.Height;
+            }
+            else
+            {
+                offset.Y = 0;
             }
 
-            if (verticalAlignment == VerticalAlignment.Center ||
-                (verticalAlignment == VerticalAlignment.Stretch && container.Height > alignedRectSize.Height))
-            {
-                alignedTop = container.Top + (container.Height - alignedRectSize.Height) / 2;
-            }
-
-            return alignedLeft == 0 && alignedTop == 0 ? new Point() : new Point(alignedLeft, alignedTop);
+            return offset;
         }
 
         /// <summary>
