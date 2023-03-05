@@ -15,7 +15,6 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Markup;
-using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -49,23 +48,32 @@ namespace Windows.UI.Xaml.Controls
     ///     TextBoxName.Text = "Some text";
     /// </code>
     /// </example>
+    [TemplatePart(Name = ContentElementName, Type = typeof(FrameworkElement))]
+    [TemplateVisualState(Name = VisualStates.StateReadOnly, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
     public partial class TextBox : Control
     {
+        private const string ContentElementName = "ContentElement"; // Sl & UWP
+        private const string ContentElementName_WPF = "PART_ContentHost"; // WPF
+
         private bool _isProcessingInput;
+        private bool _isFocused;
         private int? _selectionIdxCache;
         private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
         private ITextBoxViewHost<TextBoxView> _textViewHost;
 
-        /// <summary>
-        /// The name of the ExpanderButton template part.
-        /// </summary>
-        private readonly string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
-        //                                                  Sl & UWP                WPF
-
         public TextBox()
         {
-            this.DefaultStyleKey = typeof(TextBox);
+            DefaultStyleKey = typeof(TextBox);
+            IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
         internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
@@ -599,13 +607,8 @@ namespace Windows.UI.Xaml.Controls
                 _contentElement = null;
             }
 
-            FrameworkElement contentElement = null;
-            int i = 0;
-            while (contentElement == null && i < TextAreaContainerNames.Length)
-            {
-                contentElement = GetTemplateChild(TextAreaContainerNames[i]) as FrameworkElement;
-                ++i;
-            }
+            FrameworkElement contentElement = GetTemplateChild(ContentElementName) as FrameworkElement
+                ?? GetTemplateChild(ContentElementName_WPF) as FrameworkElement;
 
             if (contentElement != null)
             {
@@ -615,6 +618,8 @@ namespace Windows.UI.Xaml.Controls
                 _contentElement = contentElement;
                 InitializeContentElement();
             }
+
+            UpdateVisualStates();
         }
 
 #if MIGRATION
@@ -661,6 +666,34 @@ namespace Windows.UI.Xaml.Controls
 #endif
 
             e.Handled = true;
+        }
+
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
+            UpdateVisualStates();
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected override void OnPointerExited(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
+            UpdateVisualStates();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -711,6 +744,20 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+            _isFocused = true;
+            UpdateVisualStates();
+        }
+
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            _isFocused = false;
+            UpdateVisualStates();
+        }
+
         /// <summary>
         /// Selects all text in the text box.
         /// </summary>
@@ -737,15 +784,28 @@ namespace Windows.UI.Xaml.Controls
         {
             if (!IsEnabled)
             {
-                GoToState(VisualStates.StateDisabled);
+                VisualStateManager.GoToState(this, VisualStates.StateDisabled, false);
             }
             else if (IsReadOnly)
             {
-                GoToState(VisualStates.StateReadOnly);
+                VisualStateManager.GoToState(this, VisualStates.StateReadOnly, false);
+            }
+            else if (IsPointerOver)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
             }
             else
             {
-                GoToState(VisualStates.StateNormal);
+                VisualStateManager.GoToState(this, VisualStates.StateNormal, false);
+            }
+
+            if (_isFocused)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
             }
         }
 

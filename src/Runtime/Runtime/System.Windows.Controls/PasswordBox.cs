@@ -12,15 +12,16 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
+using System.Windows.Input;
 using System.Windows.Media;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -34,16 +35,28 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Represents a control for entering passwords.
     /// </summary>
+    [TemplatePart(Name = ContentElementName, Type = typeof(FrameworkElement))]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateFocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateUnfocused, GroupName = VisualStates.GroupFocus)]
+    [TemplateVisualState(Name = VisualStates.StateValid, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidUnfocused, GroupName = VisualStates.GroupValidation)]
+    [TemplateVisualState(Name = VisualStates.StateInvalidFocused, GroupName = VisualStates.GroupValidation)]
     public class PasswordBox : Control
     {
+        private const string ContentElementName = "ContentElement"; // Sl & UWP
+        private const string ContentElementName_WPF = "PART_ContentHost"; // WPF
+
+        private bool _isFocused;
         private FrameworkElement _contentElement;
         private ITextBoxViewHost<PasswordBoxView> _textViewHost;
 
-        private readonly string[] TextAreaContainerNames = { "ContentElement", "PART_ContentHost" };
-
         public PasswordBox()
         {
-            this.DefaultStyleKey = typeof(PasswordBox);
+            DefaultStyleKey = typeof(PasswordBox);
+            IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
         internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
@@ -172,7 +185,49 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-#endregion
+        #endregion
+
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
+            UpdateVisualStates();
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected override void OnPointerExited(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
+            UpdateVisualStates();
+        }
+
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+            _isFocused = true;
+            UpdateVisualStates();
+        }
+
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            _isFocused = false;
+            UpdateVisualStates();
+        }
 
         /// <summary>
         /// Builds the visual tree for the <see cref="PasswordBox" /> 
@@ -192,20 +247,16 @@ namespace Windows.UI.Xaml.Controls
                 _contentElement = null;
             }
 
-            FrameworkElement contentElement = null;
-
-            int i = 0;
-            while (contentElement == null && i < TextAreaContainerNames.Length)
-            {
-                contentElement = GetTemplateChild(TextAreaContainerNames[i]) as FrameworkElement;
-                ++i;
-            }
+            FrameworkElement contentElement = GetTemplateChild(ContentElementName) as FrameworkElement
+                ?? GetTemplateChild(ContentElementName_WPF) as FrameworkElement;
 
             if (contentElement != null)
             {
                 _contentElement = contentElement;
                 InitializeContentElement();
             }
+
+            UpdateVisualStates();
         }
 
         private PasswordBoxView CreateView()
@@ -265,7 +316,32 @@ namespace Windows.UI.Xaml.Controls
                 $"{sDiv}.setSelectionRange(0, {sDiv}.value.length)");
         }
 
-#region Not supported yet
+        internal override void UpdateVisualStates()
+        {
+            if (!IsEnabled)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateDisabled, false);
+            }
+            else if (IsPointerOver)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateMouseOver, false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateNormal, false);
+            }
+
+            if (_isFocused)
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateFocused, false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, VisualStates.StateUnfocused, false);
+            }
+        }
+
+        #region Not supported yet
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CaretBrushProperty = DependencyProperty.Register("CaretBrush", typeof(Brush), typeof(PasswordBox), null);
