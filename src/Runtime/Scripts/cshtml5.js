@@ -1346,3 +1346,28 @@ const isTouchDevice = () => {
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0));
 }
+
+document.velocityObjCache = {};
+document.addToVelocityCache = function (id, element, key) {
+    if (id in document.velocityObjCache && !document.velocityObjCache[id].includes(key)) {
+        document.velocityObjCache[id].push(key);
+    }
+    else
+        document.velocityObjCache[id] = [element, key];
+}
+
+document.cleanupVelocityCache = function () {
+    var keys = Object.keys(document.velocityObjCache);
+    keys.forEach((key) => {
+        var el = document.getElementById(key);
+        if (el === null) {
+            Velocity.Utilities.removeData(document.velocityObjCache[key][0], document.velocityObjCache[key].slice(1));
+            Velocity.Utilities.removeData(document.velocityObjCache[key][0], ['velocity']);
+            delete document.velocityObjCache[key];
+        }
+    });
+}
+
+setInterval(() => {
+    document.cleanupVelocityCache();
+}, 10000);

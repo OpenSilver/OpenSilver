@@ -58,6 +58,7 @@ namespace Windows.UI.Xaml.Media.Animation
             }
 
             string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
+            string elementId = (domElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier;
 
             var sb = new StringBuilder();
             sb.AppendLine("(function(el) {");
@@ -70,8 +71,9 @@ queue:""{visualStateGroupName}""
 
             if (callbackForWhenfinished != null)
             {
-                var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(callbackForWhenfinished);                
-                sb.Append($"options.complete = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsCallback)};");
+                var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(callbackForWhenfinished);
+                string callback = $"document.getCallbackFunc({jsCallback.Id}, true, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
+                sb.Append($"options.complete = {callback};");
                 animation.RegisterCallback(jsCallback);
             }
 
@@ -90,6 +92,7 @@ queue:""{visualStateGroupName}""
 
             sb.AppendLine($"Velocity(el, {jsFromToValues}, options);");
             sb.AppendLine($"Velocity.Utilities.dequeue(el, \"{visualStateGroupName}\");");
+            sb.AppendLine($"document.addToVelocityCache('{elementId}', el, '{visualStateGroupName}' + 'queue');");
             sb.Append($"}})({sElement});");
 
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(sb.ToString());
