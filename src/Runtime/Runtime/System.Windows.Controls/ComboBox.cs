@@ -236,6 +236,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             UpdatePresenter();
+            UpdateVisualStates();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
