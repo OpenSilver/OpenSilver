@@ -147,9 +147,9 @@ namespace System
         }
 
         /// <summary>
-        /// Render <see cref="Windows.Shapes.Shape"/> as SVG instead of rendering on js canvas.
+        /// Render <see cref="Windows.Shapes.Shape"/> using SVG instead of rendering on js canvas.
         /// </summary>
-        public bool RenderSvgShapes { get; set; }
+        public bool RenderShapesUsingSvg { get; set; }
 
         public bool EnableInvalidPropertyMetadataDefaultValueExceptions { get; set; }
 

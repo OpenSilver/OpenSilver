@@ -53,13 +53,13 @@ namespace Windows.UI.Xaml.Shapes
 
         internal bool _suspendRendering = false;
 
-        protected bool RenderSvg => UseSvgRenderer.HasValue ? UseSvgRenderer.Value : Application.Current.Host.Settings.RenderSvgShapes;
+        protected bool RenderSvg => RenderUsingSvg.HasValue ? RenderUsingSvg.Value : Application.Current.Host.Settings.RenderShapesUsingSvg;
         
         /// <summary>
-        /// Gets or sets a value indicating whether to render the shape as SVG.
-        /// Use this setting to override global <see cref="Settings.RenderSvgShapes"/>.
+        /// Gets or sets a value indicating whether to render the shape using SVG.
+        /// Use this setting to override global <see cref="Settings.RenderShapesUsingSvg"/>.
         /// </summary>
-        public bool? UseSvgRenderer { get; set; }
+        public bool? RenderUsingSvg { get; set; }
 
         #endregion
 
