@@ -19,6 +19,7 @@ using DotNetForHtml5.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -43,6 +44,38 @@ namespace Runtime.OpenSilver.Tests
             ExecuteJavascript?.Invoke(null, e);
         }
 
+        private static object ExecuteJsMock(string param)
+        {
+            var e = new ExecuteJavascriptEventArgs
+            {
+                Javascript = param
+            };
+
+            OnExecuteJavascript(e);
+
+            if (e.Handled)
+            {
+                return e.Result;
+            }
+
+            // Mocks INTERNAL_GridHelpers isCSSGridSupported() and isMSGrid()
+            if (param == @"document.isGridSupported" || param == @"document.isMSGrid")
+            {
+                return false;
+            }
+            // Mocks Simulator portion of UIElement.TransformToVisual
+            // JS code example is:
+            // document.callScriptSafe("154","(document.getElementByIdSafe(\"id31\").getBoundingClientRect().left -
+            // document.getElementByIdSafe(\"id1\").getBoundingClientRect().left) + '|' +
+            // (document.getElementByIdSafe(\"id31\").getBoundingClientRect().top -
+            // document.getElementByIdSafe(\"id1\").getBoundingClientRect().top)",108)
+            if (Regex.Matches(param, @"\(.+getBoundingClientRect\(\).left - .+.getBoundingClientRect\(\).left\) \+ '\|' \+ \(.+getBoundingClientRect\(\).top - .+.getBoundingClientRect\(\).top\)").Count == 1)
+            {
+                return JsonDocument.Parse(@"""0|0""").RootElement;
+            }
+            return new JsonElement();
+        }
+
         /// <summary>
         /// This method will be executed whenever the assembly is loaded,
         /// so before any number of tests being run.
@@ -51,43 +84,16 @@ namespace Runtime.OpenSilver.Tests
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext testContext)
         {
-            Mock<IJavaScriptExecutionHandler> javaScriptExecutionHandlerMock = new Mock<IJavaScriptExecutionHandler>();
+            var javaScriptExecutionHandlerMock = new Mock<IWebAssemblyExecutionHandler>();
             javaScriptExecutionHandlerMock
                 .Setup(x => x.ExecuteJavaScriptWithResult(It.IsAny<string>()))
-                .Returns<string>(param =>
-                {
-                    var e = new ExecuteJavascriptEventArgs
-                    {
-                        Javascript = param
-                    };
+                .Returns<string>(ExecuteJsMock);
+            javaScriptExecutionHandlerMock
+                .Setup(x => x.InvokeUnmarshalled<byte[], int, object>(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<int>()))
+                .Returns<string, byte[], int>((name, bytes, length) => ExecuteJsMock(Encoding.Unicode.GetString(bytes, 0, length)));
 
-                    OnExecuteJavascript(e);
-
-                    if (e.Handled)
-                    {
-                        return e.Result;
-                    }
-
-                    // Mocks INTERNAL_GridHelpers isCSSGridSupported() and isMSGrid()
-                    if (param == @"document.isGridSupported" || param == @"document.isMSGrid")
-                    {
-                        return false;
-                    }
-                    // Mocks Simulator portion of UIElement.TransformToVisual
-                    // JS code example is:
-                    // document.callScriptSafe("154","(document.getElementByIdSafe(\"id31\").getBoundingClientRect().left -
-                    // document.getElementByIdSafe(\"id1\").getBoundingClientRect().left) + '|' +
-                    // (document.getElementByIdSafe(\"id31\").getBoundingClientRect().top -
-                    // document.getElementByIdSafe(\"id1\").getBoundingClientRect().top)",108)
-                    else if (Regex.Matches(param, @"\(.+getBoundingClientRect\(\).left - .+.getBoundingClientRect\(\).left\) \+ '\|' \+ \(.+getBoundingClientRect\(\).top - .+.getBoundingClientRect\(\).top\)").Count == 1)
-                    {
-                        return JsonDocument.Parse(@"""0|0""").RootElement;
-                    }
-                    return new JsonElement();
-                });
-
-            IJavaScriptExecutionHandler javaScriptExecutionHandler = javaScriptExecutionHandlerMock.Object;
-            INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler;
+            var javaScriptExecutionHandler2 = javaScriptExecutionHandlerMock.Object;
+            INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;
 
             // Instantiating Application because it sets itself as Application.Current
             _ = new Application

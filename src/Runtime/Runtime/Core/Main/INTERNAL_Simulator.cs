@@ -13,6 +13,7 @@
 \*====================================================================================*/
 
 
+using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,53 +81,53 @@ namespace DotNetForHtml5.Core
 #if CSHTML5NETSTANDARD
         public static IJavaScriptExecutionHandler JavaScriptExecutionHandler
         {
-            get => JavaScriptExecutionHandler2;
+            get => WebAssemblyExecutionHandler;
             set
             {
-                IJavaScriptExecutionHandler2 jsRuntime = null;
+                IWebAssemblyExecutionHandler jsRuntime = null;
                 if (value is not null)
                 {
-                    jsRuntime = value as IJavaScriptExecutionHandler2 ?? new JSRuntimeWrapper(value);
+                    if (value is IWebAssemblyExecutionHandler wasmHandler)
+                    {
+                        jsRuntime = wasmHandler;
+                        INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime =
+                            new PendingJavascript(Cshtml5Initializer.PendingJsBufferSize, wasmHandler);
+                    }
+                    else
+                    {
+                        jsRuntime = new JSRuntimeWrapper(value);
+                        INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator(value);
+                    }
                 }
                 
-                JavaScriptExecutionHandler2 = jsRuntime;
+                WebAssemblyExecutionHandler = jsRuntime;
             }
         } // Intended to be injected when the app is initialized.
 
-        internal static IJavaScriptExecutionHandler2 JavaScriptExecutionHandler2
+        internal static IWebAssemblyExecutionHandler WebAssemblyExecutionHandler
         {
             get;
             set;
         }
 #endif
 
-#if CSHTML5NETSTANDARD
         static dynamic dynamicJavaScriptExecutionHandler;
-#else
-        static dynamic javaScriptExecutionHandler;
-#endif
 
-#if CSHTML5NETSTANDARD
         public static dynamic DynamicJavaScriptExecutionHandler
-#else
-        public static dynamic JavaScriptExecutionHandler
-#endif
         {
+            internal get => dynamicJavaScriptExecutionHandler;
             set // Intended to be called by the "Emulator" project to inject the JavaScriptExecutionHandler.
             {
-#if CSHTML5NETSTANDARD
                 dynamicJavaScriptExecutionHandler = value;
-#else
-                javaScriptExecutionHandler = value;
-#endif
-            }
-            internal get
-            {
-#if CSHTML5NETSTANDARD
-                return dynamicJavaScriptExecutionHandler;
-#else
-                return javaScriptExecutionHandler;
-#endif
+                if (dynamicJavaScriptExecutionHandler is not null)
+                {
+                    WebAssemblyExecutionHandler = new SimulatorDynamicJSRuntime(value);
+                    INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator(WebAssemblyExecutionHandler);
+                }
+                else
+                {
+                    WebAssemblyExecutionHandler = null;
+                }
             }
         }
 

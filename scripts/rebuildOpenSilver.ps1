@@ -32,9 +32,11 @@ try {
 
     taskkill /fi "imagename eq msbuild.exe" /f
     Invoke-Expression "&'$MSBUILD' .\src\Compiler\Compiler\Compiler.OpenSilver.csproj /p:Configuration=$OS_CONFIGURATION /consoleloggerparameters:ErrorsOnly $BUILD_PARAMS"
+    Invoke-Expression "&'$MSBUILD' .\src\Compiler\Compiler.ResourcesExtractor\Compiler.ResourcesExtractor.OpenSilver.csproj /p:Configuration=Release /consoleloggerparameters:ErrorsOnly $BUILD_PARAMS"
 
     # Compiler
     xcopy /y "src\Compiler\Compiler\bin\OpenSilver\$OS_CONFIGURATION\net461\OpenSilver.Compiler.*" "src\packages\$OS_NAME.$OS_BUILD_VERSION\tools\"
+    xcopy /y "src\Compiler\Compiler.ResourcesExtractor\bin\OpenSilver\Release\net461\OpenSilver.Compiler.Resources.*" "src\packages\$OS_NAME.$OS_BUILD_VERSION\tools\"
 
     # Targets
     xcopy /y "src\Targets\OpenSilver.targets" "src\packages\$OS_NAME.$OS_BUILD_VERSION\build\"

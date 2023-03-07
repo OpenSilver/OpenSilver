@@ -125,7 +125,7 @@ imageView.onload = function() {
                 _taskCompletion = new TaskCompletionSource<object>();
                 _imageRenderedCallback = JavascriptCallback.Create(callback);
 
-                INTERNAL_Simulator.JavaScriptExecutionHandler2.InvokeUnmarshalled<int[], int>(
+                INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], int>(
                     "document.WB_Copy32Buffer", _bitmap._pixels);
 
                 var javascript = @"(function (data) {
@@ -180,7 +180,7 @@ element.style.transform = currentTransform;
                     _bitmap._pixelWidth = width;
                     _bitmap._pixelHeight = height;
                     _bitmap._pixels = new int[arrayLength / 4];
-                    INTERNAL_Simulator.JavaScriptExecutionHandler2.InvokeUnmarshalled<int[], object>(
+                    INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
                         "document.WB_Fill32Buffer", _bitmap._pixels);
                     _bitmap.Invalidate();
                 }
@@ -194,7 +194,7 @@ element.style.transform = currentTransform;
             {
                 if (errorMessage is null)
                 {
-                    INTERNAL_Simulator.JavaScriptExecutionHandler2.InvokeUnmarshalled<int[], object>(
+                    INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], object>(
                         "document.WB_Fill32Buffer", _bitmap._pixels);
                 }
 

@@ -1,5 +1,4 @@
 
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,11 @@
 *  
 \*====================================================================================*/
 
-
-
 #if CSHTML5NETSTANDARD
 
 using System;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 namespace DotNetForHtml5
 {
@@ -24,15 +23,24 @@ namespace DotNetForHtml5
     {
         void ExecuteJavaScript(string javaScriptToExecute);
 
-        object ExecuteJavaScriptWithResult(string javaScriptToExecute);        
+        object ExecuteJavaScriptWithResult(string javaScriptToExecute);
     }
 
+    public interface IWebAssemblyExecutionHandler : IJavaScriptExecutionHandler
+    {
+        TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
+        TResult InvokeUnmarshalled<T0, T1, TResult>(string identifier, T0 arg0, T1 arg1);
+        TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2);
+    }
+
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.IWebAssemblyExecutionHandler instead.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IJavaScriptExecutionHandler2 : IJavaScriptExecutionHandler
     {
         TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
     }
 
-    internal sealed class JSRuntimeWrapper : IJavaScriptExecutionHandler2
+    internal sealed class JSRuntimeWrapper : IWebAssemblyExecutionHandler
     {
         private readonly IJavaScriptExecutionHandler _jsRuntime;
 
@@ -48,7 +56,47 @@ namespace DotNetForHtml5
             => _jsRuntime.ExecuteJavaScriptWithResult(javaScriptToExecute);
 
         public TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0)
+        {
+#pragma warning disable CS0618
+            if (_jsRuntime is IJavaScriptExecutionHandler2 jsRuntime)
+#pragma warning restore CS0618
+            {
+                jsRuntime.InvokeUnmarshalled<T0, TResult>(identifier, arg0);
+            }
+
+            throw new NotSupportedException();
+        }
+
+        public TResult InvokeUnmarshalled<T0, T1, TResult>(string identifier, T0 arg0, T1 arg1)
             => throw new NotSupportedException();
+
+        public TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2)
+            => throw new NotSupportedException();
+    }
+
+    internal sealed class SimulatorDynamicJSRuntime : IWebAssemblyExecutionHandler
+    {
+        private readonly dynamic _dynamicRuntime;
+
+        public SimulatorDynamicJSRuntime(dynamic dynamicRuntime)
+        {
+            _dynamicRuntime = dynamicRuntime ?? throw new ArgumentNullException(nameof(dynamicRuntime));
+        }
+
+        public void ExecuteJavaScript(string javaScriptToExecute)
+            => _dynamicRuntime.ExecuteJavaScript(javaScriptToExecute);
+
+        public object ExecuteJavaScriptWithResult(string javaScriptToExecute)
+            => _dynamicRuntime.ExecuteJavaScriptWithResult(javaScriptToExecute);
+
+        public TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0)
+            => throw new NotImplementedException();
+
+        public TResult InvokeUnmarshalled<T0, T1, TResult>(string identifier, T0 arg0, T1 arg1)
+            => throw new NotImplementedException();
+
+        public TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2)
+            => throw new NotImplementedException();
     }
 }
 

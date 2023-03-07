@@ -13,15 +13,25 @@
 
 using System;
 using System.ComponentModel;
+using CSHTML5.Internal;
 using DotNetForHtml5.Core;
+using OpenSilver.Internal;
 
 namespace DotNetForHtml5
 {
     public static class Cshtml5Initializer
     {
-        public static void Initialize(IJavaScriptExecutionHandler2 executionHandler)
+        public static int PendingJsBufferSize { get; set; } = 1024 * 1024 * 2; // 2 MB
+
+        public static void Initialize(IWebAssemblyExecutionHandler executionHandler)
         {
-            INTERNAL_Simulator.JavaScriptExecutionHandler2 = executionHandler;
+            Initialize((IJavaScriptExecutionHandler)executionHandler);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void Initialize(IJavaScriptExecutionHandler executionHandler)
+        {
+            INTERNAL_Simulator.JavaScriptExecutionHandler = executionHandler;
 #if MIGRATION
             EmulatorWithoutJavascript.StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(typeof(System.Windows.Controls.Button).Assembly);
 #else
@@ -29,19 +39,18 @@ namespace DotNetForHtml5
 #endif
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.Initialize(IWebAssemblyExecutionHandler) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void Initialize()
         {
             Initialize(new JavaScriptExecutionHandler());
         }
 
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.Initialize(IWebAssemblyExecutionHandler) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void Initialize(IJavaScriptExecutionHandler executionHandler)
+        public static void Initialize(IJavaScriptExecutionHandler2 executionHandler)
         {
-            IJavaScriptExecutionHandler2 jsRuntime = executionHandler as IJavaScriptExecutionHandler2
-                ?? new JSRuntimeWrapper(executionHandler);
-
-            Initialize(jsRuntime);
+            Initialize((IJavaScriptExecutionHandler)executionHandler);
         }
     }
 }
