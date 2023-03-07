@@ -12,10 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Collections.Generic;
-using DotNetForHtml5;
-using DotNetForHtml5.Core;
-using Runtime.OpenSilver.PublicAPI.Interop;
 
 #if MIGRATION
 using System.Windows;
@@ -27,9 +23,9 @@ namespace CSHTML5.Internal
 {
     internal static class INTERNAL_SimulatorExecuteJavaScript
     {
+        internal static IPendingJavascript JavaScriptRuntime { get; set; }
+
         internal static bool EnableInteropLogging;
-        private static readonly PendingJavascript _pendingJavascript = new(Cshtml5Initializer.PendingJsBufferSize);
-        static bool _disableAsyncJavaScriptExecution = false;
         static bool _isDispatcherPending = false;
         static bool _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false; //todo: make sure this variable is thread-safe.
 
@@ -42,16 +38,12 @@ namespace CSHTML5.Internal
         /// <returns></returns>
         internal static object ExecuteJavaScriptSync(string javaScriptToExecute, string commentForDebugging = null, bool noImpactOnPendingJSCode = false)
         {
-            if (!noImpactOnPendingJSCode)
+            if (!noImpactOnPendingJSCode && EnableInteropLogging)
             {
-                if (EnableInteropLogging)
-                    AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
-
-                _pendingJavascript.AddJavascript(javaScriptToExecute);
-                return ExecutePending();
+                AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
             }
 
-            return PerformActualInteropCall(javaScriptToExecute, "SYNC");
+            return JavaScriptRuntime.ExecuteJavaScript(javaScriptToExecute, !noImpactOnPendingJSCode);
         }
 
         /// <summary>
@@ -64,7 +56,7 @@ namespace CSHTML5.Internal
             if (EnableInteropLogging)
                 AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
 
-            if (!_disableAsyncJavaScriptExecution)
+            if (!DisableAsyncJavaScriptExecution)
             {
                 //--------------------------------------------------------
                 // Note: since we moved from the "Awesomium" control to the "DotNetBrowser" control
@@ -78,7 +70,7 @@ namespace CSHTML5.Internal
                 // This significantly improves performance.
                 //--------------------------------------------------------
 
-                _pendingJavascript.AddJavascript(javaScriptToExecute);
+                JavaScriptRuntime.AddJavaScript(javaScriptToExecute);
 
                 if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
                 {
@@ -120,7 +112,7 @@ namespace CSHTML5.Internal
 #endif
                                 if (_isDispatcherPending)
                                 {
-                                    ExecutePendingJavaScriptCode("SETTIMEOUT COMPLETED");
+                                    ExecutePendingJavaScriptCode();
                                 }
                             }));
 
@@ -130,86 +122,26 @@ namespace CSHTML5.Internal
             }
             else
             {
+                JavaScriptRuntime.ExecuteJavaScript(javaScriptToExecute, false);
 #if OPTIMIZATION_LOG
                 Console.WriteLine("[OPTIMIZATION] Direct call");
 #endif
-                PerformActualInteropCall(javaScriptToExecute, "ASYNC DISABLED");
             }
         }
 
-        static void ExecutePendingJavaScriptCode(string reasonForPerformingTheCallNow)
+        static void ExecutePendingJavaScriptCode()
         {
-            ResetIsDispatcherPending();
-            ExecutePending();
-        }
-
-        static void ResetIsDispatcherPending()
-        {
-#if OPTIMIZATION_LOG
-            Console.WriteLine("[OPTIMIZATION] About to reset _isDispatcherPending: " + _isDispatcherPending.ToString());
-#endif
             _isDispatcherPending = false;
-
-#if OPTIMIZATION_LOG
-            Console.WriteLine("[OPTIMIZATION] Done resetting _isDispatcherPending: " + _isDispatcherPending.ToString());
-#endif
+            JavaScriptRuntime.ExecuteJavaScript(null, true);
         }
 
         static void AddCommentsForDebuggingIfAny(ref string javaScriptToExecute, string commentForDebugging)
         {
             if (commentForDebugging != null)
-                javaScriptToExecute = "//" + commentForDebugging + Environment.NewLine + javaScriptToExecute;
+                javaScriptToExecute = string.Concat("//", commentForDebugging, Environment.NewLine, javaScriptToExecute);
         }
 
-        static object ExecutePending()
-        {
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                var js = _pendingJavascript.TakeJsOut();
-                // this is the JavaScriptHandler injected by the Emulator
-                return INTERNAL_Simulator.DynamicJavaScriptExecutionHandler.ExecuteJavaScriptWithResult(js);
-            }
-
-            return _pendingJavascript.ExecutePending(INTERNAL_Simulator.WebAssemblyExecutionHandler);
-        }
-
-        static object PerformActualInteropCall(string javaScriptToExecute, string reasonForPerformingTheCallNow)
-        {
-            if (EnableInteropLogging)
-            {
-                javaScriptToExecute = "//---- START INTEROP (" + reasonForPerformingTheCallNow + ") ----"
-                    + Environment.NewLine
-                    + javaScriptToExecute
-                    + Environment.NewLine
-                    + "//---- END INTEROP (" + reasonForPerformingTheCallNow + ") ----";
-            }
-
-            try
-            {
-                if (EnableInteropLogging)
-                {
-                    global::System.Diagnostics.Debug.WriteLine(javaScriptToExecute);
-                }
-
-                // OpenSilver Version has two distincts JavaScriptExecutionHandler:
-                // - DynamicJavaScriptExecutionHandler is a dynamic typed JavaScriptExecutionHandler setted by the Emulator  
-                // - JavaScriptExecutionHandler        is a static typed JavaScriptExecutionHandler used in the browser version
-                if (OpenSilver.Interop.IsRunningInTheSimulator) // this is the JavaScriptHandler injected by the Emulator
-                    return INTERNAL_Simulator.DynamicJavaScriptExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
-                else
-                    return INTERNAL_Simulator.JavaScriptExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new InvalidOperationException("Unable to execute the following JavaScript code: " + Environment.NewLine + javaScriptToExecute, ex);
-            }
-        }
-
-        public static bool DisableAsyncJavaScriptExecution
-        {
-            get { return _disableAsyncJavaScriptExecution; }
-            set { _disableAsyncJavaScriptExecution = value; }
-        }
+        public static bool DisableAsyncJavaScriptExecution { get; set; }
 
         /// <summary>
         /// Makes sure that, after the provided action has been executed, all the
@@ -232,7 +164,7 @@ namespace CSHTML5.Internal
                     // This is usually the case when we are in a nested call, which
                     // means that this method is being execute from within itself.
                     //-----------------------------
-
+                    
                     action();
                 }
                 else
@@ -240,14 +172,14 @@ namespace CSHTML5.Internal
                     _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = true;
 
                     action();
-
+                    
                     _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false;
 
 #if OPTIMIZATION_LOG
                     Console.WriteLine("[OPTIMIZATION] Auto-flush");
 #endif
                     // After the action has finished execution, let's flush all the pending JavaScript calls if any:
-                    ExecutePendingJavaScriptCode("AUTO-FLUSH");
+                    ExecutePendingJavaScriptCode();
                 }
             }
             catch (Exception e)

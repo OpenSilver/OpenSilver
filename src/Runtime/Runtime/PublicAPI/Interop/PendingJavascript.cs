@@ -11,18 +11,28 @@
 *
 \*====================================================================================*/
 
-
-using DotNetForHtml5;
+using DotNetForHtml5.Core;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
-namespace Runtime.OpenSilver.PublicAPI.Interop
+namespace CSHTML5.Internal
 {
-    internal class PendingJavascript
+    internal interface IPendingJavascript
     {
+        void AddJavaScript(string javascript);
+
+        object ExecuteJavaScript(string javascript, bool flush);
+    }
+
+    internal sealed class PendingJavascript : IPendingJavascript
+    {
+        private const string CallJSMethodName = "callJSUnmarshalledHeap";
+
         private static readonly Encoding DefaultEncoding = Encoding.Unicode;
         private static readonly byte[] Delimiter = DefaultEncoding.GetBytes(";\n");
-        private readonly object _syncObj = new ();
+        private readonly object _syncObj = new();
         private byte[] _buffer;
         private int _currentLength;
 
@@ -32,18 +42,14 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
             {
                 throw new ArgumentException("Buffer size can not be less or equal to 0");
             }
+
             _buffer = new byte[bufferSize];
         }
 
-        private void IncreaseBuffer()
+        public void AddJavaScript(string javascript)
         {
-            var currentBuffer = _buffer;
-            _buffer = new byte[currentBuffer.Length * 2];
-            currentBuffer.CopyTo(_buffer, 0);
-        }
+            if (javascript == null) return;
 
-        public void AddJavascript(string javascript)
-        {
             lock (_syncObj)
             {
                 var maxByteCount = DefaultEncoding.GetMaxByteCount(javascript.Length);
@@ -59,8 +65,15 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
             }
         }
 
-        public object ExecutePending(IWebAssemblyExecutionHandler executionHandler)
+        public object ExecuteJavaScript(string javascript, bool flush)
         {
+            if (!flush)
+            {
+                return INTERNAL_Simulator.WebAssemblyExecutionHandler.ExecuteJavaScriptWithResult(javascript);
+            }
+
+            AddJavaScript(javascript);
+
             if (_currentLength == 0)
             {
                 return null;
@@ -70,17 +83,88 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
             _currentLength = 0;
             //Here we pass a reference to _buffer object and current length
             //Js will read data from the heap
-            return executionHandler.InvokeUnmarshalled<byte[], int, object>("callJSUnmarshalledHeap",
-                _buffer, curLength);
+            return INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(
+                CallJSMethodName, _buffer, curLength);
         }
 
-        public string TakeJsOut()
+        private void IncreaseBuffer()
         {
-            lock (_syncObj)
+            var currentBuffer = _buffer;
+            _buffer = new byte[currentBuffer.Length * 2];
+            currentBuffer.CopyTo(_buffer, 0);
+        }
+    }
+
+    internal sealed class PendingJavascriptSimulator : IPendingJavascript
+    {
+        private readonly List<string> _pending = new();
+
+        public void AddJavaScript(string javascript)
+        {
+            lock (_pending)
             {
-                var res = DefaultEncoding.GetString(_buffer, 0, _currentLength);
-                _currentLength = 0;
-                return res;
+                _pending.Add(javascript);
+            }
+        }
+
+        public object ExecuteJavaScript(string javascript, bool flush)
+        {
+            if (flush)
+            {
+                string aggregatedPendingJavaScriptCode = ReadAndClearAggregatedPendingJavaScriptCode();
+
+                if (!string.IsNullOrWhiteSpace(aggregatedPendingJavaScriptCode))
+                {
+                    javascript = string.Join(Environment.NewLine, new List<string>
+                    {
+                        "// [START OF PENDING JAVASCRIPT]",
+                        aggregatedPendingJavaScriptCode,
+                        "// [END OF PENDING JAVASCRIPT]" + Environment.NewLine,
+                        javascript
+                    });
+                }
+            }
+
+            return PerformActualInteropCall(javascript);
+        }
+
+        private object PerformActualInteropCall(string javaScriptToExecute)
+        {
+            if (INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging)
+            {
+                javaScriptToExecute = "//---- START INTEROP ----"
+                    + Environment.NewLine
+                    + javaScriptToExecute
+                    + Environment.NewLine
+                    + "//---- END INTEROP ----";
+            }
+
+            try
+            {
+                if (INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging)
+                {
+                    Debug.WriteLine(javaScriptToExecute);
+                }
+
+                return INTERNAL_Simulator.WebAssemblyExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException("Unable to execute the following JavaScript code: " + Environment.NewLine + javaScriptToExecute, ex);
+            }
+        }
+
+        private string ReadAndClearAggregatedPendingJavaScriptCode()
+        {
+            lock (_pending)
+            {
+                if (_pending.Count == 0)
+                    return null;
+
+                _pending.Add(string.Empty);
+                string aggregatedPendingJavaScriptCode = string.Join(";\r\n", _pending);
+                _pending.Clear();
+                return aggregatedPendingJavaScriptCode;
             }
         }
     }

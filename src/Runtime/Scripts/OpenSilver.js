@@ -126,18 +126,20 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     }
 };
 
-const textDecoder = new TextDecoder('utf-16le');
-window.callJSUnmarshalledHeap = function (arrAddress, length) {
-    const byteArray = Module.HEAPU8.subarray(arrAddress + 16, arrAddress + 16 + length);
-    const javaScriptToExecute = textDecoder.decode(byteArray);
-    const result = eval(javaScriptToExecute);
-    const resultType = typeof result;
-    if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-        return BINDING.js_to_mono_obj(result);
-    }
-    else if (result == null) {
-        return null;
-    } else {
-        return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
-    }
-};
+
+window.callJSUnmarshalledHeap = (function () {
+    const textDecoder = new TextDecoder('utf-16le');
+    return function (arrAddress, length) {
+        const byteArray = Module.HEAPU8.subarray(arrAddress + 16, arrAddress + 16 + length);
+        const javaScriptToExecute = textDecoder.decode(byteArray);
+        const result = eval(javaScriptToExecute);
+        const resultType = typeof result;
+        if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
+            return BINDING.js_to_mono_obj(result);
+        } else if (result == null) {
+            return null;
+        } else {
+            return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
+        }
+    };
+})();

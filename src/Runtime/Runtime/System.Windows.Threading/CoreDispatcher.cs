@@ -129,7 +129,7 @@ namespace Windows.UI.Core
             {
                 // While running unit tests, we do not call Cshtml5Initializer.Initialize.
                 // We just run the code synchronously in that case.
-                if (INTERNAL_Simulator.JavaScriptExecutionHandler == null)
+                if (INTERNAL_Simulator.WebAssemblyExecutionHandler == null)
                 {
                     method();
                     return;
