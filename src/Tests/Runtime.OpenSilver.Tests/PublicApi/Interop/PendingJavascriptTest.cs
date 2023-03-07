@@ -16,9 +16,8 @@ using DotNetForHtml5;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Runtime.OpenSilver.PublicAPI.Interop;
 
-namespace Runtime.OpenSilver.Tests.PublicApi.Interop
+namespace CSHTML5.Internal
 {
     [TestClass]
     public class PendingJavascriptTest
@@ -26,22 +25,22 @@ namespace Runtime.OpenSilver.Tests.PublicApi.Interop
         [TestMethod]
         public void Should_Aggregate_Javascript()
         {
-            var pj = new PendingJavascript(1024);
+            var pj = new PendingJavascriptSimulator(new Mock<IJavaScriptExecutionHandler>().Object);
 
-            pj.AddJavascript("console.log(1)");
-            pj.AddJavascript("console.log(2)");
+            pj.AddJavaScript("console.log(1)");
+            pj.AddJavaScript("console.log(2)");
 
-            pj.TakeJsOut().Should().Be("console.log(1);\nconsole.log(2);\n");
+            pj.ReadAndClearAggregatedPendingJavaScriptCode().Should().Be("console.log(1);\nconsole.log(2);\n");
         }
 
         [TestMethod]
         public void Should_Handle_Small_Buffer_Size()
         {
-            var pj = new PendingJavascript(4);
+            var pj = new PendingJavascriptSimulator(new Mock<IJavaScriptExecutionHandler>().Object);
 
-            pj.AddJavascript("console.log(1)");
+            pj.AddJavaScript("console.log(1)");
 
-            pj.TakeJsOut().Should().Be("console.log(1);\n");
+            pj.ReadAndClearAggregatedPendingJavaScriptCode().Should().Be("console.log(1);\n");
         }
 
         [TestMethod]
@@ -50,16 +49,16 @@ namespace Runtime.OpenSilver.Tests.PublicApi.Interop
             /*
              * The real possible case: we call JS, it calls C#, which tries to execute pending js again
              */
-            var pj = new PendingJavascript(1024);
-
-            pj.AddJavascript("console.log(1)");
-
             var executionHandlerMock = new Mock<IWebAssemblyExecutionHandler>();
+            var pj = new PendingJavascript(1024, executionHandlerMock.Object);
+
+            pj.AddJavaScript("console.log(1)");
+
             executionHandlerMock
                 .Setup(x => x.InvokeUnmarshalled<byte[], int, object>(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<int>()))
-                .Returns<string, byte[], int>((name, bytes, length) => pj.ExecutePending(executionHandlerMock.Object));
+                .Returns<string, byte[], int>((name, bytes, length) => pj.ExecuteJavaScript(null, true));
 
-            var res = pj.ExecutePending(executionHandlerMock.Object);
+            var res = pj.ExecuteJavaScript("", true);
             res.Should().BeNull();
         }
     }

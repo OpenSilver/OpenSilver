@@ -93,7 +93,7 @@ namespace Runtime.OpenSilver.Tests
                 .Returns<string, byte[], int>((name, bytes, length) => ExecuteJsMock(Encoding.Unicode.GetString(bytes, 0, length)));
 
             var javaScriptExecutionHandler2 = javaScriptExecutionHandlerMock.Object;
-            INTERNAL_Simulator.WebAssemblyExecutionHandler = javaScriptExecutionHandler2;
+            INTERNAL_Simulator.JavaScriptExecutionHandler = javaScriptExecutionHandler2;
 
             // Instantiating Application because it sets itself as Application.Current
             _ = new Application

@@ -90,12 +90,13 @@ namespace DotNetForHtml5.Core
                     if (value is IWebAssemblyExecutionHandler wasmHandler)
                     {
                         jsRuntime = wasmHandler;
-                        INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime = new PendingJavascript(Cshtml5Initializer.PendingJsBufferSize);
+                        INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime =
+                            new PendingJavascript(Cshtml5Initializer.PendingJsBufferSize, wasmHandler);
                     }
                     else
                     {
                         jsRuntime = new JSRuntimeWrapper(value);
-                        INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator();
+                        INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator(value);
                     }
                 }
                 
@@ -121,7 +122,7 @@ namespace DotNetForHtml5.Core
                 if (dynamicJavaScriptExecutionHandler is not null)
                 {
                     WebAssemblyExecutionHandler = new SimulatorDynamicJSRuntime(value);
-                    INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator();
+                    INTERNAL_SimulatorExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator(WebAssemblyExecutionHandler);
                 }
                 else
                 {
