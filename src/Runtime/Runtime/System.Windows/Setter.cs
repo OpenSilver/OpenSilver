@@ -153,18 +153,22 @@ namespace Windows.UI.Xaml
 
             if (isObjectType || !DependencyProperty.IsValueTypeValid(value, dp.PropertyType))
             {
-                if (value is not Binding binding)
+                switch (value)
                 {
-                    if (!isObjectType)
-                    {
-                        throw new ArgumentException(
-                            string.Format("'{0}' is not a valid value for the '{1}.{2}' property on a Setter.",
-                                          value, dp.OwnerType, dp.Name));
-                    }
-                }
-                else
-                {
-                    binding._isInStyle = true;
+                    case Color color:
+                        if (dp.PropertyType == typeof(Brush))
+                            _value = new SolidColorBrush(color);
+                        break;
+
+                    case Binding binding:
+                        binding._isInStyle = true;
+                        break;
+
+                    default:
+                        if (!isObjectType)
+                            throw new ArgumentException(
+                                $"'{value}' is not a valid value for the '{dp.OwnerType}.{dp.Name}' property on a Setter.");
+                        break;
                 }
             }
 
