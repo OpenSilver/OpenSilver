@@ -259,7 +259,7 @@ public partial class Selector
         }
         itemsHostRect = new Rect(new Point(), new Point(viewport.ActualWidth, viewport.ActualHeight));
 
-        if (ItemContainerGenerator.ContainerFromIndex(index) is not ListBoxItem listBoxItem)
+        if (ItemContainerGenerator.ContainerFromIndex(index) is not ListBoxItem listBoxItem || !listBoxItem.IsConnectedToLiveTree)
         {
             listBoxItemRect = Rect.Empty;
             return false;
