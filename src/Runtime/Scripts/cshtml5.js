@@ -1346,3 +1346,48 @@ const isTouchDevice = () => {
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0));
 }
+
+document.velocityHelpers = (function () {
+    const cache = {};
+
+    function addToCache(element, key) {
+        const id = element.id;
+        if (id in cache && !cache[id].includes(key)) {
+            cache[id].push(key);
+        } else {
+            cache[id] = [element, key];
+        }
+    }
+
+    function cleanupCache() {
+        const keys = Object.keys(cache);
+        keys.forEach((key) => {
+            const el = document.getElementById(key);
+            if (el === null) {
+                Velocity.Utilities.removeData(cache[key][0], cache[key].slice(1));
+                Velocity.Utilities.removeData(cache[key][0], ['velocity']);
+                delete cache[key];
+            }
+        });
+    }
+
+    setInterval(() => { cleanupCache(); }, 10000);
+
+    return {
+        setDomStyle: function (element, properties, value) {
+            const obj = {};
+            for (const property of properties.split(',')) {
+                obj[property] = value;
+            }
+
+            Velocity(element, obj, { duration: 1, queue: false });
+            addToCache(element, 'velocity');
+        },
+
+        animate: function (element, fromToValues, options, groupName) {
+            Velocity(element, fromToValues, options);
+            Velocity.Utilities.dequeue(element, groupName);
+            addToCache(element, `${groupName}queue`);
+        }
+    };
+})();

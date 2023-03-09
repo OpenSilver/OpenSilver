@@ -330,7 +330,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
                     string sCssValue = INTERNAL_InteropImplementation.GetVariableStringForJS(cssValue);
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                        $"Velocity({sElement}, {{{string.Join(",", cssPropertyNames.Select(name => $"{name}:{sCssValue}"))}}}, {{duration:1,queue:false}});");
+                        $"document.velocityHelpers.setDomStyle({sElement}, '{string.Join(",", cssPropertyNames)}', {sCssValue});");
                 }
             }
             else
