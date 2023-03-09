@@ -1347,27 +1347,47 @@ const isTouchDevice = () => {
         (navigator.msMaxTouchPoints > 0));
 }
 
-document.velocityObjCache = {};
-document.addToVelocityCache = function (id, element, key) {
-    if (id in document.velocityObjCache && !document.velocityObjCache[id].includes(key)) {
-        document.velocityObjCache[id].push(key);
-    }
-    else
-        document.velocityObjCache[id] = [element, key];
-}
+document.velocityHelpers = (function () {
+    const cache = {};
 
-document.cleanupVelocityCache = function () {
-    var keys = Object.keys(document.velocityObjCache);
-    keys.forEach((key) => {
-        var el = document.getElementById(key);
-        if (el === null) {
-            Velocity.Utilities.removeData(document.velocityObjCache[key][0], document.velocityObjCache[key].slice(1));
-            Velocity.Utilities.removeData(document.velocityObjCache[key][0], ['velocity']);
-            delete document.velocityObjCache[key];
+    function addToCache(element, key) {
+        const id = element.id;
+        if (id in cache && !cache[id].includes(key)) {
+            cache[id].push(key);
+        } else {
+            cache[id] = [element, key];
         }
-    });
-}
+    }
 
-setInterval(() => {
-    document.cleanupVelocityCache();
-}, 10000);
+    function cleanupCache() {
+        const keys = Object.keys(cache);
+        keys.forEach((key) => {
+            const el = document.getElementById(key);
+            if (el === null) {
+                Velocity.Utilities.removeData(cache[key][0], cache[key].slice(1));
+                Velocity.Utilities.removeData(cache[key][0], ['velocity']);
+                delete cache[key];
+            }
+        });
+    }
+
+    setInterval(() => { cleanupCache(); }, 10000);
+
+    return {
+        setDomStyle: function (element, properties, value) {
+            const obj = {};
+            for (const property of properties.split(',')) {
+                obj[property] = value;
+            }
+
+            Velocity(element, obj, { duration: 1, queue: false });
+            addToCache(element, 'velocity');
+        },
+
+        animate: function (element, fromToValues, options, groupName) {
+            Velocity(element, fromToValues, options);
+            Velocity.Utilities.dequeue(element, groupName);
+            addToCache(element, `${groupName}queue`);
+        }
+    };
+})();

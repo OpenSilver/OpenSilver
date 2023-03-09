@@ -17,9 +17,16 @@ namespace CSHTML5.Internal
 {
     internal static class JavaScriptCallbackHelper
     {
-        public static JavascriptCallback CreateSelfDisposedJavaScriptCallback(Action action)
+        public static JavascriptCallback CreateSelfDisposedJavaScriptCallback(Action action, bool sync = false)
         {
-            return new SelfDisposedJavaScriptCallback(action).JSCallback;
+            if (sync)
+            {
+                return new SelfDisposedJavaScriptCallback(action).JSCallback;
+            }
+            else
+            {
+                return new SelfDisposedJavaScriptCallbackAsync(action).JSCallback;
+            }
         }
 
         private sealed class SelfDisposedJavaScriptCallback
@@ -34,10 +41,31 @@ namespace CSHTML5.Internal
                 JSCallback = JavascriptCallback.Create(RunCallbackAndDispose);
             }
 
+            private string RunCallbackAndDispose()
+            {
+                JSCallback.Dispose();
+                _action();
+
+                return string.Empty;
+            }
+        }
+
+        private sealed class SelfDisposedJavaScriptCallbackAsync
+        {
+            private readonly Action _action;
+            public readonly JavascriptCallback JSCallback;
+
+            public SelfDisposedJavaScriptCallbackAsync(Action action)
+            {
+                _action = action ?? throw new ArgumentNullException(nameof(action));
+
+                JSCallback = JavascriptCallback.Create(RunCallbackAndDispose);
+            }
+
             private void RunCallbackAndDispose()
             {
-                _action();
                 JSCallback.Dispose();
+                _action();
             }
         }
     }

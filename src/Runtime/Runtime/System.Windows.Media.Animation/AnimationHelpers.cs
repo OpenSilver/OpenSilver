@@ -61,8 +61,8 @@ namespace Windows.UI.Xaml.Media.Animation
             string elementId = (domElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier;
 
             var sb = new StringBuilder();
-            sb.AppendLine("(function(el) {");
-            sb.AppendLine($@"const options = {{
+            sb.AppendLine("(function(el) {")
+              .AppendLine($@"const options = {{
 easing:""{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"",
 duration:{duration.ToInvariantString()},
 queue:false,
@@ -71,9 +71,10 @@ queue:""{visualStateGroupName}""
 
             if (callbackForWhenfinished != null)
             {
-                var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(callbackForWhenfinished);
-                string callback = $"document.getCallbackFunc({jsCallback.Id}, true, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
-                sb.Append($"options.complete = {callback};");
+                var jsCallback = JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(
+                    callbackForWhenfinished,
+                    !OpenSilver.Interop.IsRunningInTheSimulator);
+                sb.Append($"options.complete = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsCallback)};");
                 animation.RegisterCallback(jsCallback);
             }
 
@@ -90,10 +91,8 @@ queue:""{visualStateGroupName}""
                 }
             }
 
-            sb.AppendLine($"Velocity(el, {jsFromToValues}, options);");
-            sb.AppendLine($"Velocity.Utilities.dequeue(el, \"{visualStateGroupName}\");");
-            sb.AppendLine($"document.addToVelocityCache('{elementId}', el, '{visualStateGroupName}' + 'queue');");
-            sb.Append($"}})({sElement});");
+            sb.AppendLine($"document.velocityHelpers.animate(el, {jsFromToValues}, options, '{visualStateGroupName}');")
+              .Append($"}})({sElement});");
 
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(sb.ToString());
         }
