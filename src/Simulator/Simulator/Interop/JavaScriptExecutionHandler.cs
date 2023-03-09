@@ -45,7 +45,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         public void ExecuteJavaScript(string javaScriptToExecute)
         {
             // This prevents interop calls from throwing an exception if they are called after the simulator started closing
-            if (_webControlDisposed)
+            if (_webControlDisposed || javaScriptToExecute == null)
                 return;
             _lastExecutedJavaScriptCode = javaScriptToExecute;
             _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
@@ -56,7 +56,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         public object ExecuteJavaScriptWithResult(string javaScriptToExecute)
         {
             // This prevents interop calls from throwing an exception if they are called after the simulator started closing
-            if (_webControlDisposed)
+            if (_webControlDisposed || javaScriptToExecute == null)
                 return null;
             _lastExecutedJavaScriptCode = javaScriptToExecute;
             _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
