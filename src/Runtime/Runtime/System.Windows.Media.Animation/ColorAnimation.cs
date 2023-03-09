@@ -97,16 +97,34 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
-            if (To != null)
+            Color? from = From;
+            Color? to = To;
+            if (!from.HasValue && !to.HasValue)
             {
-                var castedValue = DynamicCast(To, _propDp.PropertyType); //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
+                return;
+            }
 
+            Duration duration = ResolveDuration();
+            if (IsZeroDuration(duration))
+            {
+                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, to ?? from.Value);
+                OnIterationCompleted(parameters);
+                return;
+            }
+
+            if (from.HasValue)
+            {
+                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, from.Value);
+            }
+
+            if (to.HasValue)
+            {
                 // - Get the propertyMetadata from the property
                 PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
                 // - Get the cssPropertyName from the PropertyMetadata
 
                 //we make a specific name for this animation:
-                string specificGroupName = animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName;
 
                 bool cssEquivalentExists = false;
                 if (propertyMetadata.GetCSSEquivalent != null)
@@ -117,13 +135,13 @@ namespace Windows.UI.Xaml.Media.Animation
                         cssEquivalentExists = true;
                         TryStartAnimation(_propertyContainer,
                             cssEquivalent,
-                            From,
-                            To,
-                            Duration,
+                            from,
+                            to.Value,
+                            duration,
                             EasingFunction,
                             specificGroupName,
                             _propDp,
-                            GetAnimationCompletedCallback(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
+                            GetAnimationCompletedCallback(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
                 if (propertyMetadata.GetCSSEquivalents != null)
@@ -139,13 +157,13 @@ namespace Windows.UI.Xaml.Media.Animation
                             {
                                 bool updateIsFirst = TryStartAnimation(_propertyContainer,
                                     equivalent,
-                                    From,
-                                    To,
-                                    Duration,
+                                    from,
+                                    to.Value,
+                                    duration,
                                     EasingFunction,
                                     specificGroupName,
                                     _propDp,
-                                    GetAnimationCompletedCallback(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
+                                    GetAnimationCompletedCallback(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID));
                                 if (updateIsFirst)
                                 {
                                     isFirst = false;
@@ -155,29 +173,25 @@ namespace Windows.UI.Xaml.Media.Animation
                             {
                                 TryStartAnimation(_propertyContainer,
                                     equivalent,
-                                    From,
-                                    To,
-                                    Duration,
+                                    from,
+                                    to.Value,
+                                    duration,
                                     EasingFunction,
                                     specificGroupName,
                                     _propDp,
-                                    GetAnimationCompletedCallback(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
+                                    GetAnimationCompletedCallback(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID));
                             }
                         }
                         else
                         {
-                            OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID);
+                            OnAnimationCompleted(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID);
                         }
                     }
                 }
                 if (!cssEquivalentExists)
                 {
-                    OnAnimationCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID);
+                    OnAnimationCompleted(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID);
                 }
-            }
-            else
-            {
-                OnAnimationCompleted(parameters, isLastLoop, To, _propertyContainer, _targetProperty, _animationID);
             }
         }
 
@@ -328,7 +342,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     // - Get the cssPropertyName from the PropertyMetadata
 
                     //we make a specific name for this animation:
-                    string specificGroupName = animationInstanceSpecificName.ToString();
+                    string specificGroupName = animationInstanceSpecificName;
 
                     bool cssEquivalentExists = false;
                     if (propertyMetadata.GetCSSEquivalent != null)

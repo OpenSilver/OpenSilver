@@ -20,6 +20,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using System.ComponentModel;
+using System.Globalization;
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -133,21 +135,24 @@ namespace Windows.UI.Xaml.Media.Animation
         private void ApplyKeyFrame(ObjectKeyFrame keyFrame)
         {
             object value = keyFrame.Value;
-            if (value is string && _propDp.PropertyType != typeof(string))
+
+            if (value != null && !_propDp.PropertyType.IsInstanceOfType(value))
             {
-                if (_propDp.PropertyType.IsEnum)
+                if (value is Color color && _propDp.PropertyType == typeof(Brush))
                 {
-                    value = Enum.Parse(_propDp.PropertyType, (string)value);
+                    value = new SolidColorBrush(color);
                 }
                 else
                 {
-                    value = DotNetForHtml5.Core.TypeFromStringConverters.ConvertFromInvariantString(_propDp.PropertyType, (string)value);
+                    TypeConverter converter = TypeConverterHelper.GetConverter(_propDp.PropertyType);
+                    if (converter != null && converter.CanConvertFrom(value.GetType()))
+                    {
+                        value = converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
+                    }
                 }
             }
 
-            object castedValue = DynamicCast(value, _propDp.PropertyType);
-
-            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, castedValue);
+            AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, value);
         }
 
         private ObjectKeyFrame GetNextKeyFrame()

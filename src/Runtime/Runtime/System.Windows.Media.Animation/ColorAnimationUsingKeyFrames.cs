@@ -157,11 +157,16 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (!_cancelledAnimation)
             {
-                ColorKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
-                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, lastKeyFrame.Value);
+                SetFinalValue();
             }
         }
-        
+
+        private void SetFinalValue()
+            => AnimationHelpers.ApplyValue(
+                _propertyContainer,
+                _targetProperty,
+                _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)].Value);
+
         private bool CheckTimeLineEndAndRaiseCompletedEvent(IterationParameters parameters)
         {
             bool raiseEvent = false;
@@ -187,12 +192,8 @@ namespace Windows.UI.Xaml.Media.Animation
                 var to = keyFrame.Value;
                 var easingFunction = keyFrame.INTERNAL_GetEasingFunction();
 
-                //Note: we put this line here because the Xaml could use a Color gotten from a StaticResource (which was therefore not converted to a SolidColorbrush by
-                // the compiler in the .g.cs file) and led to a wrong type set in a property (Color value in a property of type Brush).
-                var castedValue = DynamicCast(to, _propDp.PropertyType);
-
                 //we make a specific name for this animation:
-                string specificGroupName = animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName;
 
                 bool cssEquivalentExists = false;
                 if (_propertyMetadata.GetCSSEquivalent != null)
@@ -209,7 +210,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             easingFunction,
                             specificGroupName,
                             _propDp,
-                            GetKeyFrameCompletedCallback(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
+                            GetKeyFrameCompletedCallback(parameters, isLastLoop, to, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
                 if (_propertyMetadata.GetCSSEquivalents != null)
@@ -231,7 +232,7 @@ namespace Windows.UI.Xaml.Media.Animation
                                     easingFunction,
                                     specificGroupName,
                                     _propDp,
-                                    GetKeyFrameCompletedCallback(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
+                                    GetKeyFrameCompletedCallback(parameters, isLastLoop, to, _propertyContainer, _targetProperty, _animationID));
                                 if (updateIsFirst)
                                 {
                                     isFirst = false;
@@ -247,18 +248,18 @@ namespace Windows.UI.Xaml.Media.Animation
                                     easingFunction,
                                     specificGroupName,
                                     _propDp,
-                                    GetKeyFrameCompletedCallback(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID));
+                                    GetKeyFrameCompletedCallback(parameters, isLastLoop, to, _propertyContainer, _targetProperty, _animationID));
                             }
                         }
                         else
                         {
-                            OnKeyFrameCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID);
+                            OnKeyFrameCompleted(parameters, isLastLoop, to, _propertyContainer, _targetProperty, _animationID);
                         }
                     }
                 }
                 if (!cssEquivalentExists)
                 {
-                    OnKeyFrameCompleted(parameters, isLastLoop, castedValue, _propertyContainer, _targetProperty, _animationID);
+                    OnKeyFrameCompleted(parameters, isLastLoop, to, _propertyContainer, _targetProperty, _animationID);
                 }
             }
         }
@@ -371,10 +372,14 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void InitializeCore()
         {
-            this.Completed -= ApplyLastKeyFrame;
-            this.Completed += ApplyLastKeyFrame;
+            Completed -= ApplyLastKeyFrame;
             InitializeKeyFramesSet();
             _propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
+
+            if (!IsZeroDuration(ResolveDuration()))
+            {
+                Completed += ApplyLastKeyFrame;
+            }
         }
 
         internal override void GetTargetInformation(IterationParameters parameters)
@@ -400,6 +405,14 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
+            Duration duration = ResolveDuration();
+            if (IsZeroDuration(duration))
+            {
+                SetFinalValue();
+                OnIterationCompleted(parameters);
+                return;
+            }
+
             _animationID = Guid.NewGuid();
             ApplyKeyFrame(GetNextKeyFrame(), _parameters, isLastLoop);
         }
@@ -416,7 +429,7 @@ namespace Windows.UI.Xaml.Media.Animation
                 // - Get the cssPropertyName from the PropertyMetadata
 
                 //we make a specific name for this animation:
-                string specificGroupName = animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName;
 
                 bool cssEquivalentExists = false;
                 if (propertyMetadata.GetCSSEquivalent != null)

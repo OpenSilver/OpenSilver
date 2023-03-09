@@ -50,47 +50,6 @@ namespace Windows.UI.Xaml.Media.Animation
             );
         }
 
-        ///// <summary>
-        ///// Provides base class initialization behavior for Timeline-derived classes.
-        ///// </summary>
-        //protected Timeline()
-        //{
-
-        //}
-
-        //// The default is false.
-        ///// <summary>
-        ///// Gets or sets a value that determines whether the timeline should be permitted
-        ///// to run on properties where the animation is considered a dependent animation.
-        ///// </summary>
-        //public static bool AllowDependentAnimations { get; set; }
-
-        //// The default value is false.
-        ///// <summary>
-        ///// Gets or sets a value that indicates whether the timeline plays in reverse
-        ///// after it completes a forward iteration.
-        ///// </summary>
-        //public bool AutoReverse { get; set; }
-
-        ///// <summary>
-        ///// Identifies the AutoReverse dependency property.
-        ///// </summary>
-        //public static DependencyProperty AutoReverseProperty { get; }
-
-        //// Returns:
-        ////     The start time of the time line. The default value is zero. If you are programming
-        ////     using C# or Visual Basic, the parameter type of this parameter is projected
-        ////     as System.TimeSpan? (a nullable System.TimeSpan).
-        ///// <summary>
-        ///// Gets or sets the time at which this Timeline should begin.
-        ///// </summary>
-        //public TimeSpan? BeginTime { get; set; }
-
-        ///// <summary>
-        ///// Identifies the BeginTime dependency property.
-        ///// </summary>
-        //public static DependencyProperty BeginTimeProperty { get; }
-
         // Returns:
         //     The timeline's simple duration: the amount of time this timeline takes to
         //     complete a single forward iteration. The default value is a Duration that
@@ -157,41 +116,6 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public static readonly DependencyProperty BeginTimeProperty =
             DependencyProperty.Register("BeginTime", typeof(TimeSpan?), typeof(Timeline), new PropertyMetadata(new TimeSpan()));
-
-
-
-
-
-        //// Returns:
-        ////     A value that specifies how the timeline behaves after it reaches the end
-        ////     of its active period but its parent is inside its active or fill period.
-        ////     The default value is HoldEnd.
-        ///// <summary>
-        ///// Gets or sets a value that specifies how the animation behaves after it reaches
-        ///// the end of its active period.
-        ///// </summary>
-        //public FillBehavior FillBehavior { get; set; }
-        ///// <summary>
-        ///// Identifies the FillBehavior dependency property.
-        ///// </summary>
-        //public static DependencyProperty FillBehaviorProperty { get; }
-
-        //// Returns:
-        ////     A finite value greater than 0 that specifies the rate at which time progresses
-        ////     for this timeline, relative to the speed of the timeline's parent. If this
-        ////     timeline is a root timeline, specifies the default timeline speed. The value
-        ////     is expressed as a factor where 1 represents normal speed, 2 is double speed,
-        ////     0.5 is half speed, and so on. The default value is 1.
-        ///// <summary>
-        ///// Gets or sets the rate, relative to its parent, at which time progresses for
-        ///// this Timeline.
-        ///// </summary>
-        //public double SpeedRatio { get; set; }
-
-        ///// <summary>
-        ///// Identifies for the SpeedRatio dependency property.
-        ///// </summary>
-        //public static DependencyProperty SpeedRatioProperty { get; }
 
         /// <summary>
         /// Occurs when this timeline has completely finished playing: it will no longer
@@ -279,103 +203,6 @@ namespace Windows.UI.Xaml.Media.Animation
             propertyPath = info.Item2;
         }
 
-        internal IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> GoThroughElementsToAccessProperty(PropertyPath propertyPath, DependencyObject targetBeforePath)
-        {
-            foreach (Tuple<DependencyObject, DependencyProperty, int?> element in propertyPath.INTERNAL_AccessPropertyContainer(targetBeforePath))
-            {
-                yield return element;
-            }
-            yield break;
-        }
-
-        internal void GetCSSEquivalents(FrameworkElement frameworkElement, out CSSEquivalent cssEquivalent, out List<CSSEquivalent> cssEquivalents)
-        {
-            DependencyObject target;
-            PropertyPath propertyPath;
-            cssEquivalent = null;
-            cssEquivalents = null;
-            Control frameworkElementAsControl = frameworkElement as Control;
-            //todo: check if the following comment is true and relevant or maybe remove the test
-            if (frameworkElementAsControl != null) //if frameworkElement is not a control, there can't be a Storyboard?
-            {
-                GetTargetElementAndPropertyInfo(_parameters, out target, out propertyPath);
-                
-                if (target != null && propertyPath != null)
-                {
-                    DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
-                        target.GetType(),
-                        propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName
-                    );
-
-                    // - Get the propertyMetadata from the property
-                    PropertyMetadata propertyMetadata = dp.GetTypeMetaData(target.GetType());
-                    // - Get the cssPropertyName from the PropertyMetadata
-
-                    if (propertyMetadata.GetCSSEquivalent != null)
-                    {
-                        cssEquivalent = propertyMetadata.GetCSSEquivalent(target);
-                    }
-                    //todo: use GetCSSEquivalent instead (?)
-                    if (propertyMetadata.GetCSSEquivalents != null)
-                    {
-                        cssEquivalents = propertyMetadata.GetCSSEquivalents(target);
-                    }
-                }
-            }
-        }
-
-        //todo: move this to a helper class and remove the implementation of this method from another class (don't remember which one but it probably has something to do with the animations)
-        internal static object DynamicCast(object source, Type destType)
-        {
-            if (source == null)
-                return null;
-
-            //We get the non-nullable destination type because a nullable enum is not considered as an enum (at least bu JSIL)
-            Type nonNullableDestType = destType; //Note: we will use this one everywhere because we have already checked whether the source was null or not.
-            if (destType.FullName.StartsWith("System.Nullable`1"))
-            {
-                nonNullableDestType = Nullable.GetUnderlyingType(destType);
-            }
-
-            Type srcType = source.GetType();
-            if (srcType == nonNullableDestType || nonNullableDestType.IsAssignableFrom(srcType) || (nonNullableDestType == typeof(double) && srcType == typeof(int)))
-                return source;
-
-            var paramTypes = new Type[] { srcType };
-            MethodInfo cast = nonNullableDestType.GetMethod("op_Implicit", paramTypes);
-
-            if (cast == null)
-            {
-                cast = nonNullableDestType.GetMethod("op_Explicit", paramTypes);
-
-                if (cast == null)
-                {
-                    cast = srcType.GetMethod("op_Implicit", paramTypes);
-
-                    if (cast == null)
-                    {
-                        cast = srcType.GetMethod("op_Explicit", paramTypes);
-                    }
-                }
-            }
-
-            if (cast != null)
-                return cast.Invoke(null, new object[] { source });
-
-            //BRIDGETODO : implemente Enum.ToObject
-#if !BRIDGE
-            if (nonNullableDestType.IsEnum) return Enum.ToObject(nonNullableDestType, source);
-#else
-            throw new NotImplementedException("Enum.ToObject not implemented in Bridge");
-#endif
-            throw new InvalidCastException();
-
-        }
-
-
-
-
-
         //Stuff added for loops purposes:
 
         //How loops work:
@@ -388,7 +215,7 @@ namespace Windows.UI.Xaml.Media.Animation
         //Note: the Guid below is used to make a different name for each animation in velocity. That way, a storyboard with looping animations will be able to
         //      stop the animations separately when they finish their loop (otherwise, the first animation to finish will stop all the animations in velocity and the other
         //      animations won't be able to loop since velocity will never call the animation completed for them).
-        internal Guid animationInstanceSpecificName = Guid.NewGuid(); //this will allow us to stop a specific animation from whithin a Storyboard with multiple animations
+        internal readonly string animationInstanceSpecificName = Guid.NewGuid().ToString(); //this will allow us to stop a specific animation from whithin a Storyboard with multiple animations
 
         //Note on BeginTime:
         //  It delays the first loop so we added a method (StartFirstIteration) before calling IterateOnce where it was fit.
@@ -427,19 +254,16 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
-            //ComputeDuration();
             _parameters = parameters;
-            if (Duration.HasTimeSpan)
+            Duration duration = ResolveDuration();
+            if (duration.HasTimeSpan && duration.TimeSpan.TotalMilliseconds > 0)
             {
-                if (Duration.TimeSpan.TotalMilliseconds > 0)
-                {
-                    _animationTimer.Interval = Duration.TimeSpan;
-                    _animationTimer.Tick -= _animationTimer_Tick;
-                    _animationTimer.Tick += _animationTimer_Tick;
-                    _isAnimationDurationReached = false;
-                    _animationTimer.Start();
-                    return;
-                }
+                _animationTimer.Interval = duration.TimeSpan;
+                _animationTimer.Tick -= _animationTimer_Tick;
+                _animationTimer.Tick += _animationTimer_Tick;
+                _isAnimationDurationReached = false;
+                _animationTimer.Start();
+                return;
             } 
             
             _isAnimationDurationReached = true;
@@ -508,17 +332,20 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <returns>
         /// A Duration quantity representing the natural duration.
         /// </returns>
-        internal void ComputeDuration()
-        {
-            if (Duration == Duration.Automatic)
-            {
-                Duration = GetNaturalDurationCore();
-            }
-        }
-
         protected virtual Duration GetNaturalDurationCore()
         {
             return Duration.Automatic;
+        }
+
+        internal Duration ResolveDuration()
+        {
+            Duration duration = Duration;
+            if (duration == Duration.Automatic)
+            {
+                return GetNaturalDurationCore();
+            }
+
+            return duration;
         }
 
         [OpenSilver.NotImplemented]

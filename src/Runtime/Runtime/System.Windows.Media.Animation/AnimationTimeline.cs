@@ -47,6 +47,9 @@ namespace Windows.UI.Xaml.Media.Animation
             return new TimeSpan(0, 0, 1);
         }
 
+        internal static bool IsZeroDuration(Duration duration)
+            => duration.HasTimeSpan && duration.TimeSpan == TimeSpan.Zero;
+
         internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
             if (!_isInitialized)
@@ -93,7 +96,6 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             GetTargetInformation(parameters);
             InitializeCore();
-            ComputeDuration();
             _isInitialized = true;
         }
 
@@ -146,7 +148,6 @@ namespace Windows.UI.Xaml.Media.Animation
         private void UnApply()
         {
             AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, DependencyProperty.UnsetValue);
-            //_targetProperty.INTERNAL_PropertySetAnimationValue(_propertyContainer, INTERNAL_NoValue.NoValue);
         }
     }
 }

@@ -105,13 +105,33 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
-            if (To != null)
+            double? from = From;
+            double? to = To;
+            if (!from.HasValue && !to.HasValue)
+            {
+                return;
+            }
+
+            Duration duration = ResolveDuration();
+            if (IsZeroDuration(duration))
+            {
+                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, to ?? from.Value);
+                OnIterationCompleted(parameters);
+                return;
+            }
+
+            if (from.HasValue)
+            {
+                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, from.Value);
+            }
+
+            if (to.HasValue)
             {
                 // - Get the propertyMetadata from the property
                 PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
 
                 //we make a specific name for this animation:
-                string specificGroupName = animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName;
 
                 _animationID = Guid.NewGuid();
 
@@ -124,13 +144,13 @@ namespace Windows.UI.Xaml.Media.Animation
                         cssEquivalentExists = true;
                         StartAnimation(_propertyContainer,
                             cssEquivalent,
-                            From,
-                            To,
-                            Duration,
+                            from,
+                            to.Value,
+                            duration,
                             (EasingFunctionBase)EasingFunction,
                             specificGroupName,
                             _propDp,
-                            GetAnimationCompletedCallback(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, _animationID));
+                            GetAnimationCompletedCallback(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
                 //todo: use GetCSSEquivalent instead (?)
@@ -142,19 +162,19 @@ namespace Windows.UI.Xaml.Media.Animation
                         cssEquivalentExists = true;
                         StartAnimation(_propertyContainer,
                             equivalent,
-                            From,
-                            To,
-                            Duration,
+                            from,
+                            to.Value,
+                            duration,
                             (EasingFunctionBase)EasingFunction,
                             specificGroupName,
                             _propDp,
-                            GetAnimationCompletedCallback(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, _animationID));
+                            GetAnimationCompletedCallback(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID));
                     }
                 }
 
                 if (!cssEquivalentExists)
                 {
-                    OnAnimationCompleted(parameters, isLastLoop, To.Value, _propertyContainer, _targetProperty, _animationID);
+                    OnAnimationCompleted(parameters, isLastLoop, to.Value, _propertyContainer, _targetProperty, _animationID);
                 }
             }
         }
@@ -253,7 +273,7 @@ namespace Windows.UI.Xaml.Media.Animation
                     PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
 
                     //we make a specific name for this animation:
-                    string specificGroupName = animationInstanceSpecificName.ToString();
+                    string specificGroupName = animationInstanceSpecificName;
 
                     // - Get the cssPropertyName from the PropertyMetadata
                     if (propertyMetadata.GetCSSEquivalent != null)

@@ -640,6 +640,11 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 // Show the popup in front of any potential previously displayed popup:
                 PutPopupInFront();
+
+                // Hack to force executing the async JS code. This prevents the popup root
+                // from briefly showing in the top left corner of the screen before being
+                // repositioned properly.
+                OpenSilver.Interop.ExecuteJavaScriptVoid(null, true);
             }
         }
 

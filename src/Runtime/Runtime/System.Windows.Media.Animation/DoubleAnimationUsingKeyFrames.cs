@@ -117,6 +117,14 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void Apply(IterationParameters parameters, bool isLastLoop)
         {
+            Duration duration = ResolveDuration();
+            if (IsZeroDuration(duration))
+            {
+                SetFinalValue();
+                OnIterationCompleted(parameters);
+                return;
+            }
+
             _animationID = Guid.NewGuid();
             ApplyKeyFrame(GetNextKeyFrame(), isLastLoop);
         }
@@ -126,7 +134,7 @@ namespace Windows.UI.Xaml.Media.Animation
             if (keyFrame != null)
             {
                 //we make a specific name for this animation:
-                string specificGroupName = animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName;
 
                 bool cssEquivalentExists = false;
                 if (_propertyMetadata.GetCSSEquivalent != null)
@@ -157,7 +165,7 @@ namespace Windows.UI.Xaml.Media.Animation
                             equivalent,
                             null,
                             keyFrame.Value,
-                            Duration,
+                            GetKeyFrameDuration(keyFrame),
                             keyFrame.INTERNAL_GetEasingFunction(),
                             specificGroupName,
                             _propDp,
@@ -225,16 +233,21 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (!_cancelledAnimation)
             {
-                DoubleKeyFrame lastKeyFrame = _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)];
-                AnimationHelpers.ApplyValue(_propertyContainer, _targetProperty, lastKeyFrame.Value);
+                SetFinalValue();
             }
         }
+
+        private void SetFinalValue()
+            => AnimationHelpers.ApplyValue(
+                _propertyContainer,
+                _targetProperty,
+                _keyFrames[_resolvedKeyFrames.GetNextKeyFrameIndex(_keyFrames.Count - 1)].Value);
 
         internal override void StopAnimation()
         {
             if (_isInitialized)
             {
-                string specificGroupName = animationInstanceSpecificName.ToString();
+                string specificGroupName = animationInstanceSpecificName;
 
                 if (_propertyMetadata.GetCSSEquivalent != null)
                 {
@@ -294,10 +307,14 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void InitializeCore()
         {
-            this.Completed -= ApplyLastKeyFrame;
-            this.Completed += ApplyLastKeyFrame;
+            Completed -= ApplyLastKeyFrame;            
             InitializeKeyFramesSet();
             _propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
+
+            if (!IsZeroDuration(ResolveDuration()))
+            {
+                Completed += ApplyLastKeyFrame;
+            }
         }
 
         internal override void RestoreDefaultCore()
