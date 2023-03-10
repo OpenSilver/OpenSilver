@@ -1,0 +1,15 @@
+{
+  "solution": {
+    "path": "OpenSilver.sln",
+    "projects": [
+      "Compiler\\Compiler.Common\\Compiler.Common.OpenSilver.csproj",
+      "Compiler\\Compiler.ResourcesExtractor\\Compiler.ResourcesExtractor.OpenSilver.csproj",
+      "Compiler\\Compiler.ProgressDialog\\Compiler.ProgressDialog.OpenSilver.csproj",
+      "Compiler\\Compiler.TypeScriptDefToCSharp\\Compiler.TypeScriptDefToCSharp.OpenSilver.csproj",
+      "Compiler\\Compiler\\Compiler.OpenSilver.csproj",
+      "Runtime\\Runtime\\Runtime.OpenSilver.csproj",
+      "Simulator\\Simulator\\Simulator.OpenSilver.csproj",
+      "Tests\\Runtime.OpenSilver.Tests\\Runtime.OpenSilver.Tests.csproj"
+    ]
+  }
+}
