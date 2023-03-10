@@ -111,7 +111,7 @@ namespace Windows.UI.Xaml
             // Initialize the window:
             if (_mainWindow == null) // Note: it could be != null if the user clicks "Restart" from the Simulator advanced options.
             {
-                _mainWindow = new Window(true);
+                _mainWindow = new Window(true, true);
                 Window.Current = _mainWindow;
                 object applicationRootDomElement = INTERNAL_HtmlDomManager.GetApplicationRootDomElement();
                 _mainWindow.AttachToDomElement(applicationRootDomElement);

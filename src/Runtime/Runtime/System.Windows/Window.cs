@@ -49,8 +49,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public Window() : this(false) { }
 
-        internal Window(bool hookUpEvents)
+        internal Window(bool hookUpEvents, bool isMainWindow = false)
         {
+            IsMainWindow = isMainWindow;
             if (hookUpEvents)
             {
                 new DOMEventManager(
@@ -66,6 +67,8 @@ namespace Windows.UI.Xaml
                 .AttachToDomEvents();
             }
         }
+
+        internal bool IsMainWindow { get; set; } //This has been added to differentiate between the MainWindow (created with the application) and the subsequent ones, as there are some things that only need to be done once (so only by the main window), or that should only be done on the main window.
 
         internal override int VisualChildrenCount
         {
@@ -130,7 +133,10 @@ namespace Windows.UI.Xaml
             INTERNAL_RootDomElement = rootDomElement ?? throw new ArgumentNullException(nameof(rootDomElement));
 
             // Reset the content of the root DIV:
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync("document.clearXamlRoot()");
+            if (IsMainWindow)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync("document.clearXamlRoot()"); //this should only be done by the MainWindow, otherwise, everytime we attach a new Window, it will clear everything.
+            }
 
             // In case of XAML view hosted inside an HTML app, we usually set the "position" of the window root to "relative" rather than "absolute" (via external JavaScript code) in order to display it inside a specific DIV. However, in this case, the layers that contain the Popups are placed under the window DIV instead of over it. To work around this issue, we set the root element display to "grid". See the sample app "IntegratingACshtml5AppInAnSPA".
             string sRootElement = INTERNAL_InteropImplementation.GetVariableStringForJS(rootDomElement);
@@ -139,7 +145,11 @@ namespace Windows.UI.Xaml
             // Create the DIV that will correspond to the root of the window visual tree:
             var windowRootDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", rootDomElement, this, out object windowRootDiv);
 
-            windowRootDivStyle.position = "absolute";
+            if (IsMainWindow) // note: position = "absolute" caused issues in the Xaml into Blazor POC where the elements did not occupy the space they took, making other elements of the page behave as if they weren't there.
+                              //        In SL, the new windows are obviously in new windows so the concept of taking space doesn't apply. The closest behaviour would use "absolute" so we might need a way to decide which one we want. 
+            {
+                windowRootDivStyle.position = "absolute"; 
+            }
             windowRootDivStyle.width = "100%";
             windowRootDivStyle.height = "100%";
             windowRootDivStyle.overflowX = "hidden";
@@ -287,7 +297,10 @@ namespace Windows.UI.Xaml
                     }
                 }
 
-                Application.Current.TextMeasurementService.CreateMeasurementText(this);
+                if (IsMainWindow) // Note we only need to create this once with the MainWindow (also, trying to do it again from another window will cause Exceptions since the next call tries to detach the measurement TextBlock from "this" passed as argument, but "this" is not the same window as the one it had been attached to)
+                {
+                    Application.Current.TextMeasurementService.CreateMeasurementText(this);
+                }
 
                 /*
                 // Invalidate when content changed
