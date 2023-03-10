@@ -303,40 +303,20 @@ namespace Windows.UI.Xaml
         }
 
         internal bool IsCustomLayoutRoot
-        {
-            get
-            {
-                FrameworkElement parent = this as FrameworkElement;
-
-                if (parent.CustomLayout == false)
-                    return false;
-
-                FrameworkElement layoutRoot = null;
-                while (parent != null)
-                {
-                    if (parent.CustomLayout)
-                        layoutRoot = parent;
-                    parent = VisualTreeHelper.GetParent(parent) as FrameworkElement;
-                }
-
-                if (layoutRoot == null)
-                    return false;
-
-                return layoutRoot == this;
-            }
-        }
+            => this is FrameworkElement fe && fe.CustomLayout && !IsUnderCustomLayout;
 
         internal bool IsUnderCustomLayout
         {
             get
             {
-                FrameworkElement parent = VisualTreeHelper.GetParent(this) as FrameworkElement;
-                
-                while (parent != null)
+                UIElement element = this;
+
+                while (GetLayoutParent(element) is FrameworkElement parent)
                 {
                     if (parent.CustomLayout)
                         return true;
-                    parent = VisualTreeHelper.GetParent(parent) as FrameworkElement;
+
+                    element = parent;
                 }
 
                 return false;
@@ -349,6 +329,7 @@ namespace Windows.UI.Xaml
         {
             DesiredSize = new Size();
             PreviousFinalRect = Rect.Empty;
+            RenderedVisualBounds = Rect.Empty;
             PreviousAvailableSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
             previousDesiredSize = Size.Empty;
             layoutMeasuredSize = Size.Empty;
@@ -1751,28 +1732,19 @@ document.ondblclick = null;
             LayoutManager.Current.AddArrange(this);
         }
 
-        internal void InvalidateParentMeasure()
-        {
-            UIElement parent = VisualTreeHelper.GetParent(this) as UIElement;
-            if (parent is GridNotLogical)
-            {
-                parent.InvalidateParentMeasure();
-                return;
-            }
-            parent?.InvalidateMeasure();
-        }
+        internal void InvalidateParentMeasure() => GetLayoutParent(this)?.InvalidateMeasure();
 
-        internal void InvalidateParentArrange()
-        {
-            UIElement parent = VisualTreeHelper.GetParent(this) as UIElement;
-            if (parent is GridNotLogical)
+        internal void InvalidateParentArrange() => GetLayoutParent(this)?.InvalidateArrange();
+
+        private static UIElement GetLayoutParent(UIElement element)
+            => VisualTreeHelper.GetParent(element) switch
             {
-                parent.InvalidateParentArrange();
-                return;
-            }
-            parent?.InvalidateArrange();
-        }
-        
+                GridNotLogical gnl => GetLayoutParent(gnl),
+                UIElement uie => uie,
+                null when element is FrameworkElement fe && fe.Parent is Popup popup => popup.PopupRoot?.Content,
+                _ => null,
+            };
+
         public void InvalidateMeasure()
         {
             if (!IsMeasureValid)

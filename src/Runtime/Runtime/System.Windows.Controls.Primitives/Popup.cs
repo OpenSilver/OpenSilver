@@ -207,10 +207,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             if (newContent != null)
             {
                 popup.AddLogicalChild(newContent);
-                if (popup.CustomLayout && newContent is FrameworkElement feContent)
-                {
-                    feContent.CustomLayout = true;
-                }
             }
 
             if (popup._outerBorder != null)
@@ -597,29 +593,20 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 // Create the popup root:
                 _popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(this, parentWindow);
-
-                // Set CustomLayout of the popup root:
                 if (CustomLayout)
                 {
-                    // Setting Visibility to Collapse as a fix to the issue where Popup shows briefly at 0,0
-                    // Will set to Visible where ShowPopupRootIfNotAlreadyVisible is called
                     _popupRoot.CustomLayout = true;
-                    if (Child is FrameworkElement childFe)
-                    {
-                        childFe.CustomLayout = true;
-                    }
                 }
 
                 UpdatePopupParent();
 
                 // Create a surrounding border to enable positioning and alignment:
                 _outerBorder = CreateContainer();
-                
+
                 // Make sure that after the OuterBorder raises the Loaded event, the PopupRoot also raises the Loaded event:
                 _outerBorder.Loaded += (s, e) =>
                 {
-                    _popupRoot?.RaiseLoadedEvent();
-                    _popupRoot?.InvalidateMeasure();
+                    _popupRoot?.SetLayoutSize();
                 };
 
                 _popupRoot.Content = _outerBorder;
@@ -641,10 +628,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 // Show the popup in front of any potential previously displayed popup:
                 PutPopupInFront();
 
-                // Hack to force executing the async JS code. This prevents the popup root
-                // from briefly showing in the top left corner of the screen before being
-                // repositioned properly.
-                OpenSilver.Interop.ExecuteJavaScriptVoid(null, true);
+                // Force layout update to prevent the popup content from briefly appearing in
+                // the top left corner of the screen.
+                if (CustomLayout)
+                {
+                    UpdateLayout();
+                }
+                else
+                {
+                    // Hack to force executing the async JS code.
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(null, true);
+                }
             }
         }
 

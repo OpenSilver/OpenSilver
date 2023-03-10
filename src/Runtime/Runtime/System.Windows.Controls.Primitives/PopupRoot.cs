@@ -70,19 +70,15 @@ namespace Windows.UI.Xaml.Controls.Primitives
             INTERNAL_UniqueIndentifier = uniqueIdentifier;
             INTERNAL_ParentWindow = parentWindow;
             INTERNAL_LinkedPopup = popup;
-
-            // Make sure that after the Loaded event of the PopupRoot, the parent Popup also raises the Loaded event:
-            Loaded += PopupRoot_Loaded;
         }
 
-        private void PopupRoot_Loaded(object sender, RoutedEventArgs e)
+        internal void SetLayoutSize()
         {
-            if (INTERNAL_ParentWindow != null && IsCustomLayoutRoot)
-            {
-                Rect windowBounds = INTERNAL_ParentWindow.Bounds;
-                Measure(new Size(windowBounds.Width, windowBounds.Height));
-                Arrange(windowBounds);
-            }
+            if (!CustomLayout) return;
+
+            InvalidateMeasure();
+            Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Arrange(new Rect(new Point(), DesiredSize));
         }
 
         /// <summary>
@@ -191,9 +187,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 UIElement child = GetVisualChild(0);
                 if (child != null)
                 {
-                    Rect windowBounds = INTERNAL_ParentWindow.Bounds;
-                    availableSize = new Size(windowBounds.Width, windowBounds.Height);
-                    child.Measure(availableSize);
+                    child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                    return child.DesiredSize;
                 }
             }
             return availableSize;
@@ -207,8 +202,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 UIElement child = GetVisualChild(0);
                 if (child != null)
                 {
-                    Rect windowBounds = INTERNAL_ParentWindow.Bounds;
-                    finalSize = new Size(windowBounds.Width, windowBounds.Height);
                     child.Arrange(new Rect(finalSize));
                 }
             }
