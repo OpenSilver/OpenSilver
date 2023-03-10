@@ -74,12 +74,12 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            return StackPanelHelper.CreateDomElement(this, parentRef, out domElementWhereToPlaceChildren);
+            return StackPanelHelper.CreateDomElement(this, Orientation, parentRef, out domElementWhereToPlaceChildren);
         }
 
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
         {
-            return StackPanelHelper.CreateDomChildWrapper(this, parentRef, out domElementWhereToPlaceChild, index);
+            return StackPanelHelper.CreateDomChildWrapper(this, Orientation, parentRef, out domElementWhereToPlaceChild, index);
         }
 
         private double GetCrossLength(Size size)

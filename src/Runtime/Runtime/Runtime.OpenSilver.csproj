@@ -234,6 +234,7 @@
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
+		<Compile Include="System.Windows.Controls\WrapPanelHelper.cs" />
 		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
 		<Compile Include="System.Windows.Markup\SetterValueConverter.cs" />
 		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
@@ -426,7 +427,6 @@
 		<Compile Include="System.Windows.Controls\TextSearch.cs" />
 		<Compile Include="OpenSilver\Controls\TimePicker.NotImplemented.cs" />
 		<Compile Include="OpenSilver\Controls\TimePickerPopup.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\WrapPanel.cs" />
 		<Compile Include="System.Windows.Data\INTERNAL_PagedCollectionView.cs" />
 		<Compile Include="System.Windows.Data\CollectionView.cs" />
 		<Compile Include="System.Windows.Data\ListCollectionView.cs" />

@@ -21,78 +21,63 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
-    internal static class StackPanelHelper
+    internal static class WrapPanelHelper
     {
         internal static object CreateDomElement(Panel panel, Orientation orientation, object parentRef, out object domElementWhereToPlaceChildren)
         {
-            Debug.Assert(panel is StackPanel || panel is VirtualizingStackPanel);
+            Debug.Assert(panel is WrapPanel);
 
             var outerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, panel, out object outerDiv);
-
             if (panel.IsUnderCustomLayout)
             {
                 domElementWhereToPlaceChildren = outerDiv;
                 return outerDiv;
             }
-            else if (panel.IsCustomLayoutRoot)
+            else if (panel.CustomLayout)
             {
                 outerDivStyle.position = "relative";
             }
 
             var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, panel, out object innerDiv);
-            switch (orientation)
+            innerDivStyle.display = "flex";
+            innerDivStyle.flexWrap = "wrap";
+            if (orientation == Orientation.Vertical)
             {
-                case Orientation.Vertical:
-                    innerDivStyle.display = "block";
-                    innerDivStyle.height = string.Empty;
-                    break;
-
-                case Orientation.Horizontal:
-                    innerDivStyle.display = "flex";
-                    innerDivStyle.height = "100%";
-                    break;
+                innerDivStyle.width = "fit-content";
+                innerDivStyle.height = "calc(100%)";
+                innerDivStyle.flexDirection = "column";
             }
 
             domElementWhereToPlaceChildren = innerDiv;
-
             return outerDiv;
         }
 
         internal static object CreateDomChildWrapper(Panel panel, Orientation orientation, object parentRef, out object domElementWhereToPlaceChild, int index)
         {
-            Debug.Assert(panel is StackPanel || panel is VirtualizingStackPanel);
+            Debug.Assert(panel is WrapPanel);
 
-            if (panel.IsUnderCustomLayout || panel.IsCustomLayoutRoot)
+            if (panel.CustomLayout || panel.IsUnderCustomLayout)
             {
                 domElementWhereToPlaceChild = null;
                 return null;
             }
 
             var div = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, panel, index);
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
-            switch (orientation)
+            var divStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(div);
+            divStyle.display = orientation switch
             {
-                case Orientation.Vertical:
-                    style.display = "block";
-                    break;
-
-                case Orientation.Horizontal:
-                    style.display = "flex";
-                    style.flex = "0 0 auto";
-                    break;
-
-                default:
-                    throw new InvalidOperationException();
-            }
-
+                Orientation.Horizontal => "inline-flex",
+                Orientation.Vertical => "block",
+                _ => throw new InvalidOperationException(),
+            };
             domElementWhereToPlaceChild = div;
             return div;
         }
 
         internal static void OnOrientationChanged(DependencyObject d, object oldValue, object newValue)
         {
-            Debug.Assert(d is StackPanel || d is VirtualizingStackPanel);
-            Panel panel = (Panel)d;
+            Debug.Assert(d is WrapPanel);
+            var panel = (Panel)d;
             if (panel.IsUnderCustomLayout)
             {
                 return;
@@ -101,21 +86,23 @@ namespace Windows.UI.Xaml.Controls
             var innerDivStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(panel.INTERNAL_InnerDomElement);
             switch ((Orientation)newValue)
             {
-                case Orientation.Vertical:
-                    innerDivStyle.display = "block";
-                    innerDivStyle.height = string.Empty;
-                    if (!panel.CustomLayout)
-                    {
-                        UpdateChildWrappers(panel, true);
-                    }
-                    break;
-
                 case Orientation.Horizontal:
-                    innerDivStyle.display = "flex";
-                    innerDivStyle.height = "100%";
+                    innerDivStyle.width = string.Empty;
+                    innerDivStyle.height = string.Empty;
+                    innerDivStyle.flexDirection = string.Empty;
                     if (!panel.CustomLayout)
                     {
                         UpdateChildWrappers(panel, false);
+                    }
+                    break;
+
+                case Orientation.Vertical:
+                    innerDivStyle.width = "fit-content";
+                    innerDivStyle.height = "calc(100%)";
+                    innerDivStyle.flexDirection = "column";
+                    if (!panel.CustomLayout)
+                    {
+                        UpdateChildWrappers(panel, true);
                     }
                     break;
             }
@@ -134,12 +121,10 @@ namespace Windows.UI.Xaml.Controls
                     if (isVertical)
                     {
                         wrapperDivStyle.display = "block";
-                        wrapperDivStyle.flex = string.Empty;
                     }
                     else
                     {
-                        wrapperDivStyle.display = "flex";
-                        wrapperDivStyle.flex = "0 0 auto";
+                        wrapperDivStyle.display = "inline-flex";
                     }
                 }
             }
