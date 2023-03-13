@@ -72,6 +72,14 @@
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                              <VisualState x:Name="Focused">
+                                  <Storyboard>
+                                      <DoubleAnimation Duration="0" Storyboard.TargetName="FocusVisualElement" Storyboard.TargetProperty="Opacity" To="1"/>
+                                  </Storyboard>
+                              </VisualState>
+                              <VisualState x:Name="Unfocused" />
+                          </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Border x:Name="Background"
                                 CornerRadius="3"
@@ -99,6 +107,7 @@
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Border x:Name="DisabledVisualElement" CornerRadius="3" Background="#FFFFFFFF" Opacity="0" IsHitTestVisible="false" />
+                        <Border x:Name="FocusVisualElement" CornerRadius="2" Margin="1" BorderBrush="#FF6DBDD1" BorderThickness="1" Opacity="0" IsHitTestVisible="false" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
