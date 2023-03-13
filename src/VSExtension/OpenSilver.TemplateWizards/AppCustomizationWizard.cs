@@ -128,7 +128,7 @@ namespace OpenSilver.TemplateWizards
                         break;
                     case BlazorVersion.Net7:
                         replacementsDictionary.Add("$blazortargetframework$", "net7.0");
-                        replacementsDictionary.Add("$blazorpackagesversion$", "7.0.0-*");
+                        replacementsDictionary.Add("$blazorpackagesversion$", "7.0.*");
                         break;
                 }
 
