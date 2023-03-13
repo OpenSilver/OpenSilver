@@ -64,15 +64,19 @@ namespace CSHTML5
             _isInitialized = true;
         }
 
-        internal static string GetVariableStringForJS(object variable)
-        {
+        internal static string GetVariableStringForJS(Delegate d) {
+            var variable = JavascriptCallback.Create(d);
+            return variable.ToJavaScriptString();
+        }
+
+        internal static string GetVariableStringForJS(object variable) {
             variable = variable is Delegate d ? JavascriptCallback.Create(d) : variable;
 
             if (variable is IJavaScriptConvertible jsConvertible)
             {
                 return jsConvertible.ToJavaScriptString();
             }
-            else if (variable == null)
+            if (variable == null)
             {
                 //--------------------
                 // Null
@@ -117,7 +121,12 @@ namespace CSHTML5
             // Make sure the JS to C# interop is set up:
             EnsureInitialized();
 
-            string unmodifiedJavascript = javascript;
+            // Surround the javascript code with some code that will store the
+            // result into the "document.jsObjRef" for later
+            // use in subsequent calls to this method
+            string referenceId = _refIdGenerator.NewId().ToString();
+            // Change the JS code to call ShowErrorMessage in case of error:
+            string errorCallBackId = Application.Current.Host.Settings.EnableJavascriptErrorCallback ?  _javascriptCallsStore.Add(javascript).ToString() : referenceId;
 
             // If the javascript code has references to previously obtained JavaScript objects,
             // we replace those references with calls to the "document.jsObjRef"
@@ -130,14 +139,6 @@ namespace CSHTML5
             {
                 javascript = javascript.Replace("$" + i.ToString(), GetVariableStringForJS(variables[i]));
             }
-
-            // Change the JS code to call ShowErrorMessage in case of error:
-            string errorCallBackId = _javascriptCallsStore.Add(unmodifiedJavascript).ToString();
-
-            // Surround the javascript code with some code that will store the
-            // result into the "document.jsObjRef" for later
-            // use in subsequent calls to this method
-            string referenceId = _refIdGenerator.NewId().ToString();
             javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
 
             // Execute the javascript code:
@@ -160,9 +161,12 @@ namespace CSHTML5
             _loadedFiles.Clear();
         }
 
+        // the idea:
+        // if EnableJavascriptErrorCallback is ON, this leaks strings (_javascriptCallsStore)
+        // however, if you run into JS errors, turn this on, JUST FOR TESTING, until you fix this issue.
         internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
-            string str = _javascriptCallsStore.Get(indexOfCallInList);
+            string str = Application.Current.Host.Settings.EnableJavascriptErrorCallback ? _javascriptCallsStore.Get(indexOfCallInList) : indexOfCallInList.ToString();
 
 #if OPENSILVER
             if (IsRunningInTheSimulator_WorkAround())
@@ -346,7 +350,7 @@ img.src = {sHtml5Path};");
         }
 #endif
     }
-
+    /*
     internal sealed class SynchronyzedStore<T>
     {
         private readonly object _lock = new object();
@@ -377,5 +381,50 @@ img.src = {sHtml5Path};");
         }
 
         public T Get(int index) => _items[index];
+    }
+     *
+     */
+
+    internal sealed class SynchronyzedStore<T>
+    {
+        private readonly object _lock = new object();
+        private int _nextId = 0;
+        private readonly Dictionary<int,T> _items;
+
+        public SynchronyzedStore()
+            : this(8192 * 16)
+        {
+        }
+
+        public SynchronyzedStore(int initialCapacity)
+        {
+            _items = new Dictionary<int, T>(initialCapacity);
+        }
+
+        public int Count() {
+            lock (_lock)
+                return _items.Count;
+        }
+
+        public int Add(T item)
+        {
+            lock (_lock) {
+                var id = ++_nextId;
+                _items.Add(id, item);
+                return id;
+            }
+        }
+
+        public void Clean(int index) {
+            lock(_lock)
+                _items.Remove(index);
+        }
+
+        public T Get(int index) {
+            lock(_lock)
+                if (_items.TryGetValue(index, out var val))
+                    return val;
+            return default;
+        }
     }
 }

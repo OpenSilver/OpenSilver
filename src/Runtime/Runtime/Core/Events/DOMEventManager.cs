@@ -78,10 +78,10 @@ namespace CSHTML5.Internal
             object domElement = _domElementProvider();
             if (domElement != null)
             {
+                string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(_handler);
                 foreach (string eventName in _domEventsNamesToListenTo)
                 {
                     string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
-                    string sAction = INTERNAL_InteropImplementation.GetVariableStringForJS(_handler);
                     OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                         $@"document.addEventListenerSafe({sElement}, ""{eventName}"", {sAction})"
                     );

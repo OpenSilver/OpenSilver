@@ -174,6 +174,13 @@ namespace System
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool IsRunningOutOfBrowser { get; set; }
 
+        // if turned on, in case of Javascript error, we'll drop a detailed message with the JS that caused the issue
+        //
+        // so why isn't this always ON ?
+        // Because this leaks strings. You should turn this on only when you get JS errors, to get the full details
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool EnableJavascriptErrorCallback { get; set; } = false;
+
         /// <summary>
         /// Gets or sets a value that indicates whether the Silverlight plug-in will resize
         /// its content based on the current browser zoom setting.
