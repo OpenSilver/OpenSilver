@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DotNetBrowser.Browser;
+using System.Windows;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript.Debugging
 {
@@ -7,11 +8,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.Debugging
     /// </summary>
     public partial class ChromiumDevTools : Window
     {
-        public ChromiumDevTools(string debugUrl)
+        public ChromiumDevTools(string debugUrl, IBrowser browser)
         {
             InitializeComponent();
 
-            DevToolsBrowser.Browser.LoadURL(debugUrl);
+            DevToolsBrowser.InitializeFrom(browser);
+            browser.Navigation.LoadUrl(debugUrl);
         }
     }
 }

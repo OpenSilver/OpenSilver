@@ -34,17 +34,25 @@ using DotNetForHtml5.EmulatorWithoutJavascript.LicensingServiceReference;
 using DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking;
 using System.Threading;
 using System.Windows.Threading;
-using DotNetBrowser;
-using DotNetBrowser.WPF;
+using DotNetBrowser.Wpf;
 using System.Windows.Media;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
 using DotNetForHtml5.EmulatorWithoutJavascript.Debugging;
-using DotNetBrowser.Events;
 using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System.Windows.Media.Imaging;
 using OpenSilver;
+using DotNetBrowser.Dom;
+using DotNetBrowser.Browser;
+using DotNetBrowser.Browser.Events;
+using DotNetBrowser.Js;
+using System.Text;
+using DotNetBrowser.Engine;
+using DotNetBrowser.Handlers;
+using DotNetBrowser.Net.Handlers;
+using DotNetBrowser.Net.Certificates;
+using DotNetBrowser.Js.Collections;
 #if OPENSILVER
 using OpenSilver.Simulator;
 #else
@@ -79,7 +87,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         string _outputResourcesPath;
         string _intermediateOutputAbsolutePath;
         bool _isFirstTimeJavaScriptCompilation = false;
-        WPFBrowserView MainWebBrowser;
+        IBrowser _browser;
+        BrowserView MainWebBrowser;
         ChromiumDevTools _devTools;
         bool _pendingRefreshOfHighlight = false;
         Assembly _coreAssembly;
@@ -123,13 +132,15 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             WelcomeTextBlock.Visibility = Visibility.Collapsed; // In version 1.x, we do not display the welcome text because there is already a similar text while the JS generation is taking place.
 #endif
 
+            HashSet<string> chromiumSwitches = new HashSet<string>();
+
 #if ENABLE_DOTNETBROWSER_LOGGING
             // Enable logging of the browser control, cf. https://dotnetbrowser.support.teamdev.com/support/solutions/articles/9000110288-logging
             LoggerProvider.Instance.LoggingEnabled = true;
             LoggerProvider.Instance.FileLoggingEnabled = true;
             LoggerProvider.Instance.OutputFile = @"C:\temp\DotNetBrowser.log";
             LoggerProvider.Instance.ChromiumLogFile = @"C:\temp\chromium.log";
-            BrowserPreferences.SetChromiumSwitches("--v=1");
+            chromiumSwitches.Add("--v=1");
 #endif
 
 #if OPENSILVER
@@ -160,30 +171,46 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             Directory.CreateDirectory(_browserUserDataDir);
             if (CrossDomainCallsHelper.IsBypassCORSErrors)
             {
-                BrowserPreferences.SetChromiumSwitches(@"--disable-web-security");
+                chromiumSwitches.Add(@"--disable-web-security");
             }
 
-            BrowserPreferences.SetChromiumSwitches(
-                @"--disable-web-security",
-                @"--allow-file-access-from-files",
-                @"--allow-file-access",
-                @"--remote-debugging-port=9222"
-            );
+            chromiumSwitches.Add(@"--disable-web-security");
+            chromiumSwitches.Add(@"--allow-file-access-from-files");
+            chromiumSwitches.Add(@"--allow-file-access");
+            chromiumSwitches.Add(@"--remote-debugging-port=9222");
 
-            BrowserContextParams parameters = new BrowserContextParams(_browserUserDataDir)
+            var engineOptionsBuilder = new EngineOptions.Builder
             {
-                StorageType = StorageType.DISK //Note: this is needed to remember the cookies
+                IncognitoEnabled = true,
+                RenderingMode = RenderingMode.OffScreen,
+                UserDataDirectory = _browserUserDataDir,
+                LicenseKey = "6P91WMFPXD5YHA5SVYNRMY5EL4MD8C0CSHHJA7R5D3G2LGD4NRZ4WZLUPBWDHC9XY3EX",
+                RemoteDebuggingPort = 4554,
             };
-            BrowserContext context = new BrowserContext(parameters);
-            context.NetworkService.NetworkDelegate = new ResourceInterceptor("http://cshtml5-simulator/");
-            Browser browser = BrowserFactory.Create(context, BrowserType.LIGHTWEIGHT);
-            MainWebBrowser = new WPFBrowserView(browser);
+
+            foreach (string chromiumSwitch in chromiumSwitches)
+            {
+                engineOptionsBuilder.ChromiumSwitches.Add(chromiumSwitch);
+            }
+
+            var resourceInterceptor = new ResourceInterceptor("http://cshtml5-simulator/");
+
+            IEngine engine = EngineFactory.Create(engineOptionsBuilder.Build());
+            engine.Profiles.Default.Network.SendUrlRequestHandler = new Handler<SendUrlRequestParameters, SendUrlRequestResponse>((e) =>
+            {
+                return resourceInterceptor.ProcessUrlRequest(e);
+            });
+
+            _browser = engine.CreateBrowser();
+
+            MainWebBrowser = new BrowserView();
+            MainWebBrowser.InitializeFrom(_browser);
 
             MainWebBrowser.Width = 150;
             MainWebBrowser.Height = 200;
             MainWebBrowser.SizeChanged += MainWebBrowser_SizeChanged;
 #if OPENSILVER
-            CookiesHelper.SetCustomCookies(MainWebBrowser, simulatorLaunchParameters?.CookiesData);
+            CookiesHelper.SetCustomCookies(_browser, simulatorLaunchParameters?.CookiesData);
             simulatorLaunchParameters?.BrowserCreatedCallback?.Invoke(MainWebBrowser);
 #endif
 
@@ -216,13 +243,14 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
             // Custom load handler to reload the app after redirection, for example in case of authentication scenarios (eg. Azure Active Directory login redirection):
+            /* TODO
             var customLoadHandler = new CustomLoadHandler();
             customLoadHandler.CustomResponseEvent += delegate (object sender, CustomResponseEventArgs e)
             {
                 // Azure Active Directory redirects to the following URL after authentication, so we need to reload the app instead of loading this URL:
                 if (e.Url.Contains(@"http://cshtml5-fbc-mm2-preview.azurewebsites.net"))
                 {
-                    browser.Stop();
+                    _browser.Navigation.Stop();
                     string urlFragment = "";
                     int hashIndex = e.Url.IndexOf('#');
                     if (hashIndex != -1)
@@ -235,7 +263,9 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                         }));
                 }
             };
-            browser.LoadHandler = customLoadHandler;
+            */
+
+            // TODO _browser.Navigation.LoadHandler = customLoadHandler;
             NetworkChange.NetworkAvailabilityChanged += MainWindow_NetworkAvailabilityChanged;
 
             // Continue when the window is loaded:
@@ -304,7 +334,7 @@ ends with "".Browser"" in your solution.";
                     // We need to check again because in the meantime the user could have closed the inspector:
                     if (HighlightElement.Visibility == Visibility.Visible && HighlightElement.Tag != null)
                     {
-                        XamlInspectionHelper.HighlightElement(HighlightElement.Tag, HighlightElement, MainWebBrowser.Browser);
+                        XamlInspectionHelper.HighlightElement(HighlightElement.Tag, HighlightElement, _browser);
                     }
                     _pendingRefreshOfHighlight = false;
                 }
@@ -500,7 +530,7 @@ ends with "".Browser"" in your solution.";
             // Initialize the WebBrowser control:
             if (InitializeApplication())
             {
-                MainWebBrowser.DocumentLoadedInMainFrameEvent += (s1, e1) =>
+                _browser.Navigation.FrameDocumentLoadFinished += (s1, e1) =>
                     {
                         Dispatcher.BeginInvoke((Action)(() =>
                         {
@@ -515,23 +545,23 @@ ends with "".Browser"" in your solution.";
                             OnLoaded();
                         }), DispatcherPriority.ApplicationIdle);
                     };
-                MainWebBrowser.ConsoleMessageEvent += OnConsoleMessageEvent;
+                _browser.ConsoleMessageReceived += OnConsoleMessageEvent;
             }
 
             LoadIndexFile();
         }
 
-        private void OnConsoleMessageEvent(object sender, ConsoleEventArgs args)
+        private void OnConsoleMessageEvent(object sender, ConsoleMessageReceivedEventArgs args)
         {
             switch (args.Level)
             {
 #if DEBUG
-                case ConsoleEventArgs.MessageLevel.DEBUG:
+                case ConsoleMessageReceivedEventArgs.MessageLevel.Debug:
 #endif
-                case ConsoleEventArgs.MessageLevel.LOG:
+                case ConsoleMessageReceivedEventArgs.MessageLevel.Log:
                     Console.AddMessage(new ConsoleMessage(args.Message, ConsoleMessage.MessageLevel.Log));
                     break;
-                case ConsoleEventArgs.MessageLevel.WARNING:
+                case ConsoleMessageReceivedEventArgs.MessageLevel.Warning:
                     if (!string.IsNullOrEmpty(args.Source))
                     {
                         Console.AddMessage(new ConsoleMessage(
@@ -548,7 +578,7 @@ ends with "".Browser"" in your solution.";
                             ));
                     }
                     break;
-                case ConsoleEventArgs.MessageLevel.ERROR:
+                case ConsoleMessageReceivedEventArgs.MessageLevel.Error:
                     if (!string.IsNullOrEmpty(args.Source))
                     {
                         Console.AddMessage(new ConsoleMessage(
@@ -630,9 +660,15 @@ ends with "".Browser"" in your solution.";
                 simulatorRootHtml = simulatorRootHtml.Replace("[PARAM_INITPARAMS_GOES_HERE]", string.Empty);
             }
 #endif
+            //var base64EncodedHtml = Convert.ToBase64String(Encoding.UTF8.GetBytes(simulatorRootHtml));
+            //_browser.Navigation.LoadUrl("data:text/html;base64," + base64EncodedHtml).Wait();
+
+            string absolutePathOfModifiedFile = Path.Combine(Path.GetDirectoryName(absolutePath), "simulator_root_mod.html");
+            File.WriteAllText(absolutePathOfModifiedFile, simulatorRootHtml);
+            _browser.Navigation.LoadUrl(absolutePathOfModifiedFile);
 
             // Load the page:
-            MainWebBrowser.Browser.LoadHTML(new LoadHTMLParams(simulatorRootHtml, "UTF-8", "http://cshtml5-simulator/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
+            //LoadHTML(new LoadHTMLParams(simulatorRootHtml, "UTF-8", "http://cshtml5-simulator/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
             //Note: (see commit c1f98763) the following line of commented code was in a #else (and the one above in a #if OPENSILVER) to fix an issue in FBC MM2 where Interop calls would return null or undefined when they shouldn't. It is probably a case where we are redirected to another context (for example when signing in a Microsoft account before being brought back).
             //      It seemed to fix it but it causes the SOAP calls to fail in the simulator (tried in the Showcase) and retrying with FBC MM2 shows that the issue was not actually fixed (or it is missing another change that was mistakenly considered to not be part of the fix).
             //MainWebBrowser.Browser.LoadHTML(new LoadHTMLParams(simulatorRootHtml, "UTF-8", baseURL + "/" + ARBITRARY_FILE_NAME_WHEN_RUNNING_FROM_SIMULATOR + urlFragment)); // Note: we set the URL so that the simulator browser can find the JS files.
@@ -676,23 +712,23 @@ ends with "".Browser"" in your solution.";
             int startTime = Environment.TickCount;
             bool loaded = false;
 
-            JSValue htmlDocument = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue(@"document");
+            IJsObject htmlDocument = _browser.MainFrame?.ExecuteJavaScript<IJsObject>(@"document").Result;
 
-            while (!loaded && (Environment.TickCount - startTime < 4000)) // Wait is limited to max 4 seconds.
+            while (!loaded /*&& (Environment.TickCount - startTime < 4000)*/) // Wait is limited to max 4 seconds.
             {
                 if (htmlDocument != null)
                 {
-                    JSValue xamlRoot = null;
+                    IJsObject xamlRoot = null;
                     try
                     {
-                        xamlRoot = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot");
+                        xamlRoot = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot") as IJsObject;
                     }
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Initialization: can not get the root. {ex.Message}");
                     }
 
-                    if (xamlRoot != null && xamlRoot.IsObject())
+                    if (xamlRoot != null)
                     {
                         loaded = true;
                         break;
@@ -710,7 +746,7 @@ ends with "".Browser"" in your solution.";
                 else
                 {
                     Debug.WriteLine("Initialization: htmlDocument was null on first try.");
-                    htmlDocument = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue(@"document");
+                    htmlDocument = _browser.MainFrame?.ExecuteJavaScript<IJsObject>(@"document").Result;
                 }
 
                 Thread.Sleep(50);
@@ -865,7 +901,7 @@ ends with "".Browser"" in your solution.";
         private void ButtonStats_Click(object sender, RoutedEventArgs e)
         {
             // Count the number of DOM elements:
-            var count = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue(@"document.getElementsByTagName(""*"").length").ToString();
+            var count = _browser.MainFrame?.ExecuteJavaScript<string>(@"document.getElementsByTagName(""*"").length").Result;
 
             // Display the result
             MessageBox.Show("Number of DOM elements: " + count
@@ -892,19 +928,19 @@ ends with "".Browser"" in your solution.";
             string html;
             if (htmlElementId != null)
             {
-                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue($"document.getElementById('{htmlElementId}').outerHTML").ToString();
+                html = _browser.MainFrame?.ExecuteJavaScript<string>($"document.getElementById('{htmlElementId}').outerHTML").Result;
             }
             else if (xamlElementName != null)
             {
-                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue($"document.querySelectorAll('[dataid=\"{xamlElementName}\"]')[0].outerHTML").ToString();
+                html = _browser.MainFrame?.ExecuteJavaScript<string>($"document.querySelectorAll('[dataid=\"{xamlElementName}\"]')[0].outerHTML").Result;
             }
             else if (osRootOnly)
             {
-                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document.getElementById('opensilver-root').outerHTML").ToString();
+                html = _browser.MainFrame?.ExecuteJavaScript<string>("document.getElementById('opensilver-root').outerHTML").Result;
             }
             else
             {
-                html = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document.documentElement.outerHTML").ToString();
+                html = _browser.MainFrame?.ExecuteJavaScript<string>("document.documentElement.outerHTML").Result;
             }
             return html ?? "";
         }
@@ -985,6 +1021,9 @@ Click OK to continue.";
                     File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.css"), Path.Combine(destinationPath, "flatpickr.css"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "flatpickr.js"), Path.Combine(destinationPath, "flatpickr.js"), true);
                     File.Copy(Path.Combine(simulatorJsCssPath, "ResizeSensor.js"), Path.Combine(destinationPath, "ResizeSensor.js"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "ResizeObserver.js"), Path.Combine(destinationPath, "ResizeObserver.js"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "quill.core.css"), Path.Combine(destinationPath, "quill.core.css"), true);
+                    File.Copy(Path.Combine(simulatorJsCssPath, "quill.min.js"), Path.Combine(destinationPath, "quill.min.js"), true);
 
                     // Create "interopcalls.js" which contains all the JS executed by the Simulator so far:
                     string fullLog = _javaScriptExecutionHandler.FullLogOfExecutedJavaScriptCode;
@@ -1015,17 +1054,11 @@ Click OK to continue.";
             try
             {
                 // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
-                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
+                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(_browser);
 
-                // Create the HTML DOM MANAGER proxy and pass it to the "Core" project:
-                JSValue htmlDocument = (JSObject)MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document");
-
-                InteropHelpers.InjectDOMDocument(MainWebBrowser.Browser.GetDocument(), _coreAssembly);
-                InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
                 InteropHelpers.InjectWebControlDispatcherBeginInvoke(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectWebControlDispatcherInvoke(MainWebBrowser, _coreAssembly);
                 InteropHelpers.InjectWebControlDispatcherCheckAccess(MainWebBrowser, _coreAssembly);
-                InteropHelpers.InjectConvertBrowserResult(BrowserResultConverter.CastFromJsValue, _coreAssembly);
                 InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
                 InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
                 InteropHelpers.InjectWebClientFactory(_coreAssembly);
@@ -1081,14 +1114,8 @@ Click OK to continue.";
                         // Create the JavaScriptExecutionHandler that will be called by the "Core" project to interact with the Emulator:
                         _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
 
-                        // Create the HTML DOM MANAGER proxy and pass it to the "Core" project:
-                        JSValue htmlDocument = (JSObject)MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document");
-
-                        InteropHelpers.InjectDOMDocument(MainWebBrowser.Browser.GetDocument(), _coreAssembly);
-                        InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
                         InteropHelpers.InjectWebControlDispatcherBeginInvoke(MainWebBrowser, _coreAssembly);
                         InteropHelpers.InjectWebControlDispatcherInvoke(MainWebBrowser, _coreAssembly);
-                        InteropHelpers.InjectConvertBrowserResult(BrowserResultConverter.CastFromJsValue, _coreAssembly);
                         InteropHelpers.InjectJavaScriptExecutionHandler(_javaScriptExecutionHandler, _coreAssembly);
                         InteropHelpers.InjectWpfMediaElementFactory(_coreAssembly);
                         InteropHelpers.InjectWebClientFactory(_coreAssembly);
@@ -1137,13 +1164,12 @@ Click OK to continue.";
             // Create the HTML DOM MANAGER proxy and pass it to the "Core" project:
             //JSValue htmlDocument = (JSObject)MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue("document");
             //InteropHelpers.InjectDOMDocument(MainWebBrowser.Browser.GetDocument(), _coreAssembly);
-            //InteropHelpers.InjectHtmlDocument(htmlDocument, _coreAssembly);//no need for this line right ?
 
             // Ensure the static constructor of all common types is called so that the type converters are initialized:
             //StaticConstructorsCaller.EnsureStaticConstructorOfCommonTypesIsCalled(_coreAssembly);
 
             // We will need to wait for the page to finish loading before executing the app:
-            MainWebBrowser.DocumentLoadedInMainFrameEvent += (s1, e1) =>
+            _browser.Navigation.FrameDocumentLoadFinished += (s1, e1) =>
                     {
                         Dispatcher.BeginInvoke((Action)(async () =>
                         {
@@ -1253,7 +1279,7 @@ Click OK to continue.";
 
         void ButtonClearCookiesAndCache_Click(object sender, RoutedEventArgs e)
         {
-            CookiesHelper.ClearCookies(MainWebBrowser, NAME_FOR_STORING_COOKIES);
+            CookiesHelper.ClearCookies(_browser, NAME_FOR_STORING_COOKIES);
             try
             {
                 if (!string.IsNullOrWhiteSpace(_browserUserDataDir)
@@ -1322,7 +1348,7 @@ Click OK to continue.";
         {
             try
             {
-                JSValue htmlDocument = MainWebBrowser.Browser.ExecuteJavaScriptAndReturnValue(@"document");
+                IJsObject htmlDocument = _browser.MainFrame?.ExecuteJavaScript<IJsObject>(@"document").Result;
 
                 if (htmlDocument != null)
                 {
@@ -1332,17 +1358,17 @@ Click OK to continue.";
                     var cshtml5DomRootElement = z;
                     */
 
-                    JSValue cshtml5DomRootElement = null;
+                    IJsObject cshtml5DomRootElement = null;
                     try
                     {
-                        cshtml5DomRootElement = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot");
+                        cshtml5DomRootElement = CallJSMethodAndReturnValue(htmlDocument, "getXamlRoot") as IJsObject;
                     }
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"Can not get the root. {ex.Message}");
                     }
 
-                    if (cshtml5DomRootElement != null && cshtml5DomRootElement.IsObject()) // It is not an object for example if the app has navigated to another page via "System.Windows.Browser.HtmlPage.Window.Navigate(url)"
+                    if (cshtml5DomRootElement != null) // It is not an object for example if the app has navigated to another page via "System.Windows.Browser.HtmlPage.Window.Navigate(url)"
                     {
                         double width = double.IsNaN(MainWebBrowser.Width) ? MainWebBrowser.ActualWidth : MainWebBrowser.Width;
                         double height = double.IsNaN(MainWebBrowser.Height) ? MainWebBrowser.ActualHeight : MainWebBrowser.Height;
@@ -1371,31 +1397,29 @@ Click OK to continue.";
             }
         }
 
-        static JSValue CallJSMethodAndReturnValue(JSValue instance, string methodname, params object[] args)
+        static object CallJSMethodAndReturnValue(IJsObject instance, string methodname, params object[] args)
         {
             var function = GetJSProperty(instance, methodname);
-            if (function == null || !function.IsFunction())
+            if (function == null || !(function is IJsFunction jsFunction))
             {
                 throw new ApplicationException($"'{methodname}' is not a function or does not exist");
             }
-            var result = function.AsFunction().InvokeAndReturnValue(instance.AsObject(), args);
-
+            var result = jsFunction.Invoke(instance, args);
+            
             return result;
         }
 
 
-        static JSValue GetJSProperty(JSValue instance, string propertyName)
+        static object GetJSProperty(IJsObject instance, string propertyName)
         {
-            JSValue result = instance.AsObject().GetProperty(propertyName);
+            object result = instance.Properties[propertyName];
 
             return result;
         }
 
-        static bool SetJSProperty(JSValue instance, string propertyName, object value)
+        static void SetJSProperty(IJsObject instance, string propertyName, object value)
         {
-            var result = instance.AsObject().SetProperty(propertyName, value);
-
-            return result;
+            instance.Properties[propertyName] = value;
         }
 
         protected override void OnClosed(EventArgs e)
@@ -1408,8 +1432,8 @@ Click OK to continue.";
             //CookiesHelper.SaveMicrosoftCookies(MainWebBrowser, NAME_FOR_STORING_COOKIES);
 
             // Destroy the WebControl and its underlying view:
-            MainWebBrowser.Browser.Dispose();
-            MainWebBrowser.Dispose();
+            _browser.Dispose();
+
             if (IS_LICENSE_CHECKER_ENABLED)
             {
                 LicenseChecker.Dispose();
@@ -1627,7 +1651,7 @@ Click OK to continue.";
         private void ButtonViewXamlTree_Click(object sender, RoutedEventArgs e)
         {
             if (_entryPointAssembly != null
-                && XamlInspectionTreeViewInstance.TryRefresh(_entryPointAssembly, XamlPropertiesPaneInstance, MainWebBrowser, HighlightElement))
+                && XamlInspectionTreeViewInstance.TryRefresh(_entryPointAssembly, XamlPropertiesPaneInstance, _browser, HighlightElement))
             {
                 MainGridSplitter.Visibility = Visibility.Visible;
                 BorderForXamlInspection.Visibility = Visibility.Visible;
@@ -1659,7 +1683,7 @@ Click OK to continue.";
             DevToolsScreencastInfoWindow infoWindow = new DevToolsScreencastInfoWindow(this);
             infoWindow.ShowDialog();
 
-            _devTools = new ChromiumDevTools(MainWebBrowser.Browser.GetRemoteDebuggingURL());
+            _devTools = new ChromiumDevTools(_browser.DevTools.RemoteDebuggingUrl, _browser);
             _devTools.Show();
 
             _devTools.Closing += ChromiumDevTools_Closing;
@@ -1729,7 +1753,7 @@ Click OK to continue.";
         private void ButtonTest_Click(object sender, RoutedEventArgs e)
         {
             if (_javaScriptExecutionHandler == null)
-                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(MainWebBrowser);
+                _javaScriptExecutionHandler = new JavaScriptExecutionHandler(_browser);
 
             dynamic rootElement = _javaScriptExecutionHandler.ExecuteJavaScriptWithResult(@"document.getXamlRoot()");
         }
@@ -2063,6 +2087,7 @@ Click OK to continue.";
         }
         private delegate void CustomResponseHandler(object sender, CustomResponseEventArgs e);
 
+        /* TODO
         private class CustomLoadHandler : DefaultLoadHandler
         {
             public event CustomResponseHandler CustomResponseEvent;
@@ -2088,8 +2113,8 @@ Click OK to continue.";
 
                 Debug.WriteLine("ErrorCode = " + errorParams.CertificateError);
                 Debug.WriteLine("SerialNumber = " + certificate.SerialNumber);
-                Debug.WriteLine("FingerPrint = " + certificate.FingerPrint);
-                Debug.WriteLine("CAFingerPrint = " + certificate.CAFingerPrint);
+                Debug.WriteLine("FingerPrint = " + certificate.Fingerprint);
+                Debug.WriteLine("CAFingerPrint = " + certificate.CaFingerPrint);
 
                 string subject = certificate.Subject;
                 Debug.WriteLine("Subject = " + subject);
@@ -2100,10 +2125,11 @@ Click OK to continue.";
                 Debug.WriteLine("KeyUsages = " + String.Join(", ", certificate.KeyUsages));
                 Debug.WriteLine("ExtendedKeyUsages = " + String.Join(", ", certificate.ExtendedKeyUsages));
 
-                Debug.WriteLine("HasExpired = " + certificate.HasExpired);
+                Debug.WriteLine("HasExpired = " + certificate.Expired);
                 return false; //ignores the error.
             }
         }
+        */
 
         #region Element Picker for XAML Inspection
 
@@ -2129,7 +2155,7 @@ Click OK to continue.";
                 ButtonViewHideElementPickerForInspector.IsChecked = false;
 
             // Remove the element picker highlight:
-            XamlInspectionHelper.HighlightElement(null, ElementPickerHighlight, MainWebBrowser.Browser);
+            XamlInspectionHelper.HighlightElement(null, ElementPickerHighlight, _browser);
 
             // Hide the tutorial:
             InformationAboutHowThePickerWorks.Visibility = Visibility.Collapsed;
@@ -2141,7 +2167,7 @@ Click OK to continue.";
             var element = XamlInspectionHelper.GetElementAtSpecifiedCoordinates(e.GetPosition(MainWebBrowser));
 
             // Highlight the element picker (or remove highlight if null):
-            XamlInspectionHelper.HighlightElement(element, ElementPickerHighlight, MainWebBrowser.Browser);
+            XamlInspectionHelper.HighlightElement(element, ElementPickerHighlight, _browser);
         }
 
         private void ElementPickerForInspection_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

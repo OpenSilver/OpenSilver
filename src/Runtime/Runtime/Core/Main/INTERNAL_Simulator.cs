@@ -31,33 +31,6 @@ namespace DotNetForHtml5.Core
     {
         // Note: all the properties here are populated by the Simulator, which "injects" stuff here when the application is launched in the Simulator.
 
-        static dynamic htmlDocument;
-        public static dynamic HtmlDocument
-        {
-            set // Intended to be called by the "Emulator" project to inject the HTML document.
-            {
-                htmlDocument = value;
-            }
-            internal get
-            {
-                return htmlDocument;
-            }
-        }
-
-        // Here we get the Document from DotNetBrowser
-        static dynamic domDocument;
-        public static dynamic DOMDocument
-        {
-            set // Intended to be called by the "Emulator" project to inject the Document.
-            {
-                domDocument = value;
-            }
-            internal get
-            {
-                return domDocument;
-            }
-        }
-
         // BeginInvoke of the WebControl's Dispatcher
         public static Action<Action> WebControlDispatcherBeginInvoke
         {
@@ -193,7 +166,5 @@ namespace DotNetForHtml5.Core
             }
         }
 #endif
-
-        public static Func<object, object> ConvertBrowserResult { get; set; }
     }
 }

@@ -16,11 +16,11 @@
 
 
 using DotNetBrowser;
-using DotNetBrowser.DOM;
 using System;
 using System.Reflection;
 using System.Windows;
-using DotNetBrowser.WPF;
+using DotNetBrowser.Wpf;
+using DotNetBrowser.Dom;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -33,34 +33,19 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         }
 #endif
 
-        internal static void InjectDOMDocument(DOMDocument document, Assembly coreAssembly)
-        {
-            InjectPropertyValue("DOMDocument", document, coreAssembly);
-        }
-
-        internal static void InjectHtmlDocument(JSValue htmlDocument, Assembly coreAssembly)
-        {
-            InjectPropertyValue("HtmlDocument", htmlDocument, coreAssembly);
-        }
-
-        internal static void InjectWebControlDispatcherBeginInvoke(WPFBrowserView webControl, Assembly coreAssembly)
+        internal static void InjectWebControlDispatcherBeginInvoke(BrowserView webControl, Assembly coreAssembly)
         {
             InjectPropertyValue("WebControlDispatcherBeginInvoke", new Action<Action>((method) => webControl.Dispatcher.BeginInvoke(method)), coreAssembly);
         }
 
-        internal static void InjectWebControlDispatcherInvoke(WPFBrowserView webControl, Assembly coreAssembly)
+        internal static void InjectWebControlDispatcherInvoke(BrowserView webControl, Assembly coreAssembly)
         {
             InjectPropertyValue("WebControlDispatcherInvoke", new Action<Action, TimeSpan>((method, timeout) => webControl.Dispatcher.Invoke(method, timeout)), coreAssembly);
         }
 
-        internal static void InjectWebControlDispatcherCheckAccess(WPFBrowserView webControl, Assembly coreAssembly)
+        internal static void InjectWebControlDispatcherCheckAccess(BrowserView webControl, Assembly coreAssembly)
         {
             InjectPropertyValue("WebControlDispatcherCheckAccess", new Func<bool>(() => webControl.Dispatcher.CheckAccess()), coreAssembly);
-        }
-
-        internal static void InjectConvertBrowserResult(Func<object, object> func, Assembly coreAssembly)
-        {
-            InjectPropertyValue("ConvertBrowserResult", func, coreAssembly);
         }
 
         internal static void InjectJavaScriptExecutionHandler(dynamic javaScriptExecutionHandler, Assembly coreAssembly)

@@ -24,6 +24,7 @@ using System.Windows;
 using System.Collections;
 using System.Windows.Shapes;
 using OpenSilver;
+using DotNetBrowser.Browser;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
 {
@@ -264,7 +265,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 return null;
         }
 
-        public static void HighlightElement(object userUIElementThatWeWantToHighlight, Rectangle rectangleUsedToHighlight, DotNetBrowser.Browser browser)
+        public static void HighlightElement(object userUIElementThatWeWantToHighlight, Rectangle rectangleUsedToHighlight, IBrowser browser)
         {
             bool wasElementHighlighted = false;
 
@@ -276,7 +277,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                     string uniqueIdentifier = ((dynamic)((dynamic)userUIElementThatWeWantToHighlight).INTERNAL_OuterDomElement).UniqueIdentifier.ToString();
                     if (uniqueIdentifier != null)
                     {
-                        string coordinates = browser.ExecuteJavaScriptAndReturnValue(string.Format(
+                        string coordinates = browser.MainFrame?.ExecuteJavaScript<string>(string.Format(
     @"var div = document.getElementByIdSafe('{0}');
                               var rect = div.getBoundingClientRect();
                               var result = rect.top + ';' + rect.right + ';' + rect.bottom + ';' + rect.left;

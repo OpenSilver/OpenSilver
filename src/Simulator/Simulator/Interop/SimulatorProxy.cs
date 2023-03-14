@@ -15,7 +15,7 @@
 
 
 
-using DotNetBrowser.WPF;
+using DotNetBrowser.Wpf;
 using DotNetForHtml5.EmulatorWithoutJavascript.Console;
 using System;
 using System.Diagnostics;
@@ -29,10 +29,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     //Do not remove this class: called via reflection.
     public class SimulatorProxy
     {
-        WPFBrowserView _webControl;
+        BrowserView _webControl;
         ConsoleControl _console;
 
-        public SimulatorProxy(WPFBrowserView webControl, ConsoleControl console)
+        public SimulatorProxy(BrowserView webControl, ConsoleControl console)
         {
             _webControl = webControl;
             _console = console;

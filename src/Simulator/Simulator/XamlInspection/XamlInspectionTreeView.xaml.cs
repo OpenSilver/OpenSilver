@@ -15,22 +15,10 @@
 
 
 
-using DotNetBrowser;
-using DotNetBrowser.WPF;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using DotNetBrowser.Browser;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
@@ -41,7 +29,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
     public partial class XamlInspectionTreeView : UserControl
     {
         XamlPropertiesPane _xamlPropertiesPane;
-        WPFBrowserView _webControl;
+        IBrowser _browser;
         Rectangle _rectangleUsedToHighlight;
         bool _hasBeenFullyExpanded;
 
@@ -50,12 +38,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
             InitializeComponent();
         }
 
-        public bool TryRefresh(Assembly entryPointAssembly, XamlPropertiesPane xamlPropertiesPane, WPFBrowserView webControl, Rectangle highlightElement)
+        public bool TryRefresh(Assembly entryPointAssembly, XamlPropertiesPane xamlPropertiesPane, IBrowser browser, Rectangle highlightElement)
         {
             int nbTreeViewElements;
 
             _xamlPropertiesPane = xamlPropertiesPane;
-            _webControl = webControl;
+            _browser = browser;
             _rectangleUsedToHighlight = highlightElement;
             _hasBeenFullyExpanded = false;
             
@@ -76,7 +64,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 _xamlPropertiesPane.Refresh(e.NewValue);
 
                 // Clear highlight:
-                XamlInspectionHelper.HighlightElement(null, _rectangleUsedToHighlight, _webControl.Browser);
+                XamlInspectionHelper.HighlightElement(null, _rectangleUsedToHighlight, _browser);
             }
             else
             {
@@ -85,7 +73,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 _xamlPropertiesPane.Refresh(treeNode.Element);
 
                 // Highlight the element in the web browser:
-                XamlInspectionHelper.HighlightElement(treeNode.Element, _rectangleUsedToHighlight, _webControl.Browser);
+                XamlInspectionHelper.HighlightElement(treeNode.Element, _rectangleUsedToHighlight, _browser);
             }
         }
 

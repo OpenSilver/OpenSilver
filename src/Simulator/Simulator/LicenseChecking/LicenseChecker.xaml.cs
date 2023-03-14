@@ -15,31 +15,19 @@
 
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Diagnostics;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using DotNetBrowser;
-using DotNetBrowser.WPF;
-using System.Xml.Serialization;
-using System.IO;
-using System.ComponentModel;
-using System.Net.NetworkInformation;
-using System.Net;
-using DotNetBrowser.Events;
+using DotNetBrowser.Wpf;
 using OpenSilver;
+using DotNetBrowser.Browser;
+using DotNetBrowser.Navigation.Events;
+using DotNetBrowser.Net;
+using DotNetBrowser.Engine;
+using DotNetBrowser.Cookies;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
 {
@@ -69,15 +57,15 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
         const string _trialFeatureFriendlyName = Constants.COMMERCIAL_EDITION_S_FRIENDLY_NAME;
 
         protected MainWindow _mainWindow;
-        protected Browser _browser;
-        protected WPFBrowserView _browserView;
+        protected IBrowser _browser;
+        protected BrowserView _browserView;
         protected string _username;
         protected string _editionFriendlyName;
         protected int _numberOfTrialDaysLeft;
         protected bool _enable;
         protected string _activatedFeatureID;
 
-        public Browser Browser
+        public IBrowser Browser
         {
             get
             {
@@ -89,7 +77,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
             }
         }
 
-        public WPFBrowserView BrowserView
+        public BrowserView BrowserView
         {
             get
             {
@@ -220,19 +208,20 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
             ButtonGoToLoginPage.Visibility = Visibility.Collapsed;
             LicenseCheckerBrowserContainer.Visibility = Visibility.Collapsed;
 
-            BrowserContextParams browserParameters = new BrowserContextParams("data-dir-license")
+            IEngine engine = EngineFactory.Create(new EngineOptions.Builder
             {
-                StorageType = StorageType.DISK
-            };
+                IncognitoEnabled = true,
+                RenderingMode = RenderingMode.OffScreen,
+                UserDataDirectory = "data-dir-license"
+            }.Build());
 
-            BrowserContext browserContext = new BrowserContext(browserParameters);
+            Browser = engine.CreateBrowser();
 
-            Browser = BrowserFactory.Create(browserContext, BrowserType.LIGHTWEIGHT);
+            CookiesHelper.LoadCookies(Browser, CSHTML5_COOKIES_URL, NAME_FOR_STORING_COOKIES);
+            CookiesHelper.LoadMicrosoftCookies(Browser, NAME_FOR_STORING_COOKIES);
 
-            CookiesHelper.LoadCookies(BrowserView, CSHTML5_COOKIES_URL, NAME_FOR_STORING_COOKIES);
-            CookiesHelper.LoadMicrosoftCookies(BrowserView, NAME_FOR_STORING_COOKIES);
-
-            BrowserView = new WPFBrowserView(Browser);
+            BrowserView = new BrowserView();
+            BrowserView.InitializeFrom(Browser);
             LicenseCheckerBrowserContainer.Child = BrowserView;
             
             // we check if a commercial key is  activated and we add it to the cookie before loading the login URL
@@ -240,13 +229,13 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
                 SetKeyGuidAsCookie(); // we set the key guid as a session cookie so the website know we have an activated key
 
             // we add an handler for browser error (eg: internet down, website down, page not found...)
-            Browser.FailLoadingFrameEvent += OnFailLoadingFrameEvent; //To Do: find a better way of managing those error
+            Browser.Navigation.FrameLoadFailed += OnFailLoadingFrameEvent; //To Do: find a better way of managing those error
 
-            Browser.LoadURL(LoginURL);
+            Browser.Navigation.LoadUrl(LoginURL);
 
             Enable = true;
 
-            BrowserView.DocumentLoadedInMainFrameEvent += (s1, e1) =>
+            Browser.Navigation.FrameDocumentLoadFinished += (s1, e1) =>
             {
                 // We use a dispatcher to go back to thread in charge of the UI.
                 MainWindow.Dispatcher.BeginInvoke((Action)(() =>
@@ -268,10 +257,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
         bool _needToRedirectAfterLogout = false;
         bool _wasLogged;
 
-        public void OnFailLoadingFrameEvent(object sender, FailLoadingEventArgs e)
+        public void OnFailLoadingFrameEvent(object sender, FrameLoadFailedEventArgs e)
         {
-            if (e.ErrorCode != NetError.ABORTED &&
-                e.ErrorCode != NetError.CONNECTION_ABORTED &&
+            if (e.ErrorCode != NetError.Aborted &&
+                e.ErrorCode != NetError.ConnectionAborted &&
                 e.ErrorCode != (NetError)(-27))
                 OnNetworkNotAvailable();
         }
@@ -279,7 +268,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
         public void OnLoaded()
         {
             //LicenseCheckerBrowserContainer.Visibility = Visibility.Visible;
-            bool onLoginPage = Browser.URL == LoginURL;
+            bool onLoginPage = Browser.Url == LoginURL;
 
             if (_needToRedirectAfterLogout)
             {
@@ -288,7 +277,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
                     _needToRedirectAfterLogout = false;
                     return;
                 }
-                Browser.LoadURL(LoginURL);
+                Browser.Navigation.LoadUrl(LoginURL);
                 return;
             }
 
@@ -403,7 +392,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
 
         public void UpdateUsername()
         {
-            string html = Browser.GetHTML();
+            string html = Browser.MainFrame?.Html;
 
             if (html != null)
             {
@@ -513,7 +502,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
             ButtonHobbyist.Visibility = Visibility.Collapsed;
             ButtonContinue.Visibility = Visibility.Collapsed;
             ToolbarForLicenseChecker.Visibility = Visibility.Collapsed;
-            Browser.LoadURL(LogoutURL);
+            Browser.Navigation.LoadUrl(LogoutURL);
         }
 
         public void SetHobbyist()
@@ -526,7 +515,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
         public void LaunchKeyActivation()
         {
             ActivationHelpers.DisplayActivationApp(ActivationHelpers.GetActivationAppPath(), TrialFeatureID, "Register your keys");
-            Browser.LoadURL(LoginURL);
+            Browser.Navigation.LoadUrl(LoginURL);
         }
 
         const string LICENSE_KEY_GUID_COOKIE = "keyGuid";
@@ -537,19 +526,24 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
 
             if (Guid.TryParse(RegistryHelpers.GetSetting("Feature_" + ActivatedFeatureID, null), out keyGuid))
             {
+                var builder = new Cookie.Builder("localhost");
+                builder.Name = LICENSE_KEY_GUID_COOKIE;
+                builder.Value = keyGuid.ToString();
+                builder.Path = "/";
+                builder.Secure = true;
+                builder.HttpOnly = true;
+                Browser.Engine.Profiles.Default.CookieStore.SetCookie(builder.Build()).Wait();
 
-                Browser.CookieStorage.SetSessionCookie(CSHTML5_COOKIES_URL, LICENSE_KEY_GUID_COOKIE, keyGuid.ToString(), "localhost", "/", true, true);
-                foreach (var cookie in Browser.CookieStorage.GetAllCookies(CSHTML5_COOKIES_URL))
+                foreach (var cookie in Browser.Engine.Profiles.Default.CookieStore.GetAllCookies(CSHTML5_COOKIES_URL).Result)
                     Debug.WriteLine(cookie);
             }
         }
 
         public void Dispose()
         {
-            CookiesHelper.SaveCookies(BrowserView, NAME_FOR_STORING_COOKIES, CSHTML5_COOKIES_URL);
-            CookiesHelper.SaveMicrosoftCookies(BrowserView, NAME_FOR_STORING_COOKIES);
+            CookiesHelper.SaveCookies(Browser, NAME_FOR_STORING_COOKIES, CSHTML5_COOKIES_URL);
+            CookiesHelper.SaveMicrosoftCookies(Browser, NAME_FOR_STORING_COOKIES);
             Browser.Dispose();
-            BrowserView.Dispose();
         }
 
         public void OnNetworkAvailabilityChanged(bool available)
@@ -603,7 +597,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking
 
         private void ButtonGoToLoginPage_Click(object sender, RoutedEventArgs e)
         {
-            Browser.LoadURL(LoginURL);
+            Browser.Navigation.LoadUrl(LoginURL);
         }
     }
 }

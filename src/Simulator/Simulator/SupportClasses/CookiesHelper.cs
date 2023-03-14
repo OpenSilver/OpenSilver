@@ -15,11 +15,9 @@
 
 
 
-using DotNetBrowser;
-using DotNetBrowser.WPF;
+using DotNetBrowser.Browser;
+using DotNetBrowser.Cookies;
 using OpenSilver;
-using System;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
@@ -28,12 +26,12 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     {
         const string MICROSOFT_COOKIES_URL = "https://login.microsoftonline.com";
 
-        public static void LoadMicrosoftCookies(WPFBrowserView wpfBrowserView, string registryName)
+        public static void LoadMicrosoftCookies(IBrowser browser, string registryName)
         {
-            LoadCookies(wpfBrowserView, MICROSOFT_COOKIES_URL, registryName);
+            LoadCookies(browser, MICROSOFT_COOKIES_URL, registryName);
         }
 
-        public static void LoadCookies(WPFBrowserView wpfBrowserView, string url, string registryName)
+        public static void LoadCookies(IBrowser browser, string url, string registryName)
         {
             // we search for cookies with a specific url into registries
             string cookiesAsString = RegistryHelpers.GetSetting(registryName + "_" + url, null);
@@ -42,25 +40,36 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 List<CookieData> cookiesList = Serializer.Load<List<CookieData>>(cookiesAsString);
                 foreach (var cookie in cookiesList)
                 {
-                    if (cookie.session)
-                        wpfBrowserView.Browser.CookieStorage.SetSessionCookie(cookie.url, cookie.name, cookie.value, cookie.domain, cookie.path, cookie.secure, cookie.httpOnly);
-                    else
-                        wpfBrowserView.Browser.CookieStorage.SetCookie(cookie.url, cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expirationTime, cookie.secure, cookie.httpOnly);
+                    var builder = new Cookie.Builder(cookie.domain)
+                    {
+                        Name = cookie.name,
+                        Value = cookie.value,
+                        Path = cookie.path,
+                        Secure = cookie.secure,
+                        HttpOnly = cookie.httpOnly
+                    };
+
+                    if (!cookie.session)
+                    {
+                        builder.ExpirationTime = cookie.expirationTime;
+                    }
+
+                    browser.Engine.Profiles.Default.CookieStore.SetCookie(builder.Build()).Wait();
                 }
             }
         }
 
-        public static void SaveMicrosoftCookies(WPFBrowserView wpfBrowserView, string registryName)
+        public static void SaveMicrosoftCookies(IBrowser browser, string registryName)
         {
-            SaveCookies(wpfBrowserView, MICROSOFT_COOKIES_URL, registryName);
+            SaveCookies(browser, MICROSOFT_COOKIES_URL, registryName);
         }
 
-        public static void SaveCookies(WPFBrowserView wpfBrowserView, string url, string registryName)
+        public static void SaveCookies(IBrowser browser, string url, string registryName)
         {
             // we register cookies with a specific url into registries
-            if (url != null && wpfBrowserView.Browser != null && wpfBrowserView.Browser.CookieStorage != null)
+            if (url != null && browser != null && browser.Engine.Profiles.Default.CookieStore != null)
             {
-                List<DotNetBrowser.Cookie> cookiesList = wpfBrowserView.Browser.CookieStorage.GetAllCookies(url);
+                IEnumerable<Cookie> cookiesList = browser.Engine.Profiles.Default.CookieStore.GetAllCookies(url).Result;
                 List<CookieData> cookiesDataList = new List<CookieData>();
                 foreach (var cookie in cookiesList)
                     cookiesDataList.Add(new CookieData(cookie, url));
@@ -69,35 +78,42 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             }
         }
 
-        public static void ClearCookies(WPFBrowserView wpfBrowserView, string registryName = null)
+        public static void ClearCookies(IBrowser browser, string registryName = null)
         {
             if (!string.IsNullOrEmpty(registryName))
             {
                 RegistryHelpers.DeleteSetting(registryName + "_" + MICROSOFT_COOKIES_URL);
             }
-            if (wpfBrowserView.Browser != null && wpfBrowserView.Browser.CookieStorage != null)
+            if (browser != null && browser.Engine.Profiles.Default.CookieStore != null)
             {
-                int numberOfDeletedCookies = wpfBrowserView.Browser.CookieStorage.DeleteAll();
-                wpfBrowserView.Browser.CookieStorage.Save();
+                int numberOfDeletedCookies = browser.Engine.Profiles.Default.CookieStore.DeleteAllCookies().Result;
+                browser.Engine.Profiles.Default.CookieStore.Save();
                 MessageBox.Show(numberOfDeletedCookies.ToString() + " cookies have been deleted.");
             }
         }
 
-        public static void SetCustomCookies(WPFBrowserView wpfBrowserView, IList<CookieData> cookies)
+        public static void SetCustomCookies(IBrowser browser, IList<CookieData> cookies)
         {
             if (cookies == null)
                 return;
 
             foreach (CookieData data in cookies)
             {
-                if (data.session)
+                var builder = new Cookie.Builder(data.domain)
                 {
-                    wpfBrowserView.Browser.CookieStorage.SetSessionCookie(data.url, data.name, data.value, data.domain, data.path, data.secure, data.httpOnly);
-                }
-                else
+                    Name = data.name,
+                    Value = data.value,
+                    Path = data.path,
+                    Secure = data.secure,
+                    HttpOnly = data.httpOnly
+                };
+
+                if (!data.session)
                 {
-                    wpfBrowserView.Browser.CookieStorage.SetCookie(data.url, data.name, data.value, data.domain, data.path, data.expirationTime, data.secure, data.httpOnly);
+                    builder.ExpirationTime = data.expirationTime;
                 }
+
+                browser.Engine.Profiles.Default.CookieStore.SetCookie(builder.Build()).Wait();
             }
         }
 

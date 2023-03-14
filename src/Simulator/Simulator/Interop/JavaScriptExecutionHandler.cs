@@ -15,27 +15,23 @@
 
 
 
-using DotNetBrowser.WPF;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using DotNetBrowser.Browser;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
     public class JavaScriptExecutionHandler
     {
         private bool _webControlDisposed = false;
-        private WPFBrowserView _webControl;
+        private IBrowser _browser;
         private List<string> _fullLogOfExecutedJavaScriptCode = new List<string>();
 
-        public JavaScriptExecutionHandler(WPFBrowserView webControl)
+        public JavaScriptExecutionHandler(IBrowser browser)
         {
-            _webControl = webControl;
-            webControl.DisposeEvent += WebControl_DisposeEvent;
-            webControl.Browser.DisposeEvent += WebControl_DisposeEvent;
+            _browser = browser;
+            browser.Disposed += WebControl_DisposeEvent;
         }
 
-        private void WebControl_DisposeEvent(object sender, DotNetBrowser.Events.DisposeEventArgs e)
+        private void WebControl_DisposeEvent(object sender, EventArgs e)
         {
             _webControlDisposed = true;
         }
@@ -48,7 +44,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 return;
             if (OpenSilver.Simulator.SimulatorLauncher.Parameters.LogExecutedJavaScriptCode)
                 _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
-            _webControl.Browser.ExecuteJavaScript(javaScriptToExecute);
+            _ = _browser.MainFrame?.ExecuteJavaScript(javaScriptToExecute).Result;
         }
 
         // Called via reflection by the "INTERNAL_HtmlDomManager" class of the "Core" project.
@@ -59,7 +55,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
                 return null;
             if (OpenSilver.Simulator.SimulatorLauncher.Parameters.LogExecutedJavaScriptCode)
                 _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
-            return _webControl.Browser.ExecuteJavaScriptAndReturnValue(javaScriptToExecute);
+            return _browser.MainFrame?.ExecuteJavaScript(javaScriptToExecute).Result;
         }
 
 

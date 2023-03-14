@@ -15,15 +15,14 @@
 
 
 
-using DotNetBrowser;
-using System;
+using DotNetBrowser.Net.Handlers;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Path = System.IO.Path;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
-    public class ResourceInterceptor : DefaultNetworkDelegate
+    public class ResourceInterceptor
     {
         private readonly string _baseURL;
         private readonly string _rootPath;
@@ -35,10 +34,10 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             _rootPath = Regex.Replace(_rootPath, "%2F", "/", RegexOptions.IgnoreCase);
         }
 
-        public override void OnBeforeURLRequest(BeforeURLRequestParams parameters)
+        internal SendUrlRequestResponse ProcessUrlRequest(SendUrlRequestParameters e)
         {
-            string url = parameters.Url.Replace(_baseURL, $"file:///{_rootPath}/").Replace("[PARENT]", "..");
-            parameters.SetUrl(url);
+            string url = e.UrlRequest.Url.Replace(_baseURL, $"file:///{_rootPath}/").Replace("[PARENT]", "..");
+            return SendUrlRequestResponse.Override(url);
         }
     }
 }

@@ -12,7 +12,9 @@
 \*====================================================================================*/
 
 using System;
+using System.Linq;
 using System.Text.Json;
+using System.Windows;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -165,21 +167,23 @@ namespace CSHTML5.Types
             if (IsArray)
             {
                 var fullName = Value.GetType().FullName;
-                if (Value != null && fullName == "DotNetBrowser.JSArray")
-                {
-                    result = ((dynamic)Value)[ArrayIndex];
-                }
-                else if (Value is object[] array)
+                if (Value is object[] array)
                 {
                     result = array[ArrayIndex];
                 }
-                else if (Value != null && (fullName == "DotNetBrowser.JSObject"))
+                else if (fullName == "DotNetBrowser.Js.JsObject")
                 {
-                    result = ((dynamic)Value).GetProperty(ArrayIndex.ToString());
+                    var propertiesValue = Value.GetType().GetProperty("Properties").GetValue(Value, null);
+                    var propertiesValueProps = propertiesValue.GetType().GetInterface("IJsObjectPropertyCollection").GetProperties();
+                    var indexer = propertiesValue.GetType()
+                        .GetInterface("IJsObjectPropertyCollection")
+                        .GetProperties()
+                        .FirstOrDefault(x => x.GetIndexParameters().Select(x => x.ParameterType).SequenceEqual(new[] { typeof(uint) }));
+                    result = indexer?.GetMethod.Invoke(propertiesValue, new object[] { (uint)ArrayIndex });
                 }
                 else
                 {
-                    throw new InvalidOperationException("Value is marked as array but is neither an object[], nor a JSArray, nor a JSObject. ReferenceId: " + (this.ReferenceId ?? "n/a"));
+                    throw new InvalidOperationException("Value is marked as array but is not an object[]. ReferenceId: " + (this.ReferenceId ?? "n/a"));
                 }
             }
             else
@@ -187,24 +191,7 @@ namespace CSHTML5.Types
                 result = Value;
             }
 
-            if (result == null)
-            {
-                return null;
-            }
-            else if (result.GetType().FullName == "DotNetBrowser.JSNumber")
-            {
-                return ((dynamic)result).GetNumber();
-            }
-            else if (result.GetType().FullName == "DotNetBrowser.JSBoolean")
-            {
-                return ((dynamic)result).GetBool();
-            }
-            else if (result.GetType().FullName == "DotNetBrowser.JSString")
-            {
-                return ((dynamic)result).GetString();
-            }
-
-            return DotNetForHtml5.Core.INTERNAL_Simulator.ConvertBrowserResult(result);
+            return result;
         }
 
         public bool IsUndefined()

@@ -1,7 +1,6 @@
 ﻿<mahapps:MetroWindow x:Class="DotNetForHtml5.EmulatorWithoutJavascript.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:dotnetbrowser="clr-namespace:DotNetBrowser.WPF;assembly=DotNetBrowser"
         xmlns:mahapps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:xamlinspection="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection"
         xmlns:licensecheckernamespace="clr-namespace:DotNetForHtml5.EmulatorWithoutJavascript.LicenseChecking"
@@ -10,7 +9,7 @@
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="Manual"
         ShowIconOnTitleBar="True"
-        GlowBrush="{DynamicResource AccentColorBrush}"
+        GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         Left="100" Top="5">
     <mahapps:MetroWindow.Resources>
         <ResourceDictionary>
@@ -19,10 +18,7 @@
                 <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <!-- MahApps.Metro Accent and AppTheme setting -->
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Blue.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </mahapps:MetroWindow.Resources>
@@ -115,7 +111,7 @@
                                         <TextBlock Text="DEBUGGING TIPS" Margin="10,0,0,0" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
-                                <Button x:Name="ButtonViewXamlTree" Click="ButtonViewXamlTree_Click" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}">
+                                <Button x:Name="ButtonViewXamlTree" Click="ButtonViewXamlTree_Click" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}">
                                     <StackPanel Orientation="Horizontal">
                                         <Path Stretch="Uniform" Fill="White" Width="14" Height="14" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Data="M40.110691,17.336001L43.787209,19.603006 47.739838,17.851579 46.722206,22.052104 49.609001,25.26417 45.300961,25.597356 43.13229,29.337 41.485435,25.338367 37.260998,24.432104 40.553104,21.631422z M30.316431,15.311499C30.737907,15.3207,31.141415,15.45716,31.470024,15.730532L33.818306,17.694105C34.694302,18.424594,34.7043,19.856977,33.841408,20.888161L6.1638265,54.03081C5.2956729,55.0699,3.888453,55.316195,3.0118785,54.583106L0.66258836,52.621932C-0.21271044,51.889041,-0.22314736,50.462062,0.64531529,49.424178L28.322847,16.281325C28.861591,15.634333,29.61397,15.296166,30.316431,15.311499z M17.982637,0.28100014L22.582518,3.1118908 27.524708,0.93214035 26.253859,6.1756935 29.865,10.203163 24.47509,10.621074 21.760185,15.288001 19.702805,10.298364 14.42,9.1577039 18.53216,5.6602993z M37.014431,0L40.23534,1.97754 43.692245,0.45019531 42.80167,4.1220703 45.327003,6.9426298 41.552406,7.2316895 39.658558,10.5 38.221096,7.0024395 34.521999,6.2094698 37.39922,3.7629395z"/>
                                         <TextBlock FontSize="11" Text="Inspect Visual Tree" Margin="6,0,0,0"/>
@@ -237,11 +233,11 @@
                         </Grid.RowDefinitions>
                         <StackPanel x:Name="ContainerForXamlInspectorToolbar" Visibility="Collapsed" Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top">
                             <StackPanel Orientation="Horizontal">
-                                <ToggleButton x:Name="ButtonViewHideElementPickerForInspector" ToolTip="Enable/disable the UI picker" Margin="16,16,0,16" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}" Click="ButtonViewHideElementPickerForInspector_Click">
+                                <ToggleButton x:Name="ButtonViewHideElementPickerForInspector" ToolTip="Enable/disable the UI picker" Margin="16,16,0,16" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}" Click="ButtonViewHideElementPickerForInspector_Click">
                                     <Path Stretch="Uniform" Fill="White" Width="18" Height="18" Margin="0,0,0,0" RenderTransformOrigin="0.5,0.5" Data="M27.534067,15.350001L27.534067,21.65646 31.025,21.65646 31.025,27.641132 27.534067,27.641132 27.534067,31.132001 21.548581,31.132001 21.548581,27.641132 15.298,27.641132C15.2975,25.358821,15.926888,23.238401,17.004468,21.412269L21.078689,21.412269 21.078689,17.227529C22.954853,16.050573,25.163012,15.3578,27.534067,15.350001z M27.578946,14.252979C20.203084,14.252979 14.203034,20.252946 14.203034,27.628605 14.203034,35.004164 20.203084,41.004732 27.578946,41.004732 34.954409,41.004732 40.955257,35.004164 40.955257,27.628605 40.955257,20.252946 34.954409,14.252979 27.578946,14.252979z M27.578946,10.253001C37.160326,10.253001 44.955292,18.047858 44.955292,27.628605 44.955292,32.11298 43.232578,36.192959 40.433754,39.27894L46.081001,46.491001 38.526737,46.491001 35.755215,42.952721C33.315794,44.258614 30.533971,45.004709 27.578946,45.004709 17.997966,45.004709 10.203,37.209852 10.203,27.628605 10.203,18.047858 17.997966,10.253001 27.578946,10.253001z M3.0078211,0L6.4980726,0 6.4980726,3.0078316 21.078974,3.0078316 21.078974,0 24.902387,0 24.902387,3.0078316 28.577,3.0078316 28.577,6.6647167 24.902387,6.6647167 24.902387,9.1940346C23.577482,9.3861761,22.298878,9.7155185,21.078974,10.171372L21.078974,6.6647167 6.4980726,6.6647167 6.4980726,21.412251 10.017635,21.412251C9.6203938,22.531458,9.3301129,23.697467,9.1516423,24.902475L6.4980726,24.902475 6.4980726,28.577001 3.0078211,28.577001 3.0078211,24.902475 0,24.902475 0,21.412251 3.0078211,21.412251 3.0078211,6.6647167 0,6.6647167 0,3.0078316 3.0078211,3.0078316z"/>
                                 </ToggleButton>
-                                <Button x:Name="ButtonRefreshXamlTree" Margin="10,16,0,16"  Content="Refresh" Click="ButtonRefreshXamlTree_Click" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}"/>
-                                <Button x:Name="ButtonXamlInspectorOptions" Margin="10,16,16,16" Content="..." Click="ButtonXamlInspectorOptions_Click" Padding="6,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource AccentColorBrush}">
+                                <Button x:Name="ButtonRefreshXamlTree" Margin="10,16,0,16"  Content="Refresh" Click="ButtonRefreshXamlTree_Click" Padding="10,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}"/>
+                                <Button x:Name="ButtonXamlInspectorOptions" Margin="10,16,16,16" Content="..." Click="ButtonXamlInspectorOptions_Click" Padding="6,3" Cursor="Hand" BorderThickness="0" Focusable="False" Background="{DynamicResource MahApps.Brushes.Accent}">
                                     <Button.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Expand All Nodes" Cursor="Hand" Click="ButtonExpandAllNodes_Click"/>

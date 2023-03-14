@@ -15,11 +15,7 @@
 
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DotNetBrowser.Cookies;
 
 namespace DotNetForHtml5.EmulatorWithoutJavascript
 {
@@ -33,19 +29,19 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
         public bool httpOnly;
         public bool session;
         public string value;
-        public long expirationTime;
+        public DateTime? expirationTime;
 
-        public CookieData(DotNetBrowser.Cookie cookie, string url)
+        public CookieData(Cookie cookie, string url)
         {
             this.url = url;
             this.name = cookie.Name;
             this.path = cookie.Path;
-            this.secure = cookie.Secure;
-            this.httpOnly = cookie.HttpOnly;
+            this.secure = cookie.IsSecure;
+            this.httpOnly = cookie.IsHttpOnly;
             this.value = cookie.Value;
-            this.domain = cookie.Domain;
+            this.domain = cookie.DomainName;
             this.expirationTime = cookie.ExpirationTime;
-            this.session = cookie.Session;
+            this.session = cookie.IsSession;
         }
     }
 }

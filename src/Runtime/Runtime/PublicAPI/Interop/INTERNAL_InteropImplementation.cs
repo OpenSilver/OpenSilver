@@ -56,8 +56,14 @@ namespace CSHTML5
             if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
                 // Adding a property to the JavaScript "window" object:
-                dynamic jsWindow = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptWithResult("window");
-                jsWindow.SetProperty("onCallBack", new OnCallbackSimulator());
+                object jsWindow = INTERNAL_HtmlDomManager.GetHtmlWindow();
+                var propertiesValue = jsWindow.GetType().GetProperty("Properties").GetValue(jsWindow, null);
+                var propertiesValueProps = propertiesValue.GetType().GetInterface("IJsObjectPropertyCollection").GetProperties();
+                var indexer = propertiesValue.GetType()
+                    .GetInterface("IJsObjectPropertyCollection")
+                    .GetProperties()
+                    .FirstOrDefault(x => x.GetIndexParameters().Select(x => x.ParameterType).SequenceEqual(new[] { typeof(string) }));
+                indexer?.SetMethod.Invoke(propertiesValue, new object[] { "onCallBack", new OnCallbackSimulator() });
             }
 
             _isInitialized = true;

@@ -135,6 +135,11 @@ namespace CSHTML5.Internal
 
         private object PerformActualInteropCall(string javaScriptToExecute)
         {
+            if (javaScriptToExecute == null)
+            {
+                return null;
+            }
+
             if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
             {
                 javaScriptToExecute = "//---- START INTEROP ----"
