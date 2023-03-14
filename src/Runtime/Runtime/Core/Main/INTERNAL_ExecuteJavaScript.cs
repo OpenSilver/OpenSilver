@@ -21,7 +21,7 @@ using Windows.UI.Xaml;
 
 namespace CSHTML5.Internal
 {
-    internal static class INTERNAL_SimulatorExecuteJavaScript
+    internal static class INTERNAL_ExecuteJavaScript
     {
         internal static IPendingJavascript JavaScriptRuntime { get; set; }
 

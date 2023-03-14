@@ -139,7 +139,7 @@ namespace CSHTML5.Internal
 
         private object PerformActualInteropCall(string javaScriptToExecute)
         {
-            if (INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging)
+            if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
             {
                 javaScriptToExecute = "//---- START INTEROP ----"
                     + Environment.NewLine
@@ -150,7 +150,7 @@ namespace CSHTML5.Internal
 
             try
             {
-                if (INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging)
+                if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
                 {
                     Debug.WriteLine(javaScriptToExecute);
                 }

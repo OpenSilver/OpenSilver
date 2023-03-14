@@ -96,7 +96,7 @@ namespace CSHTML5
 #if BRIDGE
         [Bridge.Template("null")]
 #endif
-        internal static INTERNAL_JSObjectReference ExecuteJavaScript_SimulatorImplementation(string javascript, bool runAsynchronously, bool noImpactOnPendingJSCode = false, params object[] variables)
+        internal static INTERNAL_JSObjectReference ExecuteJavaScript_Implementation(string javascript, bool runAsynchronously, bool noImpactOnPendingJSCode = false, params object[] variables)
         {
             //---------------
             // Due to the fact that it is not possible to pass JavaScript objects between the simulator JavaScript context

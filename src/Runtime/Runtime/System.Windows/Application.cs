@@ -718,7 +718,7 @@ namespace Windows.UI.Xaml
         public static void RunApplication(Action entryPoint)
         {
             // (See the comments in the definition of the following method for more information on the purpose)
-            INTERNAL_SimulatorExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction
+            INTERNAL_ExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction
                 (
                 entryPoint
                 );

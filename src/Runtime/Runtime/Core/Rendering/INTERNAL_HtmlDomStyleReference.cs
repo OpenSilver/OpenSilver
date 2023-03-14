@@ -94,19 +94,19 @@ namespace CSHTML5.Internal
         void SetStylePropertyValue(string propertyName, string propertyValue)
         {
             string javaScriptCodeToExecute = $@"document.setDomStyle(""{Uid}"", ""{propertyName}"", ""{propertyValue}"")";
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
         void SetTransformPropertyValue(string propertyValue)
         {
             string javaScriptCodeToExecute = $@"document.setDomTransform(""{Uid}"", ""{propertyValue}"")";
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
         void SetTransformOriginPropertyValue(string propertyValue)
         {
             string javaScriptCodeToExecute = $@"document.setDomTransformOrigin(""{Uid}"", ""{propertyValue}"")";
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
         }
 
         //        string GetStylePropertyValue(string propertyName)

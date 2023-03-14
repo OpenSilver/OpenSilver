@@ -38,7 +38,7 @@ namespace OpenSilver
         /// <returns>The result, if any, of the JavaScript call.</returns>
         public static object ExecuteJavaScript(string javascript)
         {
-            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation(javascript, runAsynchronously: false);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace OpenSilver
         /// </summary> 
         internal static double ExecuteJavaScriptDouble(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
             if (IsRunningInTheSimulator)
             {
                 return new INTERNAL_JSObjectReference(value).ToDouble(null);
@@ -62,7 +62,7 @@ namespace OpenSilver
         /// </summary>
         internal static int ExecuteJavaScriptInt32(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
             if (IsRunningInTheSimulator)
             {
                 return new INTERNAL_JSObjectReference(value).ToInt32(null);
@@ -78,7 +78,7 @@ namespace OpenSilver
         /// </summary>
         internal static string ExecuteJavaScriptString(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
             if (IsRunningInTheSimulator)
             {
                 return new INTERNAL_JSObjectReference(value).ToString(null);
@@ -94,7 +94,7 @@ namespace OpenSilver
         /// </summary>
         internal static bool ExecuteJavaScriptBoolean(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
             if (IsRunningInTheSimulator)
             {
                 return new INTERNAL_JSObjectReference(value).ToBoolean(null);
@@ -110,7 +110,7 @@ namespace OpenSilver
         /// </summary>
         internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue = true)
         {
-            _ = INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
+            _ = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, null, !flushQueue);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace OpenSilver
         /// <returns>The result, if any, of the JavaScript call.</returns>
         public static object ExecuteJavaScript(string javascript, params object[] variables)
         {
-            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: false, variables: variables);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation(javascript, runAsynchronously: false, variables: variables);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace OpenSilver
         /// <param name="javascript">The JavaScript code to execute.</param>
         public static object ExecuteJavaScriptAsync(string javascript)
         {
-            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation(javascript, runAsynchronously: true);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace OpenSilver
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
         public static object ExecuteJavaScriptAsync(string javascript, params object[] variables)
         {
-            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_SimulatorImplementation(javascript, runAsynchronously: true, variables: variables);
+            return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation(javascript, runAsynchronously: true, variables: variables);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace OpenSilver
         /// </summary>
         internal static void ExecuteJavaScriptFastAsync(string javascript)
         {
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javascript);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javascript);
         }
 
         /// <summary>

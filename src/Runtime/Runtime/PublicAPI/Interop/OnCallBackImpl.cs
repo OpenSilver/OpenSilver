@@ -60,7 +60,7 @@ namespace CSHTML5.Internal
         // This code follows the architecture drawn by DotNetBrowser
         // (cf https://dotnetbrowser.support.teamdev.com/support/solutions/articles/9000109868-calling-javascript-from-net)
         // For an example of implementation, go to INTERNAL_InteropImplementation.cs and
-        // ExecuteJavaScript_SimulatorImplementation method, in the first "if".
+        // ExecuteJavaScript_Implementation method, in the first "if".
         //---------------------------------------------------------------------------------------
 
         public object OnCallbackFromJavaScript<T>(
@@ -75,7 +75,7 @@ namespace CSHTML5.Internal
 
             void InvokeCallback()
             {
-                INTERNAL_SimulatorExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(
+                INTERNAL_ExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(
                 () =>
                 {
                     //--------------------
