@@ -23,13 +23,16 @@ namespace CSHTML5.Internal
     internal interface IPendingJavascript
     {
         void AddJavaScript(string javascript);
+        
+        void Flush();
 
-        object ExecuteJavaScript(string javascript, bool flush);
+        object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult);
     }
 
     internal sealed class PendingJavascript : IPendingJavascript
     {
-        private const string CallJSMethodName = "callJSUnmarshalledHeap";
+        private const string CallJSMethodNameAsync = "callJSUnmarshalledHeap";
+        private const string CallJSMethodNameSync = "callJSUnmarshalled";
 
         private static readonly Encoding DefaultEncoding = Encoding.Unicode;
         private static readonly byte[] Delimiter = DefaultEncoding.GetBytes(";\n");
@@ -68,26 +71,25 @@ namespace CSHTML5.Internal
             }
         }
 
-        public object ExecuteJavaScript(string javascript, bool flush)
-        {
-            if (!flush)
-            {
-                return _webAssemblyExecutionHandler.ExecuteJavaScriptWithResult(javascript);
-            }
-
-            AddJavaScript(javascript);
-
+        public void Flush() {
             if (_currentLength == 0)
-            {
-                return null;
-            }
+                return;
 
             var curLength = _currentLength;
             _currentLength = 0;
+
             //Here we pass a reference to _buffer object and current length
             //Js will read data from the heap
-            return _webAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(
-                CallJSMethodName, _buffer, curLength);
+
+            // everything that was appended with AddJavascript, nothing to return
+            _webAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(CallJSMethodNameAsync, _buffer, curLength);
+        }
+
+        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult) {
+            // IMPORTANT: wantsResult is passed on to JS, so that it will know if it needs to pass anything back to us
+            // (optimization, when we don't care for the result)
+            var result = _webAssemblyExecutionHandler.InvokeUnmarshalled<string, int, bool, object>(CallJSMethodNameSync, javascript, referenceId, wantsResult);
+            return wantsResult ? result : null;
         }
 
         private void IncreaseBuffer()
@@ -116,26 +118,17 @@ namespace CSHTML5.Internal
             }
         }
 
-        public object ExecuteJavaScript(string javascript, bool flush)
-        {
-            if (flush)
-            {
-                string aggregatedPendingJavaScriptCode = ReadAndClearAggregatedPendingJavaScriptCode();
+        public void Flush() {
+            string javascript = ReadAndClearAggregatedPendingJavaScriptCode();
+            if (!string.IsNullOrWhiteSpace(javascript)) 
+                PerformActualInteropCall(javascript);
+        }
 
-                if (!string.IsNullOrWhiteSpace(aggregatedPendingJavaScriptCode))
-                {
-                    javascript = string.Join(Environment.NewLine, new List<string>
-                    {
-                        "// [START OF PENDING JAVASCRIPT]",
-                        aggregatedPendingJavaScriptCode,
-                        "// [END OF PENDING JAVASCRIPT]" + Environment.NewLine,
-                        javascript
-                    });
-                }
-            }
-
+        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult) {
+            // FIXME see how to perform this -- just wrap everything in callScriptSafe
             return PerformActualInteropCall(javascript);
         }
+
 
         private object PerformActualInteropCall(string javaScriptToExecute)
         {

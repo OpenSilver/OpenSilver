@@ -166,7 +166,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElement).UniqueIdentifier;
             string javaScriptCodeToExecute = $@"document.setContentString(""{ uniqueIdentifier}"",""{EscapeStringForUseInJavaScript(content)}"",{removeTextWrapping.ToString().ToLower()})";
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
 
             INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
         }
@@ -183,7 +183,7 @@ element.style.visibility=""collapse"";
 setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifier}""); if (element2) {{ element2.style.visibility=""visible""; }} }}, 0);
 }}";
 
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         public static string GetTextBoxText(object domElementRef)
@@ -275,7 +275,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (forceSimulatorExecuteImmediately)
                 ExecuteJavaScript(javaScriptCodeToExecute);
             else
-                INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         public static void SetDomElementAttribute(object domElementRef, string attributeName, object attributeValue)
@@ -318,7 +318,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (forceSimulatorExecuteImmediately)
                 ExecuteJavaScript(javaScriptCodeToExecute);
             else
-                INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         internal static void SetDomElementStylePropertyUsingVelocity(object domElement, List<string> cssPropertyNames, object cssValue)
@@ -350,7 +350,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (forceSimulatorExecuteImmediately)
                 ExecuteJavaScript(javaScriptCodeToExecute);
             else
-                INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         public static object GetDomElementAttribute(object domElementRef, string attributeName)
@@ -808,19 +808,21 @@ parentElement.appendChild(child);";
             }
         }
 
-        public static void ExecuteJavaScript(string javaScriptToExecute, string commentForDebugging = null)
+        private static void ExecuteJavaScript(string javaScriptToExecute, string commentForDebugging = null)
         {
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
                 javaScriptToExecute,
                 INTERNAL_ExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScript)" + (commentForDebugging != null ? commentForDebugging : "") : "" );
         }
 
-        public static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool noImpactOnPendingJSCode = false)
-        {
+        private static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool hasImpactOnPendingJSCode = true) {
+            // FIXME see if i want referenceid
+            var referenceId = 0;
+            var wantsResult = true;
             return INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(
-                javaScriptToExecute,
+                javaScriptToExecute, referenceId, wantsResult,
                 INTERNAL_ExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScriptWithResult)" + (commentForDebugging != null ? commentForDebugging : "") : "", 
-                noImpactOnPendingJSCode);
+                hasImpactOnPendingJSCode);
         }
 
         /// <summary>
@@ -935,7 +937,7 @@ parentElement.appendChild(child);";
 
             string javaScriptCodeToExecute = $@"document.setVisualBounds(""{style.Uid}"",{left},{top},{width},{height},{(bSetPositionAbsolute ? "1": "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         internal static void SetPosition(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
@@ -945,7 +947,7 @@ parentElement.appendChild(child);";
 
             string javaScriptCodeToExecute = $@"document.setPosition(""{style.Uid}"",{left},{top},{(bSetPositionAbsolute ? "1" : "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
     }
 }

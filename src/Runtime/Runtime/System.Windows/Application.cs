@@ -715,13 +715,9 @@ namespace Windows.UI.Xaml
         /// to ensure correction functioning of the application.
         /// </summary>
         /// <param name="entryPoint"></param>
-        public static void RunApplication(Action entryPoint)
-        {
-            // (See the comments in the definition of the following method for more information on the purpose)
-            INTERNAL_ExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction
-                (
-                entryPoint
-                );
+        public static void RunApplication(Action entryPoint) {
+            entryPoint();
+            INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
         }
 #endif
     }

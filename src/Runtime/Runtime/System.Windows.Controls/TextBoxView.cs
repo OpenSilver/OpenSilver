@@ -142,7 +142,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 //--- SIMULATOR ONLY: ---
                 // Set the "data-accepts-return" property (that we have invented) so that the "keydown" JavaScript event can retrieve this value:
-                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)_contentEditableDiv).UniqueIdentifier}"");
 element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower()}"");");
             }
@@ -201,7 +201,7 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
             {
                 //--- SIMULATOR ONLY: ---
                 // Set the "data-maxlength" property (that we have made up) so that the "keydown" JavaScript event can retrieve this value:
-                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)_contentEditableDiv).UniqueIdentifier}"");
 element.setAttribute(""data-maxlength"", ""{maxLength}"");");
             }
@@ -361,7 +361,7 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
 
             // Set the "data-accepts-return" property (that we have invented) so that the "KeyDown" and "Paste" JavaScript events can retrieve this value:
             // also set the "data-maxlength" and the "data-isreadonly" 
-            INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element = document.getElementByIdSafe(""{uid}"");
 element.setAttribute(""data-acceptsreturn"", ""{this.Host.AcceptsReturn.ToString().ToLower()}"");
 element.setAttribute(""data-maxlength"", ""{this.Host.MaxLength}"");
@@ -371,7 +371,7 @@ element.setAttribute(""data-acceptstab"", ""{this.Host.AcceptsTab.ToString().ToL
             if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
                 // Register the "keydown" javascript event:
-                INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
 element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
@@ -449,7 +449,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
             // The simulator uses Chrome, so we can set "ContentEditable" to plain-text only:
             // We still need to prevent prevent line breaks in the pasted text if "AcceptsReturn" is false:
-            INTERNAL_HtmlDomManager.ExecuteJavaScript($@"
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
 var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
 element_OutsideEventHandler.addEventListener('paste', function(e) {{
     var element_InsideEventHandler = document.getElementByIdSafe(""{uid}""); // For some reason we need to get again the reference to the element.

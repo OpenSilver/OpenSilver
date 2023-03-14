@@ -12,6 +12,9 @@
 \*====================================================================================*/
 
 using System;
+using System.Threading.Tasks;
+using System.Windows.Threading;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows;
@@ -26,8 +29,11 @@ namespace CSHTML5.Internal
         internal static IPendingJavascript JavaScriptRuntime { get; set; }
 
         internal static bool EnableInteropLogging;
-        static bool _isDispatcherPending = false;
-        static bool _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false; //todo: make sure this variable is thread-safe.
+        private static bool _isDispatcherPending = false;
+
+        private static readonly SynchronyzedStore<string> _javascriptCallsStore = new SynchronyzedStore<string>();
+
+        public static object ExecuteJavaScriptWithResult(string javascript, bool flush = true) => ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flush);
 
         /// <summary>
         /// Executes JavaScript code immediately. This also forces all the pending async JS code to be executed (flush).
@@ -36,14 +42,36 @@ namespace CSHTML5.Internal
         /// <param name="commentForDebugging">Some optional comments to write to the log of JS calls.</param>
         /// <param name="noImpactOnPendingJSCode">true to ignore pending javascript code from asynchronous interops</param>
         /// <returns></returns>
-        internal static object ExecuteJavaScriptSync(string javaScriptToExecute, string commentForDebugging = null, bool noImpactOnPendingJSCode = false)
+        public static object ExecuteJavaScriptSync(string javaScriptToExecute, int referenceId, bool wantsResult, string commentForDebugging = null, bool flush = true)
         {
-            if (!noImpactOnPendingJSCode && EnableInteropLogging)
-            {
+            if (flush && EnableInteropLogging)
                 AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
-            }
 
-            return JavaScriptRuntime.ExecuteJavaScript(javaScriptToExecute, !noImpactOnPendingJSCode);
+            if (flush)
+                JavaScriptRuntime.Flush();
+
+            return JavaScriptRuntime.ExecuteJavaScript(javaScriptToExecute, referenceId, wantsResult);
+        }
+
+
+        public static Task<object> ExecuteJavaScriptAsync(string javaScriptToExecute, int referenceId, bool wantsResult, string commentForDebugging = null, bool hasImpactOnPendingCode = false) {
+            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            Task.Run(() => {
+                var result = ExecuteJavaScriptSync(javaScriptToExecute, referenceId, wantsResult, commentForDebugging, hasImpactOnPendingCode);
+                tcs.SetResult(result);
+            });
+            return tcs.Task;
+        }
+
+        public static void QueueExecuteJavaScript(string javascript, int referenceId) {
+            // Change the JS code to call ShowErrorMessage in case of error:
+
+            // FIXME: uncomment after PR724 is approved
+            //string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
+            string errorCallBackId = referenceId.ToString();
+
+            javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
+            QueueExecuteJavaScript(javascript);
         }
 
         /// <summary>
@@ -51,141 +79,77 @@ namespace CSHTML5.Internal
         /// </summary>
         /// <param name="javaScriptToExecute">The JS code to execute.</param>
         /// <param name="commentForDebugging">Some optional comments to write to the log of JS calls.</param>
-        internal static void ExecuteJavaScriptAsync(string javaScriptToExecute, string commentForDebugging = null)
+        internal static void QueueExecuteJavaScript(string javaScriptToExecute, string commentForDebugging = null)
         {
             if (EnableInteropLogging)
                 AddCommentsForDebuggingIfAny(ref javaScriptToExecute, commentForDebugging);
 
-            if (!DisableAsyncJavaScriptExecution)
+            //--------------------------------------------------------
+            // Note: since we moved from the "Awesomium" control to the "DotNetBrowser" control
+            // for rending the HTML in the WPF-based Simulator, we have stopped using the
+            // "ExecuteJavaScriptAsync" method provided by the browser control, because it
+            // causes DotNetBrowser to freeze (cf. the email conversation with DotNetBrowser
+            // support in December 2017).
+            // Instead, what we do is that we postpone the execution of the JS code that does
+            // not return any value (we do that by calling the "Dispatcher.BeginInvoke" method),
+            // and aggregate them in order to reduce the number of interop JS calls from C#.
+            // This significantly improves performance.
+            //--------------------------------------------------------
+
+            JavaScriptRuntime.AddJavaScript(javaScriptToExecute);
+
+#if OPTIMIZATION_LOG
+            Console.WriteLine("[OPTIMIZATION] Direct execution of code. _isDispatcherPending: " + _isDispatcherPending.ToString());
+#endif
+            if (!_isDispatcherPending)
             {
-                //--------------------------------------------------------
-                // Note: since we moved from the "Awesomium" control to the "DotNetBrowser" control
-                // for rending the HTML in the WPF-based Simulator, we have stopped using the
-                // "ExecuteJavaScriptAsync" method provided by the browser control, because it
-                // causes DotNetBrowser to freeze (cf. the email conversation with DotNetBrowser
-                // support in December 2017).
-                // Instead, what we do is that we postpone the execution of the JS code that does
-                // not return any value (we do that by calling the "Dispatcher.BeginInvoke" method),
-                // and aggregate them in order to reduce the number of interop JS calls from C#.
-                // This significantly improves performance.
-                //--------------------------------------------------------
-
-                JavaScriptRuntime.AddJavaScript(javaScriptToExecute);
-
-                if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
-                {
-#if OPTIMIZATION_LOG
-                    Console.WriteLine("[OPTIMIZATION] Add to pending JS code (" + _pendingAsyncJavaScriptToExecute.Count.ToString() + ")");
-#endif
-                    //--------------------------------------------------------
-                    // Nothing else to do here: the pending JS code will get executed when the thread is free, thanks
-                    // to the fact that we always call "EnsurePendingAsyncJavaScriptGetFlushedAfterExecutingThisAction"
-                    // before execute any piece of C# code (ie. at all the entry points of C#, such as when the app
-                    // starts, and in the callbacks from JavaScript).
-                    //--------------------------------------------------------
-                }
-                else
-                {
-                    //--------------------------------------------------------
-                    // We may arrive here is there is an "async" method that is not awaited and for example that contains
-                    // "await Task.Delay(...)", which means that the code will resume without being "wrapped" inside a
-                    // call to "RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction". In this case we use
-                    // the setTimeout method to ensure that the Flush is always executed.
-                    //--------------------------------------------------------
+                _isDispatcherPending = true;
 
 #if OPTIMIZATION_LOG
-                    Console.WriteLine("[OPTIMIZATION] Direct execution of code. _isDispatcherPending: " + _isDispatcherPending.ToString());
+                Console.WriteLine("[OPTIMIZATION] Calling setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
 #endif
-                    if (!_isDispatcherPending)
-                    {
-                        _isDispatcherPending = true;
-
-#if OPTIMIZATION_LOG
-                        Console.WriteLine("[OPTIMIZATION] Calling setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
-#endif
-
-                        string action = INTERNAL_InteropImplementation.GetVariableStringForJS(
-                            JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(() =>
-                            {
-#if OPTIMIZATION_LOG
-                                Console.WriteLine("[OPTIMIZATION] Executing setTimeout. _isDispatcherPending: " + _isDispatcherPending.ToString());
-#endif
-                                if (_isDispatcherPending)
-                                {
-                                    ExecutePendingJavaScriptCode();
-                                }
-                            }));
-
-                        ExecuteJavaScriptSync($"setTimeout({action}, 1)", null, true);
-                    }
-                }
-            }
-            else
-            {
-                JavaScriptRuntime.ExecuteJavaScript(javaScriptToExecute, false);
-#if OPTIMIZATION_LOG
-                Console.WriteLine("[OPTIMIZATION] Direct call");
-#endif
+                INTERNAL_DispatcherHelpers.QueueAction(ExecutePendingJavaScriptCode);
             }
         }
 
-        static void ExecutePendingJavaScriptCode()
+        public static void ExecutePendingJavaScriptCode()
         {
             _isDispatcherPending = false;
-            JavaScriptRuntime.ExecuteJavaScript(null, true);
+            JavaScriptRuntime.Flush();
         }
 
-        static void AddCommentsForDebuggingIfAny(ref string javaScriptToExecute, string commentForDebugging)
+        private static void AddCommentsForDebuggingIfAny(ref string javaScriptToExecute, string commentForDebugging)
         {
             if (commentForDebugging != null)
                 javaScriptToExecute = string.Concat("//", commentForDebugging, Environment.NewLine, javaScriptToExecute);
         }
 
-        public static bool DisableAsyncJavaScriptExecution { get; set; }
-
-        /// <summary>
-        /// Makes sure that, after the provided action has been executed, all the
-        /// pending aysnc JavaScript calls that were made during that action will
-        /// get flushed (ie. they get executed).
-        /// The goal is to greatly improve performance by reducing the number of
-        /// C# &lt;-&gt; JS interop calls, by aggregating the async JS calls and
-        /// executing them all at once at the end of the current thread execution.
-        /// </summary>
-        /// <param name="action">The action to execute before flushing the pending JS code.</param>
-        public static void RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(Action action)
+        // FIXME update after PR724 is approved
+        internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
-            try
-            {
-                if (_isInsideMethodToRunAnActionAndThenExecuteItsPendingJS)
-                {
-                    //-----------------------------
-                    // This means that we have already planned an auto-flush, so we do
-                    // not need to plan it again: we just execute the provided "action".
-                    // This is usually the case when we are in a nested call, which
-                    // means that this method is being execute from within itself.
-                    //-----------------------------
-                    
-                    action();
-                }
-                else
-                {
-                    _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = true;
+            string str = _javascriptCallsStore.Get(indexOfCallInList);
 
-                    action();
-                    
-                    _isInsideMethodToRunAnActionAndThenExecuteItsPendingJS = false;
-
-#if OPTIMIZATION_LOG
-                    Console.WriteLine("[OPTIMIZATION] Auto-flush");
+#if OPENSILVER
+            if (INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround())
+#else
+            if (INTERNAL_InteropImplementation.IsRunningInTheSimulator())
 #endif
-                    // After the action has finished execution, let's flush all the pending JavaScript calls if any:
-                    ExecutePendingJavaScriptCode();
-                }
-            }
-            catch (Exception e)
             {
-                Application.Current.OnUnhandledException(e, false);
+                DotNetForHtml5.Core.INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, str);
+            }
+            else
+            {
+                string message = string.Format(@"Error in the following javascript code:
+
+{0}
+
+----- Error: -----
+
+{1}
+", str, errorMessage);
+                Console.WriteLine(message);
             }
         }
+
     }
 }

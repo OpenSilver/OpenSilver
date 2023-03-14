@@ -984,7 +984,7 @@ context.fill();
 context.restore();
 }}", javascript, ((INTERNAL_HtmlDomElementReference)canvasDomElement).UniqueIdentifier);
 
-            INTERNAL_HtmlDomManager.ExecuteJavaScript(str);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(str);
         }
 
         private static void addColorStops(object canvasGradient, IList<Tuple<double, Color>> gradients, double opacity)

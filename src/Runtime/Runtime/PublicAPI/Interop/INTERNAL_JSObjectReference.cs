@@ -79,7 +79,7 @@ namespace CSHTML5.Types
         ~INTERNAL_JSObjectReference()
         {
             // Removing itself from JS dict used for C# to JS Interops, otherwise dict keeps growing. Needs more testing
-            INTERNAL_HtmlDomManager.ExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
         }
 
         public object GetActualValue()

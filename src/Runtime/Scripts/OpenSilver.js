@@ -112,9 +112,16 @@ window.callJS = function (javaScriptToExecute) {
     }
 };
 
-window.callJSUnmarshalled = function (javaScriptToExecute) {
+window.callJSUnmarshalled = function (javaScriptToExecute, referenceId, wantsResult) {
     javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
     var result = eval(javaScriptToExecute);
+
+    if (referenceId >= 0)
+        document.jsObjRef[referenceId.toString()] = result;
+
+    if (!wantsResult) 
+        return;
+
     var resultType = typeof result;
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
         return BINDING.js_to_mono_obj(result);
@@ -127,69 +134,12 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
 };
 
 
-/* normally, this function should have 4 args:
+// IMPORTANT: this doesn't return anything (this just executes the pending async JS)
 window.callJSUnmarshalledHeap = (function () {
     const textDecoder = new TextDecoder('utf-16le');
-    return function (arrAddress, length, referenceId, wantsResult) {
+    return function (arrAddress, length) {
         const byteArray = Module.HEAPU8.subarray(arrAddress + 16, arrAddress + 16 + length);
         const javaScriptToExecute = textDecoder.decode(byteArray);
-        const result = eval(javaScriptToExecute);
-        if (referenceId >= 0)
-            document.jsObjRef[referenceId] = result;
-
-        if (!wantsResult) 
-            return;
-        
-        const resultType = typeof result;
-        if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-            return BINDING.js_to_mono_obj(result);
-        } else if (result == null) {
-            return null;
-        } else {
-            return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
-        }
-    };
-})();
-
-however, due to C#-to-JS InvokeUnmarshalled constraints, I can only have 3 args max.
-So I turned referenceId into 2 arguments:
-1. if referenceId = 0 -> don't hold the result in jsObjRef and wantsResult=false
-2. if referenceId = 1 -> don't hold the result in jsObjRef and wantsResult=true
-3. if referenceId > 1 -> hold it in jsObjRef + wantsResult=true
-4. If referenceId < -1 -> negate the value and holde it in jsObjRef + wantsResult=true
-*/
-window.callJSUnmarshalledHeap = (function () {
-    const textDecoder = new TextDecoder('utf-16le');
-    return function (arrAddress, length, referenceId) {
-        const byteArray = Module.HEAPU8.subarray(arrAddress + 16, arrAddress + 16 + length);
-        const javaScriptToExecute = textDecoder.decode(byteArray);
-        const result = eval(javaScriptToExecute);
-
-        let wantsResult = false;
-        if (referenceId == 0)
-            wantsResult = false;
-        else if (referenceId == 1)
-            wantsResult = true;
-        else if (referenceId > 1)
-            wantsResult = true;
-        else {
-            referenceId = -referenceId;
-            wantsResult = false;
-        }
-        
-        if (referenceId > 1)
-            document.jsObjRef[referenceId.toString()] = result;
-
-        if (!wantsResult) 
-            return;
-        
-        const resultType = typeof result;
-        if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-            return BINDING.js_to_mono_obj(result);
-        } else if (result == null) {
-            return null;
-        } else {
-            return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
-        }
+        eval(javaScriptToExecute);
     };
 })();

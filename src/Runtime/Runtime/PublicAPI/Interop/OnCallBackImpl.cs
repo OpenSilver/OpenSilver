@@ -42,7 +42,7 @@ namespace CSHTML5.Internal
             {
                 string errorMessage = OpenSilver.Interop.ExecuteJavaScriptString($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][0]");
                 int indexOfNextUnmodifiedJSCallInList = OpenSilver.Interop.ExecuteJavaScriptInt32($"document.jsObjRef['{idWhereCallbackArgsAreStored}'][1]");
-                INTERNAL_InteropImplementation.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
+                INTERNAL_ExecuteJavaScript.ShowErrorMessage(errorMessage, indexOfNextUnmodifiedJSCallInList);
             };
 
             if (OpenSilver.Interop.IsRunningInTheSimulator)
@@ -75,26 +75,24 @@ namespace CSHTML5.Internal
 
             void InvokeCallback()
             {
-                INTERNAL_ExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction(
-                () =>
+                //--------------------
+                // Call the callback:
+                //--------------------
+                try
                 {
-                    //--------------------
-                    // Call the callback:
-                    //--------------------
-                    try
-                    {
-                        result = CallMethod(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
-                        actionExecuted = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                        //#if DEBUG
-                        //                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                        //#endif
-                        //                            throw;
-                    }
-                });
+                    result = CallMethod(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
+                    actionExecuted = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                    //#if DEBUG
+                    //                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                    //#endif
+                    //                            throw;
+                }
+
+                INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
             }
 
             if (isInSimulator)
