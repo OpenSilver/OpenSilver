@@ -135,7 +135,7 @@ if (requestMethod) {
         /// </summary>
         private void FullScreenChangedCallback()
         {
-            FullScreenChanged?.Invoke(this, EventArgs.Empty);
+            FullScreenChanged?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ if (requestMethod) {
         /// </summary>
         private void WindowResizeCallback()
         {
-            Resized?.Invoke(this, EventArgs.Empty);
+            Resized?.Invoke(Application.Current?.RootVisual, EventArgs.Empty);
         }
 
         /// <summary>
