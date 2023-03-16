@@ -20,6 +20,8 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
@@ -1312,16 +1314,17 @@ namespace Windows.UI.Xaml.Controls
                 this.Overlay.Opacity = this.OverlayOpacity;
                 this.Overlay.Background = this.OverlayBrush;
             }
+            this.Focus();
 
-#if SILVERLIGHT
             if (!this.Focus())
             {
+#if SILVERLIGHT
                 // If the Focus() fails it means there is no focusable element in the 
                 // ChildWindow. In this case we set IsTabStop to true to have the keyboard functionality
                 this.IsTabStop = true;
                 this.Focus();
-            }
 #endif
+            }
         }
 
 #if SILVERLIGHT
@@ -1343,12 +1346,12 @@ namespace Windows.UI.Xaml.Controls
         }
 #endif
 
-        /// <summary>
-        /// Executed when the page resizes.
-        /// </summary>
-        /// <param name="sender">Sender object.</param>
-        /// <param name="e">Event args.</param>
-        private void Page_Resized(object sender, WindowSizeChangedEventArgs e)
+            /// <summary>
+            /// Executed when the page resizes.
+            /// </summary>
+            /// <param name="sender">Sender object.</param>
+            /// <param name="e">Event args.</param>
+            private void Page_Resized(object sender, WindowSizeChangedEventArgs e)
         {
             if (this.ChildWindowPopup != null)
             {
@@ -1740,6 +1743,35 @@ namespace Windows.UI.Xaml.Controls
                 this._contentRootTransform.Y += Y;
             }
 #endif
+        }
+/// <inheritdoc/>
+
+        public override bool Focus()
+        {
+            var controlsWithinWindow = GetControlsWithinXamlElement(this);
+            var firstFocusableItem = controlsWithinWindow
+                .Where(x => x.TabIndex < int.MaxValue)
+                .OrderBy(x => x.TabIndex)
+                .FirstOrDefault();
+            return firstFocusableItem?.Focus() == true;
+        }
+
+        private List<Control> GetControlsWithinXamlElement(DependencyObject obj)
+        {            
+            var children = obj?.GetVisualChildren();
+            if(children == null) return new List<Control>();
+
+            var result = new List<Control>();
+            result.AddRange(FilterControlsOnly(children));
+
+            children.ForEach(x => result.AddRange(GetControlsWithinXamlElement(x)));
+
+            return result;
+        }
+
+        private List<Control> FilterControlsOnly(IEnumerable<DependencyObject> elements)
+        {
+            return elements.Select(x => x as Control).Where(x => x != null).ToList();
         }
 
         #endregion Methods

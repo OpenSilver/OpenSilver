@@ -549,7 +549,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(TabIndex), 
                 typeof(int), 
                 typeof(Control), 
-                new PropertyMetadata(int.MaxValue)
+                new PropertyMetadata(int.MaxValue, new PropertyChangedCallback(OnTabIndexChanged))
                 {
                     MethodToUpdateDom = static (d, newValue) =>
                     {
@@ -557,6 +557,14 @@ namespace Windows.UI.Xaml.Controls
                         control.UpdateTabIndex(control.IsTabStop, (int)newValue);
                     },
                 });
+
+        private static void OnTabIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (Control)d;
+            control.TabIndex = (int)e.NewValue;
+            var z = e.NewValue;
+            //throw new NotImplementedException();
+        }
 
         private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
@@ -719,7 +727,7 @@ namespace Windows.UI.Xaml.Controls
         /// true if focus was set to the control, or focus was already on the control.
         /// false if the control is not focusable.
         /// </returns>
-        public bool Focus()
+        public virtual bool Focus()
         {
             if (!Keyboard.IsSubTreeFocusable(this))
             {

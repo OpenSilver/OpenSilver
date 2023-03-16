@@ -13,9 +13,9 @@
         </Grid.RowDefinitions>
         <StackPanel>
             <TextBlock Text="Name" />
-            <TextBox x:Name="nameBox"/>
+            <TextBox x:Name="nameBox" TabIndex="1"/>
             <TextBlock Text="Password" />
-            <PasswordBox x:Name="passwordBox"/>
+            <PasswordBox x:Name="passwordBox" TabIndex="0"/>
         </StackPanel>
 
         <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" />
