@@ -549,7 +549,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(TabIndex), 
                 typeof(int), 
                 typeof(Control), 
-                new PropertyMetadata(int.MaxValue, new PropertyChangedCallback(OnTabIndexChanged))
+                new PropertyMetadata(int.MaxValue)
                 {
                     MethodToUpdateDom = static (d, newValue) =>
                     {
@@ -557,14 +557,6 @@ namespace Windows.UI.Xaml.Controls
                         control.UpdateTabIndex(control.IsTabStop, (int)newValue);
                     },
                 });
-
-        private static void OnTabIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = (Control)d;
-            control.TabIndex = (int)e.NewValue;
-            var z = e.NewValue;
-            //throw new NotImplementedException();
-        }
 
         private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
