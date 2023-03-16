@@ -115,13 +115,18 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
                 _removed.Clear();
                 _added.Clear();
             }
-            StringBuilder diffs = new StringBuilder("****** [");
+            var trueRefCount = global::OpenSilver.Interop.ExecuteJavaScript("Object.keys(document.jsObjRef).length");
+            var trueRefCountAsInt = Convert.ToInt32(trueRefCount);
+            trueRefCount.Dispose();
+
+            StringBuilder diffs = new StringBuilder("[");
             foreach (var r in removed)
                 diffs.Append($"-{r}, ");
             foreach (var a in added)
                 diffs.Append($"+{a.JsObject.ReferenceId}, ");
             diffs.Append("]");
-            Console.WriteLine($"****** Javascript references: {count}\r\n{diffs}");
+            var countStr = count != trueRefCountAsInt ? $"${count} (true={trueRefCount})" : $"{count}";
+            Console.WriteLine($"****** Javascript references: {countStr} {diffs}");
             foreach (var info in added) {
                 var str = (global::OpenSilver.Interop.DumpAllJavascriptObjectsVerbose ? info.Details() : info.Summary());
                 Console.WriteLine(str);

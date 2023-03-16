@@ -92,6 +92,25 @@ namespace CSHTML5
             }
         }
 
+        internal static string ReplaceJSArgs(string javascript, params object[] variables) {
+            // Make sure the JS to C# interop is set up:
+            EnsureInitialized();
+
+            // If the javascript code has references to previously obtained JavaScript objects,
+            // we replace those references with calls to the "document.jsObjRef"
+            // dictionary.
+            // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we
+            // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
+            // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
+            // 10 arguments and using "$10".
+            for (int i = variables.Length - 1; i >= 0; i--)
+            {
+                javascript = javascript.Replace($"${i}", GetVariableStringForJS(variables[i]));
+            }
+
+            return javascript;
+        }
+
         internal static object ExecuteJavaScript_Implementation(string javascript, 
                                                                                     bool runAsynchronously, 
                                                                                     bool wantsResult = true, 
@@ -109,21 +128,7 @@ namespace CSHTML5
             // aforementioned dictionary.
             //---------------
 
-
-            // Make sure the JS to C# interop is set up:
-            EnsureInitialized();
-
-            // If the javascript code has references to previously obtained JavaScript objects,
-            // we replace those references with calls to the "document.jsObjRef"
-            // dictionary.
-            // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we
-            // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
-            // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
-            // 10 arguments and using "$10".
-            for (int i = variables.Length - 1; i >= 0; i--)
-            {
-                javascript = javascript.Replace($"${i}", GetVariableStringForJS(variables[i]));
-            }
+            javascript = ReplaceJSArgs(javascript, variables);
 
             object result = null;
 
