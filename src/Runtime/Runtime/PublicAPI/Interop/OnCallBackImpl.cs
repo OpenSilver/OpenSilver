@@ -14,6 +14,8 @@
 using DotNetForHtml5.Core;
 using CSHTML5.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 #if BRIDGE
 using Bridge;
@@ -152,10 +154,8 @@ namespace CSHTML5.Internal
                 return null;
             }
 
-            if (TryOptimizationForCommonTypes(callback, out object result))
-            {
-                return result;
-            }
+            if (TryOptimizationForCommonTypes(callback, out object simpleResult))
+                return simpleResult;
 
             Type callbackType = callback.GetType();
             Type[] callbackGenericArgs = null;
@@ -165,54 +165,44 @@ namespace CSHTML5.Internal
                 callbackType = callbackType.GetGenericTypeDefinition();
             }
 
-            if (callbackType == typeof(Func<>))
-            {
-                return DelegateDynamicInvoke(callback);
+            object[] arguments = null;
+            IReadOnlyList<object> extraJsObjects = null;
+            try {
+                if (callbackType == typeof(Func<>))
+                {
+                    return DelegateDynamicInvoke(callback);
+                }
+
+                int argumentCount = 0;
+                if (callbackType == typeof(Action<>) || callbackType == typeof(Func<,>)) 
+                    argumentCount = 1;
+                else if (callbackType == typeof(Action<,>) || callbackType == typeof(Func<,,>))
+                    argumentCount = 2;
+                else if (callbackType == typeof(Action<,,>) || callbackType == typeof(Func<,,,>))
+                    argumentCount = 3;
+                else if (callbackType == typeof(Action<,,,>) || callbackType == typeof(Func<,,,,>)) 
+                    argumentCount = 4;
+                else if (callbackType == typeof(Action<,,,,>) || callbackType == typeof(Func<,,,,,>))
+                    argumentCount = 5;
+                else if (callbackType == typeof(Action<,,,,,>) || callbackType == typeof(Func<,,,,,,>))
+                    argumentCount = 6;
+                else if (callbackType == typeof(Action<,,,,,,>) || callbackType == typeof(Func<,,,,,,,>))
+                    argumentCount = 7;
+                else if (callbackType == typeof(Action<,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,>))
+                    argumentCount = 8;
+                else if (callbackType == typeof(Action<,,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,,>))
+                    argumentCount = 9;
+
+                (arguments, extraJsObjects) = MakeArgumentsForCallback(argumentCount, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs);
+                return DelegateDynamicInvoke(callback, arguments);
             }
-            if (callbackType == typeof(Action<>) || callbackType == typeof(Func<,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(1, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,>) || callbackType == typeof(Func<,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(2, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,,>) || callbackType == typeof(Func<,,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(3, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,,,>) || callbackType == typeof(Func<,,,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(4, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,,,,>) || callbackType == typeof(Func<,,,,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(5, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,,,,,>) || callbackType == typeof(Func<,,,,,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(6, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,,,,,,>) || callbackType == typeof(Func<,,,,,,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(7, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(8, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
-            }
-            if (callbackType == typeof(Action<,,,,,,,,>) || callbackType == typeof(Func<,,,,,,,,,>))
-            {
-                return DelegateDynamicInvoke(callback,
-                    MakeArgumentsForCallback(9, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs));
+            finally {
+                if (arguments != null)
+                    foreach (var arg in arguments.OfType<IDisposable>())
+                        arg.Dispose();
+                if (extraJsObjects != null)
+                    foreach (var arg in extraJsObjects.OfType<IDisposable>())
+                        arg.Dispose();
             }
 
             throw new Exception(string.Format(
@@ -231,43 +221,39 @@ namespace CSHTML5.Internal
                 "If a callback returns a value(for example, a Func), verify that this callback is not invoked from the C# code in the UI thread.");
         }
 
-        private static object[] MakeArgumentsForCallback(
+        private static (object[], IReadOnlyList<object>) MakeArgumentsForCallback(
             int count,
             string idWhereCallbackArgsAreStored,
             object callbackArgs,
             Type[] callbackGenericArgs)
         {
             var result = new object[count];
+            List<object> extraJsObjects = null;
 
-            INTERNAL_JSObjectReference arg = null;
             for (int i = 0; i < count; i++)
             {
-                if (arg is null)
-                {
-                    arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i);
-                }
-                else
-                {
-                    arg.ArrayIndex = i;
-                }
+                var arg = new INTERNAL_JSObjectReference(callbackArgs, idWhereCallbackArgsAreStored, i, $"callback {idWhereCallbackArgsAreStored}");
 
                 if (callbackGenericArgs != null
                     && i < callbackGenericArgs.Length
                     && callbackGenericArgs[i] != typeof(object)
-                    && (
-                    callbackGenericArgs[i].IsPrimitive
-                    || callbackGenericArgs[i] == typeof(string)))
+                    && (callbackGenericArgs[i].IsPrimitive || callbackGenericArgs[i] == typeof(string)))
                 {
-                    // Attempt to cast from JS object to the desired primitive or string type. This is useful for example when passing an Action<string> to an Interop.ExecuteJavaScript so as to not get an exception that says that it cannot cast the JS object into string (when running in the Simulator only):
+                    // Attempt to cast from JS object to the desired primitive or string type. This is useful for example
+                    // when passing an Action<string> to an Interop.ExecuteJavaScript so as to not get an exception that says
+                    // that it cannot cast the JS object into string (when running in the Simulator only):
                     result[i] = Convert.ChangeType(arg, callbackGenericArgs[i]);
+                    // this may leak the JSobjectReference?
+                    if (extraJsObjects == null)
+                        extraJsObjects = new List<object>();
+                    extraJsObjects.Add(arg);
                 }
                 else
                 {
                     result[i] = arg;
-                    arg = null;
                 }
             }
-            return result;
+            return (result, extraJsObjects);
         }
 
         //private static object MakeArgumentForCallbackAtIndex(

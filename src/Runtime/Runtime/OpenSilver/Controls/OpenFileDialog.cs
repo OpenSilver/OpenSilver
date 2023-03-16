@@ -78,7 +78,7 @@ namespace OpenSilver.Controls
             };
 
             // Listen to the "change" property of the "input" element, and call the callback:
-            Interop.ExecuteJavaScript(@"
+            Interop.ExecuteJavaScriptVoid(@"
                 $0.addEventListener(""change"", function(e) {
                     var isRunningInTheSimulator = $2;
                     if (isRunningInTheSimulator) {
@@ -118,7 +118,7 @@ namespace OpenSilver.Controls
                         reader.readAsDataURL(file);
                     }
                     readNext(0);
-                });", _inputElement, onFileChanged, Interop.IsRunningInTheSimulator,
+                });", flushQueue:false, _inputElement, onFileChanged, Interop.IsRunningInTheSimulator,
                     _windowFocusCallback, onFinishedReading);
         }
 
@@ -150,11 +150,11 @@ namespace OpenSilver.Controls
             // Apply the filter:
             if (!string.IsNullOrWhiteSpace(filtersInHtml5))
             {
-                Interop.ExecuteJavaScript(@"$0.accept = $1", _inputElement, filtersInHtml5);
+                Interop.ExecuteJavaScriptVoid(@"$0.accept = $1", flushQueue:false, _inputElement, filtersInHtml5);
             }
             else
             {
-                Interop.ExecuteJavaScript(@"$0.accept = """"", _inputElement);
+                Interop.ExecuteJavaScriptVoid(@"$0.accept = """"", flushQueue:false, _inputElement);
             }
         }
 
@@ -176,7 +176,7 @@ namespace OpenSilver.Controls
 
                 if (_multiselect)
                 {
-                    Interop.ExecuteJavaScript(@"$0.multiple = 'multiple';", _inputElement);
+                    Interop.ExecuteJavaScriptVoid(@"$0.multiple = 'multiple';", flushQueue:false, _inputElement);
                 }
             }
         }
@@ -256,9 +256,9 @@ namespace OpenSilver.Controls
             AddFileChangeCallback(showDialogTaskCompletionSource);
 
             // Triggers 'click' on <input>, even though it is not on the DOM
-            Interop.ExecuteJavaScript(@"
+            Interop.ExecuteJavaScriptVoid(@"
                 window.isOpenFileDialogOpen = true;
-                $0.dispatchEvent(new MouseEvent(""click""));", _inputElement);
+                $0.dispatchEvent(new MouseEvent(""click""));", flushQueue:false, _inputElement);
 
             return showDialogTaskCompletionSource.Task;
         }

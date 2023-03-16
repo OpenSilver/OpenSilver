@@ -143,7 +143,7 @@ namespace CSHTML5
 
             if (wantsResult) {
                 if (wantsReferenceId)
-                    result = new INTERNAL_JSObjectReference(result, referenceId.ToString());
+                    result = new INTERNAL_JSObjectReference(result, referenceId.ToString(), javascript);
                 else if (runAsynchronously)
                     throw new Exception("runAsync + wantsResult + !wantsReferenceId -> use INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync");
             } else

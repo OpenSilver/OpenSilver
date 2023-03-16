@@ -816,7 +816,6 @@ parentElement.appendChild(child);";
         }
 
         private static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool hasImpactOnPendingJSCode = true) {
-            // FIXME see if i want referenceid
             var referenceId = 0;
             var wantsResult = true;
             return INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(
@@ -832,7 +831,7 @@ parentElement.appendChild(child);";
         /// in the visual tree composition at the specified point.</returns>
         public static UIElement FindElementInHostCoordinates_UsedBySimulatorToo(double x, double y) // IMPORTANT: If you rename this method or change its signature, make sure to rename its dynamic call in the Simulator.
         {
-            object domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
+            using(var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
 (function(){{
     var domElementAtCoordinates = document.elementFromPoint({x.ToInvariantString()}, {y.ToInvariantString()});
     if (!domElementAtCoordinates || domElementAtCoordinates === document.documentElement)
@@ -843,11 +842,9 @@ parentElement.appendChild(child);";
     {{
         return domElementAtCoordinates;
     }}
-}}())");
+}}())"))
+                return GetUIElementFromDomElement(domElementAtCoordinates);
 
-            UIElement result = GetUIElementFromDomElement(domElementAtCoordinates);
-
-            return result;
         }
 
         internal static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
@@ -898,23 +895,23 @@ parentElement.appendChild(child);";
 
                 // In the Simulator, we get the CSharp object associated to a DOM element by searching for the DOM element ID in the "INTERNAL_idsToUIElements" dictionary.
 
-                object jsId = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.id");
-                if (!IsNullOrUndefined(jsId))
-                {
-                    string id = Convert.ToString(jsId);
-                    if (_store.TryGetValue(id, out var elemWeakRef))
+                using(var jsId = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.id"))
+                    if (!IsNullOrUndefined(jsId))
                     {
-                        if (elemWeakRef.TryGetTarget(out var uie))
+                        string id = Convert.ToString(jsId);
+                        if (_store.TryGetValue(id, out var elemWeakRef))
                         {
-                            result = uie;
+                            if (elemWeakRef.TryGetTarget(out var uie))
+                            {
+                                result = uie;
+                            }
+                            else
+                            {
+                                _store.Remove(id);
+                            }
+                            break;
                         }
-                        else
-                        {
-                            _store.Remove(id);
-                        }
-                        break;
                     }
-                }
 
                 // Move to the parent:
                 domElementRef = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.parentNode");

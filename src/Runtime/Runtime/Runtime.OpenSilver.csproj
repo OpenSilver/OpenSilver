@@ -112,6 +112,8 @@
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
 		<Compile Include="OpenSilver\Internal\IJavaScriptConvertible.cs" />
+		<Compile Include="PublicAPI\Interop\INTERNAL_JsObjectReferenceHolder.cs" />
+		<Compile Include="PublicAPI\Interop\INTERNAL_StackTrace.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
 		<Compile Include="PublicAPI\Interop\JavascriptCallback.cs" />
 		<Compile Include="PublicAPI\Interop\JavaScriptCallbackHelper.cs" />

@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+
+namespace Runtime.OpenSilver.PublicAPI.Interop
+{
+        [DebuggerDisplay("{FunctionName} {FileName}:{Line}")]
+        public class FunctionDetails {
+            public string FunctionName = "???";
+            public string FileName = "";
+            public string FolderName = "";
+            public int Line;
+
+            public string FriendlyStr() {
+                var friendly = FunctionName;
+                if (FileName != "")
+                    friendly += $"{FileName}:{Line}   ({FolderName})";
+                return friendly;
+            }
+        }
+
+        internal class StackTraceProvider {
+            private static FunctionDetails StackFunctionDetails(string line) {
+                var fd = new FunctionDetails();
+                var endOfFunctionIdx = line.IndexOf("(");
+                var atIdx = line.IndexOf(" at ");
+                if (endOfFunctionIdx < 0 || atIdx < 0)
+                    return fd;
+
+                atIdx += 4;
+                fd.FunctionName = line.Substring(atIdx, endOfFunctionIdx - atIdx);
+
+                var inIdx = line.IndexOf(" in ");
+                if (inIdx < 0)
+                    return fd;
+
+                inIdx += 4;
+                // ... + 2, ignore the drive's ":" char
+                var endOfFileIdx = line.IndexOf(":", inIdx + 2);
+                var fullFileName = line.Substring(inIdx, endOfFileIdx - inIdx);
+
+                var idxOfLine = line.IndexOf("line ", endOfFileIdx);
+                if (idxOfLine > 0) {
+                    idxOfLine += 5;
+                    if (int.TryParse(line.Substring(idxOfLine), out var idx))
+                        fd.Line = idx;
+                }
+
+                var lastDelimiterIdx = fullFileName.LastIndexOf("\\");
+                if (lastDelimiterIdx >= 0) {
+                    fd.FileName = fullFileName.Substring(lastDelimiterIdx + 1);
+                    fd.FolderName = fullFileName.Substring(0, lastDelimiterIdx);
+                } else
+                    fd.FileName = fullFileName;
+
+                return fd;
+            }
+
+            public static IReadOnlyList<FunctionDetails> StackTrace() {
+                var stack = Environment.StackTrace;
+                // line 0: - the Environment.Stacktrace call
+                // line 1: - this function
+                return stack.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Skip(2).Select(StackFunctionDetails).ToList();
+            }
+
+        }
+}

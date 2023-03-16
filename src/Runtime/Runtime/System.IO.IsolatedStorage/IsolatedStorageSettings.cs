@@ -300,7 +300,7 @@ if(window.IE_VERSION && document.location.protocol === ""file:"") {
                 {
                     dynamic localStorage = GetLocalStorage();
                     string applicationSpecificKey = GetKeysFirstPart() + key;
-                    Interop.ExecuteJavaScript("$0[$1] = $2", localStorage, applicationSpecificKey, value);
+                    Interop.ExecuteJavaScriptVoid("$0[$1] = $2", false,  localStorage, applicationSpecificKey, value);
                 }
                 else
                 {
@@ -421,18 +421,17 @@ return res;
             if (!Interop.IsRunningInTheSimulator)
             {
                 dynamic localStorage = GetLocalStorage();
-                var temp = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key);
-                
-                if (Convert.ToBoolean(Interop.ExecuteJavaScript("$0 == null",temp)))
-                {
-                    value = default(T);
-                    return false;
-                }
-                else
-                {
-                    value = Convert.ChangeType(temp, typeof(T));
-                    return true;
-                }
+                using(var temp = Interop.ExecuteJavaScript("$0.getItem($1)", localStorage, GetKeysFirstPart() + key))
+                    if (Convert.ToBoolean(Interop.ExecuteJavaScript("$0 == null",temp)))
+                    {
+                        value = default(T);
+                        return false;
+                    }
+                    else
+                    {
+                        value = Convert.ChangeType(temp, typeof(T));
+                        return true;
+                    }
             }
             else
             {

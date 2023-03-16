@@ -93,8 +93,8 @@ imageView.onload = function() {
   }
 }";
 
-                    OpenSilver.Interop.ExecuteJavaScript(
-                        javascript,
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(
+                        javascript, flushQueue:false, 
                         data,
                         _imageRenderedCallback);
                 });
@@ -165,8 +165,8 @@ element.style.transform = currentTransform;
                     data.Transform = $"matrix({m.M11}, {m.M12}, {m.M21}, {m.M22}, {m.OffsetX}, {m.OffsetY})";
                 }
 
-                OpenSilver.Interop.ExecuteJavaScript(
-                   javascript,
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                   javascript, flushQueue:false, 
                    JsonSerializer.Serialize(data),
                    _imageRenderedCallback);
 
