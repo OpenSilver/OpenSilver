@@ -12,45 +12,92 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
-    internal sealed class JavascriptCallback : IJavaScriptConvertible, IDisposable
-    {
-        private static readonly SynchronyzedStore<JavascriptCallback> _store = new SynchronyzedStore<JavascriptCallback>();
+    internal sealed class JavascriptCallback : IJavaScriptConvertible, IDisposable {
+        private static object _lock = new object();
+        private static readonly Dictionary<Delegate, JavascriptCallback> _store = new Dictionary<Delegate, JavascriptCallback>();
+        private static readonly Dictionary<int, JavascriptCallback> _idToCallback = new Dictionary<int, JavascriptCallback>(); 
 
+        private static int _nextId = 0;
+        private bool _isVoid;
         public int Id { get; private set; }
 
         public Delegate Callback { get; private set; }
 
         public WeakReference<Delegate> CallbackWeakReference { get; private set; }
 
+        static JavascriptCallback() {
+        }
+
+        public static void Remove(Delegate d) {
+            lock (_lock) {
+                if (_store.TryGetValue(d, out var cb)) {
+                    _idToCallback.Remove(cb.Id);
+                    _store.Remove(d);
+                }
+            }
+        }
+        public static void Remove(int id) {
+            lock (_lock) {
+                if (_idToCallback.TryGetValue(id, out var cb)) {
+                    _store.Remove(cb.GetCallback());
+                    _idToCallback.Remove(id);
+                }
+            }
+        }
+
         public static JavascriptCallback Create(Delegate callback)
         {
-            var jc = new JavascriptCallback
-            {
-                Callback = callback
-            };
-            jc.Id = _store.Add(jc);
+            bool isVoid = callback.Method.ReturnType == typeof(void);
+            lock (_lock) {
+                if (_store.TryGetValue(callback, out var existingJc))
+                    return existingJc;
 
-            return jc;
+                var id = ++_nextId;
+                var jc = new JavascriptCallback
+                {
+                    Callback = callback,
+                    _isVoid = isVoid,
+                    Id = id,
+                };
+                _store.Add(callback, jc);
+                _idToCallback.Add(id, jc);
+                return jc;
+            }
         }
 
         public static JavascriptCallback CreateWeak(Delegate callback)
         {
-            var jc = new JavascriptCallback
-            {
-                CallbackWeakReference = new WeakReference<Delegate>(callback)
-            };
-            jc.Id = _store.Add(jc);
+            bool isVoid = callback.Method.ReturnType == typeof(void);
+            lock (_lock) {
+                if (_store.TryGetValue(callback, out var existingJc))
+                    return existingJc;
 
-            return jc;
+                var id = ++_nextId;
+                var jc = new JavascriptCallback
+                {
+                    CallbackWeakReference = new WeakReference<Delegate>(callback), 
+                    _isVoid = isVoid,
+                    Id = id,
+                };
+                _store.Add(callback, jc);
+                _idToCallback.Add(id, jc);
+                return jc;
+            }
         }
 
         public static JavascriptCallback Get(int index)
         {
-            return _store.Get(index);
+            lock (_lock) {
+                if (_idToCallback.TryGetValue(index, out var cb))
+                    return cb;
+            }
+            return null;
         }
 
         public Delegate GetCallback()
@@ -65,20 +112,15 @@ namespace CSHTML5.Internal
                 return callback;
             }
 
-            _store.Clean(Id);
-
             return null;
         }
 
         public void Dispose()
         {
-            _store.Clean(Id);
+            Remove(Id);
         }
 
-        string IJavaScriptConvertible.ToJavaScriptString()
-        {
-            bool isVoid = GetCallback().Method.ReturnType == typeof(void);
-            return $"document.getCallbackFunc({Id}, {(!isVoid).ToString().ToLower()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
-        }
+        private string _jsCache;
+        public string ToJavaScriptString() => _jsCache ??= $"document.getCallbackFunc({Id}, {(!_isVoid).ToString().ToLower()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
     }
 }

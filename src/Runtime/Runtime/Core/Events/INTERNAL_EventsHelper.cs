@@ -94,6 +94,8 @@ namespace CSHTML5.Internal
             else
                 Interop.ExecuteJavaScriptFastAsync($@"document.removeEventListenerSafe({INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef)}, ""{eventName}"", {sAction})");
 
+            JavascriptCallback.Remove(proxy.Handler);
+
             /*
             DOMEventType eventType;
 

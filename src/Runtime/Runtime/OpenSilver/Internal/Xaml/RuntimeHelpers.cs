@@ -15,6 +15,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xaml;
+using CSHTML5.Internal;
 using OpenSilver.Internal.Xaml.Context;
 
 #if MIGRATION
@@ -247,5 +248,11 @@ namespace OpenSilver.Internal.Xaml
             Debug.Assert(uie != null);
             uie.KeepHiddenInFirstRender = value;
         }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void RemoveJavascriptCallback(Delegate d) {
+            JavascriptCallback.Remove(d);
+        }
+
     }
 }

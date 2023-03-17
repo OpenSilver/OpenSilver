@@ -36,10 +36,10 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             if (hookupEvents)
             {
                 // Hooks the FullScreenChanged event
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"document.addEventListener('fullscreenchange', {INTERNAL_InteropImplementation.GetVariableStringForJS(new Action(FullScreenChangedCallback))})");
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"document.addEventListener('fullscreenchange', {INTERNAL_InteropImplementation.GetVariableStringForJS(FullScreenChangedCallback)})");
 
                 // Hooks the Resized event
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"new ResizeSensor(document.getXamlRoot(), {INTERNAL_InteropImplementation.GetVariableStringForJS(new Action(WindowResizeCallback))})");
+                OpenSilver.Interop.ExecuteJavaScriptVoid($"new ResizeSensor(document.getXamlRoot(), {INTERNAL_InteropImplementation.GetVariableStringForJS(WindowResizeCallback)})");
 
                 // WORKINPROGRESS
                 // Add Zoomed event
