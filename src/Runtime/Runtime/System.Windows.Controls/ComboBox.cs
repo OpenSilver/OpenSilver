@@ -177,6 +177,8 @@ namespace Windows.UI.Xaml.Controls
 
             if (_popupChild != null)
             {
+                if (_popupChild is FrameworkElement fe)
+                    fe.SizeChanged -= new SizeChangedEventHandler(OnPopupChildSizeChanged);
                 _popupChild.KeyDown -= new KeyEventHandler(OnPopupKeyDown);
                 _popupChild.TextInput -= new TextCompositionEventHandler(OnPopupTextInput);
                 _popupChild = null;
@@ -212,6 +214,8 @@ namespace Windows.UI.Xaml.Controls
                 _popupChild = _popup.Child;
                 if (_popupChild != null)
                 {
+                    if (_popupChild is FrameworkElement fe)
+                        fe.SizeChanged += new SizeChangedEventHandler(OnPopupChildSizeChanged);
                     _popupChild.KeyDown += new KeyEventHandler(OnPopupKeyDown);
                     _popupChild.TextInput += new TextCompositionEventHandler(OnPopupTextInput);
                 }
@@ -573,6 +577,8 @@ namespace Windows.UI.Xaml.Controls
         }
 
         private void OnPopupTextInput(object sender, TextCompositionEventArgs e) => OnTextInput(e);
+
+        private void OnPopupChildSizeChanged(object sender, SizeChangedEventArgs e) => _popup?.Reposition();
 
         private void OnDropDownToggleClick(object sender, RoutedEventArgs e)
         {
