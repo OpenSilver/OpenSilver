@@ -69,7 +69,7 @@ namespace CSHTML5.Internal
             return tcs.Task;
         }
 
-        public static void QueueExecuteJavaScript(string javascript, int referenceId) {
+        public static string WrapReferenceIdInJavascriptCall(string javascript, int referenceId) {
             // Change the JS code to call ShowErrorMessage in case of error:
 
             // FIXME: uncomment after PR724 is approved
@@ -77,6 +77,11 @@ namespace CSHTML5.Internal
             string errorCallBackId = referenceId.ToString();
 
             javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
+            return javascript;
+        }
+
+        public static void QueueExecuteJavaScript(string javascript, int referenceId) {
+            javascript = WrapReferenceIdInJavascriptCall(javascript, referenceId);
             QueueExecuteJavaScript(javascript);
         }
 

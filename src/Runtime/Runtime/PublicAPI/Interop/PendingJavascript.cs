@@ -125,7 +125,8 @@ namespace CSHTML5.Internal
         }
 
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult) {
-            // FIXME see how to perform this -- just wrap everything in callScriptSafe
+            if (referenceId > 0 && !javascript.StartsWith("document.callScriptSafe"))
+                javascript = INTERNAL_ExecuteJavaScript.WrapReferenceIdInJavascriptCall(javascript, referenceId);
             return PerformActualInteropCall(javascript);
         }
 
