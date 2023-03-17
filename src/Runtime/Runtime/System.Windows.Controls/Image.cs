@@ -522,6 +522,11 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>Image's desired size.</returns>
         private Size MeasureArrangeHelper(Size inputSize)
         {
+            if (!double.IsNaN(Width) && !double.IsNaN(Height))
+            {
+                return new Size(Width, Height);
+            }
+
             if (Source == null)
             {
                 return new Size();
