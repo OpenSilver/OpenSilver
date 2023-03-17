@@ -286,13 +286,6 @@ namespace OpenSilver
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
         }
 
-        public static void ExecuteJavaScriptVoidAsync(IReadOnlyList<string> javascript) {
-            var needsFlush = true;
-            foreach (var js in javascript) {
-                INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(js, referenceId: 0, wantsResult:false, flush: needsFlush);
-                needsFlush = false;
-            }
-        }
 
 
         /// <summary>

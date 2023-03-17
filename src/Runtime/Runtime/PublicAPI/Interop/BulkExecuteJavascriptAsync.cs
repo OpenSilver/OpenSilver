@@ -27,7 +27,7 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
             return AddDisposable(global::OpenSilver.Interop.ExecuteJavaScriptAsync(javascript));
         }
 
-        public IDisposable AddDisposable(IDisposable disposable) {
+        private IDisposable AddDisposable(IDisposable disposable) {
             _disposables.Add(disposable);
             return disposable;
         }
