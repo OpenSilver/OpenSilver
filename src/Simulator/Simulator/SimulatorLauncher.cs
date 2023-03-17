@@ -9,11 +9,12 @@ namespace OpenSilver.Simulator
 namespace CSHTML5.Simulator
 #endif
 {
-    public static class SimulatorLauncher
-    {
+    public static class SimulatorLauncher {
+        internal static SimulatorLaunchParameters Parameters { get; private set; }
+
 #if OPENSILVER
-        public static int Start(Type userApplicationType, SimulatorLaunchParameters parameters = null)
-        {
+        public static int Start(Type userApplicationType, SimulatorLaunchParameters parameters = null) {
+            Parameters = parameters ?? new SimulatorLaunchParameters();
             if (userApplicationType == null)
             {
                 throw new ArgumentNullException(nameof(userApplicationType));
@@ -24,6 +25,7 @@ namespace CSHTML5.Simulator
 
         public static int Start(Action appCreationDelegate, Assembly appAssembly, SimulatorLaunchParameters parameters = null)
         {
+            Parameters = parameters ?? new SimulatorLaunchParameters();
             if (appCreationDelegate == null)
             {
                 throw new ArgumentNullException(nameof(appCreationDelegate));

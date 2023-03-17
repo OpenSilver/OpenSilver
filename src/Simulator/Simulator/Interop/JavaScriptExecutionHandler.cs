@@ -26,7 +26,6 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
     {
         private bool _webControlDisposed = false;
         private WPFBrowserView _webControl;
-        private string _lastExecutedJavaScriptCode;
         private List<string> _fullLogOfExecutedJavaScriptCode = new List<string>();
 
         public JavaScriptExecutionHandler(WPFBrowserView webControl)
@@ -47,8 +46,8 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             // This prevents interop calls from throwing an exception if they are called after the simulator started closing
             if (_webControlDisposed || javaScriptToExecute == null)
                 return;
-            _lastExecutedJavaScriptCode = javaScriptToExecute;
-            _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
+            if (OpenSilver.Simulator.SimulatorLauncher.Parameters.LogExecutedJavaScriptCode)
+                _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
             _webControl.Browser.ExecuteJavaScript(javaScriptToExecute);
         }
 
@@ -58,16 +57,11 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             // This prevents interop calls from throwing an exception if they are called after the simulator started closing
             if (_webControlDisposed || javaScriptToExecute == null)
                 return null;
-            _lastExecutedJavaScriptCode = javaScriptToExecute;
-            _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
+            if (OpenSilver.Simulator.SimulatorLauncher.Parameters.LogExecutedJavaScriptCode)
+                _fullLogOfExecutedJavaScriptCode.Add(javaScriptToExecute);
             return _webControl.Browser.ExecuteJavaScriptAndReturnValue(javaScriptToExecute);
         }
 
-
-        internal string GetLastExecutedJavaScriptCode()
-        {
-            return _lastExecutedJavaScriptCode;
-        }
 
         public string FullLogOfExecutedJavaScriptCode
         {

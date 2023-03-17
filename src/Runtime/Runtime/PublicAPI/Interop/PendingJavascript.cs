@@ -41,6 +41,7 @@ namespace CSHTML5.Internal
         private byte[] _buffer;
         private int _currentLength;
 
+
         public PendingJavascript(int bufferSize, IWebAssemblyExecutionHandler webAssemblyExecutionHandler)
         {
             if (bufferSize <= 0)
@@ -56,19 +57,18 @@ namespace CSHTML5.Internal
         {
             if (javascript == null) return;
 
-            lock (_syncObj)
-            {
-                var maxByteCount = DefaultEncoding.GetMaxByteCount(javascript.Length);
-                while (maxByteCount + _currentLength > _buffer.Length)
-                {
-                    IncreaseBuffer();
-                }
+            // the idea -- the current buffer is already huge - in the very rare scenario it would get full, just flush it and restart
+            var maxByteCount = DefaultEncoding.GetMaxByteCount(javascript.Length) + Delimiter.Length;
+            if (maxByteCount + _currentLength > _buffer.Length)
+                Flush();
 
-                _currentLength += DefaultEncoding.GetBytes(javascript, 0, javascript.Length, _buffer, _currentLength);
+            if (maxByteCount > _buffer.Length)
+                throw new Exception($"javascript too big! {maxByteCount}");
 
-                Buffer.BlockCopy(Delimiter, 0, _buffer, _currentLength, Delimiter.Length);
-                _currentLength += Delimiter.Length;
-            }
+            _currentLength += DefaultEncoding.GetBytes(javascript, 0, javascript.Length, _buffer, _currentLength);
+
+            Buffer.BlockCopy(Delimiter, 0, _buffer, _currentLength, Delimiter.Length);
+            _currentLength += Delimiter.Length;
         }
 
         public void Flush() {
@@ -92,12 +92,6 @@ namespace CSHTML5.Internal
             return wantsResult ? result : null;
         }
 
-        private void IncreaseBuffer()
-        {
-            var currentBuffer = _buffer;
-            _buffer = new byte[currentBuffer.Length * 2];
-            currentBuffer.CopyTo(_buffer, 0);
-        }
     }
 
     internal sealed class PendingJavascriptSimulator : IPendingJavascript
@@ -121,13 +115,19 @@ namespace CSHTML5.Internal
         public void Flush() {
             string javascript = ReadAndClearAggregatedPendingJavaScriptCode();
             if (!string.IsNullOrWhiteSpace(javascript)) 
-                PerformActualInteropCall(javascript);
+                PerformActualInteropCallVoid(javascript);
         }
 
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult) {
             if (referenceId > 0 && !javascript.StartsWith("document.callScriptSafe"))
                 javascript = INTERNAL_ExecuteJavaScript.WrapReferenceIdInJavascriptCall(javascript, referenceId);
-            return PerformActualInteropCall(javascript);
+
+            if (wantsResult)
+                return PerformActualInteropCall(javascript);
+            else {
+                PerformActualInteropCallVoid(javascript);
+                return null;
+            }
         }
 
 
@@ -150,6 +150,31 @@ namespace CSHTML5.Internal
                 }
 
                 return _jsExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException("Unable to execute the following JavaScript code: " + Environment.NewLine + javaScriptToExecute, ex);
+            }
+        }
+        private void PerformActualInteropCallVoid(string javaScriptToExecute)
+        {
+            if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+            {
+                javaScriptToExecute = "//---- START INTEROP ----"
+                                      + Environment.NewLine
+                                      + javaScriptToExecute
+                                      + Environment.NewLine
+                                      + "//---- END INTEROP ----";
+            }
+
+            try
+            {
+                if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+                {
+                    Debug.WriteLine(javaScriptToExecute);
+                }
+
+                _jsExecutionHandler.ExecuteJavaScript(javaScriptToExecute);
             }
             catch (InvalidOperationException ex)
             {

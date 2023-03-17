@@ -14,6 +14,9 @@ namespace CSHTML5.Simulator
 
         // Add stuff as needed, like cookies, etc.
 
+        // note: this can grow very very fast, so if you don't need it, I suggest you turn it off
+        public bool LogExecutedJavaScriptCode { get; set; } = true;
+
         public Action<WPFBrowserView> BrowserCreatedCallback { get; set; }
 
         /// <summary>
