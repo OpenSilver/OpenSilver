@@ -401,6 +401,14 @@ namespace Windows.UI.Xaml
         [OpenSilver.NotImplemented]
         public static Window GetWindow(DependencyObject dependencyObject)
         {
+            //TODO: this should in theory throw an InvaliOperationException if the dependencyObject is not valid but I didn't check what made it not valid (it looks like Windows themselves are not valid).
+            //      In Silverlight, doing: Window.GetWindow(new Border()); returns the main window if it was made from the main window, null if from another window.
+
+            UIElement dependencyObjectAsUIElement = dependencyObject as UIElement;
+            if (dependencyObjectAsUIElement != null)
+            {
+                return dependencyObjectAsUIElement.INTERNAL_ParentWindow;
+            }
             return null;
         }
 

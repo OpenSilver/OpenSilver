@@ -129,15 +129,16 @@ if (popupRoot) {sWindow}.removeChild(popupRoot);");
             }
         }
 
+        /// <summary>
+        /// Returns the coordinates of the UIElement, relative to the Window that contains it.
+        /// </summary>
+        /// <param name="element">The element of which the position will be returned.</param>
+        /// <returns>The position of the element relative to the Window that contains it.</returns>
         public static Point GetUIElementAbsolutePosition(UIElement element)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                GeneralTransform gt = element.TransformToVisual(null);
-
-                // Note: by passing "null" to "TransformToVisual", we tell the framework to
-                // get the coordinates relative to the Window root.
-
+                GeneralTransform gt = element.TransformToVisual(Window.GetWindow(element));
                 return gt.Transform(new Point(0d, 0d));
             }
             return new Point();

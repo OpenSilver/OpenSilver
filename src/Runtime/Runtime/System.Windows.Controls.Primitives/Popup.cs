@@ -447,7 +447,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                     try
                     {
                         targetBounds = target
-                            .TransformToVisual(null)
+                            .TransformToVisual(Window.GetWindow(target))
                             .TransformBounds(new Rect(0, 0, target.ActualWidth, target.ActualHeight));
                     }
                     catch { }
