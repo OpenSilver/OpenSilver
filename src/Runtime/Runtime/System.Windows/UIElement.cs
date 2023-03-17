@@ -1575,18 +1575,20 @@ document.ondblclick = null;
                 bool previousArrangeValid = IsArrangeValid;
                 Rect savedPreviousFinalRect = PreviousFinalRect;
                 PreviousFinalRect = finalRect;
-                IsArrangeValid = true;
-
                 LayoutManager.Current.RemoveArrange(this);
 
                 if (this.IsVisible == false)
                 {
                     IsRendered = false;
+                    IsArrangeValid = true;
                     return;
                 }
 
                 if (IsRendered && previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size))
+                {
+                    IsArrangeValid = true;
                     return;
+                }
 
                 if (!IsMeasureValid)
                 {
@@ -1600,7 +1602,7 @@ document.ondblclick = null;
                 }
 
                 ArrangeCore(finalRect);
-
+                IsArrangeValid = true;
                 PreviousFinalRect = finalRect;
 
                 // Render with new size & location
@@ -1679,7 +1681,6 @@ document.ondblclick = null;
                 bool previousMeasureValid = IsMeasureValid;
                 Size savedPreviousAvailableSize = PreviousAvailableSize;
                 PreviousAvailableSize = availableSize;
-                IsMeasureValid = true;
 
                 LayoutManager.Current.RemoveMeasure(this);
 
@@ -1687,10 +1688,12 @@ document.ondblclick = null;
                 {
                     DesiredSize = new Size();
                     previousDesiredSize = Size.Empty;
+                    IsMeasureValid = true;
                     return;
                 }
                 else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && previousDesiredSize != Size.Empty)
                 {
+                    IsMeasureValid = true;
                     return;
                 }
 
@@ -1704,7 +1707,7 @@ document.ondblclick = null;
                 {
                     measureInProgress = false;
                 }
-
+                IsMeasureValid = true;
                 if (previousDesiredSizeInMeasure != DesiredSize)
                 {
                     this.InvalidateArrange();
