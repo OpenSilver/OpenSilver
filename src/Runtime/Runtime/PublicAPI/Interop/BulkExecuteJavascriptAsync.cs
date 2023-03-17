@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSHTML5;
 using CSHTML5.Internal;
+using CSHTML5.Types;
 
 namespace Runtime.OpenSilver.PublicAPI.Interop
 {
@@ -25,7 +27,7 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
             return AddDisposable(global::OpenSilver.Interop.ExecuteJavaScriptAsync(javascript));
         }
 
-        private IDisposable AddDisposable(IDisposable disposable) {
+        public IDisposable AddDisposable(IDisposable disposable) {
             _disposables.Add(disposable);
             return disposable;
         }
@@ -44,7 +46,17 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
 
         public async Task ExecuteAndDisposeAsync() {
             if (_javascript.Length > 0)
-                await INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(_javascript.ToString(), 0, false);
+                try {
+                    // very important: the first functions need to be executed before executing the remaining javascript,
+                    // since the remaining javascript can rely on the results from here
+                    INTERNAL_ExecuteJavaScript.JavaScriptRuntime.Flush();
+
+                    await INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync(_javascript.ToString(), 0, false);
+                }
+                catch (Exception e) {
+                    Console.WriteLine($"error executing Javascript: {e}");
+                }
+            // Console.WriteLine($"disposed of JS Obj Refs: {string.Join(",", _disposables.OfType<INTERNAL_JSObjectReference>().Select(js => js.ReferenceId))}");
             foreach (var d in _disposables)
                 d.Dispose();
         }

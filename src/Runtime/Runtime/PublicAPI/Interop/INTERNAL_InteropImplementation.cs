@@ -164,7 +164,10 @@ namespace CSHTML5
                                                                                     bool runAsynchronously, 
                                                                                     bool hasImpactOnPendingJSCode = true, 
                                                                                     params object[] variables) {
-            var result = ExecuteJavaScript_Implementation(javascript, runAsynchronously, wantsResult: true, wantsReferenceId: true, hasImpactOnPendingJSCode, variables);
+            var result = ExecuteJavaScript_Implementation( javascript, runAsynchronously, 
+                                                           wantsResult: true, 
+                                                           wantsReferenceId: true, 
+                                                           hasImpactOnPendingJSCode, variables);
             return (INTERNAL_JSObjectReference)result;
         }
 

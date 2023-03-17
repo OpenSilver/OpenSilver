@@ -603,7 +603,6 @@ namespace Windows.UI.Xaml.Shapes
             var context = bulkJs.AddJavascriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
             string sContext = INTERNAL_InteropImplementation.GetVariableStringForJS(context);
 
-
             // we remove the previous drawing:
             // todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
             bulkJs.AddJavascript($"{sContext}.clearRect(0, 0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");

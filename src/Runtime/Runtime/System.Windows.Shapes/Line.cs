@@ -250,7 +250,6 @@ namespace Windows.UI.Xaml.Shapes
                     }
                 }
 
-
                 INTERNAL_ShapesDrawHelpers.PrepareLine(_canvasDomElement, new Point(preparedX1, preparedY1), new Point(preparedX2, preparedY2));
 
                 if (strokeValue != null)

@@ -125,12 +125,21 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
             foreach (var a in added)
                 diffs.Append($"+{a.JsObject.ReferenceId}, ");
             diffs.Append("]");
-            var countStr = count != trueRefCountAsInt ? $"${count} (true={trueRefCount})" : $"{count}";
-            Console.WriteLine($"****** Javascript references: {countStr} {diffs}");
-            foreach (var info in added) {
+            var countStr = count != trueRefCountAsInt ? $"{count} (true={trueRefCount})" : $"{count}";
+
+            var filterCount = added.Count(i => global::OpenSilver.Interop.DumpAllJavascriptObjectsFilter(i.StackTrace.First().FunctionName, i.Javascript));
+            if (filterCount != added.Count)
+                countStr += $" (filtered={filterCount}/{added.Count})";
+            else
+                countStr += $" (filtered={filterCount})";
+            global::OpenSilver.Interop.DumpAllJavascriptObjectsLogger($"****** Javascript references: {countStr} {diffs}");
+            foreach (var info in added.Where(i => global::OpenSilver.Interop.DumpAllJavascriptObjectsFilter(i.StackTrace.First().FunctionName, i.Javascript))) {
                 var str = (global::OpenSilver.Interop.DumpAllJavascriptObjectsVerbose ? info.Details() : info.Summary());
-                Console.WriteLine(str);
+                global::OpenSilver.Interop.DumpAllJavascriptObjectsLogger(str);
             }
+            // the idea - the above could be really huge, so dump this again, make it easier to read without scrolling back
+            if(global::OpenSilver.Interop.DumpAllJavascriptObjectsVerbose && filterCount > 0)
+                global::OpenSilver.Interop.DumpAllJavascriptObjectsLogger($"****** Javascript references: {countStr} {diffs}");
         }
     }
 }

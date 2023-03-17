@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using CSHTML5;
 using Runtime.OpenSilver.PublicAPI.Interop;
 
 #if MIGRATION
@@ -88,6 +89,15 @@ namespace OpenSilver
         public static bool DumpAllJavascriptObjectsVerbose { get; set; } = true;
         // how many functions (from the stack trace) to dump? (since the stack trace can end up being insanely huge)
         public static int DumpAllJavascriptObjectsStackTraceCount { get; set; } = 15;
+
+        // filter when dumping added Javascript Objects -- perhaps you already know some objects that are persistent throughout most of the app
+        // in this case, filter those out, so you can focus on the leaks
+        //
+        // function-name, javascript-code
+        public static Func<string, string, bool> DumpAllJavascriptObjectsFilter { get; set; } = (a, b) => true;
+
+        // the idea: in release AOT, Console.WriteLine doesn't work in OpenSilver, but it works on client code
+        public static Action<string> DumpAllJavascriptObjectsLogger { get; set; } = Console.WriteLine;
 
         internal static bool IsTrackingAllJavascriptObjects => DumpAllJavascriptObjectsEveryMs > 0;
 
@@ -229,6 +239,7 @@ namespace OpenSilver
             ConvertJavascriptResult(out t3, list[2]);
             ConvertJavascriptResult(out t4, list[3]);
         }
+
         /// <summary>
         /// Execute JavaScript code without document.callScriptSafe
         /// </summary>
@@ -264,6 +275,25 @@ namespace OpenSilver
                 needsFlush = false;
             }
         }
+
+
+        public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables ) {
+            javascript = INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
+        }
+
+        public static void ExecuteJavaScriptVoidAsync(string javascript) {
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
+        }
+
+        public static void ExecuteJavaScriptVoidAsync(IReadOnlyList<string> javascript) {
+            var needsFlush = true;
+            foreach (var js in javascript) {
+                INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(js, referenceId: 0, wantsResult:false, flush: needsFlush);
+                needsFlush = false;
+            }
+        }
+
 
         /// <summary>
         /// Allows calling JavaScript code from within C#.
