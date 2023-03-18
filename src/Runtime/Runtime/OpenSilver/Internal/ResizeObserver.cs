@@ -76,8 +76,8 @@ namespace OpenSilver.Internal
 
             string actualWidthAsString = argSize.Substring(0, sepIndex);
             string actualHeightAsString = argSize.Substring(sepIndex + 1);
-            double actualWidth = double.Parse(actualWidthAsString, CultureInfo.InvariantCulture);
-            double actualHeight = double.Parse(actualHeightAsString, CultureInfo.InvariantCulture);
+            double actualWidth = Math.Floor(double.Parse(actualWidthAsString, CultureInfo.InvariantCulture));
+            double actualHeight = Math.Floor(double.Parse(actualHeightAsString, CultureInfo.InvariantCulture));
             return new Size(actualWidth, actualHeight);
         }
 
