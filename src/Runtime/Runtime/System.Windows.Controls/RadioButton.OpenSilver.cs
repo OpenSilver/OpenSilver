@@ -19,6 +19,7 @@ using Bridge;
 
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -73,7 +74,7 @@ namespace Windows.UI.Xaml.Controls
             string currentlyRegisteredGroupName;
             lock (_currentlyRegisteredGroupName)
             {
-                currentlyRegisteredGroupName = (string)_currentlyRegisteredGroupName[radioButton];
+                _currentlyRegisteredGroupName.TryGetValue(radioButton, out currentlyRegisteredGroupName);
             }
 
             if (groupName != currentlyRegisteredGroupName)
@@ -112,7 +113,11 @@ namespace Windows.UI.Xaml.Controls
             }
             lock (_currentlyRegisteredGroupName)
             {
-                _currentlyRegisteredGroupName[radioButton] = groupName;
+                if (_currentlyRegisteredGroupName.TryGetValue(radioButton, out string val))
+                {
+                    _currentlyRegisteredGroupName.Remove(radioButton);
+                }
+                _currentlyRegisteredGroupName.Add(radioButton, groupName);
             }
         }
 
@@ -137,7 +142,7 @@ namespace Windows.UI.Xaml.Controls
             }
             lock (_currentlyRegisteredGroupName)
             {
-                _currentlyRegisteredGroupName[radioButton] = null;
+                _currentlyRegisteredGroupName.Remove(radioButton);
             }
         }
 
@@ -278,7 +283,8 @@ namespace Windows.UI.Xaml.Controls
         #region private data
 
         [ThreadStatic] private static Hashtable _groupNameToElements;
-        private static readonly Hashtable _currentlyRegisteredGroupName = new Hashtable();
+        private static readonly ConditionalWeakTable<RadioButton, string> _currentlyRegisteredGroupName =
+            new ConditionalWeakTable<RadioButton, string>();
 
         #endregion private data
     }
