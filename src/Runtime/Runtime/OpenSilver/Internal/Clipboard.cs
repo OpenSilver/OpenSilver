@@ -90,7 +90,7 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<object>();
 
-                Interop.ExecuteJavaScript("navigator.clipboard.writeText($0).then($1());",
+                Interop.ExecuteJavaScriptVoid("navigator.clipboard.writeText($0).then($1());",flushQueue:false, 
                     text,
                     new Action(() =>
                     {
@@ -114,7 +114,7 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<string>();
 
-                Interop.ExecuteJavaScript("navigator.clipboard.readText().then(text => $0(text));",
+                Interop.ExecuteJavaScriptVoid("navigator.clipboard.readText().then(text => $0(text));",flushQueue:false, 
                     new Action<string>(content =>
                     {
                         try
@@ -137,7 +137,7 @@ namespace OpenSilver.Internal
             {
                 var tcs = new TaskCompletionSource<bool>();
 
-                Interop.ExecuteJavaScript("navigator.clipboard.readText().then(text => $0(!!text))",
+                Interop.ExecuteJavaScriptVoid("navigator.clipboard.readText().then(text => $0(!!text))",flushQueue:false, 
                     new Action<bool>(b =>
                     {
                         try

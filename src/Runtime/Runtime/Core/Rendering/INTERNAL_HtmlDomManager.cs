@@ -166,7 +166,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElement).UniqueIdentifier;
             string javaScriptCodeToExecute = $@"document.setContentString(""{ uniqueIdentifier}"",""{EscapeStringForUseInJavaScript(content)}"",{removeTextWrapping.ToString().ToLower()})";
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
 
             INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
         }
@@ -183,7 +183,7 @@ element.style.visibility=""collapse"";
 setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifier}""); if (element2) {{ element2.style.visibility=""visible""; }} }}, 0);
 }}";
 
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         public static string GetTextBoxText(object domElementRef)
@@ -275,7 +275,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (forceSimulatorExecuteImmediately)
                 ExecuteJavaScript(javaScriptCodeToExecute);
             else
-                INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         public static void SetDomElementAttribute(object domElementRef, string attributeName, object attributeValue)
@@ -318,7 +318,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (forceSimulatorExecuteImmediately)
                 ExecuteJavaScript(javaScriptCodeToExecute);
             else
-                INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         internal static void SetDomElementStylePropertyUsingVelocity(object domElement, List<string> cssPropertyNames, object cssValue)
@@ -350,7 +350,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (forceSimulatorExecuteImmediately)
                 ExecuteJavaScript(javaScriptCodeToExecute);
             else
-                INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         public static object GetDomElementAttribute(object domElementRef, string attributeName)
@@ -808,19 +808,21 @@ parentElement.appendChild(child);";
             }
         }
 
-        public static void ExecuteJavaScript(string javaScriptToExecute, string commentForDebugging = null)
+        private static void ExecuteJavaScript(string javaScriptToExecute, string commentForDebugging = null)
         {
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(
                 javaScriptToExecute,
-                INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScript)" + (commentForDebugging != null ? commentForDebugging : "") : "" );
+                INTERNAL_ExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScript)" + (commentForDebugging != null ? commentForDebugging : "") : "" );
         }
 
-        public static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool noImpactOnPendingJSCode = false)
+        private static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool hasImpactOnPendingJSCode = true)
         {
-            return INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptSync(
-                javaScriptToExecute,
-                INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScriptWithResult)" + (commentForDebugging != null ? commentForDebugging : "") : "", 
-                noImpactOnPendingJSCode);
+            var referenceId = 0;
+            var wantsResult = true;
+            return INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(
+                javaScriptToExecute, referenceId, wantsResult,
+                INTERNAL_ExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScriptWithResult)" + (commentForDebugging != null ? commentForDebugging : "") : "", 
+                hasImpactOnPendingJSCode);
         }
 
         /// <summary>
@@ -830,7 +832,7 @@ parentElement.appendChild(child);";
         /// in the visual tree composition at the specified point.</returns>
         public static UIElement FindElementInHostCoordinates_UsedBySimulatorToo(double x, double y) // IMPORTANT: If you rename this method or change its signature, make sure to rename its dynamic call in the Simulator.
         {
-            object domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
+            using (var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
 (function(){{
     var domElementAtCoordinates = document.elementFromPoint({x.ToInvariantString()}, {y.ToInvariantString()});
     if (!domElementAtCoordinates || domElementAtCoordinates === document.documentElement)
@@ -841,11 +843,9 @@ parentElement.appendChild(child);";
     {{
         return domElementAtCoordinates;
     }}
-}}())");
+}}())"))
+                return GetUIElementFromDomElement(domElementAtCoordinates);
 
-            UIElement result = GetUIElementFromDomElement(domElementAtCoordinates);
-
-            return result;
         }
 
         internal static IEnumerable<UIElement> FindElementsInHostCoordinates(Point intersectingPoint, UIElement subtree)
@@ -896,21 +896,23 @@ parentElement.appendChild(child);";
 
                 // In the Simulator, we get the CSharp object associated to a DOM element by searching for the DOM element ID in the "INTERNAL_idsToUIElements" dictionary.
 
-                object jsId = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.id");
-                if (!IsNullOrUndefined(jsId))
+                using (var jsId = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.id"))
                 {
-                    string id = Convert.ToString(jsId);
-                    if (_store.TryGetValue(id, out var elemWeakRef))
+                    if (!IsNullOrUndefined(jsId))
                     {
-                        if (elemWeakRef.TryGetTarget(out var uie))
+                        string id = Convert.ToString(jsId);
+                        if (_store.TryGetValue(id, out var elemWeakRef))
                         {
-                            result = uie;
+                            if (elemWeakRef.TryGetTarget(out var uie))
+                            {
+                                result = uie;
+                            }
+                            else
+                            {
+                                _store.Remove(id);
+                            }
+                            break;
                         }
-                        else
-                        {
-                            _store.Remove(id);
-                        }
-                        break;
                     }
                 }
 
@@ -935,7 +937,7 @@ parentElement.appendChild(child);";
 
             string javaScriptCodeToExecute = $@"document.setVisualBounds(""{style.Uid}"",{left},{top},{width},{height},{(bSetPositionAbsolute ? "1": "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
         internal static void SetPosition(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
@@ -945,7 +947,7 @@ parentElement.appendChild(child);";
 
             string javaScriptCodeToExecute = $@"document.setPosition(""{style.Uid}"",{left},{top},{(bSetPositionAbsolute ? "1" : "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
-            INTERNAL_SimulatorExecuteJavaScript.ExecuteJavaScriptAsync(javaScriptCodeToExecute);
+            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
     }
 }

@@ -24,18 +24,20 @@ namespace CSHTML5.Internal
     {
         void AddJavaScript(string javascript);
 
-        object ExecuteJavaScript(string javascript, bool flush);
+        void Flush();
+
+        object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult);
     }
 
     internal sealed class PendingJavascript : IPendingJavascript
     {
-        private const string CallJSMethodName = "callJSUnmarshalledHeap";
+        private const string CallJSMethodNameAsync = "callJSUnmarshalledHeap";
+        private const string CallJSMethodNameSync = "callJSUnmarshalled";
 
         private static readonly Encoding DefaultEncoding = Encoding.Unicode;
         private static readonly byte[] Delimiter = DefaultEncoding.GetBytes(";\n");
-        private readonly object _syncObj = new();
         private readonly IWebAssemblyExecutionHandler _webAssemblyExecutionHandler;
-        private byte[] _buffer;
+        private readonly byte[] _buffer;
         private int _currentLength;
 
         public PendingJavascript(int bufferSize, IWebAssemblyExecutionHandler webAssemblyExecutionHandler)
@@ -53,49 +55,43 @@ namespace CSHTML5.Internal
         {
             if (javascript == null) return;
 
-            lock (_syncObj)
-            {
-                var maxByteCount = DefaultEncoding.GetMaxByteCount(javascript.Length);
-                while (maxByteCount + _currentLength > _buffer.Length)
-                {
-                    IncreaseBuffer();
-                }
+            // the idea -- the current buffer is already huge - in the very rare scenario it would get full, just flush it and restart
+            var maxByteCount = DefaultEncoding.GetMaxByteCount(javascript.Length) + Delimiter.Length;
+            if (maxByteCount + _currentLength > _buffer.Length)
+                Flush();
 
-                _currentLength += DefaultEncoding.GetBytes(javascript, 0, javascript.Length, _buffer, _currentLength);
+            if (maxByteCount > _buffer.Length)
+                throw new Exception($"javascript too big! {maxByteCount}");
 
-                Buffer.BlockCopy(Delimiter, 0, _buffer, _currentLength, Delimiter.Length);
-                _currentLength += Delimiter.Length;
-            }
+            _currentLength += DefaultEncoding.GetBytes(javascript, 0, javascript.Length, _buffer, _currentLength);
+
+            Buffer.BlockCopy(Delimiter, 0, _buffer, _currentLength, Delimiter.Length);
+            _currentLength += Delimiter.Length;
         }
 
-        public object ExecuteJavaScript(string javascript, bool flush)
+        public void Flush()
         {
-            if (!flush)
-            {
-                return _webAssemblyExecutionHandler.ExecuteJavaScriptWithResult(javascript);
-            }
-
-            AddJavaScript(javascript);
-
             if (_currentLength == 0)
-            {
-                return null;
-            }
+                return;
 
             var curLength = _currentLength;
             _currentLength = 0;
+
             //Here we pass a reference to _buffer object and current length
             //Js will read data from the heap
-            return _webAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(
-                CallJSMethodName, _buffer, curLength);
+
+            // everything that was appended with AddJavascript, nothing to return
+            _webAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(CallJSMethodNameAsync, _buffer, curLength);
         }
 
-        private void IncreaseBuffer()
+        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
         {
-            var currentBuffer = _buffer;
-            _buffer = new byte[currentBuffer.Length * 2];
-            currentBuffer.CopyTo(_buffer, 0);
+            // IMPORTANT: wantsResult is passed on to JS, so that it will know if it needs to pass anything back to us
+            // (optimization, when we don't care for the result)
+            var result = _webAssemblyExecutionHandler.InvokeUnmarshalled<string, int, bool, object>(CallJSMethodNameSync, javascript, referenceId, wantsResult);
+            return wantsResult ? result : null;
         }
+
     }
 
     internal sealed class PendingJavascriptSimulator : IPendingJavascript
@@ -107,7 +103,7 @@ namespace CSHTML5.Internal
         {
             _jsExecutionHandler = jsExecutionHandler ?? throw new ArgumentNullException(nameof(jsExecutionHandler));
         }
-        
+
         public void AddJavaScript(string javascript)
         {
             lock (_pending)
@@ -116,30 +112,30 @@ namespace CSHTML5.Internal
             }
         }
 
-        public object ExecuteJavaScript(string javascript, bool flush)
+        public void Flush()
         {
-            if (flush)
+            string javascript = ReadAndClearAggregatedPendingJavaScriptCode();
+            if (!string.IsNullOrWhiteSpace(javascript))
+                PerformActualInteropCallVoid(javascript);
+        }
+
+        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
+        {
+            if (referenceId > 0 && !javascript.StartsWith("document.callScriptSafe"))
+                javascript = INTERNAL_ExecuteJavaScript.WrapReferenceIdInJavascriptCall(javascript, referenceId);
+
+            if (wantsResult)
+                return PerformActualInteropCall(javascript);
+            else
             {
-                string aggregatedPendingJavaScriptCode = ReadAndClearAggregatedPendingJavaScriptCode();
-
-                if (!string.IsNullOrWhiteSpace(aggregatedPendingJavaScriptCode))
-                {
-                    javascript = string.Join(Environment.NewLine, new List<string>
-                    {
-                        "// [START OF PENDING JAVASCRIPT]",
-                        aggregatedPendingJavaScriptCode,
-                        "// [END OF PENDING JAVASCRIPT]" + Environment.NewLine,
-                        javascript
-                    });
-                }
+                PerformActualInteropCallVoid(javascript);
+                return null;
             }
-
-            return PerformActualInteropCall(javascript);
         }
 
         private object PerformActualInteropCall(string javaScriptToExecute)
         {
-            if (INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging)
+            if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
             {
                 javaScriptToExecute = "//---- START INTEROP ----"
                     + Environment.NewLine
@@ -150,12 +146,38 @@ namespace CSHTML5.Internal
 
             try
             {
-                if (INTERNAL_SimulatorExecuteJavaScript.EnableInteropLogging)
+                if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
                 {
                     Debug.WriteLine(javaScriptToExecute);
                 }
 
                 return _jsExecutionHandler.ExecuteJavaScriptWithResult(javaScriptToExecute);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new InvalidOperationException("Unable to execute the following JavaScript code: " + Environment.NewLine + javaScriptToExecute, ex);
+            }
+        }
+
+        private void PerformActualInteropCallVoid(string javaScriptToExecute)
+        {
+            if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+            {
+                javaScriptToExecute = "//---- START INTEROP ----"
+                                      + Environment.NewLine
+                                      + javaScriptToExecute
+                                      + Environment.NewLine
+                                      + "//---- END INTEROP ----";
+            }
+
+            try
+            {
+                if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)
+                {
+                    Debug.WriteLine(javaScriptToExecute);
+                }
+
+                _jsExecutionHandler.ExecuteJavaScript(javaScriptToExecute);
             }
             catch (InvalidOperationException ex)
             {

@@ -18,7 +18,7 @@ using OpenSilver.Internal;
 
 namespace CSHTML5.Types
 {
-    internal sealed class INTERNAL_JSObjectReference : IConvertible, IJavaScriptConvertible
+    internal sealed class INTERNAL_JSObjectReference : IConvertible, IJavaScriptConvertible, IDisposable
     {
         private string _jsCache;
 
@@ -37,7 +37,7 @@ namespace CSHTML5.Types
 
         private object Value { get; }
 
-        public string ReferenceId { get; }
+        public string ReferenceId { get; private set; }
         public bool IsArray { get; }
 
         private int _arrayIndex;
@@ -57,29 +57,49 @@ namespace CSHTML5.Types
             }
         }
 
-        internal INTERNAL_JSObjectReference(object value)
+        private INTERNAL_JSObjectReference(object value)
         {
             Value = value;
         }
 
-        public INTERNAL_JSObjectReference(object value, string referenceId)
+        public INTERNAL_JSObjectReference(object value, string referenceId, string javascript)
         {
             Value = value;
             ReferenceId = referenceId;
+
+            if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
+                JSObjectReferenceHolder.Instance.Add(this, javascript);
         }
 
-        public INTERNAL_JSObjectReference(object value, string referenceId, int arrayIndex)
+        public INTERNAL_JSObjectReference(object value, string referenceId, int arrayIndex, string javascript)
         {
             Value = value;
             ReferenceId = referenceId;
             IsArray = true;
             ArrayIndex = arrayIndex;
+
+            if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
+                JSObjectReferenceHolder.Instance.Add(this, javascript);
         }
 
         ~INTERNAL_JSObjectReference()
         {
             // Removing itself from JS dict used for C# to JS Interops, otherwise dict keeps growing. Needs more testing
-            INTERNAL_HtmlDomManager.ExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
+            RemoveFromJS();
+        }
+
+        private void RemoveFromJS()
+        {
+            if (ReferenceId != string.Empty)
+            {
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
+
+                if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
+                    JSObjectReferenceHolder.Instance.Remove(this);
+
+                ReferenceId = string.Empty;
+            }
+
         }
 
         public object GetActualValue()
@@ -204,6 +224,12 @@ namespace CSHTML5.Types
 
         public override string ToString() => ToString(null);
 
+        public void Dispose()
+        {
+            RemoveFromJS();
+            GC.SuppressFinalize(this);
+        }
+
         public static explicit operator string(INTERNAL_JSObjectReference input) => input.ToString(null);
         public static explicit operator bool(INTERNAL_JSObjectReference input) => input.ToBoolean(null);
         public static explicit operator byte(INTERNAL_JSObjectReference input) => input.ToByte(null);
@@ -218,6 +244,25 @@ namespace CSHTML5.Types
         public static explicit operator ushort(INTERNAL_JSObjectReference input) => input.ToUInt16(null);
         public static explicit operator uint(INTERNAL_JSObjectReference input) => input.ToUInt32(null);
         public static explicit operator ulong(INTERNAL_JSObjectReference input) => input.ToUInt64(null);
+
+        public static bool ToBoolean(object value) => Convert.ToBoolean(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static byte ToByte(object value) => Convert.ToByte(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static char ToChar(object value) => Convert.ToChar(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static DateTime ToDateTime(object value) => Convert.ToDateTime(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static decimal ToDecimal(object value) => Convert.ToDecimal(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static double ToDouble(object value) => Convert.ToDouble(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static short ToInt16(object value) => Convert.ToInt16(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static int ToInt32(object value) => Convert.ToInt32(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static long ToInt64(object value) => Convert.ToInt64(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static sbyte ToSByte(object value) => Convert.ToSByte(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static float ToSingle(object value) => Convert.ToSingle(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static ushort ToUInt16(object value) => Convert.ToUInt16(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static uint ToUInt32(object value) => Convert.ToUInt32(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static ulong ToUInt64(object value) => Convert.ToUInt64(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static string ToString(object value) => new INTERNAL_JSObjectReference(value).GetActualValue()?.ToString();
+        public static object ToType(Type conversionType, object value) => new INTERNAL_JSObjectReference(value).ToType(conversionType, null);
+        public static bool IsUndefined(object value) => new INTERNAL_JSObjectReference(value).IsUndefined();
+        public static bool IsNull(object value) => new INTERNAL_JSObjectReference(value).IsNull();
 
         public TypeCode GetTypeCode() => throw new NotImplementedException();
         public bool ToBoolean(IFormatProvider provider) => Convert.ToBoolean(GetActualValue());

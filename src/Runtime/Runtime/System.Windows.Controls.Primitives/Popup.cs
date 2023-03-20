@@ -636,8 +636,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 }
                 else
                 {
-                    // Hack to force executing the async JS code.
-                    OpenSilver.Interop.ExecuteJavaScriptVoid(null, true);
+                    INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
                 }
             }
         }

@@ -1185,7 +1185,7 @@ namespace Windows.UI.Xaml
                 {
                     string uid = ((INTERNAL_HtmlDomElementReference)element).UniqueIdentifier;
                     string javaScriptCodeToExecute = $@"document.rerouteMouseEvents(""{uid}"")";
-                    INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
+                    INTERNAL_ExecuteJavaScript.ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
                 }
                 return true;
             }
@@ -1280,7 +1280,7 @@ document.onclick = null;
 document.oncontextmenu = null;
 document.ondblclick = null;
 ";
-                    INTERNAL_HtmlDomManager.ExecuteJavaScript(javaScriptCodeToExecute);
+                    INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
                     Pointer.INTERNAL_captured = null;
 #if MIGRATION
                     OnLostMouseCapture(new MouseEventArgs());

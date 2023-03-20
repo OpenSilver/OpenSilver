@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenSilver.Internal;
 using System.ComponentModel;
+using CSHTML5;
 #if MIGRATION
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
@@ -499,7 +500,10 @@ namespace Windows.UI.Xaml.Controls
             base.INTERNAL_OnAttachedToVisualTree();
 
             // Prevent the selection of text while dragging from the DragDropTarget
-            OpenSilver.Interop.ExecuteJavaScriptAsync("$0.style.userSelect = 'none'", this.INTERNAL_OuterDomElement);
+            INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation("$0.style.userSelect = 'none'", 
+                runAsynchronously: true, wantsResult: false, wantsReferenceId: false,
+                hasImpactOnPendingJSCode: false, 
+                INTERNAL_OuterDomElement);
         }
 
 

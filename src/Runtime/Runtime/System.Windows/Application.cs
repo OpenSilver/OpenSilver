@@ -717,11 +717,8 @@ namespace Windows.UI.Xaml
         /// <param name="entryPoint"></param>
         public static void RunApplication(Action entryPoint)
         {
-            // (See the comments in the definition of the following method for more information on the purpose)
-            INTERNAL_SimulatorExecuteJavaScript.RunActionThenExecutePendingAsyncJSCodeExecutedDuringThatAction
-                (
-                entryPoint
-                );
+            entryPoint();
+            INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
         }
 #endif
     }

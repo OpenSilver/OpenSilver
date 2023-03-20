@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -117,6 +118,8 @@ namespace Windows.UI.Xaml.Shapes
 				return;
 			}
 
+            BulkExecuteJavascriptAsync bulkJs = new BulkExecuteJavascriptAsync();
+
 			double minX = Points[0].X;
 			double minY = Points[0].Y;
 			double maxX = Points[0].X;
@@ -148,35 +151,37 @@ namespace Windows.UI.Xaml.Shapes
 				ApplyMarginToFixNegativeCoordinates(_marginOffsets);
 			}
 
-			object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDomElement);
+			object context = bulkJs.AddJavascriptAsync(@"$0.getContext('2d')", _canvasDomElement) ;
 
 			//we remove the previous drawing:
-			CSHTML5.Interop.ExecuteJavaScriptAsync("$0.clearRect(0,0, $1, $2)", context, shapeActualSize.Width, shapeActualSize.Height);
+            bulkJs.AddJavascript("$0.clearRect(0,0, $1, $2)", context, shapeActualSize.Width, shapeActualSize.Height);
 
 			double opacity = Stroke == null ? 1 : Stroke.Opacity;
-			object strokeValue = GetHtmlBrush(this, context, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
-			object fillValue = GetHtmlBrush(this, context, Fill, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
+			object strokeValue = GetHtmlBrush(this, context, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize, bulkJs);
+			object fillValue = GetHtmlBrush(this, context, Fill, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize, bulkJs);
 
 			if (fillValue != null)
 			{
-				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = $1", context, fillValue);
+				bulkJs.AddJavascript(@"$0.fillStyle = $1", context, fillValue);
 			}
 			else
 			{
 				// If fillValue is not set it will be black.
-				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = 'transparent'", context);
+                bulkJs.AddJavascript(@"$0.fillStyle = 'transparent'", context);
 			}
 
 			INTERNAL_ShapesDrawHelpers.PrepareLines(_canvasDomElement, Points, StrokeThickness, true);
 
 			if (strokeValue != null)
-				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.strokeStyle = $1", context, strokeValue);
+                bulkJs.AddJavascript(@"$0.strokeStyle = $1", context, strokeValue);
 
-			CSHTML5.Interop.ExecuteJavaScriptAsync("$0.lineWidth = $1", context, StrokeThickness.ToString());
+            bulkJs.AddJavascript("$0.lineWidth = $1", context, StrokeThickness.ToString());
 			if (Stroke != null && StrokeThickness > 0)
 			{
-				CSHTML5.Interop.ExecuteJavaScriptAsync("$0.stroke()", context);
+                bulkJs.AddJavascript("$0.stroke()", context);
 			}
-		}
+
+            bulkJs.ExecuteAndDispose();
+        }
 	}
 }

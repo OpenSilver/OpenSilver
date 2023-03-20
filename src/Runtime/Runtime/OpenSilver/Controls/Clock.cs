@@ -54,7 +54,7 @@ namespace OpenSilver.Controls
         {
             if (_flatpickrInstance != null)
             {
-                Interop.ExecuteJavaScript("$0.set($1, $2)", _flatpickrInstance, option, value);
+                Interop.ExecuteJavaScriptVoid("$0.set($1, $2)", flushQueue:false, _flatpickrInstance, option, value);
             }
         }
 
@@ -83,15 +83,15 @@ namespace OpenSilver.Controls
 
 
             // Register the JS events:
-            Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
+            Interop.ExecuteJavaScriptVoid(@"$0.config.onChange.push(function(args) {
             var date = args[0];
             var hours = date.getHours();
             var minutes = date.getMinutes();
             $1(hours, minutes);
-            });", _flatpickrInstance, (Action<object, object>)OnJavaScriptEvent_Change);
+            });", flushQueue:false, _flatpickrInstance, (Action<object, object>)OnJavaScriptEvent_Change);
 
             // Hide the input area:
-            Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
+            Interop.ExecuteJavaScriptVoid(@"$0.style.display = 'none'", flushQueue:false, div);
         }
 
         private static void OnMinuteIntervalChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

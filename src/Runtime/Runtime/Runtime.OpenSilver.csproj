@@ -112,6 +112,9 @@
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
 		<Compile Include="OpenSilver\Internal\IJavaScriptConvertible.cs" />
+		<Compile Include="PublicAPI\Interop\BulkExecuteJavascriptAsync.cs" />
+		<Compile Include="PublicAPI\Interop\JSObjectReferenceHolder.cs" />
+		<Compile Include="PublicAPI\Interop\StackTraceProvider.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
 		<Compile Include="PublicAPI\Interop\JavascriptCallback.cs" />
 		<Compile Include="PublicAPI\Interop\JavaScriptCallbackHelper.cs" />
@@ -603,7 +606,7 @@
 		<Compile Include="Core\Main\INTERNAL_PropertyStorage.cs" />
 		<Compile Include="Core\Main\INTERNAL_PropertyStore.cs" />
 		<Compile Include="Core\Main\INTERNAL_Simulator.cs" />
-		<Compile Include="Core\Main\INTERNAL_SimulatorExecuteJavaScript.cs" />
+		<Compile Include="Core\Main\INTERNAL_ExecuteJavaScript.cs" />
 		<Compile Include="Core\Main\INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.cs" />
 		<Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />

@@ -289,31 +289,33 @@ namespace System.ServiceModel
             // Attempt to read the WCF endpoint address by first looking into the 
             // "ServiceReferences.ClientConfig" file, and then the "App.Config" file
             string endpointAddress;
-            object serviceReferencesClientConfig = OpenSilver.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig");
-            if (TryReadEndpoint(serviceReferencesClientConfig,
-                                "ServiceReferences.ClientConfig",
-                                contractConfigurationName,
-                                false /* throw if not found */,
-                                out endpointAddress))
-            {
-                _remoteAddressAsString = endpointAddress;
-            }
-            else
-            {
-                object appConfig = OpenSilver.Interop.ExecuteJavaScript("window.AppConfig");
-                if (TryReadEndpoint(appConfig,
-                                    "App.Config",
-                                    contractConfigurationName,
-                                    true /* throw if not found */,
-                                    out endpointAddress))
+            using (var serviceReferencesClientConfig = OpenSilver.Interop.ExecuteJavaScript("window.ServiceReferencesClientConfig")) {
+                if (TryReadEndpoint(serviceReferencesClientConfig,
+                        "ServiceReferences.ClientConfig",
+                        contractConfigurationName,
+                        false /* throw if not found */,
+                        out endpointAddress))
                 {
                     _remoteAddressAsString = endpointAddress;
                 }
                 else
                 {
-                    throw new Exception(
-                        string.Format("Could not find the default WCF endpoint element that references the contract '{0}' in the ServiceModel client configuration section.",
-                                      contractConfigurationName));
+                    using (var appConfig = OpenSilver.Interop.ExecuteJavaScript("window.AppConfig")) {
+                        if (TryReadEndpoint(appConfig,
+                                "App.Config",
+                                contractConfigurationName,
+                                true /* throw if not found */,
+                                out endpointAddress))
+                        {
+                            _remoteAddressAsString = endpointAddress;
+                        }
+                        else
+                        {
+                            throw new Exception(
+                                string.Format("Could not find the default WCF endpoint element that references the contract '{0}' in the ServiceModel client configuration section.",
+                                    contractConfigurationName));
+                        }
+                    }
                 }
             }
         }

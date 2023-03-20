@@ -104,7 +104,7 @@ namespace Windows.UI.Xaml.Controls
                 })", div, GetJsDate(defaultDate));
 
             // Register the JS events:
-            OpenSilver.Interop.ExecuteJavaScript(@"$0.config.onChange.push(function(args) {
+            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.onChange.push(function(args) {
                 var date = args[0];
                 if(date !== undefined)
                 {
@@ -113,18 +113,18 @@ namespace Windows.UI.Xaml.Controls
                     var year = date.getFullYear();
                     $1(year, month, day);
                 }
-            });", _flatpickrInstance, (Action<object, object, object>)OnJavaScriptEvent_Change);
+            });", flushQueue:false, _flatpickrInstance, (Action<object, object, object>)OnJavaScriptEvent_Change);
 
-            OpenSilver.Interop.ExecuteJavaScript(@"$0.config.onMonthChange.push(function(args) {
+            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.onMonthChange.push(function(args) {
                 $1();
-            });", _flatpickrInstance, (Action)OnMonthChange);
+            });", flushQueue:false, _flatpickrInstance, (Action)OnMonthChange);
 
             RefreshTodayHighlight(IsTodayHighlighted);
 
             // Enable click event
-            OpenSilver.Interop.ExecuteJavaScript(@"$0.calendarContainer.style.pointerEvents = 'auto'", _flatpickrInstance);
+            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.calendarContainer.style.pointerEvents = 'auto'", flushQueue:false, _flatpickrInstance);
             // Hide the input area:
-            OpenSilver.Interop.ExecuteJavaScript(@"$0.style.display = 'none'", div);
+            OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.style.display = 'none'", flushQueue:false, div);
         }
 
         void OnJavaScriptEvent_Change(object year, object month, object day)
@@ -173,8 +173,8 @@ namespace Windows.UI.Xaml.Controls
             if (isLoaded)
             {
                 string borderColor = isTodayHighlighted ? "transparent" : "";
-                OpenSilver.Interop.ExecuteJavaScript(@"var todaySpan = $0.calendarContainer.querySelector('span.today'); 
-                            if(todaySpan) todaySpan.style.borderColor = $1", _flatpickrInstance, borderColor);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"var todaySpan = $0.calendarContainer.querySelector('span.today'); 
+                            if(todaySpan) todaySpan.style.borderColor = $1", flushQueue:false, _flatpickrInstance, borderColor);
             }
         }
 
@@ -216,12 +216,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateStart == null)
             {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.config.minDate = undefined", this._flatpickrInstance);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.minDate = undefined", flushQueue:false, this._flatpickrInstance);
             }
             else
             {
                 DateTime nonNullDateStart = (DateTime)dateStart;
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.config.minDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateStart));
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.minDate = $1", flushQueue:false, this._flatpickrInstance, GetJsDate(nonNullDateStart));
             }
         }
 
@@ -229,12 +229,12 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateEnd == null)
             {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = undefined", flushQueue:false, this._flatpickrInstance);
             }
             else
             {
                 DateTime nonNullDateEnd = (DateTime)dateEnd;
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.config.maxDate = $1", this._flatpickrInstance, GetJsDate(nonNullDateEnd));
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = $1", flushQueue:false, this._flatpickrInstance, GetJsDate(nonNullDateEnd));
             }
         }
 
@@ -242,7 +242,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (dateTime == null)
             {
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.config.maxDate = undefined", this._flatpickrInstance);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.config.maxDate = undefined", flushQueue:false, this._flatpickrInstance);
             }
             else
             {
@@ -251,14 +251,14 @@ namespace Windows.UI.Xaml.Controls
                 {
                     throw new ArgumentOutOfRangeException("The given date is not in the range specified by System.Windows.Controls.Calendar.DisplayDateStart and System.Windows.Controls.Calendar.DisplayDateEnd");
                 }
-                OpenSilver.Interop.ExecuteJavaScript(@"$0.jumpToDate($1)", this._flatpickrInstance, GetJsDate(nonNullDate));
+                OpenSilver.Interop.ExecuteJavaScriptVoid(@"$0.jumpToDate($1)", flushQueue:false, this._flatpickrInstance, GetJsDate(nonNullDate));
             }
         }
 
         static object GetJsDate(DateTime dateTime)
         {
-            var date = OpenSilver.Interop.ExecuteJavaScript("new Date($0,$1,$2)", dateTime.Year, dateTime.Month - 1, dateTime.Day);
-            return date;
+            using(var date = OpenSilver.Interop.ExecuteJavaScript("new Date($0,$1,$2)", dateTime.Year, dateTime.Month - 1, dateTime.Day))
+                return date;
         }
     }
 }

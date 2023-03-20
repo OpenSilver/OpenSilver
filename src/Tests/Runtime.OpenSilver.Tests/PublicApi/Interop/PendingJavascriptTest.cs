@@ -54,11 +54,7 @@ namespace CSHTML5.Internal
 
             pj.AddJavaScript("console.log(1)");
 
-            executionHandlerMock
-                .Setup(x => x.InvokeUnmarshalled<byte[], int, object>(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<int>()))
-                .Returns<string, byte[], int>((name, bytes, length) => pj.ExecuteJavaScript(null, true));
-
-            var res = pj.ExecuteJavaScript("", true);
+            var res = pj.ExecuteJavaScript("", 0, true);
             res.Should().BeNull();
         }
     }

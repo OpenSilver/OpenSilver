@@ -36,9 +36,8 @@ namespace CSHTML5
     internal static class INTERNAL_InteropImplementation
     {
         private static bool _isInitialized;
-        private static readonly SynchronyzedStore<string> _javascriptCallsStore = new SynchronyzedStore<string>();
         private static readonly ReferenceIDGenerator _refIdGenerator = new ReferenceIDGenerator();
-        
+
         static INTERNAL_InteropImplementation()
         {
             Application.INTERNAL_Reloaded += (sender, e) =>
@@ -57,7 +56,7 @@ namespace CSHTML5
             if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
                 // Adding a property to the JavaScript "window" object:
-                dynamic jsWindow = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult("window");
+                dynamic jsWindow = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptWithResult("window");
                 jsWindow.SetProperty("onCallBack", new OnCallbackSimulator());
             }
 
@@ -93,10 +92,33 @@ namespace CSHTML5
             }
         }
 
-#if BRIDGE
-        [Bridge.Template("null")]
-#endif
-        internal static INTERNAL_JSObjectReference ExecuteJavaScript_SimulatorImplementation(string javascript, bool runAsynchronously, bool noImpactOnPendingJSCode = false, params object[] variables)
+        internal static string ReplaceJSArgs(string javascript, params object[] variables)
+        {
+            // Make sure the JS to C# interop is set up:
+            EnsureInitialized();
+
+            // If the javascript code has references to previously obtained JavaScript objects,
+            // we replace those references with calls to the "document.jsObjRef"
+            // dictionary.
+            // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we
+            // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
+            // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
+            // 10 arguments and using "$10".
+            for (int i = variables.Length - 1; i >= 0; i--)
+            {
+                javascript = javascript.Replace($"${i}", GetVariableStringForJS(variables[i]));
+            }
+
+            return javascript;
+        }
+
+        internal static object ExecuteJavaScript_Implementation(
+            string javascript,
+            bool runAsynchronously,
+            bool wantsResult = true,
+            bool wantsReferenceId = true,
+            bool hasImpactOnPendingJSCode = true,
+            params object[] variables)
         {
             //---------------
             // Due to the fact that it is not possible to pass JavaScript objects between the simulator JavaScript context
@@ -108,50 +130,54 @@ namespace CSHTML5
             // aforementioned dictionary.
             //---------------
 
-            // Verify the arguments:
-            if (noImpactOnPendingJSCode && runAsynchronously)
-            {
-                throw new ArgumentException("You cannot set both 'noImpactOnPendingJSCode' and 'runAsynchronously' to True. The 'noImpactOnPendingJSCode' only has meaning when running synchronously.");
-            }
+            javascript = ReplaceJSArgs(javascript, variables);
 
-            // Make sure the JS to C# interop is set up:
-            EnsureInitialized();
-
-            string unmodifiedJavascript = javascript;
-
-            // If the javascript code has references to previously obtained JavaScript objects,
-            // we replace those references with calls to the "document.jsObjRef"
-            // dictionary.
-            // Note: we iterate in reverse order because, when we replace ""$" + i.ToString()", we
-            // need to replace "$10" before replacing "$1", otherwise it thinks that "$10" is "$1"
-            // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
-            // 10 arguments and using "$10".
-            for (int i = variables.Length - 1; i >= 0; i--)
-            {
-                javascript = javascript.Replace("$" + i.ToString(), GetVariableStringForJS(variables[i]));
-            }
-
-            // Change the JS code to call ShowErrorMessage in case of error:
-            string errorCallBackId = _javascriptCallsStore.Add(unmodifiedJavascript).ToString();
+            object result = null;
 
             // Surround the javascript code with some code that will store the
             // result into the "document.jsObjRef" for later
             // use in subsequent calls to this method
-            string referenceId = _refIdGenerator.NewId().ToString();
-            javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
-
-            // Execute the javascript code:
-            object value = null;
-            if (!runAsynchronously)
+            int referenceId = wantsReferenceId ? _refIdGenerator.NewId() : -1;
+            if (runAsynchronously)
             {
-                value = INTERNAL_HtmlDomManager.ExecuteJavaScriptWithResult(javascript, noImpactOnPendingJSCode: noImpactOnPendingJSCode);
+                if (wantsReferenceId)
+                    INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript, referenceId);
+                else
+                    INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
             }
             else
             {
-                INTERNAL_HtmlDomManager.ExecuteJavaScript(javascript);
+                // run sync
+                result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId, wantsResult, flush: hasImpactOnPendingJSCode);
             }
 
-            return new INTERNAL_JSObjectReference(value, referenceId);
+            if (wantsResult)
+            {
+                if (wantsReferenceId)
+                    result = new INTERNAL_JSObjectReference(result, referenceId.ToString(), javascript);
+                else if (runAsynchronously)
+                    throw new Exception("runAsync + wantsResult + !wantsReferenceId -> use INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync");
+            }
+            else
+                result = null;
+
+            return result;
+        }
+
+#if BRIDGE
+        [Bridge.Template("null")]
+#endif
+        internal static INTERNAL_JSObjectReference ExecuteJavaScript_GetJSObject(
+            string javascript,
+            bool runAsynchronously,
+            bool hasImpactOnPendingJSCode = true,
+            params object[] variables)
+        {
+            var result = ExecuteJavaScript_Implementation(javascript, runAsynchronously,
+                                                          wantsResult: true,
+                                                          wantsReferenceId: true,
+                                                          hasImpactOnPendingJSCode, variables);
+            return (INTERNAL_JSObjectReference)result;
         }
 
         internal static void ResetLoadedFilesDictionaries()
@@ -160,31 +186,6 @@ namespace CSHTML5
             _loadedFiles.Clear();
         }
 
-        internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
-        {
-            string str = _javascriptCallsStore.Get(indexOfCallInList);
-
-#if OPENSILVER
-            if (IsRunningInTheSimulator_WorkAround())
-#else
-            if (IsRunningInTheSimulator())
-#endif
-            {
-                DotNetForHtml5.Core.INTERNAL_Simulator.SimulatorProxy.ReportJavaScriptError(errorMessage, str);
-            }
-            else
-            {
-                string message = string.Format(@"Error in the following javascript code:
-
-{0}
-
------ Error: -----
-
-{1}
-", str, errorMessage);
-                Console.WriteLine(message);
-            }
-        }
 
         //This Dictionary is here to:
         // - know when we are already attempting to load the file so we do not try to load it a second time
@@ -235,7 +236,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -247,7 +248,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();

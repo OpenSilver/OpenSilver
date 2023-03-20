@@ -111,7 +111,7 @@ namespace Windows.UI.Xaml
             // 4: Fifth button, typically the Browser Forward button
 
             int button;
-            int.TryParse(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.button").ToString(), out button);
+            int.TryParse(OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.button"), out button);
 
             switch (button)
             {
@@ -152,7 +152,7 @@ namespace Windows.UI.Xaml
             // 4: Fifth button, typically the Browser Forward button
 
             int button;
-            int.TryParse(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.button").ToString(), out button);
+            int.TryParse(OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.button"), out button);
 
             switch (button)
             {
@@ -390,7 +390,7 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnKeyPress(object jsEventArg)
         {
-            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.keyCode").ToString(), out int keyCode))
+            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.keyCode"), out int keyCode))
             {
                 return;
             }
@@ -417,7 +417,7 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnKeyDown(object jsEventArg)
         {
-            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.keyCode").ToString(), out int keyCode))
+            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.keyCode"), out int keyCode))
             {
                 return;
             }
@@ -451,7 +451,7 @@ namespace Windows.UI.Xaml
 
         private void ProcessOnKeyUp(object jsEventArg)
         {
-            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScript($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.keyCode").ToString(), out int keyCode))
+            if (!int.TryParse(OpenSilver.Interop.ExecuteJavaScriptString($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.keyCode"), out int keyCode))
             {
                 return;
             }

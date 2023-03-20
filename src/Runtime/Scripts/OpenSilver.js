@@ -130,9 +130,16 @@ window.callJS = function (javaScriptToExecute) {
     }
 };
 
-window.callJSUnmarshalled = function (javaScriptToExecute) {
+window.callJSUnmarshalled = function (javaScriptToExecute, referenceId, wantsResult) {
     javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
     var result = eval(javaScriptToExecute);
+
+    if (referenceId >= 0)
+        document.jsObjRef[referenceId.toString()] = result;
+
+    if (!wantsResult) 
+        return;
+
     var resultType = typeof result;
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
         return BINDING.js_to_mono_obj(result);
@@ -145,19 +152,12 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
 };
 
 
+// IMPORTANT: this doesn't return anything (this just executes the pending async JS)
 window.callJSUnmarshalledHeap = (function () {
     const textDecoder = new TextDecoder('utf-16le');
     return function (arrAddress, length) {
         const byteArray = Module.HEAPU8.subarray(arrAddress + 16, arrAddress + 16 + length);
         const javaScriptToExecute = textDecoder.decode(byteArray);
-        const result = eval(javaScriptToExecute);
-        const resultType = typeof result;
-        if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
-            return BINDING.js_to_mono_obj(result);
-        } else if (result == null) {
-            return null;
-        } else {
-            return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
-        }
+        eval(javaScriptToExecute);
     };
 })();

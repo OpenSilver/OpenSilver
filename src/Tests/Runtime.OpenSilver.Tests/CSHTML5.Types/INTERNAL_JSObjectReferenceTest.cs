@@ -26,75 +26,57 @@ namespace Runtime.OpenSilver.Tests.CSHTML5.Types
         private const double Delta = 0.0001;
 
         [TestMethod]
-        public void ConvertToBool()
+        public void INTERNAL_JSObjectReferenceToBool()
         {
-            var objRef = new INTERNAL_JSObjectReference(TrueJsonElement);
-            Assert.IsTrue((bool)objRef);
-            Assert.IsTrue(Convert.ToBoolean(objRef));
+            Assert.IsTrue(INTERNAL_JSObjectReference.ToBoolean(TrueJsonElement));
         }
 
         [TestMethod]
-        public void ConvertToString()
+        public void INTERNAL_JSObjectReferenceToString()
         {
-            var objRef = new INTERNAL_JSObjectReference(StrJsonElement);
-            Assert.AreEqual(StrJsonElement.GetString(), (string)objRef);
-            Assert.AreEqual(StrJsonElement.GetString(), Convert.ToString(objRef, CultureInfo.InvariantCulture));
-            Assert.AreEqual(StrJsonElement.GetString(), objRef.ToString(CultureInfo.InvariantCulture));
+            Assert.AreEqual(StrJsonElement.GetString(), INTERNAL_JSObjectReference.ToString(StrJsonElement));
         }
 
         [TestMethod]
-        public void ConvertToIntegerNumber()
+        public void INTERNAL_JSObjectReferenceToIntegerNumber()
         {
-            var objRef = new INTERNAL_JSObjectReference(IntegerNumberJsonElement);
-            Assert.AreEqual(IntegerNumberJsonElement.GetByte(), (byte)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetByte(), Convert.ToByte(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetSByte(), (sbyte)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetSByte(), Convert.ToSByte(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetDecimal(), (decimal)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetDecimal(), Convert.ToDecimal(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetInt16(), (short)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetInt16(), Convert.ToInt16(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetInt32(), (int)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetInt32(), Convert.ToInt32(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetInt64(), (long)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetInt64(), Convert.ToInt64(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetUInt16(), (ushort)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetUInt16(), Convert.ToUInt16(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetUInt32(), (uint)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetUInt32(), Convert.ToUInt32(objRef));
-            Assert.AreEqual(IntegerNumberJsonElement.GetUInt64(), (ulong)objRef);
-            Assert.AreEqual(IntegerNumberJsonElement.GetUInt64(), Convert.ToUInt64(objRef));
+            Assert.AreEqual(IntegerNumberJsonElement.GetByte(), INTERNAL_JSObjectReference.ToByte(IntegerNumberJsonElement));
+
+            Assert.AreEqual(IntegerNumberJsonElement.GetSByte(), INTERNAL_JSObjectReference.ToSByte(IntegerNumberJsonElement));
+            
+            Assert.AreEqual(IntegerNumberJsonElement.GetDecimal(), INTERNAL_JSObjectReference.ToDecimal(IntegerNumberJsonElement));
+            Assert.AreEqual(IntegerNumberJsonElement.GetInt16(), INTERNAL_JSObjectReference.ToInt16(IntegerNumberJsonElement));
+            Assert.AreEqual(IntegerNumberJsonElement.GetInt32(), INTERNAL_JSObjectReference.ToInt32(IntegerNumberJsonElement));
+            Assert.AreEqual(IntegerNumberJsonElement.GetInt64(), INTERNAL_JSObjectReference.ToInt64(IntegerNumberJsonElement));
+            Assert.AreEqual(IntegerNumberJsonElement.GetUInt16(), INTERNAL_JSObjectReference.ToUInt16(IntegerNumberJsonElement));
+            Assert.AreEqual(IntegerNumberJsonElement.GetUInt32(), INTERNAL_JSObjectReference.ToUInt32(IntegerNumberJsonElement));
+            Assert.AreEqual(IntegerNumberJsonElement.GetUInt64(), INTERNAL_JSObjectReference.ToUInt64(IntegerNumberJsonElement));
         }
 
         [TestMethod]
-        public void ConvertToRealNumber()
+        public void INTERNAL_JSObjectReferenceToRealNumber()
         {
-            var objRef = new INTERNAL_JSObjectReference(RealNumberJsonElement);
-            Assert.AreEqual(RealNumberJsonElement.GetDouble(), (double)objRef, Delta);
-            Assert.AreEqual(RealNumberJsonElement.GetDouble(), Convert.ToDouble(objRef), Delta);
-            Assert.AreEqual(RealNumberJsonElement.GetSingle(), (float)objRef, Delta);
-            Assert.AreEqual(RealNumberJsonElement.GetSingle(), Convert.ToSingle(objRef), Delta);
+            Assert.AreEqual(RealNumberJsonElement.GetDouble(), INTERNAL_JSObjectReference.ToDouble(RealNumberJsonElement), Delta);
+            Assert.AreEqual(RealNumberJsonElement.GetSingle(), INTERNAL_JSObjectReference.ToSingle(RealNumberJsonElement), Delta);
         }
 
         [TestMethod]
         public void IsUndefined()
         {
-            var objRef = new INTERNAL_JSObjectReference(UndefinedJsonElement);
-            Assert.IsTrue(objRef.IsUndefined());
+            Assert.IsTrue(INTERNAL_JSObjectReference.IsUndefined(UndefinedJsonElement));
         }
 
         [TestMethod]
         public void IsNull()
         {
-            var objRef = new INTERNAL_JSObjectReference(NullJsonElement);
-            Assert.IsTrue(objRef.IsNull());
+            Assert.IsTrue(INTERNAL_JSObjectReference.IsNull(NullJsonElement));
         }
 
         [TestMethod]
-        public void ConvertToGuid()
+        public void INTERNAL_JSObjectReferenceToGuid()
         {
-            var objRef = new INTERNAL_JSObjectReference(GuidJsonElement);
-            Assert.AreEqual(Guid.Parse(GuidJsonElement.ToString()), Convert.ChangeType(objRef, typeof(Guid)));
+            var guid = GuidJsonElement.ToString();
+            Assert.AreEqual(Guid.Parse(GuidJsonElement.ToString()), INTERNAL_JSObjectReference.ToType(typeof(Guid), guid));
         }
     }
 }

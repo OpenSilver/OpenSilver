@@ -146,12 +146,9 @@ namespace System.Windows.Browser
                 throw new ArgumentException($"{nameof(name)} is an empty string or contains an embedded null character (\0)");
             }
 
-            var jsObject = OpenSilver.Interop.ExecuteJavaScript(name);
-
-            if (!jsObject.ToString().Equals("undefined"))
-            {
-                result = jsObject;
-            }
+            using(var jsObject = OpenSilver.Interop.ExecuteJavaScript(name))
+                if (!jsObject.ToString().Equals("undefined"))
+                    result = jsObject;
 
             return result;
         }
