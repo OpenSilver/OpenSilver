@@ -7,7 +7,7 @@ using CSHTML5;
 using CSHTML5.Internal;
 using CSHTML5.Types;
 
-namespace Runtime.OpenSilver.PublicAPI.Interop
+namespace OpenSilver.Internal
 {
     public class BulkExecuteJavascriptAsync
     {

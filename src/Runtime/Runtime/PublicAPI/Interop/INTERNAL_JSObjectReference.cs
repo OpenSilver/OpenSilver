@@ -15,7 +15,6 @@ using System;
 using System.Text.Json;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-using Runtime.OpenSilver.PublicAPI.Interop;
 
 namespace CSHTML5.Types
 {
@@ -224,6 +223,7 @@ namespace CSHTML5.Types
         public override string ToString() => ToString(null);
         public void Dispose() {
             RemoveFromJS();
+            GC.SuppressFinalize(this);
         }
 
         public static explicit operator string(INTERNAL_JSObjectReference input) => input.ToString(null);
@@ -257,7 +257,8 @@ namespace CSHTML5.Types
         public static  ulong ToUInt64(object value) => Convert.ToUInt64(new INTERNAL_JSObjectReference(value).GetActualValue());
         public static  string ToString(object value) => new INTERNAL_JSObjectReference(value).GetActualValue()?.ToString();
         public static object ToType(Type conversionType, object value) => new INTERNAL_JSObjectReference(value).ToType(conversionType, null);
-
+        public static bool IsUndefined(object value) => new INTERNAL_JSObjectReference(value).IsUndefined();
+        public static bool IsNull(object value) => new INTERNAL_JSObjectReference(value).IsNull();
 
         public TypeCode GetTypeCode() => throw new NotImplementedException();
         public bool ToBoolean(IFormatProvider provider) => Convert.ToBoolean(GetActualValue());

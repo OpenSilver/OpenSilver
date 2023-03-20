@@ -12,7 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
-using Runtime.OpenSilver.PublicAPI.Interop;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Runtime.OpenSilver.PublicAPI.Interop
+namespace OpenSilver.Internal 
 {
         [DebuggerDisplay("{FunctionName} {FileName}:{Line}")]
         public class FunctionDetails {

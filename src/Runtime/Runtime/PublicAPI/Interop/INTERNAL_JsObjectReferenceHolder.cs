@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CSHTML5.Types;
 
-namespace Runtime.OpenSilver.PublicAPI.Interop
+namespace OpenSilver.Internal 
 {
     // purpose -- keep references to all c# code that uses JsObjectReference
     internal class INTERNAL_JsObjectReferenceHolder

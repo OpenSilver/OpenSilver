@@ -20,7 +20,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using CSHTML5;
-using Runtime.OpenSilver.PublicAPI.Interop;
 
 #if MIGRATION
 using System.Windows.Media;

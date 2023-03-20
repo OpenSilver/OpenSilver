@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using CSHTML5;
-using Runtime.OpenSilver.PublicAPI.Interop;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows;
@@ -28,45 +28,6 @@ using Windows.UI.Xaml;
 
 namespace OpenSilver
 {
-    /*
-        // AOT results
-        //
-        //result=9999999, run=1000000 took 1111
-        //result=0, run=1000000 took 844
-        //result=abcggggggggggggggggggggggggggggggggggggggggggggggg... [50003], run=50000 took 5710
-        //result=, run=50000 took 39
-        private void RunSyncJS<T>(string init, string increment, int count, bool getResult, T defaultValue = default) {
-
-            Stopwatch watch = Stopwatch.StartNew();
-            T result = defaultValue;
-            Interop.ExecuteJavaScriptVoid(init);
-            for (int i = 0; i < count; ++i) {
-                if (getResult)
-                    Interop.ExecuteJavaScriptGetResult(increment, ref result);
-                else 
-                    Interop.ExecuteJavaScriptVoid(increment);
-            }
-
-            var str = result.ToString();
-            if (str.Length > 50) {
-                var len = str.Length;
-                str = $"{str.Substring(0, 50) }... [{len}]" ;
-            }
-
-            Console.WriteLine($"result={str}, run={count} took {watch.ElapsedMilliseconds}");
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e) {
-            Console.WriteLine("test started");
-            RunSyncJS<int>("var i = 0;", "i += 10;", 1000000, true);
-            RunSyncJS<int>("var i = 0;", "i += 10;", 1000000, false);
-
-            RunSyncJS<string>("document.sss = new String('abc');", "document.sss += 'g';", 50000, true, "");
-            RunSyncJS<string>("document.sss = new String('abc');", "document.sss += 'g';", 50000, false, "");
-            Console.WriteLine("test ended");
-        }
-     */
-
     /// <summary>
     /// Provides static methods for executing JavaScript code from within C#.
     /// </summary>
@@ -217,28 +178,6 @@ namespace OpenSilver
             var result = ExecuteJavaScriptGetResult(javascript);
             ConvertJavascriptResult(out t1, result);
         }
-        public static void ExecuteJavaScriptGetResult<T1>(IReadOnlyList<string> javascripts, out T1 t1) {
-            var list = ExecuteJavaScriptsGetResultsImpl(javascripts);
-            ConvertJavascriptResult(out t1, list[0]);
-        }
-        public static void ExecuteJavaScriptGetResult<T1, T2>(IReadOnlyList<string> javascripts, out T1 t1, out T2 t2) {
-            var list = ExecuteJavaScriptsGetResultsImpl(javascripts);
-            ConvertJavascriptResult(out t1, list[0]);
-            ConvertJavascriptResult(out t2, list[1]);
-        }
-        public static void ExecuteJavaScriptGetResult<T1, T2, T3>(IReadOnlyList<string> javascripts, out T1 t1, out T2 t2, out T3 t3) {
-            var list = ExecuteJavaScriptsGetResultsImpl(javascripts);
-            ConvertJavascriptResult(out t1, list[0]);
-            ConvertJavascriptResult(out t2, list[1]);
-            ConvertJavascriptResult(out t3, list[2]);
-        }
-        public static void ExecuteJavaScriptGetResult<T1, T2, T3, T4>(IReadOnlyList<string> javascripts, out T1 t1, out T2 t2, out T3 t3, out T4 t4) {
-            var list = ExecuteJavaScriptsGetResultsImpl(javascripts);
-            ConvertJavascriptResult(out t1, list[0]);
-            ConvertJavascriptResult(out t2, list[1]);
-            ConvertJavascriptResult(out t3, list[2]);
-            ConvertJavascriptResult(out t4, list[3]);
-        }
 
         /// <summary>
         /// Execute JavaScript code without document.callScriptSafe
@@ -256,25 +195,13 @@ namespace OpenSilver
                 variables: variables);
         }
         public static void ExecuteJavaScriptVoid(string javascript, params object[] variables ) {
-            CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation(javascript,
-                runAsynchronously: false,
-                wantsResult: false,
-                wantsReferenceId: false,
-                hasImpactOnPendingJSCode:true,
-                variables: variables);
+            ExecuteJavaScriptVoid(javascript, false, variables);
         }
 
         public static void ExecuteJavaScriptVoid(string javascript) {
             INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:false, flush:true);
         }
 
-        public static void ExecuteJavaScriptVoid(IReadOnlyList<string> javascript) {
-            var needsFlush = true;
-            foreach (var js in javascript) {
-                INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(js, referenceId: 0, wantsResult:false, flush: needsFlush);
-                needsFlush = false;
-            }
-        }
 
 
         public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables ) {

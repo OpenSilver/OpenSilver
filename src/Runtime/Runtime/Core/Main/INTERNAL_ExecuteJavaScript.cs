@@ -55,17 +55,9 @@ namespace CSHTML5.Internal
         }
 
 
-        public static Task<object> ExecuteJavaScriptAsync(string javaScriptToExecute, int referenceId, bool wantsResult, string commentForDebugging = null, bool hasImpactOnPendingCode = false) {
+        public static async Task<object> ExecuteJavaScriptAsync(string javaScriptToExecute, int referenceId, bool wantsResult, string commentForDebugging = null, bool hasImpactOnPendingCode = false) {
             TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-            Task.Run(() => {
-                try {
-                    var result = ExecuteJavaScriptSync(javaScriptToExecute, referenceId, wantsResult, commentForDebugging, hasImpactOnPendingCode);
-                    tcs.SetResult(result);
-                }
-                catch (Exception e) {
-                    tcs.SetException(e);
-                }
-            });
+            Task.Run(() => ExecuteJavaScriptSync(javaScriptToExecute, referenceId, wantsResult, commentForDebugging, hasImpactOnPendingCode));
             return tcs.Task;
         }
 

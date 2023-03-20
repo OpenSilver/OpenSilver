@@ -15,7 +15,6 @@
 using CSHTML5.Internal;
 using System;
 using OpenSilver.Internal;
-using Runtime.OpenSilver.PublicAPI.Interop;
 
 #if MIGRATION
 using System.Windows.Media;
