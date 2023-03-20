@@ -12,7 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Linq;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -44,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// stackPanel.Orientation = Orientation.Horizontal;
     /// </code>
     /// </example>
-    public partial class StackPanel : Panel
+    public class StackPanel : Panel
     {
         internal sealed override Orientation LogicalOrientation => Orientation;
 
@@ -80,30 +79,6 @@ namespace Windows.UI.Xaml.Controls
         public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
         {
             return StackPanelHelper.CreateDomChildWrapper(this, Orientation, parentRef, out domElementWhereToPlaceChild, index);
-        }
-
-        private double GetCrossLength(Size size)
-        {
-            return Orientation == Orientation.Horizontal ? size.Height : size.Width;
-        }
-
-        private double GetMainLength(Size size)
-        {
-            return Orientation == Orientation.Horizontal ? size.Width : size.Height;
-        }
-
-        private static Size CreateSize(Orientation orientation, double mainLength, double crossLength)
-        {
-            return orientation == Orientation.Horizontal ?
-                new Size(mainLength, crossLength) :
-                new Size(crossLength, mainLength);
-        }
-
-        private static Rect CreateRect(Orientation orientation, double mainStart, double crossStart, double mainLength, double crossLength)
-        {
-            return orientation == Orientation.Horizontal ?
-                new Rect(mainStart, crossStart, mainLength, crossLength) :
-                new Rect(crossStart, mainStart, crossLength, mainLength);
         }
 
         internal override bool CheckIsAutoWidth(FrameworkElement child)
@@ -156,61 +131,88 @@ namespace Windows.UI.Xaml.Controls
             return false;
         }
 
-        protected override Size MeasureOverride(Size availableSize)
+        protected override Size MeasureOverride(Size constraint)
         {
-            double availableCrossLength = GetCrossLength(availableSize);
-            Size measureSize = CreateSize(Orientation, Double.PositiveInfinity, availableCrossLength);
+            Size stackDesiredSize = new Size();
+            UIElementCollection children = Children;
+            Size layoutSlotSize = constraint;
+            bool fHorizontal = Orientation == Orientation.Horizontal;
 
-            double mainLength = 0;
-            double crossLength = 0;
-
-            UIElement[] childrens = Children.ToArray();
-            foreach (UIElement child in childrens)
+            //
+            // Initialize child sizing and iterator data
+            // Allow children as much size as they want along the stack.
+            //
+            if (fHorizontal)
             {
-                child.Measure(measureSize);
-
-                //INTERNAL_HtmlDomElementReference domElementReference = (INTERNAL_HtmlDomElementReference)child.INTERNAL_OuterDomElement;
-                //Console.WriteLine($"MeasureOverride StackPanel Child desired Width {domElementReference.UniqueIdentifier} {child.DesiredSize.Width}, Height {child.DesiredSize.Height}");
-
-                mainLength += GetMainLength(child.DesiredSize);
-                crossLength = Math.Max(crossLength, GetCrossLength(child.DesiredSize));
+                layoutSlotSize.Width = double.PositiveInfinity;
+            }
+            else
+            {
+                layoutSlotSize.Height = double.PositiveInfinity;
             }
 
-            // measuredCrossLength = availableCrossLength;
+            //
+            //  Iterate through children.
+            //
+            int count = children.Count;
+            for (int i = 0; i < count; ++i)
+            {
+                // Get next child.
+                UIElement child = children[i];
 
-            return CreateSize(Orientation, mainLength, crossLength);
+                // Measure the child.
+                child.Measure(layoutSlotSize);
+                Size childDesiredSize = child.DesiredSize;
+
+                // Accumulate child size.
+                if (fHorizontal)
+                {
+                    stackDesiredSize.Width += childDesiredSize.Width;
+                    stackDesiredSize.Height = Math.Max(stackDesiredSize.Height, childDesiredSize.Height);
+                }
+                else
+                {
+                    stackDesiredSize.Width = Math.Max(stackDesiredSize.Width, childDesiredSize.Width);
+                    stackDesiredSize.Height += childDesiredSize.Height;
+                }
+            }
+
+            return stackDesiredSize;
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
+        protected override Size ArrangeOverride(Size arrangeSize)
         {
-            double panelMainLength = Children.Select(child => GetMainLength(child.DesiredSize)).Sum();
-            double panelCrossLength = GetCrossLength(finalSize);
+            UIElementCollection children = Children;
+            bool fHorizontal = Orientation == Orientation.Horizontal;
+            Rect rcChild = new Rect(arrangeSize);
+            double previousChildSize = 0.0;
 
-            //Console.WriteLine($"StackPanel panelMainLength {panelMainLength}, panelCrossLength {panelCrossLength}");
-
-            Size measureSize = CreateSize(Orientation, Double.PositiveInfinity, panelCrossLength);
-            //Console.WriteLine($"StackPanel ArrangeOverride measureSize {measureSize.Width}, {measureSize.Height}");
-
-            UIElement[] childrens = Children.ToArray();
-            foreach (UIElement child in childrens)
+            //
+            // Arrange and Position Children.
+            //
+            int count = children.Count;
+            for (int i = 0; i < count; ++i)
             {
-                child.Measure(measureSize);
+                UIElement child = children[i];
+
+                if (fHorizontal)
+                {
+                    rcChild.X += previousChildSize;
+                    previousChildSize = child.DesiredSize.Width;
+                    rcChild.Width = previousChildSize;
+                    rcChild.Height = Math.Max(arrangeSize.Height, child.DesiredSize.Height);
+                }
+                else
+                {
+                    rcChild.Y += previousChildSize;
+                    previousChildSize = child.DesiredSize.Height;
+                    rcChild.Height = previousChildSize;
+                    rcChild.Width = Math.Max(arrangeSize.Width, child.DesiredSize.Width);
+                }
+
+                child.Arrange(rcChild);
             }
-            bool isNormalFlow = FlowDirection == FlowDirection.LeftToRight;
-            double childrenMainLength = 0;
-            foreach (UIElement child in childrens)
-            {
-                double childMainLength = GetMainLength(child.DesiredSize);
-                double childMainStart = isNormalFlow ? childrenMainLength : panelMainLength - childrenMainLength - childMainLength;
-
-                //Console.WriteLine($"StackPanel ArrangeOverride childMainLength {childMainLength}, childMainStart {childMainStart}");
-
-                child.Arrange(CreateRect(Orientation, childMainStart, 0, childMainLength, panelCrossLength));
-
-                childrenMainLength += childMainLength;
-            }
-
-            return CreateSize(Orientation, GetMainLength(finalSize), panelCrossLength);
+            return arrangeSize;
         }
     }
 }
