@@ -13,16 +13,31 @@
 *
 \*====================================================================================*/
 
+promises = [];
+
 // Load all css and js files
 (function (names) {
     names.forEach((name) => {
         var extension = name.split('.').pop();
         var url = name + "?date=" + new Date().toISOString();
         if (extension == 'js') {
-            var el = document.createElement('script');
-            el.setAttribute('type', 'application/javascript');
-            el.setAttribute('src', url);
-            document.getElementsByTagName('head')[0].appendChild(el);
+            //create a new promise to load the file, which wil help us know when the loading is done.
+            promises.push(new Promise((resolve, reject) => {
+                var el = document.createElement('script');
+                el.setAttribute('type', 'application/javascript');
+                el.setAttribute('src', url);
+                //register to the events of the script loading to settle the promise:
+                el.onload = function () {
+                    resolve(url);
+                };
+                // if it fails, return reject
+                el.onerror = function () {
+                    reject(url);
+                }
+                //attach the script tag.
+                document.getElementsByTagName('head')[0].appendChild(el);
+
+            }));
         }
         else if (extension == 'css') {
             var el = document.createElement('link');
@@ -42,6 +57,9 @@
     'libs/ResizeObserver.js',    
     'libs/quill.min.js',
     'libs/html2canvas.js']));
+
+//the function defined below returns a promise that can be awaited so we know the js files above have all been loaded (or failed, but we went through all of them).
+window.getOSFilesLoadedPromise = () => { return Promise.allSettled(promises); };
 
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";
