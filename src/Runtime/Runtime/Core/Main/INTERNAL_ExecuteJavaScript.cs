@@ -33,14 +33,17 @@ namespace CSHTML5.Internal
 
         private static readonly SynchronyzedStore<string> _javascriptCallsStore = new SynchronyzedStore<string>();
 
-        public static object ExecuteJavaScriptWithResult(string javascript, bool flush = true) => ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flush);
+        public static object ExecuteJavaScriptWithResult(string javascript, bool flush = true)
+            => ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flush);
 
         /// <summary>
         /// Executes JavaScript code immediately. This also forces all the pending async JS code to be executed (flush).
         /// </summary>
         /// <param name="javaScriptToExecute">The JS code to execute.</param>
+        /// <param name="referenceId"></param>
+        /// <param name="wantsResult"></param>
         /// <param name="commentForDebugging">Some optional comments to write to the log of JS calls.</param>
-        /// <param name="noImpactOnPendingJSCode">true to ignore pending javascript code from asynchronous interops</param>
+        /// <param name="flush"></param>
         /// <returns></returns>
         public static object ExecuteJavaScriptSync(string javaScriptToExecute, int referenceId, bool wantsResult, string commentForDebugging = null, bool flush = true)
         {
@@ -54,14 +57,13 @@ namespace CSHTML5.Internal
             return result;
         }
 
-
-        public static async Task<object> ExecuteJavaScriptAsync(string javaScriptToExecute, int referenceId, bool wantsResult, string commentForDebugging = null, bool hasImpactOnPendingCode = false) {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
-            Task.Run(() => ExecuteJavaScriptSync(javaScriptToExecute, referenceId, wantsResult, commentForDebugging, hasImpactOnPendingCode));
-            return tcs.Task;
+        public static Task<object> ExecuteJavaScriptAsync(string javaScriptToExecute, int referenceId, bool wantsResult, string commentForDebugging = null, bool hasImpactOnPendingCode = false)
+        {
+            return Task.Run(() => ExecuteJavaScriptSync(javaScriptToExecute, referenceId, wantsResult, commentForDebugging, hasImpactOnPendingCode));
         }
 
-        public static string WrapReferenceIdInJavascriptCall(string javascript, int referenceId) {
+        public static string WrapReferenceIdInJavascriptCall(string javascript, int referenceId)
+        {
             // Change the JS code to call ShowErrorMessage in case of error:
 
             // FIXME: uncomment after PR724 is approved
@@ -72,7 +74,8 @@ namespace CSHTML5.Internal
             return javascript;
         }
 
-        public static void QueueExecuteJavaScript(string javascript, int referenceId) {
+        public static void QueueExecuteJavaScript(string javascript, int referenceId)
+        {
             javascript = WrapReferenceIdInJavascriptCall(javascript, referenceId);
             QueueExecuteJavaScript(javascript);
         }

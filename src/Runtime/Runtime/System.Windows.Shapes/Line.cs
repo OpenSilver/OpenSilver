@@ -12,8 +12,9 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -180,7 +181,8 @@ namespace Windows.UI.Xaml.Shapes
 
         override internal protected void Redraw()
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this)) {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
                 BulkExecuteJavascriptAsync bulkJs = new BulkExecuteJavascriptAsync();
                 double minX = X1;
                 double minY = Y1;
@@ -263,7 +265,7 @@ namespace Windows.UI.Xaml.Shapes
                     //context.stroke(); //draw the line
                 }
 
-                bulkJs.ExecuteAndDispose();
+                _ = bulkJs.ExecuteAndDispose();
             }
         }
 

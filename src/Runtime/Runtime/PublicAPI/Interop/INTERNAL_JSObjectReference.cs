@@ -68,7 +68,7 @@ namespace CSHTML5.Types
             ReferenceId = referenceId;
 
             if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
-                INTERNAL_JsObjectReferenceHolder.Instance.Add(this, javascript);
+                JSObjectReferenceHolder.Instance.Add(this, javascript);
         }
 
         public INTERNAL_JSObjectReference(object value, string referenceId, int arrayIndex, string javascript)
@@ -79,7 +79,7 @@ namespace CSHTML5.Types
             ArrayIndex = arrayIndex;
 
             if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
-                INTERNAL_JsObjectReferenceHolder.Instance.Add(this, javascript);
+                JSObjectReferenceHolder.Instance.Add(this, javascript);
         }
 
         ~INTERNAL_JSObjectReference()
@@ -88,14 +88,16 @@ namespace CSHTML5.Types
             RemoveFromJS();
         }
 
-        private void RemoveFromJS() {
-            if (ReferenceId != "") {
+        private void RemoveFromJS()
+        {
+            if (ReferenceId != string.Empty)
+            {
                 INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");
 
                 if (OpenSilver.Interop.IsTrackingAllJavascriptObjects)
-                    INTERNAL_JsObjectReferenceHolder.Instance.Remove(this);
+                    JSObjectReferenceHolder.Instance.Remove(this);
 
-                ReferenceId = "";
+                ReferenceId = string.Empty;
             }
 
         }
@@ -221,7 +223,9 @@ namespace CSHTML5.Types
         public bool IsNull() => GetActualValue() == null;
 
         public override string ToString() => ToString(null);
-        public void Dispose() {
+
+        public void Dispose()
+        {
             RemoveFromJS();
             GC.SuppressFinalize(this);
         }
@@ -241,21 +245,21 @@ namespace CSHTML5.Types
         public static explicit operator uint(INTERNAL_JSObjectReference input) => input.ToUInt32(null);
         public static explicit operator ulong(INTERNAL_JSObjectReference input) => input.ToUInt64(null);
 
-        public static  bool ToBoolean(object value) => Convert.ToBoolean(new INTERNAL_JSObjectReference(value). GetActualValue());
-        public static  byte ToByte(object value) => Convert.ToByte(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  char ToChar(object value) => Convert.ToChar(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  DateTime ToDateTime(object value) => Convert.ToDateTime(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  decimal ToDecimal(object value) => Convert.ToDecimal(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  double ToDouble(object value) => Convert.ToDouble(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  short ToInt16(object value) => Convert.ToInt16(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  int ToInt32(object value) => Convert.ToInt32(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  long ToInt64(object value) => Convert.ToInt64(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  sbyte ToSByte(object value) => Convert.ToSByte(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  float ToSingle(object value) => Convert.ToSingle(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  ushort ToUInt16(object value) => Convert.ToUInt16(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  uint ToUInt32(object value) => Convert.ToUInt32(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  ulong ToUInt64(object value) => Convert.ToUInt64(new INTERNAL_JSObjectReference(value).GetActualValue());
-        public static  string ToString(object value) => new INTERNAL_JSObjectReference(value).GetActualValue()?.ToString();
+        public static bool ToBoolean(object value) => Convert.ToBoolean(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static byte ToByte(object value) => Convert.ToByte(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static char ToChar(object value) => Convert.ToChar(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static DateTime ToDateTime(object value) => Convert.ToDateTime(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static decimal ToDecimal(object value) => Convert.ToDecimal(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static double ToDouble(object value) => Convert.ToDouble(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static short ToInt16(object value) => Convert.ToInt16(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static int ToInt32(object value) => Convert.ToInt32(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static long ToInt64(object value) => Convert.ToInt64(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static sbyte ToSByte(object value) => Convert.ToSByte(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static float ToSingle(object value) => Convert.ToSingle(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static ushort ToUInt16(object value) => Convert.ToUInt16(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static uint ToUInt32(object value) => Convert.ToUInt32(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static ulong ToUInt64(object value) => Convert.ToUInt64(new INTERNAL_JSObjectReference(value).GetActualValue());
+        public static string ToString(object value) => new INTERNAL_JSObjectReference(value).GetActualValue()?.ToString();
         public static object ToType(Type conversionType, object value) => new INTERNAL_JSObjectReference(value).ToType(conversionType, null);
         public static bool IsUndefined(object value) => new INTERNAL_JSObjectReference(value).IsUndefined();
         public static bool IsNull(object value) => new INTERNAL_JSObjectReference(value).IsNull();

@@ -155,7 +155,9 @@ namespace CSHTML5.Internal
             }
 
             if (TryOptimizationForCommonTypes(callback, out object simpleResult))
+            {
                 return simpleResult;
+            }
 
             Type callbackType = callback.GetType();
             Type[] callbackGenericArgs = null;
@@ -167,20 +169,21 @@ namespace CSHTML5.Internal
 
             object[] arguments = null;
             IReadOnlyList<object> extraJsObjects = null;
-            try {
+            try
+            {
                 if (callbackType == typeof(Func<>))
                 {
                     return DelegateDynamicInvoke(callback);
                 }
 
                 int argumentCount = 0;
-                if (callbackType == typeof(Action<>) || callbackType == typeof(Func<,>)) 
+                if (callbackType == typeof(Action<>) || callbackType == typeof(Func<,>))
                     argumentCount = 1;
                 else if (callbackType == typeof(Action<,>) || callbackType == typeof(Func<,,>))
                     argumentCount = 2;
                 else if (callbackType == typeof(Action<,,>) || callbackType == typeof(Func<,,,>))
                     argumentCount = 3;
-                else if (callbackType == typeof(Action<,,,>) || callbackType == typeof(Func<,,,,>)) 
+                else if (callbackType == typeof(Action<,,,>) || callbackType == typeof(Func<,,,,>))
                     argumentCount = 4;
                 else if (callbackType == typeof(Action<,,,,>) || callbackType == typeof(Func<,,,,,>))
                     argumentCount = 5;
@@ -196,7 +199,8 @@ namespace CSHTML5.Internal
                 (arguments, extraJsObjects) = MakeArgumentsForCallback(argumentCount, idWhereCallbackArgsAreStored, callbackArgs, callbackGenericArgs);
                 return DelegateDynamicInvoke(callback, arguments);
             }
-            finally {
+            finally
+            {
                 if (arguments != null)
                     foreach (var arg in arguments.OfType<IDisposable>())
                         arg.Dispose();
@@ -205,9 +209,7 @@ namespace CSHTML5.Internal
                         arg.Dispose();
             }
 
-            throw new Exception(string.Format(
-                "Callback type not supported: {0}  Please report this issue to support@cshtml5.com",
-                callbackType.ToString()));
+            throw new Exception($"Callback type not supported: '{callbackType.FullName}'");
         }
 
         private static ApplicationException GenerateDeadlockException(TimeSpan timeout)

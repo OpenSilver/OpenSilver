@@ -23,7 +23,7 @@ namespace CSHTML5.Internal
     internal interface IPendingJavascript
     {
         void AddJavaScript(string javascript);
-        
+
         void Flush();
 
         object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult);
@@ -36,11 +36,9 @@ namespace CSHTML5.Internal
 
         private static readonly Encoding DefaultEncoding = Encoding.Unicode;
         private static readonly byte[] Delimiter = DefaultEncoding.GetBytes(";\n");
-        private readonly object _syncObj = new();
         private readonly IWebAssemblyExecutionHandler _webAssemblyExecutionHandler;
-        private byte[] _buffer;
+        private readonly byte[] _buffer;
         private int _currentLength;
-
 
         public PendingJavascript(int bufferSize, IWebAssemblyExecutionHandler webAssemblyExecutionHandler)
         {
@@ -71,7 +69,8 @@ namespace CSHTML5.Internal
             _currentLength += Delimiter.Length;
         }
 
-        public void Flush() {
+        public void Flush()
+        {
             if (_currentLength == 0)
                 return;
 
@@ -85,7 +84,8 @@ namespace CSHTML5.Internal
             _webAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(CallJSMethodNameAsync, _buffer, curLength);
         }
 
-        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult) {
+        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
+        {
             // IMPORTANT: wantsResult is passed on to JS, so that it will know if it needs to pass anything back to us
             // (optimization, when we don't care for the result)
             var result = _webAssemblyExecutionHandler.InvokeUnmarshalled<string, int, bool, object>(CallJSMethodNameSync, javascript, referenceId, wantsResult);
@@ -103,7 +103,7 @@ namespace CSHTML5.Internal
         {
             _jsExecutionHandler = jsExecutionHandler ?? throw new ArgumentNullException(nameof(jsExecutionHandler));
         }
-        
+
         public void AddJavaScript(string javascript)
         {
             lock (_pending)
@@ -112,24 +112,26 @@ namespace CSHTML5.Internal
             }
         }
 
-        public void Flush() {
+        public void Flush()
+        {
             string javascript = ReadAndClearAggregatedPendingJavaScriptCode();
-            if (!string.IsNullOrWhiteSpace(javascript)) 
+            if (!string.IsNullOrWhiteSpace(javascript))
                 PerformActualInteropCallVoid(javascript);
         }
 
-        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult) {
+        public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
+        {
             if (referenceId > 0 && !javascript.StartsWith("document.callScriptSafe"))
                 javascript = INTERNAL_ExecuteJavaScript.WrapReferenceIdInJavascriptCall(javascript, referenceId);
 
             if (wantsResult)
                 return PerformActualInteropCall(javascript);
-            else {
+            else
+            {
                 PerformActualInteropCallVoid(javascript);
                 return null;
             }
         }
-
 
         private object PerformActualInteropCall(string javaScriptToExecute)
         {
@@ -156,6 +158,7 @@ namespace CSHTML5.Internal
                 throw new InvalidOperationException("Unable to execute the following JavaScript code: " + Environment.NewLine + javaScriptToExecute, ex);
             }
         }
+
         private void PerformActualInteropCallVoid(string javaScriptToExecute)
         {
             if (INTERNAL_ExecuteJavaScript.EnableInteropLogging)

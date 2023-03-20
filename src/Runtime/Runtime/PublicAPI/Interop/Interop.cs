@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using CSHTML5;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -31,17 +30,20 @@ namespace OpenSilver
     /// <summary>
     /// Provides static methods for executing JavaScript code from within C#.
     /// </summary>
-    public static class Interop {
+    public static class Interop
+    {
         // for debugging/testing only
         // if > 0, we're dumping All JS objects every X millis
-        public static int DumpAllJavascriptObjectsEveryMs {
+        public static int DumpAllJavascriptObjectsEveryMs
+        {
             get => _dumpAllJavascriptObjectsEveryMs;
-            set {
+            set
+            {
                 if (_dumpAllJavascriptObjectsEveryMs == value)
                     return;
                 _dumpAllJavascriptObjectsEveryMs = value;
                 if (_dumpAllJavascriptObjectsEveryMs > 0)
-                    INTERNAL_JsObjectReferenceHolder.Instance.StartTracking(_dumpAllJavascriptObjectsEveryMs);
+                    JSObjectReferenceHolder.Instance.StartTracking(_dumpAllJavascriptObjectsEveryMs);
             }
         }
 
@@ -62,124 +64,112 @@ namespace OpenSilver
 
         internal static bool IsTrackingAllJavascriptObjects => DumpAllJavascriptObjectsEveryMs > 0;
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // START OF ExecuteJavascript* functions
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // not public -- if we return an object, when in the Simulator, we'd need to convert it,
-        // so the user wouldn't really know what to do with it
-        internal static object ExecuteJavaScriptGetResult(string javascript) {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:true);
-            return value;
-        }
-
-        private static IReadOnlyList<object> ExecuteJavaScriptsGetResultsImpl(IReadOnlyList<string> javascript) {
-            List<object> results = new List<object>();
-            var needsFlush = true;
-            foreach (var js in javascript) {
-                var value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(js, referenceId: 0, wantsResult:true, flush: needsFlush);
-                needsFlush = false;
-                results.Add(value);
-            }
-
-            return results;
-        }
-
-        private static void ConvertJavascriptResultString(out string s, object value) {
-            s = "";
-            string converted = null;
-            if (IsRunningInTheSimulator)
-                converted = INTERNAL_JSObjectReference.ToString(value);
-            else
-                converted = Convert.ToString(value);
-            s = converted;
-        }
-
-        private static T ConvertJavascriptResult<T>(object value) {
-            object converted = null;
-            if (typeof(T) == typeof(string)) {
-                ConvertJavascriptResultString(out var s, value);
-                var resultT = (T)(object)s;
-                return resultT;
-            }
-
-            T t = default;
-            if (t is double) {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToDouble(value);
-                else
-                    converted = Convert.ToDouble(value);
-            } else if (t is float) {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToSingle(value);
-                else
-                    converted = Convert.ToSingle(value);
-            } else if (t is bool) {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToBoolean(value);
-                else
-                    converted = Convert.ToBoolean(value);
-            } else if (t is byte) {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToByte(value);
-                else
-                    converted = Convert.ToByte(value);
-            } else if (t is char) {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToChar(value);
-                else
-                    converted = Convert.ToChar(value);
-            } else if (t is string) {
+        private static T ConvertJavascriptResult<T>(object value)
+        {
+            object converted;
+            Type t = typeof(T);
+            if (t == typeof(string))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToString(value);
                 else
                     converted = Convert.ToString(value);
-            } else if (t is int) {
+            }
+            else if (t == typeof(double))
+            {
+                if (IsRunningInTheSimulator)
+                    converted = INTERNAL_JSObjectReference.ToDouble(value);
+                else
+                    converted = Convert.ToDouble(value);
+            }
+            else if (t == typeof(int))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToInt32(value);
                 else
                     converted = Convert.ToInt32(value);
-            } else if (t is uint) {
+            }
+            else if (t == typeof(bool))
+            {
+                if (IsRunningInTheSimulator)
+                    converted = INTERNAL_JSObjectReference.ToBoolean(value);
+                else
+                    converted = Convert.ToBoolean(value);
+            }
+            else if (t == typeof(char))
+            {
+                if (IsRunningInTheSimulator)
+                    converted = INTERNAL_JSObjectReference.ToChar(value);
+                else
+                    converted = Convert.ToChar(value);
+            }
+            else if (t == typeof(float))
+            {
+                if (IsRunningInTheSimulator)
+                    converted = INTERNAL_JSObjectReference.ToSingle(value);
+                else
+                    converted = Convert.ToSingle(value);
+            }
+            else if (t == typeof(byte))
+            {
+                if (IsRunningInTheSimulator)
+                    converted = INTERNAL_JSObjectReference.ToByte(value);
+                else
+                    converted = Convert.ToByte(value);
+            }
+            else if (t == typeof(uint))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToUInt32(value);
                 else
                     converted = Convert.ToUInt32(value);
-            } else if (t is long) {
+            }
+            else if (t == typeof(long))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToInt64(value);
                 else
                     converted = Convert.ToInt64(value);
-            } else if (t is ulong) {
+            }
+            else if (t == typeof(ulong))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToUInt64(value);
                 else
                     converted = Convert.ToUInt64(value);
-            } else if (t is short) {
+            }
+            else if (t == typeof(short))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToInt16(value);
                 else
                     converted = Convert.ToInt16(value);
-            } else if (t is decimal) {
+            }
+            else if (t == typeof(decimal))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToDecimal(value);
                 else
                     converted = Convert.ToDecimal(value);
-            } else if (t is DateTime) {
+            }
+            else if (t == typeof(DateTime))
+            {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToDateTime(value);
                 else
                     converted = Convert.ToDateTime(value);
-            } else
-                throw new Exception($"type {t.GetType()} not supported");
+            }
+            else
+            {
+                throw new ArgumentException($"Type '{t.FullName}' is not supported.");
+            }
 
-            t = (T)(object)converted;
-            return t;
+            return (T)converted;
         }
 
-        // the idea for executing several Javascripts at the same time: 
-        // optimization: only flush pending JS once (before executing the first one)
-        public static T1 ExecuteJavaScriptGetResult<T1>(string javascript) {
-            var result = ExecuteJavaScriptGetResult(javascript);
+        public static T1 ExecuteJavaScriptGetResult<T1>(string javascript)
+        {
+            var result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: true);
             T1 t1 = ConvertJavascriptResult<T1>(result);
             return t1;
         }
@@ -187,38 +177,41 @@ namespace OpenSilver
         /// <summary>
         /// Execute JavaScript code without document.callScriptSafe
         /// </summary>
-        internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue )
+        internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue)
         {
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:false, flush:flushQueue);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: false, flush: flushQueue);
         }
-        internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue , params object[] variables ) {
+
+        internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue, params object[] variables)
+        {
             CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation(javascript,
                 runAsynchronously: false,
                 wantsResult: false,
-                wantsReferenceId: false, 
-                hasImpactOnPendingJSCode:flushQueue,
+                wantsReferenceId: false,
+                hasImpactOnPendingJSCode: flushQueue,
                 variables: variables);
         }
-        public static void ExecuteJavaScriptVoid(string javascript, params object[] variables ) {
+
+        public static void ExecuteJavaScriptVoid(string javascript, params object[] variables)
+        {
             ExecuteJavaScriptVoid(javascript, false, variables);
         }
 
-        public static void ExecuteJavaScriptVoid(string javascript) {
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:false, flush:true);
+        public static void ExecuteJavaScriptVoid(string javascript)
+        {
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: false, flush: true);
         }
 
-
-
-        public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables ) {
-            javascript = INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
+        public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables)
+        {
+            javascript = CSHTML5.INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
         }
 
-        public static void ExecuteJavaScriptVoidAsync(string javascript) {
+        public static void ExecuteJavaScriptVoidAsync(string javascript)
+        {
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
         }
-
-
 
         /// <summary>
         /// Allows calling JavaScript code from within C#.
@@ -250,7 +243,7 @@ namespace OpenSilver
         /// </summary> 
         internal static double ExecuteJavaScriptDouble(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<double>(value);
             return result;
         }
@@ -260,7 +253,7 @@ namespace OpenSilver
         /// </summary>
         internal static int ExecuteJavaScriptInt32(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<int>(value);
             return result;
         }
@@ -270,7 +263,7 @@ namespace OpenSilver
         /// </summary>
         internal static string ExecuteJavaScriptString(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<string>(value);
             return result;
         }
@@ -280,12 +273,10 @@ namespace OpenSilver
         /// </summary>
         internal static bool ExecuteJavaScriptBoolean(string javascript, bool flushQueue = true)
         {
-            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
+            object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<bool>(value);
             return result;
         }
-
-
 
         /// <summary>
         /// Allows calling JavaScript code from within C#. The call will be asynchronous when run in the Simulator.
@@ -314,12 +305,6 @@ namespace OpenSilver
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // END OF ExecuteJavascript* functions
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
         /// <summary>
         /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
         /// </summary>
@@ -345,22 +330,22 @@ namespace OpenSilver
             //that is executed immediately after the one where the URI is defined! Be careful
             //when moving the following line of code.
 #if NETSTANDARD
-	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #elif BRIDGE
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
 
             var t = new TaskCompletionSource<object>();
             CSHTML5.INTERNAL_InteropImplementation.LoadJavaScriptFile(
-                url, 
-                callerAssemblyName, 
+                url,
+                callerAssemblyName,
                 () => t.SetResult(null), () => t.SetException(new Exception("Could not load file: \"" + url + "\"."))
             );
             return t.Task;
         }
 
         private static HashSet<string> _jsScriptFileKeys = new HashSet<string>(); //todo: This is probably redundant with the _pendingJSFile and _loadedFiles in INTERNAL_InteropImplementation so remove this?
-        
+
         public static Task<object> LoadJavaScriptFile(ResourceFile resourceFile)
         {
             if (!_jsScriptFileKeys.Contains(resourceFile.Key))
@@ -370,7 +355,7 @@ namespace OpenSilver
                 // that is executed immediately after the one where the URI is defined! Be careful
                 // when moving the following line of code.
 #if NETSTANDARD
-	            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+                string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #elif BRIDGE
                 string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -406,7 +391,7 @@ namespace OpenSilver
             // that is executed immediately after the one where the URI is defined! Be careful
             // when moving the following line of code.
 #if NETSTANDARD
-	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #else
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -421,7 +406,7 @@ namespace OpenSilver
             // that is executed immediately after the one where the URI is defined! Be careful
             // when moving the following line of code.
 #if NETSTANDARD
-	        string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
+            string callerAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
 #elif BRIDGE
             string callerAssemblyName = INTERNAL_UriHelper.GetJavaScriptCallingAssembly();
 #endif
@@ -429,7 +414,7 @@ namespace OpenSilver
             foreach (var resourceFile in resourceFiles)
             {
                 //add the key to the dictionary and add the url to the list:
-                if(!_jsScriptFileKeys.Contains(resourceFile.Key))
+                if (!_jsScriptFileKeys.Contains(resourceFile.Key))
                 {
                     _jsScriptFileKeys.Add(resourceFile.Key);
                     urlsAsList.Add(resourceFile.Url);
@@ -522,7 +507,7 @@ namespace OpenSilver
             get
             {
 #if OPENSILVER
-	            return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
+                return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround();
 #elif BRIDGE
                 return CSHTML5.INTERNAL_InteropImplementation.IsRunningInTheSimulator();
 #endif
@@ -531,7 +516,7 @@ namespace OpenSilver
 
 #if CSHTML5BLAZOR
         // For backwards compatibility
-        
+
         /// <summary>
         /// Returns True is the app is running inside the Simulator, and False otherwise.
         /// </summary>

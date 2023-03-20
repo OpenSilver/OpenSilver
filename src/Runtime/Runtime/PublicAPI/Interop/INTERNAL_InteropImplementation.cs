@@ -37,7 +37,7 @@ namespace CSHTML5
     {
         private static bool _isInitialized;
         private static readonly ReferenceIDGenerator _refIdGenerator = new ReferenceIDGenerator();
-        
+
         static INTERNAL_InteropImplementation()
         {
             Application.INTERNAL_Reloaded += (sender, e) =>
@@ -92,7 +92,8 @@ namespace CSHTML5
             }
         }
 
-        internal static string ReplaceJSArgs(string javascript, params object[] variables) {
+        internal static string ReplaceJSArgs(string javascript, params object[] variables)
+        {
             // Make sure the JS to C# interop is set up:
             EnsureInitialized();
 
@@ -111,12 +112,13 @@ namespace CSHTML5
             return javascript;
         }
 
-        internal static object ExecuteJavaScript_Implementation(string javascript, 
-                                                                                    bool runAsynchronously, 
-                                                                                    bool wantsResult = true, 
-                                                                                    bool wantsReferenceId = true, 
-                                                                                    bool hasImpactOnPendingJSCode = true, 
-                                                                                    params object[] variables)
+        internal static object ExecuteJavaScript_Implementation(
+            string javascript,
+            bool runAsynchronously,
+            bool wantsResult = true,
+            bool wantsReferenceId = true,
+            bool hasImpactOnPendingJSCode = true,
+            params object[] variables)
         {
             //---------------
             // Due to the fact that it is not possible to pass JavaScript objects between the simulator JavaScript context
@@ -136,22 +138,27 @@ namespace CSHTML5
             // result into the "document.jsObjRef" for later
             // use in subsequent calls to this method
             int referenceId = wantsReferenceId ? _refIdGenerator.NewId() : -1;
-            if (runAsynchronously) {
+            if (runAsynchronously)
+            {
                 if (wantsReferenceId)
                     INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript, referenceId);
-                else 
+                else
                     INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
-            } else {
+            }
+            else
+            {
                 // run sync
                 result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId, wantsResult, flush: hasImpactOnPendingJSCode);
             }
 
-            if (wantsResult) {
+            if (wantsResult)
+            {
                 if (wantsReferenceId)
                     result = new INTERNAL_JSObjectReference(result, referenceId.ToString(), javascript);
                 else if (runAsynchronously)
                     throw new Exception("runAsync + wantsResult + !wantsReferenceId -> use INTERNAL_ExecuteJavaScript.ExecuteJavaScriptAsync");
-            } else
+            }
+            else
                 result = null;
 
             return result;
@@ -160,14 +167,16 @@ namespace CSHTML5
 #if BRIDGE
         [Bridge.Template("null")]
 #endif
-        internal static INTERNAL_JSObjectReference ExecuteJavaScript_GetJSObject(string javascript, 
-                                                                                    bool runAsynchronously, 
-                                                                                    bool hasImpactOnPendingJSCode = true, 
-                                                                                    params object[] variables) {
-            var result = ExecuteJavaScript_Implementation( javascript, runAsynchronously, 
-                                                           wantsResult: true, 
-                                                           wantsReferenceId: true, 
-                                                           hasImpactOnPendingJSCode, variables);
+        internal static INTERNAL_JSObjectReference ExecuteJavaScript_GetJSObject(
+            string javascript,
+            bool runAsynchronously,
+            bool hasImpactOnPendingJSCode = true,
+            params object[] variables)
+        {
+            var result = ExecuteJavaScript_Implementation(javascript, runAsynchronously,
+                                                          wantsResult: true,
+                                                          wantsReferenceId: true,
+                                                          hasImpactOnPendingJSCode, variables);
             return (INTERNAL_JSObjectReference)result;
         }
 
@@ -227,7 +236,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileSuccess(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item1();
@@ -239,7 +248,7 @@ head.appendChild(script);");
         private static void LoadJavaScriptFileFailure(object jsArgument)
         {
             // using an Interop call instead of jsArgument.ToString because it causes errors in OpenSilver.
-            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument)); 
+            string loadedFileName = OpenSilver.Interop.ExecuteJavaScriptString(GetVariableStringForJS(jsArgument));
             foreach (Tuple<Action, Action> actions in _pendingJSFile[loadedFileName])
             {
                 actions.Item2();

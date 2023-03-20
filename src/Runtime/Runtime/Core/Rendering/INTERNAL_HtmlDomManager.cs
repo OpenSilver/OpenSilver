@@ -815,7 +815,8 @@ parentElement.appendChild(child);";
                 INTERNAL_ExecuteJavaScript.EnableInteropLogging ? "(Called from HtmlDomManager.ExecuteJavaScript)" + (commentForDebugging != null ? commentForDebugging : "") : "" );
         }
 
-        private static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool hasImpactOnPendingJSCode = true) {
+        private static object ExecuteJavaScriptWithResult(string javaScriptToExecute, string commentForDebugging = null, bool hasImpactOnPendingJSCode = true)
+        {
             var referenceId = 0;
             var wantsResult = true;
             return INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(
@@ -831,7 +832,7 @@ parentElement.appendChild(child);";
         /// in the visual tree composition at the specified point.</returns>
         public static UIElement FindElementInHostCoordinates_UsedBySimulatorToo(double x, double y) // IMPORTANT: If you rename this method or change its signature, make sure to rename its dynamic call in the Simulator.
         {
-            using(var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
+            using (var domElementAtCoordinates = OpenSilver.Interop.ExecuteJavaScript($@"
 (function(){{
     var domElementAtCoordinates = document.elementFromPoint({x.ToInvariantString()}, {y.ToInvariantString()});
     if (!domElementAtCoordinates || domElementAtCoordinates === document.documentElement)
@@ -895,7 +896,8 @@ parentElement.appendChild(child);";
 
                 // In the Simulator, we get the CSharp object associated to a DOM element by searching for the DOM element ID in the "INTERNAL_idsToUIElements" dictionary.
 
-                using(var jsId = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.id"))
+                using (var jsId = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.id"))
+                {
                     if (!IsNullOrUndefined(jsId))
                     {
                         string id = Convert.ToString(jsId);
@@ -912,6 +914,7 @@ parentElement.appendChild(child);";
                             break;
                         }
                     }
+                }
 
                 // Move to the parent:
                 domElementRef = OpenSilver.Interop.ExecuteJavaScript($"{sElement}.parentNode");

@@ -99,7 +99,7 @@ namespace Windows.UI.Xaml.Controls
                 return null;
             }
 
-            using(var range = OpenSilver.Interop.ExecuteJavaScript(@"$0.focus();
+            using (var range = OpenSilver.Interop.ExecuteJavaScript(@"$0.focus();
 let range = $0.getSelection(true);
 if (range) { JSON.stringify({ start: range.index, length: range.length }); }
 else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
@@ -111,7 +111,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             if (_quill == null)
                 return string.Empty;
 
-            using(var result = OpenSilver.Interop.ExecuteJavaScript($"$0.getText({start}, {length})", _quill))
+            using (var result = OpenSilver.Interop.ExecuteJavaScript($"$0.getText({start}, {length})", _quill))
                 return result.ToString();
         }
 
@@ -120,7 +120,8 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             if (_quill == null)
                 return string.Empty;
 
-            using (var result = OpenSilver.Interop.ExecuteJavaScript("$0.getText()", _quill)) {
+            using (var result = OpenSilver.Interop.ExecuteJavaScript("$0.getText()", _quill))
+            {
                 var content = result.ToString();
                 if (content == "\n") content = string.Empty;
                 return content;
@@ -134,7 +135,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
                 $"$0.deleteText({start}, {length}, 'api'); $0.insertText({start}, {HttpUtility.JavaScriptStringEncode(text, true)});",
-                flushQueue:false, 
+                flushQueue: false,
                 _quill);
         }
 
@@ -144,7 +145,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 return;
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"$0.setText({HttpUtility.JavaScriptStringEncode(text, true)}, 'api')",flushQueue:false, 
+                $"$0.setText({HttpUtility.JavaScriptStringEncode(text, true)}, 'api')", flushQueue: false,
                 _quill);
         }
 
@@ -154,7 +155,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 return;
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"$0.insertText($0.getLength() - 1,{HttpUtility.JavaScriptStringEncode(text, true)},{JsonSerializer.Serialize(formats)}, 'api')",flushQueue:false, 
+                $"$0.insertText($0.getLength() - 1,{HttpUtility.JavaScriptStringEncode(text, true)},{JsonSerializer.Serialize(formats)}, 'api')", flushQueue: false,
                 _quill);
         }
 
@@ -164,7 +165,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 return;
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"$0.insertText($0.getLength(), {HttpUtility.JavaScriptStringEncode(text, true)}, 'api')",flushQueue:false, 
+                $"$0.insertText($0.getLength(), {HttpUtility.JavaScriptStringEncode(text, true)}, 'api')", flushQueue: false,
                 _quill);
         }
 
@@ -174,13 +175,14 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 return;
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                "$0.setSelection(0, $0.getLength());",flushQueue:false, 
+                "$0.setSelection(0, $0.getLength());", flushQueue: false,
                 _quill);
         }
 
         internal object GetPropertyValue(DependencyProperty prop, int start, int length)
         {
-            using (var result = OpenSilver.Interop.ExecuteJavaScript("JSON.stringify($0.getFormat($1,$2))", _quill, start, length)) {
+            using (var result = OpenSilver.Interop.ExecuteJavaScript("JSON.stringify($0.getFormat($1,$2))", _quill, start, length))
+            {
                 var format = JsonSerializer.Deserialize<QuillRangeFormat>(result.ToString());
 
                 if (prop == Control.FontWeightProperty)
@@ -189,19 +191,19 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 }
                 else if (prop == Control.FontStyleProperty)
                 {
-    #if MIGRATION
+#if MIGRATION
                     return format.Italic ? FontStyles.Italic : FontStyles.Normal;
-    #else
+#else
                     return format.Italic ? FontStyle.Italic : FontStyle.Normal;
-    #endif
+#endif
                 }
                 else if (prop == Inline.TextDecorationsProperty)
                 {
-    #if MIGRATION
+#if MIGRATION
                     return format.Underline ? TextDecorations.Underline : null;
-    #else
+#else
                     return format.Underline ? TextDecorations.Underline : TextDecorations.None;
-    #endif
+#endif
                 }
                 else if (prop == Control.FontFamilyProperty)
                 {
@@ -252,7 +254,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 {
                     bool isBold = fontWeight == FontWeights.Bold || fontWeight == FontWeights.SemiBold || fontWeight == FontWeights.DemiBold
                         || fontWeight == FontWeights.ExtraBold || fontWeight == FontWeights.UltraBold;
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'bold',$3)", flushQueue:false, _quill, start, length, isBold);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'bold',$3)", flushQueue: false, _quill, start, length, isBold);
                 }
             }
             else if (prop == Control.FontStyleProperty)
@@ -264,7 +266,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
 #else
                     bool isItalic = fontStyle == FontStyle.Italic;
 #endif
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'italic',$3)", flushQueue:false, _quill, start, length, isItalic);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'italic',$3)", flushQueue: false, _quill, start, length, isItalic);
                 }
             }
             else if (prop == Inline.TextDecorationsProperty)
@@ -278,12 +280,12 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                     else if (textDecoration == TextDecorations.Strikethrough)
                         format = "strike";
 
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,$3,true)", flushQueue:false, _quill, start, length, format);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,$3,true)", flushQueue: false, _quill, start, length, format);
                 }
                 else if (value == null)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'underline',false)", flushQueue:false, _quill, start, length);
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'strike',false)", flushQueue:false, _quill, start, length);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'underline',false)", flushQueue: false, _quill, start, length);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'strike',false)", flushQueue: false, _quill, start, length);
                 }
 #endif
             }
@@ -291,23 +293,23 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             {
                 if (value is FontFamily fontFamily)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'font',$3)", flushQueue:false, _quill, start, length, fontFamily?.ToString().Replace(" ", "-").ToLower());
+                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'font',$3)", flushQueue: false, _quill, start, length, fontFamily?.ToString().Replace(" ", "-").ToLower());
                 }
             }
             else if (prop == Control.FontSizeProperty)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'size', $3)", flushQueue:false, _quill, start, length, value + "px");
+                OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'size', $3)", flushQueue: false, _quill, start, length, value + "px");
             }
             else if (prop == Control.ForegroundProperty)
             {
                 if (value is SolidColorBrush brush)
                 {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'color',$3)", flushQueue:false, _quill, start, length, brush.ConvertToCSSValue());
+                    OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'color',$3)", flushQueue: false, _quill, start, length, brush.ConvertToCSSValue());
                 }
             }
             else if (prop == Block.LineHeightProperty)
             {
-                OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'line-height',$3)", flushQueue:false, _quill, start, length, value);
+                OpenSilver.Interop.ExecuteJavaScriptVoid("$0.formatText($1,$2,'line-height',$3)", flushQueue: false, _quill, start, length, value);
             }
         }
 
@@ -316,7 +318,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             if (_quill == null)
                 return null;
 
-            using(var content = OpenSilver.Interop.ExecuteJavaScript("JSON.stringify($0.getContents())", _quill))
+            using (var content = OpenSilver.Interop.ExecuteJavaScript("JSON.stringify($0.getContents())", _quill))
                 return GetXamlContents(content.ToString());
         }
 
@@ -325,7 +327,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             if (_quill == null)
                 return null;
 
-            using(var content = OpenSilver.Interop.ExecuteJavaScript($"JSON.stringify($0.getContents({start}, {length}))", _quill))
+            using (var content = OpenSilver.Interop.ExecuteJavaScript($"JSON.stringify($0.getContents({start}, {length}))", _quill))
                 return GetXamlContents(content.ToString());
         }
 
@@ -334,7 +336,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
             if (_quill == null)
                 return;
 
-            OpenSilver.Interop.ExecuteJavaScriptVoid("$0.setText('','api');", flushQueue:false, _quill);
+            OpenSilver.Interop.ExecuteJavaScriptVoid("$0.setText('','api');", flushQueue: false, _quill);
         }
 
         internal void SetReadOnly(bool value)
@@ -343,7 +345,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 return;
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"$0.root.setAttribute('contenteditable', '{(value ? "false" : "true")}')",flushQueue:false, 
+                $"$0.root.setAttribute('contenteditable', '{(value ? "false" : "true")}')", flushQueue: false,
                 _quill);
         }
 
@@ -353,7 +355,7 @@ else { JSON.stringify({ start: 0, length: 0 }); }", _quill))
                 return;
 
             OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"$0.enable({(value ? "true" : "false")})",flushQueue:false, 
+                $"$0.enable({(value ? "true" : "false")})", flushQueue: false,
                 _quill);
         }
 

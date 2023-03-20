@@ -634,7 +634,8 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 {
                     UpdateLayout();
                 }
-                else {
+                else
+                {
                     INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
                 }
             }

@@ -12,14 +12,15 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using CSHTML5;
+using CSHTML5.Internal;
+using OpenSilver;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -695,7 +696,7 @@ namespace Windows.UI.Xaml.Shapes
 
             //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
             bulkJs.AddJavascript($"{sContext}.lineWidth = {shape.StrokeThickness.ToInvariantString()}");
-            bulkJs.ExecuteAndDispose();
+            _ = bulkJs.ExecuteAndDispose();
         }
 
         internal static object GetHtmlBrush(Shape shape, 
@@ -710,7 +711,8 @@ namespace Windows.UI.Xaml.Shapes
                                             double verticalMultiplicator, 
                                             double xOffsetToApplyBeforeMultiplication, 
                                             double yOffsetToApplyBeforeMultiplication, 
-                                            Size shapeActualSize, BulkExecuteJavascriptAsync bulkJs)
+                                            Size shapeActualSize,
+                                            BulkExecuteJavascriptAsync bulkJs)
         {
             object returnValue = null;
             // todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush 
@@ -839,7 +841,7 @@ namespace Windows.UI.Xaml.Shapes
 {sCanvas}.style.width = ""{width}"";
 {sCanvas}.style.height = ""{height}""");
 
-                    var ctx = bulkJs.AddJavascriptAsync( $"{sCanvas}.getContext('2d')");
+                    var ctx = bulkJs.AddJavascriptAsync($"{sCanvas}.getContext('2d')");
 
                     var gradient = createLinearGradient(ctx, 0d, 0d, distance, 0d, fillAsLinearGradientBrush, opacity, bulkJs);
 
