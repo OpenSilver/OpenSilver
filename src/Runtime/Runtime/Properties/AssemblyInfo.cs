@@ -56,6 +56,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: InternalsVisibleTo("Runtime.OpenSilver.Tests")]
 [assembly: InternalsVisibleTo("OpenSilver.ControlsKit.FastControls")]
+[assembly: InternalsVisibleTo("OpenSilver.XR")]
 
 [assembly: System.Windows.Markup.XmlnsDefinition("http://schemas.microsoft.com/winfx/2006/xaml", "System.Windows.Markup")] // This is used for example in the {x:Static ...} markup extension.
 

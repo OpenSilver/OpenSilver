@@ -96,12 +96,20 @@ namespace Windows.UI.Xaml.Input
                 string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
                 string type = OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.type");
                 string concatenated = type.StartsWith("touch") ? OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.changedTouches[0].pageX + '|' + {sEvent}.changedTouches[0].pageY")
-                                                               : OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.pageX + '|' + {sEvent}.pageY");
+                                                               : OpenSilver.Interop.ExecuteJavaScriptString($"{sEvent}.detail && {sEvent}.detail.mouseEvent ? {sEvent}.detail.mouseEvent.pageX + '|' + {sEvent}.detail.mouseEvent.pageY : {sEvent}.pageX + '|' + {sEvent}.pageY");
                 int sepIndex = concatenated.IndexOf('|');
                 string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
                 string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
-                _pointerAbsoluteX = double.Parse(pointerAbsoluteXAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                _pointerAbsoluteY = double.Parse(pointerAbsoluteYAsString, CultureInfo.InvariantCulture); //todo: read note above
+
+                try
+                {
+                    _pointerAbsoluteX = double.Parse(pointerAbsoluteXAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
+                    _pointerAbsoluteY = double.Parse(pointerAbsoluteYAsString, CultureInfo.InvariantCulture); //todo: read note above
+                }
+                catch (Exception)
+                {
+                    //OpenSilver.Interop.ExecuteJavaScript($"console.log({sEvent})");
+                }                
             }
 
             //---------------------------------------

@@ -66,9 +66,7 @@ namespace CSHTML5.Internal
         {
             // Change the JS code to call ShowErrorMessage in case of error:
 
-            // FIXME: uncomment after PR724 is approved
-            //string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
-            string errorCallBackId = referenceId.ToString();
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
 
             javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
             return javascript;

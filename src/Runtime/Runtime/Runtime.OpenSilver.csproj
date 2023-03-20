@@ -15,7 +15,7 @@
 		<OutputPath>bin\OpenSilver\$(Configuration)\</OutputPath>
 		<NoWarn>1591</NoWarn>
 		<DebugType>full</DebugType>
-		<Optimize>true</Optimize>
+		<Optimize>false</Optimize>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
@@ -334,6 +334,7 @@
 		<Compile Include="System.Windows.Media.Animation\KeyTimeConverter.cs" />
 		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
+		<Compile Include="System.Windows\FrameworkElementBase.cs" />
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />		
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
 		<Compile Include="System.Windows\LengthConverter.cs" />
