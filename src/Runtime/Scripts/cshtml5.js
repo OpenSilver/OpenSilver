@@ -292,30 +292,21 @@ document.createCanvasElement = function (id, parentElement) {
 }
 
 document.createImageElement = function (id, parentElement) {
-    const newElement = document.createElementSafe('img', id, parentElement, -1);
+    const img = document.createElementSafe('img', id, parentElement, -1);
 
-    if (newElement) {
-        newElement.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
-        // the text displayed when the image cannot be found.
-        // We set it as an empty string since there is nothing in Xaml
-        newElement.setAttribute('alt', ' ');
-
-        // this is to avoid a random few pixels wide gap below the image.
-        newElement.style['display'] = 'block';
-        // Defaulting to 0 because if there is no source set, we want the 
-        // 1x1 transparent placeholder image to be sure to take no space.
-        // If the source is set, it will then be set to "inherit"
-        newElement.style['width'] = '0';
-        newElement.style['height'] = '0';
-        newElement.style['objectPosition'] = 'center top';
-
-        newElement.addEventListener('mousedown', function (e) {
-            e.preventDefault();
-        }, false);
-        newElement.addEventListener('error', function (e) {
-            this.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-            this.style.width = 0;
-            this.style.height = 0;
+    if (img) {
+        img.setAttribute('alt', ' ');
+        img.style.display = 'none';
+        img.style.width = 'inherit';
+        img.style.height = 'inherit';
+        img.style.lineHeight = '0px';
+        img.style.objectFit = 'contain';
+        img.style.objectPosition = 'left top';
+        img.addEventListener('load', function (e) {
+            this.style.display = '';
+        })
+        img.addEventListener('error', function (e) {
+            this.style.display = 'none';
         });
     }
 }

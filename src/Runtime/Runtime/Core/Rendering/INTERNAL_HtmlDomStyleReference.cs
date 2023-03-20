@@ -181,6 +181,7 @@ namespace CSHTML5.Internal
         public string msTransform { set { transform = value; } }
         public string msTransformOrigin { set { transformOrigin = value; } }
         public string objectPosition { set { SetStylePropertyValue("objectPosition", value); } }
+        public string objectFit { set { SetStylePropertyValue("objectFit", value); } }
         public string opacity { set { SetStylePropertyValue("opacity", value); } }
         public string outline { set { SetStylePropertyValue("outline", value); } }
         public string overflow { set { SetStylePropertyValue("overflow", value); } }
