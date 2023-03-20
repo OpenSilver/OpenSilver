@@ -17,49 +17,19 @@ namespace CSHTML5.Internal
 {
     internal static class JavaScriptCallbackHelper
     {
-        public static JavascriptCallback CreateSelfDisposedJavaScriptCallback(Action action, bool sync = false)
-        {
-            if (sync)
-            {
-                return new SelfDisposedJavaScriptCallback(action).JSCallback;
-            }
-            else
-            {
-                return new SelfDisposedJavaScriptCallbackAsync(action).JSCallback;
-            }
-        }
+        public static JavaScriptCallback CreateSelfDisposedJavaScriptCallback(Action action, bool sync = false)
+            => new SelfDisposedJavaScriptCallback(action, sync).JSCallback;
 
         private sealed class SelfDisposedJavaScriptCallback
         {
             private readonly Action _action;
-            public readonly JavascriptCallback JSCallback;
+            public readonly JavaScriptCallback JSCallback;
 
-            public SelfDisposedJavaScriptCallback(Action action)
+            public SelfDisposedJavaScriptCallback(Action action, bool sync)
             {
                 _action = action ?? throw new ArgumentNullException(nameof(action));
 
-                JSCallback = JavascriptCallback.Create(RunCallbackAndDispose);
-            }
-
-            private string RunCallbackAndDispose()
-            {
-                JSCallback.Dispose();
-                _action();
-
-                return string.Empty;
-            }
-        }
-
-        private sealed class SelfDisposedJavaScriptCallbackAsync
-        {
-            private readonly Action _action;
-            public readonly JavascriptCallback JSCallback;
-
-            public SelfDisposedJavaScriptCallbackAsync(Action action)
-            {
-                _action = action ?? throw new ArgumentNullException(nameof(action));
-
-                JSCallback = JavascriptCallback.Create(RunCallbackAndDispose);
+                JSCallback = JavaScriptCallback.Create(RunCallbackAndDispose, sync);
             }
 
             private void RunCallbackAndDispose()

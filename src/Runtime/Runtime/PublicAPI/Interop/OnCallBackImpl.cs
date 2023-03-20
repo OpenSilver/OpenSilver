@@ -147,7 +147,7 @@ namespace CSHTML5.Internal
             //----------------------------------
             // Get the C# callback from its ID:
             //----------------------------------
-            var callback = JavascriptCallback.Get(callbackId)?.GetCallback();
+            var callback = JavaScriptCallback.Get(callbackId)?.GetCallback();
 
             if (callback == null)
             {

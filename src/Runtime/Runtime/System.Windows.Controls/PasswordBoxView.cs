@@ -33,8 +33,8 @@ namespace Windows.UI.Xaml.Controls
     {
         private object _passwordInputField;
         private bool _isUpdatingDOM;
-        private JavascriptCallback _gotFocusCallback;
-        private JavascriptCallback _inputCallback;
+        private JavaScriptCallback _gotFocusCallback;
+        private JavaScriptCallback _inputCallback;
 
         internal PasswordBoxView(PasswordBox host)
         {
@@ -84,8 +84,8 @@ namespace Windows.UI.Xaml.Controls
 
             DisposeJsCallbacks();
 
-            _gotFocusCallback = JavascriptCallback.Create(PasswordBox_GotFocus);
-            _inputCallback = JavascriptCallback.Create(PasswordAreaValueChanged);
+            _gotFocusCallback = JavaScriptCallback.Create(PasswordBox_GotFocus, true);
+            _inputCallback = JavaScriptCallback.Create(PasswordAreaValueChanged, true);
 
             var sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
             var sGotFocusCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_gotFocusCallback);

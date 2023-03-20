@@ -88,7 +88,7 @@ namespace OpenSilver.Internal
         {
             private bool _isObserved;
             private object _resizeSensor;
-            private JavascriptCallback _sizeChangedCallback;
+            private JavaScriptCallback _sizeChangedCallback;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ResizeSensorAdapter"/>.
@@ -105,7 +105,7 @@ namespace OpenSilver.Internal
                 if (!_isObserved)
                 {
                     _isObserved = true;
-                    _sizeChangedCallback = JavascriptCallback.Create((string arg) => callback(ParseSize(arg)));
+                    _sizeChangedCallback = JavaScriptCallback.Create((string arg) => callback(ParseSize(arg)), true);
 
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);
                     string sAction = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_sizeChangedCallback);
@@ -142,7 +142,7 @@ namespace OpenSilver.Internal
             private static object _observerJsReference;
 
             private bool _isObserved;
-            private JavascriptCallback _sizeChangedCallback;
+            private JavaScriptCallback _sizeChangedCallback;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ResizeObserverAdapter"/>.
@@ -161,7 +161,7 @@ namespace OpenSilver.Internal
                 if (!_isObserved)
                 {
                     _isObserved = true;
-                    _sizeChangedCallback = JavascriptCallback.Create((string arg) => callback(ParseSize(arg)));
+                    _sizeChangedCallback = JavaScriptCallback.Create((string arg) => callback(ParseSize(arg)), true);
 
                     string sReference = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_observerJsReference);
                     string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(elementReference);

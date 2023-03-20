@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Browser;
 using System.Windows.Interop;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows // Note: we didn't use the "Interop" namespace to avoid conflicts with CSHTML5.Interop
@@ -25,6 +26,7 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
     public partial class Host
     {
         private readonly bool _hookupEvents;
+        private readonly JavaScriptCallback _hashChangeCallback;
         private Content _content;
         private Settings _settings;
         private string _navigationState;
@@ -38,41 +40,20 @@ namespace Windows.UI.Xaml // Note: we didn't use the "Interop" namespace to avoi
             _content = new Content(_hookupEvents);
 
             _navigationState = GetBrowserNavigationState();
-            string sCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS((Action)OnNavigationChanged);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"window.addEventListener('hashchange', {sCallback}, false)");
+            _hashChangeCallback = JavaScriptCallback.Create(OnNavigationChanged, true);
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                $"window.addEventListener('hashchange', {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_hashChangeCallback)}, false)");
         }
 
         /// <summary>
         /// Gets the "Content" sub-object of this Host.
         /// </summary>
-        public Content Content
-        {
-            get
-            {
-                if (_content == null)
-                {
-                    _content = new Content(_hookupEvents);
-                }
-
-                return _content;
-            }
-        }
+        public Content Content => _content ??= new Content(_hookupEvents);
 
         /// <summary>
         /// Gets the "Settings" sub-object of this tHost.
         /// </summary>
-        public Settings Settings
-        {
-            get
-            {
-                if (_settings == null)
-                {
-                    _settings = new Settings();
-                }
-
-                return _settings;
-            }
-        }
+        public Settings Settings => _settings ??= new Settings();
 
         /// <summary>
         /// Gets the URI of the package or XAML file that specifies the XAML content

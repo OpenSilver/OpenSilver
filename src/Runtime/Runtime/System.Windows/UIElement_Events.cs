@@ -1013,7 +1013,7 @@ namespace Windows.UI.Xaml
 
         internal static class NativeEventsHelper
         {
-            private static JavascriptCallback _globalHandler;
+            private static JavaScriptCallback _globalHandler;
 
             internal static void AddEventListeners(UIElement uie, bool isFocusable)
             {
@@ -1035,23 +1035,7 @@ namespace Windows.UI.Xaml
 
             private static void EnsureInitialized()
             {
-                if (_globalHandler is not null)
-                {
-                    return;
-                }
-
-                if (OpenSilver.Interop.IsRunningInTheSimulator)
-                {
-                    _globalHandler = JavascriptCallback.Create(new Action<string, object>(NativeEventCallback));
-                }
-                else
-                {
-                    _globalHandler = JavascriptCallback.Create(new Func<string, object, string>((id, jsEventArg) =>
-                    {
-                        NativeEventCallback(id, jsEventArg);
-                        return string.Empty;
-                    }));
-                }
+                _globalHandler ??= JavaScriptCallback.Create(NativeEventCallback, true);
             }
 
             private static void NativeEventCallback(string id, object jsEventArg)

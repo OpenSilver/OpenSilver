@@ -40,8 +40,8 @@ namespace Windows.UI.Xaml.Printing
             private readonly List<UIElement> _elements;
             private Popup _popup;
             private StackPanel _panel;
-            private JavascriptCallback _printJSCallback;
-            private JavascriptCallback _endPrintJSCallback;
+            private JavaScriptCallback _printJSCallback;
+            private JavaScriptCallback _endPrintJSCallback;
 
             public PrintOperation(PrintDocument printDocument)
             {

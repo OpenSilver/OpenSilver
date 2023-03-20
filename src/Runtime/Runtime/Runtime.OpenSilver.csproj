@@ -116,7 +116,7 @@
 		<Compile Include="PublicAPI\Interop\JSObjectReferenceHolder.cs" />
 		<Compile Include="PublicAPI\Interop\StackTraceProvider.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
-		<Compile Include="PublicAPI\Interop\JavascriptCallback.cs" />
+		<Compile Include="PublicAPI\Interop\JavaScriptCallback.cs" />
 		<Compile Include="PublicAPI\Interop\JavaScriptCallbackHelper.cs" />
 		<Compile Include="PublicAPI\Interop\PendingJavascript.cs" />
 		<Compile Include="PublicAPI\Interop\OnCallBackImpl.cs" />

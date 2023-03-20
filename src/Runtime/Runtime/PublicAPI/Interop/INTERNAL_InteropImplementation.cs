@@ -65,7 +65,19 @@ namespace CSHTML5
 
         internal static string GetVariableStringForJS(object variable)
         {
-            variable = variable is Delegate d ? JavascriptCallback.Create(d) : variable;
+            static JavaScriptCallback CreateJSCallback(Delegate callback)
+            {
+                if (callback is null)
+                {
+                    throw new ArgumentNullException(nameof(callback));
+                }
+
+                bool sync = callback.Method.ReturnType != typeof(void);
+
+                return JavaScriptCallback.Create(callback, sync);
+            }
+
+            variable = variable is Delegate d ? CreateJSCallback(d) : variable;
 
             if (variable is IJavaScriptConvertible jsConvertible)
             {

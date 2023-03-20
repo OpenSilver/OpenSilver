@@ -54,8 +54,8 @@ namespace Windows.UI.Xaml.Controls
     {
         private object _imageDiv;
         private Size _naturalSize;
-        private JavascriptCallback _imgLoadCallback;
-        private JavascriptCallback _imgErrorCallack;
+        private JavaScriptCallback _imgLoadCallback;
+        private JavaScriptCallback _imgErrorCallack;
         private WeakEventListener<Image, BitmapImage, EventArgs> _sourceChangedListener;
 
         internal override bool EnablePointerEventsCore => true;
@@ -174,8 +174,8 @@ namespace Windows.UI.Xaml.Controls
 
             DisposeJSCallbacks();
 
-            _imgLoadCallback = JavascriptCallback.Create(ProcessLoadEvent);
-            _imgErrorCallack = JavascriptCallback.Create(ProcessErrorEvent);
+            _imgLoadCallback = JavaScriptCallback.Create(ProcessLoadEvent, true);
+            _imgErrorCallack = JavaScriptCallback.Create(ProcessErrorEvent, true);
 
             string sImage = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imageDiv);
             string sLoadCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imgLoadCallback);

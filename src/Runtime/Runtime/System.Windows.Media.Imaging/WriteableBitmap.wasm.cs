@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Media.Imaging
             private readonly WriteableBitmap _bitmap;
 
             private TaskCompletionSource<object> _taskCompletion;
-            private JavascriptCallback _imageRenderedCallback;
+            private JavaScriptCallback _imageRenderedCallback;
 
             static WriteableBitmapWasm()
             {
@@ -68,7 +68,7 @@ document.WB_SmoothCanvasContext = function (ctx) {
             public Task CreateFromBitmapSourceAsync(BitmapSource source)
             {
                 _taskCompletion = new TaskCompletionSource<object>();
-                _imageRenderedCallback = JavascriptCallback.Create(OnImageDataLoadedCallback);
+                _imageRenderedCallback = JavaScriptCallback.Create(OnImageDataLoadedCallback, true);
 
                 source.GetDataStringAsync(source.InheritanceContext as UIElement).ContinueWith(t =>
                 {
@@ -123,7 +123,7 @@ imageView.onload = function() {
                 }
 
                 _taskCompletion = new TaskCompletionSource<object>();
-                _imageRenderedCallback = JavascriptCallback.Create(callback);
+                _imageRenderedCallback = JavaScriptCallback.Create(callback, true);
 
                 INTERNAL_Simulator.WebAssemblyExecutionHandler.InvokeUnmarshalled<int[], int>(
                     "document.WB_Copy32Buffer", _bitmap._pixels);

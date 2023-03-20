@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml.Controls
     {
         private object _iFrame;
         private string _htmlString;
-        private JavascriptCallback _jsCallbackOnIframeLoaded;
+        private JavaScriptCallback _jsCallbackOnIframeLoaded;
 
 #if MIGRATION
         public WebBrowser()
@@ -70,7 +70,7 @@ namespace Windows.UI.Xaml.Controls
             iFrameStyle.border = "none";
 
             DisposeJsCallbacks();
-            _jsCallbackOnIframeLoaded = JavascriptCallback.Create((Action)OnIframeLoad);
+            _jsCallbackOnIframeLoaded = JavaScriptCallback.Create(OnIframeLoad, true);
 
             string sIFrame = INTERNAL_InteropImplementation.GetVariableStringForJS(_iFrame);
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
