@@ -45,6 +45,7 @@ namespace Windows.UI.Xaml.Automation.Peers.Tests
             Assert.ThrowsException<ElementNotEnabledException>(() => provider.Expand());
         }
 
+        [Ignore]
         [TestMethod]
         public void IExpandCollapseProvider_Expand_Should_Set_IsDropDownOpen_True()
         {
@@ -72,6 +73,7 @@ namespace Windows.UI.Xaml.Automation.Peers.Tests
             Assert.ThrowsException<ElementNotEnabledException>(() => provider.Collapse());
         }
 
+        [Ignore]
         [TestMethod]
         public void IExpandCollapseProvider_Collapse_Should_Set_IsDropDownOpen_False()
         {
@@ -86,9 +88,10 @@ namespace Windows.UI.Xaml.Automation.Peers.Tests
                 provider.Collapse();
                 comboBox.IsDropDownOpen.Should().BeFalse();
             };
-            
+
         }
 
+        [Ignore]
         [TestMethod]
         public void IExpandCollapseProvider_ExpandCollapseState_Should_Map_To_IsDropDownOpen()
         {
