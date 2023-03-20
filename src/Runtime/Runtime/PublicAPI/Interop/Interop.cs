@@ -85,7 +85,7 @@ namespace OpenSilver
             return results;
         }
 
-        private static void ConvertJavascriptResult(out string s, object value) {
+        private static void ConvertJavascriptResultString(out string s, object value) {
             s = "";
             string converted = null;
             if (IsRunningInTheSimulator)
@@ -95,12 +95,15 @@ namespace OpenSilver
             s = converted;
         }
 
-        private static void ConvertJavascriptResult<T>(out T t, object value) {
+        private static T ConvertJavascriptResult<T>(object value) {
             object converted = null;
-            t = default;
-            if (t is string)
-                t = (T)(object)"";
+            if (typeof(T) == typeof(string)) {
+                ConvertJavascriptResultString(out var s, value);
+                var resultT = (T)(object)s;
+                return resultT;
+            }
 
+            T t = default;
             if (t is double) {
                 if (IsRunningInTheSimulator)
                     converted = INTERNAL_JSObjectReference.ToDouble(value);
@@ -170,13 +173,15 @@ namespace OpenSilver
                 throw new Exception($"type {t.GetType()} not supported");
 
             t = (T)(object)converted;
+            return t;
         }
 
         // the idea for executing several Javascripts at the same time: 
         // optimization: only flush pending JS once (before executing the first one)
-        public static void ExecuteJavaScriptGetResult<T1>(string javascript, out T1 t1) {
+        public static T1 ExecuteJavaScriptGetResult<T1>(string javascript) {
             var result = ExecuteJavaScriptGetResult(javascript);
-            ConvertJavascriptResult(out t1, result);
+            T1 t1 = ConvertJavascriptResult<T1>(result);
+            return t1;
         }
 
         /// <summary>
@@ -246,7 +251,7 @@ namespace OpenSilver
         internal static double ExecuteJavaScriptDouble(string javascript, bool flushQueue = true)
         {
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
-            ConvertJavascriptResult(out double result, value);
+            var result = ConvertJavascriptResult<double>(value);
             return result;
         }
 
@@ -256,7 +261,7 @@ namespace OpenSilver
         internal static int ExecuteJavaScriptInt32(string javascript, bool flushQueue = true)
         {
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
-            ConvertJavascriptResult(out int result, value);
+            var result = ConvertJavascriptResult<int>(value);
             return result;
         }
 
@@ -266,7 +271,7 @@ namespace OpenSilver
         internal static string ExecuteJavaScriptString(string javascript, bool flushQueue = true)
         {
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
-            ConvertJavascriptResult(out string result, value);
+            var result = ConvertJavascriptResult<string>(value);
             return result;
         }
 
@@ -276,7 +281,7 @@ namespace OpenSilver
         internal static bool ExecuteJavaScriptBoolean(string javascript, bool flushQueue = true)
         {
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult:true, flush:flushQueue);
-            ConvertJavascriptResult(out bool result, value);
+            var result = ConvertJavascriptResult<bool>(value);
             return result;
         }
 
