@@ -274,34 +274,6 @@ namespace Windows.Foundation
             return size.IsHeightAuto() && size.IsWidthAuto();
         }
 
-        public static Size Combine(this Size size, Size fallback)
-        {
-            if (!(Double.IsNaN(size.Width) || Double.IsNaN(size.Height)))
-            {
-                return size;
-            }
-
-            if (Double.IsNaN(size.Width) && Double.IsNaN(size.Height))
-            {
-                return fallback;
-            }
-
-            return new Size(
-                Double.IsNaN(size.Width) ? fallback.Width : size.Width,
-                Double.IsNaN(size.Height) ? fallback.Height : size.Height);
-        }
-
-        public static Size Bounds(this Size size, Size minimum, Size maximum)
-        {
-            if (minimum.Width > maximum.Width || minimum.Height > maximum.Height)
-            {
-                throw new Exception($"Invalid bounds (minimum: {minimum}, maximum: {maximum})");
-            }
-
-            return size.Max(minimum).Min(maximum);
-        }
-
-
         public static bool IsClose(this Size @this, Size size)
         {
             return @this.Width.IsClose(size.Width) && @this.Height.IsClose(size.Height);

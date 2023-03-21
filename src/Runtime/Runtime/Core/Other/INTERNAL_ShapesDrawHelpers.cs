@@ -144,7 +144,7 @@ namespace CSHTML5.Internal
                 }
                 else
                 {
-                    shapeActualSize = shape.VisualBounds.Size;
+                    shapeActualSize = shape.RenderSize;
 
                     if (!frameworkElementWidthWasSpecified)
                     {

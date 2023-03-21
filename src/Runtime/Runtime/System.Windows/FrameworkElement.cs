@@ -13,21 +13,19 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Markup;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
 using System.ComponentModel;
 using System.Xaml.Markup;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Controls.Primitives;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls;
@@ -606,46 +604,6 @@ namespace Windows.UI.Xaml
             
         }
 
-        internal virtual bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Width))
-            {
-                return false;
-            }
-
-            if (child.HorizontalAlignment != HorizontalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoWidth(this);
-            }
-
-            return false;
-        }
-
-        internal virtual bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Height))
-            {
-                return false;
-            }
-
-            if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoHeight(this);
-            }
-
-            return false;
-        }
-
         // Note: the returned Size is unused for now.
         internal override sealed Size MeasureCore()
         {
@@ -1072,13 +1030,6 @@ namespace Windows.UI.Xaml
 
         #endregion Triggers
 
-        public event EventHandler LayoutUpdated;
-
-        protected override void OnLayoutUpdated()
-        {
-            LayoutUpdated?.Invoke(this, new EventArgs());
-        }
-
         #region Work in progress
 
         [OpenSilver.NotImplemented]
@@ -1177,176 +1128,6 @@ namespace Windows.UI.Xaml
                 }
             }
         }
-        internal sealed override void ArrangeCore(Rect finalRect)
-        {
-            var minSize = new Size(MinWidth, MinHeight);
-            var maxSize = new Size(MaxWidth, MaxHeight);
-            var size = new Size(Width, Height);
-            Thickness margin = Margin;
-            HorizontalAlignment ha = HorizontalAlignment;
-            VerticalAlignment va = VerticalAlignment;
-
-            bool isDefaultAlignment = ha == HorizontalAlignment.Stretch && va == VerticalAlignment.Stretch;
-            var finalSize = isDefaultAlignment ? finalRect.Size.Max(DesiredSize) : new Size(
-                ha != HorizontalAlignment.Stretch ? Math.Min(DesiredSize.Width, finalRect.Width) : finalRect.Width,
-                va != VerticalAlignment.Stretch ? Math.Min(DesiredSize.Height, finalRect.Height) : finalRect.Height);
-
-            if (!IsCustomLayoutRoot)
-            {
-                finalSize.Width = Math.Max(0, finalSize.Width - margin.Left - margin.Right);
-                finalSize.Height = Math.Max(0, finalSize.Height - margin.Top - margin.Bottom);
-            }
-
-            finalSize = size.Combine(finalSize).Bounds(minSize, maxSize);
-
-            Size arrangedSize = ArrangeOverride(finalSize);
-
-            var offset = new Point();
-            if (!IsCustomLayoutRoot)
-            {
-                var clientSize = new Size(
-                    Math.Max(0, finalRect.Width - margin.Left - margin.Right),
-                    Math.Max(0, finalRect.Height - margin.Top - margin.Bottom));
-
-                var clippedInkSize = new Size(
-                    Math.Min(arrangedSize.Width, maxSize.Width),
-                    Math.Min(arrangedSize.Height, maxSize.Height));
-
-                offset = ComputeAlignmentOffset(clientSize, clippedInkSize);
-            }
-
-            offset.X += finalRect.X + margin.Left;
-            offset.Y += finalRect.Y + margin.Top;
-
-            arrangedSize = new Size(
-                Math.Max(0, Math.Min(finalSize.Width, arrangedSize.Width)),
-                Math.Max(0, Math.Min(finalSize.Height, arrangedSize.Height)));
-            arrangedSize = size.Combine(arrangedSize).Bounds(minSize, maxSize);
-
-            VisualBounds = new Rect(offset, arrangedSize);
-
-            // Call SizeChanged event handlers
-            if (!IsCustomLayoutRoot)
-                HandleSizeChanged(new Size(VisualBounds.Width, VisualBounds.Height));
-
-            if (isFirstRendering)
-            {
-                isFirstRendering = false;
-                INTERNAL_HtmlDomManager.GetDomElementStyleForModification(this.INTERNAL_OuterDomElement).visibility = "visible";
-            }
-        }
-
-        private Point ComputeAlignmentOffset(Size clientSize, Size inkSize)
-        {
-            Point offset = new Point();
-
-            HorizontalAlignment ha = HorizontalAlignment;
-            VerticalAlignment va = VerticalAlignment;
-
-            //this is to degenerate Stretch to Top-Left in case when clipping is about to occur
-            //if we need it to be Center instead, simply remove these 2 ifs
-            if (ha == HorizontalAlignment.Stretch
-                && inkSize.Width > clientSize.Width)
-            {
-                ha = HorizontalAlignment.Left;
-            }
-
-            if (va == VerticalAlignment.Stretch
-                && inkSize.Height > clientSize.Height)
-            {
-                va = VerticalAlignment.Top;
-            }
-            //end of degeneration of Stretch to Top-Left
-
-            if (ha == HorizontalAlignment.Center
-                || ha == HorizontalAlignment.Stretch)
-            {
-                offset.X = (clientSize.Width - inkSize.Width) * 0.5;
-            }
-            else if (ha == HorizontalAlignment.Right)
-            {
-                offset.X = clientSize.Width - inkSize.Width;
-            }
-            else
-            {
-                offset.X = 0;
-            }
-
-            if (va == VerticalAlignment.Center
-                || va == VerticalAlignment.Stretch)
-            {
-                offset.Y = (clientSize.Height - inkSize.Height) * 0.5;
-            }
-            else if (va == VerticalAlignment.Bottom)
-            {
-                offset.Y = clientSize.Height - inkSize.Height;
-            }
-            else
-            {
-                offset.Y = 0;
-            }
-
-            return offset;
-        }
-
-        /// <summary>
-        /// Provides the behavior for the Arrange pass of Silverlight layout. Classes can
-        /// override this method to define their own Arrange pass behavior.
-        /// </summary>
-        /// <param name="finalSize">
-        /// The final area within the parent that this object should use to arrange itself
-        /// and its children.
-        /// </param>
-        /// <returns>
-        /// The actual size that is used after the element is arranged in layout.
-        /// </returns>
-        protected virtual Size ArrangeOverride(Size finalSize) => finalSize;
-
-        internal sealed override Size MeasureCore(Size availableSize)
-        {
-            Size MinSize = new Size(MinWidth, MinHeight);
-            Size MaxSize = new Size(MaxWidth, MaxHeight);
-            Size size = new Size(Width, Height);
-
-            if (!this.IsCustomLayoutRoot)
-            {
-                availableSize.Width = Math.Max(0, availableSize.Width - Margin.Left - Margin.Right);
-                availableSize.Height = Math.Max(0, availableSize.Height - Margin.Top - Margin.Bottom);
-            }
-            
-            availableSize = size.Combine(availableSize).Bounds(MinSize, MaxSize);
-
-            Size measuredSize = MeasureOverride(availableSize);
-            
-            var w = Math.Max(0, Math.Min(availableSize.Width, measuredSize.Width));
-            var h = Math.Max(0, Math.Min(availableSize.Height, measuredSize.Height));
-            measuredSize = new Size(w, h);
-            measuredSize = size.Combine(measuredSize).Bounds(MinSize, MaxSize);
-
-            if (!this.IsCustomLayoutRoot)
-            {
-                measuredSize.Width = Math.Max(0, measuredSize.Width + Margin.Left + Margin.Right);
-                measuredSize.Height = Math.Max(0, measuredSize.Height + Margin.Top + Margin.Bottom);
-            }
-
-            return measuredSize;
-        }
-
-        /// <summary>
-        /// Provides the behavior for the Measure pass of Silverlight layout. Classes can override 
-        /// this method to define their own Measure pass behavior.
-        /// </summary>
-        /// <param name="availableSize">
-        /// The available size that this object can give to child objects. Infinity (<see cref="double.PositiveInfinity"/>)
-        /// can be specified as a value to indicate that the object will size to whatever content is 
-        /// available.
-        /// </param>
-        /// <returns>
-        /// The size that this object determines it needs during layout, based on its calculations
-        /// of the allocated sizes for child objects; or based on other considerations, such as a 
-        /// fixed container size.
-        /// </returns>
-        protected virtual Size MeasureOverride(Size availableSize) => new Size(0, 0);
 
 #endregion Work in progress
 
@@ -1518,7 +1299,7 @@ namespace Windows.UI.Xaml
         //StoresParentTemplateValues = 0x00000100,
 
         // free bit = 0x00000200,
-        //NeedsClipBounds = 0x00000400,
+        NeedsClipBounds = 0x00000400,
 
         //HasWidthEverChanged = 0x00000800,
         //HasHeightEverChanged = 0x00001000,

@@ -90,128 +90,7 @@ namespace Windows.UI.Xaml
 #if PERFSTAT
             Performance.Counter("Size/Alignment: INTERNAL_InitializeOuterDomElementWidthAndHeight", t0);
 #endif
-        }
-
-        /// <summary>
-        /// Gets or sets the Auto Width to the root of CustomLayout
-        /// </summary>
-        public bool? IsAutoWidthOnCustomLayout
-        {
-            get { return (bool?)GetValue(IsAutoWidthOnCustomLayoutProperty); }
-            set { SetValue(IsAutoWidthOnCustomLayoutProperty, value); }
-        }
-
-        public static readonly DependencyProperty IsAutoWidthOnCustomLayoutProperty =
-            DependencyProperty.Register(
-                nameof(IsAutoWidthOnCustomLayout),
-                typeof(bool?),
-                typeof(FrameworkElement),
-                new PropertyMetadata((object)null));
-
-        internal bool IsAutoWidthOnCustomLayoutInternal
-        {
-            get
-            {
-                if (IsAutoWidthOnCustomLayout.HasValue)
-                {
-                    return IsAutoWidthOnCustomLayout.Value;
-                }
-
-                if (VisualTreeHelper.GetParent(this) is FrameworkElement parent)
-                {
-                    return parent.CheckIsAutoWidth(this);
-                }
-
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the Auto Height to the root of CustomLayout
-        /// </summary>
-        public bool? IsAutoHeightOnCustomLayout
-        {
-            get { return (bool?)GetValue(IsAutoHeightOnCustomLayoutProperty); }
-            set { SetValue(IsAutoHeightOnCustomLayoutProperty, value); }
-        }
-
-        public static readonly DependencyProperty IsAutoHeightOnCustomLayoutProperty =
-            DependencyProperty.Register(
-                nameof(IsAutoHeightOnCustomLayout),
-                typeof(bool?),
-                typeof(FrameworkElement),
-                new PropertyMetadata((object)null));
-
-        internal bool IsAutoHeightOnCustomLayoutInternal
-        {
-            get
-            {
-                if (IsAutoHeightOnCustomLayout.HasValue)
-                {
-                    return IsAutoHeightOnCustomLayout.Value;
-                }
-
-                if (VisualTreeHelper.GetParent(this) is FrameworkElement parent)
-                {
-                    return parent.CheckIsAutoHeight(this);
-                }
-
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Enable or disable measure/arrange layout system in a sub part
-        /// </summary>
-        public bool CustomLayout
-        {
-            get { return (bool)GetValue(CustomLayoutProperty); }
-            set { SetValue(CustomLayoutProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="FrameworkElement.CustomLayout"/> dependency 
-        /// property.
-        /// </summary>
-        public static readonly DependencyProperty CustomLayoutProperty =
-            DependencyProperty.Register(
-                nameof(CustomLayout),
-                typeof(bool),
-                typeof(FrameworkElement),
-                new PropertyMetadata(false, CustomLayout_Changed));
-
-        private static void CustomLayout_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            FrameworkElement fe = d as FrameworkElement;
-            if ((bool)e.NewValue && fe.IsCustomLayoutRoot)
-                fe.LayoutRootSizeChanged += Element_SizeChanged;
-            else
-                fe.LayoutRootSizeChanged -= Element_SizeChanged;
-        }
-
-        private static void Element_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            FrameworkElement fe = sender as FrameworkElement;
-
-            if (fe.IsCustomLayoutRoot == false)
-                return;
-
-#if OPENSILVER
-            if (OpenSilver.Interop.IsRunningInTheSimulator_WorkAround)
-#elif BRIDGE
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-#endif
-            {
-                double width = Math.Max(0, e.NewSize.Width - fe.Margin.Left - fe.Margin.Right);
-                double height = Math.Max(0, e.NewSize.Height - fe.Margin.Top - fe.Margin.Bottom);
-
-                fe.UpdateCustomLayout(new Size(width, height));
-            }
-            else
-            {
-                fe.UpdateCustomLayout(e.NewSize);
-            }
-        }
+        }        
 
         #region Height property
 
@@ -1302,7 +1181,7 @@ namespace Windows.UI.Xaml
                 {
                     if (IsCustomLayoutRoot || IsUnderCustomLayout)
                     {
-                        return VisualBounds.Width;
+                        return RenderSize.Width;
                     }
                         
                     try
@@ -1331,7 +1210,7 @@ namespace Windows.UI.Xaml
                 {
                     if (IsCustomLayoutRoot || IsUnderCustomLayout)
                     {
-                        return VisualBounds.Height;
+                        return RenderSize.Height;
                     }
 
                     try
@@ -1479,7 +1358,7 @@ namespace Windows.UI.Xaml
             {
                 if (currentSize == Size.Empty)
                 {
-                    currentSize = this.VisualBounds.Size;
+                    currentSize = this.RenderSize;
                 }
 
                 if (!Size.Equals(this._valueOfLayoutRootLastSizeChanged, currentSize))

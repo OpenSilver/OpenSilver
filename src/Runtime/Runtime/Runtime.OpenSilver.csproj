@@ -61,6 +61,7 @@
 		<Compile Include="OpenSilver\Internal\CriticalExceptions.cs" />
 		<Compile Include="OpenSilver\Internal\DebounceDispatcher.cs" />
 		<Compile Include="OpenSilver\Internal\DependentList.cs" />
+		<Compile Include="OpenSilver\Internal\DoubleUtil.cs" />
 		<Compile Include="OpenSilver\Internal\Helper.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
@@ -302,6 +303,7 @@
 		<Compile Include="System.Windows\FontStyleConverter.cs" />
 		<Compile Include="System.Windows\FontWeightConverter.cs" />
 		<Compile Include="System.Windows.Media\GeometryConverter.cs" />
+		<Compile Include="System.Windows\FrameworkElement.Layout.cs" />
 		<Compile Include="System.Windows\FrameworkElement.Styles.cs" />
 		<Compile Include="System.Windows\GridLengthConverter.cs" />
 		<Compile Include="System.ComponentModel\IItemProperties.cs" />
@@ -355,6 +357,7 @@
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
 		<Compile Include="System.Windows\UIElement.Automation.cs" />
 		<Compile Include="System.Windows\UIElement.EventManager.cs" />
+		<Compile Include="System.Windows\UIElement.Layout.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ExpanderAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\TreeViewAutomationPeer.cs" />

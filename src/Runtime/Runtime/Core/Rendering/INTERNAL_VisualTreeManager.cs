@@ -646,7 +646,7 @@ if(nextSibling != undefined) {
             if ((child.IsCustomLayoutRoot || child.KeepHiddenInFirstRender) && child.Visibility == Visibility.Visible)
             {
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement).visibility = "hidden";
-                child.isFirstRendering = true;
+                child.IsFirstRendering = true;
             }
 
 #if PERFSTAT
