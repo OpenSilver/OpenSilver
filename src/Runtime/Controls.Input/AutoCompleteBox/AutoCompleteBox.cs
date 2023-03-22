@@ -2513,6 +2513,8 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentNullException("e");
             }
 
+            bool _isDropDownOpen = IsDropDownOpen;
+
             base.OnKeyDown(e);
 
             if (e.Handled || !IsEnabled)
@@ -2587,7 +2589,11 @@ namespace Windows.UI.Xaml.Controls
 #else
                 case VirtualKey.Tab:
 #endif
-                    OnAdapterSelectionComplete(this, new RoutedEventArgs());
+                    // If dropdown is already closed when user pressed tab key,
+                    // that means user is switching between ui controls with tab key
+                    if (_isDropDownOpen)
+                        OnAdapterSelectionComplete(this, new RoutedEventArgs());
+
                     e.Handled = false;
                     break;
 
