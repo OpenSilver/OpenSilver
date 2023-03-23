@@ -125,21 +125,10 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(element))
             {
-                var domElementRefConcernedByFocus = element.GetFocusTarget();
-                if (domElementRefConcernedByFocus == null)
+                object domElement = element.GetFocusTarget();
+                if (domElement != null)
                 {
-                    return;
-                }
-
-                // In the OpenSilver we can never be running in javascript but we may not be in the simulator
-                // todo: find a way to use a more generic method (see: IsRunningInTheSimulator)
-                if (!OpenSilver.Interop.IsRunningInTheSimulator)
-                {
-                    SetFocusNative(domElementRefConcernedByFocus);
-                }
-                else
-                {
-                    SetFocus_SimulatorOnly(domElementRefConcernedByFocus);
+                    SetFocusNative(domElement);
                 }
             }
         }
@@ -149,15 +138,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             Debug.Assert(domElementRef != null);
 
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"setTimeout(function() {{ {sElement}.focus({{ preventScroll: true }}); }}, 1)");
-        }
-
-        static void SetFocus_SimulatorOnly(object domElementRef)
-        {
-            ExecuteJavaScript($@"var domElement = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier}"");
-                                        setTimeout(function() {{ 
-                                            domElement.focus({{ preventScroll: true }});
-                                        }}, 1);");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.focus({{ preventScroll: true }});");
         }
 
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
