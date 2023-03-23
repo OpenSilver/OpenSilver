@@ -2513,7 +2513,7 @@ namespace Windows.UI.Xaml.Controls
                 throw new ArgumentNullException("e");
             }
 
-            bool _isDropDownOpen = IsDropDownOpen;
+            bool isDropDownOpenAtBeginning = IsDropDownOpen;
 
             base.OnKeyDown(e);
 
@@ -2591,7 +2591,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
                     // If dropdown is already closed when user pressed tab key,
                     // that means user is switching between ui controls with tab key
-                    if (_isDropDownOpen)
+                    if (isDropDownOpenAtBeginning)
                         OnAdapterSelectionComplete(this, new RoutedEventArgs());
 
                     e.Handled = false;
