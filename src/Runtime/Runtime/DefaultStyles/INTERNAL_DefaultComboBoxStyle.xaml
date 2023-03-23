@@ -284,9 +284,9 @@
                                       Fill="#ffffff" />
                             </Grid>
                         </Border>
-                        <Popup x:Name="Popup"
-                               IsOpen="False">
-                            <Border HorizontalAlignment="Stretch" 
+                        <Popup x:Name="Popup">
+                            <Border x:Name="PopupBorder"
+                                    HorizontalAlignment="Stretch" 
                                     Height="Auto"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
@@ -304,7 +304,7 @@
                                               MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                               BorderThickness="0"
                                               Padding="1">
-                                    <ItemsPresenter x:Name="ItemsHost" />
+                                    <ItemsPresenter />
                                 </ScrollViewer>
                             </Border>
                         </Popup>
