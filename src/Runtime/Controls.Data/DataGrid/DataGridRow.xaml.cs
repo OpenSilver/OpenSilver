@@ -6,7 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -117,7 +117,7 @@ namespace Windows.UI.Xaml.Controls
         // The Details Template that is actually applied to the Row
         private DataTemplate _appliedDetailsTemplate;
         private Visibility? _appliedDetailsVisibility;
-        private Rectangle _bottomGridLine;
+        private IRectangleAdapter _bottomGridLine;
         private DataGridCellsPresenter _cellsElement;
         // In the case where Details scales vertically when it's arranged at a different width, we
         // get the wrong height measurement so we need to check it again after arrange
@@ -952,7 +952,7 @@ namespace Windows.UI.Xaml.Controls
                 }
             }
 
-            _bottomGridLine = GetTemplateChild(DATAGRIDROW_elementBottomGridLine) as Rectangle;
+            _bottomGridLine = RectangleAdapterProvider.From(GetTemplateChild(DATAGRIDROW_elementBottomGridLine));
             EnsureGridLines();
 
             _headerElement = GetTemplateChild(DATAGRIDROW_elementRowHeader) as DataGridRowHeader;

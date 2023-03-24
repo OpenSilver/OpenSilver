@@ -4,6 +4,7 @@
 // All other rights reserved.
 
 using System.Diagnostics;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -27,7 +28,6 @@ namespace Windows.UI.Xaml.Controls
     /// </summary>
     /// <QualityBand>Mature</QualityBand>
     [TemplatePart(Name = DATAGRIDCELL_elementRightGridLine, Type = typeof(Rectangle))]
-    [TemplatePart(Name = DATAGRIDCELL_elementRightGridLineBorder, Type = typeof(Border))]
 
     [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
     [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
@@ -46,13 +46,12 @@ namespace Windows.UI.Xaml.Controls
 #region Constants
 
         private const string DATAGRIDCELL_elementRightGridLine = "RightGridLine";
-        private const string DATAGRIDCELL_elementRightGridLineBorder = "RightGridLineBorder";
 
         #endregion Constants
 
         #region Data
 
-        private FrameworkElement _rightGridLine;
+        private IRectangleAdapter _rightGridLine;
 
         #endregion Data
 
@@ -265,9 +264,7 @@ namespace Windows.UI.Xaml.Controls
 
             ApplyCellState(false /*animate*/);
             
-            this._rightGridLine = GetTemplateChild(DATAGRIDCELL_elementRightGridLine) as Rectangle;
-            if (this._rightGridLine == null)
-                this._rightGridLine = GetTemplateChild(DATAGRIDCELL_elementRightGridLineBorder) as Border;
+            this._rightGridLine = RectangleAdapterProvider.From(GetTemplateChild(DATAGRIDCELL_elementRightGridLine));
 
             if (_rightGridLine != null && this.OwningColumn == null)
             {
@@ -399,19 +396,9 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this.OwningGrid != null && _rightGridLine != null)
             {
-                if (_rightGridLine is Rectangle r)
+                if (this.OwningGrid.VerticalGridLinesBrush != null && this.OwningGrid.VerticalGridLinesBrush != _rightGridLine.Fill)
                 {
-                    if (this.OwningGrid.VerticalGridLinesBrush != null && this.OwningGrid.VerticalGridLinesBrush != r.Fill)
-                    {
-                        r.Fill = this.OwningGrid.VerticalGridLinesBrush;
-                    }
-                }
-                else if (_rightGridLine is Border b)
-                {
-                    if (this.OwningGrid.VerticalGridLinesBrush != null && this.OwningGrid.VerticalGridLinesBrush != b.Background)
-                    {
-                        b.Background = this.OwningGrid.VerticalGridLinesBrush;
-                    }
+                    _rightGridLine.Fill = this.OwningGrid.VerticalGridLinesBrush;
                 }
 
                 Visibility newVisibility = (this.OwningGrid.GridLinesVisibility == DataGridGridLinesVisibility.Vertical || this.OwningGrid.GridLinesVisibility == DataGridGridLinesVisibility.All) &&

@@ -3,12 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-
-#if MIGRATION
-using System.Windows.Shapes;
-#else
-using Windows.UI.Xaml.Shapes;
-#endif
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -46,7 +41,7 @@ public sealed partial class DataGridCell
             }
 
             #region Internal Properties
-            internal FrameworkElement RightGridLine
+            internal IRectangleAdapter RightGridLine
             {
                 get
                 {

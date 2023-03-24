@@ -28,6 +28,7 @@
 
 
   <ItemGroup>
+    <Compile Include="..\Runtime\OpenSilver\Internal\RectangleAdapter.cs" Link="Helpers\RectangleAdapter.cs" />
     <Compile Include="DataGrid\Automation\DataGridAutomationPeer.cs" />
     <Compile Include="DataGrid\Automation\DataGridCellAutomationPeer.cs" />
     <Compile Include="DataGrid\Automation\DataGridColumnHeaderAutomationPeer.cs" />

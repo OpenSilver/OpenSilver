@@ -3,7 +3,7 @@
 // Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
 // All other rights reserved.
 
-
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml.Controls
 
 #region Internal Properties
 
-            internal Rectangle BottomGridLine
+            internal IRectangleAdapter BottomGridLine
             {
                 get
                 {

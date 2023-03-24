@@ -272,7 +272,7 @@
 
                         <Border x:Name="InvalidVisualElement" IsHitTestVisible="False" BorderThickness="1" BorderBrush="#FFDC000C" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0" />
 
-                        <Border x:Name="RightGridLineBorder" Grid.Column="1" VerticalAlignment="Stretch" Width="1" />
+                        <Border x:Name="RightGridLine" Grid.Column="1" VerticalAlignment="Stretch" Width="1" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
