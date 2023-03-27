@@ -13,19 +13,14 @@
 
 using System;
 using System.Collections.Generic;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
+using System.Diagnostics;
 
 #if MIGRATION
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 #else
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.System;
 #endif
 
 #if MIGRATION
@@ -1003,52 +998,37 @@ namespace Windows.UI.Xaml
 
         internal virtual void AddEventListeners()
         {
-            NativeEventsHelper.AddEventListeners(this, false);
+            InputManager.Current.AddEventListeners(this, false);
         }
 
-        internal virtual void DispatchEvent(object jsEventArg)
+        internal virtual UIElement MouseTarget => this;
+
+        internal virtual UIElement KeyboardTarget => this;
+
+        internal bool IsPointerOver { get; set; }
+
+        internal void RaiseMouseLeave()
         {
-            NativeEventCallback(this, this, jsEventArg);
+            Debug.Assert(IsPointerOver == true);
+            IsPointerOver = false;
+
+#if MIGRATION
+            var e = new MouseEventArgs
+            {
+                RoutedEvent = MouseLeaveEvent,
+                OriginalSource = this,
+            };
+#else
+            var e = new PointerRoutedEventArgs
+            {
+                RoutedEvent = PointerExitedEvent,
+                OriginalSource = this,
+            };
+#endif
+
+            RaiseEvent(e);
         }
 
-        internal static class NativeEventsHelper
-        {
-            private static JavaScriptCallback _globalHandler;
-
-            internal static void AddEventListeners(UIElement uie, bool isFocusable)
-            {
-                EnsureInitialized();
-
-                string sHandler = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_globalHandler);
-                if (uie.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
-                {
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                        $@"document._attachEventListeners(""{domRef.UniqueIdentifier}"", {sHandler}, {(isFocusable ? "true" : "false")})");
-                }
-                else
-                {
-                    string sOuter = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(uie.INTERNAL_OuterDomElement);
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                        $"document._attachEventListeners({sOuter}, {sHandler}, {(isFocusable ? "true" : "false")})");
-                }
-            }
-
-            private static void EnsureInitialized()
-            {
-                _globalHandler ??= JavaScriptCallback.Create(NativeEventCallback, true);
-            }
-
-            private static void NativeEventCallback(string id, object jsEventArg)
-            {
-                UIElement uie = INTERNAL_HtmlDomManager.GetElementById(id);
-                if (uie is null)
-                {
-                    // Consider detaching the event handlers
-                    return;
-                }
-
-                uie.DispatchEvent(jsEventArg);
-            }
-        }
+        internal virtual void OnTextInputInternal() { }
     }
 }

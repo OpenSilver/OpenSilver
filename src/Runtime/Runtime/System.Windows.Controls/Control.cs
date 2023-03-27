@@ -100,7 +100,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal override void AddEventListeners()
         {
-            NativeEventsHelper.AddEventListeners(this, true);
+            InputManager.Current.AddEventListeners(this, true);
         }
 
         //-----------------------

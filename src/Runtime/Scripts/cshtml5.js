@@ -427,53 +427,150 @@ document.addEventListenerSafe = function (element, method, func) {
     }
 }
 
-document._attachEventListeners = function (element, handler, isFocusable) {
-    const view = typeof element === 'string' ? document.getElementById(element) : element;
-    if (!view || view._eventsStore) return;
+document.createInputManager = function (callback) {
+    if (document.inputManager) return;
 
-    function directEventHandler(e) {
-        handler(this.id, e);
-    }
+    // This must remain synchronyzed with the EVENTS enum defined in InputManager.cs.
+    // Make sure to change both files if you update this !
+    const EVENTS = {
+        POINTER_MOVE: 0,
+        POINTER_LEFT_DOWN: 1,
+        POINTER_LEFT_UP: 2,
+        POINTER_RIGHT_DOWN: 3,
+        POINTER_RIGHT_UP: 4,
+        POINTER_ENTER: 5,
+        POINTER_LEAVE: 6,
+        WHEEL: 7,
+        KEYDOWN: 8,
+        KEYUP: 9,
+        FOCUS: 10,
+        BLUR: 11,
+        KEYPRESS: 12,
+        INPUT: 13,
+        TOUCH_START: 14,
+        TOUCH_END: 15,
+        TOUCH_MOVE: 16
+    };
 
-    function bubblingEventHandler(e) {
-        if (!e.isHandled) {
-            e.isHandled = true;
-            handler(this.id, e);
-        }
-    }
+    document.inputManager = {
+        addListeners: function (element, isFocusable) {
+            const view = typeof element === 'string' ? document.getElementById(element) : element;
+            if (!view) return;
 
-    function bubblingHandledEventHandler(e) {
-        if (!e.isHandled) {
-            e.isHandled = true;
-            handler(this.id, e);
-            e.preventDefault();
-        }
-    }
+            view.addEventListener('mousedown', function (e) {
+                if (!e.isHandled) {
+                    e.isHandled = true;
+                    switch (e.button) {
+                        case 0:
+                            callback(this.id, EVENTS.POINTER_LEFT_DOWN, e);
+                            break;
+                        case 2:
+                            callback(this.id, EVENTS.POINTER_RIGHT_DOWN, e);
+                            break;
+                    }
+                }
+            });
 
-    const store = view._eventsStore = {};
-    store.isFocusable = isFocusable;
-    store.enableTouch = isTouchDevice();
+            view.addEventListener('mouseup', function (e) {
+                if (!e.isHandled) {
+                    e.isHandled = true;
+                    switch (e.button) {
+                        case 0:
+                            callback(this.id, EVENTS.POINTER_LEFT_UP, e);
+                            break;
+                        case 2:
+                            callback(this.id, EVENTS.POINTER_RIGHT_UP, e);
+                            break;
+                    }
+                }
+            });
 
-    view.addEventListener('mousedown', store['mousedown'] = bubblingEventHandler);
-    view.addEventListener('mouseup', store['mouseup'] = bubblingEventHandler);
-    view.addEventListener('mousemove', store['mousemove'] = bubblingEventHandler);
-    view.addEventListener('wheel', store['wheel'] = bubblingEventHandler, { passive: true });
-    view.addEventListener('mouseenter', store['mouseenter'] = directEventHandler);
-    view.addEventListener('mouseleave', store['mouseleave'] = directEventHandler);
-    if (store.enableTouch) {
-        view.addEventListener('touchstart', store['touchstart'] = bubblingEventHandler, { passive: true });
-        view.addEventListener('touchend', store['touchend'] = bubblingHandledEventHandler);
-        view.addEventListener('touchmove', store['touchmove'] = bubblingEventHandler, { passive: true });
-    }
-    if (isFocusable) {
-        view.addEventListener('keypress', store['keypress'] = bubblingEventHandler);
-        view.addEventListener('input', store['input'] = bubblingEventHandler);
-        view.addEventListener('keydown', store['keydown'] = bubblingEventHandler);
-        view.addEventListener('keyup', store['keyup'] = bubblingEventHandler);
-        view.addEventListener('focus', store['focus'] = directEventHandler);
-        view.addEventListener('blur', store['blur'] = directEventHandler);
-    }
-}
+            view.addEventListener('mousemove', function (e) {
+                if (!e.isHandled) {
+                    e.isHandled = true;
+                    callback(this.id, EVENTS.POINTER_MOVE, e);
+                }
+            });
+
+            view.addEventListener('wheel', function (e) {
+                if (!e.isHandled) {
+                    e.isHandled = true;
+                    callback(this.id, EVENTS.WHEEL, e);
+                }
+            });
+
+            view.addEventListener('mouseenter', function (e) {
+                callback(this.id, EVENTS.POINTER_ENTER, e);
+            });
+
+            view.addEventListener('mouseleave', function (e) {
+                callback(this.id, EVENTS.POINTER_LEAVE, e);
+            });
+
+            if (isTouchDevice()) {
+                view.addEventListener('touchstart', function (e) {
+                    if (!e.isHandled) {
+                        e.isHandled = true;
+                        callback(this.id, EVENTS.TOUCH_START, e);
+                    }
+                }, { passive: true });
+
+                view.addEventListener('touchend', function (e) {
+                    if (!e.isHandled) {
+                        e.isHandled = true;
+                        callback(this.id, EVENTS.TOUCH_END, e);
+                        e.preventDefault();
+                    }
+                });
+
+                view.addEventListener('touchmove', function (e) {
+                    if (!e.isHandled) {
+                        e.isHandled = true;
+                        callback(this.id, EVENTS.TOUCH_MOVE, e);
+                    }
+                }, { passive: true });
+            }
+
+            if (isFocusable) {
+                view.addEventListener('keypress', function (e) {
+                    if (!e.isHandled) {
+                        e.isHandled = true;
+                        callback(this.id, EVENTS.KEYPRESS, e);
+                    }
+                });
+
+                view.addEventListener('input', function (e) {
+                    if (!e.isHandled) {
+                        e.isHandled = true;
+                        callback(this.id, EVENTS.INPUT, e);
+                    }
+                });
+
+                view.addEventListener('keydown', function (e) {
+                    if (!e.isHandled) {
+                        e.isHandled = true;
+                        callback(this.id, EVENTS.KEYDOWN, e);
+                    }
+                });
+
+                view.addEventListener('keyup', function (e) {
+                    if (!e.isHandled) {
+                        e.isHandled = true;
+                        callback(this.id, EVENTS.KEYPRESS, e);
+                    }
+                });
+
+                view.addEventListener('focus', function (e) {
+                    callback(this.id, EVENTS.FOCUS, e);
+                });
+
+                view.addEventListener('blur', function (e) {
+                    callback(this.id, EVENTS.BLUR, e);
+                });
+            }
+        },
+    };
+};
 
 document.eventCallback = function (callbackId, args, sync) {
     const argsArray = args;

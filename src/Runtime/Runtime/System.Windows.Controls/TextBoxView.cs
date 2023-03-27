@@ -116,13 +116,10 @@ namespace Windows.UI.Xaml.Controls
 
         internal sealed override void AddEventListeners()
         {
-            NativeEventsHelper.AddEventListeners(this, true);
+            InputManager.Current.AddEventListeners(this, true);
         }
 
-        internal sealed override void DispatchEvent(object jsEventArg)
-        {
-            NativeEventCallback(this, Host, jsEventArg);
-        }
+        internal sealed override UIElement KeyboardTarget => Host;
 
         internal override object GetDomElementToSetContentString()
         {

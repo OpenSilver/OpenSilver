@@ -147,25 +147,25 @@ namespace Windows.UI.Xaml.Input
             if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.shiftKey || false"))
             {
 #if MIGRATION
-                keyModifiers = keyModifiers | ModifierKeys.Shift;
+                keyModifiers |= ModifierKeys.Shift;
 #else
-                keyModifiers = keyModifiers | VirtualKeyModifiers.Shift;
+                keyModifiers |= VirtualKeyModifiers.Shift;
 #endif
             }
             if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.altKey || false"))
             {
 #if MIGRATION
-                keyModifiers = keyModifiers | ModifierKeys.Alt;
+                keyModifiers |= ModifierKeys.Alt;
 #else
-                keyModifiers = keyModifiers | VirtualKeyModifiers.Menu;
+                keyModifiers |= VirtualKeyModifiers.Menu;
 #endif
             }
             if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.ctrlKey || false"))
             {
 #if MIGRATION
-                keyModifiers = keyModifiers | ModifierKeys.Control;
+                keyModifiers |= ModifierKeys.Control;
 #else
-                keyModifiers = keyModifiers | VirtualKeyModifiers.Control;
+                keyModifiers |= VirtualKeyModifiers.Control;
 #endif
             }
             KeyModifiers = keyModifiers;
@@ -216,8 +216,8 @@ namespace Windows.UI.Xaml.Input
                 }
 
                 // Substract the XAML Window position, to get the pointer position relative to the XAML Window root:
-                _pointerAbsoluteX = _pointerAbsoluteX - windowRootLeft;
-                _pointerAbsoluteY = _pointerAbsoluteY - windowRootTop;
+                _pointerAbsoluteX -= windowRootLeft;
+                _pointerAbsoluteY -= windowRootTop;
             }
         }
 

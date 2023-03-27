@@ -19,10 +19,12 @@ using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Automation.Peers;
 using System.Windows.Documents;
+using System.Windows.Input;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Input;
 #endif
 
 #if MIGRATION
@@ -82,7 +84,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal sealed override void AddEventListeners()
         {
-            NativeEventsHelper.AddEventListeners(this, false);
+            InputManager.Current.AddEventListeners(this, false);
         }
 
         internal override string GetPlainText() => Text;

@@ -45,7 +45,10 @@ namespace Windows.UI.Xaml.Documents
 
         internal sealed override void AddEventListeners() { }
 
-        internal sealed override void DispatchEvent(object jsEventArg) { }
+        internal sealed override UIElement MouseTarget => null;
+
+        internal sealed override UIElement KeyboardTarget => null;
+
 
         internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
         {

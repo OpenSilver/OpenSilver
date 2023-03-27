@@ -311,7 +311,7 @@
 		<Compile Include="System.Windows.Media.Animation\KeyTimeConverter.cs" />
 		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
-		<Compile Include="System.Windows\InheritanceBehavior.cs" />
+		<Compile Include="System.Windows\InheritanceBehavior.cs" />		
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
 		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />
@@ -356,7 +356,6 @@
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
 		<Compile Include="System.Windows\UIElement.Automation.cs" />
-		<Compile Include="System.Windows\UIElement.EventManager.cs" />
 		<Compile Include="System.Windows\UIElement.Layout.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ExpanderAutomationPeer.cs" />
@@ -565,7 +564,8 @@
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LayoutInformation.cs" />
 		<Compile Include="System.Windows.Data\CollectionViewGroup.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Block.cs" />
-		<Compile Include="System.Windows.Input\FocusManager.cs" />
+    <Compile Include="System.Windows.Input\InputManager.cs" />
+    <Compile Include="System.Windows.Input\FocusManager.cs" />
 		<Compile Include="System.Windows.Input\WORKINPROGRESS\Touch.cs" />
 		<Compile Include="System.Windows.Input\WORKINPROGRESS\TouchAction.cs" />
 		<Compile Include="System.Windows.Input\WORKINPROGRESS\TouchDevice.cs" />
