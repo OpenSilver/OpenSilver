@@ -703,18 +703,17 @@ parentElement.appendChild(child);";
 
             if (s == null || s.Length == 0)
             {
-                return "";
+                return string.Empty;
             }
 
-            char c = '\0';
             int i;
             int len = s.Length;
-            StringBuilder sb = new StringBuilder(len + 4);
-            String t;
+            StringBuilder sb = StringBuilderFactory.Get();
+            string t;
 
             for (i = 0; i < len; i += 1)
             {
-                c = s[i];
+                char c = s[i];
                 switch (c)
                 {
                     case '\\':
@@ -748,7 +747,7 @@ parentElement.appendChild(child);";
                     default:
                         if (c < ' ')
                         {
-                            t = "000" + String.Format("X", c);
+                            t = "000" + string.Format("X", c);
                             sb.Append("\\u" + t.Substring(t.Length - 4));
                         }
                         else
@@ -758,7 +757,11 @@ parentElement.appendChild(child);";
                         break;
                 }
             }
-            return sb.ToString();
+
+            string ret = sb.ToString();
+            StringBuilderFactory.Return(sb);
+
+            return ret;
         }
 
         public static string ConvertToStringToUseInJavaScriptCode(object obj)

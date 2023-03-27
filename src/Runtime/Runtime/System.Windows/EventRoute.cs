@@ -119,6 +119,16 @@ namespace Windows.UI.Xaml
             }
         }
 
+        /// <summary>
+        ///     Cleanup all the references within the data
+        /// </summary>
+        internal void Clear()
+        {
+            RoutedEvent = null;
+
+            _routeItemList.Clear();
+        }
+
         internal RoutedEvent RoutedEvent { get; set; }
 
         // Stores the routed event handlers to be 

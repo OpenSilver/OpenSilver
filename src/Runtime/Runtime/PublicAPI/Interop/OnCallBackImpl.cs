@@ -11,25 +11,14 @@
 *  
 \*====================================================================================*/
 
-using DotNetForHtml5.Core;
-using CSHTML5.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-#if BRIDGE
-using Bridge;
-using DotNetBrowser;
-#endif
-
-#if OPENSILVER
-#endif
+using CSHTML5.Types;
+using DotNetForHtml5.Core;
 
 namespace CSHTML5.Internal
 {
-#if BRIDGE
-    [External] //we exclude this class
-#endif
     internal sealed class OnCallBackImpl
     {
         private OnCallBackImpl()
@@ -68,58 +57,9 @@ namespace CSHTML5.Internal
         public object OnCallbackFromJavaScript<T>(
             int callbackId,
             string idWhereCallbackArgsAreStored,
-            T callbackArgsObject,
-            bool isInSimulator,
-            bool returnValue)
+            T callbackArgsObject)
         {
-            object result = null;
-            var actionExecuted = false;
-
-            void InvokeCallback()
-            {
-                //--------------------
-                // Call the callback:
-                //--------------------
-                try
-                {
-                    result = CallMethod(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
-                    actionExecuted = true;
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                    //#if DEBUG
-                    //                            Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
-                    //#endif
-                    //                            throw;
-                }
-
-                INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
-            }
-
-            if (isInSimulator)
-            {
-                // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
-                if (returnValue)
-                {
-                    var timeout = TimeSpan.FromSeconds(30);
-                    INTERNAL_Simulator.WebControlDispatcherInvoke(InvokeCallback, timeout);
-                    if (!actionExecuted)
-                    {
-                        throw GenerateDeadlockException(timeout);
-                    }
-                }
-                else
-                {
-                    INTERNAL_Simulator.WebControlDispatcherBeginInvoke(InvokeCallback);
-                }
-            }
-            else
-            {
-                InvokeCallback();
-            }
-
-            return returnValue ? result : null;
+            return CallMethod(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject);
         }
 
         private static object DelegateDynamicInvoke(Delegate d, params object[] args)
@@ -136,6 +76,10 @@ namespace CSHTML5.Internal
                     result = null;
                     return true;
 
+                case Func<object> func:
+                    result = func();
+                    return true;
+
                 default:
                     result = null;
                     return false;
@@ -147,12 +91,13 @@ namespace CSHTML5.Internal
             //----------------------------------
             // Get the C# callback from its ID:
             //----------------------------------
-            var callback = JavaScriptCallback.Get(callbackId)?.GetCallback();
-
-            if (callback == null)
+            JavaScriptCallback jsCallback = JavaScriptCallback.Get(callbackId);
+            if (jsCallback == null)
             {
                 return null;
             }
+
+            Delegate callback = jsCallback.GetCallback();
 
             if (TryOptimizationForCommonTypes(callback, out object simpleResult))
             {
@@ -171,11 +116,6 @@ namespace CSHTML5.Internal
             IReadOnlyList<object> extraJsObjects = null;
             try
             {
-                if (callbackType == typeof(Func<>))
-                {
-                    return DelegateDynamicInvoke(callback);
-                }
-
                 int argumentCount = 0;
                 if (callbackType == typeof(Action<>) || callbackType == typeof(Func<,>))
                     argumentCount = 1;
@@ -212,17 +152,6 @@ namespace CSHTML5.Internal
             throw new Exception($"Callback type not supported: '{callbackType.FullName}'");
         }
 
-        private static ApplicationException GenerateDeadlockException(TimeSpan timeout)
-        {
-            return new ApplicationException(
-                $"The callback method has not finished execution in {timeout} seconds.\n" +
-                "This method was called in a sync way, and very likely, the process is deadlocked. It happens when the code from the UI thread calls JS code, which calls C# back synchronously.\n" +
-                "The Example:\n" +
-                "OpenSilver.Interop.ExecuteJavaScript(\"$0();\", (Func<string>)(() => \"Message from C#\"));\n" +
-                "The solution:\n" +
-                "If a callback returns a value(for example, a Func), verify that this callback is not invoked from the C# code in the UI thread.");
-        }
-
         private static (object[], IReadOnlyList<object>) MakeArgumentsForCallback(
             int count,
             string idWhereCallbackArgsAreStored,
@@ -257,14 +186,5 @@ namespace CSHTML5.Internal
             }
             return (result, extraJsObjects);
         }
-
-        //private static object MakeArgumentForCallbackAtIndex(
-        //    string idWhereCallbackArgsAreStored,
-        //    object callbackArgs,
-        //    Type argType,
-        //    int index)
-        //{
-
-        //}
     }
 }

@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Media.Animation
             string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
             string elementId = (domElement as INTERNAL_HtmlDomElementReference).UniqueIdentifier;
 
-            var sb = new StringBuilder();
+            StringBuilder sb = StringBuilderFactory.Get();
             sb.AppendLine("(function(el) {")
               .AppendLine($@"const options = {{
 easing:""{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(easingFunctionAsString)}"",
@@ -94,7 +94,10 @@ queue:""{visualStateGroupName}""
             sb.AppendLine($"document.velocityHelpers.animate(el, {jsFromToValues}, options, '{visualStateGroupName}');")
               .Append($"}})({sElement});");
 
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(sb.ToString());
+            string javascript = sb.ToString();
+            StringBuilderFactory.Return(sb);
+
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(javascript);
         }
 
         internal static void StopVelocity(string domElement, string visualStateGroupName)

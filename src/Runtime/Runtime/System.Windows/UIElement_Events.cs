@@ -245,11 +245,13 @@ namespace Windows.UI.Xaml
                 e.OriginalSource = this;
             }
 
-            EventRoute route = new EventRoute(e.RoutedEvent);
+            EventRoute route = EventRouteFactory.FetchObject(e.RoutedEvent);
 
             BuildRouteHelper(this, route, e);
             
             route.InvokeHandlers(e);
+
+            EventRouteFactory.RecycleObject(route);
         }
 
         internal static void BuildRouteHelper(DependencyObject e, EventRoute route, RoutedEventArgs args)

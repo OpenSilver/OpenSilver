@@ -11,19 +11,9 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Types;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-
-#if BRIDGE
-using Bridge;
-using DotNetBrowser;
-#endif
-
-#if OPENSILVER
 using Microsoft.JSInterop;
-#endif
 
 namespace CSHTML5.Internal
 {
@@ -59,8 +49,23 @@ namespace CSHTML5.Internal
             object[] callbackArgsObject,
             bool returnValue)
         {
-            return OnCallBackImpl.Instance.OnCallbackFromJavaScript(
-                callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, false, returnValue);
+            object result = null;
+
+            try
+            {
+                result = OnCallBackImpl.Instance.OnCallbackFromJavaScript(
+                    callbackId,
+                    idWhereCallbackArgsAreStored,
+                    callbackArgsObject);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+            }
+
+            INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
+
+            return returnValue ? result : null;
         }
 
         private static void CheckIsRunningInBrowser()

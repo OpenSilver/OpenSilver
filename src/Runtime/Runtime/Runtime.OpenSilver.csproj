@@ -67,6 +67,7 @@
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
 		<Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
+		<Compile Include="OpenSilver\Internal\StringBuilderFactory.cs" />
 		<Compile Include="OpenSilver\Internal\VisualStateGroupCollection.cs" />
 		<Compile Include="OpenSilver\Internal\VisualStatesCollection.cs" />
 		<Compile Include="OpenSilver\Internal\Controls\ITextBoxViewHost.cs" />
@@ -299,6 +300,7 @@
 		<Compile Include="System.Windows.Media\FontFamilyConverter.cs" />
 		<Compile Include="System.Windows\EventHandlersStore.cs" />
 		<Compile Include="System.Windows\EventRoute.cs" />
+		<Compile Include="System.Windows\EventRouteFactory.cs" />
 		<Compile Include="System.Windows\FontStretchConverter.cs" />
 		<Compile Include="System.Windows\FontStyleConverter.cs" />
 		<Compile Include="System.Windows\FontWeightConverter.cs" />

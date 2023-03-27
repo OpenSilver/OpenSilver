@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,16 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Types;
 using System;
-
-#if BRIDGE
-using Bridge;
-using DotNetBrowser;
-#endif
-
-#if OPENSILVER
-#endif
+using DotNetForHtml5.Core;
 
 namespace CSHTML5.Internal
 {
@@ -53,8 +44,44 @@ namespace CSHTML5.Internal
             object callbackArgsObject,
             bool returnValue)
         {
-            return OnCallBackImpl.Instance.OnCallbackFromJavaScript(
-                callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, true, returnValue);
+            object result = null;
+            var actionExecuted = false;
+
+            void InvokeCallback()
+            {
+                try
+                {
+                    result = OnCallBackImpl.Instance.OnCallbackFromJavaScript(
+                        callbackId,
+                        idWhereCallbackArgsAreStored,
+                        callbackArgsObject);
+                    
+                    actionExecuted = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                }
+
+                INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
+            }
+
+            // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
+            if (returnValue)
+            {
+                var timeout = TimeSpan.FromSeconds(30);
+                INTERNAL_Simulator.WebControlDispatcherInvoke(InvokeCallback, timeout);
+                if (!actionExecuted)
+                {
+                    throw GenerateDeadlockException(timeout);
+                }
+            }
+            else
+            {
+                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(InvokeCallback);
+            }
+
+            return returnValue ? result : null;
         }
 
         private static void CheckIsRunningInTheSimulator()
@@ -63,6 +90,17 @@ namespace CSHTML5.Internal
             {
                 throw new InvalidOperationException($"'{nameof(OnCallbackSimulator)}' is not supported in the browser.");
             }
+        }
+
+        private static ApplicationException GenerateDeadlockException(TimeSpan timeout)
+        {
+            return new ApplicationException(
+                $"The callback method has not finished execution in {timeout} seconds.\n" +
+                "This method was called in a sync way, and very likely, the process is deadlocked. It happens when the code from the UI thread calls JS code, which calls C# back synchronously.\n" +
+                "The Example:\n" +
+                "OpenSilver.Interop.ExecuteJavaScript(\"$0();\", (Func<string>)(() => \"Message from C#\"));\n" +
+                "The solution:\n" +
+                "If a callback returns a value(for example, a Func), verify that this callback is not invoked from the C# code in the UI thread.");
         }
     }
 }
