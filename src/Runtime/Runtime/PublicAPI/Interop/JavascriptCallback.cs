@@ -49,10 +49,10 @@ namespace CSHTML5.Internal
 
         public void Dispose() => _store.Clean(_id);
 
-        // this will allow usage in client code
         public override string ToString() => ToJavaScriptStringImpl();
 
-        private string ToJavaScriptStringImpl() =>$"document.getCallbackFunc({_id}, {GetSyncString()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
+        private string ToJavaScriptStringImpl()
+            => $"document.getCallbackFunc({_id}, {GetSyncString()}, {(!OpenSilver.Interop.IsRunningInTheSimulator).ToString().ToLower()})";
 
         string IJavaScriptConvertible.ToJavaScriptString() => ToJavaScriptStringImpl();
 

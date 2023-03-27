@@ -305,15 +305,14 @@ namespace OpenSilver
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
         }
 
-        // returns a callback that can be:
-        // 1. used in Javascript calls in client code
-        // 2. disposed in client code
-        public static IDisposable CreateJavascriptCallback(Delegate d) 
-        {
-            bool sync = d.Method.ReturnType != typeof(void);
-            return JavaScriptCallback.Create(d, sync);
-        }
-
+        /// <summary>
+        /// Register a .NET method to allow it to be invoked from JavaScript code.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IDisposable"/> object that must be disposed after it has been used.
+        /// If the object is not disposed, it will be leaked.
+        /// </returns>
+        public static IDisposable CreateJavascriptCallback(Delegate d) => JavaScriptCallback.Create(d, true);
 
         /// <summary>
         /// Unboxes the value passed as a parameter. It is particularly useful for the variables of the ExecuteJavaScript Methods calls aimed at using third party libraries.
