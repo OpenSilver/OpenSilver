@@ -581,12 +581,17 @@ namespace Windows.UI.Xaml.Controls
                 if (tabIndex < (TABINDEX_BROWSER_MAX_VALUE - 100))
                 {
                     index = Math.Max(tabIndex + 100, 0); //this is not ideal but it'll have do for now.
+                    var childWindowIdString = GetParentChildWindowIdIfApplicable(this);
+                    if(!string.IsNullOrWhiteSpace(childWindowIdString) && int.TryParse(childWindowIdString, out var childWindowId))
+                    {
+                        index = Math.Max(index + childWindowId, 0); // updating tabindex for child window, so that child window order was separate from global order
+                    }
                 }
                 else
                 {
                     index = TABINDEX_BROWSER_MAX_VALUE;
                 }
-
+                
                 INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementConcernedByFocus, "tabIndex", index.ToString()); //note: not replaced with GetCSSEquivalent because it uses SetDomeElementAttribute (so it's not the style)
 
                 //in the case where the control should not have an outline even when focused or when the control has a template that defines the VisualState "Focused", we remove the default outline that browsers put:
@@ -601,6 +606,27 @@ namespace Windows.UI.Xaml.Controls
                     INTERNAL_HtmlDomManager.SetDomElementStyleProperty(domElementConcernedByFocus, new List<string>() { "outline" }, "none");
                 }
             }
+        }
+
+        private string GetParentChildWindowIdIfApplicable(FrameworkElement currentItem)
+        {
+            string result = null;
+            var parent = currentItem?.Parent as FrameworkElement;
+
+            if (parent != null)
+            {
+                if (parent is not ChildWindow)
+                {
+                    result = GetParentChildWindowIdIfApplicable(parent);
+                } else
+                {
+                    var focusTarget = parent.GetFocusTarget();
+                    var focusTargetHtmlReference = (INTERNAL_HtmlDomElementReference)focusTarget;
+                    result = focusTargetHtmlReference.UniqueIdentifier.Replace("id", "");
+                }
+            }
+
+            return result;
         }
 
         //-----------------------
