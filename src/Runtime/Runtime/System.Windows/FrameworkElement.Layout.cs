@@ -39,7 +39,7 @@ namespace Windows.UI.Xaml
                 nameof(CustomLayout),
                 typeof(bool),
                 typeof(FrameworkElement),
-                new PropertyMetadata(false, OnCustomLayoutChanged));
+                new PropertyMetadata(false, OnCustomLayoutChanged, CoerceCustomLayout));
 
         /// <summary>
         /// Enable or disable measure/arrange layout system in a sub part
@@ -53,13 +53,44 @@ namespace Windows.UI.Xaml
         private static void OnCustomLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             FrameworkElement fe = (FrameworkElement)d;
-            if ((bool)e.NewValue && fe.IsCustomLayoutRoot)
+            fe.UseCustomLayout = (bool)e.NewValue;
+            
+            if (fe.UseCustomLayout && fe.IsCustomLayoutRoot)
             {
                 fe.LayoutRootSizeChanged += new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
             }
             else
             {
                 fe.LayoutRootSizeChanged -= new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
+            }
+
+            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
+        }
+
+        private static object CoerceCustomLayout(DependencyObject d, object baseValue)
+        {
+            FrameworkElement fe = (FrameworkElement)d;
+
+            // We must be true if our parent is true, but we can be
+            // either true or false if our parent is false.
+            //
+            // Another way of saying this is that we can only be false
+            // if our parent is false, but we can always be true.
+            if (!(bool)baseValue)
+            {
+                DependencyObject parent = GetLayoutParent(fe);
+                if (parent == null || !(bool)parent.GetValue(CustomLayoutProperty))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return true;
             }
         }
 

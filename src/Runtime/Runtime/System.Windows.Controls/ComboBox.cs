@@ -196,7 +196,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 //reason for following if condition is backward compatibility, till now we had to define template and manually set custom layout of popup to true
                 //and thus we don't need to set custom layout for combo box to make this work.
-                if (CustomLayout)
+                if (UseCustomLayout)
                 {
                     _popup.CustomLayout = true;
                 }

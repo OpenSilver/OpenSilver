@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Controls
                 domElementWhereToPlaceChildren = outerDiv;
                 return outerDiv;
             }
-            else if (panel.CustomLayout)
+            else if (panel.UseCustomLayout)
             {
                 outerDivStyle.position = "relative";
             }
@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Controls
         {
             Debug.Assert(panel is WrapPanel);
 
-            if (panel.CustomLayout || panel.IsUnderCustomLayout)
+            if (panel.UseCustomLayout)
             {
                 domElementWhereToPlaceChild = null;
                 return null;
@@ -90,7 +90,7 @@ namespace Windows.UI.Xaml.Controls
                     innerDivStyle.width = string.Empty;
                     innerDivStyle.height = string.Empty;
                     innerDivStyle.flexDirection = string.Empty;
-                    if (!panel.CustomLayout)
+                    if (!panel.UseCustomLayout)
                     {
                         UpdateChildWrappers(panel, false);
                     }
@@ -100,7 +100,7 @@ namespace Windows.UI.Xaml.Controls
                     innerDivStyle.width = "fit-content";
                     innerDivStyle.height = "calc(100%)";
                     innerDivStyle.flexDirection = "column";
-                    if (!panel.CustomLayout)
+                    if (!panel.UseCustomLayout)
                     {
                         UpdateChildWrappers(panel, true);
                     }

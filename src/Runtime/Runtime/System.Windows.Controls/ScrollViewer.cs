@@ -136,7 +136,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(HorizontalOffsetProperty);
                 }
@@ -221,7 +221,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(VerticalOffsetProperty);
                 }
@@ -669,7 +669,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(ScrollableHeightProperty);
                 }
@@ -706,7 +706,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(ScrollableWidthProperty);
                 }
@@ -742,7 +742,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(ViewportHeightProperty);
                 }
@@ -776,7 +776,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(ViewportWidthProperty);
                 }
@@ -844,7 +844,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(ExtentHeightProperty);
                 }
@@ -880,7 +880,7 @@ namespace Windows.UI.Xaml.Controls
         {
             get
             {
-                if (CustomLayout || IsUnderCustomLayout)
+                if (UseCustomLayout)
                 {
                     return (double)GetValue(ExtentWidthProperty);
                 }

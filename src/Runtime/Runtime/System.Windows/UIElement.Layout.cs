@@ -364,7 +364,7 @@ namespace Windows.UI.Xaml
 
         internal void InvalidateParentArrange() => GetLayoutParent(this)?.InvalidateArrange();
 
-        private static UIElement GetLayoutParent(UIElement element)
+        internal static UIElement GetLayoutParent(UIElement element)
             => VisualTreeHelper.GetParent(element) switch
             {
                 GridNotLogical gnl => GetLayoutParent(gnl),
@@ -463,26 +463,11 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal bool IsCustomLayoutRoot
-            => this is FrameworkElement fe && fe.CustomLayout && !IsUnderCustomLayout;
+        internal bool UseCustomLayout { get; set; }
 
-        internal bool IsUnderCustomLayout
-        {
-            get
-            {
-                UIElement element = this;
+        internal bool IsCustomLayoutRoot => UseCustomLayout && !IsUnderCustomLayout;
 
-                while (GetLayoutParent(element) is FrameworkElement parent)
-                {
-                    if (parent.CustomLayout)
-                        return true;
-
-                    element = parent;
-                }
-
-                return false;
-            }
-        }
+        internal bool IsUnderCustomLayout => GetLayoutParent(this)?.UseCustomLayout ?? false;
 
         private Rect _visualBounds;
         private Size _previousDesiredSize;
@@ -490,6 +475,6 @@ namespace Windows.UI.Xaml
         private Size _layoutLastSize;
         private bool _layoutProcessing;
         private bool _measureInProgress;
-        private int _visualLevel;       
+        private int _visualLevel;
     }
 }

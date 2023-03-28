@@ -74,7 +74,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal void SetLayoutSize()
         {
-            if (!CustomLayout) return;
+            if (!UseCustomLayout) return;
 
             InvalidateMeasure();
             Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));

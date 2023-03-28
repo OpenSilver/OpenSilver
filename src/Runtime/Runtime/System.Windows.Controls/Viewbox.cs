@@ -242,7 +242,7 @@ namespace Windows.UI.Xaml.Controls
 
         private void UpdateScale(FrameworkElement content)
         {
-            if (CustomLayout || IsUnderCustomLayout)
+            if (UseCustomLayout)
             {
                 return;
             }

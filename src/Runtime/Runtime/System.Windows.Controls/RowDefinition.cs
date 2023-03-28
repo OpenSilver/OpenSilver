@@ -266,7 +266,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (Parent != null)
                 {
-                    if (Parent.CustomLayout || Parent.IsUnderCustomLayout)
+                    if (Parent.UseCustomLayout)
                     {
                         return _measureArrangeSize;
                     }

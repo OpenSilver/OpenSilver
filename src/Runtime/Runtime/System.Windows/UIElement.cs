@@ -1415,6 +1415,9 @@ document.ondblclick = null;
             {
                 uie.UpdateIsVisible();
             }
+
+            // visual parent does not always match layout parent, so we cannot use it.
+            uie.CoerceValue(FrameworkElement.CustomLayoutProperty);
         }
 
         internal void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)

@@ -593,7 +593,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 // Create the popup root:
                 _popupRoot = INTERNAL_PopupsManager.CreateAndAppendNewPopupRoot(this, parentWindow);
-                if (CustomLayout)
+                if (UseCustomLayout)
                 {
                     _popupRoot.CustomLayout = true;
                 }
@@ -630,7 +630,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
                 // Force layout update to prevent the popup content from briefly appearing in
                 // the top left corner of the screen.
-                if (CustomLayout)
+                if (UseCustomLayout)
                 {
                     UpdateLayout();
                 }
@@ -837,10 +837,19 @@ namespace Windows.UI.Xaml.Controls.Primitives
             get => _templateChild;
             set
             {
-                if (_templateChild != value)
+                if (_templateChild == value) return;
+                    
+                if (_templateChild != null)
                 {
                     INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_templateChild, this);
-                    _templateChild = value;
+                    SynchronizeForceInheritProperties(_templateChild, this);
+                }
+
+                _templateChild = value;
+
+                if (_templateChild != null)
+                {
+                    SynchronizeForceInheritProperties(_templateChild, this);
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
                 }
             }

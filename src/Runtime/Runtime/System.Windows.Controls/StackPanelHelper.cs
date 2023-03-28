@@ -104,7 +104,7 @@ namespace Windows.UI.Xaml.Controls
                 case Orientation.Vertical:
                     innerDivStyle.display = "block";
                     innerDivStyle.height = string.Empty;
-                    if (!panel.CustomLayout)
+                    if (!panel.UseCustomLayout)
                     {
                         UpdateChildWrappers(panel, true);
                     }
@@ -113,7 +113,7 @@ namespace Windows.UI.Xaml.Controls
                 case Orientation.Horizontal:
                     innerDivStyle.display = "flex";
                     innerDivStyle.height = "100%";
-                    if (!panel.CustomLayout)
+                    if (!panel.UseCustomLayout)
                     {
                         UpdateChildWrappers(panel, false);
                     }
