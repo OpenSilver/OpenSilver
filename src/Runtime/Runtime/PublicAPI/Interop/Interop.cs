@@ -16,6 +16,7 @@ using CSHTML5.Types;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
 
@@ -66,105 +67,76 @@ namespace OpenSilver
 
         private static T ConvertJavascriptResult<T>(object value)
         {
-            object converted;
             Type t = typeof(T);
             if (t == typeof(string))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToString(value);
-                else
-                    converted = Convert.ToString(value);
+                string s = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToString(value) : Convert.ToString(value);
+                return Unsafe.As<string, T>(ref s);
             }
             else if (t == typeof(double))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToDouble(value);
-                else
-                    converted = Convert.ToDouble(value);
+                double d = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDouble(value) : Convert.ToDouble(value);
+                return Unsafe.As<double, T>(ref d);
             }
             else if (t == typeof(int))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToInt32(value);
-                else
-                    converted = Convert.ToInt32(value);
+                int i = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt32(value) : Convert.ToInt32(value);
+                return Unsafe.As<int, T>(ref i);
             }
             else if (t == typeof(bool))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToBoolean(value);
-                else
-                    converted = Convert.ToBoolean(value);
+                bool b = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToBoolean(value) : Convert.ToBoolean(value);
+                return Unsafe.As<bool, T>(ref b);
             }
             else if (t == typeof(char))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToChar(value);
-                else
-                    converted = Convert.ToChar(value);
+                char c = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToChar(value) : Convert.ToChar(value);
+                return Unsafe.As<char, T>(ref c);
             }
             else if (t == typeof(float))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToSingle(value);
-                else
-                    converted = Convert.ToSingle(value);
+                float f = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToSingle(value) : Convert.ToSingle(value);
+                return Unsafe.As<float, T>(ref f);
             }
             else if (t == typeof(byte))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToByte(value);
-                else
-                    converted = Convert.ToByte(value);
+                byte b = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToByte(value) : Convert.ToByte(value);
+                return Unsafe.As<byte, T>(ref b);
             }
             else if (t == typeof(uint))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToUInt32(value);
-                else
-                    converted = Convert.ToUInt32(value);
+                uint i = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToUInt32(value) : Convert.ToUInt32(value);
+                return Unsafe.As<uint, T>(ref i);
             }
             else if (t == typeof(long))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToInt64(value);
-                else
-                    converted = Convert.ToInt64(value);
+                long l = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt64(value) : Convert.ToInt64(value);
+                return Unsafe.As<long, T>(ref l);
             }
             else if (t == typeof(ulong))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToUInt64(value);
-                else
-                    converted = Convert.ToUInt64(value);
+                ulong l = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToUInt64(value) : Convert.ToUInt64(value);
+                return Unsafe.As<ulong, T>(ref l);
             }
             else if (t == typeof(short))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToInt16(value);
-                else
-                    converted = Convert.ToInt16(value);
+                short s = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToInt16(value) : Convert.ToInt16(value);
+                return Unsafe.As<short, T>(ref s);
             }
             else if (t == typeof(decimal))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToDecimal(value);
-                else
-                    converted = Convert.ToDecimal(value);
+                decimal d = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDecimal(value) : Convert.ToDecimal(value);
+                return Unsafe.As<decimal, T>(ref d);
             }
             else if (t == typeof(DateTime))
             {
-                if (IsRunningInTheSimulator)
-                    converted = INTERNAL_JSObjectReference.ToDateTime(value);
-                else
-                    converted = Convert.ToDateTime(value);
+                DateTime d = IsRunningInTheSimulator ? INTERNAL_JSObjectReference.ToDateTime(value) : Convert.ToDateTime(value);
+                return Unsafe.As<DateTime, T>(ref d);
             }
             else
             {
                 throw new ArgumentException($"Type '{t.FullName}' is not supported.");
             }
-
-            return (T)converted;
         }
 
         public static T1 ExecuteJavaScriptGetResult<T1>(string javascript)
