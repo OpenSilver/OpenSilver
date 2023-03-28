@@ -18,6 +18,7 @@
         <dependency id="DotNetBrowser" version="1.21.5" />
         <dependency id="MahApps.Metro" version="1.2.4.0" />
         <dependency id="Microsoft.Web.Administration" version="7.0.0.0" />
+        <dependency id="Microsoft.Extensions.ObjectPool" version="7.0.4" />
       </group>
     </dependencies>
 
