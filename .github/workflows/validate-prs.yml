@@ -25,6 +25,7 @@ jobs:
         run: |
           ./restore-packages-opensilver.bat
           nuget restore src/OpenSilver.sln -v quiet
+          build/nuget.exe install Microsoft.Extensions.ObjectPool -Version 7.0.4 -OutputDirectory src\packages -Source https://api.nuget.org/v3/index.json
       - name: Build Compiler
         run: msbuild src/Compiler/Compiler/Compiler.OpenSilver.csproj -p:Configuration=Release -clp:ErrorsOnly -restore
       - name: Build ResourcesExtractor
