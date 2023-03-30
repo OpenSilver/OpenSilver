@@ -61,7 +61,14 @@ namespace Windows.UI.Xaml.Input
 
         internal bool Cancellable { get; set; } = true;
 
-        internal bool PreventDefault => Handled && Cancellable;
+        internal void PreventDefault()
+        {
+            if (UIEventArg != null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{INTERNAL_InteropImplementation.GetVariableStringForJS(UIEventArg)}.preventDefault();");
+            }
+        }
 
         // Returns:
         //     A system value that indicates the code for the key referenced by the event.

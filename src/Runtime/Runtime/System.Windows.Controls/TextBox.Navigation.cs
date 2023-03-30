@@ -98,12 +98,46 @@ namespace Windows.UI.Xaml.Controls
             switch (e.Key)
             {
                 case Key.Left:
-                case Key.Up:
                     return CaretPosition > 0;
 
+                case Key.Up:
+                    {
+                        int caretPosition = CaretPosition;
+                        if (caretPosition == 0)
+                        {
+                            return false;
+                        }
+
+                        string text = _textViewHost.View.GetText();
+                        if (text.IndexOf('\n', 0, caretPosition) == -1 && text.IndexOf('\r', 0, caretPosition) == -1)
+                        {
+                            e.PreventDefault();
+                            e.Cancellable = false; // make sure that PreventDefault will not be called again
+                            return false;
+                        }
+                        return true;
+                    }
+
                 case Key.Right:
-                case Key.Down:
                     return CaretPosition < _textViewHost.View.GetText().Length;
+                
+                case Key.Down:
+                    {
+                        int caretPosition = CaretPosition;
+                        string text = _textViewHost.View.GetText();
+                        if (caretPosition == text.Length)
+                        {
+                            return false;
+                        }
+
+                        if (text.IndexOf('\n', caretPosition) == -1 && text.IndexOf('\r', caretPosition) == -1)
+                        {
+                            e.PreventDefault();
+                            e.Cancellable = false; // make sure that PreventDefault will not be called again
+                            return false;
+                        }
+                        return true;
+                    }
 
                 default:
                     Debug.Assert(false);

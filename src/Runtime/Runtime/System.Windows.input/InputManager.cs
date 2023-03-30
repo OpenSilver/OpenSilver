@@ -373,10 +373,9 @@ internal sealed class InputManager
 
         keyboardTarget.RaiseEvent(e);
 
-        if (e.PreventDefault)
+        if (e.Handled && e.Cancellable)
         {
-            OpenSilver.Interop.ExecuteJavaScriptVoid(
-                $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.preventDefault()");
+            e.PreventDefault();
         }
     }
 
