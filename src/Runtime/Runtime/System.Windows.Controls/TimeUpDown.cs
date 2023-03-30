@@ -921,6 +921,7 @@ namespace Windows.UI.Xaml.Controls
                     int newCaretPosition = ActualTimeGlobalizationInfo.GetTextPositionForTimeUnit(Text.Text, ts, ActualFormat);
                     Text.SelectionStart = newCaretPosition > -1 ? newCaretPosition : caretPosition;
                 }
+                this.Dispatcher.BeginInvoke(() => { Text.Focus(); });
             }
         }
 
@@ -967,6 +968,7 @@ namespace Windows.UI.Xaml.Controls
                     int newCaretPosition = ActualTimeGlobalizationInfo.GetTextPositionForTimeUnit(Text.Text, ts, ActualFormat);
                     Text.SelectionStart = newCaretPosition > -1 ? newCaretPosition : caretPosition;
                 }
+                this.Dispatcher.BeginInvoke(() => { Text.Focus(); });
             }
         }
 
