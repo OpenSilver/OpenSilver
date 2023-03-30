@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,22 +11,16 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5;
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Globalization;
+using CSHTML5;
+
 #if MIGRATION
-using System.Windows.Media;
+using System.Windows.Controls.Primitives;
 #else
-using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.Foundation;
 using Windows.System;
-//using Windows.System;
 using Windows.UI.Input;
 #endif
 
@@ -42,10 +35,9 @@ namespace Windows.UI.Xaml.Input
     /// elements, such as PointerPressed.
     /// </summary>
 #if MIGRATION
-    public partial class MouseEventArgs : RoutedEventArgs
-
+    public class MouseEventArgs : RoutedEventArgs
 #else
-    public partial class PointerRoutedEventArgs : RoutedEventArgs
+    public class PointerRoutedEventArgs : RoutedEventArgs
 #endif
     {
         internal override void InvokeHandler(Delegate handler, object target)
@@ -276,7 +268,7 @@ namespace Windows.UI.Xaml.Input
         public PointerPoint GetCurrentPoint(UIElement relativeTo)
         {
             PointerPoint pointerPoint = new PointerPoint();
-            pointerPoint.Properties.MouseWheelDelta = PointerPointProperties.GetPointerWheelDelta(INTERNAL_OriginalJSEventArg);
+            pointerPoint.Properties.MouseWheelDelta = PointerPointProperties.GetPointerWheelDelta(UIEventArg);
             pointerPoint.Position = GetPosition(new Point(_pointerAbsoluteX, _pointerAbsoluteY), relativeTo);
 
             return pointerPoint;
@@ -285,6 +277,11 @@ namespace Windows.UI.Xaml.Input
 
         internal static Point GetPosition(Point origin, UIElement relativeTo)
         {
+            if (relativeTo is Popup popup)
+            {
+                relativeTo = popup.IsOpen ? popup.Child : null;
+            }
+
             if (relativeTo == null)
             {
                 //-----------------------------------
