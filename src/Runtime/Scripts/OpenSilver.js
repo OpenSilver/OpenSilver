@@ -130,6 +130,8 @@ window.callJS = function (javaScriptToExecute) {
     }
 };
 
+
+
 window.callJSUnmarshalled = function (javaScriptToExecute, referenceId, wantsResult) {
     javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
     var result = eval(javaScriptToExecute);
@@ -152,6 +154,19 @@ window.callJSUnmarshalled = function (javaScriptToExecute, referenceId, wantsRes
 };
 
 
+window.createFunction = function (id, javaScriptToExecute) { 
+    const js = BINDING.conv_string(javaScriptToExecute);
+    document.jsObjRef["_functions"][id] = new Function('subId', 'args', js);
+}
+
+window.callFunction = function (id, subId, args) { 
+    const jsArgs = BINDING.conv_string(args);
+    return document.jsObjRef["_functions"][id](subId, jsArgs);
+}
+
+
+
+
 // IMPORTANT: this doesn't return anything (this just executes the pending async JS)
 window.callJSUnmarshalledHeap = (function () {
     const textDecoder = new TextDecoder('utf-16le');
@@ -161,3 +176,5 @@ window.callJSUnmarshalledHeap = (function () {
         eval(javaScriptToExecute);
     };
 })();
+
+

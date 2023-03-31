@@ -26,6 +26,10 @@ namespace CSHTML5.Internal
 
         void Flush();
 
+        object ExecuteJavaScriptFunc<T>(string funcName, T arg0);
+        object ExecuteJavaScriptFunc<T0, T1>(string funcName, T0 arg0, T1 arg1);
+        object ExecuteJavaScriptFunc<T0, T1, T2>(string funcName, T0 arg0, T1 arg1, T2 arg2);
+
         object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult);
     }
 
@@ -84,6 +88,19 @@ namespace CSHTML5.Internal
             _webAssemblyExecutionHandler.InvokeUnmarshalled<byte[], int, object>(CallJSMethodNameAsync, _buffer, curLength);
         }
 
+        public object ExecuteJavaScriptFunc<T>(string funcName, T arg0) {
+            var result = _webAssemblyExecutionHandler.InvokeUnmarshalled<T, object>(funcName, arg0);
+            return result;
+        }
+        public object ExecuteJavaScriptFunc<T0,T1>(string funcName, T0 arg0, T1 arg1) {
+            var result = _webAssemblyExecutionHandler.InvokeUnmarshalled<T0, T1, object>(funcName, arg0, arg1);
+            return result;
+        }
+        public object ExecuteJavaScriptFunc<T0,T1,T2>(string funcName, T0 arg0, T1 arg1, T2 arg2) {
+            var result = _webAssemblyExecutionHandler.InvokeUnmarshalled<T0, T1, T2, object>(funcName, arg0, arg1, arg2);
+            return result;
+        }
+
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)
         {
             // IMPORTANT: wantsResult is passed on to JS, so that it will know if it needs to pass anything back to us
@@ -117,6 +134,19 @@ namespace CSHTML5.Internal
             string javascript = ReadAndClearAggregatedPendingJavaScriptCode();
             if (!string.IsNullOrWhiteSpace(javascript))
                 PerformActualInteropCallVoid(javascript);
+        }
+
+        public object ExecuteJavaScriptFunc<T>(string funcName, T arg0) {
+            // FIXME
+            return null;
+        }
+        public object ExecuteJavaScriptFunc<T0,T1>(string funcName, T0 arg0, T1 arg1) {
+            // FIXME
+            return null;
+        }
+        public object ExecuteJavaScriptFunc<T0,T1,T2>(string funcName, T0 arg0, T1 arg1, T2 arg2) {
+            // FIXME
+            return null;
         }
 
         public object ExecuteJavaScript(string javascript, int referenceId, bool wantsResult)

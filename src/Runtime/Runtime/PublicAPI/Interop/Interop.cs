@@ -174,10 +174,21 @@ namespace OpenSilver
             INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: false, flush: true);
         }
 
-        public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables)
+        public static void CreateJavascriptFunction(string funcName, string javascript)
         {
-            javascript = CSHTML5.INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
+            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptFuncSync("createFunction", funcName, javascript);
+        }
+
+        public static object CallJavascriptFunction(string funcName, int subId, string args) 
+        {
+            return INTERNAL_ExecuteJavaScript.ExecuteJavaScriptFuncSync("callFunction", funcName, subId, args);
+        }
+
+        public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables) {
+            var sb = StringBuilderFactory.Get(javascript);
+            CSHTML5.INTERNAL_InteropImplementation.ReplaceJSArgsStringBuilder(sb, variables);
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
+            StringBuilderFactory.Return(sb);
         }
 
         public static void ExecuteJavaScriptVoidAsync(string javascript)

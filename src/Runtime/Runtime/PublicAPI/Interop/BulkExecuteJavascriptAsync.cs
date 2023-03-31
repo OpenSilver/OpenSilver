@@ -25,16 +25,23 @@ namespace OpenSilver
     {
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
         private readonly StringBuilder _javascript;
+        private StringBuilder _jsBuffer;
 
         public BulkExecuteJavascriptAsync()
         {
             _javascript = StringBuilderFactory.Get();
         }
 
+        private StringBuilder JsBuffer(string s) {
+            if (_jsBuffer == null)
+                _jsBuffer = StringBuilderFactory.Get(s);
+            return _jsBuffer;
+        }
+
         public IDisposable AddJavascriptAsync(string javascript, params object[] variables)
         {
-            javascript = INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
-            return AddJavascriptAsync(javascript);
+            INTERNAL_InteropImplementation.ReplaceJSArgsStringBuilder(JsBuffer(javascript), variables);
+            return AddJavascriptAsync(_jsBuffer.ToString());
         }
 
         public IDisposable AddJavascriptAsync(string javascript)
@@ -50,8 +57,8 @@ namespace OpenSilver
 
         public void AddJavascript(string javascript, params object[] variables)
         {
-            javascript = INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
-            AddJavascript(javascript);
+            INTERNAL_InteropImplementation.ReplaceJSArgsStringBuilder( JsBuffer(javascript), variables);
+            AddJavascript(_jsBuffer.ToString());
         }
 
         public void AddJavascript(string javascript)
@@ -81,6 +88,8 @@ namespace OpenSilver
             }
 
             StringBuilderFactory.Return(_javascript);
+            if (_jsBuffer != null)
+                StringBuilderFactory.Return(_jsBuffer);
 
             // Console.WriteLine($"disposed of JS Obj Refs: {string.Join(",", _disposables.OfType<INTERNAL_JSObjectReference>().Select(js => js.ReferenceId))}");
             foreach (var d in _disposables)

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using OpenSilver.Internal;
 
@@ -104,7 +105,7 @@ namespace CSHTML5
             }
         }
 
-        internal static string ReplaceJSArgs(string javascript, params object[] variables)
+        internal static void ReplaceJSArgsStringBuilder(StringBuilder javascript, params object[] variables)
         {
             // Make sure the JS to C# interop is set up:
             EnsureInitialized();
@@ -117,11 +118,22 @@ namespace CSHTML5
             // followed by the number "0". To reproduce the issue, call "ExecuteJavaScript" passing
             // 10 arguments and using "$10".
             for (int i = variables.Length - 1; i >= 0; i--)
-            {
-                javascript = javascript.Replace($"${i}", GetVariableStringForJS(variables[i]));
-            }
+                javascript.Replace($"${i}", GetVariableStringForJS(variables[i]));
+        }
 
-            return javascript;
+        [Obsolete("use ReplaceJSArgsStringBuilder")]
+        internal static string ReplaceJSArgs(string javascript, params object[] variables) {
+            // Make sure the JS to C# interop is set up:
+            EnsureInitialized();
+
+            if (variables.Length == 0)
+                return javascript;
+
+            var sb = StringBuilderFactory.Get(javascript);
+            ReplaceJSArgsStringBuilder(sb, variables);
+            var result = sb.ToString();
+            StringBuilderFactory.Return(sb);
+            return result;
         }
 
         internal static object ExecuteJavaScript_Implementation(

@@ -137,7 +137,7 @@ document.onkeyup = function (evt) {
     document.refreshKeyModifiers(evt);
 };
 
-document.jsObjRef = {};
+document.jsObjRef = { "_functions": {} };
 document.callbackCounterForSimulator = 0;
 document.measureTextBlockElement = null;
 
