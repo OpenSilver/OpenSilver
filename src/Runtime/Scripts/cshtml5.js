@@ -425,7 +425,21 @@ document.addEventListenerSafe = function (element, method, func) {
             element.addEventListener(method, func);
         }
     }
-}
+};
+
+document.setFocus = function (element) {
+    if (!element) return;
+
+    // HTML elements will not receive focus when their tabindex is null
+    // Temporarily set the tabindex to allow it to get focused
+    if (element.getAttribute('tabindex') === null) {
+        element.setAttribute('tabindex', -1);
+        element.focus({ preventScroll: true });
+        element.removeAttribute('tabindex');
+    } else {
+        element.focus({ preventScroll: true });
+    }
+};
 
 document.createInputManager = function (callback) {
     if (document.inputManager) return;

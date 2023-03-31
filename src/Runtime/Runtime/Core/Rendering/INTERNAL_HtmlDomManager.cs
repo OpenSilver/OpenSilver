@@ -138,7 +138,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             Debug.Assert(domElementRef != null);
 
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.focus({{ preventScroll: true }});");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.setFocus({sElement});");
         }
 
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
