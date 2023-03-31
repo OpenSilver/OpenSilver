@@ -17,6 +17,7 @@ using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Controls;
 #else
+using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Xaml.Controls;
 using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
@@ -56,7 +57,34 @@ internal sealed class InputManager
         TOUCH_MOVE = 16,
     }
 
+    private enum MouseButton
+    {
+        /// <summary>
+        /// The left mouse button.
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// The middle mouse button.
+        /// </summary>
+        Middle,
+
+        /// <summary>
+        /// The right mouse button.
+        /// </summary>
+        Right,
+    }
+
     private readonly JavaScriptCallback _handler;
+
+    private const int _doubleClickDeltaTime = 400;
+    private const int _doubleClickDeltaX = 5;
+    private const int _doubleClickDeltaY = 5;
+    private Point _lastClick = new Point();
+    private MouseButton _lastButton;
+    private int _clickCount;
+    private int _lastClickTime;
+    private WeakReference<UIElement> _lastClickTarget;
 
     private InputManager()
     {
@@ -92,9 +120,27 @@ internal sealed class InputManager
     private void ProcessInput(string id, int eventId, object jsEventArg)
     {
         UIElement uie = INTERNAL_HtmlDomManager.GetElementById(id);
-        if (uie is not null)
+        if (uie is null)
+        {
+            ProcessEvent((EVENTS)eventId, jsEventArg);
+        }
+        else
         {
             DispatchEvent(uie, (EVENTS)eventId, jsEventArg);
+        }
+    }
+
+    private void ProcessEvent(EVENTS eventType, object jsEventArg)
+    {
+        switch (eventType)
+        {
+            case EVENTS.MOUSE_LEFT_DOWN:
+                RefreshClickCount(null, MouseButton.Left, Environment.TickCount, new Point());
+                break;
+
+            case EVENTS.MOUSE_RIGHT_DOWN:
+                RefreshClickCount(null, MouseButton.Right, Environment.TickCount, new Point());
+                break;
         }
     }
 
@@ -194,6 +240,8 @@ internal sealed class InputManager
                 mouseTarget,
                 jsEventArg,
                 routedEvent,
+                MouseButton.Left,
+                Environment.TickCount,
                 refreshClickCount: true,
                 closeToolTips: true);
         }
@@ -213,6 +261,8 @@ internal sealed class InputManager
                 mouseTarget,
                 jsEventArg,
                 routedEvent,
+                MouseButton.Left,
+                Environment.TickCount,
                 refreshClickCount: false,
                 closeToolTips: false);
 
@@ -239,6 +289,8 @@ internal sealed class InputManager
                 mouseTarget,
                 jsEventArg,
                 UIElement.MouseRightButtonDownEvent,
+                MouseButton.Right,
+                Environment.TickCount,
                 refreshClickCount: true,
                 closeToolTips: true);
         }
@@ -510,6 +562,8 @@ internal sealed class InputManager
         UIElement uie,
         object jsEventArg,
         RoutedEvent routedEvent,
+        MouseButton button,
+        int timeStamp,
         bool refreshClickCount,
         bool closeToolTips)
     {
@@ -520,14 +574,14 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
         };
 
-        if (refreshClickCount)
-        {
-            e.RefreshClickCount(uie);
-        }
-
         if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
         {
             e.FillEventArgs(uie, jsEventArg);
+
+            if (refreshClickCount)
+            {
+                e.ClickCount = RefreshClickCount(uie, button, timeStamp, e.GetPosition(null));
+            }
 
             if (closeToolTips)
             {
@@ -552,5 +606,53 @@ internal sealed class InputManager
             e.FillEventArgs(uie, jsEventArg);
             uie.RaiseEvent(e);
         }
+    }
+
+    private int RefreshClickCount(UIElement target, MouseButton button, int timeStamp, Point ptClient)
+    {
+        _clickCount = CalculateClickCount(target, button, timeStamp, ptClient);
+        
+        if (_clickCount == 1)
+        {
+            // we need to reset out data, since this is the start of the click count process...
+            _lastButton = button;            
+            _lastClickTarget ??= new WeakReference<UIElement>(null);
+            _lastClickTarget.SetTarget(target);
+        }
+
+        _lastClick = ptClient;
+        _lastClickTime = timeStamp;
+
+        return _clickCount;
+    }
+
+    private int CalculateClickCount(UIElement uie, MouseButton button, int timeStamp, Point downPt)
+    {
+        if (timeStamp - _lastClickTime < _doubleClickDeltaTime // How long since the last click?
+              && _lastButton == button // Is this the same mouse button as the last click?
+              && IsSameTarget(uie) // Is it the same element as the last click?
+              && IsSameSpot(downPt)) // Is the delta coordinates of this click close enough to the last click?
+        {
+            return _clickCount + 1;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    private bool IsSameSpot(Point newPosition)
+    {
+        // Is the delta coordinates of this click close enough to the last click?
+        return (Math.Abs(newPosition.X - _lastClick.X) < _doubleClickDeltaX) &&
+               (Math.Abs(newPosition.Y - _lastClick.Y) < _doubleClickDeltaY);
+    }
+
+    private bool IsSameTarget(UIElement target)
+    {
+        return target != null &&
+            _lastClickTarget != null &&
+            _lastClickTarget.TryGetTarget(out UIElement uie) &&
+            target == uie;
     }
 }
