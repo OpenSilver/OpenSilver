@@ -869,7 +869,7 @@ if(nextSibling != undefined) {
                             valueWasRetrieved = true;
                         }
 
-                        INTERNAL_PropertyStore.ApplyCssChanges(value, value, propertyMetadata, storage.Owner);
+                        INTERNAL_PropertyStore.ApplyCssChanges(value, value, propertyMetadata, dependencyObject);
                     }
 
                     //--------------------------------------------------
@@ -884,7 +884,7 @@ if(nextSibling != undefined) {
                         }
 
                         // Call the "Method to update DOM"
-                        propertyMetadata.MethodToUpdateDom(storage.Owner, value);
+                        propertyMetadata.MethodToUpdateDom(dependencyObject, value);
                     }
 
                     if (propertyMetadata.MethodToUpdateDom2 != null)
@@ -897,7 +897,10 @@ if(nextSibling != undefined) {
 
                         // DependencyProperty.UnsetValue for the old value signify that
                         // the old value should be ignored.
-                        propertyMetadata.MethodToUpdateDom2(storage.Owner, DependencyProperty.UnsetValue, value);
+                        propertyMetadata.MethodToUpdateDom2(
+                            dependencyObject,
+                            DependencyProperty.UnsetValue,
+                            value);
                     }
 
                     //--------------------------------------------------
@@ -914,7 +917,9 @@ if(nextSibling != undefined) {
                         }
 
                         // Raise the "PropertyChanged" event
-                        propertyMetadata.PropertyChangedCallback(storage.Owner, new DependencyPropertyChangedEventArgs(value, value, property));
+                        propertyMetadata.PropertyChangedCallback(
+                            dependencyObject,
+                            new DependencyPropertyChangedEventArgs(value, value, property));
                     }
                 }
 

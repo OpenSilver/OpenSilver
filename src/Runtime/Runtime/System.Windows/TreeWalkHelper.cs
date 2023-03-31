@@ -59,8 +59,7 @@ namespace Windows.UI.Xaml
             if (inheritanceNode)
             {
                 BaseValueSourceInternal oldValueSource = BaseValueSourceInternal.Default;
-                INTERNAL_PropertyStorage storage;
-                if (INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d, dp, false, out storage))
+                if (INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d, dp, null, false, out INTERNAL_PropertyStorage storage))
                 {
                     oldValueSource = storage.Entry.BaseValueSourceInternal;
                 }
@@ -89,7 +88,11 @@ namespace Windows.UI.Xaml
                     if (storage == null)
                     {
                         // get the storage if we didn't to it ealier.
-                        INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d, dp, true, out storage);
+                        INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d,
+                            dp,
+                            dp.GetMetadata(d.GetType()),
+                            true,
+                            out storage);
                     }
 
                     // set the inherited value so that it is known if at some point,

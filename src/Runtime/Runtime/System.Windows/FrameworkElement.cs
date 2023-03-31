@@ -278,12 +278,14 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                INTERNAL_PropertyStorage[] storages = newParent.INTERNAL_AllInheritedProperties.Values.ToArray();
-                foreach (var storage in storages)
+                foreach (var kvp in newParent.INTERNAL_AllInheritedProperties.ToArray())
                 {
-                    uie.SetInheritedValue(storage.Property,
-                                          INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
-                                          true);
+                    DependencyProperty dp = kvp.Key;
+                    INTERNAL_PropertyStorage storage = kvp.Value;
+
+                    uie.SetInheritedValue(dp,
+                        INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
+                        true);
                 }
             }
         }
