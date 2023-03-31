@@ -1,6 +1,7 @@
 name: OpenSilver Validate PRs
 env:
   actual-version: '1.1.0'
+  next-release-version: '10.0.0'
 on:
   # Any pull request to develop
   pull_request:
@@ -50,18 +51,24 @@ jobs:
       - name: Build Simulator
         working-directory: build
         run: msbuild slnf/OpenSilver.Simulator.slnf -p:Configuration=SL -clp:ErrorsOnly -restore
+      - name: Format Version Suffix
+        id: format-suffix
+        run: echo "::set-output name=suffix::$(date +'%Y-%m-%d-%H%M%S')-${{ env.GITHUB_SHA_SHORT }}"
+      - name: Format Package Version
+        id: format-version
+        run: echo "::set-output name=version::${{ env.next-release-version }}-preview-${{ steps.format-suffix.outputs.suffix }}"
       - name: Pack OpenSilver
         working-directory: build
         run: |
-          mkdir temp; echo "OpenSilver ${{ env.actual-version }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
-          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=${{ env.actual-version }};Configuration=SL;Target=OpenSilver"
-          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -BasePath "$pwd" -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ env.actual-version }};"
+          mkdir temp; echo "OpenSilver ${{ steps.format-version.outputs.version }} (${{ steps.date.outputs.datetime }})" > temp/Version.txt
+          nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=OpenSilver;PackageVersion=${{ steps.format-version.outputs.version }};Configuration=SL;Target=OpenSilver"
+          nuget.exe pack nuspec\OpenSilver.Simulator.nuspec -BasePath "$pwd" -OutputDirectory "output/OpenSilver" -Properties "PackageVersion=${{ steps.format-version.outputs.version }};"
       - name: Replace existing package with actual one
         run: |
-          Remove-Item -Path "$($env:USERPROFILE)\.nuget\packages\OpenSilver\${{ env.actual-version }}" -Force -Recurse
-          Remove-Item -Path "$($env:USERPROFILE)\.nuget\packages\OpenSilver.Simulator\${{ env.actual-version }}" -Force -Recurse
-          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj package OpenSilver -v ${{ env.actual-version }} -s "$(Get-Location)\build\output\OpenSilver"
-          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Simulator\TestApplication.OpenSilver.Simulator.csproj package OpenSilver.Simulator -v ${{ env.actual-version }} -s "$(Get-Location)\build\output\OpenSilver"
+          nuget sources Add -Name localbuild -Source "$(Get-Location)\build\output\OpenSilver"
+          dotnet add src\Tests\TestApplication\TestApplication\TestApplication.OpenSilver.csproj package OpenSilver -v ${{ steps.format-version.outputs.version }}
+          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Browser\TestApplication.OpenSilver.Browser.csproj package OpenSilver -v ${{ steps.format-version.outputs.version }}
+          dotnet add src\Tests\TestApplication\TestApplication.OpenSilver.Simulator\TestApplication.OpenSilver.Simulator.csproj package OpenSilver.Simulator -v ${{ steps.format-version.outputs.version }}
       - name: Drop all bin and obj folders
         run: 'find . -iname "bin" -o -iname "obj" | xargs rm -rf'
         shell: bash
