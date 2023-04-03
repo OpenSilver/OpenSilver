@@ -439,6 +439,59 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
     }}
 }}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
             }
+            else
+            {
+                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
+var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
+element_OutsideEventHandler.addEventListener('keydown', function(e) {{
+    var element_InsideEventHandler = document.getElementByIdSafe(""{uid}""); // For some reason we need to get again the reference to the element.
+    var maxLength = element_InsideEventHandler.getAttribute(""data-maxlength"");
+    var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
+
+    var isAddingTabulation = e.keyCode == 9 && acceptsTab == ""true"";
+
+    if(isAddingTabulation && maxLength != 0)
+    {{
+        var text = getTextAreaInnerText(element_InsideEventHandler);
+        var correctionDueToNewLines = 0;
+        if(text.length + correctionDueToNewLines >= maxLength)
+        {{
+            if (!window.getSelection().toString()) {{
+                e.preventDefault();
+                return false;
+            }}
+        }}
+    }}
+
+    if(isAddingTabulation)
+    {{
+        //we need to add '\t' where the cursor is, prevent the event (which would change the focus) and dispatch the event for the text changed:
+        var sel, range;
+        if (window.getSelection) {{
+            sel = window.getSelection();
+            if (sel.rangeCount) {{
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode('\t'));
+                sel.collapseToEnd();
+                range.collapse(false); //for IE
+            }}
+        }} else if (document.selection && document.selection.createRange) {{
+            range = document.selection.createRange();
+            range.text = '\t';
+            document.selection.collapseToEnd();
+        }}
+        if (window.IS_EDGE)
+        {{
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }}
+
+        e.preventDefault();
+            return false;
+    }}
+}}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
+            }
 
             //-----------------------
             // Enforce only Plain Text + prevent line breaks if "AcceptsReturn" is false. This is required because in a ContentEditable div, the user can paste rich text. Furthermore, on IE, pressing Enter will insert a new paragraph.

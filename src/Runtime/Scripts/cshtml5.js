@@ -873,11 +873,12 @@ getTextAreaInnerText = function (domElement, forceNewLineFirst) {
 }
 
 document.getTextBoxSelection = (function () {
+    var charactersWentThrough = 0;
     //this counts the amount of characters before the ones (start and end) defined by the range object.
     // it does so by defining:
     //      -globalIndexes.startIndex and globalIndexes.endIndex: the indexes as in c# of the positions defined by the range
     //      -globalIndexes.isStartFound and globalIndexes.isEndFound: a boolean stating whether the index has been found yet ot not (used within this method to know when to stop changing the indexes).
-    function getRangeGlobalStartAndEndIndexes(currentParent, isFirstChild, charactersWentThrough, selection, range, globalIndexes) {
+    function getRangeGlobalStartAndEndIndexes(currentParent, isFirstChild, selection, range, globalIndexes) {
         //we go down the tree until we find multiple children or until there is no children left:
         while (currentParent.hasChildNodes()) {
             //a div/p/br tag means a new line if it is not the first child of its parent:
@@ -897,7 +898,7 @@ document.getTextBoxSelection = (function () {
             //recursively go through the children:
             for (i = 0; i < amountOfChildren; ++i) {
                 var temp = currentParent.childNodes[i];
-                charactersWentThrough = getRangeGlobalStartAndEndIndexes(temp, i == 0, charactersWentThrough, selection, range, globalIndexes);
+                getRangeGlobalStartAndEndIndexes(temp, i == 0, selection, range, globalIndexes);
                 if (globalIndexes.isCaretFound && globalIndexes.isStartFound && globalIndexes.isEndFound) {
                     break;
                 }
@@ -943,7 +944,6 @@ document.getTextBoxSelection = (function () {
                     }
                 }
             }
-            return charactersWentThrough;
         }
     }
 
@@ -955,7 +955,8 @@ document.getTextBoxSelection = (function () {
             gi.startIndex = 0;
             gi.endIndex = 0;
         } else {
-            getRangeGlobalStartAndEndIndexes(element, true, 0, sel, sel.getRangeAt(0), gi);
+            charactersWentThroughy = 0;
+            getRangeGlobalStartAndEndIndexes(element, true, sel, sel.getRangeAt(0), gi);
         }
         return JSON.stringify(gi);
     }
