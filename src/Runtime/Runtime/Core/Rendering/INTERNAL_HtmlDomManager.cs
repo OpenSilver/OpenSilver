@@ -70,6 +70,21 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
             return null;
         }
 
+        private static void AddToGlobalStore(string uniqueIdentifier, UIElement el)
+        {
+            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(el));
+        }
+
+        internal static void RemoveFromGlobalStore(INTERNAL_HtmlDomElementReference htmlDomElRef)
+        {
+            if (htmlDomElRef == null)
+            {
+                return;
+            }
+
+            _store.Remove(htmlDomElRef.UniqueIdentifier);
+        }
+
         public static void RemoveFromDom(object domNode, string commentForDebugging = null)
         {
             var htmlDomElRef = (INTERNAL_HtmlDomElementReference)domNode;
@@ -82,7 +97,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
                 htmlDomElRef.Parent.FirstChild = null;
             }
 
-            _store.Remove(htmlDomElRef.UniqueIdentifier);
+            RemoveFromGlobalStore(htmlDomElRef);
         }
 
         public static INTERNAL_HtmlDomElementReference GetParentDomElement(object domElementRef)
@@ -381,7 +396,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             OpenSilver.Interop.ExecuteJavaScriptFastAsync(
                 $"document.createPopupRootElement('{uniqueIdentifier}', {sRootElement}, '{sPointerEvents}');");
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(popupRoot));
+            AddToGlobalStore(uniqueIdentifier, popupRoot);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null);
         }
@@ -409,7 +424,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     $@"document.createTextBlockElement(""{uniqueIdentifier}"", {sParentRef}, {(wrap ? "true" : "false")})");
             }
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -436,7 +451,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     $@"document.createCanvasElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -463,7 +478,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     $@"document.createImageElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -491,7 +506,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     $@"document.createFrameworkElement(""{uniqueIdentifier}"", {sParentRef}, {(enablePointerEvents ? "true" : "false")}))");
             }
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -518,7 +533,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     $@"document.createRunElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -545,7 +560,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     $@"document.createShapeOuterElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -572,7 +587,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                     $@"document.createShapeInnerElement(""{uniqueIdentifier}"", {sParentRef})");
             }
 
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -611,8 +626,8 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                 string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"document.createElementSafe(""{domElementTag}"", ""{uniqueIdentifier}"", {sParentRef}, {index.ToInvariantString()})");
             }
-            
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent); //todo: when parent is null this breaks for the root control, but the whole logic will be replaced with simple "ExecuteJavaScript" calls in the future, so it will not be a problem.
         }
@@ -635,7 +650,7 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
     parentElement.children[{insertionIndex}].insertAdjacentElement(""{relativePosition}"", newElement);";
 
             ExecuteJavaScript(javaScriptToExecute);
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, (INTERNAL_HtmlDomElementReference)parentRef);
         }
 
@@ -653,7 +668,7 @@ var parentElement = document.getElementByIdSafe(""{parentUniqueIdentifier}"");
 parentElement.appendChild(newElement);";
 
             ExecuteJavaScript(javaScriptToExecute);
-            _store.Add(uniqueIdentifier, new WeakReference<UIElement>(associatedUIElement));
+            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, ((INTERNAL_HtmlDomElementReference)parentRef).Parent);
             //todo-perfs: check if there is a better solution in terms of performance (while still remaining compatible with all browsers).
         }
