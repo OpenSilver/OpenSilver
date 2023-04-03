@@ -606,32 +606,44 @@ namespace OpenSilver.Compiler
             return namespaceName.StartsWith("http://"); //todo: are there other conditions possible for XML namespaces declared with xmlnsDefinitionAttribute?
         }
 
-        public string GetFieldName(string fieldNameIgnoreCase, string namespaceName, string localTypeName, string assemblyIfAny = null)
+        public string GetEnumValue(
+            string name,
+            string namespaceName,
+            string enumName,
+            string assembly,
+            bool ignoreCase,
+            bool allowIntegerValue)
         {
-            Type type = FindType(namespaceName, localTypeName, assemblyIfAny);
+            name = name.Trim();
 
-            if (type == null) throw new XamlParseException($"Type '{localTypeName}' not found in namepsace '{namespaceName}'.");
+            Type type = FindType(namespaceName, enumName, assembly)
+                ?? throw new XamlParseException($"Type '{enumName}' not found in namepsace '{namespaceName}'.");
 
-            FieldInfo field;
-            if (type.IsEnum)
+            BindingFlags flags = BindingFlags.Public | BindingFlags.Static;
+            if (ignoreCase)
             {
-                field = type.GetField(fieldNameIgnoreCase, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
-                if (field == null)
+                flags |= BindingFlags.IgnoreCase;
+            }
+
+            FieldInfo field = type.GetField(name, flags);
+            if (field is not null)
+            {
+                return $"global::{type.FullName}.{field.Name}";
+            }
+
+            if (allowIntegerValue)
+            {
+                if (long.TryParse(name, out long l))
                 {
-                    // If the field isn't found "as is", we try to interpret it as the int corresponding to a field
-                    if (int.TryParse(fieldNameIgnoreCase, out int value))
-                    {
-                        string trueFieldName = Enum.GetName(type, Enum.ToObject(type, value));
-                        field = type.GetField(trueFieldName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
-                    }
+                    return $"(global::{type.FullName}){l}";
+                }
+                else if (ulong.TryParse(name, out ulong ul))
+                {
+                    return $"(global::{type.FullName}){ul}";
                 }
             }
-            else
-            {
-                field = type.GetField(fieldNameIgnoreCase, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Static);
-            }
 
-            return field?.Name ?? throw new XamlParseException($"Field '{fieldNameIgnoreCase}' not found in type: '{type.FullName}'.");
+            return null;
         }
 
         public bool IsPropertyAttached(string propertyOrFieldName, string declaringTypeNamespaceName, string declaringTypeLocalName, string parentNamespaceName, string parentLocalTypeName, string parentAssemblyNameIfAny = null)

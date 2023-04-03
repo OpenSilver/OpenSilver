@@ -99,8 +99,8 @@ namespace OpenSilver.Compiler
         public void GetPropertyOrFieldInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string memberDeclaringTypeName, out string memberTypeNamespace, out string memberTypeName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
             => MarshalledObject.GetPropertyOrFieldInfo(propertyOrFieldName, namespaceName, localTypeName, out memberDeclaringTypeName, out memberTypeNamespace, out memberTypeName, out isTypeString, out isTypeEnum, assemblyNameIfAny, isAttached);
 
-        public string GetFieldName(string fieldNameIgnoreCase, string namespaceName, string localTypeName, string assemblyIfAny = null)
-            => MarshalledObject.GetFieldName(fieldNameIgnoreCase, namespaceName, localTypeName, assemblyIfAny);
+        public string GetEnumValue(string name, string namespaceName, string enumName, string assembly, bool ignoreCase, bool allowIntegerValue)
+            => MarshalledObject.GetEnumValue(name, namespaceName, enumName, assembly, ignoreCase, allowIntegerValue);
 
         public bool IsAssignableFrom(string namespaceName, string typeName, string fromNamespaceName, string fromTypeName)
             => MarshalledObject.IsAssignableFrom(namespaceName, typeName, fromNamespaceName, fromTypeName);

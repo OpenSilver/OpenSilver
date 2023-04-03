@@ -1517,24 +1517,35 @@ else
                     //----------------------------
                     if (value.IndexOf(',') != -1)
                     {
-                        string[] values = value.Split(new char[] { ',' })
-                            .Select(v =>
-                                string.Format(
-                                    "{0}.{1}",
-                                    valueTypeFullName,
-                                    _reflectionOnSeparateAppDomain.GetFieldName(v.Trim(), valueNamespaceName, valueLocalTypeName, null)
-                                )
-                            ).ToArray();
+                        string[] split = value.Split(new char[] { ',' });
+                        for (int i = 0; i < split.Length; i++)
+                        {
+                            string fieldName = _reflectionOnSeparateAppDomain.GetEnumValue(
+                                split[i].Trim(),
+                                valueNamespaceName,
+                                valueLocalTypeName,
+                                valueAssemblyName,
+                                true,
+                                false) ?? throw new XamlParseException(
+                                    $"Field '{split[i].Trim()}' not found in type: '{valueTypeFullName}'.");
+                            
+                            split[i] = fieldName;
+                        }
 
-                        return string.Join(" | ", values);
+                        return string.Join(" | ", split);
                     }
                     else
                     {
-                        return string.Format(
-                            "{0}.{1}",
-                            valueTypeFullName,
-                            _reflectionOnSeparateAppDomain.GetFieldName(value, valueNamespaceName, valueLocalTypeName, null)
-                        );
+                        string fieldName = _reflectionOnSeparateAppDomain.GetEnumValue(
+                            value.Trim(),
+                            valueNamespaceName,
+                            valueLocalTypeName,
+                            valueAssemblyName,
+                            true,
+                            true);
+
+                        return fieldName ?? throw new XamlParseException(
+                            $"Field '{value.Trim()}' not found in type: '{valueTypeFullName}'.");
                     }
                 }
                 else if (valueTypeFullName == "global::System.Type")
