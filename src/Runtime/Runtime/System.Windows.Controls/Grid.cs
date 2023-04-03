@@ -90,14 +90,7 @@ namespace Windows.UI.Xaml.Controls
     /// </example>
     public partial class Grid : Panel
     {
-        //todo: IMPORTANT fix the bug that makes the grid ignore the changes in ColumnDefinitions  when the grid is in the visual tree. (then remove the fix for this in Datagrid)
-        //Note: todo above may not be relevant anymore?
-        //todo: this is probably only a temporary solution used by the Datagrid:
-        internal string INTERNAL_StringToSetVerticalGridLinesInCss = null;
-        internal string INTERNAL_StringToSetHorizontalGridLinesInCss = null;
-
         internal object _innerDiv;
-        internal object _currentDomTable;
         internal ColumnDefinitionCollection _columnDefinitionsOrNull;
         internal RowDefinitionCollection _rowDefinitionsOrNull;
 
@@ -166,7 +159,6 @@ namespace Windows.UI.Xaml.Controls
             base.INTERNAL_OnDetachedFromVisualTree();
 
             _innerDiv = null;
-            _currentDomTable = null;
         }
 
         internal void LocallyManageChildrenChanged()

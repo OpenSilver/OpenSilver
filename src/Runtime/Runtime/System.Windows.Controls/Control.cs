@@ -792,9 +792,9 @@ namespace Windows.UI.Xaml.Controls
             object focusTarget = GetFocusTarget();
             if (focusTarget != null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(
+                INTERNAL_HtmlDomManager.SetCSSStyleProperty(
                     focusTarget,
-                    new List<string>() { "outline" },
+                    "outline",
                     _useSystemFocusVisuals ? string.Empty : "none");
             }
         }

@@ -35,7 +35,6 @@ namespace Windows.UI.Xaml
         internal object DomElement;
         internal bool ApplyAlsoWhenThereIsAControlTemplate = false; // Note: normally, this should never be True, because DependencyProperty inheritance result in the property being passed to the child controls. However, in some cases such as "Control.Foreground" or "Control.FontSize", for performance reasons, we do not use the XAML-based property inheritance, but instead we use the HTML DOM inheritance of such CSS properties. In those cases we need to set this boolean to True.
         internal ValueToHtmlConverter Value;
-        internal ValueToMultipleValuesHtmlConverter Values;
         internal UIElement UIElement; // This is the control which appearance we modify. If not specified, the instance on which the CSSEquivalent is obtained is used. This property is used mainly to ensure that the UIElement has no ControlTemplate (otherwise we must not apply the CSS changes)
 
         //-----------------------------------Special case where CSSEquivalent does not exist on the property but we still need it -----------------------------------//

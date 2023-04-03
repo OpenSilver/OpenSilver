@@ -878,56 +878,35 @@ namespace CSHTML5.Internal
                         }
                         if (cssEquivalent.DomElement != null)
                         {
-                            cssEquivalent.Value ??= (finalInstance, value) => { return value ?? ""; }; // Default value
-                            if (cssEquivalent.Values != null)
-                            {
-                                List<object> cssValues = cssEquivalent.Values(sender, newValue);
+                            cssEquivalent.Value ??= static (finalInstance, value) => { return value ?? ""; }; // Default value
+                            
+                            object cssValue = cssEquivalent.Value(sender, newValue);
 
+                            if (!(cssValue is Dictionary<string, object>))
+                            {
                                 if (cssEquivalent.OnlyUseVelocity)
                                 {
-                                    foreach (object cssValue in cssValues)
-                                    {
-                                        INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                                    }
+                                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
                                 }
                                 else
                                 {
-                                    foreach (object cssValue in cssValues)
-                                    {
-                                        INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                                    }
+                                    INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
                                 }
                             }
-                            else if (cssEquivalent.Value != null) //I guess we cannot have both defined
+                            else
                             {
-                                object cssValue = cssEquivalent.Value(sender, newValue);
-
-                                if (!(cssValue is Dictionary<string, object>))
+                                //Note: currently, only Color needs to set multiple values when using Velocity (which is why cssValue is a Dictionary), which is why it has a special treatment.
+                                //todo: if more types arrive here, find a way to have a more generic way of handling it ?
+                                if (newValue is Color)
                                 {
+                                    Color newColor = (Color)newValue;
                                     if (cssEquivalent.OnlyUseVelocity)
                                     {
-                                        INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
+                                        INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlStringForVelocity());
                                     }
                                     else
                                     {
-                                        INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                                    }
-                                }
-                                else
-                                {
-                                    //Note: currently, only Color needs to set multiple values when using Velocity (which is why cssValue is a Dictionary), which is why it has a special treatment.
-                                    //todo: if more types arrive here, find a way to have a more generic way of handling it ?
-                                    if (newValue is Color)
-                                    {
-                                        Color newColor = (Color)newValue;
-                                        if (cssEquivalent.OnlyUseVelocity)
-                                        {
-                                            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlStringForVelocity());
-                                        }
-                                        else
-                                        {
-                                            INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlString(1d));
-                                        }
+                                        INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlString(1d));
                                     }
                                 }
                             }

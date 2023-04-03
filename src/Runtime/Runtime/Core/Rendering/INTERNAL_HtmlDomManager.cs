@@ -275,6 +275,13 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                 $"document.setDomAttribute(\"{uid}\",\"{attributeName}\",{value})");
         }
 
+        internal static void SetCSSStyleProperty(object domElementRef, string propertyName, string value)
+        {
+            Debug.Assert(domElementRef != null);
+            string uid = ((INTERNAL_HtmlDomElementReference)domElementRef).UniqueIdentifier;
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.setDomStyle('{uid}', '{propertyName}', '{value}');");
+        }
+
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
         public static void SetDomElementStyleProperty(object domElementRef, List<string> propertyCSSNames, object attributeValue, bool forceSimulatorExecuteImmediately = false)
         {
@@ -319,7 +326,6 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                 throw new InvalidOperationException("Please set the Name property of the CSSEquivalent class.");
             }
         }
-
 
         // Note: "forceSimulatorExecuteImmediately" will disable the simulator optimization that consists in deferring the execution of the JavaScript code to a later time so as to group the JavaScript calls into a single call. Disabling deferral can be useful for example in the cases where we may read the value back immediately after setting it.
         public static void RemoveDomElementAttribute(object domElementRef, string attributeName, bool forceSimulatorExecuteImmediately = false)
