@@ -180,11 +180,10 @@ namespace System
         /// </summary>
         /// <returns>
         /// true if Silverlight responds to the browser zoom setting; otherwise, false. The
-        /// default is true if there is no handler for the <see cref="Content.Zoomed"/>
-        /// event; otherwise, the default is false.
+        /// default is true.
         /// </returns>
         [OpenSilver.NotImplemented]
-        public bool EnableAutoZoom { get; set; }
+        public bool EnableAutoZoom { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value that indicates whether to use a non-production analysis
