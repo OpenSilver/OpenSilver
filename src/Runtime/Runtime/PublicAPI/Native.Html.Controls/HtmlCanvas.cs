@@ -87,6 +87,8 @@ namespace CSHTML5.Native.Html.Controls
 #endif
         }
 
+        internal sealed override bool EnablePointerEventsCore => true;
+
 #if MIGRATION
         void HtmlCanvas_MouseMove(object sender, MouseEventArgs e)
 #else

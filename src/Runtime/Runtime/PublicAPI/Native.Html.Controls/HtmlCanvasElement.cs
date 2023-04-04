@@ -540,8 +540,15 @@ $0.miterLimit = $1", jsContext2d,
             }
             set
             {
+                if (_contextMenu != null)
+                {
+                    UnregisterContextMenu(this, _contextMenu);
+                }
                 _contextMenu = value;
-                INTERNAL_ContextMenuHelpers.RegisterContextMenu(this, _contextMenu);
+                if (_contextMenu != null)
+                {
+                    RegisterContextMenu(this, _contextMenu);
+                }
             }
         }
 
@@ -550,10 +557,33 @@ $0.miterLimit = $1", jsContext2d,
         /// </summary>
         public event ContextMenuEventHandler ContextMenuOpening;
 
-        internal void INTERNAL_RaiseContextMenuOpeningEvent(double pointerLeft, double pointerTop)
+        private static void RegisterContextMenu(HtmlCanvasElement htmlCanvas, ContextMenu menu)
         {
-            if (ContextMenuOpening != null)
-                ContextMenuOpening(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
+            htmlCanvas.RightTapped += new EventHandler<HtmlCanvasPointerRoutedEventArgs>(OnRightTappedHandler);
+        }
+
+        private static void UnregisterContextMenu(HtmlCanvasElement htmlCanvas, ContextMenu menu)
+        {
+            htmlCanvas.RightTapped -= new EventHandler<HtmlCanvasPointerRoutedEventArgs>(OnRightTappedHandler);
+        }
+
+        private static void OnRightTappedHandler(object sender, HtmlCanvasPointerRoutedEventArgs e)
+        {
+            HtmlCanvasElement htmlCanvas = (HtmlCanvasElement)sender;
+            ContextMenu contextMenu = htmlCanvas.ContextMenu;
+            if (contextMenu != null && !contextMenu.IsOpen)
+            {
+#if MIGRATION
+                Point pointerPosition = e.GetPosition(null);
+#else
+                Point pointerPosition = e.GetCurrentPoint(null).Position;
+#endif
+                htmlCanvas.ContextMenuOpening?.Invoke(
+                    htmlCanvas,
+                    new ContextMenuEventArgs(pointerPosition.X, pointerPosition.Y));
+
+                contextMenu.IsOpen = true;
+            }
         }
     }
 }

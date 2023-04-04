@@ -1509,12 +1509,9 @@ namespace Windows.UI.Xaml
 
         #region ContextMenu
 
-        //Note: ContextMenu needs to be at the end of this file because JSIL sometimes causes errors when contructing the Control type (Control inherits from FrameworkElement and ContextMenu inherits Control so we get the error "Recursive construction of type Control")
-        //      This causes all the properties that are defined after this one to never be added when constructing the FrameworkElement Type.
-        //      cf. project "Chess" or "QSwot".
-
         /// <summary>
-        /// Gets or sets the context menu element that should appear whenever the context menu is requested through user interface (UI) from within this element.
+        /// Gets or sets the context menu element that should appear whenever the context 
+        /// menu is requested through user interface (UI) from within this element.
         /// </summary>
         public ContextMenu ContextMenu
         {
@@ -1523,25 +1520,18 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the <see cref="FrameworkElement.ContextMenu"/> dependency 
-        /// property.
+        /// Identifies the <see cref="ContextMenu"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ContextMenuProperty =
             DependencyProperty.Register(
                 nameof(ContextMenu),
                 typeof(ContextMenu),
                 typeof(FrameworkElement),
-                new PropertyMetadata(null, ContextMenu_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                });
+                new PropertyMetadata(null, OnContextMenuChanged));
 
-        private static void ContextMenu_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnContextMenuChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var frameworkElement = (FrameworkElement)d;
-            var contextMenu = (ContextMenu)e.NewValue;
-
-            INTERNAL_ContextMenuHelpers.RegisterContextMenu(frameworkElement, contextMenu);
+            ContextMenuService.SetContextMenu(d, (ContextMenu)e.NewValue);
         }
 
         /// <summary>
@@ -1549,11 +1539,8 @@ namespace Windows.UI.Xaml
         /// </summary>
         public event ContextMenuEventHandler ContextMenuOpening;
 
-        internal void INTERNAL_RaiseContextMenuOpeningEvent(double pointerLeft, double pointerTop)
-        {
-            if (ContextMenuOpening != null)
-                ContextMenuOpening(this, new ContextMenuEventArgs(pointerLeft, pointerTop));
-        }
+        internal void OnContextMenuOpening(double x, double y)
+            => ContextMenuOpening?.Invoke(this, new ContextMenuEventArgs(x, y));
 
         #endregion
     }

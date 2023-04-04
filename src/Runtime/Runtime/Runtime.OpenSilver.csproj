@@ -427,7 +427,7 @@
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\PopupTimeSelectionMode.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlock.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\RichTextBlockOverflow.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Separator.cs" />
+		<Compile Include="System.Windows.Controls\Separator.cs" />
     <Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\SubImageRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\TextBlock.cs" />
@@ -858,7 +858,6 @@
 		<Compile Include="System.Windows.Controls\Image.cs" />
 		<Compile Include="System.Windows.Controls\INavigate.cs" />
 		<Compile Include="System.Windows.Controls\INTERNAL_CalendarOrClockBase.cs" />
-		<Compile Include="System.Windows.Controls\INTERNAL_ContextMenuHelpers.cs" />
 		<Compile Include="System.Windows.Controls\INTERNAL_DateTimePickerBase.cs" />
 		<Compile Include="System.Windows.Controls\ItemCollection.cs" />
 		<Compile Include="System.Windows.Controls\ItemContainerGenerator.cs" />
@@ -1199,10 +1198,6 @@
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultMenuItemStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultNumericUpDownStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
@@ -1328,6 +1323,11 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="Runtime.licenseheader" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Include="DefaultStyles\INTERNAL_ContextMenuStyles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
   
 	<!-- See ths comment on the first <Import> -->
