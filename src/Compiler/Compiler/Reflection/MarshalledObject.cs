@@ -336,7 +336,7 @@ namespace OpenSilver.Compiler
         public void GetMethodReturnValueTypeInfo(string methodName, string namespaceName, string localTypeName, out string returnValueNamespaceName, out string returnValueLocalTypeName, out string returnValueAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null)
         {
             var type = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
-            returnValueNamespaceName = this.BuildPropertyPathRecursively(type);
+            returnValueNamespaceName = BuildPropertyPathRecursively(type);
             returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(type, false);
             returnValueAssemblyName = type.Assembly.GetName().Name;
             isTypeString = (type == typeof(string));
@@ -385,7 +385,7 @@ namespace OpenSilver.Compiler
             }
 
             declaringTypeName = GetTypeNameIncludingGenericArguments(methodInfo.DeclaringType, true);
-            returnValueNamespaceName = this.BuildPropertyPathRecursively(methodInfo.ReturnType);
+            returnValueNamespaceName = BuildPropertyPathRecursively(methodInfo.ReturnType);
             returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(methodInfo.ReturnType, false);
             isTypeString = methodInfo.ReturnType == typeof(string);
             isTypeEnum = methodInfo.ReturnType.IsEnum;
@@ -394,7 +394,7 @@ namespace OpenSilver.Compiler
         public void GetPropertyOrFieldTypeInfo(string propertyOrFieldName, string namespaceName, string localTypeName, out string propertyNamespaceName, out string propertyLocalTypeName, out string propertyAssemblyName, out bool isTypeString, out bool isTypeEnum, string assemblyNameIfAny = null, bool isAttached = false)
         {
             var type = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName, assemblyNameIfAny, isAttached: isAttached);
-            propertyNamespaceName = this.BuildPropertyPathRecursively(type);
+            propertyNamespaceName = BuildPropertyPathRecursively(type);
             propertyLocalTypeName = GetTypeNameIncludingGenericArguments(type, false);
             propertyAssemblyName = type.Assembly.GetName().Name;
             isTypeString = (type == typeof(string));
@@ -434,13 +434,13 @@ namespace OpenSilver.Compiler
                 propertyOrFieldDeclaringType = propertyInfo.DeclaringType;
             }
             memberDeclaringTypeName = GetTypeNameIncludingGenericArguments(propertyOrFieldDeclaringType, true);
-            memberTypeNamespace = this.BuildPropertyPathRecursively(propertyOrFieldType);
+            memberTypeNamespace = BuildPropertyPathRecursively(propertyOrFieldType);
             memberTypeName = GetTypeNameIncludingGenericArguments(propertyOrFieldType, false);
             isTypeString = (propertyOrFieldType == typeof(string));
             isTypeEnum = (propertyOrFieldType.IsEnum);
         }
 
-        private string BuildPropertyPathRecursively(Type type)
+        private static string BuildPropertyPathRecursively(Type type)
         {
             string fullPath = string.Empty;
             Type parentType = type;
@@ -476,6 +476,21 @@ namespace OpenSilver.Compiler
                 result += $"<{string.Join(", ", type.GenericTypeArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true)))}>";
             }
             return result;
+        }
+
+        private static string ConvertTypeToString(Type type)
+        {
+            string fullNamespace = BuildPropertyPathRecursively(type);
+            string typeName = GetTypeNameIncludingGenericArguments(type, false);
+
+            if (string.IsNullOrEmpty(fullNamespace))
+            {
+                return typeName;
+            }
+            else
+            {
+                return $"{fullNamespace}.{typeName}";
+            }
         }
 
         MemberInfo GetMemberInfo(string memberName, string namespaceName, string localTypeName, string assemblyNameIfAny = null, bool returnNullIfNotFoundInsteadOfException = false)
@@ -628,18 +643,18 @@ namespace OpenSilver.Compiler
             FieldInfo field = type.GetField(name, flags);
             if (field is not null)
             {
-                return $"global::{type.FullName}.{field.Name}";
+                return $"global::{ConvertTypeToString(type)}.{field.Name}";
             }
 
             if (allowIntegerValue)
             {
                 if (long.TryParse(name, out long l))
                 {
-                    return $"(global::{type.FullName}){l}";
+                    return $"(global::{ConvertTypeToString(type)}){l}";
                 }
                 else if (ulong.TryParse(name, out ulong ul))
                 {
-                    return $"(global::{type.FullName}){ul}";
+                    return $"(global::{ConvertTypeToString(type)}){ul}";
                 }
             }
 
