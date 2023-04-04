@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -148,10 +149,12 @@ namespace Windows.UI.Xaml.Shapes
 				ApplyMarginToFixNegativeCoordinates(_marginOffsets);
 			}
 
-			object context = CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDomElement);
+			var context = OpenSilver.Interop.ExecuteJavaScriptAsync(@"$0.getContext('2d')", _canvasDomElement);
+			string sContext = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(context);
 
-			//we remove the previous drawing:
-			CSHTML5.Interop.ExecuteJavaScriptAsync("$0.clearRect(0,0, $1, $2)", context, shapeActualSize.Width, shapeActualSize.Height);
+            //we remove the previous drawing:
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+				$"{sContext}.clearRect(0,0,{shapeActualSize.Width.ToInvariantString()},{shapeActualSize.Height.ToInvariantString()});");
 
 			double opacity = Stroke == null ? 1 : Stroke.Opacity;
 			object strokeValue = GetHtmlBrush(this, context, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
@@ -159,24 +162,30 @@ namespace Windows.UI.Xaml.Shapes
 
 			if (fillValue != null)
 			{
-				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = $1", context, fillValue);
+				string sFill = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(fillValue);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = {sFill};");
 			}
 			else
 			{
-				// If fillValue is not set it will be black.
-				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.fillStyle = 'transparent'", context);
+                // If fillValue is not set it will be black.
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = 'transparent';");
 			}
 
 			INTERNAL_ShapesDrawHelpers.PrepareLines(_canvasDomElement, Points, StrokeThickness, true);
 
 			if (strokeValue != null)
-				CSHTML5.Interop.ExecuteJavaScriptAsync(@"$0.strokeStyle = $1", context, strokeValue);
+			{
+				string sStroke = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.strokeStyle = {sStroke};");
+            }
 
-			CSHTML5.Interop.ExecuteJavaScriptAsync("$0.lineWidth = $1", context, StrokeThickness.ToString());
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {StrokeThickness.ToInvariantString()};");
 			if (Stroke != null && StrokeThickness > 0)
 			{
-				CSHTML5.Interop.ExecuteJavaScriptAsync("$0.stroke()", context);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke();");
 			}
+
+			INTERNAL_DispatcherHelpers.QueueAction(() => context.Dispose());
 		}
 	}
 }

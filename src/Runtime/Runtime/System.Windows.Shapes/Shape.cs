@@ -12,14 +12,14 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using OpenSilver.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using CSHTML5;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -598,12 +598,14 @@ namespace Windows.UI.Xaml.Shapes
         {
             // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
             // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
-            var context = OpenSilver.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
+            var context = OpenSilver.Interop.ExecuteJavaScriptAsync(
+                $"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
             string sContext = INTERNAL_InteropImplementation.GetVariableStringForJS(context);
 
             // we remove the previous drawing:
             // todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.clearRect(0, 0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"{sContext}.clearRect(0, 0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
 
 
             // context.save() for the fill
@@ -695,7 +697,7 @@ namespace Windows.UI.Xaml.Shapes
             //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
             OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {shape.StrokeThickness.ToInvariantString()}");
 
-            INTERNAL_DispatcherHelpers.QueueDispose(context);
+            INTERNAL_DispatcherHelpers.QueueAction(() => context.Dispose());
         }
 
         internal static object GetHtmlBrush(Shape shape, 
