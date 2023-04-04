@@ -39,6 +39,11 @@ namespace CSHTML5.Internal
         private static bool _isDispatcherPending = false;
         private static Dispatcher _dispatcher = null;
 
+        public static void QueueDispose(IDisposable disposable)
+        {
+            QueueAction(() => disposable?.Dispose());
+        }
+
         /// <summary>
         /// This will add the action to a list of actions to perform at once in a Dispatcher.Invoke call.
         /// This has better performance than calling Dispatcher.BeginInvoke directly, because all the
