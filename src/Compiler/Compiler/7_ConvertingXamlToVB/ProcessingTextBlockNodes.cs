@@ -37,12 +37,12 @@ namespace OpenSilver.Compiler
         // we do not surround it with a <Run> for performance optimization.
         //------------------------------------------------------------
 
-        public static void Process(XDocument doc, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain)
         {
             TraverseNextNode(doc.Root, 1, null, reflectionOnSeparateAppDomain);
         }
 
-        static void TraverseNextNode(XNode currentNode, int siblingNodesCount, XElement parentElement, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        static void TraverseNextNode(XNode currentNode, int siblingNodesCount, XElement parentElement, AssembliesInspector reflectionOnSeparateAppDomain)
         {
             if (currentNode is XText)
             {

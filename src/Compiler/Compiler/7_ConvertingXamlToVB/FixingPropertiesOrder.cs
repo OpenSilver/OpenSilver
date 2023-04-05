@@ -19,14 +19,14 @@ namespace OpenSilver.Compiler
     internal static class FixingPropertiesOrderVB
     {
         public static void FixPropertiesOrder(XDocument doc,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettingsVB settings)
         {
             FixSelectorItemsSourceOrder(doc.Root, reflectionOnSeparateAppDomain, settings);
         }
 
         public static void FixSelectorItemsSourceOrder(XElement currentElement,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettingsVB settings)
         {
             // Check if the current element is an object (rather than a property):

@@ -50,7 +50,7 @@ namespace OpenSilver.Compiler
 
         private class UWPMetadataVB : IMetadataVB
         {
-            public string FieldModifier { get; } = "Protecte";
+            public string FieldModifier { get; } = "Protected";
 
             public string SystemWindowsDLL => throw new NotSupportedException();
 

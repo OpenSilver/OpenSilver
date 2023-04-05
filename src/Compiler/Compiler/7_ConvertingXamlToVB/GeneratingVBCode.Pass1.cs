@@ -27,12 +27,12 @@ namespace OpenSilver.Compiler
             private readonly ConversionSettingsVB _settings;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
-            private readonly ReflectionOnSeparateAppDomainHandler _reflectionOnSeparateAppDomain;
+            private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             
             public GeneratorPass1(XDocument doc,
                 string assemblyNameWithoutExtension,
                 string fileNameWithPathRelativeToProjectRoot,
-                ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+                AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettingsVB settings)
             {
                 _reader = new XamlReaderVB(doc);
@@ -71,10 +71,16 @@ namespace OpenSilver.Compiler
                         string name = xNameAttr.Value;
                         if (!string.IsNullOrWhiteSpace(name))
                         {
-                            string fieldModifier = "Private WithEvents";
+                            string fieldModifier = _settings.Metadata.FieldModifier;
+                            XAttribute fieldModifierAttr = element.Attribute(xNamespace + "FieldModifier");
+                            if (fieldModifierAttr != null)
+                            {
+                                fieldModifier = fieldModifierAttr.Value?.ToLower() ?? "private";
+                            }
+
                             string fieldName = name;
                             string elementTypeInCSharp = GetCSharpEquivalentOfXamlTypeAsString(element.Name, true);
-                            resultingFieldsForNamedElements.Add(string.Format("    {0} {1} As {2}", fieldModifier, fieldName, elementTypeInCSharp));
+                            resultingFieldsForNamedElements.Add(string.Format("    {0} WithEvents {1} As {2}", fieldModifier, fieldName, elementTypeInCSharp));
                         }
                     }
                 }
