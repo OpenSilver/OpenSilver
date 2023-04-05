@@ -98,7 +98,7 @@ namespace OpenSilver.Compiler
             string sourceFile,
             string fileNameWithPathRelativeToProjectRoot,
             string assemblyNameWithoutExtension,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             bool isFirstPass,
             ConversionSettingsVB settings,
             string codeToPutInTheInitializeComponentOfTheApplicationClass,
@@ -239,8 +239,8 @@ End Class
             return classCodeFilled;
         }
 
-        private static void GetClassInformationFromXaml(XDocument doc, 
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain, 
+        private static void GetClassInformationFromXaml(XDocument doc,
+            AssembliesInspector reflectionOnSeparateAppDomain, 
             out string className, 
             out string namespaceStringIfAny, 
             out bool hasCodeBehind)

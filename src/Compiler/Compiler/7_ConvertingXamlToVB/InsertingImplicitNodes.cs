@@ -27,7 +27,7 @@ namespace OpenSilver.Compiler
         public const string InitializedFromStringAttribute = "__.InitializeFromString.__";
 
         public static void InsertImplicitNodes(XDocument doc,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettingsVB settings)
         {
             var indexesMapper = new Stack<List<int>>();
@@ -37,8 +37,8 @@ namespace OpenSilver.Compiler
         private static void TraverseNextElement(
             XElement currentElement, 
             int currentElementIndex, 
-            /*Stack<Dictionary<int, int>> indexesMapper*/ Stack<List<int>> indexesMapper, 
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            /*Stack<Dictionary<int, int>> indexesMapper*/ Stack<List<int>> indexesMapper,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettingsVB settings)
         {
             bool skipTraversalOfChildren = false;
