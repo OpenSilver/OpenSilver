@@ -86,7 +86,7 @@ namespace OpenSilver.Internal
         }
 
         private static string[] _ignoreFunctionNames = new[] {
-            ".INTERNAL_JsObjectReferenceHolder.Add",
+            ".JsObjectReferenceHolder.Add",
             ".INTERNAL_JSObjectReference..ctor",
             ".ExecuteJavaScript_Implementation",
             ".ExecuteJavaScript_GetJSObject",

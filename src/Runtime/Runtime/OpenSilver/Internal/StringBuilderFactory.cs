@@ -22,23 +22,11 @@ internal static class StringBuilderFactory
 
     static StringBuilderFactory()
     {
-        var provider = new DefaultObjectPoolProvider { };
-        _pool = provider.CreateStringBuilderPool( initialCapacity: 16 * 1024, maximumRetainedCapacity: 32);
+        var provider = new DefaultObjectPoolProvider { MaximumRetained = 10 };
+        _pool = provider.CreateStringBuilderPool();
     }
 
-    public static StringBuilder Get() {
-        var sb = _pool.Get();
-        sb.Clear();
-        return sb;
-    }
-
-    // helper - wrap a string into a stringbuilder
-    public static StringBuilder Get(string s) {
-        var sb = _pool.Get();
-        sb.Clear();
-        sb.Append(s);
-        return sb;
-    }
+    public static StringBuilder Get() => _pool.Get();
 
     public static void Return(StringBuilder sb) => _pool.Return(sb);
 }

@@ -90,6 +90,9 @@ namespace CSHTML5.Types
 
         private void RemoveFromJS()
         {
+            //FIXME
+            return;
+
             if (ReferenceId != string.Empty)
             {
                 INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($"delete document.jsObjRef['{ReferenceId}']");

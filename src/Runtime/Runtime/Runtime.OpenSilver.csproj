@@ -114,7 +114,12 @@
 		<Compile Include="PublicAPI\Internal\KnownTypesHelper.cs" />
 		<Compile Include="PublicAPI\Internal\WebRequestsHelper.cs" />
 		<Compile Include="OpenSilver\Internal\IJavaScriptConvertible.cs" />
+		<Compile Include="PublicAPI\Interop2\BulkInterop2.cs" />
+		<Compile Include="PublicAPI\Interop2\Interop2.cs" />
+		<Compile Include="PublicAPI\Interop2\JsCallAttribute.cs" />
 		<Compile Include="PublicAPI\Interop\BulkExecuteJavascriptAsync.cs" />
+		<Compile Include="PublicAPI\Interop2\Interop2Caller.cs" />
+		<Compile Include="PublicAPI\Interop\JavascriptCallsTracker.cs" />
 		<Compile Include="PublicAPI\Interop\JSObjectReferenceHolder.cs" />
 		<Compile Include="PublicAPI\Interop\StackTraceProvider.cs" />
 		<Compile Include="PublicAPI\Interop\Interop.Obsolete.cs" />
@@ -240,6 +245,7 @@
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Controls\WrapPanelHelper.cs" />
+		<Compile Include="System.Windows.input\MouseEventArgs.JsArgs.cs" />
 		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
 		<Compile Include="System.Windows.Markup\SetterValueConverter.cs" />
 		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
@@ -949,7 +955,7 @@
 		<Compile Include="System.Windows.Input\KeyRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Input\Pointer.cs" />
 		<Compile Include="System.Windows.Input\PointerEventHandler.cs" />
-		<Compile Include="System.Windows.Input\PointerRoutedEventArgs.cs" />
+		<Compile Include="System.Windows.Input\MouseEventArgs.cs" />
 		<Compile Include="System.Windows.Input\RightTappedEventHandler.cs" />
 		<Compile Include="System.Windows.Input\RightTappedRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Input\TappedEventHandler.cs" />

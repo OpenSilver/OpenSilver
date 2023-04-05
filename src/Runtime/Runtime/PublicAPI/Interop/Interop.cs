@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using OpenSilver.Internal;
+using Runtime.OpenSilver.PublicAPI.Interop;
 
 #if MIGRATION
 using System.Windows;
@@ -33,6 +34,8 @@ namespace OpenSilver
     /// </summary>
     public static class Interop
     {
+        private static int _dumpAllJavascriptObjectsEveryMs = 0;
+
         // for debugging/testing only
         // if > 0, we're dumping All JS objects every X millis
         public static int DumpAllJavascriptObjectsEveryMs
@@ -65,7 +68,21 @@ namespace OpenSilver
 
         internal static bool IsTrackingAllJavascriptObjects => DumpAllJavascriptObjectsEveryMs > 0;
 
-        private static T ConvertJavascriptResult<T>(object value)
+        // for debugging/testing only
+        // if > 0, dumps info on all the Javascript calls , every X millis
+        public static int DumpJavascriptCallsInfoEveryMs {
+            get => _dumpJavascriptCallsInfoEveryMs;
+            set {
+                if (_dumpJavascriptCallsInfoEveryMs == value)
+                    return;
+                _dumpJavascriptCallsInfoEveryMs = value;
+                if (_dumpJavascriptCallsInfoEveryMs > 0)
+                    JavascriptCallsTracker.Instance.StackTracking(_dumpJavascriptCallsInfoEveryMs);
+            }
+        }
+
+
+        internal static T ConvertJavascriptResult<T>(object value)
         {
             Type t = typeof(T);
             if (t == typeof(string))
@@ -139,8 +156,10 @@ namespace OpenSilver
             }
         }
 
+
         public static T1 ExecuteJavaScriptGetResult<T1>(string javascript)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             var result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: true);
             T1 t1 = ConvertJavascriptResult<T1>(result);
             return t1;
@@ -151,11 +170,13 @@ namespace OpenSilver
         /// </summary>
         internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: false, flush: flushQueue);
         }
 
         internal static void ExecuteJavaScriptVoid(string javascript, bool flushQueue, params object[] variables)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_Implementation(javascript,
                 runAsynchronously: false,
                 wantsResult: false,
@@ -166,33 +187,25 @@ namespace OpenSilver
 
         public static void ExecuteJavaScriptVoid(string javascript, params object[] variables)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             ExecuteJavaScriptVoid(javascript, false, variables);
         }
 
         public static void ExecuteJavaScriptVoid(string javascript)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: false, flush: true);
         }
 
-        public static void CreateJavascriptFunction(string funcName, string javascript)
-        {
-            INTERNAL_ExecuteJavaScript.ExecuteJavaScriptFuncSync("createFunction", funcName, javascript);
-        }
-
-        public static object CallJavascriptFunction(string funcName, int subId, string args) 
-        {
-            return INTERNAL_ExecuteJavaScript.ExecuteJavaScriptFuncSync("callFunction", funcName, subId, args);
-        }
-
         public static void ExecuteJavaScriptVoidAsync(string javascript, params object[] variables) {
-            var sb = StringBuilderFactory.Get(javascript);
-            CSHTML5.INTERNAL_InteropImplementation.ReplaceJSArgsStringBuilder(sb, variables);
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
+            javascript = CSHTML5.INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
-            StringBuilderFactory.Return(sb);
         }
 
         public static void ExecuteJavaScriptVoidAsync(string javascript)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
         }
 
@@ -205,6 +218,7 @@ namespace OpenSilver
         /// FIXME: further improvement - if I only need the result, then don't create a referenceId
         public static IDisposable ExecuteJavaScript(string javascript)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             // returns INTERNAL_JSObjectReference
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_GetJSObject(javascript, runAsynchronously: false);
         }
@@ -217,6 +231,7 @@ namespace OpenSilver
         /// <returns>The result, if any, of the JavaScript call.</returns>
         public static IDisposable ExecuteJavaScript(string javascript, params object[] variables)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             // returns INTERNAL_JSObjectReference
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_GetJSObject(javascript, runAsynchronously: false, variables: variables);
         }
@@ -226,6 +241,7 @@ namespace OpenSilver
         /// </summary> 
         internal static double ExecuteJavaScriptDouble(string javascript, bool flushQueue = true)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<double>(value);
             return result;
@@ -236,6 +252,7 @@ namespace OpenSilver
         /// </summary>
         internal static int ExecuteJavaScriptInt32(string javascript, bool flushQueue = true)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<int>(value);
             return result;
@@ -246,6 +263,7 @@ namespace OpenSilver
         /// </summary>
         internal static string ExecuteJavaScriptString(string javascript, bool flushQueue = true)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<string>(value);
             return result;
@@ -256,6 +274,7 @@ namespace OpenSilver
         /// </summary>
         internal static bool ExecuteJavaScriptBoolean(string javascript, bool flushQueue = true)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             object value = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flushQueue);
             var result = ConvertJavascriptResult<bool>(value);
             return result;
@@ -267,6 +286,7 @@ namespace OpenSilver
         /// <param name="javascript">The JavaScript code to execute.</param>
         public static IDisposable ExecuteJavaScriptAsync(string javascript)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_GetJSObject(javascript, runAsynchronously: true);
         }
 
@@ -277,6 +297,7 @@ namespace OpenSilver
         /// <param name="variables">The objects to use inside the JavaScript call.</param>
         public static IDisposable ExecuteJavaScriptAsync(string javascript, params object[] variables)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             return CSHTML5.INTERNAL_InteropImplementation.ExecuteJavaScript_GetJSObject(javascript, runAsynchronously: true, variables: variables);
         }
 
@@ -285,6 +306,7 @@ namespace OpenSilver
         /// </summary>
         internal static void ExecuteJavaScriptFastAsync(string javascript)
         {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javascript);
         }
 
@@ -428,7 +450,7 @@ namespace OpenSilver
         }
 
         static HashSet<string> _cssFileKeys = new HashSet<string>();
-        private static int _dumpAllJavascriptObjectsEveryMs = 0;
+        private static int _dumpJavascriptCallsInfoEveryMs = 0;
 
         public static Task<object> LoadCssFile(ResourceFile resourceFile)
         {

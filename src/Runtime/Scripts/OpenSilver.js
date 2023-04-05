@@ -156,12 +156,16 @@ window.callJSUnmarshalled = function (javaScriptToExecute, referenceId, wantsRes
 
 window.createFunction = function (id, javaScriptToExecute) { 
     const js = BINDING.conv_string(javaScriptToExecute);
-    document.jsObjRef["_functions"][id] = new Function('subId', 'args', js);
+    const strId = BINDING.conv_string(id);
+    document.jsObjRef["_functions"][strId] = new Function('subId', 'args', js);
 }
 
 window.callFunction = function (id, subId, args) { 
     const jsArgs = BINDING.conv_string(args);
-    return document.jsObjRef["_functions"][id](subId, jsArgs);
+    const strId = BINDING.conv_string(id);
+    var result = document.jsObjRef["_functions"][strId](subId, jsArgs);
+    if (result !== undefined)
+        return BINDING.js_to_mono_obj(result);
 }
 
 
