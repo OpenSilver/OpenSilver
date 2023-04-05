@@ -174,7 +174,7 @@ namespace OpenSilver.Compiler
             private readonly string _sourceFile;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
-            private readonly ReflectionOnSeparateAppDomainHandler _reflectionOnSeparateAppDomain;
+            private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             private readonly string _codeToPutInTheInitializeComponentOfTheApplicationClass;
             private readonly ILogger _logger;
 
@@ -182,7 +182,7 @@ namespace OpenSilver.Compiler
                 string sourceFile,
                 string fileNameWithPathRelativeToProjectRoot,
                 string assemblyNameWithoutExtension,
-                ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+                AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings,
                 string codeToPutInTheInitializeComponentOfTheApplicationClass,
                 ILogger logger)
@@ -353,9 +353,7 @@ namespace OpenSilver.Compiler
                         {
                             // If the direct content is not specified, we use the type's
                             // default value (ex: <sys:String></sys:String>)
-                            directContent = GetDefaultValueOfTypeAsString(
-                                namespaceName, localTypeName, isKnownSystemType, _reflectionOnSeparateAppDomain, assemblyNameIfAny
-                            );
+                            directContent = SystemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyNameIfAny);
                         }
 
                         parameters.StringBuilder.AppendLine(
@@ -1351,7 +1349,7 @@ else
                 }
 
                 GetClrNamespaceAndLocalName(attributeTypeString, currentXElement, out namespaceName, out localTypeName, out assemblyNameIfAny);
-                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny, ifTypeNotFoundTryGuessing: false);
+                return _reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlTypeAsXName(namespaceName, localTypeName, assemblyNameIfAny);
             }
 
             private string GetCSharpFullTypeNameFromTargetTypeString(XElement styleElement, bool isDataType = false)
@@ -1418,37 +1416,6 @@ else
                 else
                 {
                     throw new XamlParseException("Each dictionary entry must have an associated key. The element named '" + element.Name.LocalName + "' does not have a key.");
-                }
-            }
-
-            private static string GetDefaultValueOfTypeAsString(string namespaceName,
-                string localTypeName,
-                bool isSystemType,
-                ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
-                string assemblyIfAny = null)
-            {
-                if (isSystemType)
-                {
-                    return SystemTypesHelper.GetDefaultValue(namespaceName, localTypeName, assemblyIfAny);
-                }
-                else
-                {
-                    Type type = reflectionOnSeparateAppDomain.GetCSharpEquivalentOfXamlType(namespaceName, localTypeName, assemblyIfAny, true);
-                    if (type == null)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        if (type.IsValueType)
-                        {
-                            return Activator.CreateInstance(type).ToString();
-                        }
-                        else
-                        {
-                            return "";
-                        }
-                    }
                 }
             }
 
@@ -1957,7 +1924,7 @@ else
                 GetClrNamespaceAndLocalName(name, out namespaceName, out localName, out assemblyNameIfAny);
             }
 
-            private string GetKeyNameOfProperty(XElement element, string propertyName, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+            private string GetKeyNameOfProperty(XElement element, string propertyName, AssembliesInspector reflectionOnSeparateAppDomain)
             {
                 GetClrNamespaceAndLocalName(element.Name, out string elementNameSpace, out string elementLocalName, out string assemblyNameIfAny);
                 return reflectionOnSeparateAppDomain.GetKeyNameOfProperty(elementNameSpace, elementLocalName, assemblyNameIfAny, propertyName);

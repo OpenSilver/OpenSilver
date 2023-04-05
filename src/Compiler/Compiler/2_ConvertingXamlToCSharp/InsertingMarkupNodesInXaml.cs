@@ -27,7 +27,7 @@ namespace OpenSilver.Compiler
         //todo: support strings that contain commas, like in: {Binding Value, ConverterParameter = 'One, two, three, four, five, six', Mode = OneWay}
 
         internal static void InsertMarkupNodes(XDocument doc,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettings settings)
         {
             TraverseNextElement(doc.Root, doc.Root.GetDefaultNamespace(), reflectionOnSeparateAppDomain, settings);
@@ -35,7 +35,7 @@ namespace OpenSilver.Compiler
 
         private static void TraverseNextElement(XElement currentElement,
             XNamespace lastDefaultNamespace,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             ConversionSettings settings)
         {
             XNamespace currentDefaultNamespace = currentElement.GetDefaultNamespace();
@@ -157,7 +157,7 @@ namespace OpenSilver.Compiler
             XName nodeName,
             string attributeValue,
             XNamespace lastDefaultNamespace,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            AssembliesInspector reflectionOnSeparateAppDomain,
             Func<string, XNamespace> getNamespaceOfPrefix,
             ConversionSettings settings)
         {

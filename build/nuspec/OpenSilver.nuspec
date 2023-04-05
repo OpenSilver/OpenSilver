@@ -68,6 +68,11 @@
     <file src="../../src/Targets/OpenSilver.Common.targets" target="build/OpenSilver.Common.targets" />
 
     <!-- OpenSilver compiler -->
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil.Mdb.dll" target="tools/Mono.Cecil.Mdb.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil.Pdb.dll" target="tools/Mono.Cecil.Pdb.dll" />
+    <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil.Rocks.dll" target="tools/Mono.Cecil.Rocks.dll" />
+
     <file src="../../src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler.dll" target="tools/OpenSilver.Compiler.dll" />
     <file src="../../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
     <file src="../../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />

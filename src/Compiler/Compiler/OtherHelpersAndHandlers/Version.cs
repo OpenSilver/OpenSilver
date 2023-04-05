@@ -16,6 +16,6 @@ namespace OpenSilver.Compiler
 {
     internal static class Version
     {
-        public const int CompilerBuildNumber = 9;
+        public const int CompilerBuildNumber = 10;
     }
 }
