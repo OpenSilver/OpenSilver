@@ -15,11 +15,14 @@ using Mono.Cecil;
 using Mono.Cecil.Rocks;
 using System;
 using System.Linq;
+using System.Text;
 
 namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspector
 {
     internal static class TypeReferenceExtensions
     {
+        private const string GlobalPrefix = "global::";
+
         public static bool IsString(this TypeReference typeRef) => typeRef == typeRef.Module.TypeSystem.String;
 
         public static TypeReference ResolveGenericParameter(this TypeReference typeRef, TypeReference elementType)
@@ -83,9 +86,54 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return res;
         }
 
-        public static string GetNameWithFullPath(this TypeReference typeRef)
+        public static string ConvertToString(this TypeReference typeRef)
         {
-            return typeRef.FullName.Replace('/', '.');
+            var fullNamespace = typeRef.BuildFullPath();
+            var typeName = typeRef.GetTypeNameIncludingGenericArguments(false);
+
+            return string.IsNullOrEmpty(fullNamespace) ? typeName : $"{fullNamespace}.{typeName}";
+        }
+
+        public static string BuildFullPath(this TypeReference type)
+        {
+            var fullPath = string.Empty;
+            var parentType = type;
+            var rootType = type;
+            while ((parentType = parentType.DeclaringType) != null)
+            {
+                if (!string.IsNullOrEmpty(fullPath)) fullPath = "." + fullPath;
+
+                fullPath = parentType.Name + fullPath;
+                rootType = parentType;
+            }
+
+            fullPath = rootType.Namespace +
+                       (!string.IsNullOrEmpty(rootType.Namespace) && !string.IsNullOrEmpty(fullPath) ? "." : string.Empty) +
+                       fullPath;
+            return fullPath;
+        }
+
+        public static string GetTypeNameIncludingGenericArguments(this TypeReference type, bool appendNamespace)
+        {
+            var result = new StringBuilder();
+            if (appendNamespace)
+            {
+                result.Append(GlobalPrefix);
+                if (!string.IsNullOrEmpty(type.Namespace)) result.Append(type.Namespace + ".");
+            }
+
+            result.Append(type.Name);
+
+            if (type is not GenericInstanceType genericInstanceType)
+            {
+                return result.ToString();
+            }
+
+            result = new StringBuilder(result.ToString().Split('`')[0]);
+            result.Append(
+                $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true)))}>");
+
+            return result.ToString();
         }
     }
 }

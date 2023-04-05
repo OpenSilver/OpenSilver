@@ -31,6 +31,7 @@ namespace Compiler.Tests
     [TestClass]
     public class MonoCecilAssembliesInspectorTest
     {
+        private const string GlobalPrefix = "global::";
         private const string ExperimentalSubjectName = "Experimental";
         private const string ExperimentalSubjectDll = ExperimentalSubjectName + ".dll";
         private const string ExperimentalNamespace = "Experimental";
@@ -70,7 +71,7 @@ namespace Compiler.Tests
             MonoCecilVersion.GetAttachedPropertyGetMethodInfo(nameof(ToolTipService.GetPlacementTarget), "http://schemas.microsoft.com/winfx/2006/xaml/presentation", nameof(ToolTipService),
                 out var declaringTypeName, out var returnValueNamespaceName, out var returnValueLocalTypeName, out var isTypeString, out var isTypeEnum);
 
-            declaringTypeName.Should().Be("global::" + typeof(ToolTipService).FullName);
+            declaringTypeName.Should().Be(GlobalPrefix + typeof(ToolTipService).FullName);
             returnValueNamespaceName.Should().Be(typeof(UIElement).Namespace);
             returnValueLocalTypeName.Should().Be(nameof(UIElement));
             isTypeString.Should().BeFalse();
@@ -177,7 +178,7 @@ namespace Compiler.Tests
         {
             var res = MonoCecilVersion.GetEnumValue(nameof(ClassWithNestedEnum.InputBehavior.SelectFromList).ToLower(),typeof(ClassWithNestedEnum).FullName, nameof(ClassWithNestedEnum.InputBehavior), null, true, true);
 
-            res.Should().Be("global::" + typeof(ClassWithNestedEnum).FullName + "." + nameof(ClassWithNestedEnum.InputBehavior) + "." + nameof(ClassWithNestedEnum.InputBehavior.SelectFromList));
+            res.Should().Be($"{GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)}.{nameof(ClassWithNestedEnum.InputBehavior.SelectFromList)}");
         }
 
         [TestMethod]
@@ -185,7 +186,15 @@ namespace Compiler.Tests
         {
             var res = MonoCecilVersion.GetEnumValue("1", typeof(ClassWithNestedEnum).FullName, nameof(ClassWithNestedEnum.InputBehavior), null, true, true);
 
-            res.Should().Be("(global::" + typeof(ClassWithNestedEnum).FullName + "." + nameof(ClassWithNestedEnum.InputBehavior) + ")1");
+            res.Should().Be($"({GlobalPrefix}{typeof(ClassWithNestedEnum).FullName}.{nameof(ClassWithNestedEnum.InputBehavior)})1");
+        }
+
+        [TestMethod]
+        public void GetEnumValue_Should_Return_Value_For_Enum_Without_Namespace()
+        {
+            var res = MonoCecilVersion.GetEnumValue(nameof(EnumWithoutNamespace.Item), "", nameof(EnumWithoutNamespace), null, true, false);
+
+            res.Should().Be($"{GlobalPrefix}{typeof(EnumWithoutNamespace).FullName}.{nameof(EnumWithoutNamespace.Item)}");
         }
 
         [TestMethod]

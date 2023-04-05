@@ -16,7 +16,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Xml.Linq;
 using Mono.Cecil;
 using OpenSilver.Compiler.Common;
@@ -110,7 +109,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     // Search for the type:
                     foreach (var namespaceToLookInto in namespacesToLookInto)
                     {
-                        var fullTypeNameToFind = namespaceToLookInto + "." + localTypeName;
+                        var fullTypeNameToFind = string.IsNullOrEmpty(namespaceToLookInto) ? localTypeName : $"{namespaceToLookInto}.{localTypeName}";
+
                         var typeIfFound =
                             assembly.MainModule.Types.FirstOrDefault(x => x.FullName == fullTypeNameToFind);
                         if (typeIfFound == null)
@@ -255,46 +255,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             return returnType;
         }
 
-        private static string BuildPropertyPathRecursively(TypeReference type)
-        {
-            var fullPath = string.Empty;
-            var parentType = type;
-            var rootType = type;
-            while ((parentType = parentType.DeclaringType) != null)
-            {
-                if (!string.IsNullOrEmpty(fullPath)) fullPath = "." + fullPath;
-
-                fullPath = parentType.Name + fullPath;
-                rootType = parentType;
-            }
-
-            fullPath = rootType.Namespace +
-                       (!string.IsNullOrEmpty(rootType.Namespace) && !string.IsNullOrEmpty(fullPath) ? "." : string.Empty) +
-                       fullPath;
-            return fullPath;
-        }
-
-        private static string GetTypeNameIncludingGenericArguments(TypeReference type, bool appendNamespace)
-        {
-            var result = new StringBuilder();
-            if (appendNamespace)
-            {
-                result.Append(GlobalPrefix);
-                if (!string.IsNullOrEmpty(type.Namespace)) result.Append(type.Namespace + ".");
-            }
-
-            result.Append(type.Name);
-
-            if (type is GenericInstanceType genericInstanceType)
-            {
-                result = new StringBuilder(result.ToString().Split('`')[0]);
-                result.Append(
-                    $"<{string.Join(", ", genericInstanceType.GenericArguments.Select(x => GetTypeNameIncludingGenericArguments(x, true)))}>");
-            }
-
-            return result.ToString();
-        }
-
         private TypeReference GetMethodReturnValueType(string methodName, string namespaceName, string localTypeName,
             string assemblyNameIfAny = null)
         {
@@ -374,7 +334,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (type != null)
                 // Use information from the type
-                return $"global::{type}";
+                return $"{GlobalPrefix}{type}";
 
             if (ifTypeNotFoundTryGuessing)
             {
@@ -384,7 +344,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     return localTypeName;
 
                 return
-                    $"global::{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
+                    $"{GlobalPrefix}{namespaceName}{(string.IsNullOrEmpty(namespaceName) ? string.Empty : ".")}{localTypeName}";
             }
 
             throw new XamlParseException(
@@ -401,7 +361,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
             if (type != null)
             {
-                return type.GetNameWithFullPath() + ", " + type.Module.Assembly.Name.Name;
+                return type.ConvertToString() + ", " + type.Module.Assembly.Name.Name;
             }
 
             return null;
@@ -441,8 +401,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             var typeRef = GetPropertyOrFieldType(propertyOrFieldName, namespaceName, localTypeName,
                 assemblyNameIfAny, isAttached);
-            propertyNamespaceName = BuildPropertyPathRecursively(typeRef);
-            propertyLocalTypeName = GetTypeNameIncludingGenericArguments(typeRef, false);
+            propertyNamespaceName = typeRef.BuildFullPath();
+            propertyLocalTypeName = typeRef.GetTypeNameIncludingGenericArguments(false);
             propertyAssemblyName = typeRef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeString = typeRef.IsString();
             isTypeEnum = typeRef.ResolveOrThrow().IsEnum;
@@ -454,8 +414,8 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             string assemblyNameIfAny = null)
         {
             var typeDef = GetMethodReturnValueType(methodName, namespaceName, localTypeName, assemblyNameIfAny);
-            returnValueNamespaceName = BuildPropertyPathRecursively(typeDef);
-            returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(typeDef, false);
+            returnValueNamespaceName = typeDef.BuildFullPath();
+            returnValueLocalTypeName = typeDef.GetTypeNameIncludingGenericArguments(false);
             returnValueAssemblyName = typeDef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeString = typeDef.IsString();
             isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
@@ -471,7 +431,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 if (eventInfo != null)
                 {
                     var eventType = eventInfo.EventType.PopulateGeneric(type, typeIterator);
-                    return GetTypeNameIncludingGenericArguments(eventType, true);
+                    return eventType.GetTypeNameIncludingGenericArguments(true);
                 }
 
                 typeIterator = typeIterator.BaseType?.ResolveOrThrow();
@@ -664,7 +624,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var field = FindFieldDeep(type, fieldName, out _, false, false, assemblyName != type.Module.Name);
             if (field != null &&
                 (field.IsPublic || field.IsAssembly || field.IsFamilyOrAssembly))
-                return $"{GetTypeNameIncludingGenericArguments(type, true)}.{field.Name}";
+                return $"{type.GetTypeNameIncludingGenericArguments(true)}.{field.Name}";
 
             return null;
         }
@@ -711,9 +671,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             }
 
 
-            memberDeclaringTypeName = GetTypeNameIncludingGenericArguments(propertyOrFieldDeclaringType, true);
-            memberTypeNamespace = BuildPropertyPathRecursively(propertyOrFieldType);
-            memberTypeName = GetTypeNameIncludingGenericArguments(propertyOrFieldType, false);
+            memberDeclaringTypeName = propertyOrFieldDeclaringType.GetTypeNameIncludingGenericArguments(true);
+            memberTypeNamespace = propertyOrFieldType.BuildFullPath();
+            memberTypeName = propertyOrFieldType.GetTypeNameIncludingGenericArguments(false);
             isTypeString = propertyOrFieldType.IsString();
             isTypeEnum = propertyOrFieldType.ResolveOrThrow().IsEnum;
         }
@@ -732,9 +692,9 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     dependencyObjectType.IsAssignableFrom(m.Parameters[0].ParameterType.ResolveOrThrow()));
                 if (method != null)
                 {
-                    declaringTypeName = GetTypeNameIncludingGenericArguments(currentType, true);
-                    returnValueNamespaceName = BuildPropertyPathRecursively(method.ReturnType);
-                    returnValueLocalTypeName = GetTypeNameIncludingGenericArguments(method.ReturnType.PopulateGeneric(elementType, currentType), false);
+                    declaringTypeName = currentType.GetTypeNameIncludingGenericArguments(true);
+                    returnValueNamespaceName = method.ReturnType.BuildFullPath();
+                    returnValueLocalTypeName = method.ReturnType.PopulateGeneric(elementType, currentType).GetTypeNameIncludingGenericArguments(false);
                     isTypeString = method.ReturnType.IsString();
                     isTypeEnum = method.ReturnType.ResolveOrThrow().IsEnum;
                     return;
@@ -760,18 +720,18 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             var field = FindFieldDeep(type, name, out _, ignoreCase, true, true);
             if (field is not null)
             {
-                return $"global::{type.GetNameWithFullPath()}.{field.Name}";
+                return $"{GlobalPrefix}{type.ConvertToString()}.{field.Name}";
             }
 
             if (allowIntegerValue)
             {
                 if (long.TryParse(name, out var l))
                 {
-                    return $"(global::{type.GetNameWithFullPath()}){l}";
+                    return $"({GlobalPrefix}{type.ConvertToString()}){l}";
                 }
                 if (ulong.TryParse(name, out var ul))
                 {
-                    return $"(global::{type.GetNameWithFullPath()}){ul}";
+                    return $"({GlobalPrefix}{type.ConvertToString()}){ul}";
                 }
             }
 

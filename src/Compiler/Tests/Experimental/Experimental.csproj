@@ -19,6 +19,7 @@
     <Compile Include="ClassWithNestedEnum.cs" />
     <Compile Include="DerivedClassWithGenericEvents.cs" />
     <Compile Include="DerivedContentControl.cs" />
+    <Compile Include="EnumWithoutNamespace.cs" />
     <Compile Include="GenericType.cs" />
     <Compile Include="PlanetStructure.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
