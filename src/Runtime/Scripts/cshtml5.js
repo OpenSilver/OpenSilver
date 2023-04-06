@@ -583,7 +583,7 @@ document.createInputManager = function (callback) {
                 view.addEventListener('keyup', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.KEYPRESS, e);
+                        callback(this.id, EVENTS.KEYUP, e);
                     }
                 });
 
