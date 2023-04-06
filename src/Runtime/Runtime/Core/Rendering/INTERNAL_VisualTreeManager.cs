@@ -259,6 +259,10 @@ namespace CSHTML5.Internal
                     fe.RaiseUnloadedEvent();
                     fe.UnloadResources();
                 }
+
+                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.INTERNAL_OuterDomElement as INTERNAL_HtmlDomElementReference);
+                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.INTERNAL_InnerDomElement as INTERNAL_HtmlDomElementReference);
+                INTERNAL_HtmlDomManager.RemoveFromGlobalStore(element.INTERNAL_AdditionalOutsideDivForMargins as INTERNAL_HtmlDomElementReference);
             }
 
             // Reset all visual-tree related information:
