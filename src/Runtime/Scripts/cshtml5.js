@@ -238,11 +238,10 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
     return newElement;
 }
 
-document.createTextBlockElement = function (id, parentElement, wrap) {
+document.createTextBlockElement = function (id, parentElement, wrap, overflow) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
 
     if (newElement) {
-        newElement.style['overflow'] = 'hidden';
         newElement.style['textAlign'] = 'left';
         newElement.style['boxSizing'] = 'border-box';
         if (wrap) {
@@ -250,6 +249,12 @@ document.createTextBlockElement = function (id, parentElement, wrap) {
             newElement.style['whiteSpace'] = 'pre-wrap';
         } else {
             newElement.style['whiteSpace'] = 'pre';
+        }
+
+        if (overflow) {
+            newElement.style['overflow'] = 'auto';
+        } else {
+            newElement.style['overflow'] = 'hidden';
         }
     }
 }

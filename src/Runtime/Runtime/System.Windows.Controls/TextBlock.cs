@@ -15,6 +15,7 @@ using System;
 using System.Windows.Markup;
 using System.Diagnostics;
 using CSHTML5.Internal;
+using System.Windows.Media;
 
 #if MIGRATION
 using System.Windows.Automation.Peers;
@@ -77,7 +78,17 @@ namespace Windows.UI.Xaml.Controls
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.Wrap);
+            var contentPresenter = VisualTreeHelper.GetParent(this);
+            bool shouldOverflow = false;
+            if (contentPresenter != null && contentPresenter.GetType() == typeof(ContentPresenter)) //because of templated parent, immediate parent will always be content presenter
+            {
+                var parent = VisualTreeHelper.GetParent(contentPresenter);
+                if (parent != null && parent.GetType() == typeof(ScrollViewer))
+                {
+                    shouldOverflow = true;
+                }
+            }
+            var div = INTERNAL_HtmlDomManager.CreateTextBlockDomElementAndAppendIt(parentRef, this, TextWrapping == TextWrapping.Wrap, shouldOverflow);
             domElementWhereToPlaceChildren = div;
             return div;
         }

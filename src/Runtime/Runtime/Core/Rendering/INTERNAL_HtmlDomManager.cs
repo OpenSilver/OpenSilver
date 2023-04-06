@@ -410,7 +410,8 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
         internal static object CreateTextBlockDomElementAndAppendIt(
             object parentRef,
             UIElement associatedUIElement,
-            bool wrap)
+            bool wrap,
+            bool overflow = false)
         {
 #if PERFSTAT
             Performance.Counter("CreateTextBlockDomElementAndAppendIt", t0);
@@ -421,7 +422,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             if (parent != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {(wrap ? "true" : "false")})");
+                    $@"document.createTextBlockElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"", {(wrap ? "true" : "false")},{(overflow ? "true" : "false")})");
             }
             else
             {
