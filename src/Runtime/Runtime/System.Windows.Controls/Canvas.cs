@@ -112,10 +112,9 @@ namespace Windows.UI.Xaml.Controls
 
         private static void OnPositioningChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is UIElement uie
-                && VisualTreeHelper.GetParent(uie) is Canvas p)
+            if (d is UIElement uie)
             {
-                p.InvalidateArrange();
+                uie.InvalidateParentArrange();
             }
         }
 
