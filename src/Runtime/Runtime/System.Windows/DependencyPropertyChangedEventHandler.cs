@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,24 +11,21 @@
 *  
 \*====================================================================================*/
 
-
-using System;
-
 #if MIGRATION
 namespace System.Windows
 #else
 namespace Windows.UI.Xaml
 #endif
 {
-    // Summary:
-    //     Represents the method that will handle events raised when a System.Windows.DependencyProperty
-    //     is changed on a particular System.Windows.DependencyObject implementation.
-    //
-    // Parameters:
-    //   sender:
-    //     The source of the event (typically the object where the property changed).
-    //
-    //   e:
-    //     The event data.
+    /// <summary>
+    /// Represents the method that will handle events raised when a <see cref="DependencyProperty"/>
+    /// is changed on a particular <see cref="DependencyObject"/> implementation.
+    /// </summary>
+    /// <param name="sender">
+    /// The source of the event (typically the object where the property changed).
+    /// </param>
+    /// <param name="e">
+    /// The event data.
+    /// </param>
     public delegate void DependencyPropertyChangedEventHandler(object sender, DependencyPropertyChangedEventArgs e);
 }
