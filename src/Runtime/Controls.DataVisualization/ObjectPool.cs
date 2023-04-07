@@ -6,6 +6,10 @@
 using System;
 using System.Collections.Generic;
 
+#if DEBUG
+using System.Diagnostics;
+#endif
+
 #if MIGRATION
 namespace System.Windows.Controls.DataVisualization
 #else
@@ -144,7 +148,7 @@ namespace Windows.UI.Xaml.Controls.DataVisualization
         public void Clear()
         {
 #if DEBUG
-            System.Diagnostics.Debug.Assert(!_traversing, "Cannot clear an object pool while it is being traversed.");
+            Debug.Assert(!_traversing, "Cannot clear an object pool while it is being traversed.");
 #endif
             _objects.Clear();
         }

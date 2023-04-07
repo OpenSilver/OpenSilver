@@ -32,12 +32,12 @@ namespace OpenSilver.Compiler
         // ContentTemplate="{TemplateBinding ContentTemplate}" />"
         //------------------------------------------------------------
 
-        public static void Process(XDocument doc, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain)
         {
             TraverseNextElement(doc.Root, false, reflectionOnSeparateAppDomain);
         }
 
-        static void TraverseNextElement(XElement currentElement, bool isInsideControlTemplate, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        static void TraverseNextElement(XElement currentElement, bool isInsideControlTemplate, AssembliesInspector reflectionOnSeparateAppDomain)
         {
             if (GeneratingCSharpCode.IsControlTemplate(currentElement))
             {
@@ -72,7 +72,7 @@ namespace OpenSilver.Compiler
             }
         }
 
-        private static bool HasAttribute(XElement cp, string attributeName, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        private static bool HasAttribute(XElement cp, string attributeName, AssembliesInspector reflectionOnSeparateAppDomain)
         {
             bool found = cp.Attribute(attributeName) != null;
             if (!found)

@@ -12,8 +12,16 @@ param (
     $BUILD_SIMULATOR = $false
 )
 
-# DEFAULT RELEASE BUILD
-$BUILD_PARAMS = "/p:DebugSymbols=false /p:DebugType=None /p:Optimize=true"
+if ($true -eq $COPY_PDB) {
+    $BUILD_PARAMS = "/p:DebugSymbols=true /p:DebugType=Full /p:Optimize=false"
+}
+else {
+    # DEFAULT RELEASE BUILD
+    $BUILD_PARAMS = "/p:DebugSymbols=false /p:DebugType=None /p:Optimize=true"
+    (Get-Content -path ..\build\nuspec\OpenSilver.nuspec -Raw -Encoding UTF8) `
+        -replace '<file src(.+)\.pdb" />', '<!-- replaced -->' `
+        | Out-File -FilePath ..\build\nuspec\OpenSilver.nuspec -Encoding UTF8
+}
 
 Push-Location ".."
 try {
@@ -36,20 +44,13 @@ try {
 
     # Compiler
     xcopy /y "src\Compiler\Compiler\bin\OpenSilver\$OS_CONFIGURATION\net461\OpenSilver.Compiler.*" "src\packages\$OS_NAME.$OS_BUILD_VERSION\tools\"
+    xcopy /y "src\Compiler\Compiler\bin\OpenSilver\$OS_CONFIGURATION\net461\Mono.Cecil.*" "src\packages\$OS_NAME.$OS_BUILD_VERSION\tools\"
     xcopy /y "src\Compiler\Compiler.ResourcesExtractor\bin\OpenSilver\Release\net461\OpenSilver.Compiler.Resources.*" "src\packages\$OS_NAME.$OS_BUILD_VERSION\tools\"
 
     # Targets
-    xcopy /y "src\Targets\OpenSilver.targets" "src\packages\$OS_NAME.$OS_BUILD_VERSION\build\"
+    xcopy /y "src\Targets\$OS_NAME.targets" "src\packages\$OS_NAME.$OS_BUILD_VERSION\build\"
     xcopy /y "src\Targets\OpenSilver.Common.targets" "src\packages\$OS_NAME.$OS_BUILD_VERSION\build\"
 
-    if ($true -eq $COPY_PDB) {
-        $BUILD_PARAMS = "/p:DebugSymbols=true /p:DebugType=Full /p:Optimize=false"
-    }
-    else {
-        (Get-Content -path build\nuspec\OpenSilver.nuspec -Raw -Encoding UTF8) `
-            -replace '<file src(.+)\.pdb" />', '<!-- replaced -->' `
-            | Out-File -FilePath build\nuspec\OpenSilver.nuspec -Encoding UTF8        
-    }
 
     # Build
     Invoke-Expression "&'$MSBUILD' .\build\slnf\OpenSilver.slnf /p:Configuration=$OS_CONFIGURATION /consoleloggerparameters:ErrorsOnly /t:""clean;build"" $BUILD_PARAMS"
@@ -64,7 +65,7 @@ try {
             md temp
         }
         echo "Opensilver $OS_VERSION ($date)" > temp/Version.txt
-        .\nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=$OS_NAME;PackageVersion=$OS_VERSION;Configuration=$OS_CONFIGURATION;Target=OpenSilver"
+        .\nuget.exe pack nuspec\OpenSilver.nuspec -OutputDirectory "output/OpenSilver" -Properties "PackageId=$OS_NAME;PackageVersion=$OS_VERSION;Configuration=$OS_CONFIGURATION;Target=$OS_NAME"
 
         if ($true -eq $BUILD_SIMULATOR) {
             Invoke-Expression "&'$MSBUILD' .\slnf\OpenSilver.Simulator.slnf /p:Configuration=$OS_CONFIGURATION /consoleloggerparameters:ErrorsOnly /t:""clean;restore;build"""

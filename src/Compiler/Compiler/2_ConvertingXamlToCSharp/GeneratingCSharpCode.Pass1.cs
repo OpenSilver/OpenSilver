@@ -27,12 +27,12 @@ namespace OpenSilver.Compiler
             private readonly ConversionSettings _settings;
             private readonly string _fileNameWithPathRelativeToProjectRoot;
             private readonly string _assemblyNameWithoutExtension;
-            private readonly ReflectionOnSeparateAppDomainHandler _reflectionOnSeparateAppDomain;
+            private readonly AssembliesInspector _reflectionOnSeparateAppDomain;
             
             public GeneratorPass1(XDocument doc,
                 string assemblyNameWithoutExtension,
                 string fileNameWithPathRelativeToProjectRoot,
-                ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+                AssembliesInspector reflectionOnSeparateAppDomain,
                 ConversionSettings settings)
             {
                 _reader = new XamlReader(doc);

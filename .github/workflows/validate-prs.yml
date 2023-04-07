@@ -33,10 +33,12 @@ jobs:
       - name: Copy Compiler SL Assemblies
         run: |
           cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
+          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil*dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
           cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.${{ env.actual-version }}/tools/;
       - name: Copy Compiler UWP Assemblies
         run: |
           cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/OpenSilver.Compiler*dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
+          cp src/Compiler/Compiler/bin/OpenSilver/Release/net461/Mono.Cecil*dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
           cp src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll src/packages/OpenSilver.UWPCompatible.${{ env.actual-version }}/tools/;
       - name: Copy Targets
         run: |
@@ -74,6 +76,8 @@ jobs:
         shell: bash
       - name: Verify Building of OpenSilver Solution SL Configuration
         run: msbuild src/OpenSilver.sln -p:Configuration=SL -clp:ErrorsOnly -restore
+      - name: Run Compiler Tests SL Configuration
+        run: dotnet test src/Compiler/Tests/Compiler.Tests/bin/SL/net472/Compiler.Tests.dll
       - name: Run Runtime Tests SL Configuration
         run: dotnet test src/Tests/Runtime.OpenSilver.Tests/bin/SL/net472/Runtime.OpenSilver.Tests.dll
       - name: Run Analyzers Tests Configuration
@@ -85,6 +89,8 @@ jobs:
         shell: bash
       - name: Verify Building of OpenSilver Solution UWP Configuration
         run: msbuild src/OpenSilver.sln -p:Configuration=UWP -clp:ErrorsOnly -restore
+      - name: Run Compiler Tests UWP Configuration
+        run: dotnet test src/Compiler/Tests/Compiler.Tests/bin/UWP/net472/Compiler.Tests.dll
       - name: Run Runtime Tests UWP Configuration
         run: dotnet test src/Tests/Runtime.OpenSilver.Tests/bin/UWP/net472/Runtime.OpenSilver.Tests.dll
       - name: Drop all bin and obj folders
