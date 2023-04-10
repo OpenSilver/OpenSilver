@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace Runtime.OpenSilver.PublicAPI.Interop
@@ -105,6 +106,7 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
 
             var secs = (double)ms / 1000d;
             int bigTimeIndex = 0;
+            int interop2CallCount = Interop2Caller.CallCount;
             while (true)
             {
                 await Task.Delay(ms);
@@ -115,6 +117,10 @@ namespace Runtime.OpenSilver.PublicAPI.Interop
                 if (needsResetPrevCallCount)
                     _bigTimeLast.Clear();
                 DumpCallInfos(_all, "ALL");
+                var interop2Diff = Interop2Caller.CallCount - interop2CallCount;
+                if (interop2Diff > 0)
+                    Console.WriteLine($"*** INTEROP2: +{interop2Diff} ({Interop2Caller.CallCount})");
+                interop2CallCount = Interop2Caller.CallCount;
             }
         }
 

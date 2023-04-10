@@ -55,6 +55,7 @@
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
+		<Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.JsCall.cs" />
 		<Compile Include="Diagnostics\DebugInfo.cs" />
 		<Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
 		<Compile Include="OpenSilver\Internal\Clipboard.cs" />
@@ -116,6 +117,7 @@
 		<Compile Include="OpenSilver\Internal\IJavaScriptConvertible.cs" />
 		<Compile Include="PublicAPI\Interop2\BulkInterop2.cs" />
 		<Compile Include="PublicAPI\Interop2\Interop2.cs" />
+		<Compile Include="PublicAPI\Interop2\Interop2OldImplementation.cs" />
 		<Compile Include="PublicAPI\Interop2\JsCallAttribute.cs" />
 		<Compile Include="PublicAPI\Interop\BulkExecuteJavascriptAsync.cs" />
 		<Compile Include="PublicAPI\Interop2\Interop2Caller.cs" />
@@ -245,6 +247,7 @@
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Controls\WrapPanelHelper.cs" />
+		<Compile Include="System.Windows.Input\InputManager.JsCall.cs" />
 		<Compile Include="System.Windows.input\MouseEventArgs.JsArgs.cs" />
 		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
 		<Compile Include="System.Windows.Markup\SetterValueConverter.cs" />

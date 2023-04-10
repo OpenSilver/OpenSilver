@@ -14,4 +14,5 @@ namespace OpenSilver
             this._jsCall = jsCall;
         }
     }
+
 }

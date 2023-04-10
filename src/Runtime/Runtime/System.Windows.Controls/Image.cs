@@ -310,7 +310,7 @@ namespace Windows.UI.Xaml.Controls
             if (Source != null)
             {
                 var imageSrc = await Source.GetDataStringAsync(this);
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc ?? string.Empty, true);
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc ?? string.Empty);
             }
             else
             {

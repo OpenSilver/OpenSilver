@@ -14,6 +14,8 @@ namespace OpenSilver
         {
             public string Javascript;
             public int Index;
+            // only for debugging/testing
+            public string Enum;
             public string FuncName;
         }
 
@@ -30,8 +32,14 @@ namespace OpenSilver
 
         private bool PreallocateCapacity => _maxCapacity > 0;
 
-        public BulkInterop2( int maxCapacity = -1)
+        private Dispatcher _dispatcher;
+
+        // for testing -- this will execute each JS instantly, so that it's easier to find javascript errors
+        public bool ExecuteInstantly { get; set; } = false;
+
+        public BulkInterop2(Dispatcher dispatcher, int maxCapacity = -1)
         {
+            _dispatcher = dispatcher;
             _maxCapacity = maxCapacity;
             _cachedCalls = PreallocateCapacity ? new List<SingleCall>(_maxCapacity) : new List<SingleCall>();
             if (PreallocateCapacity)
@@ -50,16 +58,33 @@ namespace OpenSilver
 
         private static object CallJavascriptFunctionImpl(string funcName, int subId, string args)
         {
-            return INTERNAL_ExecuteJavaScript.ExecuteJavaScriptFuncSync("callFunction", funcName, subId, args);
+            // note: args is already pre-processed
+            return Interop2Caller.CallJavascriptFunctionWithAllArgs(funcName, subId, args);
         }
 
         public void AddJavascript<T>(T subId, params object[] args) where T : Enum
         {
             var funcName = Interop2.CreateFunctionAndReturnName<T>();
+            if (ExecuteInstantly)
+            {
+                var index = (int)(object)subId;
+                var js = Interop2Caller.ConvertArgsToString(args);
+                try
+                {
+                    CallJavascriptFunctionImpl(funcName, index, js);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"FATAL BulkInterop2 execute: {funcName}:{subId}  {js}\r\n{e}");
+                }
+                return;
+            }
+
             if (PreallocateCapacity)
             {
                 _cachedCalls[_index].Javascript = Interop2Caller.ConvertArgsToString(args);
                 _cachedCalls[_index].Index = (int)(object)subId;
+                _cachedCalls[_index].Enum= subId.ToString();
                 _cachedCalls[_index].FuncName = funcName;
             } 
             else
@@ -67,6 +92,7 @@ namespace OpenSilver
                 {
                     Javascript = Interop2Caller.ConvertArgsToString(args),
                     Index = (int)(object)subId,
+                    Enum= subId.ToString(),
                     FuncName = funcName,
                 });
 
@@ -77,6 +103,9 @@ namespace OpenSilver
 
         public void Execute()
         {
+            if (_index < 1)
+                return;
+
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < _index; ++i)
             {
@@ -87,7 +116,7 @@ namespace OpenSilver
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"FATAL BulkInterop2 execute: {call.FuncName}:{call.Index}  {call.Javascript}\r\n{e}");
+                    Console.WriteLine($"FATAL BulkInterop2 execute: {call.FuncName}:{call.Enum}  {call.Javascript}\r\n{e}");
                 }
                 if (PreallocateCapacity)
                     call.Javascript = call.FuncName = null;
@@ -101,12 +130,12 @@ namespace OpenSilver
                 _cachedCalls.Clear();
         }
 
-        public void PostponeExecute(Dispatcher dispatcher)
+        public void PostponeExecute()
         {
             if (_postponedExecute)
                 return; // already postponed
             _postponedExecute = true;
-            dispatcher.BeginInvoke(Execute);
+            _dispatcher.BeginInvoke(Execute);
         }
     }
 }

@@ -105,9 +105,26 @@ window.onCallBack = (function () {
     return {
         OnCallbackFromJavaScript: function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue) {
             let formattedArgs = prepareCallbackArgs(callbackArgsObject);
-            const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
-            if (returnValue) {
-                return res;
+            /* protect against :
+
+Uncaught ExitStatus ExitStatus
+    at quit_ (localhost?55591/_framework/dotnet.6.0.15.4de83zsqbd.js:1:251)
+    at exit (localhost?55591/_framework/dotnet.6.0.15.4de83zsqbd.js:1:234777)
+    at _exit (localhost?55591/_framework/dotnet.6.0.15.4de83zsqbd.js:1:106255)
+    at $func111 (undefined:1:38087)
+    at $func2230 (undefined:1:584627)
+    at $func3483 (undefined:1:836327)
+    ....
+
+            */
+            try { 
+                const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
+                if (returnValue) {
+                    return res;
+                }
+            } catch (e) { 
+                // note: stacktrace is useless
+                console.log('ERROR in OnCallbackFromJavaScript: ' + callbackId); 
             }
         },
 

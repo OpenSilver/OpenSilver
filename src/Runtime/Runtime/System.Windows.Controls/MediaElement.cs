@@ -324,7 +324,7 @@ namespace Windows.UI.Xaml.Controls
                     }
 
                     // Update the "src" property of the <video> or <audio> tag
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(control._mediaElement, "src", valueForHtml5SourceProperty, true);
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(control._mediaElement, "src", valueForHtml5SourceProperty);
                 }
                 else
                 {

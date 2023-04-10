@@ -106,7 +106,7 @@ namespace Windows.UI.Xaml.Input
             if (Pointer.INTERNAL_captured == null)
             {
                 //this is just in case the handler of this event starts a capture of the Pointer: we do not want to reroute it right away.
-                Interop2.ExecuteJavaScript(JsCall.DoNotRerouteTrue, jsEventArg);
+                Interop2.Void(JsCall.DoNotRerouteTrue, jsEventArg);
                 //todo: check if the comment above is always right (questionnable if capturing element is another one than the one that threw this event).
                 return true;
             }
@@ -114,12 +114,12 @@ namespace Windows.UI.Xaml.Input
             {
                 if (Pointer.INTERNAL_captured == element)
                 {
-                    Interop2.ExecuteJavaScript(JsCall.DoNotRerouteTrue, jsEventArg);
+                    Interop2.Void(JsCall.DoNotRerouteTrue, jsEventArg);
                     return true;
                 }
                 else
                 {
-                    return Interop2.ExecuteJavaScriptBoolean(JsCall.TestDoNotReroute , jsEventArg);
+                    return Interop2.Boolean(JsCall.TestDoNotReroute , jsEventArg);
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace Windows.UI.Xaml.Input
             // If the element has captured the pointer, we do not want the Document to reroute the event to the element because it would result in the event being handled twice.
             if (Pointer.INTERNAL_captured == null || Pointer.INTERNAL_captured == element)
             {
-                Interop2.ExecuteJavaScript(JsCall.DoNotRerouteTrue, jsEventArg);
+                Interop2.Void(JsCall.DoNotRerouteTrue, jsEventArg);
             }
 
             AddKeyModifiers(jsEventArg);
@@ -143,7 +143,7 @@ namespace Windows.UI.Xaml.Input
 #else
             VirtualKeyModifiers keyModifiers = VirtualKeyModifiers.None;
 #endif
-            if (Interop2.ExecuteJavaScriptBoolean(JsCall.ShiftKey , jsEventArg) )
+            if (Interop2.Boolean(JsCall.ShiftKey , jsEventArg) )
             {
 #if MIGRATION
                 keyModifiers |= ModifierKeys.Shift;
@@ -151,7 +151,7 @@ namespace Windows.UI.Xaml.Input
                 keyModifiers |= VirtualKeyModifiers.Shift;
 #endif
             }
-            if (Interop2.ExecuteJavaScriptBoolean(JsCall.AltKey , jsEventArg) )
+            if (Interop2.Boolean(JsCall.AltKey , jsEventArg) )
             {
 #if MIGRATION
                 keyModifiers |= ModifierKeys.Alt;
@@ -159,7 +159,7 @@ namespace Windows.UI.Xaml.Input
                 keyModifiers |= VirtualKeyModifiers.Menu;
 #endif
             }
-            if (Interop2.ExecuteJavaScriptBoolean(JsCall.CtrlKey , jsEventArg))
+            if (Interop2.Boolean(JsCall.CtrlKey , jsEventArg))
             {
 #if MIGRATION
                 keyModifiers |= ModifierKeys.Control;
@@ -175,8 +175,8 @@ namespace Windows.UI.Xaml.Input
             {
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
                 string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
-                string type = Interop2.ExecuteJavaScriptString(JsCall.GetType, sEvent);
-                var concatenated = Interop2.ExecuteJavaScriptString(type.StartsWith("touch") ? JsCall.GetTouchXY : JsCall.GetPageXY, sEvent);
+                string type = Interop2.String(JsCall.GetType, sEvent);
+                var concatenated = Interop2.String(type.StartsWith("touch") ? JsCall.GetTouchXY : JsCall.GetPageXY, sEvent);
                 int sepIndex = concatenated.IndexOf('|');
                 string pointerAbsoluteXAsString = concatenated.Substring(0, sepIndex);
                 string pointerAbsoluteYAsString = concatenated.Substring(sepIndex + 1);
@@ -196,7 +196,7 @@ namespace Windows.UI.Xaml.Input
                 double windowRootTop;
 
                 // Hack to improve the Simulator performance by making only one interop call rather than two:
-                string concatenated = Interop2.ExecuteJavaScriptString(JsCall.SetPointerAbsolutePos , windowRootDomElement); 
+                string concatenated = Interop2.String(JsCall.SetPointerAbsolutePos , windowRootDomElement); 
                 int sepIndex = concatenated.IndexOf('|');
                 if (sepIndex > -1)
                 {

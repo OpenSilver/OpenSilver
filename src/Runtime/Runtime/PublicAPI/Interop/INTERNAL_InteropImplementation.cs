@@ -122,6 +122,9 @@ namespace CSHTML5
             return javascript;
         }
 
+        // used in Interop2
+        internal static int NewReferenceId() => _refIdGenerator.NewId();
+
         internal static object ExecuteJavaScript_Implementation(
             string javascript,
             bool runAsynchronously,

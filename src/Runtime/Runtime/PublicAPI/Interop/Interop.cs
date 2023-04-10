@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using CSHTML5;
 using OpenSilver.Internal;
 using Runtime.OpenSilver.PublicAPI.Interop;
 
@@ -160,6 +161,14 @@ namespace OpenSilver
         public static T1 ExecuteJavaScriptGetResult<T1>(string javascript)
         {
             JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
+            var result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: true);
+            T1 t1 = ConvertJavascriptResult<T1>(result);
+            return t1;
+        }
+        public static T1 ExecuteJavaScriptGetResult<T1>(string javascript, params object[] variables)
+        {
+            JavascriptCallsTracker.Instance.AddJavascriptCall(javascript);
+            javascript = INTERNAL_InteropImplementation.ReplaceJSArgs(javascript, variables);
             var result = INTERNAL_ExecuteJavaScript.ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: true);
             T1 t1 = ConvertJavascriptResult<T1>(result);
             return t1;
