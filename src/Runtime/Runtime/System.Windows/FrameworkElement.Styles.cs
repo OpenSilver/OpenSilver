@@ -260,12 +260,12 @@ namespace Windows.UI.Xaml
         }
 
         // Cache the ThemeStyle for the current instance if there is a DefaultStyleKey specified for it
-        internal Style ThemeStyle
+        internal override Style ThemeStyle
         {
             get { return _themeStyleCache; }
         }
 
-        internal Style ImplicitStyle
+        internal override Style ImplicitStyle
         {
             get { return _implicitStyleCache; }
         }
@@ -285,7 +285,7 @@ namespace Windows.UI.Xaml
         }
 
         // Indicates if there are any implicit styles in the ancestry
-        internal bool ShouldLookupImplicitStyles
+        internal override bool ShouldLookupImplicitStyles
         {
             get { return ReadInternalFlag(InternalFlags.ShouldLookupImplicitStyles); }
             set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
@@ -311,17 +311,22 @@ namespace Windows.UI.Xaml
 
         // Indicates that the ThemeStyleProperty full fetch has been
         // performed atleast once on this node
-        internal bool HasThemeStyleEverBeenFetched
+        internal override bool HasThemeStyleEverBeenFetched
         {
             get { return ReadInternalFlag(InternalFlags.HasThemeStyleEverBeenFetched); }
             set { WriteInternalFlag(InternalFlags.HasThemeStyleEverBeenFetched, value); }
         }
 
         // Indicates that the StyleProperty has been set locally on this element
-        internal bool HasLocalStyle
+        internal override bool HasLocalStyle
         {
             get { return ReadInternalFlag(InternalFlags.HasLocalStyle); }
             set { WriteInternalFlag(InternalFlags.HasLocalStyle, value); }
+        }
+
+        internal override void UpdateHasLocalStyle()
+        {
+            HasLocalStyle = ReadLocalValueInternal(StyleProperty) != DependencyProperty.UnsetValue;
         }
     }
 }

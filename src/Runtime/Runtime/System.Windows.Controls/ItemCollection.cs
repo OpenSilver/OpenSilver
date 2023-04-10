@@ -34,9 +34,9 @@ namespace Windows.UI.Xaml.Controls
         private bool _isUsingListWrapper;
         private EnumerableWrapper _listWrapper;
 
-        private FrameworkElement _modelParent;
+        private FrameworkElementBase _modelParent;
 
-        internal ItemCollection(FrameworkElement parent) : base(true)
+        internal ItemCollection(FrameworkElementBase parent) : base(true)
         {
             this._modelParent = parent;
         }

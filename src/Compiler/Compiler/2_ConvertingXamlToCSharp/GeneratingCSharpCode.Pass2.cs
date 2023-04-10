@@ -124,7 +124,7 @@ namespace OpenSilver.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"private static global::{_metadata.SystemWindowsNS}.FrameworkElement {MethodName}(global::{_metadata.SystemWindowsNS}.FrameworkElement {TemplateOwner}, {XamlContextClass} {XamlContext})")
+                    builder.AppendLine($"private static global::{_metadata.SystemWindowsNS}.FrameworkElementBase {MethodName}(global::{_metadata.SystemWindowsNS}.FrameworkElementBase {TemplateOwner}, {XamlContextClass} {XamlContext})")
                         .AppendLine("{")
                         .Append(StringBuilder.ToString());
                     builder.AppendLine($"return {Root};")

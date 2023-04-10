@@ -994,7 +994,7 @@ namespace Windows.UI.Xaml.Controls
                     //---------------------------------------------------
 
                     // Apply the data template
-                    result = ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
+                    result = (FrameworkElement)ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
                     result.DataContext = displayElement;
                 }
                 else

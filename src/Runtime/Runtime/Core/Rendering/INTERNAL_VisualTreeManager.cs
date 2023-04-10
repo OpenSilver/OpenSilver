@@ -269,7 +269,7 @@ namespace CSHTML5.Internal
                 // before the "unloaded" event of the children)
                 element._isLoaded = false;
 
-                if (element is FrameworkElement fe)
+                if (element is FrameworkElementBase fe)
                 {
                     // Detach resizeSensor
                     fe.DetachResizeSensorFromDomElement();
@@ -590,8 +590,6 @@ if(nextSibling != undefined) {
 
             // Determine if an additional DIV for handling margins is needed:
             object additionalOutsideDivForMargins = null;
-            var margin = ((FrameworkElement)child).Margin;
-            bool containsNegativeMargins = (margin.Left < 0d || margin.Top < 0d || margin.Right < 0d || margin.Bottom < 0d);
             bool isADivForMarginsNeeded = !(parent is Canvas) // Note: In a Canvas, we don't want to add the additional DIV because there are no margins and we don't want to interfere with the pointer events by creating an additional DIV.
                                             && !(child is Inline); // Note: inside a TextBlock we do not want the HTML DIV because we want to create HTML SPAN elements only (otherwise there would be unwanted line returns).
 
@@ -660,8 +658,8 @@ if(nextSibling != undefined) {
             }
 
             // Initialize the "Width" and "Height" of the child DOM structure:
-            if (child is FrameworkElement)
-                FrameworkElement.INTERNAL_InitializeOuterDomElementWidthAndHeight(((FrameworkElement)child), outerDomElement);
+            if (child is FrameworkElementBase frameworkElementBase)
+                frameworkElementBase.INTERNAL_InitializeOuterDomElementSize(outerDomElement);
 
             // Update the DOM structure of the Child (for example, if the child is a Grid, this will render its rows and columns):
             child.INTERNAL_UpdateDomStructureIfNecessary();
@@ -740,9 +738,9 @@ if(nextSibling != undefined) {
             // SET "ISLOADED" PROPERTY AND CALL "ONATTACHED" EVENT:
             //--------------------------------------------------------
 
-            if (child is FrameworkElement)
+            if (child is FrameworkElementBase frameworkElement)
             {
-                ((FrameworkElement)child).LoadResources();
+                frameworkElement.LoadResources();
             }
 
             // Tell the control that it is now present into the visual tree:
@@ -796,9 +794,9 @@ if(nextSibling != undefined) {
 
             // Raise the "SizeChanged" event: (note: in XAML, the "SizeChanged" event is called before the "Loaded" event)
             // IMPORTANT: This event needs to be raised AFTER the "OnApplyTemplate" and AFTER the "IsLoaded=true" (for example, it is used in the ScrollBar implementation).
-            if (child is FrameworkElement)
+            if (child is FrameworkElementBase feb)
             {
-                ((FrameworkElement)child).INTERNAL_SizeChangedWhenAttachedToVisualTree();
+                feb.INTERNAL_SizeChangedWhenAttachedToVisualTree();
             }
 
 #if PERFSTAT
@@ -813,7 +811,7 @@ if(nextSibling != undefined) {
 #endif
 
             // Raise the "Loaded" event: (note: in XAML, the "loaded" event of the children is called before the "loaded" event of the parent)
-            if (child is FrameworkElement fe)
+            if (child is FrameworkElementBase fe)
             {
                 fe.RaiseLoadedEvent();
                 fe.InvalidateMeasure();

@@ -28,7 +28,7 @@ namespace Windows.UI.Xaml
 {
     internal static class StyleHelper
     {
-        private delegate void SetStyleValueDelegate(FrameworkElement fe, DependencyProperty dp, object value);
+        private delegate void SetStyleValueDelegate(FrameworkElementBase fe, DependencyProperty dp, object value);
 
         private static readonly SetStyleValueDelegate _setLocalStyleValueDelegate =
             new SetStyleValueDelegate((fe, dp, v) => fe.SetLocalStyleValue(dp, v));
@@ -40,7 +40,7 @@ namespace Windows.UI.Xaml
         //  This method
         //  1. Updates the style cache for the given fe
         //
-        internal static void UpdateStyleCache(FrameworkElement fe, Style oldStyle, Style newStyle, ref Style styleCache)
+        internal static void UpdateStyleCache(FrameworkElementBase fe, Style oldStyle, Style newStyle, ref Style styleCache)
         {
             SealStyle(fe, newStyle);
 
@@ -53,7 +53,7 @@ namespace Windows.UI.Xaml
         //  This method
         //  1. Updates the theme style cache for the given fe
         //
-        internal static void UpdateThemeStyleCache(FrameworkElement fe, Style oldStyle, Style newStyle, ref Style themeStyleCache)
+        internal static void UpdateThemeStyleCache(FrameworkElementBase fe, Style oldStyle, Style newStyle, ref Style themeStyleCache)
         {
             SealStyle(fe, newStyle);
 
@@ -62,13 +62,13 @@ namespace Windows.UI.Xaml
             UpdateInstanceData(fe, oldStyle, newStyle, _setThemeStyleValueDelegate);
         }
 
-        internal static void UpdateImplicitStyleCache(FrameworkElement fe, Style oldStyle, Style newStyle, ref Style implicitStyleCache)
+        internal static void UpdateImplicitStyleCache(FrameworkElementBase fe, Style oldStyle, Style newStyle, ref Style implicitStyleCache)
         {
             SealStyle(fe, newStyle);
 
             implicitStyleCache = newStyle;
 
-            fe.HasLocalStyle = fe.ReadLocalValueInternal(FrameworkElement.StyleProperty) != DependencyProperty.UnsetValue;
+            fe.UpdateHasLocalStyle();
 
             // Local style takes priority over an implicit style.
             if (!fe.HasLocalStyle)
@@ -82,7 +82,7 @@ namespace Windows.UI.Xaml
         //  1. Is called whenever a Style is [un]applied to an FE
         //  2. It updates the per-instance style data
         //
-        private static void UpdateInstanceData(FrameworkElement fe, Style oldStyle, Style newStyle, SetStyleValueDelegate setValue)
+        private static void UpdateInstanceData(FrameworkElementBase fe, Style oldStyle, Style newStyle, SetStyleValueDelegate setValue)
         {
             Dictionary<DependencyProperty, object> newStyleValues = newStyle?.EffectiveValues;
 
@@ -116,7 +116,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal static Style GetThemeStyle(FrameworkElement fe)
+        internal static Style GetThemeStyle(FrameworkElementBase fe)
         {
             // If this is the first time that the ThemeStyleProperty
             // is being fetched then mark it such
@@ -189,7 +189,7 @@ namespace Windows.UI.Xaml
             return newThemeStyle;
         }
 
-        internal static void SealStyle(FrameworkElement fe, Style style)
+        internal static void SealStyle(FrameworkElementBase fe, Style style)
         {
             if (style != null)
             {

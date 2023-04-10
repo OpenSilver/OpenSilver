@@ -30,47 +30,24 @@ namespace Windows.UI.Xaml
 {
     public partial class FrameworkElement
     {
-        /// <summary>
-        /// Identifies the <see cref="CustomLayout"/> dependency 
-        /// property.
-        /// </summary>
-        public static readonly DependencyProperty CustomLayoutProperty =
-            DependencyProperty.Register(
-                nameof(CustomLayout),
-                typeof(bool),
-                typeof(FrameworkElement),
-                new PropertyMetadata(false, OnCustomLayoutChanged, CoerceCustomLayout));
-
-        /// <summary>
-        /// Enable or disable measure/arrange layout system in a sub part
-        /// </summary>
-        public bool CustomLayout
+        protected override void OnCustomLayoutChanged(DependencyPropertyChangedEventArgs e)
         {
-            get => (bool)GetValue(CustomLayoutProperty);
-            set => SetValue(CustomLayoutProperty, value);
-        }
-
-        private static void OnCustomLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-            fe.UseCustomLayout = (bool)e.NewValue;
+            UseCustomLayout = (bool)e.NewValue;
             
-            if (fe.UseCustomLayout && fe.IsCustomLayoutRoot)
+            if (UseCustomLayout && IsCustomLayoutRoot)
             {
-                fe.LayoutRootSizeChanged += new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
+                LayoutRootSizeChanged += new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
             }
             else
             {
-                fe.LayoutRootSizeChanged -= new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
+                LayoutRootSizeChanged -= new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
             }
 
-            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
+            InvalidateForceInheritPropertyOnChildren(e.Property);
         }
 
-        private static object CoerceCustomLayout(DependencyObject d, object baseValue)
+        protected override object CoerceCustomLayout(object baseValue)
         {
-            FrameworkElement fe = (FrameworkElement)d;
-
             // We must be true if our parent is true, but we can be
             // either true or false if our parent is false.
             //
@@ -78,7 +55,7 @@ namespace Windows.UI.Xaml
             // if our parent is false, but we can always be true.
             if (!(bool)baseValue)
             {
-                DependencyObject parent = GetLayoutParent(fe);
+                DependencyObject parent = GetLayoutParent(this);
                 if (parent == null || !(bool)parent.GetValue(CustomLayoutProperty))
                 {
                     return false;

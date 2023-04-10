@@ -369,7 +369,7 @@ namespace Windows.UI.Xaml
             {
                 GridNotLogical gnl => GetLayoutParent(gnl),
                 UIElement uie => uie,
-                null when element is FrameworkElement fe && fe.Parent is Popup popup => popup.PopupRoot?.Content,
+                null when element is FrameworkElementBase fe && fe.GetParent() is Popup popup => popup.PopupRoot?.Content,
                 _ => null,
             };
 
@@ -393,18 +393,21 @@ namespace Windows.UI.Xaml
                 if (RenderedVisualBounds != _visualBounds)
                 {
                     Size renderedSize = _visualBounds.Size;
-                    FrameworkElement fe = this as FrameworkElement;
 
-                    if (RenderedVisualBounds.Width != renderedSize.Width && fe.IsAutoWidthOnCustomLayoutInternal)
+                    // todo:
+                    if (this is FrameworkElement fe)
                     {
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement).width =
-                            $"{renderedSize.Width.ToInvariantString()}px";
-                    }
+                        if (RenderedVisualBounds.Width != renderedSize.Width && fe.IsAutoWidthOnCustomLayoutInternal)
+                        {
+                            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement).width =
+                                $"{renderedSize.Width.ToInvariantString()}px";
+                        }
 
-                    if (RenderedVisualBounds.Height != renderedSize.Height && fe.IsAutoHeightOnCustomLayoutInternal)
-                    {
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement).height =
-                            $"{renderedSize.Height.ToInvariantString()}px";
+                        if (RenderedVisualBounds.Height != renderedSize.Height && fe.IsAutoHeightOnCustomLayoutInternal)
+                        {
+                            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement).height =
+                                $"{renderedSize.Height.ToInvariantString()}px";
+                        }
                     }
 
                     RenderedVisualBounds = _visualBounds;

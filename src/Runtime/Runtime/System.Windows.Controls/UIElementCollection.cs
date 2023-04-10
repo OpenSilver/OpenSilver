@@ -25,7 +25,7 @@ namespace Windows.UI.Xaml.Controls
     /// <exclude/>
     public class UIElementCollection : PresentationFrameworkCollection<UIElement>
     {
-        internal UIElementCollection(UIElement visualParent, FrameworkElement logicalParent) : base(true)
+        internal UIElementCollection(UIElement visualParent, FrameworkElementBase logicalParent) : base(true)
         {
             // Note: visualParent should never be null. However because we have Panels which rely on other Panels
             // for their rendering (DockPanel and TileViewPanel use a Grid) we have to make an exception for these
@@ -41,7 +41,7 @@ namespace Windows.UI.Xaml.Controls
 
         internal UIElement VisualParent { get; }
 
-        internal FrameworkElement LogicalParent { get; }
+        internal FrameworkElementBase LogicalParent { get; }
 
         internal override void AddOverride(UIElement value)
         {

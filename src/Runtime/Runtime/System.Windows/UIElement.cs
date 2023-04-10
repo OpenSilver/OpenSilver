@@ -696,10 +696,9 @@ namespace Windows.UI.Xaml
                         style.display = uiElement._previousValueOfDisplayCssProperty;
 
                     // The alignment was not calculated when the object was hidden, so we need to calculate it now:
-                    if (uiElement is FrameworkElement && uiElement.INTERNAL_VisualParent != null) // Note: The "INTERNAL_VisualParent" can be "null" for example if we are changing the visibility of a "PopupRoot" control.
+                    if (uiElement is FrameworkElementBase fe && uiElement.INTERNAL_VisualParent != null) // Note: The "INTERNAL_VisualParent" can be "null" for example if we are changing the visibility of a "PopupRoot" control.
                     {
-                        FrameworkElement.INTERNAL_ApplyHorizontalAlignmentAndWidth((FrameworkElement)uiElement, ((FrameworkElement)uiElement).HorizontalAlignment); //todo-perfs: only call the relevant portion of the code?
-                        FrameworkElement.INTERNAL_ApplyVerticalAlignmentAndHeight((FrameworkElement)uiElement, ((FrameworkElement)uiElement).VerticalAlignment); //todo-perfs: only call the relevant portion of the code?
+                        fe.INTERNAL_ApplyAlignmentAndSize();                        
                     }
                 }
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
@@ -899,7 +898,7 @@ namespace Windows.UI.Xaml
 
         internal static bool EnablePointerEventsBase(UIElement uie)
         {
-            return (bool)uie.GetValue(FrameworkElement.IsEnabledProperty) &&
+            return (bool)uie.GetValue(FrameworkElementBase.IsEnabledProperty) &&
                    uie.IsHitTestVisible;
         }
 
@@ -1221,9 +1220,9 @@ namespace Windows.UI.Xaml
 
         internal static void SynchronizeForceInheritProperties(UIElement uie, DependencyObject parent)
         {
-            if (!(bool)parent.GetValue(FrameworkElement.IsEnabledProperty))
+            if (!(bool)parent.GetValue(FrameworkElementBase.IsEnabledProperty))
             {
-                uie.CoerceValue(FrameworkElement.IsEnabledProperty);
+                uie.CoerceValue(FrameworkElementBase.IsEnabledProperty);
             }
 
             if (!(bool)parent.GetValue(IsHitTestVisibleProperty))
@@ -1237,7 +1236,7 @@ namespace Windows.UI.Xaml
             }
 
             // visual parent does not always match layout parent, so we cannot use it.
-            uie.CoerceValue(FrameworkElement.CustomLayoutProperty);
+            uie.CoerceValue(FrameworkElementBase.CustomLayoutProperty);
         }
 
         internal void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)

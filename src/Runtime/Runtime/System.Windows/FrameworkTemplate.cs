@@ -48,14 +48,14 @@ namespace Windows.UI.Xaml
             set { CheckSealed(); _template = value; }
         }
 
-        internal bool ApplyTemplateContent(FrameworkElement container)
+        internal bool ApplyTemplateContent(FrameworkElementBase container)
         {
             Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
 
             if (Template != null)
             {
-                FrameworkElement visualTree = Template.LoadContent(container);
-                container.TemplateChild = visualTree;
+                FrameworkElementBase visualTree = Template.LoadContent(container);
+                container.SetTemplateChild(visualTree);
                 
                 return visualTree != null;
             }
@@ -65,7 +65,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal virtual bool BuildVisualTree(FrameworkElement container)
+        internal virtual bool BuildVisualTree(FrameworkElementBase container)
         {
             return false;
         }
@@ -74,7 +74,7 @@ namespace Windows.UI.Xaml
         /// Creates an instance of the Template. Intented to be called for templates that have no owner, such as DataTemplates (not ControlTemplates).
         /// </summary>
         /// <returns>The instantiated template.</returns>
-        internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate()
+        internal FrameworkElementBase INTERNAL_InstantiateFrameworkTemplate()
         {
             if (Template != null)
             {
@@ -142,7 +142,7 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkTemplate),
                 null);
 
-        internal static INameScope GetTemplateNameScope(FrameworkElement fe)
+        internal static INameScope GetTemplateNameScope(FrameworkElementBase fe)
         {
             if (fe is null)
             {
@@ -152,7 +152,7 @@ namespace Windows.UI.Xaml
             return (INameScope)fe.GetValue(TemplateNameScopeProperty);
         }
 
-        internal static void SetTemplateNameScope(FrameworkElement fe, INameScope namescope)
+        internal static void SetTemplateNameScope(FrameworkElementBase fe, INameScope namescope)
         {
             if (fe is null)
             {
@@ -166,9 +166,9 @@ namespace Windows.UI.Xaml
     internal sealed class TemplateContent
     {
         private readonly XamlContext _xamlContext;
-        private readonly Func<FrameworkElement, XamlContext, FrameworkElement> _factory;
+        private readonly Func<FrameworkElementBase, XamlContext, FrameworkElementBase> _factory;
 
-        internal TemplateContent(XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
+        internal TemplateContent(XamlContext xamlContext, Func<FrameworkElementBase, XamlContext, FrameworkElementBase> factory)
         {
             if (xamlContext == null)
             {
@@ -179,14 +179,14 @@ namespace Windows.UI.Xaml
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        internal FrameworkElement LoadContent(FrameworkElement owner)
+        internal FrameworkElementBase LoadContent(FrameworkElementBase owner)
         {
             XamlContext context = new XamlContext(_xamlContext)
             {
                 ExternalNameScope = new NameScope(),
             };
 
-            FrameworkElement rootElement = _factory(owner, context);
+            FrameworkElementBase rootElement = _factory(owner, context);
             
             if (owner == null)
             {
