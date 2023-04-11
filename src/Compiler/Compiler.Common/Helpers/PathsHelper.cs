@@ -102,16 +102,18 @@ namespace OpenSilver
         /// <returns>The combined path</returns>
         public static string CombinePathsWhileEnsuringEndingBackslashAndMore(string path1, string path2)
         {
-            // Replace any forward slash with a backslash:
-            path1 = path1.Replace('/', '\\');
-            path2 = path2.Replace('/', '\\');
+            var separator = Path.DirectorySeparatorChar;
+
+            // Replace any incorrect path separators with the correct one:
+            path1 = path1.Replace('/', separator).Replace('\\', separator);
+            path2 = path2.Replace('/', separator).Replace('\\', separator);
 
             // Combine the paths:
-            string combinedPath = Path.Combine(path1, path2);
+            var combinedPath = Path.Combine(path1, path2);
 
-            // Make sure that the combined path ends with "\":
-            if (!combinedPath.EndsWith(@"\"))
-                combinedPath = combinedPath + @"\";
+            // Make sure that the combined path ends with the correct separator:
+            if (!combinedPath.EndsWith(separator.ToString()))
+                combinedPath += separator;
 
             return combinedPath;
         }
@@ -129,9 +131,10 @@ namespace OpenSilver
             // IMPORTANT: If you update this method, make sure to update the other one as well.
             //--------------------------
 
-            string outputRootPathFixed = outputRootPath.Replace('/', '\\');
-            if (!outputRootPathFixed.EndsWith("\\") && outputRootPathFixed != "")
-                outputRootPathFixed = outputRootPathFixed + '\\';
+            var separator = Path.DirectorySeparatorChar;
+            var outputRootPathFixed = outputRootPath.Replace('/', separator).Replace('\\', separator);
+            if (!outputRootPathFixed.EndsWith(separator.ToString()) && outputRootPathFixed != "")
+                outputRootPathFixed += separator;
 
             // If the path is already ABSOLUTE, we return it directly, otherwise we concatenate it to the path of the assembly:
             string outputPathAbsolute;
@@ -143,10 +146,10 @@ namespace OpenSilver
             {
                 outputPathAbsolute = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(assemblyFullNameAndPath)), outputRootPathFixed);
 
-                outputPathAbsolute = outputPathAbsolute.Replace('/', '\\');
+                outputPathAbsolute = outputPathAbsolute.Replace('/', separator).Replace('\\', separator);
 
-                if (!outputPathAbsolute.EndsWith("\\") && outputPathAbsolute != "")
-                    outputPathAbsolute = outputPathAbsolute + '\\';
+                if (!outputPathAbsolute.EndsWith(separator.ToString()) && outputPathAbsolute != "")
+                    outputPathAbsolute += separator;
             }
 
             return outputPathAbsolute;

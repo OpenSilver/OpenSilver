@@ -178,7 +178,7 @@ namespace OpenSilver.Compiler.Resources
                     string absoluteOutputResourcesPath = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(outputPathAbsolute, outputResourcesPath);
 
                     // Create the destination folders hierarchy if it does not already exist:
-                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName + "\\", fileName);
+                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName + Path.DirectorySeparatorChar, fileName);
                     if (destinationFile.Length < 256)
                     {
                         string destinationDirectory = Path.GetDirectoryName(destinationFile);
