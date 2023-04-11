@@ -252,15 +252,6 @@ namespace OpenSilver
 
         internal static void AddAsyncCall(string funcName, int index, string javascript)
         {
-            // the idea:
-            // when we have async calls, we need to have them executed sequentially
-            // however, this gets complicated when we're trying to do this with both Interop. and Interop2. calls,
-            // since Interop2. calls are executed one by one, while Interop. calls are appended to a byte-array and executed all at once
-            //
-            // so in order to maintain this sequential behavior, when we execute an Interop2 Async call, we flush the Interop. queue,
-            // and vice versa
-            INTERNAL_ExecuteJavaScript.JavaScriptRuntime.Flush();
-
             bool needsQueueAction = false;
             lock (_pendingAsyncCalls)
             {
@@ -275,7 +266,7 @@ namespace OpenSilver
                 INTERNAL_DispatcherHelpers.QueueAction(Flush);
         }
 
-        internal static void Flush()
+        private static void Flush()
         {
             lock (_pendingAsyncCalls)
             {

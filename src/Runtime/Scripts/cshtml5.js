@@ -760,6 +760,7 @@ document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMa
 document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, maxWidth, emptyVal) {
     var element = document.measureTextBlockElement;
     var elToMeasure = document.getElementById(uid);
+
     if (element && elToMeasure) {
         var computedStyle = getComputedStyle(elToMeasure);
 

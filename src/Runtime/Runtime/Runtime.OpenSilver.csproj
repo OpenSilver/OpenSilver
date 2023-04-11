@@ -55,6 +55,7 @@
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
+		<Compile Include="Core\Rendering\INTERNAL_Html2dContextReference.JsCall.cs" />
 		<Compile Include="Core\Rendering\INTERNAL_HtmlDomManager.JsCall.cs" />
 		<Compile Include="Diagnostics\DebugInfo.cs" />
 		<Compile Include="OpenSilver\Controls\OpenFileDialog.cs" />
@@ -194,6 +195,7 @@
 		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitter.TestHook.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\GridSplitterAutomationPeer.cs" />
 		<Compile Include="System.Windows.Controls\GridSplitter\PreviewControl.cs" />
+		<Compile Include="System.Windows.Controls\Image.JsCall.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControl.ItemInfo.cs" />
 		<Compile Include="System.Windows.Controls\ItemsControlDragDropTarget.cs" />
 		<Compile Include="System.Windows.Controls\ListBoxDragDropTarget.cs" />
@@ -334,6 +336,7 @@
 		<Compile Include="System.Windows\SizeConverter.cs" />
 		<Compile Include="System.Windows\StyleHelper.cs" />
 		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
+		<Compile Include="System.Windows\TextMeasurementService.JsCall.cs" />
 		<Compile Include="System.Windows\ThicknessConverter.cs" />
 		<Compile Include="System.Windows.Media\TransformConverter.cs" />
 		<Compile Include="System.ComponentModel\TypeConverterHelper.cs" />

@@ -26,6 +26,8 @@ namespace OpenSilver
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
         private readonly StringBuilder _javascript;
 
+        public static bool LogErrors { get; set; } = true;
+
         public BulkExecuteJavascriptAsync()
         {
             _javascript = StringBuilderFactory.Get();
@@ -77,7 +79,8 @@ namespace OpenSilver
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"error executing Javascript: {e}");
+                    if (LogErrors)
+                        Console.WriteLine($"error executing Javascript: {e}");
                 }
             }
 

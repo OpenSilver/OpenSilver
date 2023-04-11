@@ -4,14 +4,37 @@ namespace CSHTML5.Internal;
 
 public static partial class INTERNAL_HtmlDomManager
 {
+    /* (john.torjo) IMPORTANT NOTE:
+     *
+     * I decided to revert all my changes to INTERNAL_HtmlDomManager class.
+     *
+     * Even though everything seems correct, and I've tested it a gazillion times, it seems there's still some async issue
+     * that will cause some controls to be incorrectly shown (in my case, a scrollbar inside a popup).
+     *
+     * It happens on SetVisualBounds/SetPosition. However, the issue is deeper than that -- the JS is correct, it gets executed correctly,
+     * but the values sent to the JS function are incorrect. My assumption is that some JS gets executed too soon (like, before some <div/> gets shown/set up correctly,
+     * thus, some left/top/width/height values are incorrect)
+     *
+     *
+     * The issue is because of Async Javascript calls -- namely,
+     * - Interop. async calls are added to PendingJavascript, which basically adds everything to an internal buffer.
+     * - In Interop2., all async calls are added to an internal array.
+     *
+     * Thus, they can get out of sync. Even though I tried to sync() them, this still doesn't work 100% correctly.
+     * I even tried to have a single list of Interop/Interop2 calls, and do a single Flush() for both queues -- this only made it worse.
+     *
+     * I may give it another try in the future, if there's need for it.
+     *
+     */
     private enum JsCall
     {
         [JsCall("ref;document.getXamlRoot()")]
         GetXamlRoot,
 
+        // note: removeChild can throw when removing a child dialog with an animation (AVA)
         [JsCall(@"void;
 let element = document.getElementById({htmlDomElRef.UniqueIdentifier});
-if (element) element.parentNode.removeChild(element);
+if (element) try {{ element.parentNode.removeChild(element); }} catch(e) {{ }}
 ")]
         RemoveFromDom,
 

@@ -149,6 +149,7 @@ namespace CSHTML5.Internal
         // FIXME update after PR724 is approved
         internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
+            return;
             string str = _javascriptCallsStore.Get(indexOfCallInList);
 
 #if OPENSILVER

@@ -60,15 +60,6 @@ namespace CSHTML5.Internal
         {
             if (javascript == null) return;
 
-            // the idea:
-            // when we have async calls, we need to have them executed sequentially
-            // however, this gets complicated when we're trying to do this with both Interop. and Interop2. calls,
-            // since Interop2. calls are executed one by one, while Interop. calls are appended to a byte-array and executed all at once
-            //
-            // so in order to maintain this sequential behavior, when we execute an Interop2 Async call, we flush the Interop. queue,
-            // and vice versa
-            Interop2.Flush();
-
             // the idea -- the current buffer is already huge - in the very rare scenario it would get full, just flush it and restart
             var maxByteCount = DefaultEncoding.GetMaxByteCount(javascript.Length) + Delimiter.Length;
             if (maxByteCount + _currentLength > _buffer.Length)
@@ -135,15 +126,6 @@ namespace CSHTML5.Internal
         {
             if (javascript == null)
                 return;
-
-            // the idea:
-            // when we have async calls, we need to have them executed sequentially
-            // however, this gets complicated when we're trying to do this with both Interop. and Interop2. calls,
-            // since Interop2. calls are executed one by one, while Interop. calls are appended to a byte-array and executed all at once
-            //
-            // so in order to maintain this sequential behavior, when we execute an Interop2 Async call, we flush the Interop. queue,
-            // and vice versa
-            Interop2.Flush();
 
             lock (_pending)
             {
