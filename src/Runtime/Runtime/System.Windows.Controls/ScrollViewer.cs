@@ -306,7 +306,7 @@ namespace Windows.UI.Xaml.Controls
             }
 
             var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
-            innerDivStyle.display = "block";
+            innerDivStyle.display = "grid";
 
             ApplyHorizontalSettings(HorizontalScrollBarVisibility, outerDivStyle, innerDivStyle);
             ApplyVerticalSettings(VerticalScrollBarVisibility, outerDivStyle, innerDivStyle);
