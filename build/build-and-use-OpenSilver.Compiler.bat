@@ -13,7 +13,7 @@ rem Reading version information from version_info.txt file
 for /f "delims== tokens=1,2" %%G in (version_info.txt) do set %%G=%%H
 
 set config=Release
-set repoPath=E:\Workspace\oDesk\Userware\projects\OpenSilver
+set repoPath=%~dp0..
 set sourceBase=%repoPath%\src\Compiler
 set destDir=%repoPath%\src\packages\OpenSilver.%STABLE_VERSION%\tools
 
