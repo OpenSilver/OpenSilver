@@ -13,16 +13,30 @@
 
 namespace System.Windows.Browser
 {
-	[OpenSilver.NotImplemented]
-    public sealed class HtmlPopupWindowOptions
+    /// <summary>
+    /// Specifies constants that indicate which mouse button was clicked.
+    /// </summary>
+    [Flags]
+    public enum MouseButtons
     {
-		[OpenSilver.NotImplemented]
-        public bool Menubar { get; set; }
-		[OpenSilver.NotImplemented]
-        public bool Status { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Resizeable { get; set; }
-        [OpenSilver.NotImplemented]
-        public bool Toolbar { get; set; }
+        /// <summary>
+        /// No mouse button was clicked.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// The left mouse button was clicked.
+        /// </summary>
+        Left = 1,
+
+        /// <summary>
+        /// The right mouse button was clicked.
+        /// </summary>
+        Right = 2,
+
+        /// <summary>
+        /// The wheel button was clicked.
+        /// </summary>
+        Middle = 4
     }
 }

@@ -19,9 +19,13 @@ namespace System.Windows.Browser
     /// <summary>
     /// Represents an HTML element in the Document Object Model (DOM) of a Web page.
     /// </summary>
-	[OpenSilver.NotImplemented]
-    public sealed partial class HtmlElement : HtmlObject
+    public sealed class HtmlElement : HtmlObject
     {
+        internal HtmlElement(IJSObjectRef jsInstance)
+            : base(jsInstance)
+        {
+        }
+
         /// <summary>
         /// Gets a read-only collection of HTML elements that are immediate descendants of
         /// the current HTML element.
@@ -98,10 +102,6 @@ namespace System.Windows.Browser
         public void Focus()
         {
 
-        }
-
-        internal HtmlElement()
-        {
         }
 
         /// <summary>
@@ -277,7 +277,6 @@ namespace System.Windows.Browser
 		[OpenSilver.NotImplemented]
         public void RemoveAttribute(string name)
         {
-
         }
     }
 }

@@ -26,20 +26,18 @@ namespace System.Windows.Browser
 {
     public static class HtmlPage
     {
-        private static HtmlWindow _initWindow;
-        private static HtmlDocument _initDocument;
         private static HtmlElement _initPlugin;
         private static BrowserInformation _browserInformation;
 
         /// <summary>
         /// Gets the browser's window object.
         /// </summary>
-        public static HtmlWindow Window => _initWindow ??= new HtmlWindow();
+        public static HtmlWindow Window { get; } = new HtmlWindow(new WindowRef());
 
         /// <summary>
         /// Gets the browser's document object.
         /// </summary>
-        public static HtmlDocument Document => _initDocument ??= new HtmlDocument();
+        public static HtmlDocument Document { get; } = new HtmlDocument(new DocumentRef());
 
         [OpenSilver.NotImplemented]
         public static bool IsPopupWindowAllowed => false;
@@ -55,7 +53,7 @@ namespace System.Windows.Browser
         /// or &lt;embed&gt; tag on the host HTML page.
         /// </summary>
         [OpenSilver.NotImplemented]
-        public static HtmlElement Plugin => _initPlugin ??= new HtmlElement();
+        public static HtmlElement Plugin => _initPlugin ??= new HtmlElement(null);
 
         [OpenSilver.NotImplemented]
         public static bool IsEnabled { get; private set; }
@@ -144,5 +142,28 @@ namespace System.Windows.Browser
                 eventInfo.AddEventHandler(instance, d);
             }
         }
+
+        /// <summary>
+        /// Registers a managed type as available for creation from JavaScript code, through
+        /// the Content.services.createObject and Content.services.createManagedObject helper
+        /// methods.
+        /// </summary>
+        /// <param name="scriptAlias">
+        /// The name used to register the managed type.
+        /// </param>
+        /// <param name="type">
+        /// A managed type.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// scriptAlias or type is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// type is not public.-or-type does not have a public, parameterless constructor.-or-type
+        /// is a string, primitive or value type, managed delegate, or empty string.-or-type
+        /// contains an embedded null character (<see cref="char.MinValue"/>).-or-An attempt is made to reregister
+        /// type.
+        /// </exception>
+        [OpenSilver.NotImplemented]
+        public static void RegisterCreateableType(string scriptAlias, Type type) { }
     }
 }

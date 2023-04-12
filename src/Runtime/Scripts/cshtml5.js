@@ -1506,3 +1506,122 @@ document.velocityHelpers = (function () {
         }
     };
 })();
+
+document.browserService = (function () {
+    const TYPES = {
+        ERROR: -1,
+        VOID: 0,
+        STRING: 1,
+        INTEGER: 2,
+        DOUBLE: 3,
+        BOOLEAN: 4,
+        OBJECT: 5,
+        HTMLELEMENT: 6,
+        HTMLCOLLECTION: 7,
+        HTMLDOCUMENT: 8,
+        HTMLWINDOW: 9,
+    };
+
+    let _id = 0;
+    const _idToObj = new Map();
+    const _objToId = new Map();
+
+    function getOrCreateId(obj) {
+        if (!_objToId.has(obj)) {
+            const id = (_id++).toString();
+            _objToId.set(obj, id);
+            _idToObj.set(id, obj);
+        }
+
+        return _objToId.get(obj);
+    };
+
+    function isDOMCollection(v) {
+        return v instanceof HTMLCollection ||
+               v instanceof NodeList;
+    };
+
+    function conv(v) {
+        if (v instanceof Document) {
+            return { Type: TYPES.HTMLDOCUMENT };
+        } else if (v instanceof Window) {
+            return { Type: TYPES.HTMLWINDOW };
+        } else if (v instanceof HTMLElement) {
+            return { Type: TYPES.HTMLELEMENT, Value: getOrCreateId(v) };
+        } else if (isDOMCollection(v)) {
+            return { Type: TYPES.HTMLCOLLECTION, Value: getOrCreateId(v) };
+        } else if (typeof v === 'number') {
+            if (Number.isInteger(v))
+                return { Type: TYPES.INTEGER, Value: v.toString() };
+            else
+                return { Type: TYPES.DOUBLE, Value: v.toString() };
+        } else if (typeof v === 'string') {
+            return { Type: TYPES.STRING, Value: v };
+        } else if (typeof v === 'boolean') {
+            return { Type: TYPES.BOOLEAN, Value: v.toStrin_dependentListMapg() };
+        } else if (v === null || v === undefined) {
+            return { Type: TYPES.VOID };
+        } else if (typeof v === 'object' || typeof v === 'function') {
+            return { Type: TYPES.OBJECT, Value: getOrCreateId(v) };
+        } else {
+            return { Type: TYPES.ERROR, Value: 'An unexpected error occurred' };
+        }
+    };
+
+    function error(message) {
+        return { Type: TYPES.ERROR, Value: message };
+    };
+
+    return {
+        invoke: function (instance, name, ...args) {
+            const m = instance[name];
+            if (m) {
+                try {
+                    const r = m.call(instance, ...args);
+                    return JSON.stringify(conv(r));
+                } catch (err) {
+                    return JSON.stringify(error(err.message));
+                }
+            } else {
+                return JSON.stringify(error(`The method '${name}' is not defined.`));
+            }
+        },
+        invokeSelf: function (f, ...args) {
+            if (typeof f === 'function') {
+                try {
+                    const r = f.call(null, ...args);
+                    return JSON.stringify(conv(r));
+                } catch (err) {
+                    return JSON.stringify(error(err.message));
+                }
+            } else {
+                return JSON.stringify(error("'InvokeSelf' can only be called on a 'function'."));
+            }
+        },
+        getProperty: function (instance, name) {
+            try {
+                return JSON.stringify(conv(instance[name]));
+            } catch (err) {
+                return JSON.stringify(error(err.message));
+            }
+        },
+        setProperty: function (instance, name, value) {
+            try {
+                instance[name] = value;
+                return JSON.stringify(conv(undefined));
+            } catch (err) {
+                return JSON.stringify(error(err.message));
+            }
+        },
+        getObject: function (id) {
+            return _idToObj.get(id);
+        },
+        releaseObject: function (id) {
+            if (_idToObj.has(id)) {
+                const o = _idToObj.get(id);
+                _objToId.delete(o);
+                _idToObj.delete(id);
+            }
+        },
+    };
+})();

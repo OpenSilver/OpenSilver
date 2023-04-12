@@ -17,13 +17,19 @@ namespace System.Windows.Browser
     /// Provides methods for browser elements that are explicitly supplied by the HTML
     /// features exposed by Silverlight.
     /// </summary>
-    public abstract partial class HtmlObject : ScriptObject
+    public abstract class HtmlObject : ScriptObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HtmlObject"/> class.
         /// </summary>
 		[OpenSilver.NotImplemented]
         protected HtmlObject()
+            : this(null)
+        {
+        }
+
+        internal HtmlObject(IJSObjectRef jsObject)
+            : base(jsObject)
         {
         }
 
