@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Browser;
 using System.Windows.Controls;
 
 namespace TestApplication
@@ -14,6 +15,8 @@ namespace TestApplication
             {
                 CreateTreeItem(i, MenuContainer.Items);
             }
+
+            HtmlPage.Document.SetProperty("title", "Test title");
         }
 
         private void CreateTreeItem(ITreeItem item, ItemCollection parent)

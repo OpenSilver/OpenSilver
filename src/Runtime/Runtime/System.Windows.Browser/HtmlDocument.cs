@@ -93,6 +93,11 @@ namespace System.Windows.Browser
             return null;
         }
 
+        public override void SetProperty(string name, object value)
+        {
+            OpenSilver.Interop.ExecuteJavaScript($"document.querySelector('{name}').textContent='{value}'");
+        }
+
         /// <summary>
         /// Gets or sets the browser's cookie string. If the browser does not have a 
         /// cookie string, the property returns an empty string.
