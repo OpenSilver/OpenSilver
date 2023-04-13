@@ -1732,7 +1732,21 @@ namespace System.ServiceModel
 
                     if (!isXmlSerializer)
                     {
-                        xElement = xElement.Elements().FirstOrDefault() ?? xElement;
+                        if (typeToDeserialize.GetCustomAttribute<MessageContractAttribute>() != null)
+                        {
+                            // DataContractSerializer needs correct namespace instead of http://tempuri.org/
+                            XNamespace ns = DataContractSerializer_Helpers.GetDefaultNamespace(typeToDeserialize.Namespace, false);
+                            xElement.Name = ns + xElement.Name.LocalName;
+                            xElement.Attributes("xmlns").Remove();
+                            foreach (var childElement in xElement.Elements())
+                            {
+                                childElement.Name = ns + childElement.Name.LocalName;
+                            }
+                        }
+                        else
+                        {
+                            xElement = xElement.Elements().FirstOrDefault() ?? xElement;
+                        }
                         requestResponse = deSerializer.DeserializeFromXElement(xElement);
                     }
                     else
