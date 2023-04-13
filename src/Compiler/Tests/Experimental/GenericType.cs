@@ -29,12 +29,12 @@ namespace Experimental
         public static readonly DependencyProperty HasSomethingProperty =
             DependencyProperty.RegisterAttached(
                 "HasSomething",
-                typeof(bool), typeof(GenericType<K, B, T>), null);
+                typeof(T), typeof(GenericType<K, B, T>), null);
 
-        public static bool GetHasSomething(UIElement target) =>
-            (bool)target.GetValue(HasSomethingProperty);
+        public static T GetHasSomething(UIElement target) =>
+            (T)target.GetValue(HasSomethingProperty);
 
-        public static void SetHasSomething(UIElement target, bool value) =>
+        public static void SetHasSomething(UIElement target, T value) =>
             target.SetValue(HasSomethingProperty, value);
 
         public T MethodWithGenericReturnType()
