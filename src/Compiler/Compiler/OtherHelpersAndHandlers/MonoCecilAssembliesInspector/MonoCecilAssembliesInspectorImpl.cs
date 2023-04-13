@@ -693,10 +693,11 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 if (method != null)
                 {
                     declaringTypeName = currentType.GetTypeNameIncludingGenericArguments(true);
-                    returnValueNamespaceName = method.ReturnType.BuildFullPath();
-                    returnValueLocalTypeName = method.ReturnType.PopulateGeneric(elementType, currentType).GetTypeNameIncludingGenericArguments(false);
-                    isTypeString = method.ReturnType.IsString();
-                    isTypeEnum = method.ReturnType.ResolveOrThrow().IsEnum;
+                    var returnType = method.ReturnType.PopulateGeneric(elementType, currentType);
+                    returnValueNamespaceName = returnType.BuildFullPath();
+                    returnValueLocalTypeName = returnType.GetTypeNameIncludingGenericArguments(false);
+                    isTypeString = returnType.IsString();
+                    isTypeEnum = returnType.ResolveOrThrow().IsEnum;
                     return;
                 }
                 currentType = resolved.BaseType;

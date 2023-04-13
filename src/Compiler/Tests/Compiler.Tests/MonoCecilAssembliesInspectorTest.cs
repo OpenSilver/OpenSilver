@@ -167,9 +167,9 @@ namespace Compiler.Tests
                 out var declaringTypeName, out var returnValueNamespaceName, out var returnValueLocalTypeName,
                 out var isTypeString, out var isTypeEnum);
             declaringTypeName.Should().Be("global::Experimental.GenericType<global::System.Double, global::System.Int32, global::System.String>");
-            returnValueNamespaceName.Should().Be(typeof(bool).Namespace);
-            returnValueLocalTypeName.Should().Be(nameof(Boolean));
-            isTypeString.Should().BeFalse();
+            returnValueNamespaceName.Should().Be(typeof(string).Namespace);
+            returnValueLocalTypeName.Should().Be(nameof(String));
+            isTypeString.Should().BeTrue();
             isTypeEnum.Should().BeFalse();
         }
 
