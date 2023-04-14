@@ -92,9 +92,6 @@ namespace Windows.UI.Xaml.Controls
         {
             base.ManageIsEnabled(isEnabled); // Useful for setting the "disabled" attribute on the DOM element.
 
-            //OnTabIndexPropertyChanged(TabIndex);
-            UpdateTabIndex(IsTabStop, TabIndex);
-
             UpdateVisualStates();
         }
 
@@ -537,8 +534,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public int TabIndex
         {
-            get { return (int)GetValue(TabIndexProperty); }
-            set { SetValue(TabIndexProperty, value); }
+            get => (int)GetValue(TabIndexProperty);
+            set => SetValue(TabIndexProperty, value);
         }
 
         /// <summary>
@@ -549,67 +546,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(TabIndex), 
                 typeof(int), 
                 typeof(Control), 
-                new PropertyMetadata(int.MaxValue)
-                {
-                    MethodToUpdateDom = static (d, newValue) =>
-                    {
-                        var control = (Control)d;
-                        control.UpdateTabIndex(control.IsTabStop, (int)newValue);
-                    },
-                });
-
-        internal void UpdateTabIndex(bool isTabStop, int tabindex)
-        {
-            UpdateTabIndexCore(isTabStop, tabindex);
-            UpdateSystemFocusVisuals();
-        }
-
-        internal virtual void UpdateTabIndexCore(bool isTabStop, int tabindex)
-        {
-            object focusTarget = GetFocusTarget();
-            if (focusTarget == null)
-            {
-                return;
-            }
-
-            if (!isTabStop || !IsEnabled)
-            {
-                INTERNAL_HtmlDomManager.RemoveDomElementAttribute(focusTarget, "tabindex");
-            }
-            else
-            {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                    focusTarget,
-                    "tabindex",
-                    ConvertToHtmlTabIndex(tabindex).ToString());
-            }
-        }
-
-        internal static int ConvertToHtmlTabIndex(int tabindex)
-        {
-            const int TABINDEX_BROWSER_MAX_VALUE = 32767;
-
-            // Note: according to W3C, tabIndex needs to be between 0 and 32767 on browsers:
-            // https://www.w3.org/TR/html401/interact/forms.html#adef-tabindex
-            // also, the behaviour of the different browsers outside of these values can be
-            // different and therefore, we have to restrict the values.
-            //
-            // We translate the TabIndexes to have a little margin with negative TabIndexes:
-            // this is because a negative tabIndex in html is equivalent to IsTabStop = false
-            // in C#. This way, we make sure to keep the order of elements with TabIndexes
-            // between -100 and TABINDEX_BROWSER_MAX_VALUE - 100.
-            // 100 is empirically chosen because the only reason I would see for a negative
-            // TabIndex would be if the person has already set some TabIndexes and forgot one
-            // that needs to come before that so he is likely to simply use small numbers.
-            if (tabindex < (TABINDEX_BROWSER_MAX_VALUE - 100))
-            {
-                return Math.Max(tabindex + 100, 0);
-            }
-            else
-            {
-                return TABINDEX_BROWSER_MAX_VALUE;
-            }
-        }
+                new PropertyMetadata(int.MaxValue));
 
         //-----------------------
         // ISTABSTOP
@@ -621,26 +558,42 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public bool IsTabStop
         {
-            get { return (bool)GetValue(IsTabStopProperty); }
-            set { SetValue(IsTabStopProperty, value); }
+            get => (bool)GetValue(IsTabStopProperty);
+            set => SetValue(IsTabStopProperty, value);
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.IsTabStop"/> dependency property.
+        /// Identifies the <see cref="IsTabStop"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty IsTabStopProperty =
             DependencyProperty.Register(
                 nameof(IsTabStop),    
                 typeof(bool), 
                 typeof(Control), 
-                new PropertyMetadata(true)
-                {
-                    MethodToUpdateDom = static (d, newValue) =>
-                    {
-                        var control = (Control)d;
-                        control.UpdateTabIndex((bool)newValue, control.TabIndex);
-                    },
-                });
+                new PropertyMetadata(true));
+
+        /// <summary>
+        /// Gets or sets a value that modifies how tabbing and <see cref="TabIndex"/>
+        /// work for this control.
+        /// </summary>
+        /// <returns>
+        /// A value of the enumeration. The default is <see cref="KeyboardNavigationMode.Local"/>.
+        /// </returns>
+        public KeyboardNavigationMode TabNavigation
+        {
+            get => (KeyboardNavigationMode)GetValue(TabNavigationProperty);
+            set => SetValue(TabNavigationProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="TabNavigation"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty TabNavigationProperty =
+            DependencyProperty.Register(
+                nameof(TabNavigation),
+                typeof(KeyboardNavigationMode),
+                typeof(Control),
+                new PropertyMetadata(KeyboardNavigationMode.Local));
 
         //-----------------------
         // TEMPLATE
@@ -729,45 +682,14 @@ namespace Windows.UI.Xaml.Controls
         /// </returns>
         public bool Focus()
         {
-            if (!Keyboard.IsSubTreeFocusable(this))
+            if (KeyboardNavigation.Current.Focus(this) is UIElement uie)
             {
-                return false;
+                INTERNAL_HtmlDomManager.SetFocus(uie);
+                KeyboardNavigation.UpdateFocusedElement(uie);
+                return true;
             }
 
-            return FocusElement(this) || FocusInTree(this);
-
-            static bool FocusElement(Control c)
-            {
-                if (Keyboard.IsKeyboardFocusable(c))
-                {
-                    FocusManager.SetFocusedElement(c.INTERNAL_ParentWindow, c);
-                    INTERNAL_HtmlDomManager.SetFocus(c);
-
-                    return true;
-                }
-
-                return false;
-            }
-
-            static bool FocusInTree(UIElement uie)
-            {
-                int childrenCount = VisualTreeHelper.GetChildrenCount(uie);
-                for (int i = 0; i < childrenCount; i++)
-                {
-                    UIElement child = VisualTreeHelper.GetChild(uie, i) as UIElement;
-                    if (!Keyboard.IsSubTreeFocusable(child))
-                    {
-                        continue;
-                    }
-
-                    if ((child is Control c && FocusElement(c)) || FocusInTree(child))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
+            return false;
         }
 
         private bool _useSystemFocusVisuals;
@@ -787,7 +709,7 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private void UpdateSystemFocusVisuals()
+        internal void UpdateSystemFocusVisuals()
         {
             object focusTarget = GetFocusTarget();
             if (focusTarget != null)
@@ -919,21 +841,6 @@ namespace Windows.UI.Xaml.Controls
         {
             get { return (int)GetValue(CharacterSpacingProperty); }
             set { SetValue(CharacterSpacingProperty, value); }
-        }
-
-        [OpenSilver.NotImplemented]
-        public static readonly DependencyProperty TabNavigationProperty = 
-            DependencyProperty.Register(
-                nameof(TabNavigation), 
-                typeof(KeyboardNavigationMode), 
-                typeof(Control), 
-                new PropertyMetadata(KeyboardNavigationMode.Local));
-
-        [OpenSilver.NotImplemented]
-        public KeyboardNavigationMode TabNavigation
-        {
-            get { return (KeyboardNavigationMode)this.GetValue(Control.TabNavigationProperty); }
-            set { this.SetValue(Control.TabNavigationProperty, value); }
         }
 
         [OpenSilver.NotImplemented]

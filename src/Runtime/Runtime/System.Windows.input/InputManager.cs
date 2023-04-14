@@ -57,6 +57,7 @@ internal sealed class InputManager
         TOUCH_START = 14,
         TOUCH_END = 15,
         TOUCH_MOVE = 16,
+        WINDOW_BLUR = 17,
     }
 
     private enum MouseButton
@@ -94,8 +95,10 @@ internal sealed class InputManager
 
         if (Current == null)
         {
+            string sRootElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                INTERNAL_HtmlDomManager.GetApplicationRootDomElement());
             string sHandler = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_handler);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sHandler});");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sRootElement}, {sHandler});");
         }
     }
 
@@ -173,6 +176,50 @@ internal sealed class InputManager
             case EVENTS.MOUSE_RIGHT_DOWN:
                 RefreshClickCount(null, MouseButton.Right, Environment.TickCount, new Point());
                 break;
+
+            case EVENTS.FOCUS:
+                OnFocus();
+                break;
+
+            case EVENTS.WINDOW_BLUR:
+                OnWindowBlur(jsEventArg);
+                break;
+        }
+    }
+
+    private void OnFocus()
+    {
+        if (FocusManager.GetFocusedElement() is UIElement focusedElement)
+        {
+            // Focus moved back to the application (most likely to the opensilver-root div).
+            // Reposition focus to the element that has logical focus.
+            INTERNAL_HtmlDomManager.SetFocus(focusedElement);
+        }
+        else
+        {
+            DependencyObject rootVisual = Application.Current?.RootVisual;
+            if (rootVisual is not null)
+            {
+                KeyboardNavigation.Current.Navigate(
+                    rootVisual,
+                    new TraversalRequest(
+                        ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift) ?
+                        FocusNavigationDirection.Last :
+                        FocusNavigationDirection.First));
+            }
+        }
+    }
+
+    private void OnWindowBlur(object jsEventArg)
+    {
+        if (FocusManager.GetFocusedElement() is UIElement focusedElement)
+        {
+            focusedElement.RaiseEvent(new RoutedEventArgs
+            {
+                RoutedEvent = UIElement.LostFocusEvent,
+                OriginalSource = focusedElement,
+                UIEventArg = jsEventArg,
+            });
         }
     }
 
@@ -224,10 +271,6 @@ internal sealed class InputManager
 
             case EVENTS.FOCUS:
                 ProcessOnFocus(uie, jsEventArg);
-                break;
-
-            case EVENTS.BLUR:
-                ProcessOnBlur(uie, jsEventArg);
                 break;
 
             case EVENTS.KEYPRESS:
@@ -455,6 +498,8 @@ internal sealed class InputManager
 
         keyboardTarget.RaiseEvent(e);
 
+        KeyboardNavigation.Current.ProcessInput(e);
+
         if (e.Handled && e.Cancellable)
         {
             e.PreventDefault();
@@ -489,32 +534,13 @@ internal sealed class InputManager
 
     private void ProcessOnFocus(UIElement uie, object jsEventArg)
     {
-        UIElement keyboardTarget = uie.KeyboardTarget;
-        if (keyboardTarget is not null)
-        {
-            FocusManager.SetFocusedElement(keyboardTarget.INTERNAL_ParentWindow, keyboardTarget);
+        UIElement newFocus = uie.KeyboardTarget;
 
-            keyboardTarget.RaiseEvent(new RoutedEventArgs
-            {
-                RoutedEvent = UIElement.GotFocusEvent,
-                OriginalSource = keyboardTarget,
-                UIEventArg = jsEventArg
-            });
-        }
-    }
-
-    private void ProcessOnBlur(UIElement uie, object jsEventArg)
-    {
-        UIElement keyboardTarget = uie.KeyboardTarget;
-        if (keyboardTarget is not null)
+        newFocus?.RaiseEvent(new RoutedEventArgs
         {
-            keyboardTarget.RaiseEvent(new RoutedEventArgs
-            {
-                RoutedEvent = UIElement.LostFocusEvent,
-                OriginalSource = keyboardTarget,
-                UIEventArg = jsEventArg
-            });
-        }
+            RoutedEvent = UIElement.GotFocusEvent,
+            OriginalSource = newFocus,
+        });
     }
 
     private void ProcessOnKeyPress(UIElement uie, object jsEventArg)

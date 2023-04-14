@@ -210,20 +210,6 @@ document.createPopupRootElement = function (id, rootElement, pointerEvents) {
     popupRoot.style.overflowX = 'hidden';
     popupRoot.style.overflowY = 'hidden';
     popupRoot.style.pointerEvents = pointerEvents;
-    popupRoot.addEventListener('keydown', function (e) {
-        if (e.key === 'Tab') {
-            const focusableElements = document.querySelectorAll(`#${id} [tabindex]:not([tabindex="-1"], [tabindex=""])`);
-            if (focusableElements.length === 0) return;
-            if (!e.shiftKey && e.target === focusableElements[focusableElements.length - 1]) {
-                e.preventDefault();
-                focusableElements[0].focus();
-            } else if (e.shiftKey && e.target === focusableElements[0]) {
-                e.preventDefault();
-                focusableElements[focusableElements.length - 1].focus();
-            }
-        }
-    });
-
     rootElement.appendChild(popupRoot);
 }
 
@@ -375,18 +361,13 @@ document.addEventListenerSafe = function (element, method, func) {
 document.setFocus = function (element) {
     if (!element) return;
 
-    // HTML elements will not receive focus when their tabindex is null
-    // Temporarily set the tabindex to allow it to get focused
-    if (element.getAttribute('tabindex') === null) {
-        element.setAttribute('tabindex', -1);
+    setTimeout(function () {
+        element.setAttribute('tabindex', 0);
         element.focus({ preventScroll: true });
-        element.removeAttribute('tabindex');
-    } else {
-        element.focus({ preventScroll: true });
-    }
+    });
 };
 
-document.createInputManager = function (callback) {
+document.createInputManager = function (root, callback) {
     if (document.inputManager) return;
 
     // This must remain synchronyzed with the EVENTS enum defined in InputManager.cs.
@@ -408,7 +389,8 @@ document.createInputManager = function (callback) {
         INPUT: 13,
         TOUCH_START: 14,
         TOUCH_END: 15,
-        TOUCH_MOVE: 16
+        TOUCH_MOVE: 16,
+        WINDOW_BLUR: 17,
     };
 
     const MODIFIERKEYS = {
@@ -435,53 +417,72 @@ document.createInputManager = function (callback) {
             _modifiers |= MODIFIERKEYS.WINDOWS;
     };
 
-    document.addEventListener('mousedown', function (e) {
-        if (!e.isHandled) {
-            switch (e.button) {
-                case 0:
-                    callback('', EVENTS.MOUSE_LEFT_DOWN, e);
-                    break;
-                case 2:
-                    callback('', EVENTS.MOUSE_RIGHT_DOWN, e);
-                    break;
-            }
-        }
-    });
-    document.addEventListener('mouseup', function (e) {
-        if (!e.isHandled) {
-            const target = _mouseCapture;
-            if (target !== null) {
+    function initDom(root) {
+
+        // Make sure the root div is keyboard focusable, so that we can tab into the app.
+        root.tabIndex = Math.max(root.tabIndex, 0);
+
+        document.addEventListener('mousedown', function (e) {
+            if (!e.isHandled) {
                 switch (e.button) {
                     case 0:
-                        callback(target.id, EVENTS.MOUSE_LEFT_UP, e);
+                        callback('', EVENTS.MOUSE_LEFT_DOWN, e);
                         break;
                     case 2:
-                        callback(target.id, EVENTS.MOUSE_RIGHT_UP, e);
+                        callback('', EVENTS.MOUSE_RIGHT_DOWN, e);
                         break;
                 }
             }
-        }
-    });
-    document.addEventListener('mousemove', function (e) {
-        if (!e.isHandled) {
-            const target = _mouseCapture;
-            if (target !== null) {
-                callback(target.id, EVENTS.MOUSE_MOVE, e);
+        });
+
+        document.addEventListener('mouseup', function (e) {
+            if (!e.isHandled) {
+                const target = _mouseCapture;
+                if (target !== null) {
+                    switch (e.button) {
+                        case 0:
+                            callback(target.id, EVENTS.MOUSE_LEFT_UP, e);
+                            break;
+                        case 2:
+                            callback(target.id, EVENTS.MOUSE_RIGHT_UP, e);
+                            break;
+                    }
+                }
             }
-        }
-    });
-    document.addEventListener('selectstart', function (e) {
-        if (_mouseCapture !== null) e.preventDefault();
-    });
-    document.addEventListener('contextmenu', function (e) {
-        if (_suppressContextMenu ||
-            (_mouseCapture !== null && this !== _mouseCapture)) {
-            _suppressContextMenu = false;
-            e.preventDefault();
-        }
-    });
-    document.addEventListener('keydown', function (e) { setModifiers(e); });
-    document.addEventListener('keyup', function (e) { setModifiers(e); });
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            if (!e.isHandled) {
+                const target = _mouseCapture;
+                if (target !== null) {
+                    callback(target.id, EVENTS.MOUSE_MOVE, e);
+                }
+            }
+        });
+
+        document.addEventListener('selectstart', function (e) { if (_mouseCapture !== null) e.preventDefault(); });
+
+        document.addEventListener('contextmenu', function (e) {
+            if (_suppressContextMenu ||
+                (_mouseCapture !== null && this !== _mouseCapture)) {
+                _suppressContextMenu = false;
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keydown', function (e) { setModifiers(e); });
+
+        document.addEventListener('keyup', function (e) { setModifiers(e); });        
+
+        window.addEventListener('blur', function (e) {
+            callback('', EVENTS.WINDOW_BLUR, e);
+            _modifiers = MODIFIERKEYS.NONE;
+        });
+
+        root.addEventListener('focusin', function (e) { callback(e.target.id, EVENTS.FOCUS, e); });
+    };
+
+    initDom(root);
 
     document.inputManager = {
         addListeners: function (element, isFocusable) {
@@ -598,14 +599,6 @@ document.createInputManager = function (callback) {
                         setModifiers(e);
                         callback(this.id, EVENTS.KEYUP, e);
                     }
-                });
-
-                view.addEventListener('focus', function (e) {
-                    callback(this.id, EVENTS.FOCUS, e);
-                });
-
-                view.addEventListener('blur', function (e) {
-                    callback(this.id, EVENTS.BLUR, e);
                 });
             }
         },

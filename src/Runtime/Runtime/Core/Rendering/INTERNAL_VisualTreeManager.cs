@@ -751,19 +751,9 @@ if(nextSibling != undefined) {
                 RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
             }
 
-            //--------------------------------------------------------
-            // HANDLE TABINDEX:
-            //--------------------------------------------------------
-
-            // For GotFocus and LostFocus to work, the DIV specified by UIElement.GetFocusTarget() needs to have the "tabIndex"
-            // attribute set. Therefore we need to always set it (unless IsTabStop is False) to its current value (default is
-            // Int32.MaxValue). At the time when this code was written, there was no way to automatically call the "OnChanged"
-            // on a dependency property if no value was set.
-
-            if (isChildAControl && child is not TextBlock)
+            if (isChildAControl && child is not TextBlock && child is not TextElement)
             {
-                Control c = (Control)child;
-                c.UpdateTabIndex(c.IsTabStop, c.TabIndex);
+                ((Control)child).UpdateSystemFocusVisuals();
             }
 
             //--------------------------------------------------------

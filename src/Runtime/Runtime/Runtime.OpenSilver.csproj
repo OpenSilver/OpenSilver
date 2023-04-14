@@ -256,6 +256,8 @@
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Controls\WrapPanelHelper.cs" />
+		<Compile Include="System.Windows.input\KeyboardNavigation.cs" />
+		<Compile Include="System.Windows.input\TraversalRequest.cs" />
 		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
 		<Compile Include="System.Windows.Markup\SetterValueConverter.cs" />
 		<Compile Include="System.Windows.Media.Imaging\PngEncoder.cs" />
@@ -955,7 +957,7 @@
 		<Compile Include="System.Windows.Input\RightTappedRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Input\TappedEventHandler.cs" />
 		<Compile Include="System.Windows.Input\TappedRoutedEventArgs.cs" />
-		<Compile Include="System.Windows.Input\WORKINPROGRESS\KeyboardNavigationMode.cs" />
+		<Compile Include="System.Windows.input\KeyboardNavigationMode.cs" />
 		<Compile Include="System.Windows.input\MouseWheelEventArgs.cs" />
 		<Compile Include="System.Windows.input\TextComposition.cs" />
 		<Compile Include="System.Windows.input\TextCompositionEventArgs.cs" />

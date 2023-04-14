@@ -1200,6 +1200,30 @@ namespace Windows.UI.Xaml
             return new Size();
         }
 
+        internal bool IsDescendantOf(DependencyObject ancestor)
+        {
+            if (ancestor is null)
+            {
+                throw new ArgumentNullException(nameof(ancestor));
+            }
+
+            if (ancestor is not UIElement)
+            {
+                throw new ArgumentException($"ancestor must be a UIElement.");
+            }
+
+            // Walk up the parent chain of the descendant until we run out
+            // of parents or we find the ancestor.
+            DependencyObject current = this;
+
+            while ((current != null) && (current != ancestor))
+            {
+                current = VisualTreeHelper.GetParent(current);
+            }
+
+            return current == ancestor;
+        }
+
         //internal virtual void INTERNAL_Render()
         //{
         //}

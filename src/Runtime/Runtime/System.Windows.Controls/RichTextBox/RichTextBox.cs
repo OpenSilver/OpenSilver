@@ -456,7 +456,6 @@ namespace Windows.UI.Xaml.Controls
             }
 
             SetContentsFromBlocks();
-            UpdateTabIndex(IsTabStop, TabIndex);
         }
 
         /// <summary>

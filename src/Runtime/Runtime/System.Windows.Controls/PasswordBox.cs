@@ -62,20 +62,6 @@ namespace Windows.UI.Xaml.Controls
 
         internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
 
-        internal sealed override void UpdateTabIndexCore(bool isTabStop, int tabindex)
-        {
-            object focusTarget = GetFocusTarget();
-            if (focusTarget == null)
-            {
-                return;
-            }
-
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(
-                focusTarget,
-                "tabindex",
-                (!isTabStop || !IsEnabled) ? "-1" : ConvertToHtmlTabIndex(tabindex).ToString());
-        }
-
         /// <summary>
         /// The DependencyID for the PasswordChar property.
         /// Default Value: '•'
@@ -286,7 +272,6 @@ namespace Windows.UI.Xaml.Controls
             if (_textViewHost != null)
             {
                 PasswordBoxView view = CreateView();
-                view.Loaded += new RoutedEventHandler(OnViewLoaded);
 
                 _textViewHost.AttachView(view);
             }
@@ -296,21 +281,9 @@ namespace Windows.UI.Xaml.Controls
         {
             if (_textViewHost != null)
             {
-                _textViewHost.View.Loaded -= new RoutedEventHandler(OnViewLoaded);
-
                 _textViewHost.DetachView();
                 _textViewHost = null;
             }
-        }
-
-        private void OnViewLoaded(object sender, RoutedEventArgs e)
-        {
-            if (!IsLoaded)
-            {
-                return;
-            }
-
-            UpdateTabIndex(IsTabStop, TabIndex);
         }
 
         protected override AutomationPeer OnCreateAutomationPeer()
