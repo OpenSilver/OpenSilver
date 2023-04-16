@@ -50,7 +50,7 @@ namespace Windows.UI.Xaml.Documents
         internal sealed override UIElement KeyboardTarget => null;
 
 
-        internal override void UpdateTabIndex(bool isTabStop, int tabIndex)
+        internal sealed override void UpdateTabIndexCore(bool isTabStop, int tabIndex)
         {
             // we don't do anything since TextElement is not supposed to be a Control in the first place
             // and it is not supposed to be counted in tabbing

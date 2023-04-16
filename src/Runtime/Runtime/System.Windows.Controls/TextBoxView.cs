@@ -346,7 +346,6 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
 
             string isContentEditable = (!isReadOnly).ToString().ToLower();
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "contentEditable", isContentEditable);
-            this.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth = contentEditableDiv;
 
             contentEditableDivStyle.minWidth = "max(14px, 100%)";
             contentEditableDivStyle.minHeight = $"max({(Math.Floor(Host.FontSize * 1.5 * 1000) / 1000).ToInvariantString()}px, 100%)";

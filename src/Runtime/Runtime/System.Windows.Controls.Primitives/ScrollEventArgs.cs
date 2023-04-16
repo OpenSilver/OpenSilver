@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 #if MIGRATION
 namespace System.Windows.Controls.Primitives
 #else
@@ -22,7 +20,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// <summary>
     /// Provides data for the Scroll event.
     /// </summary>
-    public sealed partial class ScrollEventArgs : RoutedEventArgs
+    public sealed class ScrollEventArgs : RoutedEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the ScrollEventArgs class.
@@ -30,19 +28,39 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// <param name="newValue">The new Value of the ScrollBar.</param>
         /// <param name="scrollEventType">A ScrollEventType describing the event.</param>
         public ScrollEventArgs(double newValue, ScrollEventType scrollEventType)
+            : this(scrollEventType, newValue)
         {
-            this.NewValue = newValue;
-            this.ScrollEventType = scrollEventType;
         }
 
         /// <summary>
-        /// Gets the new Value of the ScrollBar.
+        /// Initializes a new instance of the <see cref="ScrollEventArgs"/> class.
         /// </summary>
-        public double NewValue { get; private set; }
+        /// <param name="scrollEventType">
+        /// A <see cref="ScrollEventType"/> describing the event.
+        /// </param>
+        /// <param name="newValue">
+        /// The new <see cref="RangeBase.Value"/> of the <see cref="ScrollBar"/>.
+        /// </param>
+        public ScrollEventArgs(ScrollEventType scrollEventType, double newValue)
+        {
+            NewValue = newValue;
+            ScrollEventType = scrollEventType;
+        }
 
         /// <summary>
-        /// Gets a ScrollEventType describing the event.
+        /// Gets the new <see cref="RangeBase.Value"/> of the <see cref="ScrollBar"/>.
         /// </summary>
-        public ScrollEventType ScrollEventType { get; private set; }
+        /// <returns>
+        /// The <see cref="RangeBase.Value"/> of the <see cref="ScrollBar"/> after the event.
+        /// </returns>
+        public double NewValue { get; }
+
+        /// <summary>
+        /// Gets a <see cref="ScrollEventType"/> describing the event.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="ScrollEventType"/> describing the event.
+        /// </returns>
+        public ScrollEventType ScrollEventType { get; }
     }
 }

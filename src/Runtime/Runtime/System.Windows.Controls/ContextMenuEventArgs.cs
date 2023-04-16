@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,6 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 
 #if MIGRATION
@@ -24,47 +22,35 @@ namespace Windows.UI.Xaml.Controls
     /// <summary>
     /// Provides data for the context menu event.
     /// </summary>
-    public sealed partial class ContextMenuEventArgs : RoutedEventArgs
+    public sealed class ContextMenuEventArgs : RoutedEventArgs
     {
-        double _pointerLeft;
-        double _pointerTop;
-
         public ContextMenuEventArgs(double pointerLeft, double pointerTop)
         {
-            _pointerLeft = pointerLeft;
-            _pointerTop = pointerTop;
+#if MIGRATION
+            CursorLeft = pointerLeft;
+            CursorTop = pointerTop;
+#else
+            PointerLeft = pointerLeft;
+            PointerTop = pointerTop;
+#endif
         }
 
         /// <summary>
         /// Gets the horizontal position of the mouse.
         /// </summary>
 #if MIGRATION
-        public double CursorLeft
+        public double CursorLeft { get; }
 #else
-        public double PointerLeft
+        public double PointerLeft { get; }
 #endif
-        {
-            get
-            {
-                return _pointerLeft;
-            }
-        }
 
         /// <summary>
         /// Gets the vertical position of the mouse.
         /// </summary>
 #if MIGRATION
-        public double CursorTop
+        public double CursorTop { get; }
 #else
-        public double PointerTop
+        public double PointerTop { get; }
 #endif
-        {
-            get
-            {
-                return _pointerTop;
-            }
-        }
-
-        //protected override void InvokeEventHandler(Delegate genericHandler, object genericTarget);
     }
 }

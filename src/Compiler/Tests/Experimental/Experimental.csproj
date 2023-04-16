@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <DefineSilverlight>true</DefineSilverlight>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <Configurations>SL;UWP</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'SL' ">
+    <DefineConstants>MIGRATION</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="AnotherGenericType.cs" />
+    <Compile Include="ClassWithGenericEvents.cs" />
+    <Compile Include="ClassWithField.cs" />
+    <Compile Include="ClassWithNestedEnum.cs" />
+    <Compile Include="DerivedClassWithGenericEvents.cs" />
+    <Compile Include="DerivedContentControl.cs" />
+    <Compile Include="EnumWithoutNamespace.cs" />
+    <Compile Include="GenericType.cs" />
+    <Compile Include="PlanetStructure.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DerivedClassGenericType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="file.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Runtime\Runtime\Runtime.OpenSilver.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading;
 using OpenSilver.Compiler.Common;
 using ILogger = OpenSilver.Compiler.Common.ILogger;
+using System.Linq;
 
 namespace OpenSilver.Compiler
 {
@@ -140,7 +141,7 @@ namespace OpenSilver.Compiler
                         if (shouldTheFileBeProcessed)
                         {
                             // The "ReflectionOnSeparateAppDomainHandler" class lets us use a separate AppDomain to resolve the types so that the types can be unloaded when done (when disposed, it frees any hook on the user application DLL's):
-                            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain = ReflectionOnSeparateAppDomainHandler.Current; // Note: this is not supposed to be null because it was instantiated in the "BeforeXamlPreprocessor" task. We use a static instance to avoid reloading the assemblies for each XAML file that is processed.
+                            AssembliesInspector reflectionOnSeparateAppDomain = AssembliesInspector.Current; // Note: this is not supposed to be null because it was instantiated in the "BeforeXamlPreprocessor" task. We use a static instance to avoid reloading the assemblies for each XAML file that is processed.
 
                             // Make sure that the reference is not null:
                             if (reflectionOnSeparateAppDomain == null)
@@ -188,12 +189,12 @@ namespace OpenSilver.Compiler
                     issues when the user recompiles his application). So we free them now.
                  */
 
-                ReflectionOnSeparateAppDomainHandler.Current.Dispose(); // Note: this is not supposed to be null because it was instantiated in the "BeforeXamlPreprocessor" task.
+                AssembliesInspector.Current.Dispose(); // Note: this is not supposed to be null because it was instantiated in the "BeforeXamlPreprocessor" task.
 
                 //-----------------------------------------------------
                 // Display the error and cancel the Build process:
                 //-----------------------------------------------------
-                string message = $"{operationName} failed: {ex.Message}\nNote: the XAML editor sometimes raises errors that are misleading. To see only real non-misleading errors, make sure to close all the XAML editor windows/tabs before compiling.";
+                string message = $"{operationName} failed: {string.Join(Environment.NewLine, GetInnerExceptions(ex).Select(e => e.Message))}\nNote: the XAML editor sometimes raises errors that are misleading. To see only real non-misleading errors, make sure to close all the XAML editor windows/tabs before compiling.";
 
                 if (ex is XamlParseException)
                 {
@@ -294,6 +295,22 @@ namespace OpenSilver.Compiler
         {
             HashAlgorithm algorithm = MD5.Create();  //or use SHA1.Create();
             return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        }
+
+        private static  IEnumerable<Exception> GetInnerExceptions(Exception ex)
+        {
+            if (ex == null)
+            {
+                throw new ArgumentNullException(nameof(ex));
+            }
+
+            var innerException = ex;
+            do
+            {
+                yield return innerException;
+                innerException = innerException.InnerException;
+            }
+            while (innerException != null);
         }
     }
 }

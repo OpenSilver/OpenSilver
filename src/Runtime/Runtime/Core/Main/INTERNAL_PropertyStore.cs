@@ -1,23 +1,30 @@
-﻿//#define USEASSERT
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
+//#define USEASSERT
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using OpenSilver.Internal;
-using OpenSilver.Internal.Data;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
 #else
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Media;
 #endif
 
 namespace CSHTML5.Internal
@@ -31,13 +38,15 @@ namespace CSHTML5.Internal
         /// </summary>
         /// <param name="dependencyObject"></param>
         /// <param name="dependencyProperty"></param>
+        /// <param name="metadata"></param>
         /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
         /// <param name="storage"></param>
         /// <returns></returns>
         public static bool TryGetStorage(DependencyObject dependencyObject,
-                                         DependencyProperty dependencyProperty,
-                                         bool createIfNotFoud,
-                                         out INTERNAL_PropertyStorage storage)
+            DependencyProperty dependencyProperty,
+            PropertyMetadata metadata,
+            bool createIfNotFoud,
+            out INTERNAL_PropertyStorage storage)
         {
             if (dependencyObject.INTERNAL_PropertyStorageDictionary.TryGetValue(dependencyProperty, out storage))
             {
@@ -46,20 +55,20 @@ namespace CSHTML5.Internal
 
             if (createIfNotFoud)
             {
-                // Get the type metadata
-                PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
-
                 //----------------------
                 // CREATE A NEW STORAGE:
                 //----------------------
 
-                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
+                metadata ??= dependencyProperty.GetMetadata(dependencyObject.GetType());
+
+                storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.DefaultValue);
+
                 dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
 
                 //-----------------------
                 // CHECK IF THE PROPERTY IS INHERITABLE:
                 //-----------------------
-                if (typeMetadata.Inherits)
+                if (metadata.Inherits)
                 {
                     //-----------------------
                     // ADD THE STORAGE TO "INTERNAL_AllInheritedProperties" IF IT IS NOT ALREADY THERE:
@@ -77,13 +86,15 @@ namespace CSHTML5.Internal
         /// </summary>
         /// <param name="dependencyObject"></param>
         /// <param name="dependencyProperty"></param>
+        /// <param name="metadata"></param>
         /// <param name="createIfNotFoud">when set to true, it forces the creation of the storage if it does not exists yet.</param>
         /// <param name="storage"></param>
         /// <returns></returns>
         internal static bool TryGetInheritedPropertyStorage(DependencyObject dependencyObject,
-                                                            DependencyProperty dependencyProperty,
-                                                            bool createIfNotFoud,
-                                                            out INTERNAL_PropertyStorage storage)
+            DependencyProperty dependencyProperty,
+            PropertyMetadata metadata,
+            bool createIfNotFoud,
+            out INTERNAL_PropertyStorage storage)
         {
             // Create the Storage if it does not already exist
             if (dependencyObject.INTERNAL_AllInheritedProperties.TryGetValue(dependencyProperty, out storage))
@@ -93,14 +104,13 @@ namespace CSHTML5.Internal
 
             if (createIfNotFoud)
             {
-                // Get the type metadata (if any):
-                PropertyMetadata typeMetadata = dependencyProperty.GetTypeMetaData(dependencyObject.GetType());
+                metadata ??= dependencyProperty.GetMetadata(dependencyObject.GetType());
 
-                global::System.Diagnostics.Debug.Assert(typeMetadata != null && typeMetadata.Inherits,
-                                                        $"{dependencyProperty.Name} is not an inherited property.");
+                Debug.Assert(metadata != null && metadata.Inherits,
+                    $"{dependencyProperty.Name} is not an inherited property.");
 
                 // Create the storage:
-                storage = new INTERNAL_PropertyStorage(dependencyObject, dependencyProperty, typeMetadata);
+                storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.DefaultValue);
 
                 //-----------------------
                 // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
@@ -120,13 +130,16 @@ namespace CSHTML5.Internal
         }
 
         internal static void SetValueCommon(INTERNAL_PropertyStorage storage,
-                                            object newValue,
-                                            bool coerceWithCurrentValue)
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            object newValue,
+            bool coerceWithCurrentValue)
         {
             if (newValue == DependencyProperty.UnsetValue)
             {
-                global::System.Diagnostics.Debug.Assert(!coerceWithCurrentValue, "Don't call SetCurrentValue with UnsetValue");
-                ClearValueCommon(storage);
+                Debug.Assert(!coerceWithCurrentValue, "Don't call SetCurrentValue with UnsetValue");
+                ClearValueCommon(storage, depObj, dp, metadata);
                 return;
             }
 
@@ -141,16 +154,16 @@ namespace CSHTML5.Internal
                         var newExpr = newValue as Expression;
                         if (currentExpr == newExpr)
                         {
-                            global::System.Diagnostics.Debug.Assert(newExpr.IsAttached);
-                            RefreshExpressionCommon(storage, newExpr, false);
+                            Debug.Assert(newExpr.IsAttached);
+                            RefreshExpressionCommon(storage, depObj, dp, metadata, newExpr, false);
                             return;
                         }
 
                         // if the current BindingExpression is a TwoWay binding, we don't want to remove the binding 
                         // unless we are overriding it with a new Expression.
-                        if (newExpr != null || !currentExpr.CanSetValue(storage.Owner, storage.Property))
+                        if (newExpr != null || !currentExpr.CanSetValue(depObj, dp))
                         {
-                            currentExpr.OnDetach(storage.Owner, storage.Property);
+                            currentExpr.OnDetach(depObj, dp);
                         }
                         else
                         {
@@ -160,7 +173,7 @@ namespace CSHTML5.Internal
                 }
                 else if (storage.Entry.IsExpressionFromStyle)
                 {
-                    ((Expression)storage.Entry.ModifiedValue.BaseValue).OnDetach(storage.Owner, storage.Property);
+                    ((Expression)storage.Entry.ModifiedValue.BaseValue).OnDetach(depObj, dp);
                 }
 
                 // Set the new local value
@@ -168,67 +181,93 @@ namespace CSHTML5.Internal
             }
 
             UpdateEffectiveValue(storage,
-                                 newValue,
-                                 BaseValueSourceInternal.Local,
-                                 coerceWithCurrentValue, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 false, // clearValue
-                                 true); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                newValue,
+                BaseValueSourceInternal.Local,
+                coerceWithCurrentValue, // coerceWithCurrentValue
+                false, // coerceValue
+                false, // clearValue
+                true); // propagateChanges
         }
 
-        internal static void RefreshExpressionCommon(INTERNAL_PropertyStorage storage, Expression expression, bool isInStyle)
+        internal static void RefreshExpressionCommon(INTERNAL_PropertyStorage storage,
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            Expression expression,
+            bool isInStyle)
         {
-            global::System.Diagnostics.Debug.Assert(expression != null, "Expression should not be null");
-            global::System.Diagnostics.Debug.Assert(storage.Entry.IsExpression || storage.Entry.IsExpressionFromStyle, "Property base value is not a BindingExpression !");
+            Debug.Assert(expression != null, "Expression should not be null");
+            Debug.Assert(storage.Entry.IsExpression || storage.Entry.IsExpressionFromStyle, "Property base value is not a BindingExpression !");
 
             UpdateEffectiveValue(storage,
-                                 expression,
-                                 isInStyle ? BaseValueSourceInternal.LocalStyle : BaseValueSourceInternal.Local,
-                                 false, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 false, // clearValue
-                                 true); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                expression,
+                isInStyle ? BaseValueSourceInternal.LocalStyle : BaseValueSourceInternal.Local,
+                false, // coerceWithCurrentValue
+                false, // coerceValue
+                false, // clearValue
+                true); // propagateChanges
         }
 
-        internal static void ClearValueCommon(INTERNAL_PropertyStorage storage)
+        internal static void ClearValueCommon(INTERNAL_PropertyStorage storage,
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata)
         {
             // Check for expression
             var currentExpr = storage.Entry.IsExpression
                               ? storage.LocalValue as Expression
                               : null;
 
-            if (currentExpr != null)
-            {
-                currentExpr.OnDetach(storage.Owner, storage.Property);
-            }
+            currentExpr?.OnDetach(depObj, dp);
 
             // Reset local value
             storage.LocalValue = DependencyProperty.UnsetValue;
 
             UpdateEffectiveValue(storage,
-                                 DependencyProperty.UnsetValue,
-                                 BaseValueSourceInternal.Local,
-                                 false, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 true, // clearValue
-                                 true); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                DependencyProperty.UnsetValue,
+                BaseValueSourceInternal.Local,
+                false, // coerceWithCurrentValue
+                false, // coerceValue
+                true, // clearValue
+                true); // propagateChanges
         }
 
-        internal static void CoerceValueCommon(INTERNAL_PropertyStorage storage)
+        internal static void CoerceValueCommon(INTERNAL_PropertyStorage storage,
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata)
         {
             if (storage.Entry.IsCoercedWithCurrentValue)
             {
-                SetValueCommon(storage, storage.Entry.ModifiedValue.CoercedValue, true);
+                SetValueCommon(storage,
+                    depObj,
+                    dp,
+                    metadata,
+                    storage.Entry.ModifiedValue.CoercedValue,
+                    true);
+
                 return;
             }
 
             UpdateEffectiveValue(storage,
-                                 null, //unused for coerce operation 
-                                 BaseValueSourceInternal.Local,
-                                 false, // coerceWithCurrentValue
-                                 true, // coerceValue
-                                 false, // clearValue
-                                 true); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                null, //unused for coerce operation 
+                BaseValueSourceInternal.Local,
+                false, // coerceWithCurrentValue
+                true, // coerceValue
+                false, // clearValue
+                true); // propagateChanges
         }
 
         internal static object GetEffectiveValue(EffectiveValueEntry entry)
@@ -245,27 +284,33 @@ namespace CSHTML5.Internal
             }
         }
 
-        internal static void SetAnimationValue(INTERNAL_PropertyStorage storage,
-                                               object value)
+        internal static void SetAnimationValue(
+            INTERNAL_PropertyStorage storage,
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            object value)
         {
             if (storage.Entry.IsExpression || storage.Entry.IsExpressionFromStyle)
             {
-                var currentExpr = storage.Entry.ModifiedValue.BaseValue as Expression;
-                if (currentExpr != null)
+                if (storage.Entry.ModifiedValue.BaseValue is Expression currentExpr)
                 {
-                    currentExpr.OnDetach(storage.Owner, storage.Property);
+                    currentExpr.OnDetach(depObj, dp);
                 }
             }
 
             storage.AnimatedValue = value;
 
             UpdateEffectiveValue(storage,
-                                 value,
-                                 BaseValueSourceInternal.Animated,
-                                 false, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 value == DependencyProperty.UnsetValue, // clearValue
-                                 true); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                value,
+                BaseValueSourceInternal.Animated,
+                false, // coerceWithCurrentValue
+                false, // coerceValue
+                value == DependencyProperty.UnsetValue, // clearValue
+                true); // propagateChanges
         }
 
         #endregion
@@ -273,8 +318,9 @@ namespace CSHTML5.Internal
         #region Private Methods
 
         private static void ComputeEffectiveValue(INTERNAL_PropertyStorage storage,
-                                                  out object effectiveValue,
-                                                  out BaseValueSourceInternal kind)
+            PropertyMetadata metadata,
+            out object effectiveValue,
+            out BaseValueSourceInternal kind)
         {
             if (!storage.IsAnimatedOverLocal &&
                  storage.LocalValue != DependencyProperty.UnsetValue)
@@ -305,20 +351,23 @@ namespace CSHTML5.Internal
             }
             else // Property default value
             {
-                effectiveValue = storage.TypeMetadata.DefaultValue;
+                effectiveValue = metadata.DefaultValue;
                 kind = BaseValueSourceInternal.Default;
             }
         }
 
         private static bool UpdateEffectiveValue(INTERNAL_PropertyStorage storage,
-                                                 object newValue,
-                                                 BaseValueSourceInternal newValueSource,
-                                                 bool coerceWithCurrentValue,
-                                                 bool coerceValue,
-                                                 bool clearValue,
-                                                 bool propagateChanges)
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            object newValue,
+            BaseValueSourceInternal newValueSource,
+            bool coerceWithCurrentValue,
+            bool coerceValue,
+            bool clearValue,
+            bool propagateChanges)
         {
-            global::System.Diagnostics.Debug.Assert((coerceWithCurrentValue == coerceValue && !coerceValue) || coerceValue != coerceWithCurrentValue);
+            Debug.Assert((coerceWithCurrentValue == coerceValue && !coerceValue) || coerceValue != coerceWithCurrentValue);
 
             bool isCoerceOperation = coerceValue || coerceWithCurrentValue;
             EffectiveValueEntry newEntry;
@@ -358,7 +407,7 @@ namespace CSHTML5.Internal
             }
             else
             {
-                ComputeEffectiveValue(storage, out effectiveValue, out effectiveValueKind);
+                ComputeEffectiveValue(storage, metadata, out effectiveValue, out effectiveValueKind);
 
                 // Check for early exit if effective value is not impacted (if we are doing 
                 // a coerce operation, we have to go through the update process)
@@ -376,9 +425,9 @@ namespace CSHTML5.Internal
                 // If the current base value is an Expression, it should have been detached by now
                 // Or is the same instance as 'effectiveValue' (this occurs when we update a property bound to a
                 // BindingExpression)
-                global::System.Diagnostics.Debug.Assert(currentExpr == null ||
-                                                        !currentExpr.IsAttached ||
-                                                        object.ReferenceEquals(currentExpr, effectiveValue), "Binding expression should be detached.");
+                Debug.Assert(currentExpr == null ||
+                    !currentExpr.IsAttached ||
+                    object.ReferenceEquals(currentExpr, effectiveValue), "Binding expression should be detached.");
 #endif
                 newEntry = new EffectiveValueEntry(effectiveValueKind);
             }
@@ -388,10 +437,9 @@ namespace CSHTML5.Internal
 
             if (!isCoerceOperation)
             {
-                var newExpr = effectiveValue as Expression;
-                if (newExpr == null)
+                if (effectiveValue is not Expression newExpr)
                 {
-                    computedValue = storage.Property.PropertyType == typeof(string)
+                    computedValue = dp.PropertyType == typeof(string)
                                     ? effectiveValue?.ToString()
                                     : effectiveValue;
                     newEntry.Value = computedValue;
@@ -399,7 +447,7 @@ namespace CSHTML5.Internal
                 else
                 {
 #if USEASSERT
-                    global::System.Diagnostics.Debug.Assert(effectiveValueKind == BaseValueSourceInternal.Local || effectiveValueKind == BaseValueSourceInternal.LocalStyle);
+                    Debug.Assert(effectiveValueKind == BaseValueSourceInternal.Local || effectiveValueKind == BaseValueSourceInternal.LocalStyle);
 #endif
 
                     // If the new Expression is the same as the current one,
@@ -412,18 +460,18 @@ namespace CSHTML5.Internal
                             throw new InvalidOperationException(string.Format("Cannot attach an instance of '{0}' multiple times", newExpr.GetType()));
                         }
 
-                        newExpr.OnAttach(storage.Owner, storage.Property);
+                        newExpr.OnAttach(depObj, dp);
                     }
-                    
+
                     newEntry.Value = newExpr; // Set the new base value
 
                     if (effectiveValueKind == BaseValueSourceInternal.Local)
                     {
-                        newEntry.SetExpressionValue(storage.TypeMetadata.DefaultValue, newExpr);
+                        newEntry.SetExpressionValue(metadata.DefaultValue, newExpr);
                     }
                     else
                     {
-                        newEntry.SetExpressionFromStyleValue(storage.TypeMetadata.DefaultValue, newExpr);
+                        newEntry.SetExpressionFromStyleValue(metadata.DefaultValue, newExpr);
                     }
 
                     // 1- 'isNewBinding == true' means that we are attaching a new Expression.
@@ -432,9 +480,9 @@ namespace CSHTML5.Internal
                     // 3- Otherwise we are trying to change the value of a TwoWay binding.
                     // In that case we have to preserve the Expression (this is not the case if the first two 
                     // situations), hence the following line :
-                    computedValue = isNewBinding || newValue is Expression ? newExpr.GetValue(storage.Owner, storage.Property)
+                    computedValue = isNewBinding || newValue is Expression ? newExpr.GetValue(depObj, dp)
                                                                            : newValue;
-                    computedValue = storage.Property.PropertyType == typeof(string)
+                    computedValue = dp.PropertyType == typeof(string)
                                     ? computedValue?.ToString()
                                     : computedValue;
                     newEntry.ModifiedValue.ExpressionValue = computedValue;
@@ -453,29 +501,29 @@ namespace CSHTML5.Internal
             if (coerceWithCurrentValue)
             {
                 object baseValue = GetCoercionBaseValue(newEntry);
-                ProcessCoerceValue(storage.Owner,
-                                   storage.Property,
-                                   storage.TypeMetadata,
-                                   newEntry,
-                                   ref computedValue,
-                                   oldValue,
-                                   baseValue,
-                                   true);
+                ProcessCoerceValue(depObj,
+                    dp,
+                    metadata,
+                    newEntry,
+                    ref computedValue,
+                    oldValue,
+                    baseValue,
+                    true);
             }
 
             // Coerce Value
             // We don't want to coerce the value if it's being reset to the property's default value
-            if (storage.TypeMetadata.CoerceValueCallback != null && !(clearValue && newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default))
+            if (metadata.CoerceValueCallback != null && !(clearValue && newEntry.FullValueSource == (FullValueSource)BaseValueSourceInternal.Default))
             {
                 object baseValue = GetCoercionBaseValue(newEntry);
-                ProcessCoerceValue(storage.Owner,
-                                   storage.Property,
-                                   storage.TypeMetadata,
-                                   newEntry,
-                                   ref computedValue,
-                                   oldValue,
-                                   baseValue,
-                                   false);
+                ProcessCoerceValue(depObj,
+                    dp,
+                    metadata,
+                    newEntry,
+                    ref computedValue,
+                    oldValue,
+                    baseValue,
+                    false);
             }
 
             // Reset old value inheritance context
@@ -485,34 +533,34 @@ namespace CSHTML5.Internal
                 // - Inheritance context is only handled by local value
                 // - We use null instead of the actual DependencyProperty
                 // as the parameter is ignored in the current implentation.
-                storage.Owner.RemoveSelfAsInheritanceContext(oldValue, null/*storage.Property*/);
+                depObj.RemoveSelfAsInheritanceContext(oldValue, null/*storage.Property*/);
             }
 
             // Set new value inheritance context
             if (effectiveValueKind == BaseValueSourceInternal.Local)
             {
                 // Check above
-                storage.Owner.ProvideSelfAsInheritanceContext(computedValue, null/*storage.Property*/);
+                depObj.ProvideSelfAsInheritanceContext(computedValue, null/*storage.Property*/);
             }
 
             storage.Entry = newEntry;
 
             bool valueChanged;
-            if (valueChanged = (storage.INTERNAL_IsVisualValueDirty || !ArePropertiesEqual(oldValue, computedValue, storage.Property.PropertyType)))
+            if (valueChanged = (storage.INTERNAL_IsVisualValueDirty || !ArePropertiesEqual(oldValue, computedValue, dp.PropertyType)))
             {
                 // Raise the PropertyChanged event
-                if (!storage.TypeMetadata.Inherits || ShouldRaisePropertyChanged(storage))
+                if (!metadata.Inherits || ShouldRaisePropertyChanged(depObj, dp))
                 {
-                    OnPropertyChanged(storage, oldValue, computedValue);
+                    OnPropertyChanged(depObj, dp, metadata, oldValue, computedValue);
                 }
 
                 // Propagate to children if property is inherited
-                if (storage.TypeMetadata.Inherits)
+                if (metadata.Inherits)
                 {
-                    if (storage.Owner is FrameworkElement rootElement)
+                    if (depObj is FrameworkElement rootElement)
                     {
                         InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo(rootElement,
-                            storage.Property,
+                            dp,
                             oldValue, oldBaseValueSource,
                             computedValue, newValueSource);
 
@@ -534,7 +582,7 @@ namespace CSHTML5.Internal
             // it is null).
             if (currentExpr != null) 
             {
-                currentExpr.SetValue(storage.Owner, storage.Property, computedValue);
+                currentExpr.SetValue(depObj, dp, computedValue);
             }
 
             return valueChanged;
@@ -547,13 +595,13 @@ namespace CSHTML5.Internal
         }
 
         private static void ProcessCoerceValue(DependencyObject target,
-                                               DependencyProperty dp,
-                                               PropertyMetadata metadata,
-                                               EffectiveValueEntry entry,
-                                               ref object newValue,
-                                               object oldValue,
-                                               object baseValue,
-                                               bool coerceWithCurrentValue)
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            EffectiveValueEntry entry,
+            ref object newValue,
+            object oldValue,
+            object baseValue,
+            bool coerceWithCurrentValue)
         {
             newValue = coerceWithCurrentValue ? newValue : metadata.CoerceValueCallback(target, newValue);
 
@@ -596,29 +644,29 @@ namespace CSHTML5.Internal
             }
             else
             {
-                global::System.Diagnostics.Debug.Assert(entry.IsExpression || entry.IsExpressionFromStyle);
+                Debug.Assert(entry.IsExpression || entry.IsExpressionFromStyle);
                 baseValue = entry.ModifiedValue.ExpressionValue;
             }
             return baseValue;
         }
 
-        private static void OnPropertyChanged(INTERNAL_PropertyStorage storage, object oldValue, object newValue)
+        private static void OnPropertyChanged(DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            object oldValue,
+            object newValue)
         {
-            DependencyObject sender = storage.Owner;
-
-            var typeMetadata = storage.TypeMetadata;
-
             //---------------------
             // Ensure tha the value knows in which properties it is used (this is useful for example so that a SolidColorBrush knows in which properties it is used):
             //---------------------
 
             if (oldValue is IHasAccessToPropertiesWhereItIsUsed2 hasAccessToProperties)
             {
-                var key = new WeakDependencyObjectWrapper(sender);
+                var key = new WeakDependencyObjectWrapper(depObj);
                 var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
                 if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
                 {
-                    val.Remove(storage.Property);
+                    val.Remove(dp);
                     // Remove key from dictionary if no properties left
                     if (val.Count == 0)
                     {
@@ -629,15 +677,15 @@ namespace CSHTML5.Internal
 
             if ((hasAccessToProperties = newValue as IHasAccessToPropertiesWhereItIsUsed2) != null)
             {
-                var key = new WeakDependencyObjectWrapper(sender);
+                var key = new WeakDependencyObjectWrapper(depObj);
                 var propertiesWhereUsed = hasAccessToProperties.PropertiesWhereUsed;
                 if (propertiesWhereUsed.TryGetValue(key, out HashSet<DependencyProperty> val))
                 {
-                    val.Add(storage.Property);
+                    val.Add(dp);
                 }
                 else
                 {
-                    propertiesWhereUsed.Add(key, new HashSet<DependencyProperty>() { storage.Property });
+                    propertiesWhereUsed.Add(key, new HashSet<DependencyProperty>() { dp });
                 }
             }
 
@@ -645,15 +693,15 @@ namespace CSHTML5.Internal
             // If the element is in the Visual Tree, update the DOM:
             //---------------------
 
-            if (typeMetadata != null)
+            if (metadata != null)
             {
-                ApplyCssChanges(oldValue, newValue, typeMetadata, sender); // Note: this we need to call regardless of whether the element is in the visual tree. In fact, for example, the SolidColorBrush.Color property can be used by multiple UIElements, some of which may be in the visual tree and others not.
+                ApplyCssChanges(oldValue, newValue, metadata, depObj); // Note: this we need to call regardless of whether the element is in the visual tree. In fact, for example, the SolidColorBrush.Color property can be used by multiple UIElements, some of which may be in the visual tree and others not.
 
-                if (sender is UIElement && ((UIElement)sender)._isLoaded)
+                if (depObj is UIElement && ((UIElement)depObj)._isLoaded)
                 {
                     // Note: this we call only if the element is in the visual tree.
-                    typeMetadata.MethodToUpdateDom?.Invoke(sender, newValue); 
-                    typeMetadata.MethodToUpdateDom2?.Invoke(sender, oldValue, newValue);
+                    metadata.MethodToUpdateDom?.Invoke(depObj, newValue); 
+                    metadata.MethodToUpdateDom2?.Invoke(depObj, oldValue, newValue);
                 }
             }
 
@@ -661,20 +709,20 @@ namespace CSHTML5.Internal
             // Call the PropertyChangedCallback if any:
             //---------------------
 
-            var args = new DependencyPropertyChangedEventArgs(oldValue, newValue, storage.Property);
-            if (typeMetadata != null && typeMetadata.PropertyChangedCallback != null)
+            var args = new DependencyPropertyChangedEventArgs(oldValue, newValue, dp);
+            if (metadata != null && metadata.PropertyChangedCallback != null)
             {
-                typeMetadata.PropertyChangedCallback(sender, args);
+                metadata.PropertyChangedCallback(depObj, args);
             }
 
             //---------------------
             // Update bindings if any:
             //---------------------
 
-            sender.InvalidateDependents(args);
+            depObj.InvalidateDependents(args);
 
             // Raise the InvalidateMeasure or InvalidateArrange
-            sender.OnPropertyChanged(args);
+            depObj.OnPropertyChanged(args);
         }
 
         private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
@@ -690,73 +738,89 @@ namespace CSHTML5.Internal
             return object.ReferenceEquals(obj1, obj2);
         }
 
-        private static bool ShouldRaisePropertyChanged(INTERNAL_PropertyStorage storage)
+        private static bool ShouldRaisePropertyChanged(DependencyObject depObj, DependencyProperty dp)
         {
             // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
-            if (!storage.Property.IsAttached)
+            if (!dp.IsAttached)
             {
-                return storage.Property.OwnerType.IsAssignableFrom(storage.Owner.GetType()) || storage.Property == FrameworkElement.DataContextProperty;
+                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || dp == FrameworkElement.DataContextProperty;
             }
             return true;
         }
 
 #endregion
 
-        internal static bool SetInheritedValue(INTERNAL_PropertyStorage storage, object newValue, bool recursively)
+        internal static bool SetInheritedValue(INTERNAL_PropertyStorage storage,
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            object newValue,
+            bool recursively)
         {
             storage.InheritedValue = newValue;
 
             return UpdateEffectiveValue(storage,
-                                        newValue,
-                                        BaseValueSourceInternal.Inherited,
-                                        false, // coerceWithCurrentValue
-                                        false, // coerceValue
-                                        newValue == DependencyProperty.UnsetValue, // clearValue
-                                        recursively); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                newValue,
+                BaseValueSourceInternal.Inherited,
+                false, // coerceWithCurrentValue
+                false, // coerceValue
+                newValue == DependencyProperty.UnsetValue, // clearValue
+                recursively); // propagateChanges
         }
 
-        internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage, object newValue)
+        internal static void SetLocalStyleValue(INTERNAL_PropertyStorage storage,
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            object newValue)
         {
             if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.LocalStyle)
             {
                 var oldExpr = storage.Entry.IsExpressionFromStyle ? storage.LocalStyleValue as Expression : null;
-                if (oldExpr != null)
-                {
-                    oldExpr.OnDetach(storage.Owner, storage.Property);
-                }
+                oldExpr?.OnDetach(depObj, dp);
             }
 
             storage.LocalStyleValue = newValue;
 
             UpdateEffectiveValue(storage,
-                                 newValue,
-                                 BaseValueSourceInternal.LocalStyle,
-                                 false, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 newValue == DependencyProperty.UnsetValue, // clearValue
-                                 true); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                newValue,
+                BaseValueSourceInternal.LocalStyle,
+                false, // coerceWithCurrentValue
+                false, // coerceValue
+                newValue == DependencyProperty.UnsetValue, // clearValue
+                true); // propagateChanges
         }
 
-        internal static void SetThemeStyleValue(INTERNAL_PropertyStorage storage, object newValue)
+        internal static void SetThemeStyleValue(INTERNAL_PropertyStorage storage,
+            DependencyObject depObj,
+            DependencyProperty dp,
+            PropertyMetadata metadata,
+            object newValue)
         {
             if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.ThemeStyle)
             {
                 var oldExpr = storage.Entry.IsExpressionFromStyle ? storage.ThemeStyleValue as Expression : null;
-                if (oldExpr != null)
-                {
-                    oldExpr.OnDetach(storage.Owner, storage.Property);
-                }
+                oldExpr?.OnDetach(depObj, dp);
             }
 
             storage.ThemeStyleValue = newValue;
 
             UpdateEffectiveValue(storage,
-                                 newValue,
-                                 BaseValueSourceInternal.ThemeStyle,
-                                 false, // coerceWithCurrentValue
-                                 false, // coerceValue
-                                 newValue == DependencyProperty.UnsetValue, // clearValue
-                                 true); // propagateChanges
+                depObj,
+                dp,
+                metadata,
+                newValue,
+                BaseValueSourceInternal.ThemeStyle,
+                false, // coerceWithCurrentValue
+                false, // coerceValue
+                newValue == DependencyProperty.UnsetValue, // clearValue
+                true); // propagateChanges
         }
 
         internal static void ApplyCssChanges(object oldValue, object newValue, PropertyMetadata typeMetadata, DependencyObject sender)
@@ -814,56 +878,35 @@ namespace CSHTML5.Internal
                         }
                         if (cssEquivalent.DomElement != null)
                         {
-                            cssEquivalent.Value ??= (finalInstance, value) => { return value ?? ""; }; // Default value
-                            if (cssEquivalent.Values != null)
-                            {
-                                List<object> cssValues = cssEquivalent.Values(sender, newValue);
+                            cssEquivalent.Value ??= static (finalInstance, value) => { return value ?? ""; }; // Default value
+                            
+                            object cssValue = cssEquivalent.Value(sender, newValue);
 
+                            if (!(cssValue is Dictionary<string, object>))
+                            {
                                 if (cssEquivalent.OnlyUseVelocity)
                                 {
-                                    foreach (object cssValue in cssValues)
-                                    {
-                                        INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                                    }
+                                    INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
                                 }
                                 else
                                 {
-                                    foreach (object cssValue in cssValues)
-                                    {
-                                        INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                                    }
+                                    INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
                                 }
                             }
-                            else if (cssEquivalent.Value != null) //I guess we cannot have both defined
+                            else
                             {
-                                object cssValue = cssEquivalent.Value(sender, newValue);
-
-                                if (!(cssValue is Dictionary<string, object>))
+                                //Note: currently, only Color needs to set multiple values when using Velocity (which is why cssValue is a Dictionary), which is why it has a special treatment.
+                                //todo: if more types arrive here, find a way to have a more generic way of handling it ?
+                                if (newValue is Color)
                                 {
+                                    Color newColor = (Color)newValue;
                                     if (cssEquivalent.OnlyUseVelocity)
                                     {
-                                        INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
+                                        INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlStringForVelocity());
                                     }
                                     else
                                     {
-                                        INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, cssValue);
-                                    }
-                                }
-                                else
-                                {
-                                    //Note: currently, only Color needs to set multiple values when using Velocity (which is why cssValue is a Dictionary), which is why it has a special treatment.
-                                    //todo: if more types arrive here, find a way to have a more generic way of handling it ?
-                                    if (newValue is Color)
-                                    {
-                                        Color newColor = (Color)newValue;
-                                        if (cssEquivalent.OnlyUseVelocity)
-                                        {
-                                            INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlStringForVelocity());
-                                        }
-                                        else
-                                        {
-                                            INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlString(1d));
-                                        }
+                                        INTERNAL_HtmlDomManager.SetDomElementStyleProperty(cssEquivalent.DomElement, cssEquivalent.Name, newColor.INTERNAL_ToHtmlString(1d));
                                     }
                                 }
                             }

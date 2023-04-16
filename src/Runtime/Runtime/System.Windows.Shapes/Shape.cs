@@ -19,7 +19,6 @@ using System.Globalization;
 using System.Linq;
 using CSHTML5;
 using CSHTML5.Internal;
-using OpenSilver;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -599,17 +598,18 @@ namespace Windows.UI.Xaml.Shapes
         {
             // Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need 
             // to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
-            BulkExecuteJavascriptAsync bulkJs = new BulkExecuteJavascriptAsync();
-            var context = bulkJs.AddJavascriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
+            var context = OpenSilver.Interop.ExecuteJavaScriptAsync(
+                $"{INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement)}.getContext('2d')");
             string sContext = INTERNAL_InteropImplementation.GetVariableStringForJS(context);
 
             // we remove the previous drawing:
             // todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
-            bulkJs.AddJavascript($"{sContext}.clearRect(0, 0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                $"{sContext}.clearRect(0, 0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
 
 
             // context.save() for the fill
-            bulkJs.AddJavascript($"{sContext}.save()");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.save()");
 
             // FillStyle:
             double opacity = shape.Fill == null ? 1 : shape.Fill.Opacity;
@@ -625,32 +625,32 @@ namespace Windows.UI.Xaml.Shapes
                                             verticalMultiplicator, 
                                             xOffsetToApplyBeforeMultiplication, 
                                             yOffsetToApplyBeforeMultiplication, 
-                                            shapeActualSize, bulkJs);
+                                            shapeActualSize);
 
             if (fillValue != null)
             {
-                bulkJs.AddJavascript($"{sContext}.fillStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(fillValue)}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(fillValue)}");
             }
             else
             {
-                bulkJs.AddJavascript($"{sContext}.fillStyle = ''");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fillStyle = ''");
             }
 
-            bulkJs.AddJavascript($"{sContext}.lineJoin = '{shape.StrokeLineJoin.ToString().ToLower()}';");
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineJoin = '{shape.StrokeLineJoin.ToString().ToLower()}';");
             if (shape.StrokeLineJoin == PenLineJoin.Miter)
             {
-                bulkJs.AddJavascript($"{sContext}.miterLimit = {shape.StrokeMiterLimit.ToInvariantString()}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.miterLimit = {shape.StrokeMiterLimit.ToInvariantString()}");
             }
 
             if (shape.Fill != null)
             {
                 // Note: I am not sure that calling fill("evenodd") works properly in Edge, the canvasRenderingContext2d 
                 // has a msfillRule property which might be the intended way to use the evenodd rule when in Edge.
-                bulkJs.AddJavascript($"{sContext}.fill({INTERNAL_InteropImplementation.GetVariableStringForJS(fillRule)})"); 
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.fill({INTERNAL_InteropImplementation.GetVariableStringForJS(fillRule)})"); 
             }
 
             // restore after fill then save before stroke
-            bulkJs.AddJavascript($"{sContext}.restore(); {sContext}.save()"); 
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.restore(); {sContext}.save()"); 
 
             //stroke
             opacity = shape.Stroke == null ? 1 : shape.Stroke.Opacity;
@@ -666,7 +666,7 @@ namespace Windows.UI.Xaml.Shapes
                                               verticalMultiplicator, 
                                               xOffsetToApplyBeforeMultiplication, 
                                               yOffsetToApplyBeforeMultiplication, 
-                                              shapeActualSize, bulkJs);
+                                              shapeActualSize);
 
             double strokeThickness = shape.StrokeThickness;
             if (shape.Stroke == null)
@@ -678,8 +678,8 @@ namespace Windows.UI.Xaml.Shapes
             if (strokeValue != null && strokeThickness > 0)
             {
                 double thickness = shape.StrokeThickness;
-                bulkJs.AddJavascript($"{sContext}.strokeStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
-                bulkJs.AddJavascript($"{sContext}.lineWidth = {strokeThickness.ToInvariantString()}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.strokeStyle = {INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {strokeThickness.ToInvariantString()}");
                 DoubleCollection strokeDashArray = shape.StrokeDashArray;
                 if (strokeDashArray != null)
                 {
@@ -688,15 +688,16 @@ namespace Windows.UI.Xaml.Shapes
 
                 if (shape.Stroke != null && shape.StrokeThickness > 0)
                 {
-                    bulkJs.AddJavascript($"{sContext}.stroke()");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke()");
                 }
 
-                bulkJs.AddJavascript($"{sContext}.restore()");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.restore()");
             }
 
             //todo: make sure this is correct, especially when shrinking the ellipse (width and height may already have been applied).
-            bulkJs.AddJavascript($"{sContext}.lineWidth = {shape.StrokeThickness.ToInvariantString()}");
-            _ = bulkJs.ExecuteAndDispose();
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.lineWidth = {shape.StrokeThickness.ToInvariantString()}");
+
+            INTERNAL_DispatcherHelpers.QueueAction(() => context.Dispose());
         }
 
         internal static object GetHtmlBrush(Shape shape, 
@@ -711,8 +712,7 @@ namespace Windows.UI.Xaml.Shapes
                                             double verticalMultiplicator, 
                                             double xOffsetToApplyBeforeMultiplication, 
                                             double yOffsetToApplyBeforeMultiplication, 
-                                            Size shapeActualSize,
-                                            BulkExecuteJavascriptAsync bulkJs)
+                                            Size shapeActualSize)
         {
             object returnValue = null;
             // todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush 
@@ -743,7 +743,7 @@ namespace Windows.UI.Xaml.Shapes
 
                 if (fillAsLinearGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    returnValue = createLinearGradient(context, x0, y0, x1, y1, fillAsLinearGradientBrush, opacity, bulkJs);
+                    returnValue = createLinearGradient(context, x0, y0, x1, y1, fillAsLinearGradientBrush, opacity);
                 }
                 else
                 {
@@ -831,24 +831,24 @@ namespace Windows.UI.Xaml.Shapes
                     double tempCanvasHeight = shapeHeight > shapeWidth ? shapeHeight : shapeWidth;
 
 
-                    var canvas = bulkJs.AddJavascriptAsync(@"document.createElement('canvas')");
+                    var canvas = OpenSilver.Interop.ExecuteJavaScript(@"document.createElement('canvas')");
                     string sCanvas = INTERNAL_InteropImplementation.GetVariableStringForJS(canvas);
                     string width = distance.ToInvariantString() + "px";
                     string height = tempCanvasHeight.ToInvariantString() + "px";
-                    bulkJs.AddJavascript($@"
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 {sCanvas}.setAttribute('width', ""{width}"");
 {sCanvas}.setAttribute('height', ""{height}"");
 {sCanvas}.style.width = ""{width}"";
 {sCanvas}.style.height = ""{height}""");
 
-                    var ctx = bulkJs.AddJavascriptAsync($"{sCanvas}.getContext('2d')");
+                    var ctx = OpenSilver.Interop.ExecuteJavaScriptAsync($"{sCanvas}.getContext('2d')");
 
-                    var gradient = createLinearGradient(ctx, 0d, 0d, distance, 0d, fillAsLinearGradientBrush, opacity, bulkJs);
+                    var gradient = createLinearGradient(ctx, 0d, 0d, distance, 0d, fillAsLinearGradientBrush, opacity);
 
                     string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(shape._canvasDomElement);
                     string sCtx = INTERNAL_InteropImplementation.GetVariableStringForJS(ctx);
                     string sGradient = INTERNAL_InteropImplementation.GetVariableStringForJS(gradient);
-                    bulkJs.AddJavascript($@"
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
 {sCtx}.fillStyle = {sGradient};
 {sCtx}.fillRect(0, 0, {distance.ToInvariantString()}, {tempCanvasHeight.ToInvariantString()});
 if({sElement} != undefined && {sElement} != null) {{
@@ -857,7 +857,7 @@ context.rotate({angle.ToInvariantString()});
 context.translate({offset.ToInvariantString()}, 0);
 }}");
 
-                    bulkJs.AddJavascriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.createPattern({sCanvas}, 'repeat')");
+                    returnValue = OpenSilver.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.createPattern({sCanvas}, 'repeat')");
                 }
             }
             else if (brush is RadialGradientBrush)
@@ -896,11 +896,11 @@ context.translate({offset.ToInvariantString()}, 0);
                     r = r * (yOffsetToApplyBeforeMultiplication + maxY - minY) * verticalMultiplicator + minY;
                 }
 
-                bulkJs.AddJavascript($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.scale({radiusScaling.ToInvariantString()},1)");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.scale({radiusScaling.ToInvariantString()},1)");
                 if (fillAsRadialGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
                     returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d, centerX, centerY, r,
-                        fillAsRadialGradientBrush, opacity, bulkJs);
+                        fillAsRadialGradientBrush, opacity);
                 }
                 else
                 {
@@ -930,7 +930,7 @@ context.translate({offset.ToInvariantString()}, 0);
                         centerY - yCorrection * additionalRepetitions * r,
                         r + additionalRepetitions * r,
                         null,
-                        opacity, bulkJs);
+                        opacity);
 
                     var orderedGradients = fillAsRadialGradientBrush.GradientStops.OrderBy(gs => gs.Offset);
                     double repetitionOffset = 1.0 / repeatingTimes;
@@ -939,7 +939,7 @@ context.translate({offset.ToInvariantString()}, 0);
                     {
                         List<Tuple<double, Color>> gradients = orderedGradients.Select(gs => new Tuple<double, Color>(
                             gs.Offset / repeatingTimes + i * repetitionOffset, gs.Color)).ToList();
-                        addColorStops(returnValue, gradients, opacity, bulkJs);
+                        addColorStops(returnValue, gradients, opacity);
                     }
                 }
             }
@@ -988,10 +988,10 @@ context.fill();
 context.restore();
 }}", javascript, ((INTERNAL_HtmlDomElementReference)canvasDomElement).UniqueIdentifier);
 
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(str);
+            OpenSilver. Interop.ExecuteJavaScriptVoid(str);
         }
 
-        private static void addColorStops(object canvasGradient, IList<Tuple<double, Color>> gradients, double opacity, BulkExecuteJavascriptAsync bulkJs)
+        private static void addColorStops(object canvasGradient, IList<Tuple<double, Color>> gradients, double opacity)
         {
             if (gradients.Count == 0)
             {
@@ -1000,7 +1000,7 @@ context.restore();
             else if (gradients.Count == 1)
             {
                 Tuple<double, Color> gs = gradients[0];
-                bulkJs.AddJavascript($@"{INTERNAL_InteropImplementation.GetVariableStringForJS(canvasGradient)}.addColorStop({Math.Max(Math.Min(gs.Item1, 1d), 0d).ToInvariantString()}, ""{gs.Item2.INTERNAL_ToHtmlString(opacity)}"")");
+                CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{INTERNAL_InteropImplementation.GetVariableStringForJS(canvasGradient)}.addColorStop({Math.Max(Math.Min(gs.Item1, 1d), 0d).ToInvariantString()}, ""{gs.Item2.INTERNAL_ToHtmlString(opacity)}"")");
             }
             else
             {
@@ -1057,7 +1057,7 @@ context.restore();
                         exit = true;
                     }
 
-                    bulkJs.AddJavascript($@"{INTERNAL_InteropImplementation.GetVariableStringForJS(canvasGradient)}.addColorStop({offset.ToInvariantString()}, ""{color.INTERNAL_ToHtmlString(opacity)}"")");
+                    CSHTML5.Interop.ExecuteJavaScriptFastAsync($@"{INTERNAL_InteropImplementation.GetVariableStringForJS(canvasGradient)}.addColorStop({offset.ToInvariantString()}, ""{color.INTERNAL_ToHtmlString(opacity)}"")");
 
                     if (exit)
                         break;
@@ -1066,30 +1066,30 @@ context.restore();
         }
 
         private static object createLinearGradient(object context2d, double x0, double y0, double x1, double y1,
-            LinearGradientBrush lgb, double opacity, BulkExecuteJavascriptAsync bulkJs)
+            LinearGradientBrush lgb, double opacity)
         {
             string sContext2d = INTERNAL_InteropImplementation.GetVariableStringForJS(context2d);
-            object canvasGradient = bulkJs.AddJavascriptAsync(
+            object canvasGradient = OpenSilver.Interop.ExecuteJavaScriptAsync(
                 $"{sContext2d}.createLinearGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()})");
 
             if (lgb != null)
             {
-                addColorStops(canvasGradient, lgb.GradientStops.Select(gs => new Tuple<double, Color>(gs.Offset, gs.Color)).ToList(), opacity, bulkJs);
+                addColorStops(canvasGradient, lgb.GradientStops.Select(gs => new Tuple<double, Color>(gs.Offset, gs.Color)).ToList(), opacity);
             }
 
             return canvasGradient;
         }
 
         private static object createRadialGradient(object context2d, double x0, double y0, double r0, double x1, double y1, double r1,
-            RadialGradientBrush rgb, double opacity, BulkExecuteJavascriptAsync bulkJs)
+            RadialGradientBrush rgb, double opacity)
         {
             string sContext2d = INTERNAL_InteropImplementation.GetVariableStringForJS(context2d);
-            object canvasGradient = bulkJs.AddJavascriptAsync(
+            object canvasGradient = OpenSilver.Interop.ExecuteJavaScriptAsync(
                 $"{sContext2d}.createRadialGradient({x0.ToInvariantString()}, {y0.ToInvariantString()}, {r0.ToInvariantString()}, {x1.ToInvariantString()}, {y1.ToInvariantString()}, {r1.ToInvariantString()})");
 
             if (rgb != null)
             {
-                addColorStops(canvasGradient, rgb.GradientStops.Select(gs => new Tuple<double, Color>(gs.Offset, gs.Color)).ToList(), opacity, bulkJs);
+                addColorStops(canvasGradient, rgb.GradientStops.Select(gs => new Tuple<double, Color>(gs.Offset, gs.Color)).ToList(), opacity);
             }
 
             return canvasGradient;

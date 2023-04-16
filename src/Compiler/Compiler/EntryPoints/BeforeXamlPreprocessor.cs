@@ -86,8 +86,8 @@ namespace OpenSilver.Compiler
                         throw new Exception(operationName + " failed because the SourceAssembly parameter was not specified during the second pass.");
 
                     // Create a new static instance of the "ReflectionOnSeparateAppDomainHandler":
-                    ReflectionOnSeparateAppDomainHandler.Current = new ReflectionOnSeparateAppDomainHandler(isSLMigration);
-                    ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain = ReflectionOnSeparateAppDomainHandler.Current;
+                    AssembliesInspector.Current = new AssembliesInspector(isSLMigration);
+                    AssembliesInspector reflectionOnSeparateAppDomain = AssembliesInspector.Current;
 
                     // we load the source assembly early in case we are processing the CSHTML5.
                     if (isSecondPass && isProcessingCSHTML5Itself)
@@ -129,9 +129,6 @@ namespace OpenSilver.Compiler
                             skipReadingAttributesFromAssemblies: false);
                     }
 
-                    // Load "mscorlib.dll" too (this is useful for resolving Mscorlib types in XAML, such as <system:String x:Key="TestString" xmlns:system="clr-namespace:System;assembly=mscorlib">Test</system:String>)
-                    reflectionOnSeparateAppDomain.LoadAssemblyMscorlib(isCoreAssembly: false);
-
                     // Load for reflection the source assembly itself and the referenced assemblies if second path:
                     if (isSecondPass && !isProcessingCSHTML5Itself)
                     {
@@ -151,7 +148,7 @@ namespace OpenSilver.Compiler
             }
             catch (Exception ex)
             {
-                ReflectionOnSeparateAppDomainHandler.Current?.Dispose();
+                AssembliesInspector.Current?.Dispose();
 
                 logger.WriteError(operationName + " failed: " + ex.ToString());
                 return false;

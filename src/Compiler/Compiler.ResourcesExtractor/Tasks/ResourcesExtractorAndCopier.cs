@@ -21,7 +21,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using OpenSilver.Compiler.Common;
+using OpenSilver.Compiler.Common.Helpers;
 using ILogger = OpenSilver.Compiler.Common.ILogger;
+using Mono.Cecil;
+using OpenSilver.Compiler.Resources.Helpers;
 
 namespace OpenSilver.Compiler.Resources
 {
@@ -95,13 +98,13 @@ namespace OpenSilver.Compiler.Resources
 
                     // Create a separate AppDomain so that the types loaded for reflection can be unloaded when done.
                     bool isSuccess = false;
-                    using (var reflectionOnSeparateAppDomain = new ReflectionOnSeparateAppDomainHandler())
+                    using (var storage = new MonoCecilAssemblyStorage())
                     {
                         // Load for the core assemblies first:
                         string[] coreAssemblyFilesArray = coreAssemblyFiles.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string coreAssemblyFile in coreAssemblyFilesArray)
                         {
-                            reflectionOnSeparateAppDomain.LoadAssembly(
+                            storage.LoadAssembly(
                                 coreAssemblyFile,
                                 loadReferencedAssembliesToo: false,
                                 skipReadingAttributesFromAssemblies: true);
@@ -121,7 +124,7 @@ namespace OpenSilver.Compiler.Resources
                             simpleNameOfAssembliesToIgnore,
                             supportedExtensionsLowercase,
                             logger,
-                            reflectionOnSeparateAppDomain,
+                            storage,
                             out listOfCopiedResXFiles);
                     }
 
@@ -146,14 +149,11 @@ namespace OpenSilver.Compiler.Resources
             HashSet<string> simpleNameOfAssembliesToIgnore,
             HashSet<string> supportedExtensionsLowercase,
             ILogger logger,
-            ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain,
+            MonoCecilAssemblyStorage storage,
             out List<string> resXFilesCopied)
         {
             resXFilesCopied = new List<string>();
-            reflectionOnSeparateAppDomain.LoadAssemblyAndAllReferencedAssembliesRecursively(
-                assemblyPath,
-                skipReadingAttributesFromAssemblies: true,
-                assemblySimpleNames: out List<string> assemblySimpleNames);
+            var assemblySimpleNames = storage.LoadAssembly(assemblyPath, true, skipReadingAttributesFromAssemblies: true);
 
             foreach (string assemblySimpleName in assemblySimpleNames)
             {
@@ -166,7 +166,7 @@ namespace OpenSilver.Compiler.Resources
                 // Process JavaScript, CSS, Image, Video, Audio files:
                 //-----------------------------------------------
 
-                Dictionary<string, byte[]> jsAndCssFiles = reflectionOnSeparateAppDomain.GetManifestResources(assemblySimpleName, supportedExtensionsLowercase);
+                Dictionary<string, byte[]> jsAndCssFiles = new ResourcesExtractor().GetManifestResources(storage, assemblySimpleName, supportedExtensionsLowercase);
 
                 // Copy files:
                 foreach (KeyValuePair<string, byte[]> file in jsAndCssFiles)
@@ -178,7 +178,7 @@ namespace OpenSilver.Compiler.Resources
                     string absoluteOutputResourcesPath = PathsHelper.CombinePathsWhileEnsuringEndingBackslashAndMore(outputPathAbsolute, outputResourcesPath);
 
                     // Create the destination folders hierarchy if it does not already exist:
-                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName + "\\", fileName);
+                    string destinationFile = Path.Combine(absoluteOutputResourcesPath, assemblySimpleName + Path.DirectorySeparatorChar, fileName);
                     if (destinationFile.Length < 256)
                     {
                         string destinationDirectory = Path.GetDirectoryName(destinationFile);

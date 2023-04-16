@@ -14,7 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
@@ -29,7 +29,7 @@ namespace Windows.UI.Xaml
     /// Implements a data structure for describing a property as a path below another
     /// property, or below an owning type. Property paths are used in data binding to objects.
     /// </summary>
-    public sealed partial class PropertyPath : DependencyObject
+    public sealed class PropertyPath : DependencyObject
     {
         private SourceValueInfo[] _arySVI;
 
@@ -40,18 +40,12 @@ namespace Windows.UI.Xaml
         public PropertyPath(string path)
         {
             Path = path;
-
-            INTERNAL_AccessPropertyContainer = accessVisualStateProperty;
-            INTERNAL_PropertySetAnimationValue = setVisualStateProperty;
         }
 
         public PropertyPath(DependencyProperty dependencyProperty)
         {
             Path = dependencyProperty.Name;
             DependencyProperty = dependencyProperty;
-
-            INTERNAL_AccessPropertyContainer = (d) => Enumerable.Empty<Tuple<DependencyObject, DependencyProperty, int?>>();
-            INTERNAL_PropertySetAnimationValue = (target, value) => target.SetAnimationValue(DependencyProperty, value);
         }
 
         /// <summary>
@@ -85,7 +79,8 @@ namespace Windows.UI.Xaml
         /// <param name="propertySetLocalValue">The function that sets the Local value on the given element.</param>
         /// <param name="propertyGetVisualState">The function that gets the VisualState value on the given element.</param>
         /// <ignore/>
-        [Obsolete(Helper.ObsoleteMemberMessage + " Please use PropertyPath(string) instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use PropertyPath(string) instead.", true)]
         public PropertyPath(string path, string dependencyPropertyName, Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> accessPropertyContainer,
             Action<DependencyObject, object> propertySetVisualState,
             Action<DependencyObject, object> propertySetAnimationValue,
@@ -93,9 +88,6 @@ namespace Windows.UI.Xaml
             Func<DependencyObject, object> propertyGetVisualState)
         {
             Path = path;
-
-            INTERNAL_AccessPropertyContainer = accessPropertyContainer;
-            INTERNAL_PropertySetAnimationValue = propertySetAnimationValue;
         }
 
         /// <summary>
@@ -105,30 +97,7 @@ namespace Windows.UI.Xaml
 
         internal DependencyProperty DependencyProperty { get; }
 
-        /// <summary>
-        /// When set, defines a method designed to access the element that contains the property whose Value will be accessed.
-        /// </summary>
-        /// <ignore/>
-        internal Func<DependencyObject, IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>>> INTERNAL_AccessPropertyContainer { get; }
-
-        /// <summary>
-        /// Sets the Animation value (value is second parameter) of the previously defined property on the DependencyObject (first parameter).
-        /// </summary>
-        /// <ignore/>
-        internal Action<DependencyObject, object> INTERNAL_PropertySetAnimationValue { get; }
-
-        internal SourceValueInfo[] SVI
-        {
-            get
-            {
-                if (_arySVI == null)
-                {
-                    _arySVI = ParsePath(Path);
-                }
-
-                return _arySVI;
-            }
-        }
+        internal SourceValueInfo[] SVI => _arySVI ??= ParsePath(Path);
 
         private static SourceValueInfo[] ParsePath(string path)
         {
@@ -165,43 +134,45 @@ namespace Windows.UI.Xaml
             return steps.ToArray();
         }
 
-        private IEnumerable<Tuple<DependencyObject, DependencyProperty, int?>> accessVisualStateProperty(DependencyObject rootTargetObjectInstance)
+        internal DependencyObject GetFinalItem(DependencyObject rootItem)
         {
-            DependencyObject currentTarget = rootTargetObjectInstance;
-            for (int i = 0; i < SVI.Length - 1; i++)
+            DependencyObject finalTarget = rootItem;
+
+            if (DependencyProperty == null)
             {
-                SourceValueInfo svi = _arySVI[i];
-                switch (svi.type)
+                for (int i = 0; i < SVI.Length - 1; i++)
                 {
-                    case PropertyNodeType.Property:
-                        DependencyProperty dp = DependencyPropertyFromName(svi.propertyName, currentTarget.GetType());
-                        currentTarget = AsDependencyObject(currentTarget.GetValue(dp));
-                        yield return new Tuple<DependencyObject, DependencyProperty, int?>(currentTarget, dp, null);
-                        break;
+                    SourceValueInfo svi = _arySVI[i];
+                    switch (svi.type)
+                    {
+                        case PropertyNodeType.Property:
+                            DependencyProperty dp = DependencyPropertyFromName(svi.propertyName, finalTarget.GetType());
+                            finalTarget = AsDependencyObject(finalTarget.GetValue(dp));
+                            break;
 
-                    case PropertyNodeType.Indexed:
-                        IList list = currentTarget as IList;
-                        if (!(currentTarget is IList))
-                        {
-                            throw new InvalidOperationException($"'{currentTarget}' must implement IList.");
-                        }
-                        int index = -1;
-                        if (!int.TryParse(svi.param, out index))
-                        {
-                            throw new InvalidOperationException($"'{svi.param}' can't be converted to an integer value.");
-                        }
+                        case PropertyNodeType.Indexed:
+                            if (finalTarget is not IList list)
+                            {
+                                throw new InvalidOperationException($"'{finalTarget}' must implement IList.");
+                            }
+                            if (!int.TryParse(svi.param, out int index))
+                            {
+                                throw new InvalidOperationException($"'{svi.param}' can't be converted to an integer value.");
+                            }
 
-                        currentTarget = AsDependencyObject(list[index]);
-                        yield return new Tuple<DependencyObject, DependencyProperty, int?>(currentTarget, null, index);
-                        break;
+                            finalTarget = AsDependencyObject(list[index]);
+                            break;
 
-                    default:
-                        throw new InvalidOperationException();
+                        default:
+                            throw new InvalidOperationException();
+                    }
                 }
             }
+
+            return finalTarget;
         }
 
-        private void setVisualStateProperty(DependencyObject finalTargetInstance, object value)
+        internal DependencyProperty GetFinalProperty(DependencyObject d)
         {
             if (SVI.Length == 0)
             {
@@ -209,9 +180,7 @@ namespace Windows.UI.Xaml
             }
 
             SourceValueInfo svi = _arySVI[_arySVI.Length - 1];
-            DependencyProperty dp = DependencyPropertyFromName(svi.propertyName, finalTargetInstance.GetType());
-
-            finalTargetInstance.SetAnimationValue(dp, value);
+            return DependencyPropertyFromName(svi.propertyName, d.GetType());
         }
 
         private static DependencyObject AsDependencyObject(object o)

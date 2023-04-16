@@ -1,20 +1,9 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-using System;
-using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 #if MIGRATION
 namespace System.Windows.Controls
@@ -22,42 +11,62 @@ namespace System.Windows.Controls
 namespace Windows.UI.Xaml.Controls
 #endif
 {
+    /// <summary>
+    /// Provides the system implementation for displaying a ContextMenu.
+    /// </summary>
+    /// <QualityBand>Preview</QualityBand>
     public static class ContextMenuService
     {
         /// <summary>
-        ///     The DependencyProperty for the ContextMenu property.
+        /// Gets the value of the ContextMenu property of the specified object.
         /// </summary>
-        public static readonly DependencyProperty ContextMenuProperty =
-                DependencyProperty.Register(
-                       "ContextMenu",
-                        typeof(ContextMenu),
-                        typeof(ContextMenuService),
-                        new PropertyMetadata(null));
-
-        /// <summary>
-        ///     Gets the value of the ContextMenu property on the specified object.
-        /// </summary>
-        /// <param name="element">The object on which to query the ContextMenu property.</param>
-        /// <returns>The value of the ContextMenu property.</returns>
-        public static ContextMenu GetContextMenu(DependencyObject element)
+        /// <param name="obj">Object to query concerning the ContextMenu property.</param>
+        /// <returns>Value of the ContextMenu property.</returns>
+        public static ContextMenu GetContextMenu(DependencyObject obj)
         {
-            return ((FrameworkElement)element).ContextMenu;
+            return (ContextMenu)obj.GetValue(ContextMenuProperty);
         }
 
         /// <summary>
-        ///     Sets the ContextMenu property on the specified object.
+        /// Sets the value of the ContextMenu property of the specified object.
         /// </summary>
-        /// <param name="element">The object on which to set the ContextMenu property.</param>
-        /// <param name="value">
-        ///     The value of the ContextMenu property. If the value is of type ContextMenu, then
-        ///     that is the ContextMenu that will be used (without any modification). If the value
-        ///     is of any other type, then that value will be used as the content for a ContextMenu
-        ///     provided by this service, and the other attached properties of this service
-        ///     will be used to configure the ContextMenu.
-        /// </param>
-        public static void SetContextMenu(DependencyObject element, ContextMenu value)
+        /// <param name="obj">Object to set the property on.</param>
+        /// <param name="value">Value to set.</param>
+        public static void SetContextMenu(DependencyObject obj, ContextMenu value)
         {
-            ((FrameworkElement)element).ContextMenu = value;
+            obj.SetValue(ContextMenuProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the ContextMenu attached property.
+        /// </summary>
+        public static readonly DependencyProperty ContextMenuProperty = DependencyProperty.RegisterAttached(
+            "ContextMenu",
+            typeof(ContextMenu),
+            typeof(ContextMenuService),
+            new PropertyMetadata(null, OnContextMenuChanged));
+
+        /// <summary>
+        /// Handles changes to the ContextMenu DependencyProperty.
+        /// </summary>
+        /// <param name="o">DependencyObject that changed.</param>
+        /// <param name="e">Event data for the DependencyPropertyChangedEvent.</param>
+        private static void OnContextMenuChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            FrameworkElement element = o as FrameworkElement;
+            if (null != element)
+            {
+                ContextMenu oldContextMenu = e.OldValue as ContextMenu;
+                if (null != oldContextMenu)
+                {
+                    oldContextMenu.Owner = null;
+                }
+                ContextMenu newContextMenu = e.NewValue as ContextMenu;
+                if (null != newContextMenu)
+                {
+                    newContextMenu.Owner = element;
+                }
+            }
         }
     }
 }

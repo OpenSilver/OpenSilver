@@ -158,15 +158,12 @@ namespace Windows.UI.Xaml.Media.Animation
         /// <param name="frameworkElement"></param>
         internal void UnApply(FrameworkElement frameworkElement)
         {
-            Control frameworkElementAsControl = frameworkElement as Control;
-            if (frameworkElementAsControl != null)
+            if (frameworkElement is Control)
             {
-                DependencyObject target;
-                PropertyPath propertyPath;
-                GetTargetElementAndPropertyInfo(_parameters, out target, out propertyPath);
+                GetTargetElementAndPropertyInfo(_parameters, out DependencyObject target, out PropertyPath propertyPath);
                 if (target != null && propertyPath != null)
                 {
-                    propertyPath.INTERNAL_PropertySetAnimationValue(target, DependencyProperty.UnsetValue);
+                    AnimationHelpers.ApplyValue(target, propertyPath, DependencyProperty.UnsetValue);
                 }
             }
         }
@@ -181,14 +178,8 @@ namespace Windows.UI.Xaml.Media.Animation
 
             if (parameters != null && parameters.TimelineMappings.TryGetValue(this, out Tuple<DependencyObject, PropertyPath> info))
             {
-                DependencyObject targetBeforePath = info.Item1;
                 propertyPath = info.Item2;
-
-                target = targetBeforePath;
-                foreach (Tuple<DependencyObject, DependencyProperty, int?> element in propertyPath.INTERNAL_AccessPropertyContainer(targetBeforePath))
-                {
-                    target = element.Item1;
-                }
+                target = propertyPath.GetFinalItem(info.Item1);
             }
         }
 

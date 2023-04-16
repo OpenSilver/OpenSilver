@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
@@ -266,7 +267,6 @@ namespace Windows.UI.Xaml
         private Dictionary<DependencyProperty, DependentList> _dependentListMap;
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_PropertyStorageDictionary { get; } // Contains all the properties that are either not in INTERNAL_AllInheritedProperties or in INTERNAL_UsefulInheritedProperties
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_AllInheritedProperties { get; } // Here so that when we attach a child, the child gets all the properties that are in there (this allows the inherited properties to go all the way down even for properties that are not contained in the children)
-        internal List<DependencyProperty> INTERNAL_PropertiesForWhichToCallPropertyChangedWhenLoadedIntoVisualTree; // When a UI element is added to the Visual Tree, we call "PropertyChanged" on all its set properties so that the control can refresh itself. However, when a property is not set, we don't call PropertyChanged. Unless the property is listed here.
 
 
         #region Constructor
@@ -289,12 +289,21 @@ namespace Windows.UI.Xaml
         /// <returns>Returns the current effective value.</returns>
         public object GetValue(DependencyProperty dependencyProperty)
         {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            if (dependencyProperty == null)
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this,
+                dependencyProperty,
+                null,
+                false,
+                out INTERNAL_PropertyStorage storage))
             {
                 return INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
             }
-            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
+
+            return dependencyProperty.GetMetadata(GetType()).DefaultValue;
         }
 
         /// <summary>
@@ -305,22 +314,57 @@ namespace Windows.UI.Xaml
         [Obsolete(Helper.ObsoleteMemberMessage + " Use SetCurrentValue instead.")]
         public void SetLocalValue(DependencyProperty dependencyProperty, object value)
         {
-            this.SetCurrentValue(dependencyProperty, value);
+            if (dependencyProperty == null)
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
+
+            SetCurrentValue(dependencyProperty, value);
         }
 
         public void SetCurrentValue(DependencyProperty dp, object value)
         {
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.SetValueCommon(storage, value, true);
+            if (dp == null)
+            {
+                throw new ArgumentNullException(nameof(dp));
+            }
+
+            PropertyMetadata metadata = dp.GetMetadata(GetType());
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+            
+            INTERNAL_PropertyStore.SetValueCommon(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                true);
         }
 
         [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue instead.")]
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, true/*create*/, out storage);
-            INTERNAL_PropertyStore.CoerceValueCommon(storage);
+            if (dependencyProperty == null)
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
+
+            PropertyMetadata metadata = dependencyProperty.GetMetadata(GetType());
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dependencyProperty,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+            
+            INTERNAL_PropertyStore.CoerceValueCommon(storage,
+                this,
+                dependencyProperty,
+                metadata);
         }
 
         /// <summary>
@@ -336,8 +380,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public object ReadLocalValue(DependencyProperty dp)
         {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, false/*don't create*/, out storage))
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, null, false, out INTERNAL_PropertyStorage storage))
             {
                 // In silverlight ReadLocalValue returns a BindingExpression if the value
                 // is a BindingExpression set from a style's setter and the "real" local
@@ -348,22 +391,21 @@ namespace Windows.UI.Xaml
                 }
                 else if (storage.LocalStyleValue != DependencyProperty.UnsetValue)
                 {
-                    BindingExpression be = storage.LocalStyleValue as BindingExpression;
-                    if (be != null)
+                    if (storage.LocalStyleValue is BindingExpression be)
                     {
                         return be;
                     }
                 }
                 else
                 {
-                    BindingExpression be = storage.ThemeStyleValue as BindingExpression;
-                    if (be != null)
+                    if (storage.ThemeStyleValue is BindingExpression be)
                     {
                         return be;
                     }
                 }
                 return storage.LocalValue;
             }
+
             return DependencyProperty.UnsetValue;
         }
 
@@ -372,74 +414,119 @@ namespace Windows.UI.Xaml
         // ReadLocalValue() will only return the local value
         internal object ReadLocalValueInternal(DependencyProperty dp)
         {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, false/*don't create*/, out storage))
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, null, false, out INTERNAL_PropertyStorage storage))
             {
                 return storage.LocalValue;
             }
+
             return DependencyProperty.UnsetValue;
         }
 
         internal bool HasDefaultValue(DependencyProperty dp)
         {
-            return !INTERNAL_PropertyStore.TryGetStorage(this, dp, false, out var storage) || 
+            return !INTERNAL_PropertyStore.TryGetStorage(this, dp, null, false, out var storage) || 
                 storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default;
         }
 
-        public object GetVisualStateValue(DependencyProperty dependencyProperty) //todo: see if this is actually useful (to get specifically the VisualStateValue) and if so, change the GetValue into a GetVisualStateValue at the "return" line.
+        public object GetVisualStateValue(DependencyProperty dependencyProperty)
         {
             if (dependencyProperty == null)
-                throw new ArgumentNullException("No property specified");
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, null, false, out INTERNAL_PropertyStorage storage))
             {
                 return storage.AnimatedValue;
             }
-            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
+
+            return dependencyProperty.GetMetadata(GetType()).DefaultValue;
         }
 
         public void SetVisualStateValue(DependencyProperty dependencyProperty, object value)
         {
             if (dependencyProperty == null)
-                throw new ArgumentNullException("No property specified");
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
 
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, true/*create*/, out storage);
-            INTERNAL_PropertyStore.SetAnimationValue(storage, value);
+            PropertyMetadata metadata = dependencyProperty.GetMetadata(GetType());
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dependencyProperty,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+            
+            INTERNAL_PropertyStore.SetAnimationValue(storage,
+                this,
+                dependencyProperty,
+                metadata,
+                value);
         }
 
         public void SetAnimationValue(DependencyProperty dependencyProperty, object value)
         {
             if (dependencyProperty == null)
-                throw new ArgumentNullException("No property specified");
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
 
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, true/*create*/, out storage);
-            INTERNAL_PropertyStore.SetAnimationValue(storage, value);
+            PropertyMetadata metadata = dependencyProperty.GetMetadata(GetType());
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dependencyProperty,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+
+            INTERNAL_PropertyStore.SetAnimationValue(storage,
+                this,
+                dependencyProperty,
+                metadata,
+                value);
         }
 
         public object GetAnimationValue(DependencyProperty dependencyProperty)
         {
             if (dependencyProperty == null)
-                throw new ArgumentNullException("No property specified");
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
 
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dependencyProperty, false/*don't create*/, out storage))
+            if (INTERNAL_PropertyStore.TryGetStorage(this,
+                dependencyProperty,
+                null,
+                false,
+                out INTERNAL_PropertyStorage storage))
             {
                 return storage.AnimatedValue;
             }
-            return dependencyProperty.GetTypeMetaData(this.GetType()).DefaultValue;
+
+            return dependencyProperty.GetMetadata(GetType()).DefaultValue;
         }
 
         public void SetValue(DependencyProperty dp, object value)
         {
-            // Verify the arguments:
             if (dp == null)
-                throw new ArgumentNullException("No property specified");
+            {
+                throw new ArgumentNullException(nameof(dp));
+            }
 
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.SetValueCommon(storage, value, false);
+            PropertyMetadata metadata = dp.GetMetadata(GetType());
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+
+            INTERNAL_PropertyStore.SetValueCommon(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                false);
         }
 
         internal virtual void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -448,19 +535,37 @@ namespace Windows.UI.Xaml
 
         internal void SetLocalStyleValue(DependencyProperty dp, object value)
         {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
+            Debug.Assert(dp != null);
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                null,
+                value != DependencyProperty.UnsetValue,
+                out INTERNAL_PropertyStorage storage))
             {
-                INTERNAL_PropertyStore.SetLocalStyleValue(storage, value);
+                INTERNAL_PropertyStore.SetLocalStyleValue(storage,
+                    this,
+                    dp,
+                    dp.GetMetadata(GetType()),
+                    value);
             }
         }
 
         internal void SetThemeStyleValue(DependencyProperty dp, object value)
         {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, value != DependencyProperty.UnsetValue/*create*/, out storage))
+            Debug.Assert(dp != null);
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                null,
+                value != DependencyProperty.UnsetValue,
+                out INTERNAL_PropertyStorage storage))
             {
-                INTERNAL_PropertyStore.SetThemeStyleValue(storage, value);
+                INTERNAL_PropertyStore.SetThemeStyleValue(storage,
+                    this,
+                    dp,
+                    dp.GetMetadata(GetType()),
+                    value);
             }
         }
 
@@ -470,8 +575,13 @@ namespace Windows.UI.Xaml
         /// <param name="dp">The DependencyProperty that needs its visual's equivalents refreshed.</param>
         internal void DirtyVisualValue(DependencyProperty dp)
         {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create if not found*/, out storage))
+            Debug.Assert(dp != null);
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                dp.GetMetadata(GetType()),
+                true,
+                out INTERNAL_PropertyStorage storage))
             {
                 INTERNAL_PropertyStore.DirtyVisualValue(storage);
             }
@@ -486,12 +596,26 @@ namespace Windows.UI.Xaml
         /// <returns>true if this property's value changed, false otherwise.</returns>
         internal bool SetInheritedValue(DependencyProperty dp, object value, bool recursively)
         {
+            Debug.Assert(dp != null);
+
             //-----------------------
             // CALL "SET INHERITED VALUE" ON THE STORAGE:
             //-----------------------
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this, dp, true/*create*/, out storage);
-            return INTERNAL_PropertyStore.SetInheritedValue(storage, value, recursively);
+
+            PropertyMetadata metadata = dp.GetMetadata(GetType()); 
+
+            INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this,
+                dp,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+            
+            return INTERNAL_PropertyStore.SetInheritedValue(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                recursively);
         }
 
         /// <summary>
@@ -501,35 +625,54 @@ namespace Windows.UI.Xaml
         [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue.")]
         public void Coerce(DependencyProperty dependencyProperty)
         {
-            this.CoerceValue(dependencyProperty);
+            if (dependencyProperty == null)
+            {
+                throw new ArgumentNullException(nameof(dependencyProperty));
+            }
+
+            CoerceValue(dependencyProperty);
         }
 
         public void CoerceValue(DependencyProperty dp)
         {
             if (dp == null)
             {
-                throw new ArgumentNullException("No property specified.");
+                throw new ArgumentNullException(nameof(dp));
             }
 
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.CoerceValueCommon(storage);
+            PropertyMetadata metadata = dp.GetMetadata(GetType());
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+            
+            INTERNAL_PropertyStore.CoerceValueCommon(storage,
+                this,
+                dp,
+                metadata);
         }
 
         internal void ResetInheritedProperties()
         {
-            // Copy of the keys to allow removing items from the Dictionary furing the foreach.
-            INTERNAL_PropertyStorage[] storages = INTERNAL_AllInheritedProperties.Values.ToArray();
-            foreach (INTERNAL_PropertyStorage storage in storages)
+            foreach (var kvp in INTERNAL_AllInheritedProperties.ToArray())
             {
-                INTERNAL_PropertyStore.SetInheritedValue(storage, 
-                                                         DependencyProperty.UnsetValue,
-                                                         false); // recursively
+                DependencyProperty dp = kvp.Key;
+                INTERNAL_PropertyStorage storage = kvp.Value;
+                
+                INTERNAL_PropertyStore.SetInheritedValue(storage,
+                    this,
+                    dp,
+                    dp.GetMetadata(GetType()),
+                    DependencyProperty.UnsetValue,
+                    false); // recursively
+
                 if (storage.Entry.BaseValueSourceInternal == BaseValueSourceInternal.Default)
                 {
                     // Remove storage if the effective value is the default value.
-                    INTERNAL_AllInheritedProperties.Remove(storage.Property);
-                    INTERNAL_PropertyStorageDictionary.Remove(storage.Property);
+                    INTERNAL_AllInheritedProperties.Remove(dp);
+                    INTERNAL_PropertyStorageDictionary.Remove(dp);
                 }
             }
         }
@@ -558,9 +701,22 @@ namespace Windows.UI.Xaml
 
         internal void ApplyExpression(DependencyProperty dp, Expression expression, bool isInStyle)
         {
-            INTERNAL_PropertyStorage storage;
-            INTERNAL_PropertyStore.TryGetStorage(this, dp, true/*create*/, out storage);
-            INTERNAL_PropertyStore.RefreshExpressionCommon(storage, expression, isInStyle); // Set LocalStyle if Binding is from style.
+            Debug.Assert(dp != null);
+
+            PropertyMetadata metadata = dp.GetMetadata(GetType());
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+            
+            INTERNAL_PropertyStore.RefreshExpressionCommon(storage,
+                this,
+                dp,
+                metadata,
+                expression,
+                isInStyle); // Set LocalStyle if Binding is from style.
         }
 
         /// <exclude/>
@@ -582,10 +738,14 @@ namespace Windows.UI.Xaml
         /// </summary>
         public void ClearValue(DependencyProperty dp)
         {
-            INTERNAL_PropertyStorage storage;
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, false/*don't create*/, out storage))
+            if (dp == null)
             {
-                INTERNAL_PropertyStore.ClearValueCommon(storage);
+                throw new ArgumentNullException(nameof(dp));
+            }
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, null, false, out INTERNAL_PropertyStorage storage))
+            {
+                INTERNAL_PropertyStore.ClearValueCommon(storage, this, dp, dp.GetMetadata(GetType()));
             }
         }
 

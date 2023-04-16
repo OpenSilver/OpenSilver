@@ -12,12 +12,6 @@
 *  
 \*====================================================================================*/
 
-
-#if BRIDGE
-using Bridge;
-#endif
-using System.Linq;
-
 namespace System.Windows.Browser
 {
     internal sealed class EventSubscriber
@@ -66,35 +60,5 @@ namespace System.Windows.Browser
             OpenSilver.Interop.ExecuteJavaScriptVoid("callScriptableObjectEvent($0, $1, [$2, $3, $4, $5, $6])", flushQueue:false, 
                 _scriptKey, _functionName, obj1, obj2, obj3, obj4, obj5);
         }
-
-#if BRIDGE
-        public void OnRaisedBridgeNet(object obj1, object obj2, object obj3, object obj4, object obj5)
-        {
-            if (obj1 == Script.Undefined)
-            {
-                OnRaised0();
-            }
-            else if (obj2 == Script.Undefined)
-            {
-                OnRaised1(obj1);
-            }
-            else if (obj3 == Script.Undefined)
-            {
-                OnRaised2(obj1, obj2);
-            }
-            else if (obj4 == Script.Undefined)
-            {
-                OnRaised3(obj1, obj2, obj3);
-            }
-            else if (obj5 == Script.Undefined)
-            {
-                OnRaised4(obj1, obj2, obj3, obj4);
-            }
-            else
-            {
-                OnRaised5(obj1, obj2, obj3, obj4, obj5);
-            }
-        }
-#endif
     }
 }

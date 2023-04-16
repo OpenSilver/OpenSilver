@@ -60,39 +60,31 @@ namespace Windows.UI.Xaml.Media
         public static readonly DependencyProperty ColorProperty =
             DependencyProperty.Register("Color", typeof(Color), typeof(SolidColorBrush), new PropertyMetadata(Color.FromArgb(0, 0, 0, 0))
             {
-                GetCSSEquivalents = (instance) =>
+                GetCSSEquivalents = static (instance) =>
+                {
+                    static ValueToHtmlConverter ConvertValueToHtml(CSSEquivalent cssEquivalent)
                     {
-                        Brush brush = instance as Brush;
-                        if (brush != null)
+                        return (inst, value) =>
                         {
-                            Func<CSSEquivalent, ValueToHtmlConverter> parentPropertyToValueToHtmlConverter =
-                                (parentPropertyCSSEquivalent) =>
-                                    ((inst, value) =>
-                                    {
-                                        Dictionary<string, object> valuesDict = new Dictionary<string, object>();
-                                        foreach (string name in parentPropertyCSSEquivalent.Name)
-                                        {
-                                            if (!name.EndsWith("Alpha"))
-                                            {
-                                                valuesDict.Add(name, ((Color)value).INTERNAL_ToHtmlStringForVelocity());
-                                            }
-                                            else
-                                            {
-                                                valuesDict.Add(name, ((double)((Color)value).A) / 255);
-                                            }
-                                        }
-                                        return valuesDict;
-                                    });
-
-                            return MergeCSSEquivalentsOfTheParentsProperties(brush, parentPropertyToValueToHtmlConverter);
-                        }
-                        else
-                        {
-                            throw new ArgumentException();
-                        }
+                            var valuesDict = new Dictionary<string, object>();
+                            foreach (string name in cssEquivalent.Name)
+                            {
+                                if (!name.EndsWith("Alpha"))
+                                {
+                                    valuesDict.Add(name, ((Color)value).INTERNAL_ToHtmlStringForVelocity());
+                                }
+                                else
+                                {
+                                    valuesDict.Add(name, ((double)((Color)value).A) / 255);
+                                }
+                            }
+                            return valuesDict;
+                        };
                     }
-            }
-            );
+
+                    return MergeCSSEquivalentsOfTheParentsProperties((Brush)instance, ConvertValueToHtml);
+                }
+            });
 
         internal string INTERNAL_ToHtmlString()
         {

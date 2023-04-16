@@ -33,12 +33,12 @@ namespace OpenSilver.Compiler
         // if XXX doesn't end on ".Color" or ".Color)"
         //------------------------------------------------------------
 
-        public static void Process(XDocument doc, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        public static void Process(XDocument doc, AssembliesInspector reflectionOnSeparateAppDomain)
         {
             TraverseNextElement(doc.Root, reflectionOnSeparateAppDomain);
         }
 
-        static void TraverseNextElement(XElement currentElement, ReflectionOnSeparateAppDomainHandler reflectionOnSeparateAppDomain)
+        static void TraverseNextElement(XElement currentElement, AssembliesInspector reflectionOnSeparateAppDomain)
         {
            
             if (GeneratingCSharpCode.IsColorAnimation(currentElement))

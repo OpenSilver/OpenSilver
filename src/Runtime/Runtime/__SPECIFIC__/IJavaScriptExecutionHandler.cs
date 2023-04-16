@@ -33,8 +33,8 @@ namespace DotNetForHtml5
         TResult InvokeUnmarshalled<T0, T1, T2, TResult>(string identifier, T0 arg0, T1 arg1, T2 arg2);
     }
 
-    [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.IWebAssemblyExecutionHandler instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.IWebAssemblyExecutionHandler instead.", true)]
     public interface IJavaScriptExecutionHandler2 : IJavaScriptExecutionHandler
     {
         TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0);
@@ -56,16 +56,7 @@ namespace DotNetForHtml5
             => _jsRuntime.ExecuteJavaScriptWithResult(javaScriptToExecute);
 
         public TResult InvokeUnmarshalled<T0, TResult>(string identifier, T0 arg0)
-        {
-#pragma warning disable CS0618
-            if (_jsRuntime is IJavaScriptExecutionHandler2 jsRuntime)
-#pragma warning restore CS0618
-            {
-                jsRuntime.InvokeUnmarshalled<T0, TResult>(identifier, arg0);
-            }
-
-            throw new NotSupportedException();
-        }
+            => throw new NotSupportedException();
 
         public TResult InvokeUnmarshalled<T0, T1, TResult>(string identifier, T0 arg0, T1 arg1)
             => throw new NotSupportedException();

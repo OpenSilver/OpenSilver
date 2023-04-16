@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.0.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,9 @@
     <Compile Include="2_ConvertingXamlToCSharp\IMetadata.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\XamlReader.cs" />
     <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
+    <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssembliesInspectorImpl.cs" />
+    <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeDefinitionExtensions.cs" />
+    <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeReferenceExtensions.cs" />
     <Compile Include="OtherHelpersAndHandlers\Version.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\ConvertingStringToValue.cs" />
@@ -61,12 +65,10 @@
     <Compile Include="OtherHelpersAndHandlers\RegistryHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\TrialHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\Constants.cs" />
+    <Compile Include="OtherHelpersAndHandlers\AssembliesInspector.cs" />
     <Compile Include="OtherHelpersAndHandlers\ValidityHelpers_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\VersionInformation_SharedWithOtherProjects.cs" />
     <Compile Include="OtherHelpersAndHandlers\AssembliesLoadHelper.cs" />
-    <Compile Include="Reflection\IMarshalledObject.cs" />
-    <Compile Include="Reflection\MarshalledObject.cs" />
-    <Compile Include="Reflection\ReflectionOnSeparateAppDomainHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Compiler.licenseheader" />

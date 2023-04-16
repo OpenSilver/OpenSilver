@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -59,7 +60,21 @@ namespace Windows.UI.Xaml.Controls
             IsEnabledChanged += (o, e) => UpdateVisualStates();
         }
 
-        internal override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+        internal sealed override object GetFocusTarget() => _textViewHost?.View?.InputDiv;
+
+        internal sealed override void UpdateTabIndexCore(bool isTabStop, int tabindex)
+        {
+            object focusTarget = GetFocusTarget();
+            if (focusTarget == null)
+            {
+                return;
+            }
+
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(
+                focusTarget,
+                "tabindex",
+                (!isTabStop || !IsEnabled) ? "-1" : ConvertToHtmlTabIndex(tabindex).ToString());
+        }
 
         /// <summary>
         /// The DependencyID for the PasswordChar property.

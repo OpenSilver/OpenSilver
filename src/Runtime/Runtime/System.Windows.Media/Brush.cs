@@ -99,73 +99,72 @@ namespace Windows.UI.Xaml.Media
 
                 foreach (var dependencyProperty in item.Value)
                 {
-                    var parentCssEquivalents = new List<CSSEquivalent>();
                     if (dependencyProperty == Border.BorderBrushProperty)
                     {
                         if (brush is LinearGradientBrush)
                         {
-                            parentCssEquivalents.Add(new CSSEquivalent
-                            {
-                                Name = new List<string>(1) { "border-image-source" },
-                            });
-                            parentCssEquivalents.Add(new CSSEquivalent
-                            {
-                                Name = new List<string>(1) { "border-image-slice" },
-                                Value = (d, value) => { return "1"; },
-                            });
+                            result.Add(ProcessCSSEquivalent(
+                                new CSSEquivalent { Name = new List<string>(1) { "border-image-source" } },
+                                uiElement,
+                                parentPropertyToValueToHtmlConverter));
+
+                            result.Add(ProcessCSSEquivalent(
+                                new CSSEquivalent { Name = new List<string>(1) { "border-image-slice" } },
+                                uiElement,
+                                parentPropertyToValueToHtmlConverter));
                         }
                         else
                         {
-                            parentCssEquivalents.Add(new CSSEquivalent
-                            {
-                                Name = new List<string>(1) { "borderColor" },
-                                Value = (inst, value) => value ?? "transparent"
-                            });
+                            result.Add(ProcessCSSEquivalent(
+                                new CSSEquivalent { Name = new List<string>(1) { "borderColor" } },
+                                uiElement,
+                                parentPropertyToValueToHtmlConverter));
                         }
                     }
                     else if (dependencyProperty == Border.BackgroundProperty ||
                         dependencyProperty == Panel.BackgroundProperty ||
                         dependencyProperty == Control.BackgroundProperty)
                     {
-                        parentCssEquivalents.Add(new CSSEquivalent
-                        {
-                            Name = new List<string>(3) { "background", "backgroundColor", "backgroundColorAlpha" },
-                        });
+                        result.Add(ProcessCSSEquivalent(
+                            new CSSEquivalent { Name = new List<string>(3) { "background", "backgroundColor", "backgroundColorAlpha" } },
+                            uiElement,
+                            parentPropertyToValueToHtmlConverter));
                     }
                     else if (dependencyProperty == Control.ForegroundProperty)
                     {
-                        parentCssEquivalents.Add(new CSSEquivalent
-                        {
-                            Name = new List<string>(2) { "color", "colorAlpha" },
-                            ApplyAlsoWhenThereIsAControlTemplate = true,
-                        });
+                        result.Add(ProcessCSSEquivalent(
+                            new CSSEquivalent
+                            {
+                                Name = new List<string>(2) { "color", "colorAlpha" },
+                                ApplyAlsoWhenThereIsAControlTemplate = true,
+                            },
+                            uiElement,
+                            parentPropertyToValueToHtmlConverter));
                     }
                     else
                     {
-                        parentCssEquivalents.Add(new()
-                        {
-                            UIElement = uiElement,
-                            CallbackMethod = dependencyProperty.GetMetadata(uiElement.GetType()).PropertyChangedCallback,
-                            DependencyProperty = dependencyProperty
-                        });
-                    }
-
-                    foreach (var cssEquivalent in parentCssEquivalents)
-                    {
-                        result.Add(new()
-                        {
-                            Name = cssEquivalent.Name,
-                            ApplyAlsoWhenThereIsAControlTemplate = cssEquivalent.ApplyAlsoWhenThereIsAControlTemplate,
-                            Value = parentPropertyToValueToHtmlConverter(cssEquivalent),
-                            DomElement = cssEquivalent.DomElement ?? uiElement.INTERNAL_OuterDomElement,
-                            UIElement = uiElement,
-                            DependencyProperty = cssEquivalent.DependencyProperty,
-                            CallbackMethod = cssEquivalent.CallbackMethod,
-                        });
+                        result.Add(ProcessCSSEquivalent(
+                            new CSSEquivalent
+                            {
+                                CallbackMethod = dependencyProperty.GetMetadata(uiElement.GetType()).PropertyChangedCallback,
+                                DependencyProperty = dependencyProperty
+                            },
+                            uiElement,
+                            parentPropertyToValueToHtmlConverter));
                     }
                 }
             }
             return result;
+
+            static CSSEquivalent ProcessCSSEquivalent(CSSEquivalent cssEquivalent,
+                UIElement uie,
+                Func<CSSEquivalent, ValueToHtmlConverter> valueConverter)
+            {
+                cssEquivalent.Value = valueConverter(cssEquivalent);
+                cssEquivalent.DomElement ??= uie.INTERNAL_OuterDomElement;
+                cssEquivalent.UIElement = uie;
+                return cssEquivalent;
+            }
         }
 
         internal virtual Task<string> GetDataStringAsync(UIElement parent)

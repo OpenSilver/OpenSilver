@@ -558,48 +558,56 @@ namespace Windows.UI.Xaml.Controls
                     },
                 });
 
-        private const int TABINDEX_BROWSER_MAX_VALUE = 32767;
-
-        internal virtual void UpdateTabIndex(bool isTabStop, int tabIndex)
+        internal void UpdateTabIndex(bool isTabStop, int tabindex)
         {
-            var domElementConcernedByFocus = GetFocusTarget();
-            if (domElementConcernedByFocus == null)
-                return;
-            if (!isTabStop || !this.IsEnabled)
+            UpdateTabIndexCore(isTabStop, tabindex);
+            UpdateSystemFocusVisuals();
+        }
+
+        internal virtual void UpdateTabIndexCore(bool isTabStop, int tabindex)
+        {
+            object focusTarget = GetFocusTarget();
+            if (focusTarget == null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementConcernedByFocus, "tabIndex", "-1");
+                return;
+            }
+
+            if (!isTabStop || !IsEnabled)
+            {
+                INTERNAL_HtmlDomManager.RemoveDomElementAttribute(focusTarget, "tabindex");
             }
             else
             {
-                //Note: according to W3C, tabIndex needs to be between 0 and 32767 on browsers: https://www.w3.org/TR/html401/interact/forms.html#adef-tabindex
-                //      also, the behaviour of the different browsers outside of these values can be different and therefore, we have to restrict the values.
-                //We translate the TabIndexes to have a little margin with negative TabIndexes:
-                //this is because a negative tabIndex in html is equivalent to IsTabStop = false in CS.
-                //this way, we make sure to keep the order of elements with TabIndexes between -100 and TABINDEX_BROWSER_MAX_VALUE - 100
-                //100 is empirically chosen because the only reason I would see for a negative TabIndex would be if the person has already set some TabIndexes and forgot one that needs to come before that so he is likely to simply use small numbers.
-                int index;
-                if (tabIndex < (TABINDEX_BROWSER_MAX_VALUE - 100))
-                {
-                    index = Math.Max(tabIndex + 100, 0); //this is not ideal but it'll have do for now.
-                }
-                else
-                {
-                    index = TABINDEX_BROWSER_MAX_VALUE;
-                }
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(
+                    focusTarget,
+                    "tabindex",
+                    ConvertToHtmlTabIndex(tabindex).ToString());
+            }
+        }
 
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementConcernedByFocus, "tabIndex", index.ToString()); //note: not replaced with GetCSSEquivalent because it uses SetDomeElementAttribute (so it's not the style)
+        internal static int ConvertToHtmlTabIndex(int tabindex)
+        {
+            const int TABINDEX_BROWSER_MAX_VALUE = 32767;
 
-                //in the case where the control should not have an outline even when focused or when the control has a template that defines the VisualState "Focused", we remove the default outline that browsers put:
-                IList<VisualStateGroup> groups = this.StateGroupsRoot?.GetValue(VisualStateManager.VisualStateGroupsProperty) as Collection<VisualStateGroup>;
-#pragma warning disable CS0618 // Type or member is obsolete
-                if (!this.UseSystemFocusVisuals ||
-#pragma warning restore CS0618 // Type or member is obsolete
-                    (groups != null && groups.Any(gr => ((IList<VisualState>)gr.States).Any(state => state.Name == "Focused"))))
-                {
-
-                    // this.INTERNAL_GetVisualStateGroups().ContainsVisualState("Focused")
-                    INTERNAL_HtmlDomManager.SetDomElementStyleProperty(domElementConcernedByFocus, new List<string>() { "outline" }, "none");
-                }
+            // Note: according to W3C, tabIndex needs to be between 0 and 32767 on browsers:
+            // https://www.w3.org/TR/html401/interact/forms.html#adef-tabindex
+            // also, the behaviour of the different browsers outside of these values can be
+            // different and therefore, we have to restrict the values.
+            //
+            // We translate the TabIndexes to have a little margin with negative TabIndexes:
+            // this is because a negative tabIndex in html is equivalent to IsTabStop = false
+            // in C#. This way, we make sure to keep the order of elements with TabIndexes
+            // between -100 and TABINDEX_BROWSER_MAX_VALUE - 100.
+            // 100 is empirically chosen because the only reason I would see for a negative
+            // TabIndex would be if the person has already set some TabIndexes and forgot one
+            // that needs to come before that so he is likely to simply use small numbers.
+            if (tabindex < (TABINDEX_BROWSER_MAX_VALUE - 100))
+            {
+                return Math.Max(tabindex + 100, 0);
+            }
+            else
+            {
+                return TABINDEX_BROWSER_MAX_VALUE;
             }
         }
 
@@ -762,9 +770,34 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
+        private bool _useSystemFocusVisuals;
+
         [Obsolete(Helper.ObsoleteMemberMessage)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool UseSystemFocusVisuals { get; set; }
+        public bool UseSystemFocusVisuals
+        {
+            get => _useSystemFocusVisuals;
+            set
+            {
+                if (_useSystemFocusVisuals != value)
+                {
+                    _useSystemFocusVisuals = value;
+                    UpdateSystemFocusVisuals();
+                }
+            }
+        }
+
+        private void UpdateSystemFocusVisuals()
+        {
+            object focusTarget = GetFocusTarget();
+            if (focusTarget != null)
+            {
+                INTERNAL_HtmlDomManager.SetCSSStyleProperty(
+                    focusTarget,
+                    "outline",
+                    _useSystemFocusVisuals ? string.Empty : "none");
+            }
+        }
 
         /// <summary>
         /// If control has a scrollviewer in its style and has a custom keyboard 

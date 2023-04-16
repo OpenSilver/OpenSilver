@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,11 +11,11 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using CSHTML5.Internal;
 using System.Collections.Generic;
 using System.Globalization;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -28,12 +27,10 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-
-
     /// <summary>
     /// Creates an arbitrary affine matrix transformation that is used to manipulate objects or coordinate systems in a two-dimensional plane.
     /// </summary>
-    public sealed partial class MatrixTransform : Transform
+    public sealed class MatrixTransform : Transform
     {
         #region Constructors
 
@@ -69,21 +66,15 @@ namespace Windows.UI.Xaml.Media
                 typeof(MatrixTransform),
                 new PropertyMetadata(Matrix.Identity, OnMatrixChanged)
                 {
-                    GetCSSEquivalent = (instance) =>
+                    GetCSSEquivalent = static (instance) =>
                     {
                         var target = ((MatrixTransform)instance).INTERNAL_parent;
                         if (target != null)
                         {
-                            return new CSSEquivalent()
+                            return new CSSEquivalent
                             {
                                 DomElement = target.INTERNAL_OuterDomElement,
-                                Value = (inst, value) =>
-                                {
-                                    var m = (Matrix)value;
-                                    return string.Format(CultureInfo.InvariantCulture,
-                                        "matrix({0}, {1}, {2}, {3}, {4}, {5})",
-                                        m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY);
-                                },
+                                Value = (inst, value) => MatrixToHtmlString((Matrix)value),
                                 Name = new List<string>(1) { "transform" },
                                 UIElement = target,
                                 ApplyAlsoWhenThereIsAControlTemplate = true,
@@ -103,15 +94,19 @@ namespace Windows.UI.Xaml.Media
 
         private void ApplyCSSChanges(Matrix matrix)
         {
-            CSSEquivalent cssEquivalent = MatrixProperty.GetTypeMetaData(typeof(MatrixTransform)).GetCSSEquivalent(this);
-            if (cssEquivalent != null)
+            UIElement owner = INTERNAL_parent;
+            if (owner is not null)
             {
-                object domElement = cssEquivalent.DomElement;
-                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(
-                    cssEquivalent.DomElement, 
-                    cssEquivalent.Name, 
-                    cssEquivalent.Value(this, matrix));
+                INTERNAL_HtmlDomManager.SetCSSStyleProperty(
+                    owner.INTERNAL_OuterDomElement,
+                    "transform",
+                    MatrixToHtmlString(matrix));
             }
+        }
+
+        internal static string MatrixToHtmlString(Matrix m)
+        {
+            return $"matrix({m.M11.ToInvariantString()}, {m.M12.ToInvariantString()}, {m.M21.ToInvariantString()}, {m.M22.ToInvariantString()}, {m.OffsetX.ToInvariantString()}, {m.OffsetY.ToInvariantString()})";
         }
 
         internal override void INTERNAL_ApplyTransform()

@@ -11,7 +11,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultExpanderStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultGridSplitterStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultHyperlinkButtonStyle.xaml" />
-        <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultMenuItemStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultNumericUpDownStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultPasswordBoxStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultProgressBarStyle.xaml" />
@@ -38,5 +37,6 @@
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultCalendarDayButtonStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultDragDecoratorStyle.xaml" />
         <ResourceDictionary Source="../DefaultStyles/INTERNAL_DefaultRichTextBoxStyle.xaml" />
+        <ResourceDictionary Source="../DefaultStyles/INTERNAL_ContextMenuStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

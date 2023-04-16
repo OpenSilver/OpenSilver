@@ -278,12 +278,14 @@ namespace Windows.UI.Xaml
             }
             else
             {
-                INTERNAL_PropertyStorage[] storages = newParent.INTERNAL_AllInheritedProperties.Values.ToArray();
-                foreach (var storage in storages)
+                foreach (var kvp in newParent.INTERNAL_AllInheritedProperties.ToArray())
                 {
-                    uie.SetInheritedValue(storage.Property,
-                                          INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
-                                          true);
+                    DependencyProperty dp = kvp.Key;
+                    INTERNAL_PropertyStorage storage = kvp.Value;
+
+                    uie.SetInheritedValue(dp,
+                        INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
+                        true);
                 }
             }
         }
@@ -354,14 +356,13 @@ namespace Windows.UI.Xaml
         /// </summary>
         internal virtual FrameworkElement StateGroupsRoot => TemplateChild;
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        internal Style INTERNAL_defaultStyle;
-
         private ResourceDictionary _resources;
 
         /// <summary>
         /// Derived classes can set this flag in their constructor to prevent the "Style" property from being applied.
         /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected bool INTERNAL_DoNotApplyStyle = false;
 
         /// <summary>
@@ -525,13 +526,6 @@ namespace Windows.UI.Xaml
             div2style.height = "100%";
             domElementWhereToPlaceChildren = div2;
             return div1;
-        }
-#if BRIDGE
-        [Bridge.Template("true")]
-#endif
-        static bool IsRunningInJavaScript()
-        {
-            return false;
         }
 
         // Internal helper so the FrameworkElement could see the
@@ -801,21 +795,20 @@ namespace Windows.UI.Xaml
         {
             var element = (FrameworkElement)d;
             SetPointerEvents(element);
-            element.ManageIsEnabled(newValue != null ? (bool)newValue : true);
+            element.ManageIsEnabled((bool)newValue);
         }
 
         internal protected virtual void ManageIsEnabled(bool isEnabled)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                var domElementToEnableOrDisable = (INTERNAL_OptionalSpecifyDomElementConcernedByIsEnabled != null ? INTERNAL_OptionalSpecifyDomElementConcernedByIsEnabled : INTERNAL_OuterDomElement);
                 if (isEnabled)
                 {
-                    INTERNAL_HtmlDomManager.RemoveDomElementAttribute(domElementToEnableOrDisable, "disabled", forceSimulatorExecuteImmediately: true);
+                    INTERNAL_HtmlDomManager.RemoveDomElementAttribute(INTERNAL_OuterDomElement, "disabled", forceSimulatorExecuteImmediately: true);
                 }
                 else
                 {
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(domElementToEnableOrDisable, "disabled", "true");
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(INTERNAL_OuterDomElement, "disabled", "true");
                 }
             }
         }
@@ -1158,7 +1151,6 @@ namespace Windows.UI.Xaml
         [Obsolete(Helper.ObsoleteMemberMessage + " Use DefaultStyleKey instead.")]
         protected void INTERNAL_SetDefaultStyle(Style defaultStyle)
         {
-            INTERNAL_defaultStyle = defaultStyle;
         }
 
         #region Loaded/Unloaded events

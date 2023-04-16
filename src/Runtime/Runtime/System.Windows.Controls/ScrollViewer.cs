@@ -205,7 +205,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 sv.ApplyHorizontalSettings(
                     (ScrollBarVisibility)newValue,
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_OuterDomElement));
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_OuterDomElement),
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_InnerDomElement));
             }
         }
 
@@ -277,7 +278,8 @@ namespace Windows.UI.Xaml.Controls
             {
                 sv.ApplyVerticalSettings(
                     (ScrollBarVisibility)newValue,
-                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_OuterDomElement));
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_OuterDomElement),
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(sv.INTERNAL_InnerDomElement));
             }
         }
 
@@ -304,12 +306,10 @@ namespace Windows.UI.Xaml.Controls
             }
 
             var innerDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", outerDiv, this, out object innerDiv);
-            innerDivStyle.display = "block";
-            innerDivStyle.height = "100%";
-            innerDivStyle.width = "100%";
+            innerDivStyle.display = "grid";
 
-            ApplyHorizontalSettings(HorizontalScrollBarVisibility, outerDivStyle);
-            ApplyVerticalSettings(VerticalScrollBarVisibility, outerDivStyle);
+            ApplyHorizontalSettings(HorizontalScrollBarVisibility, outerDivStyle, innerDivStyle);
+            ApplyVerticalSettings(VerticalScrollBarVisibility, outerDivStyle, innerDivStyle);
 
             domElementWhereToPlaceChildren = innerDiv;
             return outerDiv;
@@ -317,7 +317,8 @@ namespace Windows.UI.Xaml.Controls
 
         private void ApplyHorizontalSettings(
             ScrollBarVisibility horizontalScrollBarVisibility,
-            INTERNAL_HtmlDomStyleReference outerDivStyle)
+            INTERNAL_HtmlDomStyleReference outerDivStyle,
+            INTERNAL_HtmlDomStyleReference innerDivStyle)
         {
             // if it's under customlayout, it works with Measure & Arrange.
             if (IsCustomLayoutRoot || IsUnderCustomLayout)
@@ -332,24 +333,27 @@ namespace Windows.UI.Xaml.Controls
                 switch (horizontalScrollBarVisibility)
                 {
                     case ScrollBarVisibility.Disabled:
-                        //there cannot be an overflow at all
-                        //a solution would be to put for ALL the children : max-width:100% (But it wouldn't work with margins)
-                        //the solution above should stop when a child is a canvas : its children can have the size they want
-                        outerDivStyle.overflowX = "hidden";//todo: fix this (the children are not limited to the size of this control)
+                        outerDivStyle.overflowX = "hidden";
+                        innerDivStyle.width = "100%";
+                        innerDivStyle.minWidth = string.Empty;
                         break;
 
                     case ScrollBarVisibility.Auto:
-                        //there is a scrollbar when the content is wider, there is no scrollbar when the content fits
-                        outerDivStyle.overflowX = "auto"; //todo: check if the overflowX actually sets overflow-x and not overflow (I think it sets overflow).
+                        outerDivStyle.overflowX = "auto";
+                        innerDivStyle.width = "fit-content";
+                        innerDivStyle.minWidth = "100%";
                         break;
 
                     case ScrollBarVisibility.Hidden:
-                        //--> overflow is hidden
                         outerDivStyle.overflowX = "hidden";
+                        innerDivStyle.width = "100%";
+                        innerDivStyle.minWidth = string.Empty;
                         break;
 
                     case ScrollBarVisibility.Visible:
                         outerDivStyle.overflowX = "scroll";
+                        innerDivStyle.width = "fit-content";
+                        innerDivStyle.minWidth = "100%";
                         break;
 
                     default:
@@ -360,7 +364,8 @@ namespace Windows.UI.Xaml.Controls
 
         private void ApplyVerticalSettings(
             ScrollBarVisibility verticalScrollBarVisibility,
-            INTERNAL_HtmlDomStyleReference outerDivStyle)
+            INTERNAL_HtmlDomStyleReference outerDivStyle,
+            INTERNAL_HtmlDomStyleReference innerDivStyle)
         {
             // if it's under customlayout, it works with Measure & Arrange.
             if (IsCustomLayoutRoot || IsUnderCustomLayout)
@@ -375,24 +380,27 @@ namespace Windows.UI.Xaml.Controls
                 switch (verticalScrollBarVisibility)
                 {
                     case ScrollBarVisibility.Disabled:
-                        //there cannot be an overflow at all
-                        //a solution would be to put for ALL the children : max-width:100% (But it wouldn't work with margins)
-                        //the solution above should stop when a child is a canvas : its children can have the size they want
-                        outerDivStyle.overflowY = "hidden";//todo: fix this (the children are not limited to the size of this control)
+                        outerDivStyle.overflowY = "hidden";
+                        innerDivStyle.height = "100%";
+                        innerDivStyle.minHeight = string.Empty;
                         break;
 
                     case ScrollBarVisibility.Auto:
-                        //there is a scrollbar when the content is wider, there is no scrollbar when the content fits
-                        outerDivStyle.overflowY = "auto"; //todo: check if the overflowX actually sets overflow-x and not overflow (I think it sets overflow).
+                        outerDivStyle.overflowY = "auto";
+                        innerDivStyle.height = "fit-content";
+                        innerDivStyle.minHeight = "100%";
                         break;
 
                     case ScrollBarVisibility.Hidden:
-                        //--> overflow is hidden
                         outerDivStyle.overflowY = "hidden";
+                        innerDivStyle.height = "100%";
+                        innerDivStyle.minHeight = string.Empty;
                         break;
 
                     case ScrollBarVisibility.Visible:
                         outerDivStyle.overflowY = "scroll";
+                        innerDivStyle.height = "fit-content";
+                        innerDivStyle.minHeight = "100%";
                         break;
 
                     default:

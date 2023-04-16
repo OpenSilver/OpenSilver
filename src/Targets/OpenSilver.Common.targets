@@ -81,7 +81,7 @@
   Set the default values for some properties (for example, if the output paths have not been specified, we set the default ones):
   ============================================================-->
   <PropertyGroup Condition="'$(CompilerBuildNumber)'==''">
-	  <CompilerBuildNumber>8</CompilerBuildNumber>
+    <CompilerBuildNumber>10</CompilerBuildNumber>
   </PropertyGroup>
   <PropertyGroup Condition="'$(IsSecondPass)'==''">
     <IsSecondPass>False</IsSecondPass>
@@ -183,14 +183,30 @@
 
 	  <Error Condition="$(IsCompilerVersionChecked)==''"
 			 Text="Compiler initialization error. Please restart Visual Studio or manually kill the Msbuild process, then recompile the solution to fix this error."/>
-	  
 
+
+	  <!--============================================================
+    Check if the project has a reference to WebAssembly:
+    ============================================================-->
+	  <PropertyGroup>
+		  <WebAssemblyFileName>Microsoft.AspNetCore.Components.WebAssembly</WebAssemblyFileName>
+	  </PropertyGroup>
+
+	  <CreateProperty
+		Value="True"
+		Condition="$([System.String]::Copy('%(Reference.Filename)').EndsWith('$(WebAssemblyFileName)'))" >
+		  <Output
+			  TaskParameter="Value"
+			  PropertyName="HasReferenceToWebAssembly"/>
+	  </CreateProperty>
+	  
 	  <!--============================================================
     Display an error if this version has breaking changes that require manual update of the project files:
     ============================================================-->
 	<PropertyGroup>
 	  <IsBrowserProject Condition="'$(OpenSilverType)' != ''">True</IsBrowserProject>
 	  <IsBrowserProject Condition="'$(OpenSilverType)' == ''">False</IsBrowserProject>
+	  <IsRazorProject  Condition="'$(UsingMicrosoftNETSdkRazor)'=='true'">True</IsRazorProject>
 	</PropertyGroup>
     <Exec
       Condition="'$(IsBrowserProject)'=='True' And ('$(OpenSilverType)'=='' Or $(OpenSilverType)&lt;2)"
@@ -449,10 +465,14 @@
       <Cshtml5OutputRootPath>..\..\..\wwwroot\</Cshtml5OutputRootPath>
     </PropertyGroup>
 
+	  <PropertyGroup Condition="'$(IsBrowserProject)' == 'True' OR ('$(IsRazorProject)' == 'True' AND '$(HasReferenceToWebAssembly)' == 'True')">
+		  <ShouldCopyJsCssFiles>True</ShouldCopyJsCssFiles>
+	  </PropertyGroup>
+	  
     <!--============================================================
       Copying the js/css libraries that come with OpenSilver:
       ============================================================-->
-    <ItemGroup Condition="'$(IsBrowserProject)' == 'True'">
+	<ItemGroup Condition="'$(ShouldCopyJsCssFiles)' == 'True'">
       <MySourceFiles Include="$(MSBuildThisFileDirectory)..\js_css\*"/>
     </ItemGroup>
     
@@ -460,11 +480,11 @@
                 Text="Copying resources from &quot;$(MSBuildThisFileDirectory)&quot; to &quot;$(BaseIntermediateOutputPath)..\wwwroot\libs\&quot;"
                 Importance="normal"/>-->
     
-    <Message  Condition="'$(IsBrowserProject)' == 'True'"
+    <Message  Condition="'$(ShouldCopyJsCssFiles)' == 'True'"
                 Text="Copying OpenSilver's required js/css libraries."
                 Importance="normal"/>
 
-    <Copy Condition="'$(IsBrowserProject)' == 'True'"
+    <Copy Condition="'$(ShouldCopyJsCssFiles)' == 'True'"
         SourceFiles="@(MySourceFiles)"
         SkipUnchangedFiles="true"
         DestinationFolder="$(BaseIntermediateOutputPath)..\wwwroot\libs\"
@@ -472,9 +492,9 @@
 
     <PropertyGroup>
       <ResourcesSourceLocation>$(OutputAssemblyDirectory)</ResourcesSourceLocation>
-      <ResourcesSourceLocation Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\wwwroot\_framework</ResourcesSourceLocation>
+      <ResourcesSourceLocation Condition="('$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0') And '$(IsBrowserProject)' == 'True'">$(OutputAssemblyDirectory)\wwwroot\_framework</ResourcesSourceLocation>
       <ResourcesRootOutput>$(Cshtml5OutputRootPath)</ResourcesRootOutput>
-      <ResourcesRootOutput Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0'">$(OutputAssemblyDirectory)\..\..\..\wwwroot\</ResourcesRootOutput>
+      <ResourcesRootOutput Condition="('$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0') And '$(IsBrowserProject)' == 'True'">$(OutputAssemblyDirectory)\..\..\..\wwwroot\</ResourcesRootOutput>
     </PropertyGroup>
 
     <!--============================================================

@@ -164,24 +164,6 @@ namespace Windows.UI.Xaml.Controls
                 UpdateDomOnBorderBrushChanged(this, null, null);
             }
 
-            if (!this.INTERNAL_EnableProgressiveLoading)
-            {
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
-            }
-            else
-            {
-                ProgressivelyAttachChild();
-            }
-        }
-
-        private async void ProgressivelyAttachChild()
-        {
-            await Task.Delay(1);
-            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-            {
-                //this can happen if the Panel is detached during the delay.
-                return;
-            }
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(Child, this);
         }
 

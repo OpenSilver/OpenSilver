@@ -55,7 +55,7 @@ namespace OpenSilver.Compiler
                     //-----------------------------------------------------
 
                     // Dispose the static instance of the "ReflectionOnSeparateAppDomainHandler":
-                    ReflectionOnSeparateAppDomainHandler.Current.Dispose(); // Note: this is not supposed to be null because it was instantiated in the "BeforeXamlPreprocessor" task.
+                    AssembliesInspector.Current.Dispose(); // Note: this is not supposed to be null because it was instantiated in the "BeforeXamlPreprocessor" task.
 
 
                     bool isSuccess = true;

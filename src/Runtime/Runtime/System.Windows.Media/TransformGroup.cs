@@ -13,9 +13,8 @@
 
 using System;
 using System.Windows.Markup;
-using System.Collections.Generic;
-using System.Globalization;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -112,15 +111,13 @@ namespace Windows.UI.Xaml.Media
 
         private void ApplyCSSChanges(Matrix m)
         {
-            var target = this.INTERNAL_parent;
-            if (target != null)
+            UIElement target = INTERNAL_parent;
+            if (target is not null)
             {
-                INTERNAL_HtmlDomManager.SetDomElementStyleProperty(
-                target.INTERNAL_OuterDomElement,
-                new List<string>(1) { "transform" },
-                string.Format(CultureInfo.InvariantCulture,
-                              "matrix({0}, {1}, {2}, {3}, {4}, {5})",
-                              m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY));
+                INTERNAL_HtmlDomManager.SetCSSStyleProperty(
+                    target.INTERNAL_OuterDomElement,
+                    "transform",
+                    MatrixTransform.MatrixToHtmlString(m));
             }
         }
 

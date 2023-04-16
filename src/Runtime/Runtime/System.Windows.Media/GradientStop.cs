@@ -47,38 +47,23 @@ namespace Windows.UI.Xaml.Media
         public static readonly DependencyProperty ColorProperty =
             DependencyProperty.Register("Color", typeof(Color), typeof(GradientStop), new PropertyMetadata(Color.FromArgb(0, 0, 0, 0))
             {
-                GetCSSEquivalents = (instance) =>
+                GetCSSEquivalents = static (instance) =>
                 {
-                    GradientStop gradientStop = instance as GradientStop;
-                    if (gradientStop != null)
+                    GradientStop gradientStop = (GradientStop)instance;
+                    Brush brush = gradientStop.INTERNAL_ParentBrush;
+                    if (brush != null)
                     {
-                        Brush brush = gradientStop.INTERNAL_ParentBrush;
-                        if(brush != null)
-                        {
-                            Func<CSSEquivalent, ValueToHtmlConverter> parentPropertyToValueToHtmlConverter =
-                            (parentPropertyCSSEquivalent) =>
-                                ((inst, value) =>
-                                {
-                                    return brush;
+                        ValueToHtmlConverter ConvertValueToHtml(CSSEquivalent cssEquivalent) => (inst, value) => brush;
 
-                                    //todo: support "Velocity" animations by using a similar approach as the one of the SolidColorBrush?
-                                });
-
-                            return Brush.MergeCSSEquivalentsOfTheParentsProperties(brush, parentPropertyToValueToHtmlConverter);
-                        }
-                        else
-                        {
-                            // this may happen if the color property is set before the GradientStop has been added to the GradientStopCollection/GradientBrush. 
-                            return new List<CSSEquivalent>();
-                        }
+                        return Brush.MergeCSSEquivalentsOfTheParentsProperties(brush, ConvertValueToHtml);
                     }
                     else
                     {
-                        throw new ArgumentException();
+                        // this may happen if the color property is set before the GradientStop has been added to the GradientStopCollection/GradientBrush. 
+                        return new List<CSSEquivalent>();
                     }
                 }
-            }
-            );
+            });
 
         /// <summary>
         /// Gets the location of the gradient stop within the gradient vector.

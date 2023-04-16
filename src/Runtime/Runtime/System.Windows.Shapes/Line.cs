@@ -14,7 +14,6 @@
 
 using System;
 using CSHTML5.Internal;
-using OpenSilver;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -183,7 +182,6 @@ namespace Windows.UI.Xaml.Shapes
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                BulkExecuteJavascriptAsync bulkJs = new BulkExecuteJavascriptAsync();
                 double minX = X1;
                 double minY = Y1;
                 double maxX = X2;
@@ -217,10 +215,12 @@ namespace Windows.UI.Xaml.Shapes
                     ApplyMarginToFixNegativeCoordinates(_marginOffsets);
                 }
 
-                object context = bulkJs.AddJavascriptAsync($"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext('2d')"); //Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
+                var context = OpenSilver.Interop.ExecuteJavaScriptAsync(
+                    $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_canvasDomElement)}.getContext('2d')"); //Note: we do not use INTERNAL_HtmlDomManager.Get2dCanvasContext here because we need to use the result in ExecuteJavaScript, which requires the value to come from a call of ExecuteJavaScript.
                 string sContext = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(context);
                 //we remove the previous drawing:
-                bulkJs.AddJavascript($"{sContext}.clearRect(0,0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"{sContext}.clearRect(0,0, {shapeActualSize.Width.ToInvariantString()}, {shapeActualSize.Height.ToInvariantString()})");
 
 
                 //double preparedX1 = (X1 + xOffsetToApplyBeforeMultiplication) * horizontalMultiplicator + xOffsetToApplyAfterMultiplication;
@@ -235,16 +235,16 @@ namespace Windows.UI.Xaml.Shapes
 
                 //todo: if possible, manage strokeStyle and lineWidth in their respective methods (Stroke_Changed and StrokeThickness_Changed) then use context.save() and context.restore() (can't get it to work yet).
                 double opacity = Stroke == null ? 1 : Stroke.Opacity;
-                object strokeValue = GetHtmlBrush(this, context, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize, bulkJs);
+                object strokeValue = GetHtmlBrush(this, context, Stroke, opacity, minX, minY, maxX, maxY, horizontalMultiplicator, verticalMultiplicator, xOffsetToApplyBeforeMultiplication, yOffsetToApplyBeforeMultiplication, shapeActualSize);
 
                 //we set the StrokeDashArray:
                 if (strokeValue != null && StrokeThickness > 0)
                 {
                     double thickness = StrokeThickness;
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
-{sContext}.strokeStyle = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
-                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
-{sContext}.lineWidth = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(StrokeThickness)}");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                        $"{sContext}.strokeStyle = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                        $"{sContext}.lineWidth = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(StrokeThickness)}");
                     if (StrokeDashArray != null)
                     {
                         // TODO
@@ -254,18 +254,19 @@ namespace Windows.UI.Xaml.Shapes
                 INTERNAL_ShapesDrawHelpers.PrepareLine(_canvasDomElement, new Point(preparedX1, preparedY1), new Point(preparedX2, preparedY2));
 
                 if (strokeValue != null)
-                    bulkJs.AddJavascript($"{sContext}.strokeStyle = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                        $"{sContext}.strokeStyle = {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(strokeValue)}");
 
                 //context.strokeStyle = strokeAsString; //set the shape's lines color
-                bulkJs.AddJavascript($"{sContext}.lineWidth= {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(StrokeThickness)}");
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"{sContext}.lineWidth= {CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(StrokeThickness)}");
                 //context.lineWidth = StrokeThickness.ToString();
                 if (Stroke != null && StrokeThickness > 0)
                 {
-                    bulkJs.AddJavascript($"{sContext}.stroke()"); //draw the line
+                    OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sContext}.stroke()"); //draw the line
                     //context.stroke(); //draw the line
                 }
-
-                _ = bulkJs.ExecuteAndDispose();
+                INTERNAL_DispatcherHelpers.QueueAction(() => context.Dispose());
             }
         }
 

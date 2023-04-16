@@ -321,11 +321,13 @@ namespace Windows.UI.Xaml.Data
         /// for a value change that keeps/makes it Invalid (which is what happens on Silverlight).
         /// Defaults to False since it is the behaviour of Silverlight and WPF.
         /// </summary>
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool ValidatesOnLoad { get; set; }
 
-        //
-        // Summary:
-        //     Indicates whether data binding debugging is enabled.
+        /// <summary>
+        /// Indicates whether data binding debugging is enabled.
+        /// </summary>
         [OpenSilver.NotImplemented]
         public static bool IsDebuggingEnabled;
 

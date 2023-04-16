@@ -46,8 +46,8 @@ namespace DotNetForHtml5
             Initialize(new JavaScriptExecutionHandler());
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.Initialize(IWebAssemblyExecutionHandler) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use DotNetForHtml5.Initialize(IWebAssemblyExecutionHandler) instead.", true)]
         public static void Initialize(IJavaScriptExecutionHandler2 executionHandler)
         {
             Initialize((IJavaScriptExecutionHandler)executionHandler);

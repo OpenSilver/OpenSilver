@@ -1,16 +1,10 @@
-﻿
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
+﻿// (c) Copyright Microsoft Corporation. 
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
+using System;
+using System.Diagnostics;
 using System.ComponentModel;
 using OpenSilver.Internal;
 
@@ -18,10 +12,9 @@ using OpenSilver.Internal;
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 #else
-using System;
-using Windows.Foundation;
 using Windows.UI.Xaml.Automation.Peers;
-using Windows.UI.Xaml.Input;
+using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
+using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 #endif
 
 #if MIGRATION
@@ -31,60 +24,27 @@ namespace Windows.UI.Xaml.Controls.Primitives
 #endif
 {
     /// <summary>
-    /// Represents a control that provides a scroll bar that has a sliding Thumb whose position corresponds to a value.
-    /// </summary>
-    public sealed partial class ScrollBar : RangeBase
+    /// Represents a control that provides a scroll bar that has a sliding 
+    /// <see cref="Thumb" /> whose position corresponds to a value.
+    /// </summary> 
+    [TemplatePart(Name = ElementHorizontalTemplateName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementHorizontalLargeIncreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementHorizontalLargeDecreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementHorizontalSmallDecreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementHorizontalSmallIncreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementHorizontalThumbName, Type = typeof(Thumb))]
+    [TemplatePart(Name = ElementVerticalTemplateName, Type = typeof(FrameworkElement))]
+    [TemplatePart(Name = ElementVerticalLargeIncreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementVerticalLargeDecreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementVerticalSmallIncreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementVerticalSmallDecreaseName, Type = typeof(RepeatButton))]
+    [TemplatePart(Name = ElementVerticalThumbName, Type = typeof(Thumb))]
+    [TemplateVisualState(Name = VisualStates.StateNormal, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateMouseOver, GroupName = VisualStates.GroupCommon)]
+    [TemplateVisualState(Name = VisualStates.StateDisabled, GroupName = VisualStates.GroupCommon)]
+    public sealed class ScrollBar : RangeBase
     {
-        const double MINIMUM_THUMB_SIZE = 16d;
-        double _smallDecreaseButtonSize;
-        double _smallIncreaseButtonSize;
-        bool _controlWasProperlyDrawn;
-        double _valueWithoutCoercion; // Note: Normally we keep the value within the Min/Max range (this is called "coercion"). However, while dragging the thumb, we store the "ValueWithoutCoercion" so that when the user drags the pointer beyond the scrollbar limits and then goes back, the "going back" movement does not modify the actual value until the pointer is again inside the scrollbar range.
-
-        // Horizontal elements:
-        FrameworkElement _horizontalRoot;
-        Thumb _horizontalThumb;
-        ButtonBase _horizontalSmallDecrease;
-        ButtonBase _horizontalSmallIncrease;
-        ButtonBase _horizontalLargeDecrease;
-        ButtonBase _horizontalLargeIncrease;
-
-        // Vertical elements:
-        FrameworkElement _verticalRoot;
-        Thumb _verticalThumb;
-        ButtonBase _verticalSmallDecrease;
-        ButtonBase _verticalSmallIncrease;
-        ButtonBase _verticalLargeDecrease;
-        ButtonBase _verticalLargeIncrease;
-
         private DebounceDispatcher _debounceDispatcher;
-
-        /// <summary>
-        /// Initializes a new instance of the ScrollBar class.
-        /// </summary>
-        public ScrollBar()
-        {
-            // Set default style:
-            this.DefaultStyleKey = typeof(ScrollBar);
-
-            // Register some events:
-            this.Unloaded += ScrollBar_Unloaded;
-            this.SizeChanged += ScrollBar_SizeChanged;
-        }
-
-        void ScrollBar_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            // Note: this handler is also called the first time that the element is added to the visual tree.
-
-            // Update the position of all the elements:
-            if (TryUpdateSizeAndPositionOfUIElements())
-                _controlWasProperlyDrawn = true;
-        }
-
-        void ScrollBar_Unloaded(object sender, RoutedEventArgs e)
-        {
-            _controlWasProperlyDrawn = false;
-        }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static readonly DependencyProperty DebounceProperty =
@@ -134,6 +94,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
             fe.SetValue(DebounceProperty, debounce);
         }
 
+        /// <summary> 
+        /// Initializes a new instance of the <see cref="ScrollBar"/> class.
+        /// </summary> 
+        public ScrollBar()
+        {
+            SizeChanged += delegate { UpdateTrackLayout(GetTrackLength()); };
+
+            DefaultStyleKey = typeof(ScrollBar);
+            IsEnabledChanged += OnIsEnabledChanged;
+        }
+
+        /// <summary> 
+        /// Builds the visual tree for the <see cref="ScrollBar"/> control
+        /// when a new template is applied.
+        /// </summary>
 #if MIGRATION
         public override void OnApplyTemplate()
 #else
@@ -142,543 +117,168 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             base.OnApplyTemplate();
 
-            //----------------------------
-            // Get a reference to the UI elements defined in the control template:
-            //----------------------------
+            // Get the parts
+            ElementHorizontalTemplate = GetTemplateChild(ElementHorizontalTemplateName) as FrameworkElement;
+            ElementHorizontalLargeIncrease = GetTemplateChild(ElementHorizontalLargeIncreaseName) as RepeatButton;
+            ElementHorizontalLargeDecrease = GetTemplateChild(ElementHorizontalLargeDecreaseName) as RepeatButton;
+            ElementHorizontalSmallIncrease = GetTemplateChild(ElementHorizontalSmallIncreaseName) as RepeatButton;
+            ElementHorizontalSmallDecrease = GetTemplateChild(ElementHorizontalSmallDecreaseName) as RepeatButton;
+            ElementHorizontalThumb = GetTemplateChild(ElementHorizontalThumbName) as Thumb;
+            ElementVerticalTemplate = GetTemplateChild(ElementVerticalTemplateName) as FrameworkElement;
+            ElementVerticalLargeIncrease = GetTemplateChild(ElementVerticalLargeIncreaseName) as RepeatButton;
+            ElementVerticalLargeDecrease = GetTemplateChild(ElementVerticalLargeDecreaseName) as RepeatButton;
+            ElementVerticalSmallIncrease = GetTemplateChild(ElementVerticalSmallIncreaseName) as RepeatButton;
+            ElementVerticalSmallDecrease = GetTemplateChild(ElementVerticalSmallDecreaseName) as RepeatButton;
+            ElementVerticalThumb = GetTemplateChild(ElementVerticalThumbName) as Thumb;
 
-            _horizontalRoot = this.GetTemplateChild("HorizontalRoot") as FrameworkElement;
-            _horizontalThumb = this.GetTemplateChild("HorizontalThumb") as Thumb;
-            _horizontalSmallDecrease = this.GetTemplateChild("HorizontalSmallDecrease") as ButtonBase;
-            _horizontalSmallIncrease = this.GetTemplateChild("HorizontalSmallIncrease") as ButtonBase;
-            _horizontalLargeDecrease = this.GetTemplateChild("HorizontalLargeDecrease") as ButtonBase;
-            _horizontalLargeIncrease = this.GetTemplateChild("HorizontalLargeIncrease") as ButtonBase;
-
-            _verticalRoot = this.GetTemplateChild("VerticalRoot") as FrameworkElement;
-            _verticalThumb = this.GetTemplateChild("VerticalThumb") as Thumb;
-            _verticalSmallDecrease = this.GetTemplateChild("VerticalSmallDecrease") as ButtonBase;
-            _verticalSmallIncrease = this.GetTemplateChild("VerticalSmallIncrease") as ButtonBase;
-            _verticalLargeDecrease = this.GetTemplateChild("VerticalLargeDecrease") as ButtonBase;
-            _verticalLargeIncrease = this.GetTemplateChild("VerticalLargeIncrease") as ButtonBase;
-                    
-            //----------------------------
-            // Register the events:
-            //----------------------------
-            if (_horizontalThumb != null)
+            if (ElementHorizontalThumb != null)
             {
-                _horizontalThumb.DragStarted += HorizontalThumb_DragStarted;
-                _horizontalThumb.DragDelta += HorizontalThumb_DragDelta;
-                _horizontalThumb.DragCompleted += HorizontalThumb_DragCompleted;
+                ElementHorizontalThumb.DragStarted += delegate (object sender, DragStartedEventArgs e) { OnThumbDragStarted(); };
+                ElementHorizontalThumb.DragDelta += delegate (object sender, DragDeltaEventArgs e) { OnThumbDragDelta(e); };
+                ElementHorizontalThumb.DragCompleted += delegate (object sender, DragCompletedEventArgs e) { OnThumbDragCompleted(); };
             }
-            if (_verticalThumb != null)
+            if (ElementHorizontalLargeDecrease != null)
             {
-                _verticalThumb.DragStarted += VerticalThumb_DragStarted;
-                _verticalThumb.DragDelta += VerticalThumb_DragDelta;
-                _verticalThumb.DragCompleted += VerticalThumb_DragCompleted;
+                ElementHorizontalLargeDecrease.Click += delegate (object sender, RoutedEventArgs e) { LargeDecrement(); };
             }
-            if (_horizontalSmallDecrease != null)
-                _horizontalSmallDecrease.Click += SmallDecrease_Click;
-            if (_verticalSmallDecrease != null)
-                _verticalSmallDecrease.Click += SmallDecrease_Click;
-            if (_horizontalLargeDecrease != null)
-                _horizontalLargeDecrease.Click += LargeDecrease_Click;
-            if (_verticalLargeDecrease != null)
-                _verticalLargeDecrease.Click += LargeDecrease_Click;
-            if (_horizontalSmallIncrease != null)
-                _horizontalSmallIncrease.Click += SmallIncrease_Click;
-            if (_verticalSmallIncrease != null)
-                _verticalSmallIncrease.Click += SmallIncrease_Click;
-            if (_horizontalLargeIncrease != null)
-                _horizontalLargeIncrease.Click += LargeIncrease_Click;
-            if (_verticalLargeIncrease != null)
-                _verticalLargeIncrease.Click += LargeIncrease_Click;
-
-
-            //----------------------------
-            // Display the horizontal or vertical root depending on the orientation:
-            //----------------------------
-
-            if (_verticalRoot != null)
+            if (ElementHorizontalLargeIncrease != null)
             {
-                _verticalRoot.Visibility = (this.Orientation == Orientation.Vertical ? Visibility.Visible : Visibility.Collapsed);
+                ElementHorizontalLargeIncrease.Click += delegate (object sender, RoutedEventArgs e) { LargeIncrement(); };
             }
-            if (_horizontalRoot != null)
+            if (ElementHorizontalSmallDecrease != null)
             {
-                _horizontalRoot.Visibility = (this.Orientation == Orientation.Horizontal ? Visibility.Visible : Visibility.Collapsed);
+                ElementHorizontalSmallDecrease.Click += delegate (object sender, RoutedEventArgs e) { SmallDecrement(); };
             }
-
-            if (TryUpdateSizeAndPositionOfUIElements())
-                _controlWasProperlyDrawn = true;
-        }
-
-        protected override void OnValueChanged(double oldValue, double newValue)
-        {
-            base.OnValueChanged(oldValue, newValue);
-
-            // Refresh the position of the thumb:
-            UpdateThumbPositionAndSize();
-        }
-
-        protected override void OnMaximumChanged(double oldMaximum, double newMaximum)
-        {
-            base.OnMaximumChanged(oldMaximum, newMaximum);
-
-            // Refresh the position of the thumb:
-            UpdateThumbPositionAndSize();
-        }
-
-        protected override void OnMinimumChanged(double oldMinimum, double newMinimum)
-        {
-            base.OnMinimumChanged(oldMinimum, newMinimum);
-
-            // Refresh the position of the thumb:
-            UpdateThumbPositionAndSize();
+            if (ElementHorizontalSmallIncrease != null)
+            {
+                ElementHorizontalSmallIncrease.Click += delegate (object sender, RoutedEventArgs e) { SmallIncrement(); };
+            }
+            if (ElementVerticalThumb != null)
+            {
+                ElementVerticalThumb.DragStarted += delegate (object sender, DragStartedEventArgs e) { OnThumbDragStarted(); };
+                ElementVerticalThumb.DragDelta += delegate (object sender, DragDeltaEventArgs e) { OnThumbDragDelta(e); };
+                ElementVerticalThumb.DragCompleted += delegate (object sender, DragCompletedEventArgs e) { OnThumbDragCompleted(); };
+            }
+            if (ElementVerticalLargeDecrease != null)
+            {
+                ElementVerticalLargeDecrease.Click += delegate (object sender, RoutedEventArgs e) { LargeDecrement(); };
+            }
+            if (ElementVerticalLargeIncrease != null)
+            {
+                ElementVerticalLargeIncrease.Click += delegate (object sender, RoutedEventArgs e) { LargeIncrement(); };
+            }
+            if (ElementVerticalSmallDecrease != null)
+            {
+                ElementVerticalSmallDecrease.Click += delegate (object sender, RoutedEventArgs e) { SmallDecrement(); };
+            }
+            if (ElementVerticalSmallIncrease != null)
+            {
+                ElementVerticalSmallIncrease.Click += delegate (object sender, RoutedEventArgs e) { SmallIncrement(); };
+            }
+            // Updating states for parts where properties might have been updated through 
+            // XAML before the template was loaded.
+            OnOrientationChanged();
+            UpdateVisualState(false);
         }
 
         protected override AutomationPeer OnCreateAutomationPeer()
             => new ScrollBarAutomationPeer(this);
 
-        void LargeIncrease_Click(object sender, RoutedEventArgs e)
+        private void SmallDecrement()
         {
-            OnClickOnSmallOrLargeDecreaseIncreaseButtons(this.LargeChange, ScrollEventType.LargeIncrement);
-        }
-
-        void SmallIncrease_Click(object sender, RoutedEventArgs e)
-        {
-            OnClickOnSmallOrLargeDecreaseIncreaseButtons(this.SmallChange, ScrollEventType.SmallIncrement);
-        }
-
-        void LargeDecrease_Click(object sender, RoutedEventArgs e)
-        {
-            OnClickOnSmallOrLargeDecreaseIncreaseButtons(-this.LargeChange, ScrollEventType.LargeDecrement);
-        }
-
-        void SmallDecrease_Click(object sender, RoutedEventArgs e)
-        {
-            OnClickOnSmallOrLargeDecreaseIncreaseButtons(-this.SmallChange, ScrollEventType.SmallDecrement);
-        }
-
-        void VerticalThumb_DragCompleted(object sender, DragCompletedEventArgs e)
-        {
-            OnDragCompleted();
-        }
-
-        void HorizontalThumb_DragCompleted(object sender, DragCompletedEventArgs e)
-        {
-            OnDragCompleted();
-        }
-
-        void VerticalThumb_DragStarted(object sender, DragStartedEventArgs e)
-        {
-            OnDragStarted();
-        }
-
-        void HorizontalThumb_DragStarted(object sender, DragStartedEventArgs e)
-        {
-            OnDragStarted();
-        }
-
-        void VerticalThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            ChangeValueBasedOnPointerMovement(e.VerticalChange);
-        }
-
-        void HorizontalThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            ChangeValueBasedOnPointerMovement(e.HorizontalChange);
-        }
-
-        void OnClickOnSmallOrLargeDecreaseIncreaseButtons(double amountByWhichToIncreaseOrDecreaseTheValue, ScrollEventType scrollEventType)
-        {
-            double newValue = CoerceValue(this.Value + amountByWhichToIncreaseOrDecreaseTheValue);
-            if (newValue != this.Value)
+            double newValue = Math.Max(Value - SmallChange, Minimum);
+            if (Value != newValue)
             {
-                this.SetCurrentValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
-                OnScroll(newValue, scrollEventType);
+                Value = newValue;
+                RaiseScrollEvent(ScrollEventType.SmallDecrement);
             }
         }
-
-        private void OnScroll(double value, ScrollEventType scrollEventType)
+        private void SmallIncrement()
         {
-            TimeSpan debounce = Debounce;
-            if (debounce > TimeSpan.Zero && scrollEventType != ScrollEventType.EndScroll)
+            double newValue = Math.Min(Value + SmallChange, Maximum);
+            if (Value != newValue)
             {
-                if (_debounceDispatcher == null)
-                {
-                    _debounceDispatcher = new DebounceDispatcher();
-                }
-
-                _debounceDispatcher.Debounce(
-                    debounce,
-                    () => Scroll?.Invoke(this, new ScrollEventArgs(value, scrollEventType)));
-            }
-            else
-            {
-                Scroll?.Invoke(this, new ScrollEventArgs(value, scrollEventType));
+                Value = newValue;
+                RaiseScrollEvent(ScrollEventType.SmallIncrement);
             }
         }
-
-        void OnDragStarted()
+        private void LargeDecrement()
         {
-            // Reset the "ValueWithoutCoercion" (read the note near the definition of that variable to better understand what it is used for):
-            _valueWithoutCoercion = this.Value;
-
-            // Disable the large decrease/increase buttons so that if the user moves the pointer really quickly, they do not get highlighted:
-            if (_verticalLargeDecrease != null)
-                _verticalLargeDecrease.IsHitTestVisible = false;
-            if (_verticalLargeIncrease != null)
-                _verticalLargeIncrease.IsHitTestVisible = false;
-            if (_horizontalLargeDecrease != null)
-                _horizontalLargeDecrease.IsHitTestVisible = false;
-            if (_horizontalLargeIncrease != null)
-                _horizontalLargeIncrease.IsHitTestVisible = false;
-        }
-
-        void OnDragCompleted()
-        {
-            // Re-enable the large decrease/increase buttons (see note in the method where they are disabled to better understand why they were disabled in the first place):
-            if (_verticalLargeDecrease != null)
-                _verticalLargeDecrease.IsHitTestVisible = true;
-            if (_verticalLargeIncrease != null)
-                _verticalLargeIncrease.IsHitTestVisible = true;
-            if (_horizontalLargeDecrease != null)
-                _horizontalLargeDecrease.IsHitTestVisible = true;
-            if (_horizontalLargeIncrease != null)
-                _horizontalLargeIncrease.IsHitTestVisible = true;
-
-            OnScroll(Value, ScrollEventType.EndScroll);
-        }
-
-        void ChangeValueBasedOnPointerMovement(double pointerMovementInPixels)
-        {
-            //----------------------------
-            // Change the value when the thumb is dragged:
-            //----------------------------
-
-            //First, check that the control was properly drawn and get its size:
-            Size totalControlSize;
-            if (CheckIfControlWasRenderedProperlyAndGetCurrentControlSize(out totalControlSize))
+            double newValue = Math.Max(Value - LargeChange, Minimum);
+            if (Value != newValue)
             {
-                double totalControlSizeInMainDirection = (this.Orientation == Orientation.Vertical ? totalControlSize.Height : totalControlSize.Width);
-                double trackSize; // Note: the "Track" is the area where the thumb moves.
-                double thumbSize;
-                double scrollableSize; // Note: the "ScrollableSize" corresponds to the distance that the center of the thumb can travel.
-                double minValue;
-                double maxValue;
-                CalculateThumbTrackAndScrollableSizes(totalControlSizeInMainDirection, out trackSize, out thumbSize, out scrollableSize, out minValue, out maxValue);
-                double maxMinusMin = maxValue - minValue;
-
-                // Calculate the amount by which we should change the "this.Value" based on the movement of the pointern, by comparing the movement of the pointer to the length of the "track" where the thumb is allowed to move into:
-                double valueDelta;
-                if (scrollableSize > 0 && maxMinusMin > 0)
-                    valueDelta = (pointerMovementInPixels * maxMinusMin) / scrollableSize;
-                else
-                    valueDelta = 0;
-
-                // Calculate what should be the new "value" of the ScrollBar, while ensuring that it does not get out of the Min/Max range:
-                _valueWithoutCoercion += valueDelta; // Note: read the note near the definition of the "_valueWithoutCoercion" variable to better understand what it is used for. 
-                double newValue = CoerceValue(_valueWithoutCoercion); // Note: "Coerce" means that we ensure that it stays within the Min/Max range.
-
-                // Apply the change to the value of the ScrollBar, and update the Thumb position accordingly:
-                if (newValue != this.Value)
-                {
-                    this.SetCurrentValue(RangeBase.ValueProperty, newValue); // Note: we do not use "this.Value = newValue" because it deletes any bindings that the user may have set to the scrollbar with <ScrollBar Value="{Binding...}"/>.
-
-                    // Update the position of the Thumb based on the new value:
-                    UpdateThumbPositionAndSize(totalControlSizeInMainDirection);
-
-                    // Call the "Scroll" event:
-                    OnScroll(newValue, ScrollEventType.ThumbTrack);
-                }
+                Value = newValue;
+                RaiseScrollEvent(ScrollEventType.LargeDecrement);
             }
         }
-
-        double CoerceValue(double value)
+        private void LargeIncrement()
         {
-            // Note: "Coerce" means that we ensure that the value stays within the Min/Max range.
-
-            double minValue = this.Minimum;
-            double maxValue = this.Maximum;
-            if (value <= minValue)
-                value = minValue;
-            if (value >= maxValue)
-                value = maxValue;
-            return value;
-        }
-
-        bool TryUpdateSizeAndPositionOfUIElements()
-        {
-            //----------------------------
-            // Position the elements that are inside the scrollbar:
-            //----------------------------
-
-            //First, check that the control was properly drawn and get its size:
-            Size totalControlSize;
-            if (this.IsLoaded && TryGetCurrentControlSize(out totalControlSize))
+            double newValue = Math.Min(Value + LargeChange, Maximum);
+            if (Value != newValue)
             {
-                if (Orientation == Orientation.Vertical)
-                {
-                    //***************
-                    // VERTICAL CASE
-                    //***************
-
-                    if (_verticalRoot != null
-                        && _verticalThumb != null
-                        && _verticalSmallDecrease != null
-                        && _verticalSmallIncrease != null
-                        && _verticalLargeDecrease != null
-                        && _verticalLargeIncrease != null)
-                    {
-                        //--------------------------------
-                        // Update the size of the UI elements:
-                        //--------------------------------
-                        _verticalThumb.Width
-                            = _verticalSmallDecrease.Width
-                            = _verticalSmallIncrease.Width
-                            = _verticalLargeDecrease.Width
-                            = _verticalLargeIncrease.Width
-                            = totalControlSize.Width;
-
-                        double buttonsHeight = totalControlSize.Width; // Deliberately square.
-
-                        // We choose the size of the small decrease buttons (ie. the arrows):
-                        _smallDecreaseButtonSize = buttonsHeight;
-                        _smallIncreaseButtonSize = buttonsHeight;
-
-                        if (_verticalSmallDecrease.Visibility == Visibility.Collapsed)
-                            _smallDecreaseButtonSize = 0;
-
-                        if (_verticalSmallIncrease.Visibility == Visibility.Collapsed)
-                            _smallIncreaseButtonSize = 0;
-
-                        // We apply that size:
-                        _verticalSmallDecrease.Height = _smallDecreaseButtonSize;
-                        _verticalSmallIncrease.Height = _smallIncreaseButtonSize;
-
-                        //--------------------------------
-                        // Update the position of the buttons:
-                        //--------------------------------
-                        Canvas.SetTop(_verticalSmallDecrease, 0d);
-                        Canvas.SetTop(_verticalSmallIncrease, totalControlSize.Height - buttonsHeight);
-
-                        //--------------------------------
-                        // Update the position of the thumb and of the large increment/decrement areas:
-                        //--------------------------------
-                        UpdateThumbPositionAndSize(totalControlSize.Height);
-
-                        return true;
-                    }
-                }
-                else
-                {
-                    //***************
-                    // HORIZONTAL CASE
-                    //***************
-
-                    if (_horizontalRoot != null
-                        && _horizontalThumb != null
-                        && _horizontalSmallDecrease != null
-                        && _horizontalSmallIncrease != null
-                        && _horizontalLargeDecrease != null
-                        && _horizontalLargeIncrease != null)
-                    {
-                        //--------------------------------
-                        // Update the size of the UI elements:
-                        //--------------------------------
-                        _horizontalThumb.Height
-                            = _horizontalSmallDecrease.Height
-                            = _horizontalSmallIncrease.Height
-                            = _horizontalLargeDecrease.Height
-                            = _horizontalLargeIncrease.Height
-                            = totalControlSize.Height;
-
-                        double buttonsWidth = totalControlSize.Height; // Deliberately square.
-
-                        // We choose the size of the small decrease buttons (ie. the arrows):
-                        _smallDecreaseButtonSize = buttonsWidth;
-                        _smallIncreaseButtonSize = buttonsWidth;
-
-                        if (_horizontalSmallDecrease.Visibility == Visibility.Collapsed)
-                            _smallDecreaseButtonSize = 0;
-
-                        if (_horizontalSmallIncrease.Visibility == Visibility.Collapsed)
-                            _smallIncreaseButtonSize = 0;
-
-                        // We apply that size:
-                        _horizontalSmallDecrease.Width = _smallDecreaseButtonSize;
-                        _horizontalSmallIncrease.Width = _smallIncreaseButtonSize;
-
-                        //--------------------------------
-                        // Update the position of the UI elements:
-                        //--------------------------------
-                        Canvas.SetLeft(_horizontalSmallDecrease, 0d);
-                        Canvas.SetLeft(_horizontalSmallIncrease, totalControlSize.Width - buttonsWidth);
-
-                        //--------------------------------
-                        // Update the position of the thumb and of the large increment/decrement areas:
-                        //--------------------------------
-                        UpdateThumbPositionAndSize(totalControlSize.Width);
-
-                        return true;
-                    }
-                }
+                Value = newValue;
+                RaiseScrollEvent(ScrollEventType.LargeIncrement);
             }
-
-            return false;
-        }
-
-        bool CheckIfControlWasRenderedProperlyAndGetCurrentControlSize(out Size totalControlSize)
-        {
-            if (_controlWasProperlyDrawn) // Note: this is true when all the internal sizes of the control have been calculated, such as the "_smallDecreaseButtonSize" and "_smallIncreaseButtonSize" values.
-            {
-                return TryGetCurrentControlSize(out totalControlSize);
-            }
-            else
-            {
-                totalControlSize = new Size(0d, 0d); // Note: this is the default return value.
-                return false;
-            }
-        }
-
-        bool TryGetCurrentControlSize(out Size totalControlSize)
-        {
-            totalControlSize = new Size(0d, 0d); // Note: this is the default return value.
-            if (_verticalRoot != null && _horizontalRoot != null)
-            {
-                // Calculate current width and height of this control:
-                Size actualSize;
-                if (this.Orientation == Orientation.Vertical)
-                {
-                    actualSize = _verticalRoot.INTERNAL_GetActualWidthAndHeight();
-                }
-                else
-                {
-                    actualSize = _horizontalRoot.INTERNAL_GetActualWidthAndHeight();
-                }
-                double width = !double.IsNaN(actualSize.Width) ? actualSize.Width : this.Width;
-                double height = !double.IsNaN(actualSize.Height) ? actualSize.Height : this.Height;
-
-                // If the width and height are not null, return the size:
-                if (!double.IsNaN(width) && !double.IsNaN(height))
-                {
-                    totalControlSize = new Size(width, height);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        void CalculateThumbTrackAndScrollableSizes(double totalControlSize, out double trackSize, out double thumbSize, out double scrollableSize, out double minValue, out double maxValue)
-        {
-            minValue = this.Minimum;
-            maxValue = this.Maximum;
-            double maxMinusMin = maxValue - minValue;
-
-            trackSize = Math.Max(0d, totalControlSize - _smallDecreaseButtonSize - _smallIncreaseButtonSize); // Note: the "Track" is the area where the thumb moves.
-            thumbSize = maxMinusMin > 0 ? (trackSize * this.ViewportSize / (maxMinusMin + this.ViewportSize)) : trackSize;
-            thumbSize = Math.Min(trackSize, Math.Max(MINIMUM_THUMB_SIZE, thumbSize));
-            scrollableSize = trackSize - thumbSize; // Note: the "ScrollableSize" corresponds to the distance that the center of the thumb can travel.
-        }
-
-        void UpdateThumbPositionAndSize()
-        {
-            //First, check that the control was properly drawn and get its size:
-            Size totalControlSize;
-            if (CheckIfControlWasRenderedProperlyAndGetCurrentControlSize(out totalControlSize))
-            {
-                // Refresh the position of the thumb:
-                double totalControlSizeInMainDirection = (this.Orientation == Orientation.Vertical ? totalControlSize.Height : totalControlSize.Width);
-                UpdateThumbPositionAndSize(totalControlSizeInMainDirection);
-            }
-        }
-
-        void UpdateThumbPositionAndSize(double totalControlSize)
-        {
-            // Note: in the arguments of this method, and this method implementation, by the word "Size" we mean either "Width" (if we are in horizontal orientation) or "Height" (if we are in vertical orientation).
-
-            double value = this.Value;
-            double trackSize; // Note: the "Track" is the area where the thumb moves.
-            double thumbSize;
-            double scrollableSize; // Note: the "ScrollableSize" corresponds to the distance that the center of the thumb can travel.
-            double minValue;
-            double maxValue;
-            CalculateThumbTrackAndScrollableSizes(totalControlSize, out trackSize, out thumbSize, out scrollableSize, out minValue, out maxValue);
-            double maxMinusMin = maxValue - minValue;
-
-            double thumbCenterPosition = _smallDecreaseButtonSize + (maxMinusMin > 0 ? (thumbSize / 2) + (scrollableSize * (value - Minimum) / maxMinusMin) : trackSize / 2); // This is the X or Y position of the thumb (respectively for horizontal or vertical orientation).
-            double thumbTopLeftPosition = thumbCenterPosition - (thumbSize / 2);
-            double thumbBottomRightPosition = thumbCenterPosition + (thumbSize / 2);
-
-            if (Orientation == Orientation.Vertical)
-            {
-                if (_verticalThumb != null
-                    && _verticalLargeDecrease != null
-                    && _verticalLargeIncrease != null)
-                {
-                    // Position the thumb:
-                    _verticalThumb.Height = thumbSize;
-                    Canvas.SetTop(_verticalThumb, thumbTopLeftPosition);
-
-                    // Position the large decrease button:
-                    _verticalLargeDecrease.Height = Math.Max(1d, thumbTopLeftPosition - _smallDecreaseButtonSize); //todo: replace 1d with 0d when fixed bug with Height=0.
-                    Canvas.SetTop(_verticalLargeDecrease, _smallDecreaseButtonSize);
-
-                    // Position the large increase button:
-                    _verticalLargeIncrease.Height = Math.Max(1d, totalControlSize - _smallIncreaseButtonSize - thumbBottomRightPosition); //todo: replace 1d with 0d when fixed bug with Height=0.
-                    Canvas.SetTop(_verticalLargeIncrease, thumbBottomRightPosition);
-                }
-            }
-            else
-            {
-                if (_horizontalThumb != null
-                    && _horizontalLargeDecrease != null
-                    && _horizontalLargeIncrease != null)
-                {
-                    // Position the thumb:
-                    _horizontalThumb.Width = thumbSize;
-                    Canvas.SetLeft(_horizontalThumb, thumbTopLeftPosition);
-
-                    // Position the large decrease button:
-                    _horizontalLargeDecrease.Width = Math.Max(1d, thumbTopLeftPosition - _smallDecreaseButtonSize); //todo: replace 1d with 0d when fixed bug with Width=0.
-                    Canvas.SetLeft(_horizontalLargeDecrease, _smallDecreaseButtonSize);
-
-                    // Position the large increase button:
-                    _horizontalLargeIncrease.Width = Math.Max(1d, totalControlSize - _smallIncreaseButtonSize - thumbBottomRightPosition); //todo: replace 1d with 0d when fixed bug with Width=0.
-                    Canvas.SetLeft(_horizontalLargeIncrease, thumbBottomRightPosition);
-                }
-            }
-        }
-
-#if MIGRATION
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs eventArgs)
-        {
-            base.OnMouseLeftButtonDown(eventArgs);
-#else
-        protected override void OnPointerPressed(PointerRoutedEventArgs eventArgs)
-        {
-            base.OnPointerPressed(eventArgs);
-#endif
-
-            eventArgs.Handled = true;
-        }
-
-#if MIGRATION
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs eventArgs)
-        {
-            base.OnMouseLeftButtonUp(eventArgs);
-#else
-        protected override void OnPointerReleased(PointerRoutedEventArgs eventArgs)
-        {
-            base.OnPointerReleased(eventArgs);
-#endif
-
-            // Setting MouseLeftUp event as handled to not have it bubbled up and trigger selection on host
-            eventArgs.Handled = true;
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the ScrollBar is displayed horizontally or vertically.
-        /// The default is Horizontal.  Specific control templates might change this value, which would cause the templated value to be the apparent runtime default.
+        /// Called whenever the Thumb drag operation is complete
+        /// </summary> 
+        private void OnThumbDragCompleted()
+        {
+            RaiseScrollEvent(ScrollEventType.EndScroll);
+        }
+
+        /// <summary> 
+        /// Called whenever the Thumb drag operation is started
         /// </summary>
+        private void OnThumbDragStarted()
+        {
+            this._dragValue = this.Value;
+        }
+
+        /// <summary>
+        /// Whenever the thumb gets dragged, we handle the event through 
+        /// this function to update the current value depending upon the
+        /// thumb drag delta.
+        /// </summary> 
+        /// <param name="e">DragEventArgs</param> 
+        private void OnThumbDragDelta(DragDeltaEventArgs e)
+        {
+            double offset = 0;
+
+            if (Orientation == Orientation.Horizontal && ElementHorizontalThumb != null)
+            {
+                offset = e.HorizontalChange / (GetTrackLength() - ElementHorizontalThumb.ActualWidth) * (Maximum - Minimum);
+            }
+            else if (Orientation == Orientation.Vertical && ElementVerticalThumb != null)
+            {
+                offset = e.VerticalChange / (GetTrackLength() - ElementVerticalThumb.ActualHeight) * (Maximum - Minimum);
+            }
+
+            if (!double.IsNaN(offset) && !double.IsInfinity(offset))
+            {
+                _dragValue += offset;
+
+                double newValue = Math.Min(Maximum, Math.Max(Minimum, _dragValue));
+
+                if (newValue != Value)
+                {
+                    Value = newValue;
+                    RaiseScrollEvent(ScrollEventType.ThumbTrack);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the <see cref="ScrollBar"/> is displayed
+        /// horizontally or vertically.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="Orientation"/> enumeration value that defines whether
+        /// the <see cref="ScrollBar"/> is displayed horizontally or vertically.
+        /// The default is <see cref="Orientation.Horizontal"/>.
+        /// </returns>
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
@@ -686,44 +286,510 @@ namespace Windows.UI.Xaml.Controls.Primitives
         }
 
         /// <summary>
-        /// Identifies the Orientation dependency property.
+        /// Identifies the <see cref="Orientation"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(ScrollBar),
-                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, Orientation_Changed));
+            DependencyProperty.Register(
+                nameof(Orientation),
+                typeof(Orientation),
+                typeof(ScrollBar),
+                new PropertyMetadata(Orientation.Vertical, OnOrientationPropertyChanged));
 
-        private static void Orientation_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary> 
+        /// OrientationProperty property changed handler.
+        /// </summary>
+        /// <param name="d">ScrollBar that changed Orientation.</param> 
+        /// <param name="e">DependencyPropertyChangedEventArgs.</param> 
+        private static void OnOrientationPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // Attempt to refresh all the elements inside the scrollbar:
-            var scrollBar = (ScrollBar)d;
-            scrollBar._controlWasProperlyDrawn = scrollBar.TryUpdateSizeAndPositionOfUIElements();
+            ScrollBar s = d as ScrollBar;
+            Debug.Assert(s != null);
+
+            s.OnOrientationChanged();
         }
 
         /// <summary>
-        /// Gets or sets the amount of the scrollable content that is currently visible. The default is 0.
+        /// Gets or sets the amount of the scrollable content that is currently visible.
         /// </summary>
+        /// <returns>
+        /// The amount of the scrollable content that is currently visible. The default is 0.
+        /// </returns>
         public double ViewportSize
         {
             get { return (double)GetValue(ViewportSizeProperty); }
             set { SetValue(ViewportSizeProperty, value); }
         }
 
-        /// <summary>
-        /// Identifies the ViewportSize dependency property.
+        /// <summary> 
+        /// Identifies the <see cref="ViewportSize"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ViewportSizeProperty =
-            DependencyProperty.Register("ViewportSize", typeof(double), typeof(ScrollBar), new PropertyMetadata(0d, ViewportSize_Changed));
+            DependencyProperty.Register(
+                "ViewportSize",
+                typeof(double),
+                typeof(ScrollBar),
+                new PropertyMetadata(0.0d, OnViewportSizeChanged));
 
-        private static void ViewportSize_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnViewportSizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // Attempt to refresh all the elements inside the scrollbar:
-            var scrollBar = (ScrollBar)d;
-            scrollBar._controlWasProperlyDrawn = scrollBar.TryUpdateSizeAndPositionOfUIElements();
+            ScrollBar s = d as ScrollBar;
+            Debug.Assert(s != null);
+
+            s.UpdateTrackLayout(s.GetTrackLength());
+        }
+
+        /// <summary> 
+        /// Called when the IsEnabled property changes.
+        /// </summary> 
+        /// <param name="e">Property changed args</param>
+        private void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (!IsEnabled)
+            {
+                IsMouseOver = false;
+            }
+            UpdateVisualState();
+        }
+
+        /// <summary> 
+        /// Called when the Value property changes. 
+        /// </summary>
+        /// <param name="oldValue">Old value of the Value property.</param> 
+        /// <param name="newValue">New value of the Value property.</param>
+        protected override void OnValueChanged(double oldValue, double newValue)
+        {
+            double trackLength = GetTrackLength();
+
+            base.OnValueChanged(oldValue, newValue);
+
+            UpdateTrackLayout(trackLength);
         }
 
         /// <summary>
-        /// Occurs one or more times as content scrolls in a ScrollBar when the user moves the Thumb by using the mouse.
+        /// Called when the Maximum property changes 
+        /// </summary>
+        /// <param name="oldMaximum">Old value of the Maximum property.</param>
+        /// <param name="newMaximum">New value of the Maximum property.</param> 
+        protected override void OnMaximumChanged(double oldMaximum, double newMaximum)
+        {
+            double trackLength = GetTrackLength();
+
+            base.OnMaximumChanged(oldMaximum, newMaximum);
+            UpdateTrackLayout(trackLength);
+        }
+
+        /// <summary> 
+        /// Called when the Minimum property changes 
+        /// </summary>
+        /// <param name="oldMinimum">Old value of the Minimum property.</param> 
+        /// <param name="newMinimum">New value of the Minimum property.</param>
+        protected override void OnMinimumChanged(double oldMinimum, double newMinimum)
+        {
+            double trackLength = GetTrackLength();
+
+            base.OnMinimumChanged(oldMinimum, newMinimum);
+            UpdateTrackLayout(trackLength);
+        }
+
+        /// <summary>
+        /// Responds to the MouseEnter event.
+        /// </summary> 
+        /// <param name="e">The event data for the MouseEnter event.</param> 
+#if MIGRATION
+        protected override void OnMouseEnter(MouseEventArgs e)
+#else
+        protected override void OnPointerEntered(MouseEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseEnter(e);
+#else
+            base.OnPointerEntered(e);
+#endif
+            IsMouseOver = true;
+            if ((Orientation == Orientation.Horizontal && ElementHorizontalThumb != null && !ElementHorizontalThumb.IsDragging) ||
+                (Orientation == Orientation.Vertical && ElementVerticalThumb != null && !ElementVerticalThumb.IsDragging))
+            {
+                UpdateVisualState();
+            }
+        }
+
+        /// <summary>
+        /// Responds to the MouseLeave event. 
+        /// </summary>
+        /// <param name="e">The event data for the MouseLeave event.</param>
+#if MIGRATION
+        protected override void OnMouseLeave(MouseEventArgs e)
+#else
+        protected override void OnPointerExited(MouseEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeave(e);
+#else
+            base.OnPointerExited(e);
+#endif
+            IsMouseOver = false;
+            if ((Orientation == Orientation.Horizontal && ElementHorizontalThumb != null && !ElementHorizontalThumb.IsDragging) ||
+                (Orientation == Orientation.Vertical && ElementVerticalThumb != null && !ElementVerticalThumb.IsDragging))
+            {
+                UpdateVisualState();
+            }
+        }
+
+        /// <summary> 
+        /// Responds to the MouseLeftButtonDown event.
+        /// </summary>
+        /// <param name="e">The event data for the MouseLeftButtonDown event.</param>
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+            if (e.Handled)
+            {
+                return;
+            }
+            e.Handled = true;
+#if MIGRATION
+            CaptureMouse();
+#else
+            CapturePointer(e.Pointer);
+#endif
+        }
+
+        /// <summary> 
+        /// Responds to the MouseLeftButtonUp event.
+        /// </summary> 
+        /// <param name="e">The event data for the MouseLeftButtonUp event.</param>
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+            if (e.Handled)
+            {
+                return;
+            }
+            e.Handled = true;
+#if MIGRATION
+            ReleaseMouseCapture();
+#else
+            ReleasePointerCapture(e.Pointer);
+#endif
+            UpdateVisualState();
+        }
+
+        /// <summary>
+        /// Occurs one or more times as content scrolls in a <see cref="ScrollBar"/>
+        /// when the user moves the <see cref="Thumb"/> by using the mouse.
         /// </summary>
         public event ScrollEventHandler Scroll;
+
+        /// <summary> 
+        /// This raises the Scroll event, passing in the scrollEventType 
+        /// as a parameter to let the handler know what triggered this event.
+        /// </summary> 
+        /// <param name="scrollEventType">ScrollEventType</param>
+        internal void RaiseScrollEvent(ScrollEventType scrollEventType)
+        {
+            TimeSpan debounce = Debounce;
+            if (debounce > TimeSpan.Zero && scrollEventType != ScrollEventType.EndScroll)
+            {
+                _debounceDispatcher ??= new DebounceDispatcher();
+
+                _debounceDispatcher.Debounce(
+                    debounce,
+                    () => Scroll?.Invoke(this, new ScrollEventArgs(scrollEventType, Value)));
+            }
+            else
+            {
+                Scroll?.Invoke(this, new ScrollEventArgs(scrollEventType, Value));
+            }
+        }
+
+        /// <summary> 
+        /// Update the current visual state of the ScrollBar.
+        /// </summary> 
+        internal void UpdateVisualState()
+        {
+            UpdateVisualState(true);
+        }
+
+        /// <summary>
+        /// Update the current visual state of the ScrollBar.
+        /// </summary> 
+        /// <param name="useTransitions">
+        /// true to use transitions when updating the visual state, false to
+        /// snap directly to the new visual state. 
+        /// </param> 
+        internal void UpdateVisualState(bool useTransitions)
+        {
+            if (!IsEnabled)
+            {
+                GoToState(useTransitions, VisualStates.StateDisabled);
+            }
+            else if (IsMouseOver)
+            {
+                GoToState(useTransitions, VisualStates.StateMouseOver);
+            }
+            else
+            {
+                GoToState(useTransitions, VisualStates.StateNormal);
+            }
+        }
+
+        /// <summary> 
+        /// This code will run whenever Orientation changes, to change the template
+        /// being used to display this control.
+        /// </summary> 
+        private void OnOrientationChanged()
+        {
+            double trackLength = GetTrackLength();
+
+            if (ElementHorizontalTemplate != null)
+            {
+                ElementHorizontalTemplate.Visibility = (Orientation == Orientation.Horizontal ? Visibility.Visible : Visibility.Collapsed);
+            }
+            if (ElementVerticalTemplate != null)
+            {
+                ElementVerticalTemplate.Visibility = (Orientation == Orientation.Horizontal ? Visibility.Collapsed : Visibility.Visible);
+            }
+            UpdateTrackLayout(trackLength);
+        }
+
+        /// <summary>
+        /// This method will take the current min, max, and value to
+        /// calculate and layout the current control measurements. 
+        /// </summary>
+        private void UpdateTrackLayout(double trackLength)
+        {
+            double maximum = Maximum;
+            double minimum = Minimum;
+            double value = Value;
+            double multiplier = (value - minimum) / (maximum - minimum);
+
+            double thumbSize = UpdateThumbSize(trackLength);
+
+            if (Orientation == Orientation.Horizontal && ElementHorizontalLargeDecrease != null && ElementHorizontalThumb != null)
+            {
+                ElementHorizontalLargeDecrease.Width = Math.Max(0.0f, multiplier * (trackLength - thumbSize));
+            }
+            else if (Orientation == Orientation.Vertical && ElementVerticalLargeDecrease != null && ElementVerticalThumb != null)
+            {
+                ElementVerticalLargeDecrease.Height = Math.Max(0.0f, multiplier * (trackLength - thumbSize));
+            }
+        }
+
+        /// <summary> 
+        /// Based on the size of the Large Increase/Decrease RepeatButtons 
+        /// and on the Thumb, we will calculate the size of the track area
+        /// of the ScrollBar 
+        /// </summary>
+        /// <returns>The length of the track</returns>
+        internal double GetTrackLength()
+        {
+            double length = Double.NaN;
+
+            if (Orientation == Orientation.Horizontal)
+            {
+                length = this.ActualWidth;
+
+                if (ElementHorizontalSmallDecrease != null)
+                {
+                    length -= ElementHorizontalSmallDecrease.ActualWidth + ElementHorizontalSmallDecrease.Margin.Left + ElementHorizontalSmallDecrease.Margin.Right;
+                }
+                if (ElementHorizontalSmallIncrease != null)
+                {
+                    length -= ElementHorizontalSmallIncrease.ActualWidth + ElementHorizontalSmallIncrease.Margin.Left + ElementHorizontalSmallIncrease.Margin.Right;
+                }
+            }
+            else
+            {
+                length = this.ActualHeight;
+
+                if (ElementVerticalSmallDecrease != null)
+                {
+                    length -= ElementVerticalSmallDecrease.ActualHeight + ElementVerticalSmallDecrease.Margin.Top + ElementVerticalSmallDecrease.Margin.Bottom;
+                }
+                if (ElementVerticalSmallIncrease != null)
+                {
+                    length -= ElementVerticalSmallIncrease.ActualHeight + ElementVerticalSmallIncrease.Margin.Top + ElementVerticalSmallIncrease.Margin.Bottom;
+                }
+            }
+
+            return length;
+        }
+
+        /// <summary>
+        /// Based on the ViewportSize, the Track's length, and the
+        /// Minimum and Maximum values, we will calculate the length 
+        /// of the thumb.
+        /// </summary>
+        /// <returns>Double value representing display unit length</returns> 
+        private double ConvertViewportSizeToDisplayUnits(double trackLength)
+        {
+            double viewRangeValue = Maximum - Minimum;
+
+            return trackLength * ViewportSize / (ViewportSize + viewRangeValue);
+        }
+
+        /// <summary>
+        /// This will resize the Thumb, based on calculations with the ViewportSize, 
+        /// the Track's length, and the Minimum and Maximum values. 
+        /// </summary>
+        internal double UpdateThumbSize(double trackLength)
+        {
+            double result = Double.NaN;
+            bool hideThumb = trackLength <= 0;
+
+            if (trackLength > 0)
+            {
+                if (Orientation == Orientation.Horizontal && ElementHorizontalThumb != null)
+                {
+                    if (Maximum - Minimum != 0)
+                    {
+                        result = Math.Max(ElementHorizontalThumb.MinWidth, ConvertViewportSizeToDisplayUnits(trackLength));
+                    }
+
+                    // hide the thumb if too big
+                    if (Maximum - Minimum == 0 || result > ActualWidth || trackLength <= ElementHorizontalThumb.MinWidth)
+                    {
+                        hideThumb = true;
+                    }
+                    else
+                    {
+                        ElementHorizontalThumb.Visibility = Visibility.Visible;
+                        ElementHorizontalThumb.Width = result;
+                    }
+                }
+                else if (Orientation == Orientation.Vertical && ElementVerticalThumb != null)
+                {
+                    if (Maximum - Minimum != 0)
+                    {
+                        result = Math.Max(ElementVerticalThumb.MinHeight, ConvertViewportSizeToDisplayUnits(trackLength));
+                    }
+
+                    // hide the thumb if too big
+                    if (Maximum - Minimum == 0 || result > ActualHeight || trackLength <= ElementVerticalThumb.MinHeight)
+                    {
+                        hideThumb = true;
+                    }
+                    else
+                    {
+                        ElementVerticalThumb.Visibility = Visibility.Visible;
+                        ElementVerticalThumb.Height = result;
+                    }
+                }
+            }
+
+            if (hideThumb)
+            {
+                if (ElementHorizontalThumb != null)
+                {
+                    ElementHorizontalThumb.Visibility = Visibility.Collapsed;
+                }
+
+                if (ElementVerticalThumb != null)
+                {
+                    ElementVerticalThumb.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Horizontal template root 
+        /// </summary>
+        internal FrameworkElement ElementHorizontalTemplate { get; set; }
+        internal const string ElementHorizontalTemplateName = "HorizontalRoot";
+
+        /// <summary>
+        /// Large increase repeat button 
+        /// </summary>
+        internal RepeatButton ElementHorizontalLargeIncrease { get; set; }
+        internal const string ElementHorizontalLargeIncreaseName = "HorizontalLargeIncrease";
+
+        /// <summary>
+        /// Large decrease repeat button 
+        /// </summary> 
+        internal RepeatButton ElementHorizontalLargeDecrease { get; set; }
+        internal const string ElementHorizontalLargeDecreaseName = "HorizontalLargeDecrease";
+
+        /// <summary>
+        /// Small increase repeat button 
+        /// </summary>
+        internal RepeatButton ElementHorizontalSmallIncrease { get; set; }
+        internal const string ElementHorizontalSmallIncreaseName = "HorizontalSmallIncrease";
+
+        /// <summary>
+        /// Small decrease repeat button 
+        /// </summary>
+        internal RepeatButton ElementHorizontalSmallDecrease { get; set; }
+        internal const string ElementHorizontalSmallDecreaseName = "HorizontalSmallDecrease";
+
+        /// <summary>
+        /// Thumb for dragging track 
+        /// </summary> 
+        internal Thumb ElementHorizontalThumb { get; set; }
+        internal const string ElementHorizontalThumbName = "HorizontalThumb";
+
+        /// <summary>
+        /// Vertical template root 
+        /// </summary>
+        internal FrameworkElement ElementVerticalTemplate { get; set; }
+        internal const string ElementVerticalTemplateName = "VerticalRoot";
+
+        /// <summary>
+        /// Large increase repeat button 
+        /// </summary>
+        internal RepeatButton ElementVerticalLargeIncrease { get; set; }
+        internal const string ElementVerticalLargeIncreaseName = "VerticalLargeIncrease";
+
+        /// <summary>
+        /// Large decrease repeat button 
+        /// </summary> 
+        internal RepeatButton ElementVerticalLargeDecrease { get; set; }
+        internal const string ElementVerticalLargeDecreaseName = "VerticalLargeDecrease";
+
+        /// <summary>
+        /// Small increase repeat button 
+        /// </summary>
+        internal RepeatButton ElementVerticalSmallIncrease { get; set; }
+        internal const string ElementVerticalSmallIncreaseName = "VerticalSmallIncrease";
+
+        /// <summary>
+        /// Small decrease repeat button 
+        /// </summary>
+        internal RepeatButton ElementVerticalSmallDecrease { get; set; }
+        internal const string ElementVerticalSmallDecreaseName = "VerticalSmallDecrease";
+
+        /// <summary>
+        /// Thumb for dragging track 
+        /// </summary> 
+        internal Thumb ElementVerticalThumb { get; set; }
+        internal const string ElementVerticalThumbName = "VerticalThumb";
+
+        /// <summary> 
+        /// Whether the mouse is currently over the control 
+        /// </summary>
+        internal bool IsMouseOver { get; set; }
+        /// <summary>
+        /// Accumulates drag offsets in case the mouse drags off the end of the track.
+        /// </summary> 
+        private double _dragValue;
     }
 }

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,10 @@
 *  
 \*====================================================================================*/
 
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows
@@ -25,5 +22,7 @@ namespace System.Windows
 namespace Windows.UI.Xaml
 #endif
 {
+    [Obsolete(Helper.ObsoleteMemberMessage)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate List<object> ValueToMultipleValuesHtmlConverter(DependencyObject d, object value);
 }

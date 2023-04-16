@@ -1,81 +1,180 @@
-﻿<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- IMPORTANT: If you modify this style, make sure to also modify the one in the "XamlDesigner" project (in the file "ImplicitStylesToSimulateSameRenderingInDesignerAsInHtml5.xaml") -->
-
-    <!--<Style x:Key="DefaultSliderStyle" TargetType="Slider">-->
     <Style TargetType="Slider">
-        <Setter Property="Foreground" Value="#FF333333" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="Maximum"
+                Value="10" />
+        <Setter Property="Minimum"
+                Value="0" />
+        <Setter Property="Value"
+                Value="0" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="0.5,1"
+                                     StartPoint="0.5,0">
+                    <GradientStop Color="#FFA3AEB9"
+                                  Offset="0" />
+                    <GradientStop Color="#FF8399A9"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF718597"
+                                  Offset="0.375" />
+                    <GradientStop Color="#FF617584"
+                                  Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="IsTabStop"
+                Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Slider">
                     <Grid x:Name="Root">
                         <Grid.Resources>
-                            <Style x:Key="RepeatButtonStyle" TargetType="RepeatButton">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="Opacity" Value="0"/>
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="Cursor" Value="Arrow"/>
-                            </Style>
+                            <ControlTemplate x:Key="RepeatButtonTemplate">
+                                <Grid x:Name="Root"
+                                      Opacity="0"
+                                      Background="Transparent" />
+                            </ControlTemplate>
                         </Grid.Resources>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal" />
                                 <VisualState x:Name="MouseOver" />
-                                <VisualState x:Name="Disabled" />
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalTrackRectangleDisabledOverlay"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ThumbDisabledOverlay"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalTrackRectangleDisabledOverlay"
+                                                                       Storyboard.TargetProperty="Visibility"
+                                                                       Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Canvas x:Name="HorizontalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
-                            <Rectangle x:Name="HorizontalRail" Fill="#FFF1F1F1" Stroke="Gray" StrokeThickness="1" Height="3" Width="{TemplateBinding Width}"/>
-                            <RepeatButton x:Name="HorizontalLargeDecrease" Style="{StaticResource RepeatButtonStyle}" Height="18"/>
-                            <RepeatButton x:Name="HorizontalLargeIncrease" Style="{StaticResource RepeatButtonStyle}" Height="18"/>
-                            <Thumb x:Name="HorizontalThumb" Cursor="Arrow" Width="9" Height="18">
-                                <Thumb.Template>
-                                    <ControlTemplate>
-                                        <Border BorderBrush="Black" BorderThickness="1" Width="9" Height="18" CornerRadius="2">
-                                            <Border BorderBrush="White" BorderThickness="1">
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1" >
-                                                        <LinearGradientBrush.GradientStops>
-                                                            <GradientStopCollection>
-                                                                <GradientStop Color="White" Offset="0"/>
-                                                                <GradientStop Color="LightGray" Offset="1"/>
-                                                            </GradientStopCollection>
-                                                        </LinearGradientBrush.GradientStops>
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                            </Border>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Thumb.Template>
-                            </Thumb>
-                        </Canvas>
-                        <Canvas x:Name="VerticalRoot" Visibility="Collapsed" Background="{TemplateBinding Background}">
-                            <Rectangle x:Name="VerticalRail" Fill="#FFF1F1F1" Stroke="Gray" StrokeThickness="1" Width="3" Height="{TemplateBinding Height}"/>
-                            <RepeatButton x:Name="VerticalLargeDecrease" Style="{StaticResource RepeatButtonStyle}" Width="18"/>
-                            <RepeatButton x:Name="VerticalLargeIncrease" Style="{StaticResource RepeatButtonStyle}" Width="18"/>
-                            <Thumb x:Name="VerticalThumb" Background="#FFBBBBBB" Cursor="Arrow" Width="18" Height="9">
-                                <Thumb.Template>
-                                    <ControlTemplate>
-                                        <Border BorderBrush="Black" BorderThickness="1" Width="18" Height="9" CornerRadius="2">
-                                            <Border BorderBrush="White" BorderThickness="1">
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1" >
-                                                        <LinearGradientBrush.GradientStops>
-                                                            <GradientStopCollection>
-                                                                <GradientStop Color="White" Offset="0"/>
-                                                                <GradientStop Color="LightGray" Offset="1"/>
-                                                            </GradientStopCollection>
-                                                        </LinearGradientBrush.GradientStops>
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                            </Border>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Thumb.Template>
-                            </Thumb>
-                        </Canvas>
+
+                        <!-- Horizontal Template -->
+                        <Grid x:Name="HorizontalTemplate"
+                              Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Track Layer -->
+                            <Border x:Name="TrackRectangle"
+                                    BorderBrush="#FFA3AEB9"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="#FFE6EFF7"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Height="3"
+                                    CornerRadius="1"
+                                    Margin="5,0,5,0" />
+                            <Border x:Name="HorizontalTrackRectangleDisabledOverlay"
+                                    Visibility="Collapsed"
+                                    Background="White"
+                                    Opacity=".55"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Height="3"
+                                    CornerRadius="1"
+                                    Margin="5,0,5,0" />
+                            <!-- Repeat Buttons + Thumb -->
+                            <RepeatButton x:Name="HorizontalTrackLargeChangeDecreaseRepeatButton"
+                                          Height="18"
+                                          IsTabStop="False"
+                                          Template="{StaticResource RepeatButtonTemplate}"
+                                          Grid.Column="0" />
+                            <Thumb Height="18"
+                                   x:Name="HorizontalThumb"
+                                   Width="11"
+                                   Grid.Column="1"
+                                   IsTabStop="True" />
+                            <Border x:Name="ThumbDisabledOverlay"
+                                    CornerRadius="2"
+                                    Width="11"
+                                    Grid.Column="1"
+                                    Background="White"
+                                    Opacity=".55"
+                                    Visibility="Collapsed" />
+                            <RepeatButton x:Name="HorizontalTrackLargeChangeIncreaseRepeatButton"
+                                          Height="18"
+                                          IsTabStop="False"
+                                          Template="{StaticResource RepeatButtonTemplate}"
+                                          Grid.Column="2" />
+                        </Grid>
+
+                        <!-- Vertical Template -->
+                        <Grid x:Name="VerticalTemplate"
+                              Visibility="Collapsed"
+                              Background="{TemplateBinding Background}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Track Layer -->
+                            <Border BorderBrush="#FFA3AEB9"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="#FFE6EFF7"
+                                    Grid.Row="0"
+                                    Grid.RowSpan="3"
+                                    Width="3"
+                                    CornerRadius="1"
+                                    Margin="0,5,0,5" />
+                            <Border x:Name="VerticalTrackRectangleDisabledOverlay"
+                                    Visibility="Collapsed"
+                                    Background="White"
+                                    Opacity=".55"
+                                    Grid.Row="0"
+                                    Grid.RowSpan="3"
+                                    Width="3"
+                                    CornerRadius="1"
+                                    Margin="0,5,0,5" />
+                            <!-- Repeat Buttons + Thumb -->
+                            <RepeatButton x:Name="VerticalTrackLargeChangeDecreaseRepeatButton"
+                                          Width="18"
+                                          IsTabStop="False"
+                                          Template="{StaticResource RepeatButtonTemplate}"
+                                          Grid.Row="2" />
+                            <Thumb Height="11"
+                                   x:Name="VerticalThumb"
+                                   Width="18"
+                                   Grid.Row="1"
+                                   IsTabStop="True" />
+                            <RepeatButton x:Name="VerticalTrackLargeChangeIncreaseRepeatButton"
+                                          Width="18"
+                                          IsTabStop="False"
+                                          Template="{StaticResource RepeatButtonTemplate}"
+                                          Grid.Row="0" />
+                        </Grid>
+
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

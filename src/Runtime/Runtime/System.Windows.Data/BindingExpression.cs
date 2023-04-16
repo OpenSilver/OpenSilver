@@ -16,8 +16,6 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections;
-using System.Threading;
-using System.Security;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
@@ -26,12 +24,10 @@ using OpenSilver.Internal.Data;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Common;
 #else
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Common;
 #endif
 
 #if MIGRATION
@@ -53,10 +49,6 @@ namespace Windows.UI.Xaml.Data
 
         private static readonly Type NullableType = typeof(Nullable<>);
 
-        // This boolean is set to true in OnAttached to force Validation at the next
-        // UpdateSourceObject. Its purpose is to force the Validation only once to
-        // avoid hindering performances.
-        internal bool INTERNAL_ForceValidateOnNextSetValue = false;
         internal bool IsUpdating;
         private bool _isAttaching;
         private DynamicValueConverter _dynamicConverter;
@@ -251,13 +243,6 @@ namespace Windows.UI.Xaml.Data
             if (ParentBinding.Mode == BindingMode.TwoWay)
             {
                 _targetPropertyListener = new DependencyPropertyChangedListener(Target, TargetProperty, UpdateSourceCallback);
-
-                // If the user wants to force the Validation of the value when the element
-                // is added to the Visual tree, we set a boolean to do it as soon as possible:
-                if (ParentBinding.ValidatesOnExceptions && ParentBinding.ValidatesOnLoad)
-                {
-                    INTERNAL_ForceValidateOnNextSetValue = true;
-                }
             }
 
             _isAttaching = false;
