@@ -13,6 +13,7 @@
 
 using System;
 using CSHTML5.Internal;
+using OpenSilver;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -32,7 +33,7 @@ namespace System.Windows.Input;
 namespace Windows.UI.Xaml.Input;
 #endif
 
-internal sealed class InputManager
+internal sealed partial class InputManager
 {
     // This must remain synchronyzed with the EVENTS enum defined in cshtml5.js.
     // Make sure to change both files if you update this !
@@ -106,14 +107,16 @@ internal sealed class InputManager
     {
         if (uie.INTERNAL_OuterDomElement is INTERNAL_HtmlDomElementReference domRef)
         {
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"document.inputManager.addListeners('{domRef.UniqueIdentifier}', {(isFocusable ? "true" : "false")});");
+            Interop2.VoidAsync(JsCall.AddEventListeners, domRef.UniqueIdentifier, isFocusable);
+            //OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+            //    $"document.inputManager.addListeners('{domRef.UniqueIdentifier}', {(isFocusable ? "true" : "false")});");
         }
         else
         {
-            string sOuter = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(uie.INTERNAL_OuterDomElement);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                $"document.inputManager.addListeners({sOuter}, {(isFocusable ? "true" : "false")});");
+            Interop2.VoidAsync(JsCall.AddEventListeners, uie.INTERNAL_OuterDomElement, isFocusable);
+            //string sOuter = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(uie.INTERNAL_OuterDomElement);
+            //OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+            //    $"document.inputManager.addListeners({sOuter}, {(isFocusable ? "true" : "false")});");
         }
     }
 

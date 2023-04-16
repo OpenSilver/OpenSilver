@@ -19,6 +19,7 @@ using System.Text;
 using OpenSilver.Internal;
 using System.Linq;
 using System.Diagnostics;
+using OpenSilver;
 
 #if MIGRATION
 using System.Windows;
@@ -31,7 +32,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
 {
-    public static class INTERNAL_HtmlDomManager // Note: this class is "internal" but still visible to the Simulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
+    public static partial class INTERNAL_HtmlDomManager // Note: this class is "internal" but still visible to the Simulator because of the "InternalsVisibleTo" flag in "Assembly.cs".
     {
         //------
         // All JavaScript functions (called through dynamic objects) for manipulating the DOM should go here.
@@ -406,6 +407,7 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, null);
         }
+
 
         internal static object CreateTextBlockDomElementAndAppendIt(
             object parentRef,

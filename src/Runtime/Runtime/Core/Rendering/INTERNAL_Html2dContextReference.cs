@@ -20,12 +20,13 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using OpenSilver;
 using OpenSilver.Internal;
 
 namespace CSHTML5.Internal
 {
     // Note: this class is intented to be used by the Simulator only, not when compiled to JavaScript.
-    public class INTERNAL_Html2dContextReference : DynamicObject
+    public partial class INTERNAL_Html2dContextReference : DynamicObject
     {
         private readonly string _id;
 
@@ -44,9 +45,11 @@ namespace CSHTML5.Internal
         public override bool TrySetMember(SetMemberBinder binder, object value) => throw new NotSupportedException();
 
         void SetPropertyValue(string propertyName, string propertyValue)
+            //=> Interop2.VoidAsync(JsCall.SetPropertyValue, _id, propertyName, propertyValue);
             => OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.set2dContextProperty(\"{_id}\",\"{propertyName}\",\"{propertyValue}\");");
 
         void InvokeMethod(string methodName, object[] args)
+            //=> InvokeMethodImpl(methodName, string.Join(", ", args.Select(Interop2Caller.ConvertObjToJs)) );
             => InvokeMethodImpl(methodName, string.Join(", ", args.Select(x => INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(x))));
 
         void InvokeMethod(string methodName) => InvokeMethodImpl(methodName, string.Empty);
@@ -66,6 +69,7 @@ namespace CSHTML5.Internal
             => InvokeMethodImpl(methodName, string.Join(", ", args.Select(x => x.ToInvariantString())));
 
         void InvokeMethodImpl(string methodName, string args)
+            //=> Interop2.VoidAsync(JsCall.InvokeMethod, _id, methodName, args);
             => OpenSilver.Interop.ExecuteJavaScriptFastAsync($"document.invoke2dContextMethod(\"{_id}\", \"{methodName}\", \"{args}\");");
 
 #pragma warning disable IDE1006 // Naming Styles

@@ -36,6 +36,22 @@ namespace CSHTML5.Internal
         public static object ExecuteJavaScriptWithResult(string javascript, bool flush = true)
             => ExecuteJavaScriptSync(javascript, referenceId: 0, wantsResult: true, flush: flush);
 
+
+        // allow calling custom JS functions
+        public static object ExecuteJavaScriptFuncSync<T>(string funcName, T arg0) {
+            return JavaScriptRuntime.ExecuteJavaScriptFunc(funcName, arg0);
+        }
+
+        // allow calling custom JS functions
+        public static object ExecuteJavaScriptFuncSync<T0,T1>(string funcName, T0 arg0, T1 arg1) {
+            return JavaScriptRuntime.ExecuteJavaScriptFunc(funcName, arg0, arg1);
+        }
+
+        // allow calling custom JS functions
+        public static object ExecuteJavaScriptFuncSync<T0,T1,T2>(string funcName, T0 arg0, T1 arg1, T2 arg2) {
+            return JavaScriptRuntime.ExecuteJavaScriptFunc(funcName, arg0, arg1, arg2);
+        }
+
         /// <summary>
         /// Executes JavaScript code immediately. This also forces all the pending async JS code to be executed (flush).
         /// </summary>
@@ -133,6 +149,7 @@ namespace CSHTML5.Internal
         // FIXME update after PR724 is approved
         internal static void ShowErrorMessage(string errorMessage, int indexOfCallInList)
         {
+            return;
             string str = _javascriptCallsStore.Get(indexOfCallInList);
 
 #if OPENSILVER

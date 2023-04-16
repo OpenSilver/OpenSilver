@@ -137,9 +137,46 @@ document.onkeyup = function (evt) {
     document.refreshKeyModifiers(evt);
 };
 
-document.jsObjRef = {};
+document.jsObjRef = { "_functions": {} };
 document.callbackCounterForSimulator = 0;
 document.measureTextBlockElement = null;
+
+document.argToJsObj = function (arg) {
+    if (arg.startsWith("document.jsObjRef")) {
+        const idxEnd = arg.indexOf("]");
+        // note: ignore the start and end quotes as well
+        let refId = arg.substr(19,idxEnd-20);
+
+        let arrayIdx = -1;
+        let argIdx = arg.indexOf("[", idxEnd);
+        if (argIdx > 0) {
+            ++argIdx;
+            arrayIdx = parseInt( arg.substr(argIdx, arg.length - 1 - argIdx), 10);
+        }
+
+        if (arrayIdx >= 0)
+            return document.jsObjRef[refId][arrayIdx];
+        else 
+            return document.jsObjRef[refId];
+    }
+    if (arg.startsWith("document.getElementByIdSafe")) {
+        // note: ignore the start and end quotes as well
+        let refId = arg.substr(29,arg.length-31);
+        return document.getElementByIdSafe(refId);
+    }
+    if (arg.startsWith("document.getCallbackFunc")) {
+        let idxEnd = arg.indexOf(",");
+        let id = parseInt( arg.substr(25,idxEnd-25));
+        ++idxEnd;
+        let idxLastComma = arg.indexOf(",", idxEnd );
+        let isSync = arg.substr(idxEnd , idxLastComma - idxEnd).trim();
+        ++idxLastComma;
+        var isNotSimulator = arg.substr(idxLastComma, arg.length - idxLastComma - 1).trim();
+        return document.getCallbackFunc(id, isSync == "true", isNotSimulator == "true");
+    }
+
+    return arg;
+}
 
 document.reroute = function reroute(e, elem, shiftKey) {
     shiftKey = shiftKey || false;
@@ -750,6 +787,7 @@ document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMa
 document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, maxWidth, emptyVal) {
     var element = document.measureTextBlockElement;
     var elToMeasure = document.getElementById(uid);
+
     if (element && elToMeasure) {
         var computedStyle = getComputedStyle(elToMeasure);
 

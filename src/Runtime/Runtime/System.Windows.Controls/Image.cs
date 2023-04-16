@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Globalization;
 using CSHTML5.Internal;
+using OpenSilver;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -50,7 +51,7 @@ namespace Windows.UI.Xaml.Controls
     /// MyStackPanel.Children.Add(image);
     /// </code>
     /// </example>
-    public sealed class Image : FrameworkElement
+    public sealed partial class Image : FrameworkElement
     {
         private object _imageDiv;
         private Size _naturalSize;
@@ -177,6 +178,7 @@ namespace Windows.UI.Xaml.Controls
             _imgLoadCallback = JavaScriptCallback.Create(ProcessLoadEvent, true);
             _imgErrorCallack = JavaScriptCallback.Create(ProcessErrorEvent, true);
 
+            //Interop2.VoidAsync(JsCall.AttachToDomEvents, _imageDiv, _imgLoadCallback, _imgErrorCallack);
             string sImage = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imageDiv);
             string sLoadCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imgLoadCallback);
             string sErrorCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_imgErrorCallack);
@@ -310,7 +312,7 @@ namespace Windows.UI.Xaml.Controls
             if (Source != null)
             {
                 var imageSrc = await Source.GetDataStringAsync(this);
-                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc ?? string.Empty, true);
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(_imageDiv, "src", imageSrc ?? string.Empty);
             }
             else
             {

@@ -16,6 +16,7 @@ using System.Globalization;
 using OpenSilver.Internal;
 using CSHTML5;
 using CSHTML5.Internal;
+using OpenSilver;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -48,7 +49,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Measure Text Block width and height from html element.
     /// </summary>
-    internal sealed class TextMeasurementService : ITextMeasurementService
+    internal sealed partial class TextMeasurementService : ITextMeasurementService
     {
         private INTERNAL_HtmlDomStyleReference textBlockDivStyle;
         private object textBlockReference;
@@ -144,6 +145,7 @@ namespace Windows.UI.Xaml
 
             string javaScriptCodeToExecute = $@"document.measureTextBlock(""{uid}"",""{whiteSpace}"",""{overflowWrap}"",""{strPadding}"",""{strMaxWidth}"",""{emptyVal}"")";
             string strTextSize = OpenSilver.Interop.ExecuteJavaScriptString(javaScriptCodeToExecute);
+
             Size measuredSize;
             int sepIndex = strTextSize != null ? strTextSize.IndexOf('|') : -1;
             if (sepIndex > -1)
