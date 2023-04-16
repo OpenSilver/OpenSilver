@@ -340,7 +340,7 @@
                             <!-- #endif -->
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
-                                    <Grid Background="{TemplateBinding Background}">
+                                    <Grid Background="{TemplateBinding Background}" CustomLayout="True" IsAutoWidthOnCustomLayout="True">
                                         <VisualStateManager.VisualStateGroups>
                                             <VisualStateGroup x:Name="CommonStates">
                                                 <VisualState x:Name="Normal" />
