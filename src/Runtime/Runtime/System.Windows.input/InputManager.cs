@@ -17,13 +17,15 @@ using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Controls;
 #else
+using System.Windows.Input;
 using Windows.Foundation;
-using Windows.System;
 using Windows.UI.Xaml.Controls;
 using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 using MouseWheelEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
+using ModifierKeys = Windows.System.VirtualKeyModifiers;
+using INTERNAL_VirtualKeysHelpers = Windows.System.INTERNAL_VirtualKeysHelpers;
 #endif
 
 #if MIGRATION
@@ -101,6 +103,36 @@ internal sealed class InputManager
     /// Return the input manager associated with the current context.
     /// </summary>
     public static InputManager Current { get; } = new InputManager();
+
+    internal ModifierKeys GetKeyboardModifiers()
+    {
+        return (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("document.inputManager.getModifiers();", false);
+    }
+
+    internal bool CaptureMouse(UIElement uie)
+    {
+        if (Pointer.INTERNAL_captured is null)
+        {
+            Pointer.INTERNAL_captured = uie;
+
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(uie.INTERNAL_OuterDomElement);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.captureMouse({sDiv});");
+
+            return true;
+        }
+
+        return Pointer.INTERNAL_captured == uie;
+    }
+
+    internal void ReleaseMouseCapture(UIElement uie)
+    {
+        if (Pointer.INTERNAL_captured is not null)
+        {
+            Pointer.INTERNAL_captured = null;
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.releaseMouseCapture();");
+            uie.OnLostMouseCapturedInternal(new MouseEventArgs());
+        }
+    }
 
     internal void AddEventListeners(UIElement uie, bool isFocusable)
     {
@@ -318,11 +350,8 @@ internal sealed class InputManager
             };
 #endif
 
-            if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-            {
-                e.FillEventArgs(mouseTarget, jsEventArg);
-                mouseTarget.RaiseEvent(e);
-            }
+            e.FillEventArgs(mouseTarget, jsEventArg);
+            mouseTarget.RaiseEvent(e);
 
             mouseTarget.Dispatcher.BeginInvoke(() =>
             {
@@ -352,17 +381,14 @@ internal sealed class InputManager
                 UIEventArg = jsEventArg,
             };
 
-            if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-            {
-                e.FillEventArgs(mouseTarget, jsEventArg);
+            e.FillEventArgs(mouseTarget, jsEventArg);
 
 #if MIGRATION
-                // fill the Mouse Wheel delta:
-                e.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
+            // fill the Mouse Wheel delta:
+            e.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
 #endif
 
-                mouseTarget.RaiseEvent(e);
-            }
+            mouseTarget.RaiseEvent(e);
         }
     }
 
@@ -417,9 +443,8 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
             Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
+            KeyModifiers = Keyboard.Modifiers,
         };
-
-        e.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
 
         ToolTipService.OnKeyDown(e);
 
@@ -451,9 +476,8 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
             Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
+            KeyModifiers = Keyboard.Modifiers,
         };
-
-        e.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
 
         keyboardTarget.RaiseEvent(e);
     }
@@ -529,11 +553,8 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
         };
 
-        if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-        {
-            e.FillEventArgs(uie, jsEventArg);
-            uie.RaiseEvent(e);
-        }
+        e.FillEventArgs(uie, jsEventArg);
+        uie.RaiseEvent(e);
     }
 
     private void ProcessOnTouchEndEvent(
@@ -574,22 +595,19 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
         };
 
-        if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
+        e.FillEventArgs(uie, jsEventArg);
+
+        if (refreshClickCount)
         {
-            e.FillEventArgs(uie, jsEventArg);
-
-            if (refreshClickCount)
-            {
-                e.ClickCount = RefreshClickCount(uie, button, timeStamp, e.GetPosition(null));
-            }
-
-            if (closeToolTips)
-            {
-                ToolTipService.OnMouseButtonDown(e);
-            }
-
-            uie.RaiseEvent(e);
+            e.ClickCount = RefreshClickCount(uie, button, timeStamp, e.GetPosition(null));
         }
+
+        if (closeToolTips)
+        {
+            ToolTipService.OnMouseButtonDown(e);
+        }
+
+        uie.RaiseEvent(e);
     }
 
     private void ProcessOnTapped(UIElement uie, object jsEventArg)
@@ -601,11 +619,8 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
         };
 
-        if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-        {
-            e.FillEventArgs(uie, jsEventArg);
-            uie.RaiseEvent(e);
-        }
+        e.FillEventArgs(uie, jsEventArg);
+        uie.RaiseEvent(e);
     }
 
     private int RefreshClickCount(UIElement target, MouseButton button, int timeStamp, Point ptClient)

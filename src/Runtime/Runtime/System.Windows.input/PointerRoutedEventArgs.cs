@@ -18,10 +18,11 @@ using CSHTML5;
 #if MIGRATION
 using System.Windows.Controls.Primitives;
 #else
+using System.Windows.Input;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.Foundation;
-using Windows.System;
 using Windows.UI.Input;
+using ModifierKeys = Windows.System.VirtualKeyModifiers;
 #endif
 
 #if MIGRATION
@@ -62,24 +63,14 @@ namespace Windows.UI.Xaml.Input
             set => HandledImpl = value;
         }
 
-#if MIGRATION
-        ModifierKeys _keyModifiers;
-#else
-        VirtualKeyModifiers _keyModifiers;
-#endif
-
         /// <summary>
         /// Gets a value that indicates which key modifiers were active at the time that
         /// the pointer event was initiated.
         /// </summary>
-#if MIGRATION
         public ModifierKeys KeyModifiers
-#else
-        public VirtualKeyModifiers KeyModifiers
-#endif
         {
-            get { return _keyModifiers; }
-            internal set { _keyModifiers = value; }
+            get;
+            internal set;
         }
 
         /// <summary>
@@ -91,76 +82,10 @@ namespace Windows.UI.Xaml.Input
         /// </returns>
         public StylusDevice StylusDevice => new StylusDevice(this);
 
-        internal bool CheckIfEventShouldBeTreated(UIElement element, object jsEventArg)
-        {
-            //todo: this method is called by "OnMouseEvent", "OnMouseLeave", etc., but there appears to be other events where this method is not called: shouldn't we call it in those methods too? todo: verify that the handler is not called twice when an element has captured the pointer and registered the PointerPressed event for example.
-            string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
-            if (Pointer.INTERNAL_captured == null)
-            {
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"{sEvent}.doNotReroute = true"); //this is just in case the handler of this event starts a capture of the Pointer: we do not want to reroute it right away.
-                //todo: check if the comment above is always right (questionnable if capturing element is another one than the one that threw this event).
-                return true;
-            }
-            else
-            {
-                if (Pointer.INTERNAL_captured == element)
-                {
-                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sEvent}.doNotReroute = true");
-                    return true;
-                }
-                else
-                {
-                    return OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.doNotReroute == true");
-                }
-            }
-        }
-
         internal void FillEventArgs(UIElement element, object jsEventArg)
         {
-            // If the element has captured the pointer, we do not want the Document to reroute the event to the element because it would result in the event being handled twice.
-            if (Pointer.INTERNAL_captured == null || Pointer.INTERNAL_captured == element)
-            {
-                string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
-                OpenSilver.Interop.ExecuteJavaScriptVoid($"{sEvent}.doNotReroute = true");
-            }
-
-            AddKeyModifiers(jsEventArg);
+            KeyModifiers = Keyboard.Modifiers;
             SetPointerAbsolutePosition(jsEventArg, element.INTERNAL_ParentWindow);
-        }
-
-        private void AddKeyModifiers(object jsEventArg)
-        {
-            string sEvent = INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg);
-#if MIGRATION
-            ModifierKeys keyModifiers = ModifierKeys.None;
-#else
-            VirtualKeyModifiers keyModifiers = VirtualKeyModifiers.None;
-#endif
-            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.shiftKey || false"))
-            {
-#if MIGRATION
-                keyModifiers |= ModifierKeys.Shift;
-#else
-                keyModifiers |= VirtualKeyModifiers.Shift;
-#endif
-            }
-            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.altKey || false"))
-            {
-#if MIGRATION
-                keyModifiers |= ModifierKeys.Alt;
-#else
-                keyModifiers |= VirtualKeyModifiers.Menu;
-#endif
-            }
-            if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sEvent}.ctrlKey || false"))
-            {
-#if MIGRATION
-                keyModifiers |= ModifierKeys.Control;
-#else
-                keyModifiers |= VirtualKeyModifiers.Control;
-#endif
-            }
-            KeyModifiers = keyModifiers;
         }
 
         protected internal void SetPointerAbsolutePosition(object jsEventArg, Window window)

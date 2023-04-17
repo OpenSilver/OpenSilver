@@ -111,64 +111,9 @@ document.getAppParams = function () {
 
 document.ResXFiles = {};
 
-document.modifiersPressed = 0;
-
-document.refreshKeyModifiers = function (evt) {
-    var value = 0;
-    if (evt.ctrlKey) {
-        value = value | 1;
-    }
-    if (evt.altKey) {
-        value = value | 2;
-    }
-    if (evt.shiftKey) {
-        value = value | 4;
-    }
-    document.modifiersPressed = value;
-}
-
-document.onkeydown = function (evt) {
-    evt = evt || window.event;
-    document.refreshKeyModifiers(evt);
-};
-
-document.onkeyup = function (evt) {
-    evt = evt || window.event;
-    document.refreshKeyModifiers(evt);
-};
-
 document.jsObjRef = {};
 document.callbackCounterForSimulator = 0;
 document.measureTextBlockElement = null;
-
-document.reroute = function reroute(e, elem, shiftKey) {
-    shiftKey = shiftKey || false;
-    if (e.rerouted === undefined) {
-        var evt;
-        if (typeof document.dispatchEvent !== 'undefined') {
-            evt = document.createEvent('MouseEvents');
-            evt.initMouseEvent(
-                e.type				// event type
-                , e.bubbles			// can bubble?
-                , e.cancelable		// cancelable?
-                , window			// the event's abstract view (should always be window)
-                , e.detail			// mouse click count (or event "detail")
-                , e.screenX			// event's screen x coordinate
-                , e.screenY			// event's screen y coordinate
-                , e.pageX			// event's client x coordinate
-                , e.pageY			// event's client y coordinate
-                , e.ctrlKey			// whether or not CTRL was pressed during event
-                , e.altKey			// whether or not ALT was pressed during event
-                , shiftKey			// whether or not SHIFT was pressed during event
-                , e.metaKey			// whether or not the meta key was pressed during event
-                , e.button			// indicates which button (if any) caused the mouse event (1 = primary button)
-                , e.relatedTarget	// relatedTarget (only applicable for mouseover/mouseout events)
-            );
-            evt.rerouted = true;
-            elem.dispatchEvent(evt);
-        }
-    }
-}
 
 document.performanceCounters = [];
 
@@ -466,18 +411,74 @@ document.createInputManager = function (callback) {
         TOUCH_MOVE: 16
     };
 
+    const MODIFIERKEYS = {
+        NONE: 0,
+        CONTROL: 1,
+        ALT: 2,
+        SHIFT: 4,
+        WINDOWS: 8,
+    };
+
+    let _modifiers = MODIFIERKEYS.NONE;
+    let _mouseCapture = null;
+
+    function setModifiers(e) {
+        _modifiers = MODIFIERKEYS.NONE;
+        if (e.ctrlKey)
+            _modifiers |= MODIFIERKEYS.CONTROL;
+        if (e.altKey)
+            _modifiers |= MODIFIERKEYS.ALT;
+        if (e.shiftKey)
+            _modifiers |= MODIFIERKEYS.SHIFT;
+        if (e.metaKey)
+            _modifiers |= MODIFIERKEYS.WINDOWS;
+    };
+
     document.addEventListener('mousedown', function (e) {
         if (!e.isHandled) {
             switch (e.button) {
                 case 0:
-                    callback('', EVENTS.MOUSE_LEFT_DOWN);
+                    callback('', EVENTS.MOUSE_LEFT_DOWN, e);
                     break;
                 case 2:
-                    callback('', EVENTS.MOUSE_RIGHT_DOWN);
+                    callback('', EVENTS.MOUSE_RIGHT_DOWN, e);
                     break;
             }
         }
     });
+    document.addEventListener('mouseup', function (e) {
+        if (!e.isHandled) {
+            const target = _mouseCapture;
+            if (target !== null) {
+                switch (e.button) {
+                    case 0:
+                        callback(target.id, EVENTS.MOUSE_LEFT_UP, e);
+                        break;
+                    case 2:
+                        callback(target.id, EVENTS.MOUSE_RIGHT_UP, e);
+                        break;
+                }
+            }
+        }
+    });
+    document.addEventListener('mousemove', function (e) {
+        if (!e.isHandled) {
+            const target = _mouseCapture;
+            if (target !== null) {
+                callback(target.id, EVENTS.MOUSE_MOVE, e);
+            }
+        }
+    });
+    document.addEventListener('selectstart', function (e) {
+        if (_mouseCapture !== null) e.preventDefault();
+    });
+    document.addEventListener('contextmenu', function (e) {
+        if (_mouseCapture !== null && this !== _mouseCapture) {
+            e.preventDefault();
+        }
+    });
+    document.addEventListener('keydown', function (e) { setModifiers(e); });
+    document.addEventListener('keyup', function (e) { setModifiers(e); });
 
     document.inputManager = {
         addListeners: function (element, isFocusable) {
@@ -487,12 +488,13 @@ document.createInputManager = function (callback) {
             view.addEventListener('mousedown', function (e) {
                 if (!e.isHandled) {
                     e.isHandled = true;
+                    let id = (_mouseCapture === null || this === _mouseCapture) ? this.id : '';
                     switch (e.button) {
                         case 0:
-                            callback(this.id, EVENTS.MOUSE_LEFT_DOWN, e);
+                            callback(id, EVENTS.MOUSE_LEFT_DOWN, e);
                             break;
                         case 2:
-                            callback(this.id, EVENTS.MOUSE_RIGHT_DOWN, e);
+                            callback(id, EVENTS.MOUSE_RIGHT_DOWN, e);
                             break;
                     }
                 }
@@ -501,12 +503,13 @@ document.createInputManager = function (callback) {
             view.addEventListener('mouseup', function (e) {
                 if (!e.isHandled) {
                     e.isHandled = true;
+                    const target = _mouseCapture || this;
                     switch (e.button) {
                         case 0:
-                            callback(this.id, EVENTS.MOUSE_LEFT_UP, e);
+                            callback(target.id, EVENTS.MOUSE_LEFT_UP, e);
                             break;
                         case 2:
-                            callback(this.id, EVENTS.MOUSE_RIGHT_UP, e);
+                            callback(target.id, EVENTS.MOUSE_RIGHT_UP, e);
                             break;
                     }
                 }
@@ -515,7 +518,8 @@ document.createInputManager = function (callback) {
             view.addEventListener('mousemove', function (e) {
                 if (!e.isHandled) {
                     e.isHandled = true;
-                    callback(this.id, EVENTS.MOUSE_MOVE, e);
+                    const target = _mouseCapture || this;
+                    callback(target.id, EVENTS.MOUSE_MOVE, e);
                 }
             });
 
@@ -527,11 +531,15 @@ document.createInputManager = function (callback) {
             });
 
             view.addEventListener('mouseenter', function (e) {
-                callback(this.id, EVENTS.MOUSE_ENTER, e);
+                if (_mouseCapture === null || this === _mouseCapture) {
+                    callback(this.id, EVENTS.MOUSE_ENTER, e);
+                }
             });
 
             view.addEventListener('mouseleave', function (e) {
-                callback(this.id, EVENTS.MOUSE_LEAVE, e);
+                if (_mouseCapture === null || this === _mouseCapture) {
+                    callback(this.id, EVENTS.MOUSE_LEAVE, e);
+                }
             });
 
             if (isTouchDevice()) {
@@ -576,6 +584,7 @@ document.createInputManager = function (callback) {
                 view.addEventListener('keydown', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
+                        setModifiers(e);
                         callback(this.id, EVENTS.KEYDOWN, e);
                     }
                 });
@@ -583,6 +592,7 @@ document.createInputManager = function (callback) {
                 view.addEventListener('keyup', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
+                        setModifiers(e);
                         callback(this.id, EVENTS.KEYUP, e);
                     }
                 });
@@ -595,6 +605,15 @@ document.createInputManager = function (callback) {
                     callback(this.id, EVENTS.BLUR, e);
                 });
             }
+        },
+        getModifiers: function () {
+            return _modifiers;
+        },
+        captureMouse: function (element) {
+            _mouseCapture = element;
+        },
+        releaseMouseCapture: function () {
+            _mouseCapture = null;
         },
     };
 };
@@ -639,74 +658,6 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
     argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
     document.jsObjRef[idWhereErrorCallbackArgsAreStored] = argsArr;
     window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
-}
-
-document.rerouteMouseEvents = function (id) {
-    document.onmouseup = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmouseover = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmousedown = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmouseout = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmousemove = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onclick = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.oncontextmenu = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.ondblclick = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onselectstart = function (e) { return false; }
 }
 
 document.setVisualBounds = function (id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {

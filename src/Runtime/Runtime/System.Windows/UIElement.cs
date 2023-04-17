@@ -976,7 +976,6 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Sets pointer capture to a UIElement.
         /// </summary>
-        /// <param name="value">The pointer object reference.</param>
         /// <returns>True if the object has pointer capture; otherwise, false.</returns>
 #if MIGRATION
         public bool CaptureMouse()
@@ -984,128 +983,7 @@ namespace Windows.UI.Xaml
         public bool CapturePointer(Pointer value = null)
 #endif
         {
-#if MIGRATION
-            Pointer value = null;
-#endif
-            return CapturePointer(value, this.INTERNAL_OuterDomElement);
-        }
-
-        private bool CapturePointer(Pointer value, object element) //note: when the pointer is already captured, trying to capture it again does absolutely nothing (even after releasing the first one)
-        {
-            // We set the events on document then reroute these events to the UIElement.
-            if (Pointer.INTERNAL_captured == null)
-            {
-                Pointer.INTERNAL_captured = this;
-
-                if (IsRunningInJavaScript())
-                {
-#if BRIDGE
-                    Bridge.Script.Write(@"
-     document.onmouseup = function(e) {
-        if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }
-     document.onmouseover = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }       
-    document.onmousedown = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }                               
-     document.onmouseout = function(e) {   
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }                                      
-     document.onmousemove = function(e) {  
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }                                      
-     document.onclick = function(e) {      
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }                                      
-     document.oncontextmenu = function(e) {
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }                                      
-     document.ondblclick = function(e) {   
-       if(e.doNotReroute == undefined)
-        {
-               document.reroute(e, {0});
-        }
-    }
-", element);
-#endif
-
-                    //javacript reroute function: taken from http://blog.stchur.com/blogcode/event-rerouting/
-                    //the following function is added in the cshtml5.js file
-                    //function reroute(e, elem, shiftKey)
-                    //{
-                    //    shiftKey = shiftKey || false;
-                    //
-                    //    var evt;
-                    //    if (typeof document.dispatchEvent !== 'undefined')
-                    //    {
-                    //        evt = document.createEvent('MouseEvents');
-                    //        evt.initMouseEvent(
-                    //           e.type				// event type
-                    //           ,e.bubbles			// can bubble?
-                    //           ,e.cancelable		// cancelable?
-                    //           ,window				// the event's abstract view (should always be window)
-                    //           ,e.detail			// mouse click count (or event "detail")
-                    //           ,e.screenX			// event's screen x coordinate
-                    //           ,e.screenY			// event's screen y coordinate
-                    //           ,e.pageX				// event's client x coordinate
-                    //           ,e.pageY				// event's client y coordinate
-                    //           ,e.ctrlKey			// whether or not CTRL was pressed during event
-                    //           ,e.altKey			// whether or not ALT was pressed during event
-                    //           ,shiftKey			// whether or not SHIFT was pressed during event
-                    //           ,e.metaKey			// whether or not the meta key was pressed during event
-                    //           ,e.button			// indicates which button (if any) caused the mouse event (1 = primary button)
-                    //           ,e.relatedTarget		// relatedTarget (only applicable for mouseover/mouseout events)
-                    //        );
-                    //        elem.dispatchEvent(evt);
-                    //    }
-                    //    else if (typeof document.fireEvent !== 'undefined')
-                    //    {
-                    //        evt = document.createEventObject(e);
-                    //        evt.shiftKey = shiftKey;
-                    //        elem.fireEvent('on' + e.type, evt);
-                    //    }
-                    //}
-
-                }
-                else
-                {
-                    string uid = ((INTERNAL_HtmlDomElementReference)element).UniqueIdentifier;
-                    string javaScriptCodeToExecute = $@"document.rerouteMouseEvents(""{uid}"")";
-                    INTERNAL_ExecuteJavaScript.ExecuteJavaScriptWithResult(javaScriptCodeToExecute);
-                }
-                return true;
-            }
-            else if (Pointer.INTERNAL_captured == this)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return InputManager.Current.CaptureMouse(this);
         }
 
         /// <summary>
@@ -1126,78 +1004,26 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Releases pointer captures for capture of one specific pointer by this UIElement.
         /// </summary>
-        /// <param name="value">
-        /// The pointer reference. Use either saved references from previous captures,
-        /// or pointer event data, to obtain this reference.
-        /// </param>
 #if MIGRATION
         public void ReleaseMouseCapture()
 #else
         public void ReleasePointerCapture(Pointer value = null)
 #endif
         {
-            if (IsRunningInJavaScript())
-            {
-                if (Pointer.INTERNAL_captured != null)
-                {
-#if !BRIDGE
-                    JSIL.Verbatim.Expression(@"
- document.onmousedown = null;
- document.onmouseup = null;
- document.onmouseover = null;
- document.onmouseout = null;
- document.onmousemove = null;
- document.onclick = null;
- document.oncontextmenu = null;
- document.ondblclick = null;
-");
-#else
-                    Bridge.Script.Write(@"
- document.onmousedown = null;
- document.onmouseup = null;
- document.onmouseover = null;
- document.onmouseout = null;
- document.onmousemove = null;
- document.onclick = null;
- document.oncontextmenu = null;
- document.ondblclick = null;
-");
+            InputManager.Current.ReleaseMouseCapture(this);
+        }
 
-#endif
-
-                    Pointer.INTERNAL_captured = null;
 #if MIGRATION
-                    OnLostMouseCapture(new MouseEventArgs());
+        internal void OnLostMouseCapturedInternal(MouseEventArgs e)
 #else
-                    OnPointerCaptureLost(new PointerRoutedEventArgs());
+        internal void OnLostMouseCapturedInternal(PointerRoutedEventArgs e)
 #endif
-                }
-            }
-            else
-            {
-                if (Pointer.INTERNAL_captured != null)
-                {
-                    //todo: remove "string.Format" on the next line when JSIL will be able to compile without it (there is currently an issue with JSIL).
-                    string javaScriptCodeToExecute = @"
-document.onselectstart = null;
-document.onmousedown = null;
-document.onmouseup = null;
-document.onmouseover = null;
-document.onmouseout = null;
-document.onmousemove = null;
-document.onclick = null;
-document.oncontextmenu = null;
-document.ondblclick = null;
-";
-                    INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
-                    Pointer.INTERNAL_captured = null;
+        {
 #if MIGRATION
-                    OnLostMouseCapture(new MouseEventArgs());
+            OnLostMouseCapture(e);
 #else
-                    OnPointerCaptureLost(new PointerRoutedEventArgs());
+            OnPointerCaptureLost(e);
 #endif
-                }
-            }
         }
 
 #if MIGRATION
