@@ -41,6 +41,8 @@
     <file src="../src/Simulator/Simulator/bin/OpenSilver/Debug/interop_debug_root_opensilver.html" target="contentFiles/any/net462/interop_debug_root.html" />
 
     <!-- OpenSilver compiler -->
+    <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/Mono.Cecil.dll" target="tools/Mono.Cecil.dll" />
+
     <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.dll" target="tools/OpenSilver.Compiler.Resources.dll" />
     <file src="../src/Compiler/Compiler.ResourcesExtractor/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Resources.pdb" target="tools/OpenSilver.Compiler.Resources.pdb" />
     <file src="../src/Compiler/Compiler.Common/bin/OpenSilver/Release/net461/OpenSilver.Compiler.Common.dll" target="tools/OpenSilver.Compiler.Common.dll" />
