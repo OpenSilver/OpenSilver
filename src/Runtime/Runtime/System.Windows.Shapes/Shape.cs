@@ -714,18 +714,22 @@ namespace Windows.UI.Xaml.Shapes
                                             double yOffsetToApplyBeforeMultiplication, 
                                             Size shapeActualSize)
         {
-            object returnValue = null;
             // todo: make sure we want the same behaviour when it is null and when it is a SolidColorBrush 
             // (basically, check if null means default value)
             if (brush == null || brush is SolidColorBrush) 
             {
                 if (brush != null) //if stroke is null, we want to set it as an empty string, otherwise, it is a SolidColorBrush and we want to get its color.
                 {
-                    returnValue = ((SolidColorBrush)brush).INTERNAL_ToHtmlString();
+                    return ((SolidColorBrush)brush).INTERNAL_ToHtmlString();
                 }
             }
             else if (brush is LinearGradientBrush)
             {
+                if (shapeActualSize.Width == 0 || shapeActualSize.Height == 0)
+                {
+                    return null;
+                }
+
                 LinearGradientBrush fillAsLinearGradientBrush = (LinearGradientBrush)brush;
 
                 double x0 = fillAsLinearGradientBrush.StartPoint.X;
@@ -743,11 +747,10 @@ namespace Windows.UI.Xaml.Shapes
 
                 if (fillAsLinearGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    returnValue = createLinearGradient(context, x0, y0, x1, y1, fillAsLinearGradientBrush, opacity);
+                    return createLinearGradient(context, x0, y0, x1, y1, fillAsLinearGradientBrush, opacity);
                 }
                 else
                 {
-
                     //*******************************
                     //example in js:
                     //*******************************
@@ -856,8 +859,7 @@ var context = {sElement}.getContext('2d');
 context.rotate({angle.ToInvariantString()});
 context.translate({offset.ToInvariantString()}, 0);
 }}");
-
-                    returnValue = OpenSilver.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.createPattern({sCanvas}, 'repeat')");
+                    return OpenSilver.Interop.ExecuteJavaScriptAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.createPattern({sCanvas}, 'repeat')");
                 }
             }
             else if (brush is RadialGradientBrush)
@@ -899,7 +901,7 @@ context.translate({offset.ToInvariantString()}, 0);
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{INTERNAL_InteropImplementation.GetVariableStringForJS(context)}.scale({radiusScaling.ToInvariantString()},1)");
                 if (fillAsRadialGradientBrush.SpreadMethod == GradientSpreadMethod.Pad)
                 {
-                    returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d, centerX, centerY, r,
+                    return createRadialGradient(context, gradientOriginX, gradientOriginY, 0d, centerX, centerY, r,
                         fillAsRadialGradientBrush, opacity);
                 }
                 else
@@ -925,7 +927,7 @@ context.translate({offset.ToInvariantString()}, 0);
                     }
                     int additionalRepetitions = repeatingTimes - 1;
 
-                    returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d,
+                    var returnValue = createRadialGradient(context, gradientOriginX, gradientOriginY, 0d,
                         centerX - xCorrection * additionalRepetitions * r, 
                         centerY - yCorrection * additionalRepetitions * r,
                         r + additionalRepetitions * r,
@@ -941,15 +943,18 @@ context.translate({offset.ToInvariantString()}, 0);
                             gs.Offset / repeatingTimes + i * repetitionOffset, gs.Color)).ToList();
                         addColorStops(returnValue, gradients, opacity);
                     }
+
+                    return returnValue;
                 }
             }
             else
             {
                 // Other types of brush are not supported. Use a transparent brush as a fallback.
                 Debug.WriteLine($"Brush of type '{brush.GetType().FullName}' are not supported.");
-                returnValue = Colors.Transparent.INTERNAL_ToHtmlString(1.0);
+                return Colors.Transparent.INTERNAL_ToHtmlString(1.0);
             }
-            return returnValue;
+
+            return null;
         }
 
 
