@@ -317,7 +317,7 @@ internal sealed class InputManager
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
-            ProcessMouseButtonEvent(
+            bool handled = ProcessMouseButtonEvent(
                 mouseTarget,
                 jsEventArg,
                 UIElement.MouseRightButtonDownEvent,
@@ -325,6 +325,11 @@ internal sealed class InputManager
                 Environment.TickCount,
                 refreshClickCount: true,
                 closeToolTips: true);
+
+            if (handled)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoid("document.inputManager.suppressContextMenu(true);");
+            }
         }
 #endif
     }
@@ -579,7 +584,7 @@ internal sealed class InputManager
         uie.RaiseEvent(e);
     }
 
-    private void ProcessMouseButtonEvent(
+    private bool ProcessMouseButtonEvent(
         UIElement uie,
         object jsEventArg,
         RoutedEvent routedEvent,
@@ -608,6 +613,8 @@ internal sealed class InputManager
         }
 
         uie.RaiseEvent(e);
+
+        return e.Handled;
     }
 
     private void ProcessOnTapped(UIElement uie, object jsEventArg)

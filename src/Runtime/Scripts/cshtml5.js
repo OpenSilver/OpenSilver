@@ -421,6 +421,7 @@ document.createInputManager = function (callback) {
 
     let _modifiers = MODIFIERKEYS.NONE;
     let _mouseCapture = null;
+    let _suppressContextMenu = false;
 
     function setModifiers(e) {
         _modifiers = MODIFIERKEYS.NONE;
@@ -473,7 +474,9 @@ document.createInputManager = function (callback) {
         if (_mouseCapture !== null) e.preventDefault();
     });
     document.addEventListener('contextmenu', function (e) {
-        if (_mouseCapture !== null && this !== _mouseCapture) {
+        if (_suppressContextMenu ||
+            (_mouseCapture !== null && this !== _mouseCapture)) {
+            _suppressContextMenu = false;
             e.preventDefault();
         }
     });
@@ -614,6 +617,9 @@ document.createInputManager = function (callback) {
         },
         releaseMouseCapture: function () {
             _mouseCapture = null;
+        },
+        suppressContextMenu: function (value) {
+            _suppressContextMenu = value;
         },
     };
 };
