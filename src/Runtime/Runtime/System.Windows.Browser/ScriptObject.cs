@@ -349,6 +349,9 @@ namespace System.Windows.Browser
             object o = value switch
             {
                 ScriptObject so => so._jsObjectRef,
+                string or char or Guid => value.ToString(),
+                double or float or decimal or int or uint or short or ushort or long or ulong or byte or sbyte or Enum => Convert.ToDouble(value, CultureInfo.InvariantCulture),
+                bool or null => value,
                 _ => value,
             };
 
@@ -398,6 +401,14 @@ namespace System.Windows.Browser
                 }
 
                 return o;
+            }
+        }
+
+        internal static void UnregisterScriptObject(string id)
+        {
+            lock (_objects)
+            {
+                _objects.Remove(id);
             }
         }
 
@@ -462,6 +473,7 @@ namespace System.Windows.Browser
 
         public void Dispose()
         {
+            ScriptObject.UnregisterScriptObject(_jsRef);
             OpenSilver.Interop.ExecuteJavaScriptVoid($"document.browserService.releaseObject('{_jsRef}');");
         }
     }
