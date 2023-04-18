@@ -242,21 +242,43 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
+        // Animation timer should not prevent the element from being collected by the garbage collector.
+        // Therefore, the WeakEventListener pattern is used here.
+        // The most important use case: Storyboards with RepeatBehavior property set to "Forever".
+        private WeakEventListener<Timeline, DispatcherTimer, object> _animationTimerTickListener;
+        private WeakEventListener<Timeline, DispatcherTimer, object> AnimationTimerTickListener
+        {
+            get
+            {
+                return _animationTimerTickListener ??= new(this, _animationTimer)
+                {
+                    OnEventAction = static (instance, sender, args) =>
+                    {
+                        instance._animationTimer_Tick(sender, args);
+                    },
+                    OnDetachAction = static (listener, source) =>
+                    {
+                        source.Tick -= listener.OnEvent;
+                        source.Stop();
+                    }
+                };
+            }
+        }
 
         internal virtual void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
             _parameters = parameters;
-            Duration duration = ResolveDuration();
+            var duration = ResolveDuration();
             if (duration.HasTimeSpan && duration.TimeSpan.TotalMilliseconds > 0)
             {
                 _animationTimer.Interval = duration.TimeSpan;
-                _animationTimer.Tick -= _animationTimer_Tick;
-                _animationTimer.Tick += _animationTimer_Tick;
+                _animationTimer.Tick -= AnimationTimerTickListener.OnEvent;
+                _animationTimer.Tick += AnimationTimerTickListener.OnEvent;
                 _isAnimationDurationReached = false;
                 _animationTimer.Start();
                 return;
-            } 
-            
+            }
+
             _isAnimationDurationReached = true;
         }
 
@@ -310,6 +332,7 @@ namespace Windows.UI.Xaml.Media.Animation
         internal IterationParameters _parameters;
         void _animationTimer_Tick(object sender, object e)
         {
+            _animationTimer.Tick -= AnimationTimerTickListener.OnEvent;
             _animationTimer.Stop();
             _isAnimationDurationReached = true;
             OnIterationCompleted(_parameters);
