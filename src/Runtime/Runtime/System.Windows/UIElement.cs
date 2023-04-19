@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml
     /// UIElement is a base class for most of the objects that have visual appearance
     /// and can process basic input in a user interface.
     /// </summary>
-    public abstract partial class UIElement : DependencyObject
+    public abstract partial class UIElement : DependencyObject, IUIElement
     {
         static UIElement()
         {
@@ -101,6 +101,8 @@ namespace Windows.UI.Xaml
             }
         }
 
+        DependencyObject IUIElement.GetINTERNAL_VisualParent() => INTERNAL_VisualParent;
+
 #endregion Visual Parent
 
 #region Visual Children
@@ -120,6 +122,8 @@ namespace Windows.UI.Xaml
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
+        DependencyObject IUIElement.Internal_GetVisualChild(int index) => GetVisualChild(index);
+
         /// <summary>
         /// Derived classes override this property to enable the UIElement code to enumerate
         /// the UIElement children. Derived classes need to return the number of children
@@ -134,14 +138,18 @@ namespace Windows.UI.Xaml
             get { return 0; }
         }
 
+        int IUIElement.GetVisualChildrenCount() => VisualChildrenCount;
+
         /// <Summary>
         /// Flag to check if this visual has any children
         /// </Summary>
         internal bool HasVisualChildren { get; private set; }
 
+        bool IUIElement.GetHasVisualChildren() => HasVisualChildren;
+
         // Are we in the process of iterating the visual children.
         // This flag is set during a descendents walk, for property invalidation.
-        internal bool IsVisualChildrenIterationInProgress { get; set; }
+        bool IUIElement.IsVisualChildrenIterationInProgress { get; set; }
 
         /// <summary>
         /// AttachChild
@@ -248,6 +256,7 @@ namespace Windows.UI.Xaml
         //Note: the two following fields are only used in the PointerRoutedEventArgs class to determine how many clicks have been made on this UIElement in a short amount of time.
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
         internal bool _isLoaded;
+        bool IUIElement.Internal_IsLoaded => _isLoaded;
         internal Action INTERNAL_DeferredRenderingWhenControlBecomesVisible;
         internal Action INTERNAL_DeferredLoadingWhenControlBecomesVisible;
 

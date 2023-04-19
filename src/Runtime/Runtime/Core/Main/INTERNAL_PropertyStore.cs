@@ -557,9 +557,9 @@ namespace CSHTML5.Internal
                 // Propagate to children if property is inherited
                 if (metadata.Inherits)
                 {
-                    if (depObj is FrameworkElement rootElement)
+                    if (depObj is IFrameworkElement rootElement)
                     {
-                        InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo(rootElement,
+                        InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo((DependencyObject)rootElement,
                             dp,
                             oldValue, oldBaseValueSource,
                             computedValue, newValueSource);
@@ -569,7 +569,7 @@ namespace CSHTML5.Internal
                             TreeWalkHelper.InvalidateOnInheritablePropertyChange(rootElement, info, true);
                         }
 
-                        FrameworkElement.OnInheritedPropertyChanged(rootElement, info);
+                        rootElement.OnInheritedPropertyChanged(info);
                     }
                 }
                 storage.INTERNAL_IsVisualValueDirty = false;
@@ -697,7 +697,7 @@ namespace CSHTML5.Internal
             {
                 ApplyCssChanges(oldValue, newValue, metadata, depObj); // Note: this we need to call regardless of whether the element is in the visual tree. In fact, for example, the SolidColorBrush.Color property can be used by multiple UIElements, some of which may be in the visual tree and others not.
 
-                if (depObj is UIElement && ((UIElement)depObj)._isLoaded)
+                if (depObj is IUIElement uiElement && uiElement.Internal_IsLoaded)
                 {
                     // Note: this we call only if the element is in the visual tree.
                     metadata.MethodToUpdateDom?.Invoke(depObj, newValue); 
@@ -743,7 +743,7 @@ namespace CSHTML5.Internal
             // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
             if (!dp.IsAttached)
             {
-                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || dp == FrameworkElement.DataContextProperty;
+                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || (depObj is IFrameworkElement fe && fe.ShouldRaisePropertyChanged(dp));
             }
             return true;
         }

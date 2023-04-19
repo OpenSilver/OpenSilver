@@ -334,8 +334,9 @@
 		<Compile Include="System.Windows.Media.Animation\KeyTimeConverter.cs" />
 		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
-		<Compile Include="System.Windows\FrameworkElementBase.cs" />
-		<Compile Include="System.Windows\InheritanceBehavior.cs" />		
+		<Compile Include="System.Windows\IFrameworkElement.cs" />
+		<Compile Include="System.Windows\InheritanceBehavior.cs" />
+		<Compile Include="System.Windows\IUIElement.cs" />		
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
 		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />

@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Media.Animation
             set { SetValue(StoryboardProperty, value); }
         }
 
-        internal override void Invoke(FrameworkElement fe)
+        internal override void Invoke(IFrameworkElement fe)
         {
             Storyboard?.Begin();
         }

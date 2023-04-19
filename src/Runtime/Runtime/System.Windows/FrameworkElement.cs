@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml
     /// programmatic layout. FrameworkElement also defines APIs related to data binding,
     /// object tree, and object lifetime feature areas.
     /// </summary>
-    public abstract partial class FrameworkElement : UIElement
+    public abstract partial class FrameworkElement : UIElement, IFrameworkElement
     {
         #region Inheritance Context
 
@@ -73,6 +73,8 @@ namespace Windows.UI.Xaml
         {
             return base.ShouldProvideInheritanceContext(target, property) || property == ResourceDictionary.ResourceKeyProperty;
         }
+
+        bool IFrameworkElement.ShouldRaisePropertyChanged(DependencyProperty dp) => dp == DataContextProperty;
 
         internal FrameworkElement InheritedParent { get; private set; }
 
@@ -126,6 +128,11 @@ namespace Windows.UI.Xaml
             {
                 handler(fe, new InheritedPropertyChangedEventArgs(ref info));
             }
+        }
+
+        void IFrameworkElement.OnInheritedPropertyChanged(InheritablePropertyChangeInfo info)
+        {
+            OnInheritedPropertyChanged(this, info);
         }
 
         #endregion Inheritance Context
@@ -191,18 +198,20 @@ namespace Windows.UI.Xaml
             private set;
         }
 
+        DependencyObject IFrameworkElement.GetParent() => Parent;
+
         internal void AddLogicalChild(object child)
         {
             if (child != null)
             {
                 // It is invalid to modify the children collection that we
                 // might be iterating during a property invalidation tree walk.
-                if (IsLogicalChildrenIterationInProgress)
+                if (((IFrameworkElement)this).IsLogicalChildrenIterationInProgress)
                 {
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
 
-                HasLogicalChildren = true;
+                ((IFrameworkElement)this).HasLogicalChildren = true;
 
                 FrameworkElement fe = child as FrameworkElement;
                 if (fe != null)
@@ -218,7 +227,7 @@ namespace Windows.UI.Xaml
             {
                 // It is invalid to modify the children collection that we
                 // might be iterating during a property invalidation tree walk.
-                if (IsLogicalChildrenIterationInProgress)
+                if (((IFrameworkElement)this).IsLogicalChildrenIterationInProgress)
                 {
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
@@ -234,12 +243,12 @@ namespace Windows.UI.Xaml
                 // if null, there are no children.
                 if (children == null)
                 {
-                    HasLogicalChildren = false;
+                    ((IFrameworkElement)this).HasLogicalChildren = false;
                 }
                 else
                 {
                     // If we can move next, there is at least one child
-                    HasLogicalChildren = children.MoveNext();
+                    ((IFrameworkElement)this).HasLogicalChildren = children.MoveNext();
                 }
             }
         }
@@ -298,13 +307,15 @@ namespace Windows.UI.Xaml
             get { return null; }
         }
 
-        internal bool IsLogicalChildrenIterationInProgress
+        IEnumerator IFrameworkElement.GetLogicalChildren() => LogicalChildren;
+
+        bool IFrameworkElement.IsLogicalChildrenIterationInProgress
         {
             get { return ReadInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress); }
             set { WriteInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress, value); }
         }
 
-        internal bool HasLogicalChildren
+        bool IFrameworkElement.HasLogicalChildren
         {
             get { return ReadInternalFlag(InternalFlags.HasLogicalChildren); }
             set { WriteInternalFlag(InternalFlags.HasLogicalChildren, value); }
