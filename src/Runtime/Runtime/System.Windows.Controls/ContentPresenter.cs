@@ -512,7 +512,7 @@ namespace Windows.UI.Xaml.Controls
 
         private class UseContentTemplate : DataTemplate
         {
-            internal override bool BuildVisualTree(FrameworkElementBase container)
+            internal override bool BuildVisualTree(FrameworkElement container)
             {
                 FrameworkElement child = ((ContentPresenter)container).Content as FrameworkElement;
                 if (child != null)
@@ -524,7 +524,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
 
-                container.SetTemplateChild(child);
+                container.TemplateChild = child;
 
                 return true;
             }
@@ -532,12 +532,12 @@ namespace Windows.UI.Xaml.Controls
 
         private class DefaultTemplate : DataTemplate
         {
-            internal override bool BuildVisualTree(FrameworkElementBase container)
+            internal override bool BuildVisualTree(FrameworkElement container)
             {
                 ContentPresenter cp = (ContentPresenter)container;
                 FrameworkElement result = DefaultExpansion(cp.Content, cp);
 
-                container.SetTemplateChild(result);
+                container.TemplateChild = result;
 
                 return result != null;
             }

@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml
     /// programmatic layout. FrameworkElement also defines APIs related to data binding,
     /// object tree, and object lifetime feature areas.
     /// </summary>
-    public abstract partial class FrameworkElement
+    public abstract partial class FrameworkElement : UIElement
     {
         //static bool _theWarningAboutMarginsHasAlreadyBeenDisplayed = false;
 
@@ -54,35 +54,35 @@ namespace Windows.UI.Xaml
         {
         }
 
-        internal override void INTERNAL_InitializeOuterDomElementSize(object outerDomElement)
+        internal static void INTERNAL_InitializeOuterDomElementWidthAndHeight(FrameworkElement element, object outerDomElement)
         {
 #if PERFSTAT
             var t0 = Performance.now();
 #endif
 
             var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-            if (IsUnderCustomLayout)
+            if (element.IsUnderCustomLayout)
             {
-                INTERNAL_HtmlDomManager.SetPosition(style, RenderedVisualBounds, false, true, true);
+                INTERNAL_HtmlDomManager.SetPosition(style, element.RenderedVisualBounds, false, true, true);
             }
             else
             {
                 // Height:
-                if (!double.IsNaN(Height))
-                    style.height = Height.ToInvariantString() + "px";
-                else if (INTERNAL_VisualParent is Canvas)
+                if (!double.IsNaN(element.Height))
+                    style.height = element.Height.ToInvariantString() + "px";
+                else if (element.INTERNAL_VisualParent is Canvas)
                     style.height = "max-content";
-                else if (VerticalAlignment == VerticalAlignment.Stretch)
+                else if (element.VerticalAlignment == VerticalAlignment.Stretch)
                     style.height = "100%";
                 else
                     style.height = "auto";
 
                 // Width:
-                if (!double.IsNaN(Width))
-                    style.width = Width.ToInvariantString() + "px";
-                else if (INTERNAL_VisualParent is Canvas)
+                if (!double.IsNaN(element.Width))
+                    style.width = element.Width.ToInvariantString() + "px";
+                else if (element.INTERNAL_VisualParent is Canvas)
                     style.width = "max-content";
-                else if (HorizontalAlignment == HorizontalAlignment.Stretch)
+                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch)
                     style.width = "100%";
                 else
                     style.width = "auto";
@@ -306,12 +306,6 @@ namespace Windows.UI.Xaml
             var frameworkElement = (FrameworkElement)d;
             HorizontalAlignment newHorizontalAlignment = (HorizontalAlignment)e.NewValue;
             INTERNAL_ApplyHorizontalAlignmentAndWidth(frameworkElement, newHorizontalAlignment);
-        }
-
-        internal override void INTERNAL_ApplyAlignmentAndSize()
-        {
-            INTERNAL_ApplyHorizontalAlignmentAndWidth(this, HorizontalAlignment); //todo-perfs: only call the relevant portion of the code?
-            INTERNAL_ApplyVerticalAlignmentAndHeight(this, VerticalAlignment); //todo-perfs: only call the relevant portion of the code?
         }
 
         internal static void INTERNAL_ApplyHorizontalAlignmentAndWidth(FrameworkElement fe, HorizontalAlignment newHorizontalAlignment)
@@ -1372,7 +1366,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal override void INTERNAL_SizeChangedWhenAttachedToVisualTree() // Intended to be called by the "VisualTreeManager" when the FrameworkElement is attached to the visual tree.
+        internal void INTERNAL_SizeChangedWhenAttachedToVisualTree() // Intended to be called by the "VisualTreeManager" when the FrameworkElement is attached to the visual tree.
         {
             // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
             _valueOfLastSizeChanged = Size.Empty;
@@ -1410,7 +1404,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal override void DetachResizeSensorFromDomElement()
+        internal void DetachResizeSensorFromDomElement()
         {
             _resizeObserver.Unobserve(this.INTERNAL_OuterDomElement);
 

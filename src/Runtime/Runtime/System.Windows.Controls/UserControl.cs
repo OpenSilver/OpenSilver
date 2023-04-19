@@ -127,9 +127,9 @@ namespace Windows.UI.Xaml.Controls
                 Seal();
             }
 
-            internal override bool BuildVisualTree(FrameworkElementBase container)
+            internal override bool BuildVisualTree(FrameworkElement container)
             {
-                container.SetTemplateChild(((UserControl)container).Content as FrameworkElementBase);
+                container.TemplateChild = ((UserControl)container).Content as FrameworkElement;
                 return false;
             }
         }

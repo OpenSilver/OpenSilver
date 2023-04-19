@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml
     {
         #region InheritablePropertyChange
 
-        internal static void InvalidateOnInheritablePropertyChange(FrameworkElementBase fe, InheritablePropertyChangeInfo info, bool skipStartNode)
+        internal static void InvalidateOnInheritablePropertyChange(FrameworkElement fe, InheritablePropertyChangeInfo info, bool skipStartNode)
         {
             if (HasChildren(fe))
             {
@@ -68,9 +68,9 @@ namespace Windows.UI.Xaml
                 // only then do we need to Invalidate the property
                 if (BaseValueSourceInternal.Inherited >= oldValueSource)
                 {
-                    if (visitedViaVisualTree && d is FrameworkElementBase fe)
+                    if (visitedViaVisualTree && typeof(FrameworkElement).IsInstanceOfType(d))
                     {
-                        DependencyObject logicalParent = fe.GetParent();
+                        DependencyObject logicalParent = ((FrameworkElement)d).Parent;
                         if (logicalParent != null)
                         {
                             DependencyObject visualParent = VisualTreeHelper.GetParent(d);
@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         ///     Says if the current FE has visual or logical children
         /// </summary>
-        internal static bool HasChildren(FrameworkElementBase fe)
+        internal static bool HasChildren(FrameworkElement fe)
         {
             // See if we have logical or visual children, in which case this is a real tree invalidation.
             return fe != null && (fe.HasLogicalChildren || fe.HasVisualChildren);

@@ -104,7 +104,7 @@ namespace OpenSilver.Internal.Xaml
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
-            Debug.Assert(dependencyObject is FrameworkElementBase);
+            Debug.Assert(dependencyObject is FrameworkElement);
 
             NameScope.SetNameScope(dependencyObject, new NameScope());
         }
@@ -134,7 +134,7 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void SetTemplatedParent(FrameworkElementBase element, DependencyObject templatedParent)
+        public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
         {
             element.TemplatedParent = templatedParent;
         }
@@ -146,7 +146,7 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<FrameworkElementBase, XamlContext, FrameworkElementBase> factory)
+        public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
         {
             Debug.Assert(template != null);
             Debug.Assert(xamlContext != null);

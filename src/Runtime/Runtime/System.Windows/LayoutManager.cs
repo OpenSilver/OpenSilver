@@ -151,8 +151,8 @@ namespace Windows.UI.Xaml
                     //Console.WriteLine($"LayoutManager UpdateLayout / Arrange {element}");
 
                     Rect previousRect = element.PreviousFinalRect;
-                    // todo:
-                    if (element is FrameworkElement fe && fe.IsCustomLayoutRoot)
+                    FrameworkElement fe = element as FrameworkElement;
+                    if (fe.IsCustomLayoutRoot)
                     {
                         if (fe.IsAutoWidthOnCustomLayoutInternal)
                             previousRect.Width = fe.DesiredSize.Width;

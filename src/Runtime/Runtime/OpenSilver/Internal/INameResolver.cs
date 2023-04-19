@@ -30,27 +30,27 @@ namespace OpenSilver.Internal
 
     internal sealed class TemplateNameResolver : INameResolver
     {
-        private readonly WeakReference<FrameworkElementBase> _templateRootRef;
+        private readonly WeakReference<FrameworkElement> _templateRootRef;
 
-        public TemplateNameResolver(FrameworkElementBase templateRoot)
+        public TemplateNameResolver(FrameworkElement templateRoot)
         {
             if (templateRoot is null)
             {
                 throw new ArgumentNullException(nameof(templateRoot));
             }
 
-            _templateRootRef = new WeakReference<FrameworkElementBase>(templateRoot);
+            _templateRootRef = new WeakReference<FrameworkElement>(templateRoot);
         }
 
         object INameResolver.Resolve(string name) => GetNameScope()?.FindName(name);
 
         private INameScope GetNameScope()
         {
-            if (_templateRootRef.TryGetTarget(out FrameworkElementBase templateRoot))
+            if (_templateRootRef.TryGetTarget(out FrameworkElement templateRoot))
             {
                 if (templateRoot.TemplatedParent != null)
                 {
-                    return FrameworkTemplate.GetTemplateNameScope(templateRoot.TemplatedParent as FrameworkElementBase);
+                    return FrameworkTemplate.GetTemplateNameScope(templateRoot.TemplatedParent as FrameworkElement);
                 }
                 else
                 {
@@ -64,23 +64,23 @@ namespace OpenSilver.Internal
 
     internal sealed class XamlNameResolver : INameResolver
     {
-        private readonly WeakReference<FrameworkElementBase> _namescopeOwnerRef;
+        private readonly WeakReference<FrameworkElement> _namescopeOwnerRef;
 
-        public XamlNameResolver(FrameworkElementBase namescopeOwner)
+        public XamlNameResolver(FrameworkElement namescopeOwner)
         {
             if (namescopeOwner is null)
             {
                 throw new ArgumentNullException(nameof(namescopeOwner));
             }
 
-            _namescopeOwnerRef = new WeakReference<FrameworkElementBase>(namescopeOwner);
+            _namescopeOwnerRef = new WeakReference<FrameworkElement>(namescopeOwner);
         }
 
         object INameResolver.Resolve(string name) => GetNameScope()?.FindName(name);
 
         private INameScope GetNameScope()
         {
-            if (_namescopeOwnerRef.TryGetTarget(out FrameworkElementBase namescopeOwner))
+            if (_namescopeOwnerRef.TryGetTarget(out FrameworkElement namescopeOwner))
             {
                 return NameScope.GetNameScope(namescopeOwner);
             }

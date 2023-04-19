@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml
     /// programmatic layout. FrameworkElement also defines APIs related to data binding,
     /// object tree, and object lifetime feature areas.
     /// </summary>
-    public abstract partial class FrameworkElement : FrameworkElementBase
+    public abstract partial class FrameworkElement : UIElement
     {
         #region Inheritance Context
 
@@ -191,9 +191,7 @@ namespace Windows.UI.Xaml
             private set;
         }
 
-        public override DependencyObject GetParent() => Parent;
-
-        internal override void AddLogicalChild(object child)
+        internal void AddLogicalChild(object child)
         {
             if (child != null)
             {
@@ -214,7 +212,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal override void RemoveLogicalChild(object child)
+        internal void RemoveLogicalChild(object child)
         {
             if (child != null)
             {
@@ -306,7 +304,7 @@ namespace Windows.UI.Xaml
             set { WriteInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress, value); }
         }
 
-        internal override bool HasLogicalChildren
+        internal bool HasLogicalChildren
         {
             get { return ReadInternalFlag(InternalFlags.HasLogicalChildren); }
             set { WriteInternalFlag(InternalFlags.HasLogicalChildren, value); }
@@ -316,7 +314,7 @@ namespace Windows.UI.Xaml
 
         private WeakReference<DependencyObject> _templatedParentRef;
 
-        internal override DependencyObject TemplatedParent
+        internal DependencyObject TemplatedParent
         {
             get
             {
@@ -351,11 +349,6 @@ namespace Windows.UI.Xaml
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
                 }
             }
-        }
-
-        internal override void SetTemplateChild(FrameworkElementBase templateChild)
-        {
-            TemplateChild = (FrameworkElement)templateChild;
         }
 
         /// <summary>
@@ -475,13 +468,15 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets a value that indicates whether this element is in the Visual Tree, that is, if it has been loaded for presentation.
         /// </summary>
-        public override bool IsLoaded
+        public bool IsLoaded
         {
             get
             {
                 return _isLoaded;
             }
         }
+
+        internal bool IsLoadedInResourceDictionary { get; set; }
 
         /// <summary>
         /// Provides a base implementation for creating the dom elements designed to represent an instance of a FrameworkElement and defines the place where its child(ren) will be added.
@@ -719,17 +714,43 @@ namespace Windows.UI.Xaml
             }
         }
 
-        protected override void IsEnabled_Changed(DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets a value indicating whether the user can interact with the control.
+        /// </summary>
+        public bool IsEnabled
         {
-            if (IsEnabledChanged != null)
-            {
-                IsEnabledChanged(this, e);
-            }
-            InvalidateForceInheritPropertyOnChildren(e.Property);
+            get { return (bool)GetValue(IsEnabledProperty); }
+            set { SetValue(IsEnabledProperty, value); }
         }
 
-        protected override object CoerceIsEnabled(object baseValue)
+        /// <summary>
+        /// Identifies the <see cref="FrameworkElement.IsEnabled"/> dependency
+        /// property.
+        /// </summary>
+        public static readonly DependencyProperty IsEnabledProperty =
+            DependencyProperty.Register(
+                nameof(IsEnabled),
+                typeof(bool),
+                typeof(FrameworkElement),
+                new PropertyMetadata(true, IsEnabled_Changed, CoerceIsEnabled)
+                {
+                    MethodToUpdateDom = IsEnabled_MethodToUpdateDom,
+                });
+
+        private static void IsEnabled_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            FrameworkElement fe = (FrameworkElement)d;
+            if (fe.IsEnabledChanged != null)
+            {
+                fe.IsEnabledChanged(fe, e);
+            }
+            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
+        }
+
+        private static object CoerceIsEnabled(DependencyObject d, object baseValue)
+        {
+            FrameworkElement fe = (FrameworkElement)d;
+
             if (!(baseValue is bool)) //todo: this is a temporary workaround to avoid an invalid cast exception. Fix this by investigating why sometimes baseValue is not a bool, such as a Binding (eg. Client_GD).
                 return true;
 
@@ -749,10 +770,10 @@ namespace Windows.UI.Xaml
                 // The content tree uses the "logical" links.  But not all
                 // "logical" links lead to a content tree.
                 //
-                DependencyObject parent = Parent ?? VisualTreeHelper.GetParent(this);
+                DependencyObject parent = fe.Parent ?? VisualTreeHelper.GetParent(fe);
                 if (parent == null || (bool)parent.GetValue(IsEnabledProperty))
                 {
-                    return IsEnabledCore;
+                    return fe.IsEnabledCore;
                 }
                 else
                 {
@@ -770,10 +791,11 @@ namespace Windows.UI.Xaml
         /// </summary>
         public event DependencyPropertyChangedEventHandler IsEnabledChanged;
 
-        protected override void IsEnabled_MethodToUpdateDom(object newValue)
+        private static void IsEnabled_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            SetPointerEvents(this);
-            ManageIsEnabled((bool)newValue);
+            var element = (FrameworkElement)d;
+            SetPointerEvents(element);
+            element.ManageIsEnabled((bool)newValue);
         }
 
         protected internal virtual void ManageIsEnabled(bool isEnabled)
@@ -966,6 +988,41 @@ namespace Windows.UI.Xaml
 
         #endregion
 
+        #region Triggers
+
+        /// <summary>
+        /// Gets the collection of triggers for animations that are defined for a <see cref="FrameworkElement"/>.
+        /// </summary>
+        /// <returns>
+        /// The collection of triggers for animations that are defined for this object.
+        /// </returns>
+        public TriggerCollection Triggers
+        {
+            get
+            {
+                TriggerCollection triggers = (TriggerCollection)GetValue(TriggersProperty);
+                if (triggers == null)
+                {
+                    triggers = new TriggerCollection(this);
+                    SetValue(TriggersProperty, triggers);
+                }
+
+                return triggers;
+            }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="Triggers"/> dependency property.
+        /// </summary>
+        internal static readonly DependencyProperty TriggersProperty =
+            DependencyProperty.Register(
+                nameof(Triggers),
+                typeof(TriggerCollection),
+                typeof(FrameworkElement),
+                null);
+
+        #endregion Triggers
+
         #region Work in progress
 
         [OpenSilver.NotImplemented]
@@ -1098,7 +1155,21 @@ namespace Windows.UI.Xaml
 
         #region Loaded/Unloaded events
 
-        internal override void LoadResources()
+        public static readonly RoutedEvent LoadedEvent = 
+            new RoutedEvent(
+                nameof(Loaded),
+                RoutingStrategy.Direct,
+                typeof(RoutedEventHandler), 
+                typeof(FrameworkElement));
+
+        /// <summary>
+        /// Occurs when a FrameworkElement has been constructed and added to the object tree.
+        /// </summary>
+        public event RoutedEventHandler Loaded;
+
+        internal void RaiseLoadedEvent() => Loaded?.Invoke(this, new RoutedEventArgs());
+
+        internal void LoadResources()
         {
             if (HasResources)
             {
@@ -1111,9 +1182,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public event RoutedEventHandler Unloaded;
 
-        internal override void RaiseUnloadedEvent() => Unloaded?.Invoke(this, new RoutedEventArgs());
+        internal void RaiseUnloadedEvent() => Unloaded?.Invoke(this, new RoutedEventArgs());
 
-        internal override void UnloadResources()
+        internal void UnloadResources()
         {
             if (HasResources)
             {
