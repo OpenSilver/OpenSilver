@@ -768,8 +768,7 @@ parentElement.appendChild(child);";
                     default:
                         if (c < ' ')
                         {
-                            t = "000" + string.Format("X", c);
-                            sb.Append("\\u" + t.Substring(t.Length - 4));
+                            sb.Append($"\\u{(int)c:x4}");
                         }
                         else
                         {
