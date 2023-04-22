@@ -29,7 +29,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 {
     internal static class PopupService
     {
-        private static FrameworkElement _rootVisual;
+        internal static FrameworkElement RootVisual { get; private set; }
 
         /// <summary>
         /// Place the ToolTip relative to this point 
@@ -40,16 +40,16 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
         internal static void SetRootVisual()
         {
-            if (_rootVisual == null && Application.Current != null)
+            if (RootVisual == null && Application.Current != null)
             {
-                _rootVisual = Application.Current.RootVisual as FrameworkElement;
-                if (_rootVisual != null)
+                RootVisual = Application.Current.RootVisual as FrameworkElement;
+                if (RootVisual != null)
                 {
                     // keep caching mouse position because we can't query it from Silverlight 
 #if MIGRATION
-                    _rootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
+                    RootVisual.MouseMove += new MouseEventHandler(OnRootMouseMove);
 #else
-                    _rootVisual.PointerMoved += new MouseEventHandler(OnRootMouseMove);
+                    RootVisual.PointerMoved += new MouseEventHandler(OnRootMouseMove);
 #endif
                 }
             }
