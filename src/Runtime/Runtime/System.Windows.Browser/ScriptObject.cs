@@ -132,7 +132,7 @@ namespace System.Windows.Browser
         /// </exception>
         public virtual object GetProperty(string name)
         {
-            ValidateName(name);
+            ValidateParameter(name);
 
             string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
 
@@ -169,7 +169,7 @@ namespace System.Windows.Browser
         /// </exception>
         public virtual object Invoke(string name, params object[] args)
         {
-            ValidateName(name);
+            ValidateParameter(name);
 
             string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sParams = args is null ? string.Empty : string.Join(",", args.Select(a => ConvertToJavaScriptParam(a)));
@@ -250,7 +250,7 @@ namespace System.Windows.Browser
         /// </exception>
         public virtual void SetProperty(string name, object value)
         {
-            ValidateName(name);
+            ValidateParameter(name);
 
             string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sValue = ConvertToJavaScriptParam(value);
@@ -326,7 +326,13 @@ namespace System.Windows.Browser
             return null;
         }
 
-        private static void ValidateName(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
+        private protected static void ValidateParameter(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
+        {
+            CheckNullOrEmpty(name, paramName);
+            CheckInvalidCharacters(name, paramName);
+        }
+
+        private protected static void CheckNullOrEmpty(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
         {
             if (name is null)
             {
@@ -337,7 +343,10 @@ namespace System.Windows.Browser
             {
                 throw new ArgumentException($"'{paramName}' cannot be empty", paramName);
             }
+        }
 
+        private protected static void CheckInvalidCharacters(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
+        {
             if (name.IndexOf(char.MinValue) > -1)
             {
                 throw new ArgumentException("Invalid identifier. Identifiers may not contain null-terminators.", paramName);

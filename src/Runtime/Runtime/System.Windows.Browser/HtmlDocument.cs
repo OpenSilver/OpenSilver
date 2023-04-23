@@ -20,8 +20,14 @@ using OpenSilver.Internal;
 
 namespace System.Windows.Browser
 {
+    /// <summary>
+    /// Represents the HTML document in the browser.
+    /// </summary>
     public sealed class HtmlDocument : HtmlObject
     {
+        private HtmlElement _body;
+        private HtmlElement _documentElement;
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete(Helper.ObsoleteMemberMessage + " Use System.Windows.Browser.HtmlPage.Document instead.")]
         public HtmlDocument()
@@ -91,10 +97,11 @@ namespace System.Windows.Browser
         /// <exception cref="InvalidOperationException">
         /// An unexpected error occurred.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public HtmlElement GetElementById(string id)
         {
-            return null;
+            ValidateParameter(id);
+
+            return (HtmlElement)Invoke("getElementById", id);
         }
 
         /// <summary>
@@ -107,13 +114,45 @@ namespace System.Windows.Browser
             set => OpenSilver.Interop.ExecuteJavaScriptVoid($"document.cookie = {INTERNAL_InteropImplementation.GetVariableStringForJS(value)}");
         }
 
-        [OpenSilver.NotImplemented]
-        public HtmlElement Body { get; private set; }
+        /// <summary>
+        /// Gets a reference to the BODY element of the HTML document.
+        /// </summary>
+        /// <returns>
+        /// The HTML document's BODY element.
+        /// </returns>
+        public HtmlElement Body => _body ??= (HtmlElement)GetProperty("body");
 
-        [OpenSilver.NotImplemented]
+        /// <summary>
+        /// Gets a reference to the browser's DOCUMENT element.
+        /// </summary>
+        /// <returns>
+        /// The browser's DOCUMENT element.
+        /// </returns>
+        public HtmlElement DocumentElement => _documentElement ??= (HtmlElement)GetProperty("documentElement");
+
+        /// <summary>
+        /// Creates a browser element.
+        /// </summary>
+        /// <param name="tagName">
+        /// The tag name of the browser element to create.
+        /// </param>
+        /// <returns>
+        /// A reference to a browser element.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// tagName is an empty string.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// tagName is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// An unexpected error occurred.
+        /// </exception>
         public HtmlElement CreateElement(string tagName)
         {
-            return default(HtmlElement);
+            ValidateParameter(tagName);
+
+            return (HtmlElement)Invoke("createElement", tagName);
         }
 
         /// <summary>
@@ -136,10 +175,11 @@ namespace System.Windows.Browser
         /// An unexpected error occurred.
         /// </exception>
         [SecuritySafeCritical]
-        [OpenSilver.NotImplemented]
         public ScriptObjectCollection GetElementsByTagName(string tagName)
         {
-            return default(ScriptObjectCollection);
+            ValidateParameter(tagName);
+
+            return (ScriptObjectCollection)Invoke("getElementsByTagName", tagName);
         }
     }
 }

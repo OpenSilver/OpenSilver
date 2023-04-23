@@ -76,7 +76,7 @@ namespace System.Windows.Browser
         /// <returns>The results of the JavaScript engine's evaluation of the string in the code parameter.</returns>
         public object Eval(string code)
         {
-            return OpenSilver.Interop.ExecuteJavaScript("eval($0)", code);
+            return Invoke("eval", code);
         }
 
         [OpenSilver.NotImplemented]

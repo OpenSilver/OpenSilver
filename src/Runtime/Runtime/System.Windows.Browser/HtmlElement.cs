@@ -34,12 +34,8 @@ namespace System.Windows.Browser
         /// A collection of HTML elements. If the current HTML element has no children, the
         /// returned collection is empty.
         /// </returns>
-		[OpenSilver.NotImplemented]
-        public ScriptObjectCollection Children
-        {
-            get;
-        }
-   
+        public ScriptObjectCollection Children => (ScriptObjectCollection)GetProperty("childNodes");
+
         /// <summary>
         /// Gets the identifier of the current HTML element.
         /// </summary>
@@ -53,8 +49,15 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// The property is set to null.
         /// </exception>
-		[OpenSilver.NotImplemented]
-        public string Id { get; set; }
+        public string Id
+        {
+            get => (string)GetProperty("id");
+            set
+            {
+                ValidateParameter(value);
+                SetProperty("id", value);
+            }
+        }
 
         /// <summary>
         /// Gets a reference to the parent of the current HTML element.
@@ -62,23 +65,15 @@ namespace System.Windows.Browser
         /// <returns>
         /// An HTML element reference if the element has a parent; otherwise, null.
         /// </returns>
-		[OpenSilver.NotImplemented]
-        public HtmlElement Parent
-        {
-            get;
-        }
- 
+        public HtmlElement Parent => (HtmlElement)GetProperty("parentElement");
+
         /// <summary>
         /// Gets the HTML tag name of the current HTML element.
         /// </summary>
         /// <returns>
         /// An HTML element tag name, such as div or span.
         /// </returns>
-		[OpenSilver.NotImplemented]
-        public string TagName
-        { 
-            get;
-        }
+        public string TagName => ((string)GetProperty("tagName"))?.ToLower() ?? string.Empty;
 
         /// <summary>
         /// Gets or sets the cascading style sheet (CSS) class string for the current
@@ -88,8 +83,15 @@ namespace System.Windows.Browser
         /// A CSS class string if the element is associated with a CSS class; otherwise,
         /// an empty string.
         /// </returns>
-		[OpenSilver.NotImplemented]
-        public string CssClass { get; set; }
+        public string CssClass
+        {
+            get => (string)GetProperty("className") ?? string.Empty;
+            set
+            {
+                CheckInvalidCharacters(value);
+                SetProperty("className", value ?? string.Empty);
+            }
+        }
 
         /// <summary>
         /// Sets the browser focus to the current HTML element.
@@ -98,11 +100,7 @@ namespace System.Windows.Browser
         /// All errors.
         /// </exception>
         [SecuritySafeCritical]
-		[OpenSilver.NotImplemented]
-        public void Focus()
-        {
-
-        }
+        public void Focus() => Invoke("focus");
 
         /// <summary>
         /// Adds an element to the end of the child collection for the current HTML element.
@@ -116,9 +114,19 @@ namespace System.Windows.Browser
         /// <exception cref="InvalidOperationException">
         /// element is a reference to this <see cref="HtmlElement"/>.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public void AppendChild(HtmlElement element)
         {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            if (this == element)
+            {
+                throw new InvalidOperationException("An element cannot call appendChild on itself.");
+            }
+
+            Invoke("appendChild", element);
         }
 
         /// <summary>
@@ -138,9 +146,14 @@ namespace System.Windows.Browser
         /// element is null.
         /// </exception>
         [SecuritySafeCritical]
-		[OpenSilver.NotImplemented]
         public void AppendChild(HtmlElement element, HtmlElement referenceElement)
         {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            Invoke("insertBefore", element, referenceElement);
         }
 
         /// <summary>
@@ -157,9 +170,14 @@ namespace System.Windows.Browser
         /// All other errors.
         /// </exception>
         [SecuritySafeCritical]
-		[OpenSilver.NotImplemented]
         public void RemoveChild(HtmlElement element)
         {
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
+            Invoke("removeChild", element);
         }
 
         /// <summary>
@@ -177,9 +195,11 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public void SetAttribute(string name, string value)
         {
+            CheckNullOrEmpty(name);
+
+            Invoke("setAttribute", name, value);
         }
 
         /// <summary>
@@ -197,10 +217,11 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public string GetAttribute(string name)
         {
-            return string.Empty;
+            CheckNullOrEmpty(name);
+
+            return (string)Invoke("getAttribute", name);
         }
 
         /// <summary>
@@ -218,10 +239,12 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public string GetStyleAttribute(string name)
         {
-            return string.Empty;
+            CheckNullOrEmpty(name);
+
+            ScriptObject style = (ScriptObject)GetProperty("style");
+            return (string)style.GetProperty(name);
         }
 
         /// <summary>
@@ -239,9 +262,12 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public void SetStyleAttribute(string name, string value)
         {
+            CheckNullOrEmpty(name);
+
+            ScriptObject style = (ScriptObject)GetProperty("style");
+            style.SetProperty(name, value);
         }
 
         /// <summary>
@@ -256,10 +282,12 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public void RemoveStyleAttribute(string name)
         {
+            CheckNullOrEmpty(name);
 
+            ScriptObject style = (ScriptObject)GetProperty("style");
+            style.SetProperty(name, string.Empty);
         }
 
         /// <summary>
@@ -274,9 +302,11 @@ namespace System.Windows.Browser
         /// <exception cref="ArgumentNullException">
         /// name is null.
         /// </exception>
-		[OpenSilver.NotImplemented]
         public void RemoveAttribute(string name)
         {
+            CheckNullOrEmpty(name);
+
+            Invoke("removeAttribute", name);
         }
     }
 }

@@ -20,13 +20,18 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Browser;
+using CSHTML5.Internal;
 using CSHTML5.Types;
+
+#if !MIGRATION
+using Windows.UI.Xaml;
+#endif
 
 namespace System.Windows.Browser
 {
     public static class HtmlPage
     {
-        private static HtmlElement _initPlugin;
+        private static HtmlElement _plugin;
         private static BrowserInformation _browserInformation;
 
         /// <summary>
@@ -52,11 +57,46 @@ namespace System.Windows.Browser
         /// Gets a reference to the Silverlight plug-in that is defined within an &lt;object&gt;
         /// or &lt;embed&gt; tag on the host HTML page.
         /// </summary>
-        [OpenSilver.NotImplemented]
-        public static HtmlElement Plugin => _initPlugin ??= new HtmlElement(null);
+        public static HtmlElement Plugin
+        {
+            get
+            {
+                if (_plugin is null)
+                {
+                    object root = INTERNAL_HtmlDomManager.GetApplicationRootDomElement();
+                    if (root is not null)
+                    {
+                        string id = OpenSilver.Interop.ExecuteJavaScriptString(
+                            $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(root)}.id");
 
-        [OpenSilver.NotImplemented]
-        public static bool IsEnabled { get; private set; }
+                        _plugin = Document.GetElementById(id);
+                    }
+                }
+
+                return _plugin;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value that indicates whether the rest of the public surface area of the
+        /// HTML Bridge feature is enabled.
+        /// </summary>
+        /// <returns>
+        /// true if the HTML Bridge feature is enabled; otherwise, false.
+        /// </returns>
+        public static bool IsEnabled
+        {
+            get
+            {
+                var app = Application.Current;
+                if (app is not null)
+                {
+                    return app.Host.Settings.EnableHTMLAccess;
+                }
+
+                return true;
+            }
+        }
 
         /// <summary>
         /// Gets general information about the browser, such as name, version, and operating system.
