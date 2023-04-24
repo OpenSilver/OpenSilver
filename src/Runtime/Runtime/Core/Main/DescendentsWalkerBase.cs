@@ -44,7 +44,7 @@ namespace OpenSilver.Internal
 
                 if (ancestor is IFrameworkElement fe)
                 {
-                    logicalParent = fe.GetParent();
+                    logicalParent = fe.Parent;
                     // FrameworkElement
                     DependencyObject dependencyObjectParent = VisualTreeHelper.GetParent((DependencyObject)fe);
                     if (dependencyObjectParent != null && logicalParent != null && dependencyObjectParent != logicalParent)

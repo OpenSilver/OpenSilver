@@ -9,15 +9,23 @@ namespace Windows.UI.Xaml;
 
 internal interface IFrameworkElement : IUIElement
 {
+    public event RoutedEventHandler Loaded;
+
     bool HasLogicalChildren { get; set; }
 
     bool IsLogicalChildrenIterationInProgress { get; set; }
 
-    DependencyObject GetParent();
+    DependencyObject Parent { get; }
 
     IEnumerator GetLogicalChildren();
 
     bool ShouldRaisePropertyChanged(DependencyProperty dp);
 
+    bool IsLoadedEvent(RoutedEvent routedEvent);
+
     void OnInheritedPropertyChanged(InheritablePropertyChangeInfo info);
+
+    void Internal_AddLogicalChild(object child);
+
+    void Internal_RemoveLogicalChild(object child);
 }

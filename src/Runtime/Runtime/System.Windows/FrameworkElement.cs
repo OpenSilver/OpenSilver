@@ -198,8 +198,6 @@ namespace Windows.UI.Xaml
             private set;
         }
 
-        DependencyObject IFrameworkElement.GetParent() => Parent;
-
         internal void AddLogicalChild(object child)
         {
             if (child != null)
@@ -220,6 +218,8 @@ namespace Windows.UI.Xaml
                 }
             }
         }
+
+        void IFrameworkElement.Internal_AddLogicalChild(object child) => AddLogicalChild(child);
 
         internal void RemoveLogicalChild(object child)
         {
@@ -252,6 +252,8 @@ namespace Windows.UI.Xaml
                 }
             }
         }
+
+        void IFrameworkElement.Internal_RemoveLogicalChild(object child) => RemoveLogicalChild(child);
 
         internal void ChangeLogicalParent(DependencyObject newParent)
         {
@@ -1179,6 +1181,8 @@ namespace Windows.UI.Xaml
         public event RoutedEventHandler Loaded;
 
         internal void RaiseLoadedEvent() => Loaded?.Invoke(this, new RoutedEventArgs());
+
+        bool IFrameworkElement.IsLoadedEvent(RoutedEvent routedEvent) => routedEvent == LoadedEvent;
 
         internal void LoadResources()
         {

@@ -4,7 +4,18 @@ namespace System.Windows;
 namespace Windows.UI.Xaml;
 #endif
 
-internal interface IUIElement
+internal interface IDependencyObject
+{
+    object GetValue(DependencyProperty dependencyProperty);
+
+    void SetValue(DependencyProperty dp, object value);
+
+    void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo);
+
+    void RemoveHandler(RoutedEvent routedEvent, Delegate handler);
+}
+
+internal interface IUIElement : IDependencyObject
 {
     bool Internal_IsLoaded { get; }
 

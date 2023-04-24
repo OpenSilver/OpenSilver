@@ -70,7 +70,7 @@ namespace Windows.UI.Xaml
                 {
                     if (visitedViaVisualTree && typeof(IFrameworkElement).IsInstanceOfType(d))
                     {
-                        DependencyObject logicalParent = ((IFrameworkElement)d).GetParent();
+                        DependencyObject logicalParent = ((IFrameworkElement)d).Parent;
                         if (logicalParent != null)
                         {
                             DependencyObject visualParent = VisualTreeHelper.GetParent(d);

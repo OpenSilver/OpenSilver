@@ -217,7 +217,7 @@ namespace OpenSilver.Internal
                                 // For the case that both parents are identical, this node should
                                 // have already been visited when walking through visual
                                 // children, hence we short-circuit here
-                                if (VisualTreeHelper.GetParent((DependencyObject)fe) != fe.GetParent())
+                                if (VisualTreeHelper.GetParent((DependencyObject)fe) != fe.Parent)
                                 {
                                     bool visitedViaVisualTree = false;
                                     VisitNode(fe, visitedViaVisualTree);
@@ -265,7 +265,7 @@ namespace OpenSilver.Internal
                         // For the case that both parents are identical, this node should
                         // have already been visited when walking through logical
                         // children, hence we short-circuit here
-                        if (VisualTreeHelper.GetParent(child) != ((IFrameworkElement)child).GetParent())
+                        if (VisualTreeHelper.GetParent(child) != ((IFrameworkElement)child).Parent)
                         {
                             bool visitedViaVisualTree = true;
                             VisitNode(child, visitedViaVisualTree);
