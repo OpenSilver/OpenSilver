@@ -47,7 +47,12 @@ namespace OpenSilver.Compiler
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             string sourceFile = item.ItemSpec;
-            string operationName = "C#/XAML for HTML5: ServiceReferenceFixer";
+            string operationName = "";
+            if (outputFile.EndsWith(".cs"))
+                operationName = "C#/XAML for HTML5: ServiceReferenceFixer";
+            else
+                operationName = "VB.Net/XAML for HTML5: ServiceReferenceFixer";
+
             try
             {
                 // Validate input strings:
@@ -68,13 +73,26 @@ namespace OpenSilver.Compiler
                     bool wasAnythingFixed;
 
                     // Process the code:
-                    sourceCode = FixingServiceReferences.Fix(
-                        sourceCode, 
-                        item.GetMetadata("ClientBaseToken"), 
-                        item.GetMetadata("ClientBaseInterfaceName"), 
-                        item.GetMetadata("EndpointCode"), 
-                        item.GetMetadata("SoapVersion"), 
-                        out wasAnythingFixed);
+                    if (outputFile.EndsWith(".cs"))
+                    {
+                        sourceCode = FixingServiceReferences.Fix(
+                            sourceCode,
+                            item.GetMetadata("ClientBaseToken"),
+                            item.GetMetadata("ClientBaseInterfaceName"),
+                            item.GetMetadata("EndpointCode"),
+                            item.GetMetadata("SoapVersion"),
+                            out wasAnythingFixed);
+                    }
+                    else
+                    {
+                        sourceCode = FixingServiceReferencesVB.Fix(
+                            sourceCode,
+                            item.GetMetadata("ClientBaseToken"),
+                            item.GetMetadata("ClientBaseInterfaceName"),
+                            item.GetMetadata("EndpointCode"),
+                            item.GetMetadata("SoapVersion"),
+                            out wasAnythingFixed);
+                    }
 
                     // Create output directory:
                     Directory.CreateDirectory(Path.GetDirectoryName(outputFile));

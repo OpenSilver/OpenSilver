@@ -289,6 +289,7 @@
       ============================================================-->
 	  <ItemGroup>
 		  <ServiceReferenceFile Include="%(Compile.RelativeDir)%(Compile.Filename).cs" Condition="'%(Compile.Filename)%(Compile.Extension)'=='reference.cs'" />
+		  <ServiceReferenceFile Include="%(Compile.RelativeDir)%(Compile.Filename).vb" Condition="'%(Compile.Filename)%(Compile.Extension)'=='reference.vb'" />
 		  <!-- Note: users can specify additional files by adding ServiceReferenceFile tags to the .CSPROJ
 		  Possible optional attributes are:
 		  - ClientBaseToken to enforce a specific token representing the ClientBase object, if different from "base.Channel"
