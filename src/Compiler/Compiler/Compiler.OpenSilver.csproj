@@ -33,6 +33,7 @@
     <Compile Include="2_ConvertingXamlToCSharp\IMetadata.cs" />
     <Compile Include="2_ConvertingXamlToCSharp\XamlReader.cs" />
     <Compile Include="EntryPoints\ValidateCompilerVersion.cs" />
+    <Compile Include="OtherHelpersAndHandlers\FixingServiceReferencesVB.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\MonoCecilAssembliesInspectorImpl.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeDefinitionExtensions.cs" />
     <Compile Include="OtherHelpersAndHandlers\MonoCecilAssembliesInspector\TypeReferenceExtensions.cs" />
