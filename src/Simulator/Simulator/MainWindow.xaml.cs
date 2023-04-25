@@ -102,6 +102,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript
             Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             InitializeComponent();
             Instance = this;
@@ -259,7 +260,12 @@ ends with "".Browser"" in your solution.";
 
         }
 
-        void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            SimulatorProxy.ShowExceptionStatic((Exception)e.ExceptionObject);
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             SimulatorProxy.ShowExceptionStatic(e.Exception);
             e.Handled = true;
