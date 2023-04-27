@@ -16,6 +16,7 @@
 		<NoWarn>1591</NoWarn>
 		<DebugType>full</DebugType>
 		<Optimize>false</Optimize>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
 		<NoCSHTML5Reference>true</NoCSHTML5Reference>
 		<EnableDefaultItems>false</EnableDefaultItems>
 		<!-- This emluates the behavior of NET Framework, which excludes every files by default -->
@@ -33,6 +34,10 @@
 	<PropertyGroup Condition="$(Optimize) != true">
 		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
 	</PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;%USERPROFILE%\.nuget\packages\opensilver\1.2.0-private-2023-04-24-xr\lib\netstandard2.0\$(TargetName).dll&quot;&#xD;&#xA;xcopy /Y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;%USERPROFILE%\.nuget\packages\opensilver\1.2.0-private-2023-04-24-xr\lib\netstandard2.0\$(TargetName).pdb&quot;" />
+  </Target>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

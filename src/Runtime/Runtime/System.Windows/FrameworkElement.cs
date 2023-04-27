@@ -211,8 +211,7 @@ namespace Windows.UI.Xaml
 
                 ((IFrameworkElement)this).HasLogicalChildren = true;
 
-                FrameworkElement fe = child as FrameworkElement;
-                if (fe != null)
+                if (child is IFrameworkElement fe)
                 {
                     fe.ChangeLogicalParent(this);
                 }
@@ -232,7 +231,7 @@ namespace Windows.UI.Xaml
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
 
-                if (child is FrameworkElement fe && fe.Parent == this)
+                if (child is IFrameworkElement fe && fe.Parent == this)
                 {
                     fe.ChangeLogicalParent(null);
                 }
@@ -255,7 +254,7 @@ namespace Windows.UI.Xaml
 
         void IFrameworkElement.Internal_RemoveLogicalChild(object child) => RemoveLogicalChild(child);
 
-        internal void ChangeLogicalParent(DependencyObject newParent)
+        void IFrameworkElement.ChangeLogicalParent(DependencyObject newParent)
         {
             // Logical Parent must first be dropped before you are attached to a newParent
             if (Parent != null && newParent != null && Parent != newParent)

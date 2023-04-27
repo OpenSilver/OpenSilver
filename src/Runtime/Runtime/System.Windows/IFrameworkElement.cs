@@ -9,7 +9,7 @@ namespace Windows.UI.Xaml;
 
 internal interface IFrameworkElement : IUIElement
 {
-    public event RoutedEventHandler Loaded;
+    event RoutedEventHandler Loaded;
 
     bool HasLogicalChildren { get; set; }
 
@@ -28,4 +28,6 @@ internal interface IFrameworkElement : IUIElement
     void Internal_AddLogicalChild(object child);
 
     void Internal_RemoveLogicalChild(object child);
+
+    void ChangeLogicalParent(DependencyObject newParent);
 }

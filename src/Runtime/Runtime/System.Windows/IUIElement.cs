@@ -28,4 +28,8 @@ internal interface IUIElement : IDependencyObject
     DependencyObject Internal_GetVisualChild(int index);
 
     DependencyObject GetINTERNAL_VisualParent();
+
+    void SetVisualParent(DependencyObject visualParent);
+
+    void Internal_OnVisualParentChanged(DependencyObject oldParent);
 }
