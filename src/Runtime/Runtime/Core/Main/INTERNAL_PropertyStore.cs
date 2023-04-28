@@ -743,7 +743,7 @@ namespace CSHTML5.Internal
             // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
             if (!dp.IsAttached)
             {
-                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || (depObj is IFrameworkElement fe && fe.ShouldRaisePropertyChanged(dp));
+                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || (depObj is IFrameworkElement fe && dp == fe.GetDataContextProperty());
             }
             return true;
         }

@@ -49,14 +49,12 @@ namespace Windows.UI.Xaml
     {
         #region Inheritance Context
 
-        internal static FrameworkElement FindMentor(DependencyObject d)
+        internal static IFrameworkElement FindMentor(DependencyObject d)
         {
             // Find the nearest FE InheritanceContext
             while (d != null)
             {
-                FrameworkElement fe = d as FrameworkElement;
-
-                if (fe != null)
+                if (d is IFrameworkElement fe)
                 {
                     return fe;
                 }
@@ -74,14 +72,12 @@ namespace Windows.UI.Xaml
             return base.ShouldProvideInheritanceContext(target, property) || property == ResourceDictionary.ResourceKeyProperty;
         }
 
-        bool IFrameworkElement.ShouldRaisePropertyChanged(DependencyProperty dp) => dp == DataContextProperty;
-
-        internal FrameworkElement InheritedParent { get; private set; }
+        internal IFrameworkElement InheritedParent { get; private set; }
 
         internal override void OnInheritanceContextChangedCore(EventArgs args)
         {
-            FrameworkElement oldMentor = InheritedParent;
-            FrameworkElement newMentor = FindMentor(InheritanceContext);
+            IFrameworkElement oldMentor = InheritedParent;
+            IFrameworkElement newMentor = FindMentor(InheritanceContext);
 
             if (oldMentor != newMentor)
             {
@@ -99,18 +95,18 @@ namespace Windows.UI.Xaml
             }
         }
 
-        private void ConnectMentor(FrameworkElement mentor)
+        private void ConnectMentor(IFrameworkElement mentor)
         {
-            mentor.InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+            mentor.Internal_InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
             
-            InvalidateInheritedProperties(this, mentor);
+            InvalidateInheritedProperties(this, (DependencyObject)mentor);
         }
 
-        private void DisconnectMentor(FrameworkElement mentor)
+        private void DisconnectMentor(IFrameworkElement mentor)
         {
-            mentor.InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+            mentor.Internal_InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
 
-            InvalidateInheritedProperties(this, mentor);
+            InvalidateInheritedProperties(this, (DependencyObject)mentor);
         }
 
         // handle the InheritedPropertyChanged event from the mentor
@@ -120,6 +116,12 @@ namespace Windows.UI.Xaml
         }
 
         internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
+
+        event InheritedPropertyChangedEventHandler IFrameworkElement.Internal_InheritedPropertyChanged
+        {
+            add => InheritedPropertyChanged += value;
+            remove => InheritedPropertyChanged -= value;
+        }
 
         internal static void OnInheritedPropertyChanged(FrameworkElement fe, InheritablePropertyChangeInfo info)
         {
@@ -344,6 +346,8 @@ namespace Windows.UI.Xaml
             }
         }
 
+        DependencyObject IFrameworkElement.GetTemplatedParent() => TemplatedParent;
+
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
         // Note: TemplateChild is an UIElement in WPF.
@@ -399,7 +403,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-#region Resources
+        #region Resources
 
         /// <summary>
         ///     Check if resource is not empty.
@@ -982,6 +986,8 @@ namespace Windows.UI.Xaml
                     Inherits = true
                 });
 
+        DependencyProperty IFrameworkElement.GetDataContextProperty() => DataContextProperty;
+
         private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((FrameworkElement)d).RaiseDataContextChangedEvent(e);
@@ -1284,6 +1290,8 @@ namespace Windows.UI.Xaml
         }
 
         private InternalFlags _flags = 0; // Stores Flags (see Flags enum)
+
+        DependencyProperty IFrameworkElement.GetContentPresenterContentProperty() => ContentPresenter.ContentProperty;
     }
 
     internal enum InternalFlags : uint

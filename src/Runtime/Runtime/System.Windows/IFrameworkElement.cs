@@ -11,6 +11,8 @@ internal interface IFrameworkElement : IUIElement
 {
     event RoutedEventHandler Loaded;
 
+    event InheritedPropertyChangedEventHandler Internal_InheritedPropertyChanged;
+
     bool HasLogicalChildren { get; set; }
 
     bool IsLogicalChildrenIterationInProgress { get; set; }
@@ -18,8 +20,6 @@ internal interface IFrameworkElement : IUIElement
     DependencyObject Parent { get; }
 
     IEnumerator GetLogicalChildren();
-
-    bool ShouldRaisePropertyChanged(DependencyProperty dp);
 
     bool IsLoadedEvent(RoutedEvent routedEvent);
 
@@ -30,4 +30,14 @@ internal interface IFrameworkElement : IUIElement
     void Internal_RemoveLogicalChild(object child);
 
     void ChangeLogicalParent(DependencyObject newParent);
+
+    void SubscribeToSizeChanged();
+
+    DependencyObject GetTemplatedParent();
+
+    DependencyProperty GetDataContextProperty();
+
+    DependencyProperty GetContentPresenterContentProperty();
+
+    object FindName(string name);
 }

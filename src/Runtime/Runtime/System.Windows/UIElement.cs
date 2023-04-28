@@ -84,6 +84,8 @@ namespace Windows.UI.Xaml
 
         internal bool IsUnloading { get; set; }
 
+        bool IUIElement.Internal_IsConnectedToLiveTree => IsConnectedToLiveTree;
+
         internal bool LoadingIsPending { get; set; }
 
 #region Visual Parent

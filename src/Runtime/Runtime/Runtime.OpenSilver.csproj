@@ -36,7 +36,7 @@
 	</PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;%USERPROFILE%\.nuget\packages\opensilver\1.2.0-private-2023-04-24-xr\lib\netstandard2.0\$(TargetName).dll&quot;&#xD;&#xA;xcopy /Y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;%USERPROFILE%\.nuget\packages\opensilver\1.2.0-private-2023-04-24-xr\lib\netstandard2.0\$(TargetName).pdb&quot;" />
+    <Exec Command="xcopy /Y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;%USERPROFILE%\.nuget\packages\opensilver\1.2.0-private-2023-05-17-xr\lib\netstandard2.0\$(TargetName).dll&quot;&#xD;&#xA;xcopy /Y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;%USERPROFILE%\.nuget\packages\opensilver\1.2.0-private-2023-05-17-xr\lib\netstandard2.0\$(TargetName).pdb&quot;" />
   </Target>
 
 	<ItemGroup>
@@ -341,6 +341,7 @@
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
 		<Compile Include="System.Windows\IFrameworkElement.cs" />
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />
+		<Compile Include="System.Windows\IPanel.cs" />
 		<Compile Include="System.Windows\IUIElement.cs" />		
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
 		<Compile Include="System.Windows\LengthConverter.cs" />

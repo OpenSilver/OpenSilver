@@ -1,6 +1,8 @@
 ﻿#if MIGRATION
 namespace System.Windows;
 #else
+using System;
+
 namespace Windows.UI.Xaml;
 #endif
 
@@ -17,7 +19,11 @@ internal interface IDependencyObject
 
 internal interface IUIElement : IDependencyObject
 {
+    event RoutedEventHandler LostFocus;
+
     bool Internal_IsLoaded { get; }
+
+    bool Internal_IsConnectedToLiveTree { get; }
 
     bool IsVisualChildrenIterationInProgress { get; set; }
 
