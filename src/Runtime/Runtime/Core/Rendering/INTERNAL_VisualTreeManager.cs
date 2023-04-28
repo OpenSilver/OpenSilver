@@ -236,6 +236,11 @@ namespace CSHTML5.Internal
                     element.RaiseMouseLeave();
                 }
 
+                if (FocusManager.GetFocusedElement() == element)
+                {
+                    KeyboardNavigation.UpdateFocusedElement(null);
+                }
+
                 // Call the "OnDetached" of the element. This is particularly useful for elements to
                 // clear any references they have to DOM elements. For example, the Grid will use it
                 // to set its _tableDiv to null.
