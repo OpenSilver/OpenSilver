@@ -77,6 +77,7 @@ namespace Windows.UI.Xaml.Controls
         public ComboBox()
         {
             DefaultStyleKey = typeof(ComboBox);
+            this.ClipToBounds = true;
             IsEnabledChanged += (o, e) =>
             {
                 if (!(bool)e.NewValue)
