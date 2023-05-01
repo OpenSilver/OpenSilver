@@ -13,6 +13,7 @@
 
 using System;
 using System.Security;
+using System.Windows.Browser.Internal;
 
 namespace System.Windows.Browser
 {

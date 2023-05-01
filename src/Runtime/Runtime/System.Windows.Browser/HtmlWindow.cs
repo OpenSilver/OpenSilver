@@ -12,8 +12,9 @@
 \*====================================================================================*/
 
 using System;
-using OpenSilver.Internal;
 using System.ComponentModel;
+using System.Windows.Browser.Internal;
+using OpenSilver.Internal;
 
 #if !MIGRATION
 using Windows.UI.Xaml;

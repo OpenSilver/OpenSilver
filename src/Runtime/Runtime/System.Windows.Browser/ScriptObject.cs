@@ -18,7 +18,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using OpenSilver.Internal;
+using System.Windows.Browser.Internal;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Threading;
@@ -36,19 +37,37 @@ namespace System.Windows.Browser
     {
         private readonly IJSObjectRef _jsObjectRef;
 
+        static ScriptObject()
+        {
+            string getMemberCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                JavaScriptCallback.Create(GetMemberFromJS, true));
+            string setPropertyCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                JavaScriptCallback.Create(SetPropertyFromJS, true));
+            string invokeMethodCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                JavaScriptCallback.Create(InvokeMethodFromJS, true));
+            string addEventListenerCallback = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                JavaScriptCallback.Create(AddEventListenerFromJS, true));
+
+            OpenSilver.Interop.ExecuteJavaScriptVoid(
+                $"document.browserService.initialize({getMemberCallback}, {setPropertyCallback}, {invokeMethodCallback}, {addEventListenerCallback});");
+        }
+
         internal ScriptObject(IJSObjectRef jsObject)
+            : this(jsObject, null)
+        {
+        }
+
+        internal ScriptObject(IJSObjectRef jsObject, object managedObject)
         {
             _jsObjectRef = jsObject;
+            ManagedObject = managedObject;
         }
 
         /// <summary>
         /// Frees resources and performs other cleanup operations before the scriptable object
         /// is reclaimed by garbage collection.
         /// </summary>
-        ~ScriptObject()
-        {
-            _jsObjectRef?.Dispose();
-        }
+        ~ScriptObject() => Dispose(false);
 
         /// <summary>
         /// Gets an instance of the dispatcher.
@@ -66,7 +85,6 @@ namespace System.Windows.Browser
         /// A managed object reference if the current <see cref="ScriptObject"/>
         /// wraps a managed type; otherwise, null.
         /// </returns>
-		[OpenSilver.NotImplemented]
         public object ManagedObject { get; }
 
         /// <summary>
@@ -136,7 +154,7 @@ namespace System.Windows.Browser
 
             string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
 
-            JSResult result = JsonSerializer.Deserialize<JSResult>(
+            JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
                     $"document.browserService.getProperty({sJSObj}, '{name}');"));
 
@@ -174,7 +192,7 @@ namespace System.Windows.Browser
             string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sParams = args is null ? string.Empty : string.Join(",", args.Select(a => ConvertToJavaScriptParam(a)));
 
-            JSResult result = JsonSerializer.Deserialize<JSResult>(
+            JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
                     $"document.browserService.invoke({sJSObj}, '{name}', {sParams});"));
 
@@ -200,7 +218,7 @@ namespace System.Windows.Browser
             string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sParams = args is null ? string.Empty : string.Join(",", args.Select(a => ConvertToJavaScriptParam(a)));
 
-            JSResult result = JsonSerializer.Deserialize<JSResult>(
+            JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
                     $"document.browserService.invokeSelf({sJSObj}, {sParams});"));
 
@@ -255,7 +273,7 @@ namespace System.Windows.Browser
             string sJSObj = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_jsObjectRef);
             string sValue = ConvertToJavaScriptParam(value);
 
-            JSResult result = JsonSerializer.Deserialize<JSResult>(
+            JSParam result = JsonSerializer.Deserialize<JSParam>(
                 OpenSilver.Interop.ExecuteJavaScriptString(
                     $"document.browserService.setProperty({sJSObj}, '{name}', {sValue});"));
 
@@ -326,13 +344,30 @@ namespace System.Windows.Browser
             return null;
         }
 
-        private protected static void ValidateParameter(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
+        internal void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                GC.SuppressFinalize(this);
+            }
+
+            _jsObjectRef?.Dispose();
+
+            if (ManagedObject is not null)
+            {
+                _managedObjects.Remove(ManagedObject);
+            }
+        }
+
+        internal void OnEvent(object sender, EventArgs e) => InvokeSelf(sender, e);
+
+        internal static void ValidateParameter(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
         {
             CheckNullOrEmpty(name, paramName);
             CheckInvalidCharacters(name, paramName);
         }
 
-        private protected static void CheckNullOrEmpty(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
+        internal static void CheckNullOrEmpty(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
         {
             if (name is null)
             {
@@ -345,7 +380,7 @@ namespace System.Windows.Browser
             }
         }
 
-        private protected static void CheckInvalidCharacters(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
+        internal static void CheckInvalidCharacters(string name, [CallerArgumentExpression(nameof(name))] string paramName = null)
         {
             if (name.IndexOf(char.MinValue) > -1)
             {
@@ -353,7 +388,7 @@ namespace System.Windows.Browser
             }
         }
 
-        private static string ConvertToJavaScriptParam(object value)
+        internal static string ConvertToJavaScriptParam(object value)
         {
             object o = value switch
             {
@@ -361,56 +396,125 @@ namespace System.Windows.Browser
                 string or char or Guid => value.ToString(),
                 double or float or decimal or int or uint or short or ushort or long or ulong or byte or sbyte or Enum => Convert.ToDouble(value, CultureInfo.InvariantCulture),
                 bool or null => value,
-                _ => value,
+                object => OpenSilver.Interop.IsRunningInTheSimulator ? null : GetOrCreateManagedObject(value)._jsObjectRef,
             };
 
             return CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(o);
         }
 
-        private static object Unwrap(JSResult result)
+        private static ManagedObject GetOrCreateManagedObject(object obj)
         {
-            return result.Type switch
+            lock (_managedObjects)
             {
-                TYPES.ERROR => throw new InvalidOperationException(result.Value),
-                TYPES.VOID => null,
-                TYPES.STRING => result.Value,
-                TYPES.INTEGER => int.Parse(result.Value, CultureInfo.InvariantCulture),
-                TYPES.DOUBLE => double.Parse(result.Value, CultureInfo.InvariantCulture),
-                TYPES.BOOLEAN => bool.Parse(result.Value),
-                TYPES.OBJECT => GetOrCreateScriptObject(result.Value, CreateScriptObject),
-                TYPES.HTMLELEMENT => GetOrCreateScriptObject(result.Value, CreateHtmlElement),
-                TYPES.HTMLCOLLECTION => GetOrCreateScriptObject(result.Value, CreateScriptObjectCollection),
-                TYPES.HTMLWINDOW => HtmlPage.Window,
-                TYPES.HTMLDOCUMENT => HtmlPage.Document,
-                _ => throw new InvalidOperationException(),
-            };
-
-            static ScriptObject CreateScriptObject(string id) => new(new JSObjectRef(id));
-            static HtmlElement CreateHtmlElement(string id) => new(new JSObjectRef(id));
-            static ScriptObjectCollection CreateScriptObjectCollection(string id) => new(new JSObjectRef(id));
+                return GetManagedObject(obj) ?? CreateManagedObject(obj);
+            }
         }
 
-        private static Exception UnwrapException(JSResult result)
+        private static ManagedObject GetManagedObject(object obj)
+            => (_managedObjects.TryGetValue(obj, out WeakReference<ManagedObject> wr) &&
+                wr.TryGetTarget(out ManagedObject managedObject))
+                ? managedObject
+                : null;
+
+        private static ManagedObject CreateManagedObject(object obj)
+        {
+            string jsRef = OpenSilver.Interop.ExecuteJavaScriptString(
+                $"document.browserService.registerManagedObject({(obj is Delegate ? "true" : "false")});");
+            var managedObject = new ManagedObject(new JSObjectRef(jsRef), obj);
+            RegisterScriptObject(jsRef, managedObject);
+            RegisterManagedObject(obj, managedObject);
+            return managedObject;
+        }
+
+        internal static object Unwrap(JSParam result)
         {
             return result.Type switch
             {
-                TYPES.ERROR => new InvalidOperationException(result.Value),
+                JSTYPE.ERROR => throw new InvalidOperationException(result.Value),
+                JSTYPE.VOID => null,
+                JSTYPE.STRING => result.Value,
+                JSTYPE.INTEGER => int.Parse(result.Value, CultureInfo.InvariantCulture),
+                JSTYPE.DOUBLE => double.Parse(result.Value, CultureInfo.InvariantCulture),
+                JSTYPE.BOOLEAN => bool.Parse(result.Value),
+                JSTYPE.OBJECT => GetOrCreateScriptObject(result.Value),
+                JSTYPE.HTMLELEMENT => GetOrCreateHtmlElement(result.Value),
+                JSTYPE.HTMLCOLLECTION => GetOrCreateScriptObjectCollection(result.Value),
+                JSTYPE.HTMLWINDOW => HtmlPage.Window,
+                JSTYPE.HTMLDOCUMENT => HtmlPage.Document,
+                _ => throw new InvalidOperationException(),
+            };
+        }
+
+        private static Exception UnwrapException(JSParam result)
+        {
+            return result.Type switch
+            {
+                JSTYPE.ERROR => new InvalidOperationException(result.Value),
                 _ => null,
             };
         }
 
-        private static ScriptObject GetOrCreateScriptObject(string id, Func<string, ScriptObject> creationFunc)
+        private static T GetOrCreateScriptObject<T>(string id, object managedObject, Func<string, object, T> creationFunc)
+            where T : ScriptObject
         {
             lock (_objects)
             {
-                if (!_objects.TryGetValue(id, out WeakReference<ScriptObject> wr) || !wr.TryGetTarget(out ScriptObject o))
+                T o = (T)GetScriptObject(id);
+                if (o is null)
                 {
-                    o = creationFunc(id);
-                    _objects[id] = new WeakReference<ScriptObject>(o);
+                    o = creationFunc(id, managedObject);
+                    RegisterScriptObject(id, o);
                 }
 
                 return o;
             }
+        }
+
+        private static void RegisterScriptObject(string id, ScriptObject scriptObject)
+            => _objects[id] = new WeakReference<ScriptObject>(scriptObject);
+
+        private static void RegisterManagedObject(object obj, ManagedObject managedObject)
+            => _managedObjects[obj] = new WeakReference<ManagedObject>(managedObject);
+
+        internal static ScriptObject GetOrCreateScriptObject(string id)
+        {
+            return GetOrCreateScriptObject(id, null, CreateScriptObject);
+
+            static ScriptObject CreateScriptObject(string id, object managedObj) => new(new JSObjectRef(id), managedObj);
+        }
+
+        internal static HtmlElement GetOrCreateHtmlElement(string id)
+        {
+            return GetOrCreateScriptObject(id, null, CreateHtmlElement);
+
+            static HtmlElement CreateHtmlElement(string id, object managedObject) => new(new JSObjectRef(id));
+        }
+
+        internal static ScriptObjectCollection GetOrCreateScriptObjectCollection(string id)
+        {
+            return GetOrCreateScriptObject(id, null, CreateScriptObjectCollection);
+
+            static ScriptObjectCollection CreateScriptObjectCollection(string id, object managedObject) => new(new JSObjectRef(id));
+        }
+
+        private static ScriptObject GetScriptObject(string id)
+            => (_objects.TryGetValue(id, out WeakReference<ScriptObject> wr) && wr.TryGetTarget(out ScriptObject o)) ? o : null;
+
+        private static ManagedObject GetManagedObject(string id, bool throwIfNotFound = false)
+        {
+            if (_objects.TryGetValue(id, out WeakReference<ScriptObject> wr)
+                && wr.TryGetTarget(out ScriptObject o)
+                && o is ManagedObject managedObject)
+            {
+                return managedObject;
+            }
+
+            if (throwIfNotFound)
+            {
+                throw new InvalidOperationException();
+            }
+
+            return null;
         }
 
         internal static void UnregisterScriptObject(string id)
@@ -421,15 +525,39 @@ namespace System.Windows.Browser
             }
         }
 
-        private static readonly Dictionary<string, WeakReference<ScriptObject>> _objects = new();
+        private static string GetMemberFromJS(string caller, string memberName)
+            => GetManagedObject(caller, true).Invoker.GetPropertyValue(memberName);            
 
-        private struct JSResult
+        private static string SetPropertyFromJS(string caller, string propertyName, string value)
+            => GetManagedObject(caller, true).Invoker.SetPropertyValue(propertyName, value);
+
+        private static string InvokeMethodFromJS(string caller, string methodName, string args)
         {
-            public TYPES Type { get; set; }
+            ManagedObject managedObject = GetManagedObject(caller, true);
+
+            if (string.IsNullOrEmpty(methodName))
+            {
+                return managedObject.Invoker.InvokeSelf(args);
+            }
+            else
+            {
+                return managedObject.Invoker.InvokeMethod(methodName, args);
+            }
+        }
+
+        private static string AddEventListenerFromJS(string caller, string eventName, string handler, bool add)
+            => GetManagedObject(caller, true).Invoker.AddEventHandler(eventName, handler, add);
+
+        private static readonly Dictionary<string, WeakReference<ScriptObject>> _objects = new();
+        private static readonly Dictionary<object, WeakReference<ManagedObject>> _managedObjects = new();
+
+        internal struct JSParam
+        {
+            public JSTYPE Type { get; set; }
             public string Value { get; set; }
         }
 
-        private enum TYPES
+        internal enum JSTYPE
         {
             ERROR = -1,
             VOID = 0,
@@ -442,48 +570,6 @@ namespace System.Windows.Browser
             HTMLCOLLECTION = 7,
             HTMLDOCUMENT = 8,
             HTMLWINDOW = 9,
-        }
-    }
-
-    internal interface IJSObjectRef : IJavaScriptConvertible, IDisposable { }
-
-    internal sealed class WindowRef : IJSObjectRef
-    {
-        private const string Window = "window";
-
-        public WindowRef() { }
-
-        public string ToJavaScriptString() => Window;
-
-        public void Dispose() { }
-    }
-
-    internal sealed class DocumentRef : IJSObjectRef
-    {
-        private const string Document = "document";
-
-        public DocumentRef() { }
-
-        public string ToJavaScriptString() => Document;
-
-        public void Dispose() { }
-    }
-
-    internal sealed class JSObjectRef : IJSObjectRef
-    {
-        private readonly string _jsRef;
-
-        public JSObjectRef(string jsRef)
-        {
-            _jsRef = jsRef;
-        }
-
-        public string ToJavaScriptString() => $"document.browserService.getObject('{_jsRef}')";
-
-        public void Dispose()
-        {
-            ScriptObject.UnregisterScriptObject(_jsRef);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.browserService.releaseObject('{_jsRef}');");
         }
     }
 }

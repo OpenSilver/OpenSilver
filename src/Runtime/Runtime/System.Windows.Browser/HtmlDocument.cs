@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Security;
+using System.Windows.Browser.Internal;
 using CSHTML5;
 using OpenSilver.Internal;
 

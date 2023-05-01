@@ -1458,7 +1458,7 @@ document.velocityHelpers = (function () {
 })();
 
 document.browserService = (function () {
-    const TYPES = {
+    const JSTYPE = {
         ERROR: -1,
         VOID: 0,
         STRING: 1,
@@ -1472,9 +1472,122 @@ document.browserService = (function () {
         HTMLWINDOW: 9,
     };
 
+    const INTEROP_RESULT = {
+        ERROR: 0,
+        VOID: 1,
+        OBJECT: 2,
+        MEMBER: 3,
+    };
+
     let _id = 0;
     const _idToObj = new Map();
     const _objToId = new Map();
+
+    let _isInitialized = false;
+    let _getMemberCallback = null;
+    let _setPropertyCallback = null;
+    let _invokeMethodCallback = null;
+    let _addEventListenerCallback = null;
+
+    function checkInitialized() {
+        if (!_isInitialized) {
+            throw new Error('browserService has not been initialized yet.');
+        }
+    };
+
+    function createManagedObject(id, isDelegate) {
+        const o = isDelegate ? function () { } : {};
+        o.id = id;
+        Object.defineProperty(o, 'id', { writable: false });
+
+        const handler = {
+            get: function (target, prop, receiver) {
+                switch (prop) {
+                    case 'addEventListener':
+                        return function (event, handler) {
+                            const r = addDotNetEventListener(target, event, JSON.stringify(conv(handler)));
+                            switch (r.type) {
+                                case INTEROP_RESULT.ERROR:
+                                    throw new Error(r.value);
+                            }
+                        };
+                    case 'removeEventListener':
+                        return function (event, handler) {
+                            const r = removeDotNetEventListener(target, event, JSON.stringify(conv(handler)));
+                            switch (r.type) {
+                                case INTEROP_RESULT.ERROR:
+                                    throw new Error(r.value);
+                            }
+                        };
+                    default:
+                        const r = getDotNetMember(target, prop);
+                        switch (r.type) {
+                            case INTEROP_RESULT.ERROR:
+                                throw new Error(r.value);
+                            case INTEROP_RESULT.OBJECT:
+                                return r.value;
+                            case INTEROP_RESULT.MEMBER:
+                                return function (...args) {
+                                    const r = invokeDotNetMethod(target, prop, JSON.stringify(args.map(function (x) { return conv(x); })));
+                                    switch (r.type) {
+                                        case INTEROP_RESULT.ERROR:
+                                            throw new Error(r.value);
+                                        case INTEROP_RESULT.OBJECT:
+                                            return r.value;
+                                    }
+                                };
+                        }
+                }
+            },
+            set: function (target, prop, value, receiver) {
+                const r = setDotNetProperty(target, prop, JSON.stringify(conv(value)));
+                switch (r.type) {
+                    case INTEROP_RESULT.ERROR:
+                        throw new Error(r.value);
+                }
+                return true;
+            },
+        };
+
+        if (isDelegate) {
+            handler.apply = function (target, thisArg, argumentsList) {
+                const r = invokeDotNetMethod(target, '', JSON.stringify(argumentsList.map(function (x) { return conv(x); })));
+                switch (r.type) {
+                    case INTEROP_RESULT.ERROR:
+                        throw new Error(r.value);
+                    case INTEROP_RESULT.OBJECT:
+                        return r.value;
+                }
+            };
+        }
+
+        return new Proxy(o, handler);
+    };
+
+    function getDotNetMember(managedObject, name) {
+        const str_result = _getMemberCallback(managedObject.id, name);
+        return eval(str_result);
+    };
+
+    function invokeDotNetMethod(managedObject, name, args) {
+        const str_result = _invokeMethodCallback(managedObject.id, name, args);
+        return eval(str_result);
+    };
+
+    function setDotNetProperty(managedObject, name, value) {
+        const str_result = _setPropertyCallback(managedObject.id, name, value);
+        return eval(str_result);
+    };
+
+    function addDotNetEventListener(managedObject, event, handler) {
+        const str_result = _addEventListenerCallback(managedObject.id, event, handler, true);
+        return eval(str_result);
+    };
+
+    function removeDotNetEventListener(managedObject, event, handler) {
+        const str_result = _addEventListenerCallback(managedObject.id, event, handler, false);
+        return eval(str_result);
+    };
 
     function getOrCreateId(obj) {
         if (!_objToId.has(obj)) {
@@ -1487,43 +1600,53 @@ document.browserService = (function () {
     };
 
     function isDOMCollection(v) {
-        return v instanceof HTMLCollection ||
-               v instanceof NodeList;
+        return v instanceof HTMLCollection || v instanceof NodeList;
     };
 
     function conv(v) {
         if (v instanceof Document) {
-            return { Type: TYPES.HTMLDOCUMENT };
+            return { Type: JSTYPE.HTMLDOCUMENT };
         } else if (v instanceof Window) {
-            return { Type: TYPES.HTMLWINDOW };
+            return { Type: JSTYPE.HTMLWINDOW };
         } else if (v instanceof HTMLElement) {
-            return { Type: TYPES.HTMLELEMENT, Value: getOrCreateId(v) };
+            return { Type: JSTYPE.HTMLELEMENT, Value: getOrCreateId(v) };
         } else if (isDOMCollection(v)) {
-            return { Type: TYPES.HTMLCOLLECTION, Value: getOrCreateId(v) };
+            return { Type: JSTYPE.HTMLCOLLECTION, Value: getOrCreateId(v) };
         } else if (typeof v === 'number') {
             if (Number.isInteger(v))
-                return { Type: TYPES.INTEGER, Value: v.toString() };
+                return { Type: JSTYPE.INTEGER, Value: v.toString() };
             else
-                return { Type: TYPES.DOUBLE, Value: v.toString() };
+                return { Type: JSTYPE.DOUBLE, Value: v.toString() };
         } else if (typeof v === 'string') {
-            return { Type: TYPES.STRING, Value: v };
+            return { Type: JSTYPE.STRING, Value: v };
         } else if (typeof v === 'boolean') {
-            return { Type: TYPES.BOOLEAN, Value: v.toStrin_dependentListMapg() };
+            return { Type: JSTYPE.BOOLEAN, Value: v.toString() };
         } else if (v === null || v === undefined) {
-            return { Type: TYPES.VOID };
+            return { Type: JSTYPE.VOID };
         } else if (typeof v === 'object' || typeof v === 'function') {
-            return { Type: TYPES.OBJECT, Value: getOrCreateId(v) };
+            return { Type: JSTYPE.OBJECT, Value: getOrCreateId(v) };
         } else {
-            return { Type: TYPES.ERROR, Value: 'An unexpected error occurred' };
+            return { Type: JSTYPE.ERROR, Value: 'An unexpected error occurred' };
         }
     };
 
     function error(message) {
-        return { Type: TYPES.ERROR, Value: message };
+        return { Type: JSTYPE.ERROR, Value: message };
     };
 
     return {
+        initialize: function (getMemberCallback, setPropertyCallback, invokeMethodCallback, addEventListenerCallback) {
+            if (_isInitialized) {
+                throw new Error('browserService can only be initialized once.');
+            }
+            _isInitialized = true;
+            _getMemberCallback = getMemberCallback;
+            _setPropertyCallback = setPropertyCallback;
+            _invokeMethodCallback = invokeMethodCallback;
+            _addEventListenerCallback = addEventListenerCallback;
+        },
         invoke: function (instance, name, ...args) {
+            checkInitialized();
             const m = instance[name];
             if (m) {
                 try {
@@ -1537,6 +1660,7 @@ document.browserService = (function () {
             }
         },
         invokeSelf: function (f, ...args) {
+            checkInitialized();
             if (typeof f === 'function') {
                 try {
                     const r = f.call(null, ...args);
@@ -1549,6 +1673,7 @@ document.browserService = (function () {
             }
         },
         getProperty: function (instance, name) {
+            checkInitialized();
             try {
                 return JSON.stringify(conv(instance[name]));
             } catch (err) {
@@ -1556,6 +1681,7 @@ document.browserService = (function () {
             }
         },
         setProperty: function (instance, name, value) {
+            checkInitialized();
             try {
                 instance[name] = value;
                 return JSON.stringify(conv(undefined));
@@ -1564,14 +1690,24 @@ document.browserService = (function () {
             }
         },
         getObject: function (id) {
+            checkInitialized();
             return _idToObj.get(id);
         },
         releaseObject: function (id) {
+            checkInitialized();
             if (_idToObj.has(id)) {
                 const o = _idToObj.get(id);
                 _objToId.delete(o);
                 _idToObj.delete(id);
             }
+        },
+        registerManagedObject: function (isDelegate) {
+            checkInitialized();
+            const id = (_id++).toString();
+            const managedObject = createManagedObject(id, isDelegate);
+            _objToId.set(managedObject, id);
+            _idToObj.set(id, managedObject);
+            return id;
         },
     };
 })();

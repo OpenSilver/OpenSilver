@@ -19,7 +19,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Browser;
+using System.Windows.Browser.Internal;
 using CSHTML5.Internal;
 using CSHTML5.Types;
 
@@ -204,6 +204,34 @@ namespace System.Windows.Browser
         /// type.
         /// </exception>
         [OpenSilver.NotImplemented]
-        public static void RegisterCreateableType(string scriptAlias, Type type) { }
+        public static void RegisterCreateableType(string scriptAlias, Type type)
+        {
+            ScriptObject.ValidateParameter(scriptAlias);
+
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (!type.IsVisible)
+            {
+                throw new ArgumentException($"'{nameof(type)}' must be a public type.", nameof(type));
+            }
+
+            if (type.IsAbstract)
+            {
+                throw new ArgumentException($"'{nameof(type)}' cannot be abstract.", nameof(type));
+            }
+
+            if (type.GetConstructor(Type.EmptyTypes) is null)
+            {
+                throw new ArgumentException($"'{nameof(type)}' must have a public parameterless constructor.", nameof(type));
+            }
+
+            if (type == typeof(string) || type.IsPrimitive || typeof(Delegate).IsAssignableFrom(type))
+            {
+                throw new ArgumentException($"'{nameof(type)}' is not a valid type.", nameof(type));
+            }
+        }
     }
 }
