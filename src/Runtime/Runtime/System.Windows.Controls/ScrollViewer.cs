@@ -99,15 +99,10 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        // Note: we need to force this to true because template are disabled
-        // for ScrollViewers.
-        internal override bool EnablePointerEventsCore
-        {
-            get
-            {
-                return true;
-            }
-        }
+        // Note: we need to handle this here because templates are disabled for ScrollViewers.
+        // We check the background because this condition is true with the default ScrollViewer's
+        // template of Silverlight. With custom templates, this might still be an issue.
+        internal override bool EnablePointerEventsCore => Background is not null;
 
         /// <summary> 
         /// Reference to the ScrollContentPresenter child.
