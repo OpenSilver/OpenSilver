@@ -1208,17 +1208,6 @@ namespace Windows.UI.Xaml
 
 #endregion
 
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            base.INTERNAL_OnDetachedFromVisualTree();
-            if (HasImplicitStyleFromResources && 
-                (!HasResources || !Resources.Contains(GetType())))
-            {
-                HasStyleInvalidated = false;
-                UpdateStyleProperty();
-            }
-        }
-
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
