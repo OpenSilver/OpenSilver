@@ -108,10 +108,8 @@
                 Value="Arrow" />
         <Setter Property="IsTabStop"
                 Value="True" />
-        <!-- #if WORKINPROGRESS -->
-        <!-- <Setter Property="TabNavigation"
-                     Value="Once" /> -->
-        <!-- #endif -->
+        <Setter Property="TabNavigation"
+                Value="Once" /> 
         <Setter Property="Margin"
                 Value="0 1 0 0" />
         <Setter Property="Template">
@@ -233,10 +231,8 @@
                         <ToggleButton x:Name="ExpanderButton"
                                       HorizontalAlignment="Stretch"
                                       VerticalAlignment="Stretch"
-                                      IsTabStop="False">
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- TabNavigation="Once" -->
-                            <!-- #endif -->
+                                      IsTabStop="False"
+                                      TabNavigation="Once">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Grid x:Name="Root"
@@ -334,10 +330,8 @@
                                 Cursor="{TemplateBinding Cursor}"
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                IsTabStop="False">
-                            <!-- #if WORKINPROGRESS -->
-                            <!-- TabNavigation="Once" -->
-                            <!-- #endif -->
+                                IsTabStop="False"
+                                TabNavigation="Once">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Grid Background="{TemplateBinding Background}">
@@ -396,12 +390,10 @@
                             <ToolTipService.ToolTip>
                                 <ToolTip x:Name="ValidationToolTip"
                                          Template="{StaticResource CommonValidationToolTipTemplate}"
+                                         Placement="Right"
+                                         PlacementTarget="{Binding ElementName=Header}"
                                          DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                          IsHitTestVisible="True" />
-                                <!-- #if WORKINPROGRESS -->
-                                <!-- Placement="Right"
-                                     PlacementTarget="{Binding ElementName=Header}" -->
-                                <!-- #endif -->
                             </ToolTipService.ToolTip>
                             <Grid Width="10"
                                   Height="10"
