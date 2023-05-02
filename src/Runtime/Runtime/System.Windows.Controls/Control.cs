@@ -466,7 +466,7 @@ namespace Windows.UI.Xaml.Controls
                         if (control.INTERNAL_InnerDomElement != null && 
                             !control.HasTemplate && 
                             control.INTERNAL_VisualParent is not Canvas && 
-                            (!control.IsUnderCustomLayout || control.GetType() == typeof(TextBlock)))
+                            (!control.IsUnderCustomLayout || control is TextBlock))
                         {
                             var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(control.INTERNAL_InnerDomElement);
                             Thickness padding = (Thickness)newValue;
