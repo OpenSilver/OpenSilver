@@ -462,10 +462,11 @@ namespace Windows.UI.Xaml.Controls
                         var control = (Control)d;
                         // if the parent is a canvas, we ignore this property and we want to ignore this
                         // property if there is a ControlTemplate on this control.
+                        // textblock under custom layout can support padding property now
                         if (control.INTERNAL_InnerDomElement != null && 
                             !control.HasTemplate && 
                             control.INTERNAL_VisualParent is not Canvas && 
-                            !control.IsUnderCustomLayout)
+                            (!control.IsUnderCustomLayout || control is TextBlock))
                         {
                             var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(control.INTERNAL_InnerDomElement);
                             Thickness padding = (Thickness)newValue;
