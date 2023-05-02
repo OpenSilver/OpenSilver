@@ -14,6 +14,7 @@
 
 
 using CSHTML5;
+using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -232,7 +233,7 @@ namespace System
         bool _isFirstTryAtSendingUnsafeRequest = false;
 
         // if the last request was asynchronous, any error will be cought here.
-        private void OnError(object sender)
+        private void OnError()
         {
             if (IsCrashInPreflight)
                 ResendRequestInCaseOfPreflightError(true);
@@ -318,7 +319,8 @@ namespace System
         internal static void SetCallbackMethod(object xmlHttpRequest, Action OnDownloadStatusCompleted)
         {
             string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
-            string sCallback = INTERNAL_InteropImplementation.GetVariableStringForJS(OnDownloadStatusCompleted);
+            string sCallback = INTERNAL_InteropImplementation.GetVariableStringForJS(
+                JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(OnDownloadStatusCompleted));
             OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.onloadend = {sCallback}");
         }
 
@@ -338,10 +340,11 @@ namespace System
             OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.withCredentials = {enableCookies}");
         }
 
-        internal static void SetErrorCallback(object xmlHttpRequest, Action<object> OnError)
+        internal static void SetErrorCallback(object xmlHttpRequest, Action onError)
         {
             string sRequest = INTERNAL_InteropImplementation.GetVariableStringForJS(xmlHttpRequest);
-            string sCallback = INTERNAL_InteropImplementation.GetVariableStringForJS(OnError);
+            string sCallback = INTERNAL_InteropImplementation.GetVariableStringForJS(
+                JavaScriptCallbackHelper.CreateSelfDisposedJavaScriptCallback(onError));
             OpenSilver.Interop.ExecuteJavaScriptVoid($"{sRequest}.onerror = {sCallback}");
         }
 
