@@ -46,7 +46,7 @@ public static class ClientSideResourceRegister
             catch (Exception e)
             {
                 Console.Error.WriteLine(e);
-                throw e;
+                throw;
             }
         }
     }
