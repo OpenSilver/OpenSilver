@@ -83,6 +83,11 @@ namespace Windows.UI.Xaml
 
             AppParams = GetAppParams();
 
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+                OnUnhandledException(e.ExceptionObject as Exception, false);
+            };
+
             new DOMEventManager(GetWindow, "unload", ProcessOnExit).AttachToDomEvents();
 
             // In case of a redirection from Microsoft AAD, when running in the Simulator, we re-instantiate the application. We need to reload the JavaScript files because they are no longer in the HTML DOM due to the AAD redirection:

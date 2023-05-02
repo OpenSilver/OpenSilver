@@ -61,6 +61,7 @@ namespace CSHTML5.Internal
             catch (Exception ex)
             {
                 Console.Error.WriteLine("DEBUG: OnCallBack: OnCallBackFromJavascript: " + ex);
+                throw;
             }
 
             INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
