@@ -12,12 +12,13 @@
 \*====================================================================================*/
 
 using System;
-using CSHTML5.Internal;
-using OpenSilver.Internal;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Media.Effects;
 using System.Diagnostics;
+using System.ComponentModel;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Input;
@@ -84,8 +85,6 @@ namespace Windows.UI.Xaml
 
         internal bool IsUnloading { get; set; }
 
-        internal bool LoadingIsPending { get; set; }
-
 #region Visual Parent
 
         /// <summary>
@@ -129,11 +128,52 @@ namespace Windows.UI.Xaml
         /// <Summary>
         /// Flag to check if this visual has any children
         /// </Summary>
-        internal bool HasVisualChildren { get; private set; }
+        internal bool HasVisualChildren
+        {
+            get { return ReadVisualFlag(VisualFlags.HasChildren); }
+            set { WriteVisualFlag(VisualFlags.HasChildren, value); }
+        }
 
         // Are we in the process of iterating the visual children.
         // This flag is set during a descendents walk, for property invalidation.
-        internal bool IsVisualChildrenIterationInProgress { get; set; }
+        internal bool IsVisualChildrenIterationInProgress
+        {
+            get { return ReadVisualFlag(VisualFlags.IsVisualChildrenIterationInProgress); }
+            set { WriteVisualFlag(VisualFlags.IsVisualChildrenIterationInProgress, value); }
+        }
+
+        /// <summary>
+        /// AttachChild
+        ///
+        /// Derived classes must call this method to notify the UIElement layer that a new
+        /// child appeard in the children collection. The UIElement layer will then call the GetVisualChild
+        /// method to find out where the child was added.
+        /// </summary>
+        internal void AddVisualChild(UIElement child)
+        {
+            if (child == null)
+            {
+                return;
+            }
+
+            if (child.INTERNAL_VisualParent != null)
+            {
+                throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
+            }
+
+            HasVisualChildren = true;
+
+            // Set the parent pointer.
+
+            child.INTERNAL_VisualParent = this;
+
+            //
+            // Resume layout.
+            //
+            PropagateResumeLayout(this, child);
+
+            child.OnVisualParentChanged(null);
+        }
 
         /// <summary>
         /// AttachChild
@@ -161,6 +201,39 @@ namespace Windows.UI.Xaml
             child.VisualParent = this;
 
             child.OnVisualParentChanged(null);
+        }
+        
+        /// <summary>
+        /// DisconnectChild
+        ///
+        /// Derived classes must call this method to notify the UIElement layer that a
+        /// child was removed from the children collection. The UIElement layer will then call
+        /// GetChildren to find out which child has been removed.
+        /// </summary>
+        internal void RemoveVisualChild(UIElement child)
+        {
+            if (child == null || child.INTERNAL_VisualParent == null)
+            {
+                return;
+            }
+
+            if (child.INTERNAL_VisualParent != this)
+            {
+                throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
+            }
+
+            if (VisualChildrenCount == 0)
+            {
+                HasVisualChildren = false;
+            }
+
+            // Set the parent pointer to null.
+
+            child.INTERNAL_VisualParent = null;
+
+            PropagateSuspendLayout(child);
+
+            child.OnVisualParentChanged(this);
         }
 
         /// <summary>
@@ -216,48 +289,32 @@ namespace Windows.UI.Xaml
 
 #endregion Visual Children
 
-        internal virtual Size MeasureCore()
-        {
-            return new Size(0, 0);
-        }
-
         internal Window INTERNAL_ParentWindow { get; set; } // This is a reference to the window where this control is presented. It is useful for example to know where to display the popups. //todo-perfs: replace all these properties with fields?
 
         // This is the main DIV of the HTML representation of the control
-#if CSHTML5NETSTANDARD
         internal object INTERNAL_OuterDomElement { get; set; }
-#else
-        internal dynamic INTERNAL_OuterDomElement { get; set; }
-#endif
-
         internal object INTERNAL_InnerDomElement { get; set; } // This is used to add visual children to the DOM (optionally wrapped into additional code, c.f. "INTERNAL_VisualChildInformation")
-        internal object INTERNAL_AdditionalOutsideDivForMargins { get; set; } // This is used to define the margins and to remove the div used for the margins when we remove this element.
-        internal object INTERNAL_InnerDivOfTheChildWrapperOfTheParentIfAny { get; set; } // This is non-null only if the parent has a "ChildWrapper", that is, a DIV that it creates for each of its children. If it is the case, we store the "inner div" of that child wrapper. It is useful for alignment purposes (cf. alignment methods in the FrameworkElement class).
-        internal object INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth { get; set; } // This is optional. When set, it means that the "FrameworkElement.MinHeight" and "MinWidth" properties are applied on this specified DOM element rather than on the INTERNAL_OuterDomElement. An example is the "TextBox", for which applying MinHeight to the outer DOM does not make the inner DOM bigger.
         internal string INTERNAL_HtmlRepresentation { get; set; } // This can be used instead of overriding the "CreateDomElement" method to specify the appearance of the control.
         internal Dictionary<UIElement, INTERNAL_VisualChildInformation> INTERNAL_VisualChildrenInformation { get; set; } //todo-performance: verify that JavaScript output is a performant dictionary too, otherwise change structure.
         internal bool INTERNAL_RenderTransformOriginHasBeenApplied = false; // This is useful to ensure that the default RenderTransformOrigin is (0,0) like in normal XAML, instead of (0.5,0.5) like in CSS.
         //Note: the two following fields are only used in the PointerRoutedEventArgs class to determine how many clicks have been made on this UIElement in a short amount of time.
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
         internal bool _isLoaded;
-        internal Action INTERNAL_DeferredRenderingWhenControlBecomesVisible;
-        internal Action INTERNAL_DeferredLoadingWhenControlBecomesVisible;
+
+        internal bool RenderingIsDeferred { get; set; } = false;
 
         public UIElement()
         {
-            DesiredSize = new Size();
-            PreviousFinalRect = Rect.Empty;
-            RenderedVisualBounds = Rect.Empty;
             PreviousAvailableSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
-            _previousDesiredSize = Size.Empty;
-            _layoutMeasuredSize = Size.Empty;
-            _layoutLastSize = Size.Empty;
-            _layoutProcessing = false;
-            IsMeasureValid = false;
-            IsArrangeValid = false;
-            IsRendered = false;
             IsFirstRendering = false;
-            _visualLevel = -1;
+            
+            NeverMeasured = true;
+            NeverArranged = true;
+
+            VisibilityCache = (Visibility)VisibilityProperty.GetMetadata(GetType()).DefaultValue;
+            ClipToBoundsCache = (bool)ClipToBoundsProperty.GetMetadata(GetType()).DefaultValue;
+            
+            WriteVisualFlag(VisualFlags.IsUIElement, true);
         }
         internal virtual object GetDomElementToSetContentString()
         {
@@ -273,39 +330,28 @@ namespace Windows.UI.Xaml
         /// </summary>
         public bool ClipToBounds
         {
-            get { return (bool)GetValue(ClipToBoundsProperty); }
+            get { return ClipToBoundsCache; }
             set { SetValue(ClipToBoundsProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.ClipToBounds"/> dependency
-        /// property.
+        /// Identifies the <see cref="ClipToBounds"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty ClipToBoundsProperty =
             DependencyProperty.Register(
                 nameof(ClipToBounds),
                 typeof(bool),
                 typeof(UIElement),
-                new PropertyMetadata(false)
-                {
-                    MethodToUpdateDom = ClipToBounds_MethodToUpdateDom,
-                });
+                new PropertyMetadata(false, OnClipToBoundsChanged));
 
-        private static void ClipToBounds_MethodToUpdateDom(DependencyObject d, object newValue)
+        private static void OnClipToBoundsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //todo: doesn't work with vertical overflow if the display is table or table-cell
-            UIElement uiElement = (UIElement)d;
-            var outerDomElement = uiElement.INTERNAL_OuterDomElement;
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-            if ((bool)newValue)
+            UIElement uie = (UIElement)d;
+            uie.ClipToBoundsCache = (bool)e.NewValue;
+
+            if (!uie.NeverMeasured && !uie.NeverArranged)
             {
-                style.overflow = "hidden"; //todo: ? if this is a ScrollViewer do not do anything?
-                style.tableLayout = "fixed"; //Note: this might break stuff somewhere else
-            }
-            else
-            {
-                style.overflow = "auto";
-                style.tableLayout = "auto";
+                uie.InvalidateArrange();
             }
         }
 
@@ -617,13 +663,43 @@ namespace Windows.UI.Xaml
 
 #region Visibility
 
+        private Visibility VisibilityCache
+        {
+            get
+            {
+                if (ReadVisualFlag(VisualFlags.VisibilityCache_Visible))
+                {
+                    return Visibility.Visible;
+                }
+                else
+                {
+                    return Visibility.Collapsed;
+                }
+            }
+            set
+            {
+                Debug.Assert(value == Visibility.Visible || value == Visibility.Collapsed);
+
+                switch (value)
+                {
+                    case Visibility.Visible:
+                        WriteVisualFlag(VisualFlags.VisibilityCache_Visible, true);
+                        break;
+
+                    case Visibility.Collapsed:
+                        WriteVisualFlag(VisualFlags.VisibilityCache_Visible, false);
+                        break;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets or sets the visibility of a UIElement. A UIElement that is not visible
         /// is not rendered and does not communicate its desired size to layout.
         /// </summary>
         public Visibility Visibility
         {
-            get { return (Visibility)GetValue(VisibilityProperty); }
+            get { return VisibilityCache; }
             set { SetValue(VisibilityProperty, value); }
         }
 
@@ -635,26 +711,19 @@ namespace Windows.UI.Xaml
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(UIElement),
-                new PropertyMetadata(VisibilityBoxes.VisibleBox, Visibility_Changed, CoerceVisibility));
+                new PropertyMetadata(VisibilityBoxes.VisibleBox, OnVisibilityChanged, CoerceVisibility));
 
         private string _previousValueOfDisplayCssProperty = "block";
 
-        private static void Visibility_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement uie = (UIElement)d;
-            Visibility newValue = (Visibility)e.NewValue;
+            Visibility newVisibility = (Visibility)e.NewValue;
 
-            // Finish loading the element if it was not loaded yet because it was Collapsed (and optimization was enabled in the Settings):
-            if (uie.INTERNAL_DeferredLoadingWhenControlBecomesVisible != null
-                && newValue != Visibility.Collapsed)
-            {
-                Action deferredLoadingWhenControlBecomesVisible = uie.INTERNAL_DeferredLoadingWhenControlBecomesVisible;
-                uie.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
-                deferredLoadingWhenControlBecomesVisible();
-            }
+            uie.VisibilityCache = newVisibility;
 
             // Make the CSS changes required to apply the visibility at the DOM level:
-            INTERNAL_ApplyVisibility(uie, newValue);
+            INTERNAL_ApplyVisibility(uie, newVisibility);
 
             // The IsVisible property depends on this property.
             uie.UpdateIsVisible();
@@ -666,13 +735,50 @@ namespace Windows.UI.Xaml
             return VisibilityBoxes.Box(visibility);
         }
 
+        private void SwitchVisibilityIfNeeded(bool isVisible)
+        {
+            if (isVisible)
+            {
+                EnsureVisible();
+            }
+            else
+            {
+                EnsureInvisible();
+            }
+        }
+
+        private void EnsureVisible()
+        {
+            if (ReadFlag(CoreFlags.IsCollapsed))
+            {
+                WriteFlag(CoreFlags.IsCollapsed, false);
+
+                //invalidate parent if needed
+                InvalidateParentMeasure();
+
+                //make sure element has been rendered
+                InvalidateVisual();
+            }
+        }
+
+        private void EnsureInvisible()
+        {
+            if (!ReadFlag(CoreFlags.IsCollapsed))
+            {
+                WriteFlag(CoreFlags.IsCollapsed, true);
+
+                //invalidate parent
+                InvalidateParentMeasure();
+            }
+        }
+
         internal static void INTERNAL_ApplyVisibility(UIElement uiElement, Visibility newValue)
         {
             // Set the CSS to make the DOM element visible/collapsed:
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(uiElement))
             {
                 // Get a reference to the most outer DOM element to show/hide:
-                object mostOuterDomElement = uiElement.INTERNAL_AdditionalOutsideDivForMargins ?? uiElement.INTERNAL_OuterDomElement;
+                object mostOuterDomElement = uiElement.INTERNAL_OuterDomElement;
                 var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(mostOuterDomElement);
 
                 // Apply the visibility:
@@ -691,13 +797,6 @@ namespace Windows.UI.Xaml
                     // Show the DOM element (or its wrapper if any) by reverting the CSS property "display" to its previous value:
                     if (style.display == "none")
                         style.display = uiElement._previousValueOfDisplayCssProperty;
-
-                    // The alignment was not calculated when the object was hidden, so we need to calculate it now:
-                    if (uiElement is FrameworkElement && uiElement.INTERNAL_VisualParent != null) // Note: The "INTERNAL_VisualParent" can be "null" for example if we are changing the visibility of a "PopupRoot" control.
-                    {
-                        FrameworkElement.INTERNAL_ApplyHorizontalAlignmentAndWidth((FrameworkElement)uiElement, ((FrameworkElement)uiElement).HorizontalAlignment); //todo-perfs: only call the relevant portion of the code?
-                        FrameworkElement.INTERNAL_ApplyVerticalAlignmentAndHeight((FrameworkElement)uiElement, ((FrameworkElement)uiElement).VerticalAlignment); //todo-perfs: only call the relevant portion of the code?
-                    }
                 }
                 INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
             }
@@ -710,7 +809,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// A property indicating if this element is visible or not.
         /// </summary>
-        public bool IsVisible => (bool)GetValue(IsVisibleProperty);
+        public bool IsVisible => ReadFlag(CoreFlags.IsVisibleCache);
 
         /// <summary>
         /// Identifies the <see cref="IsVisible"/> dependency property.
@@ -725,24 +824,25 @@ namespace Windows.UI.Xaml
         private static void OnIsVisibleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             UIElement uie = (UIElement)d;
+            bool isVisible = (bool)e.NewValue;
 
-            if ((bool)e.NewValue)
+            uie.WriteFlag(CoreFlags.IsVisibleCache, isVisible);
+
+            if (isVisible)
             {
-                Action deferredLoadingWhenControlBecomesVisible = uie.INTERNAL_DeferredRenderingWhenControlBecomesVisible;
-                if (deferredLoadingWhenControlBecomesVisible != null)
+                if (uie.RenderingIsDeferred)
                 {
-                    uie.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
-                    deferredLoadingWhenControlBecomesVisible();
+                    uie.RenderingIsDeferred = false;
+                    INTERNAL_VisualTreeManager.RenderElementsAndRaiseChangedEventOnAllDependencyProperties(uie);
                 }
             }
+
+            uie.SwitchVisibilityIfNeeded(isVisible);
 
             // Invalidate the children so that they will inherit the new value.
             uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             uie.IsVisibleChanged?.Invoke(d, e);
-
-            uie.InvalidateParentMeasure();
-            uie.InvalidateParentArrange();
         }
 
         private static object CoerceIsVisible(DependencyObject d, object baseValue)
@@ -955,20 +1055,6 @@ namespace Windows.UI.Xaml
                 new PropertyMetadata(false) { Inherits = true });
 
 #endregion
-
-        internal virtual void INTERNAL_UpdateDomStructureIfNecessary()
-        {
-            // Used to update the DOM structure (for example, in case of a grid, we need to (re)create the rows and columns where to place the child elements).
-        }
-
-#if BRIDGE
-        [Bridge.Template("true")]
-#endif
-        private static bool IsRunningInJavaScript() //must be static for Bridge "Template" to work properly
-        {
-            return false;
-        }
-
 
 #region CapturePointer, ReleasePointerCapture, IsPointerCaptured, and OnLostMouseCapture
 
@@ -1232,9 +1318,6 @@ namespace Windows.UI.Xaml
             {
                 uie.UpdateIsVisible();
             }
-
-            // visual parent does not always match layout parent, so we cannot use it.
-            uie.CoerceValue(FrameworkElement.CustomLayoutProperty);
         }
 
         internal void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
@@ -1251,18 +1334,6 @@ namespace Windows.UI.Xaml
         }
 
 #endregion ForceInherit property support
-
-        internal bool MeasureDirty
-        {
-            get { return ReadFlag(CoreFlags.MeasureDirty); }
-            set { WriteFlag(CoreFlags.MeasureDirty, value); }
-        }
-
-        internal bool MeasureInProgress
-        {
-            get { return ReadFlag(CoreFlags.MeasureInProgress); }
-            set { WriteFlag(CoreFlags.MeasureInProgress, value); }
-        }
 
         internal bool ReadFlag(CoreFlags field)
         {
@@ -1281,23 +1352,28 @@ namespace Windows.UI.Xaml
             }
         }
 
-        private CoreFlags _flags;
-
-        internal void InvalidateMeasureInternal()
+        internal bool ReadVisualFlag(VisualFlags field)
         {
-            if (!this.MeasureDirty &&
-                !this.MeasureInProgress)
+            return (_visualFlags & field) != 0;
+        }
+
+        internal void WriteVisualFlag(VisualFlags field, bool value)
+        {
+            if (value)
             {
-                this.MeasureDirty = true;
-                INTERNAL_VisualTreeManager.LayoutManager.MeasureQueue.Add(this);
+                _visualFlags |= field;
+            }
+            else
+            {
+                _visualFlags &= (~field);
             }
         }
 
-        internal void RaiseLayoutUpdated()
-        {
-            OnLayoutUpdated();
-        }
+        private CoreFlags _flags;
+        private VisualFlags _visualFlags;
 
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void OnLayoutUpdated()
         {
             //
@@ -1309,15 +1385,15 @@ namespace Windows.UI.Xaml
     {
         None = 0x00000000,
         //SnapsToDevicePixelsCache = 0x00000001,
-        //ClipToBoundsCache = 0x00000002,
+        ClipToBoundsCache = 0x00000002,
         MeasureDirty = 0x00000004,
-        //ArrangeDirty = 0x00000008,
+        ArrangeDirty = 0x00000008,
         MeasureInProgress = 0x00000010,
-        //ArrangeInProgress = 0x00000020,
-        //NeverMeasured = 0x00000040,
-        //NeverArranged = 0x00000080,
-        //MeasureDuringArrange = 0x00000100,
-        //IsCollapsed = 0x00000200,
+        ArrangeInProgress = 0x00000020,
+        NeverMeasured = 0x00000040,
+        NeverArranged = 0x00000080,
+        MeasureDuringArrange = 0x00000100,
+        IsCollapsed = 0x00000200,
         //IsKeyboardFocusWithinCache = 0x00000400,
         //IsKeyboardFocusWithinChanged = 0x00000800,
         //IsMouseOverCache = 0x00001000,
@@ -1329,8 +1405,8 @@ namespace Windows.UI.Xaml
         //IsStylusCaptureWithinCache = 0x00040000,
         //IsStylusCaptureWithinChanged = 0x00080000,
         HasAutomationPeer = 0x00100000,
-        //RenderingInvalidated = 0x00200000,
-        //IsVisibleCache = 0x00400000,
+        RenderingInvalidated = 0x00200000,
+        IsVisibleCache = 0x00400000,
         //AreTransformsClean = 0x00800000,
         //IsOpacitySuppressed = 0x01000000,
         //ExistsEventHandlersStore = 0x02000000,
@@ -1340,5 +1416,107 @@ namespace Windows.UI.Xaml
         //TouchesCapturedWithinChanged = 0x20000000,
         //TouchLeaveCache = 0x40000000,
         //TouchEnterCache = 0x80000000,
+    }
+
+    /// <summary>
+    /// Visual flags.
+    /// </summary>
+    [Flags]
+    internal enum VisualFlags : uint
+    {
+        /// <summary>
+        /// No flags are set for this visual.
+        /// </summary>
+        None = 0x0,
+
+        //// IsSubtreeDirtyForPrecompute indicates that at least one Visual in the sub-graph of this Visual needs
+        //// a bounding box update.
+        //IsSubtreeDirtyForPrecompute = 0x00000001,
+
+        //// Should post render indicates that this is a root visual and therefore we need to indicate that this
+        //// visual tree needs to be re-rendered. Today we are doing this by posting a render queue item.
+        //ShouldPostRender = 0x00000002,
+
+        // Needs documentation
+        IsUIElement = 0x00000004,
+
+        // For UIElement -- It's in VisualFlags so that it can be propagated through the
+        // Visual subtree without casting.
+        IsLayoutSuspended = 0x00000008,
+
+        // Are we in the process of iterating the visual children. 
+        // This flag is set during a descendents walk, for property invalidation.
+        IsVisualChildrenIterationInProgress = 0x00000010,
+
+        //// Used on ModelVisual3D to signify that its content bounds
+        //// cache is valid.
+        ////
+        //// Stop over-invalidating _bboxSubgraph
+        ////
+        //// We use this flag to maintain a separate cache of a ModelVisual3D’s content
+        //// bounds.  A better solution that would be both a 2D and 3D win would be to
+        //// stop invalidating _bboxSubgraph when a visual’s transform changes.
+        //// 
+        //Are3DContentBoundsValid = 0x00000020,
+
+        //// FindCommonAncestor is used to find the common ancestor of a Visual.
+        //FindCommonAncestor = 0x00000040,
+
+        //// IsLayoutIslandRoot indicates that this Visual is a root of Element Layout Island.
+        //IsLayoutIslandRoot = 0x00000080,
+
+        //// UseLayoutRounding indicates that layout rounding should be applied during Measure/Arrange for this UIElement.
+        //UseLayoutRounding = 0x00000100,
+
+        // These bits together make up UIElement.VisibilityCache
+        VisibilityCache_Visible = 0x00000200,
+        //VisibilityCache_TakesSpace = 0x00000400,
+
+        //// Indicates that a given node is registered for AncestorChanged.
+        //RegisteredForAncestorChanged = 0x00000800,
+
+        //// Indicates that a node below this node is registered for AncestorChanged.
+        //SubTreeHoldsAncestorChanged = 0x00001000,
+
+        //// Indicates that this node is used by a cyclic brush
+        //NodeIsCyclicBrushRoot = 0x00002000,
+
+        //// Indicates that this node has an Effect
+        //NodeHasEffect = 0x00004000,
+
+        //// Indicates that this node is of Viewport3DVisual class.
+        //IsViewport3DVisual = 0x00008000,
+
+        //// Used to discover cycles in VisualBrush scenarios.
+        //ReentrancyFlag = 0x00010000,
+
+        // Indicates if the visual has any children. Avoids calls to visualchildrencount while checking for presence of children.
+        HasChildren = 0x00020000,
+
+        //// Controls if the bitmap effect emulation layer is enabled. 
+        //BitmapEffectEmulationDisabled = 0x00040000,
+
+        //// These two DPI flags are used to determine the DPI value of a Visual.
+        //// Combination of these two flags point to 4 possible choices (DpiScaleFlag1 being the LSB) : Choice 0-2 directly 
+        //// represent the index in the static array (in UIElement) on which DPI is stored. Choice 3 indicates that the index is stored 
+        //// in an uncommon field on the Visual.
+        //DpiScaleFlag1 = 0x00080000,
+
+        //DpiScaleFlag2 = 0x00100000,
+
+        ////TreeLevel counter - occupies 11 bits. 
+        ////NOTE: The location of these bits in this ulong should be synchronized with 
+        ////Visual.TreeLevel property getter/setter.
+        //TreeLevelBit0 = 0x00200000,
+        //TreeLevelBit1 = 0x00400000,
+        //TreeLevelBit2 = 0x00800000,
+        //TreeLevelBit3 = 0x01000000,
+        //TreeLevelBit4 = 0x02000000,
+        //TreeLevelBit5 = 0x04000000,
+        //TreeLevelBit6 = 0x08000000,
+        //TreeLevelBit7 = 0x10000000,
+        //TreeLevelBit8 = 0x20000000,
+        //TreeLevelBit9 = 0x40000000,
+        //TreeLevelBit10 = 0x80000000,
     }
 }

@@ -54,44 +54,6 @@ namespace Windows.UI.Xaml
         {
         }
 
-        internal static void INTERNAL_InitializeOuterDomElementWidthAndHeight(FrameworkElement element, object outerDomElement)
-        {
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-
-            var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(outerDomElement);
-            if (element.IsUnderCustomLayout)
-            {
-                INTERNAL_HtmlDomManager.SetPosition(style, element.RenderedVisualBounds, false, true, true);
-            }
-            else
-            {
-                // Height:
-                if (!double.IsNaN(element.Height))
-                    style.height = element.Height.ToInvariantString() + "px";
-                else if (element.INTERNAL_VisualParent is Canvas)
-                    style.height = "max-content";
-                else if (element.VerticalAlignment == VerticalAlignment.Stretch)
-                    style.height = "100%";
-                else
-                    style.height = "auto";
-
-                // Width:
-                if (!double.IsNaN(element.Width))
-                    style.width = element.Width.ToInvariantString() + "px";
-                else if (element.INTERNAL_VisualParent is Canvas)
-                    style.width = "max-content";
-                else if (element.HorizontalAlignment == HorizontalAlignment.Stretch)
-                    style.width = "100%";
-                else
-                    style.width = "auto";
-            }
-#if PERFSTAT
-            Performance.Counter("Size/Alignment: INTERNAL_InitializeOuterDomElementWidthAndHeight", t0);
-#endif
-        }        
-
         #region Height property
 
         /// <summary>
@@ -123,65 +85,12 @@ namespace Windows.UI.Xaml
                             throw new InvalidOperationException(
                                 string.Format("Error when trying to set FrameworkElement.Height: expected double, got '{0}'.",
                                     value.GetType().FullName)),
-                        CallbackMethod = Height_Changed,
                         UIElement = (UIElement)instance,
                         Name = new List<string> { "height" },
                         ApplyAlsoWhenThereIsAControlTemplate = true
                     }
                 },
                 IsWidthHeightValid);
-
-        private static void Height_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var frameworkElement = (FrameworkElement)d;
-
-#if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-            // We need to update vertical alignment because of the "Stretch" 
-            // case which depends on whether the Height is set. It also makes 
-            // the code simpler. //todo-performance: call only the relevant 
-            // code in "INTERNAL_ApplyVerticalAlignmentAndHeight" not the 
-            // whole method?
-            INTERNAL_ApplyVerticalAlignmentAndHeight(frameworkElement, frameworkElement.VerticalAlignment);
-#else
-            RefreshHeight(frameworkElement);
-#endif
-            if (!double.IsNaN(frameworkElement.Width) && !double.IsNaN(frameworkElement.Height))
-                frameworkElement.HandleSizeChanged(Size.Empty);
-        }
-
-#if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-        internal static void RefreshHeight(FrameworkElement frameworkElement)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement))
-            {
-                if (frameworkElement.Visibility != Visibility.Collapsed)
-                {
-                    var styleOfDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
-                    var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
-                    var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);
-                    if (!double.IsNaN(frameworkElement.Height))
-                    {
-                        styleOfBoxSizingElement.height = "";
-                        styleOfDomElement.height = frameworkElement.Height + "px";
-                    }
-                    else if (frameworkElement.VerticalAlignment == VerticalAlignment.Stretch && !(frameworkElement.INTERNAL_VisualParent is Canvas) && !(frameworkElement is CheckBox))
-                    {
-                        styleOfDomElement.height = "100%";
-                        styleOfBoxSizingElement.height = "100%";
-                    }
-                    else
-                    {
-                        styleOfBoxSizingElement.height = "";
-                        styleOfDomElement.height = "auto";
-
-                    }
-                }
-            }
-
-            //NOTE: we don't need to refresh the frameworkElement here for the "Stretch" case like in the Width_Changed method because it will already vertically center the element.
-            //todo: we still need to make the default alignment depend on the type of the element (it is sometimes by default centered, sometimes top...)
-        }
-#endif
 
         #endregion
 
@@ -217,64 +126,12 @@ namespace Windows.UI.Xaml
                             throw new InvalidOperationException(
                                 string.Format("Error when trying to set FrameworkElement.Width: expected double, got '{0}'.",
                                     value.GetType().FullName)),
-                        CallbackMethod = Width_Changed,
                         UIElement = (UIElement)instance,
                         Name = new List<string> { "width" },
                         ApplyAlsoWhenThereIsAControlTemplate = true
                     }
                 },
                 IsWidthHeightValid);
-
-        internal static void Width_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var frameworkElement = (FrameworkElement)d;
-
-#if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-            // We need to update horizontal alignment because of the "Stretch"
-            // case which depends on whether the Width is set. It also makes 
-            // the code simpler. //todo-performance: call only the relevant 
-            // code in "INTERNAL_ApplyHorizontalAlignmentAndWidth" not the 
-            //whole method?
-            INTERNAL_ApplyHorizontalAlignmentAndWidth(frameworkElement, frameworkElement.HorizontalAlignment);
-#else
-            RefreshWidth(frameworkElement);
-#endif
-            if (!double.IsNaN(frameworkElement.Width) && !double.IsNaN(frameworkElement.Height))
-                frameworkElement.HandleSizeChanged(Size.Empty);
-        }
-
-#if PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-        internal static void RefreshWidth(FrameworkElement frameworkElement)
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(frameworkElement))
-            {
-                if (frameworkElement.Visibility != Visibility.Collapsed)
-                {
-                    var outerDomElementStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
-                    var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
-                    var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);
-                    if (!double.IsNaN(frameworkElement.Width))
-                    {
-                        styleOfBoxSizingElement.width = "";
-                        outerDomElementStyle.width = frameworkElement.Width + "px";
-                    }
-                    else if (frameworkElement.HorizontalAlignment == HorizontalAlignment.Stretch && !(frameworkElement.INTERNAL_VisualParent is Canvas))
-                    {
-                        styleOfBoxSizingElement.width = "100%";
-                        outerDomElementStyle.width = "100%";
-                    }
-                    else
-                    {
-                        styleOfBoxSizingElement.width = "";
-                        outerDomElementStyle.width = "auto";
-                    }
-                }
-            }
-
-            // We need to update horizontal alignment because of the "Stretch" case which depends on whether the Width is set. //todo-performance: call only the relevant code in "RefreshHorizontalAlignment" not the whole method?
-            RefreshHorizontalAlignment(frameworkElement, frameworkElement.HorizontalAlignment);
-        }
-#endif
 
         #endregion
 
@@ -293,7 +150,7 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the <see cref="FrameworkElement.HorizontalAlignment"/> dependency 
+        /// Identifies the <see cref="HorizontalAlignment"/> dependency 
         /// property.
         /// </summary>
         public static readonly DependencyProperty HorizontalAlignmentProperty =
@@ -301,287 +158,7 @@ namespace Windows.UI.Xaml
                 nameof(HorizontalAlignment),
                 typeof(HorizontalAlignment),
                 typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(HorizontalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, HorizontalAlignment_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                });
-
-        private static void HorizontalAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var frameworkElement = (FrameworkElement)d;
-            HorizontalAlignment newHorizontalAlignment = (HorizontalAlignment)e.NewValue;
-            INTERNAL_ApplyHorizontalAlignmentAndWidth(frameworkElement, newHorizontalAlignment);
-        }
-
-        internal static void INTERNAL_ApplyHorizontalAlignmentAndWidth(FrameworkElement fe, HorizontalAlignment newHorizontalAlignment)
-        {
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-            if (fe.IsUnderCustomLayout)
-                return;
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
-                && fe.Visibility != Visibility.Collapsed)
-            {
-                // Gain access to the outer style:
-                var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(fe);
-
-                //We check if the element is the direct child of a ViewBox, in which case alignment has no meaning:
-                UIElement currentParent = fe.INTERNAL_VisualParent as UIElement;
-                //the test below is basically: frameworkElement.VisualParent.VisualParent.VisualParent is ViewBox
-                bool isParentAViewBox =
-                    currentParent != null
-                    && ((currentParent = currentParent.INTERNAL_VisualParent as UIElement) != null)
-                    && currentParent.INTERNAL_VisualParent as Viewbox != null; //todo: this test is unlikely to work with a custom Template on the ViewBox, use frameworkElement.LogicalParent (or something like that) once the logical tree branch will be integrated)
-
-                // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
-                if (fe.INTERNAL_VisualParent is Canvas) //todo: replace the second part of this test with something meaning "logical parent is ViewBox" instead once we will have the logical tree (we cannot do that yet since we cannot access the ViewBox from frameworkElement).
-                {
-                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? 
-                        fe.Width.ToInvariantString() + "px" : 
-                        "max-content";
-                }
-                else if (isParentAViewBox)
-                {
-                    styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ?
-                        fe.Width.ToInvariantString() + "px" :
-                        "auto";
-                }
-                else // Otherwise we handle both alignment and Width/Height:
-                {
-#if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-
-                    //-----------------------------
-                    // Gain access to the styles:
-                    //-----------------------------
-
-                    var wrapperElement = fe.INTERNAL_AdditionalOutsideDivForMargins;
-                    var styleOfWrapperElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(wrapperElement);
-
-                    //-----------------------------
-                    // Handle special cases:
-                    //-----------------------------
-
-                    if (fe is ChildWindow)
-                    {
-                        //we force the Stretch behaviour on ChildWindow so that the Gray background thing can be on the whole window.
-                        styleOfWrapperElement.width = "100%";
-                        styleOfOuterDomElement.marginLeft = "0px"; // Default value
-                        styleOfOuterDomElement.marginRight = "0px"; // Default value
-                        styleOfOuterDomElement.display = "block"; // Default value
-                        styleOfOuterDomElement.width = "100%";
-                        styleOfOuterDomElement.maxWidth = "none";
-                        styleOfOuterDomElement.maxHeight = "none";
-                        return;
-                    }
-
-                    // If the alignment is "Stretch" AND a size in pixels is specified, the behavior is similar to "Center".
-                    // Also, if the alignment is "Stretch" AND the element is an Image with Stretch = None this same case applies since it has a fixed size too:
-                    if (newHorizontalAlignment == HorizontalAlignment.Stretch
-                        && (!double.IsNaN(fe.Width) || (fe is Image && ((Image)fe).Stretch == Media.Stretch.None)))
-                    {
-                        newHorizontalAlignment = HorizontalAlignment.Center;
-                    }
-
-                    //If the element is an Image and it has Stretch = Uniform and no size, the behavior is similar to "Stretch":
-                    if (fe is Image
-                        && double.IsNaN(fe.Width)
-                        && double.IsNaN(fe.Height)
-                        && ((Image)fe).Stretch != Media.Stretch.None)
-                    {
-                        newHorizontalAlignment = HorizontalAlignment.Stretch;
-                    }
-
-                    //-----------------------------
-                    // Apply CSS alignment and size:
-                    //-----------------------------
-
-                    switch (newHorizontalAlignment)
-                    {
-                        case HorizontalAlignment.Left:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.justifyContent = "start";
-                            styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? fe.Width.ToInvariantString() + "px" : "auto";
-                            break;
-                        case HorizontalAlignment.Center:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.justifyContent = "center";
-                            styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? fe.Width.ToInvariantString() + "px" : "auto";
-                            break;
-                        case HorizontalAlignment.Right:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.justifyContent = "end";
-                            styleOfOuterDomElement.width = !double.IsNaN(fe.Width) ? fe.Width.ToInvariantString() + "px" : "auto";
-                            break;
-                        case HorizontalAlignment.Stretch:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.justifyContent = "stretch";
-                            styleOfOuterDomElement.width = "100%";
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                //-----------------------------
-                // Handle the "Overflow" CSS property:
-                //-----------------------------
-
-                /*
-                 
-                // COMMENTED ON 2016.09.02 because it prevents properly displaying child elements with NEGATIVE MARGINS. To reproduce: put a border with negative margins inside another border.
-                 
-                if (!(frameworkElement is ScrollViewer)) //Note: The ScrollViewer handles the "overflow" property by itself.
-                {
-                    // We always display the portions of the child exceeding the edges, unless the element has a fixed size in pixels AND it is not a canvas:
-                    if (!double.IsNaN(frameworkElement.Width) && !(frameworkElement is Canvas))
-                        styleOfOuterDomElement.overflowX = "hidden"; //Note: This value means to crop the portion of the child exceeding the edges.
-                    else
-                        styleOfOuterDomElement.overflowX = ""; //Note: the default value is "visible"
-                }
-                 */
-
-                //-----------------------------
-                // Call code from derived class if any:
-                //-----------------------------
-
-                fe.OnAfterApplyHorizontalAlignmentAndWidth();
-#else
-
-                var outerDomElementStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
-                var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
-                var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);
-
-                string marginLeft = "0px";
-                string marginRight = "0px";
-                if ((frameworkElement.INTERNAL_VisualParent is Canvas)) //if the parent is a canvas, we ignore this property
-                {
-                    if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                    {
-                        if (!double.IsNaN(frameworkElement.Width) && !(frameworkElement is Canvas))
-                        {
-                            styleOfBoxSizingElement.overflowX = "hidden";
-                        }
-                        else
-                        {
-                            styleOfBoxSizingElement.overflowX = "display";
-                        }
-                    }
-                    //marginRight = "auto";
-
-                    //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).marginLeft = marginLeft;
-                    //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).marginRight = marginRight;
-                }
-                else
-                {
-                    if (newHorizontalAlignment == HorizontalAlignment.Left)
-                    {
-                        //todo: Add this as the parent of the element if it is not already there:
-                        //<div style="display:table; position: relative;"> //(the elements are by default put on the left but we still add it so that it is here)
-                        if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (!double.IsNaN(frameworkElement.Width) && !(frameworkElement is Canvas))
-                            {
-                                styleOfBoxSizingElement.overflowX = "hidden";
-                            }
-                            else
-                            {
-                                styleOfBoxSizingElement.overflowX = "display";
-                            }
-                        }
-                        marginRight = "auto";
-                    }
-                    else if (newHorizontalAlignment == HorizontalAlignment.Center
-                        || (!double.IsNaN(frameworkElement.Width) && newHorizontalAlignment == HorizontalAlignment.Stretch)) // Note: this second test is because elements that have a fixed size but a "Stretch" alignment behave as if they were centered.
-                    {
-                        //todo: Add this as the parent of the element if it is not already there:
-                        //<div style="display:table; position: relative; margin-right: auto; margin-left:auto;">
-                        if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (!double.IsNaN(frameworkElement.Width) && !(frameworkElement is Canvas))
-                            {
-                                styleOfBoxSizingElement.overflowX = "hidden";
-                            }
-                            else
-                            {
-                                styleOfBoxSizingElement.overflowX = "display";
-                            }
-                        }
-                        marginLeft = "auto";
-                        marginRight = "auto";
-                    }
-                    else if (newHorizontalAlignment == HorizontalAlignment.Right)
-                    {
-                        //todo: Add this as the parent of the element if it is not already there:
-                        //<div style="display:table; position: relative; margin-left:auto;">
-                        if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (!double.IsNaN(frameworkElement.Width) && !(frameworkElement is Canvas))
-                            {
-                                styleOfBoxSizingElement.overflowX = "hidden";
-                            }
-                            else
-                            {
-                                styleOfBoxSizingElement.overflowX = "display";
-                            }
-                        }
-                        marginLeft = "auto";
-                    }
-                    else if (newHorizontalAlignment == HorizontalAlignment.Stretch)
-                    {
-                        //todo: Add this as the parent of the element if it is not already there:
-                        //<div style="display:table; position: relative; margin-right: 0px; margin-left:0px;">
-
-                        if (frameworkElement is ScrollViewer) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (double.IsNaN(frameworkElement.Width))
-                            {
-                                outerDomElementStyle.width = "100%";
-                            }
-                        }
-                        else
-                        {
-                            if (!double.IsNaN(frameworkElement.Width))
-                            {
-                                if (frameworkElement is Canvas)
-                                {
-                                    styleOfBoxSizingElement.overflowX = "display";
-                                }
-                                else
-                                {
-                                    styleOfBoxSizingElement.overflowX = "hidden";
-                                }
-                                marginLeft = "auto";
-                                marginRight = "auto";
-                            }
-                            else
-                            {
-                                styleOfBoxSizingElement.overflowX = "display";
-                                outerDomElementStyle.width = "100%";
-                            }
-                        }
-                    }
-
-                    //the "parent is canvas" case is dealt with before the switch
-                    outerDomElementStyle.position = "relative";
-
-                    if (newHorizontalAlignment == HorizontalAlignment.Stretch || frameworkElement is ScrollViewer)
-                        outerDomElementStyle.display = "block";
-                    else
-                        outerDomElementStyle.display = "table";
-
-
-                    outerDomElementStyle.marginLeft = marginLeft;
-                    outerDomElementStyle.marginRight = marginRight;
-                }
-#endif
-
-#if PERFSTAT
-                Performance.Counter("Size/Alignment: INTERNAL_ApplyHorizontalAlignmentAndWidth", t0);
-#endif
-            }
-        }
+                new FrameworkPropertyMetadata(HorizontalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
         #endregion
 
@@ -608,320 +185,7 @@ namespace Windows.UI.Xaml
                 nameof(VerticalAlignment),
                 typeof(VerticalAlignment),
                 typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(VerticalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange, VerticalAlignment_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                });
-
-        private static void VerticalAlignment_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var frameworkElement = (FrameworkElement)d;
-            VerticalAlignment newVerticalAlignment = (VerticalAlignment)e.NewValue;
-            INTERNAL_ApplyVerticalAlignmentAndHeight(frameworkElement, newVerticalAlignment);
-        }
-
-        internal static void INTERNAL_ApplyVerticalAlignmentAndHeight(FrameworkElement fe, VerticalAlignment newVerticalAlignment)
-        {
-#if PERFSTAT
-            var t0 = Performance.now();
-#endif
-            if (fe.IsUnderCustomLayout)
-            {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
-                    && fe.Visibility != Visibility.Collapsed
-                    && !double.IsNaN(fe.Height))
-                {
-                    var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(fe);
-                    styleOfOuterDomElement.height = fe.Height.ToInvariantString() + "px";
-                }
-                return;
-            }
-
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe)
-                && fe.Visibility != Visibility.Collapsed)
-            {
-                // Gain access to the outer style:
-                var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(fe);
-
-                //We check if the element is the direct child of a ViewBox, in which case alignment has no meaning:
-                UIElement currentParent = fe.INTERNAL_VisualParent as UIElement;
-                //the test below is basically: frameworkElement.VisualParent.VisualParent.VisualParent is ViewBox
-                bool isParentAViewBox =
-                    currentParent != null
-                    && ((currentParent = currentParent.INTERNAL_VisualParent as UIElement) != null)
-                    && currentParent.INTERNAL_VisualParent as Viewbox != null; //todo: this test is unlikely to work with a custom Template on the ViewBox, use frameworkElement.LogicalParent (or something like that) once the logical tree branch will be integrated)
-
-
-                // If the element is inside a Canvas, we ignore alignment and only apply the Width/Height:
-                if (fe.INTERNAL_VisualParent is Canvas)
-                {
-                    styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? fe.Height.ToInvariantString() + "px" : "max-content";
-                }
-                else if (isParentAViewBox)
-                {
-                    styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? fe.Height.ToInvariantString() + "px" : "auto";
-                }
-                else // Otherwise we handle both alignment and Width/Height:
-                {
-#if !PREVIOUS_WAY_OF_HANDLING_ALIGNMENTS
-
-                    //-----------------------------
-                    // Gain access to the styles:
-                    //-----------------------------
-
-                    var wrapperElement = fe.INTERNAL_AdditionalOutsideDivForMargins;
-                    var styleOfWrapperElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(wrapperElement);
-
-                    //-----------------------------
-                    // Handle special cases:
-                    //-----------------------------
-
-                    if (fe is ChildWindow)
-                    {
-                        //we force the Stretch behaviour on ChildWindow so that the Gray background thing can be on the whole window.
-                        styleOfWrapperElement.verticalAlign = "middle"; // This might be useless.
-                        styleOfOuterDomElement.height = "100%";
-                        return;
-                    }
-
-
-                    // If the alignment is "Stretch" AND a size in pixels is specified, the behavior is similar to "Center".
-                    // Also, if the alignment is "Stretch" AND the element is an Image with Stretch = None this same case applies since it has a fixed size too:
-                    if (newVerticalAlignment == VerticalAlignment.Stretch
-                        && (!double.IsNaN(fe.Height) || (fe is Image && ((Image)fe).Stretch == Media.Stretch.None)))
-                    {
-                        newVerticalAlignment = VerticalAlignment.Center;
-                    }
-
-                    //If the element is an Image and it has Stretch = Uniform and no size, the behavior is similar to "Stretch":
-                    if (fe is Image
-                        && double.IsNaN(fe.Width)
-                        && double.IsNaN(fe.Height)
-                        && ((Image)fe).Stretch != Media.Stretch.None)
-                    {
-                        newVerticalAlignment = VerticalAlignment.Stretch;
-                    }
-
-                    //-----------------------------
-                    // Apply CSS alignment and size:
-                    //-----------------------------
-
-                    switch (newVerticalAlignment)
-                    {
-                        case VerticalAlignment.Top:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.alignItems = "start";
-                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? $"{fe.Height.ToInvariantString()}px" : "auto";
-                            break;
-                        case VerticalAlignment.Center:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.alignItems = "center";
-                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? $"{fe.Height.ToInvariantString()}px" : "auto";
-                            break;
-                        case VerticalAlignment.Bottom:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.alignItems = "end";
-                            styleOfOuterDomElement.height = !double.IsNaN(fe.Height) ? $"{fe.Height.ToInvariantString()}px" : "auto";
-                            break;
-                        case VerticalAlignment.Stretch:
-                            styleOfWrapperElement.display = "flex";
-                            styleOfWrapperElement.alignItems = "stretch";
-                            styleOfOuterDomElement.height = "100%";
-                            break;
-                        default:
-                            throw new NotSupportedException();
-                    }
-                }
-
-                //-----------------------------
-                // Call code from derived class if any:
-                //-----------------------------
-
-                fe.OnAfterApplyVerticalAlignmentAndWidth();
-#else
-
-                var boxSizingElement = frameworkElement.INTERNAL_AdditionalOutsideDivForMargins;
-                var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(boxSizingElement);
-                string verticalAlignCssProperty = "middle";
-                if ((frameworkElement.INTERNAL_VisualParent is Canvas)) //if the parent is a canvas, we consider that it always is top-left
-                {
-                    if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                    {
-                        if (!double.IsNaN(frameworkElement.Height))
-                        {
-                            styleOfBoxSizingElement.overflowY = "hidden";
-                            //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "hidden";
-                        }
-                        else
-                        {
-                            styleOfBoxSizingElement.overflowY = "display";
-                            //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "display";
-                        }
-                    }
-                    verticalAlignCssProperty = "top";
-
-                    var immediateDomParent = INTERNAL_HtmlDomManager.GetParentDomElement(frameworkElement.INTERNAL_AdditionalOutsideDivForMargins);
-                    var immediateDomParentStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(immediateDomParent);
-
-                    //immediateDomParent.style.display = "table-cell"; //TESTTSET
-
-                    immediateDomParentStyle.verticalAlign = verticalAlignCssProperty;
-                }
-                else
-                {
-                    if (newVerticalAlignment == VerticalAlignment.Top)
-                    {
-                        if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (!double.IsNaN(frameworkElement.Height) && !(frameworkElement is Canvas))
-                            {
-                                styleOfBoxSizingElement.overflowY = "hidden";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "hidden";
-                            }
-                            else
-                            {
-                                styleOfBoxSizingElement.overflowY = "display";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "display";
-                            }
-                        }
-                        verticalAlignCssProperty = "top";
-                    }
-                    else if (newVerticalAlignment == VerticalAlignment.Center
-                        || (!double.IsNaN(frameworkElement.Height) && newVerticalAlignment == VerticalAlignment.Stretch)) // Note: this second test is because elements that have a fixed size but a "Stretch" alignment behave as if they were centered.
-                    {
-                        if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (!double.IsNaN(frameworkElement.Height) && !(frameworkElement is Canvas))
-                            {
-                                styleOfBoxSizingElement.overflowY = "hidden";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "hidden";
-                            }
-                            else
-                            {
-                                styleOfBoxSizingElement.overflowY = "display";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "display";
-                            }
-                        }
-                        verticalAlignCssProperty = "middle";
-                    }
-                    else if (newVerticalAlignment == VerticalAlignment.Bottom)
-                    {
-                        if (!(frameworkElement is ScrollViewer)) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (!double.IsNaN(frameworkElement.Height) && !(frameworkElement is Canvas))
-                            {
-                                styleOfBoxSizingElement.overflowY = "hidden";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "hidden";
-                            }
-                            else
-                            {
-                                styleOfBoxSizingElement.overflowY = "display";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "display";
-                            }
-                        }
-                        verticalAlignCssProperty = "bottom";
-                    }
-                    else if (newVerticalAlignment == VerticalAlignment.Stretch)
-                    {
-                        //todo
-                        if (frameworkElement is ScrollViewer) //the ScrollViewer handles his overflows by himself
-                        {
-                            if (double.IsNaN(frameworkElement.Height))
-                            {
-                                styleOfBoxSizingElement.height = "100%";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).height = "100%";
-                            }
-                        }
-                        else
-                        {
-                            if (!double.IsNaN(frameworkElement.Height)) //the ScrollViewer handles his overflows by himself
-                            {
-                                if (frameworkElement is Canvas)
-                                {
-                                    styleOfBoxSizingElement.overflowY = "display";
-                                }
-                                else
-                                {
-                                    styleOfBoxSizingElement.overflowY = "hidden";
-                                }
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "hidden";
-                            }
-                            else if (!(frameworkElement is CheckBox))
-                            {
-                                styleOfBoxSizingElement.height = "100%";
-                                styleOfBoxSizingElement.overflowY = "display";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).height = "100%";
-                                //INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement).overflowY = "display";
-                            }
-                        }
-                    }
-
-                    // Set style of "immediate DOM parent": "position: relative; display: table; vertical-align: bottom;"
-                    var immediateDomParent = INTERNAL_HtmlDomManager.GetParentDomElement(frameworkElement.INTERNAL_AdditionalOutsideDivForMargins);
-                    if (immediateDomParent != null) //Note: it can be null if the element is the MainPage and the immediateDomParent is the ROOT control.
-                    {
-                        var immediateDomParentStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(immediateDomParent);
-
-                        immediateDomParentStyle.position = "relative";
-                        if (newVerticalAlignment == VerticalAlignment.Stretch)
-                        {
-                            immediateDomParentStyle.display = "inline-block";
-                        }
-                        else if (!(frameworkElement.INTERNAL_VisualParent is StackPanel && ((StackPanel)frameworkElement.INTERNAL_VisualParent).Orientation == Orientation.Vertical))
-                        {
-                            immediateDomParentStyle.display = "table-cell";
-                        }
-                        else
-                        {
-                            immediateDomParentStyle.display = "";
-                        }
-                        immediateDomParentStyle.verticalAlign = verticalAlignCssProperty;
-
-                        // Set style of outerDIV of current element (unless the visual parent is a Canvas, which case is already dealt with before the switch): style="position: relative;":
-                        var outerDomElementStyle = INTERNAL_HtmlDomManager.GetFrameworkElementOuterStyleForModification(frameworkElement);
-                        outerDomElementStyle.position = "relative";
-
-                        var grandParent = INTERNAL_HtmlDomManager.GetParentDomElement(immediateDomParent);
-                        if (grandParent != null) //Note: it can be null if the immediateDomParent is the MainPage and the grand parent is the ROOT control.
-                        {
-                            var grandParentStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(grandParent);
-                            grandParentStyle.display = "table";
-                        }
-                    }
-
-                    // OBSOLETE:
-                    // it should be like this
-                    //<something style="height: inherit; position: relative; display: table-cell; vertical-align: bottom;">
-                    //NOTE: something is the parent element --it should be:
-                    // - the first <td> element in the wrapper when we go from the outside of the wrapper to the inside
-                    // - if no <td> element, the outer element of the wrapper for the child
-                    // - if no wrapper: add a div around the child and apply this style to it.
-                    //  <div style="position: relative;">
-                    //      ...Element (example below)
-                    //      <div style="display:table;background-color: rgb(255, 0, 255); margin-right:50px;">bottom right</div>
-                    //  </div>
-                    //</something>
-                    //EXAMPLE WITH <td>
-                    //<td style="padding: 0px; height: inherit; position: relative; display: table-cell; vertical-align: top">
-                    //  <div style="width: 50px; height: 50px;position: relative;"> <!-- this is a canvas (child of the stackpanel) -->
-                    //      <div style="background-color: rgb(200,0,200);width:20px;height:20px;  position: absolute"></div>
-                    //      <div style="background-color: rgb(100,0,200);width:20px;height:20px;margin-left:20px;margin-right:auto;  position: absolute"></div>
-                    //  </div> <!-- this is the end of the canvas -->
-                    //</td>
-                    //EXAMPLE WITH <div>
-                    //<div style="width: inherit; height: inherit; position: relative; display: table-cell; vertical-align: bottom;">
-                    //    <div style="display:table; position: relative; margin-right: 0px; margin-left:auto;"> ---this div is here to handle horizontal alignment
-                    //        <div style="background-color: rgb(255, 0, 255);">bottom right</div> ---thi is the element
-                    //    </div>
-                    //</div>
-                }
-#endif
-
-#if PERFSTAT
-                Performance.Counter("Size/Alignment: INTERNAL_ApplyVerticalAlignmentAndHeight", t0);
-#endif
-            }
-        }
+                new FrameworkPropertyMetadata(VerticalAlignment.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
         #endregion
 
@@ -947,73 +211,14 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(
                     new Thickness(),
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
-                {
-                    MethodToUpdateDom = Margin_MethodToUpdateDom,
-                },
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange),
                 IsMarginValid);
-
-        internal static void Margin_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var fe = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
-            {
-                var margin = (Thickness)newValue;
-                var styleOfBoxSizingElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_AdditionalOutsideDivForMargins);
-                var styleOfOuterDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(fe.INTERNAL_OuterDomElement);
-                if (margin.Left >= 0)
-                {
-                    styleOfBoxSizingElement.paddingLeft = $"{margin.Left.ToInvariantString()}px";
-                    styleOfBoxSizingElement.marginLeft = string.Empty;
-                }
-                else
-                {
-                    styleOfBoxSizingElement.paddingLeft = string.Empty;
-                    styleOfBoxSizingElement.marginLeft = $"{margin.Left.ToInvariantString()}px";
-                }
-
-                if (margin.Top >= 0)
-                {
-                    styleOfBoxSizingElement.paddingTop = $"{margin.Top.ToInvariantString()}px";
-                    styleOfOuterDomElement.marginTop = string.Empty;
-                }
-                else
-                {
-                    styleOfBoxSizingElement.paddingTop = string.Empty;
-                    styleOfOuterDomElement.marginTop = $"{margin.Top.ToInvariantString()}px";
-                }
-
-                if (margin.Right >= 0)
-                {
-                    styleOfBoxSizingElement.paddingRight = $"{margin.Right.ToInvariantString()}px";
-                    styleOfBoxSizingElement.marginRight = string.Empty;
-                }
-                else
-                {
-                    styleOfBoxSizingElement.paddingRight = string.Empty;
-                    styleOfBoxSizingElement.marginRight = $"{margin.Right.ToInvariantString()}px";
-                    styleOfBoxSizingElement.width = "auto";
-                }
-
-                if (margin.Bottom >= 0)
-                {
-                    styleOfBoxSizingElement.paddingBottom = $"{margin.Bottom.ToInvariantString()}px";
-                    styleOfOuterDomElement.marginBottom = string.Empty;
-                }
-                else
-                {
-                    styleOfBoxSizingElement.paddingBottom = string.Empty;
-                    styleOfOuterDomElement.marginBottom = $"{margin.Bottom.ToInvariantString()}px";
-                }
-            }
-        }
 
         private static bool IsMarginValid(object value)
         {
             Thickness m = (Thickness)value;
             return Thickness.IsValid(m, true, false, false, false);
         }
-
         #endregion
 
 
@@ -1038,24 +243,8 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(
                     0d,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
-                    MinHeight_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                },
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange),
                 IsMinWidthHeightValid);
-
-        private static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var fe = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
-            {
-                double minHeight = (double)e.NewValue;
-                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
-                style.minHeight = !double.IsNaN(minHeight) && minHeight > 0 ? $"{minHeight.ToInvariantString()}px" : string.Empty;
-            }
-        }
 
         #endregion
 
@@ -1081,24 +270,8 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(
                     0d,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
-                    MinWidth_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                },
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange),
                 IsMinWidthHeightValid);
-
-        private static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var fe = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
-            {
-                double minWidth = (double)e.NewValue;
-                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
-                style.minWidth = !double.IsNaN(minWidth) && minWidth > 0 ? $"{minWidth.ToInvariantString()}px" : string.Empty;
-            }
-        }
 
         #endregion
 
@@ -1124,26 +297,8 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(
                     double.PositiveInfinity,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
-                    MaxHeight_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                },
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange),
                 IsMaxWidthHeightValid);
-
-        private static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var fe = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
-            {
-                double maxHeight = (double)e.NewValue;
-                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
-                // Commented because at the time of writing "IsInfinity" was not implemented in JSIL:
-                //style.maxHeight = !double.IsInfinity(newValue) ? newValue.ToString() + "px" : "initial";
-                style.maxHeight = (maxHeight != double.MaxValue) ? $"{maxHeight.ToInvariantString()}px" : string.Empty;
-            }
-        }
 
         #endregion
 
@@ -1169,26 +324,8 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(
                     double.PositiveInfinity,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange,
-                    MaxWidth_Changed)
-                {
-                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet
-                },
+                    FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange),
                 IsMaxWidthHeightValid);
-
-        private static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var fe = (FrameworkElement)d;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
-            {
-                double maxWidth = (double)e.NewValue;
-                var domElement = fe.INTERNAL_OptionalSpecifyDomElementConcernedByMinMaxHeightAndWidth ?? fe.INTERNAL_OuterDomElement;
-                var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(domElement);
-                // Commented because at the time of writing "IsInfinity" was not implemented in JSIL:
-                //style.maxWidth = !double.IsInfinity(newValue) ? newValue.ToString() + "px" : "initial";
-                style.maxWidth = (maxWidth != double.MaxValue) ? $"{maxWidth.ToInvariantString()}px" : string.Empty;
-            }
-        }
 
         #endregion
 
@@ -1213,62 +350,22 @@ namespace Windows.UI.Xaml
         #region ActualWidth / ActualHeight
 
         /// <summary>
-        /// Gets the rendered width of a FrameworkElement. The FrameworkElement must be in the visual tree,
-        /// otherwise this property will return 0.
+        /// Gets the rendered width of a <see cref="FrameworkElement"/>.
         /// </summary>
-        public double ActualWidth
-        {
-            get
-            {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    if (IsCustomLayoutRoot || IsUnderCustomLayout)
-                    {
-                        return RenderSize.Width;
-                    }
-                        
-                    try
-                    {
-                        return INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(INTERNAL_OuterDomElement, "offsetWidth");
-                    }
-                    catch
-                    {
-                        return 0d;
-                    }
-                }
-
-                return 0d;
-            }
-        }
+        /// <returns>
+        /// The width, in pixels, of the object. The default is 0. The default might be 
+        /// encountered if the object has not been loaded and undergone a layout pass.
+        /// </returns>
+        public double ActualWidth => RenderSize.Width;
 
         /// <summary>
-        /// Gets the rendered height of a FrameworkElement. The FrameworkElement must be in the visual tree,
-        /// otherwise this property will return 0.
+        /// Gets the rendered height of a <see cref="FrameworkElement"/>.
         /// </summary>
-        public double ActualHeight
-        {
-            get
-            {
-                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
-                {
-                    if (IsCustomLayoutRoot || IsUnderCustomLayout)
-                    {
-                        return RenderSize.Height;
-                    }
-
-                    try
-                    {
-                        return INTERNAL_HtmlDomManager.GetDomElementAttributeInt32(INTERNAL_OuterDomElement, "offsetHeight");
-                    }
-                    catch
-                    {
-                        return 0d;
-                    }
-                }
-
-                return 0d;
-            }
-        }
+        /// <returns>
+        /// The height, in pixels, of the object. The default is 0. The default might be
+        /// encountered if the object has not been loaded and undergone a layout pass.
+        /// </returns>
+        public double ActualHeight => RenderSize.Height;
 
         public static readonly DependencyProperty ActualWidthProperty =
             DependencyProperty.Register(
@@ -1308,216 +405,11 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets the rendered size of a FrameworkElement.
         /// </summary>
-        public Size ActualSize
-        {
-            get { return this.INTERNAL_GetActualWidthAndHeight(); }
-        }
-
-        /// <summary>
-        /// Use this method for better performance in the Simulator compared to requesting the ActualWidth and ActualHeight separately.
-        /// </summary>
-        /// <returns>The actual size of the element.</returns>
-        internal Size INTERNAL_GetActualWidthAndHeight()
-        {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && this.INTERNAL_OuterDomElement != null)
-            {
-                if (!double.IsNaN(this.Width) && !double.IsNaN(this.Height))
-                    return new Size(this.Width, this.Height);
-                try
-                {
-                    // Hack to improve the Simulator performance by making only one interop call rather than two:
-                    string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
-                        $"document.getActualWidthAndHeight({CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement)})");
-                    int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
-                    if (sepIndex > -1)
-                    {
-                        string actualWidthAsString = concatenated.Substring(0, sepIndex);
-                        string actualHeightAsString = concatenated.Substring(sepIndex + 1);
-                        double actualWidth = double.Parse(actualWidthAsString, CultureInfo.InvariantCulture); //todo: verify that the locale is OK. I think that JS by default always produces numbers in invariant culture (with "." separator).
-                        double actualHeight = double.Parse(actualHeightAsString, CultureInfo.InvariantCulture); //todo: read note above
-                        return new Size(actualWidth, actualHeight);
-                    }
-                    else
-                    {
-                        return new Size(0d, 0d);
-                    }
-                }
-                catch
-                {
-                    return new Size(0d, 0d);
-                }
-            }
-            
-            return new Size(0d, 0d);
-        }
+        [Obsolete(Helper.ObsoleteMemberMessage + " Use FrameworkElement.RenderSize instead.")]
+        public Size ActualSize => RenderSize;
 
         #endregion
 
-
-        #region SizeChanged
-
-        private Size _valueOfLastSizeChanged = new Size(0d, 0d);
-        private readonly IResizeObserverAdapter _resizeObserver = ResizeObserverFactory.Create();
-
-        // Size changed event for the CustomLayout Root
-        internal Size _valueOfLayoutRootLastSizeChanged = new Size(0d, 0d);
-        internal readonly IResizeObserverAdapter _layoutRootResizeObserver = ResizeObserverFactory.Create();
-
-        private void HandleSizeChanged(Size currentSize)
-        {
-            if (this._sizeChangedEventHandlers != null
-               && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-               && this._isLoaded)
-            {
-                if (currentSize == Size.Empty)
-                {
-                    currentSize = this.INTERNAL_GetActualWidthAndHeight();
-                }
-
-                if (!Size.Equals(this._valueOfLastSizeChanged, currentSize))
-                {
-                    this._valueOfLastSizeChanged = currentSize;
-
-                    SizeChangedEventArgs e = new SizeChangedEventArgs(currentSize);
-
-                    // Raise the "SizeChanged" event of all the listeners:
-                    this._sizeChangedEventHandlers(this, e);
-                }
-            }
-        }
-
-        internal void LayoutRootHandleSizeChanged(Size currentSize)
-        {
-            if (this._layoutRootSizeChangedEventHandlers != null
-               && INTERNAL_VisualTreeManager.IsElementInVisualTree(this)
-               && this._isLoaded)
-            {
-                if (currentSize == Size.Empty)
-                {
-                    currentSize = this.RenderSize;
-                }
-
-                if (!Size.Equals(this._valueOfLayoutRootLastSizeChanged, currentSize))
-                {
-                    this._valueOfLayoutRootLastSizeChanged = currentSize;
-
-                    SizeChangedEventArgs e = new SizeChangedEventArgs(currentSize);
-
-                    // Raise the "LayoutRootSizeChanged" event of all the listeners:
-                    this._layoutRootSizeChangedEventHandlers(this, e);
-                }
-            }
-        }
-
-        internal void INTERNAL_SizeChangedWhenAttachedToVisualTree() // Intended to be called by the "VisualTreeManager" when the FrameworkElement is attached to the visual tree.
-        {
-            // We reset the previous size value so that the SizeChanged event can be called (see the comment in "HandleSizeChanged"):
-            _valueOfLastSizeChanged = Size.Empty;
-
-            if (this.IsUnderCustomLayout == false)
-            {
-                if (this.IsCustomLayoutRoot == false)
-                    HandleSizeChanged(Size.Empty);
-
-                if (this._sizeChangedEventHandlers != null &&
-                    !this._resizeObserver.IsObserved)
-                {
-                    if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
-                    {
-                        _resizeObserver.Observe(this.INTERNAL_OuterDomElement, (Action<Size>)this.HandleSizeChanged);
-                    }
-                }
-            }
-
-            _valueOfLayoutRootLastSizeChanged = Size.Empty;
-            if (this.IsCustomLayoutRoot)
-            {
-                if (this._layoutRootSizeChangedEventHandlers != null &&
-                    !this._layoutRootResizeObserver.IsObserved)
-                {
-                    if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
-                    {
-                        _layoutRootResizeObserver.Observe(this.INTERNAL_AdditionalOutsideDivForMargins, (Action<Size>)this.LayoutRootHandleSizeChanged);
-                    }
-                    else
-                    {
-                        LayoutRootHandleSizeChanged(new Size(this.Width, this.Height));
-                    }
-                }
-            }
-        }
-
-        internal void DetachResizeSensorFromDomElement()
-        {
-            _resizeObserver.Unobserve(this.INTERNAL_OuterDomElement);
-
-            if (this._layoutRootResizeObserver.IsObserved)
-                _layoutRootResizeObserver.Unobserve(this.INTERNAL_AdditionalOutsideDivForMargins);
-        }
-
-        private SizeChangedEventHandler _sizeChangedEventHandlers;
-        public event SizeChangedEventHandler SizeChanged
-        {
-            add
-            {
-                if (!this._resizeObserver.IsObserved && this.INTERNAL_OuterDomElement != null)
-                {
-                    if (this.IsUnderCustomLayout == false)
-                    {
-                        if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
-                        {
-                            _valueOfLastSizeChanged = new Size(0d, 0d);
-                            _resizeObserver.Observe(this.INTERNAL_OuterDomElement, (Action<Size>)this.HandleSizeChanged);
-                        } 
-                        else
-                        {
-                            HandleSizeChanged(new Size(this.Width, this.Height));
-                        }
-                    }
-                }
-                this._sizeChangedEventHandlers += value;
-            }
-            remove
-            {
-                this._sizeChangedEventHandlers -= value;
-                if (this._sizeChangedEventHandlers == null && this._resizeObserver.IsObserved)
-                {
-                    _resizeObserver.Unobserve(this.INTERNAL_OuterDomElement);
-                }
-            }
-        }
-
-        private SizeChangedEventHandler _layoutRootSizeChangedEventHandlers;
-        internal event SizeChangedEventHandler LayoutRootSizeChanged
-        {
-            add
-            {
-                if (!this._layoutRootResizeObserver.IsObserved && this.INTERNAL_AdditionalOutsideDivForMargins != null)
-                {
-                    if (double.IsNaN(this.Width) || double.IsNaN(this.Height))
-                    {
-                        _valueOfLayoutRootLastSizeChanged = new Size(0d, 0d);
-                        _layoutRootResizeObserver.Observe(this.INTERNAL_AdditionalOutsideDivForMargins, (Action<Size>)this.LayoutRootHandleSizeChanged);
-                    }
-                    else
-                    {
-                        LayoutRootHandleSizeChanged(new Size(this.Width, this.Height));
-                    }
-                }
-                this._layoutRootSizeChangedEventHandlers += value;
-            }
-            remove
-            {
-                this._layoutRootSizeChangedEventHandlers -= value;
-
-                if (this._layoutRootSizeChangedEventHandlers == null && this._layoutRootResizeObserver.IsObserved)
-                {
-                    _layoutRootResizeObserver.Unobserve(this.INTERNAL_AdditionalOutsideDivForMargins);
-                }
-            }
-        }
-
-        #endregion
 
         #region ContextMenu
 

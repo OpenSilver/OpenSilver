@@ -115,25 +115,14 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.Background"/> dependency property.
+        /// Identifies the <see cref="Background"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BackgroundProperty =
             DependencyProperty.Register(
-                nameof(Background), typeof(Brush), 
+                nameof(Background),
+                typeof(Brush), 
                 typeof(Control), 
-                new PropertyMetadata((object)null)
-                {
-                    MethodToUpdateDom2 = UpdateDomOnBackgroundChanged,
-                });
-
-        private static void UpdateDomOnBackgroundChanged(DependencyObject d, object oldValue, object newValue)
-        {
-            var control = (Control)d;
-            if (!control.HasTemplate)
-            {
-                _ = Panel.RenderBackgroundAsync(control, (Brush)newValue);
-            }
-        }
+                new PropertyMetadata((object)null));
 
         //-----------------------
         // BORDERBRUSH
@@ -460,7 +449,7 @@ namespace Windows.UI.Xaml.Controls
                         if (control.INTERNAL_InnerDomElement != null && 
                             !control.HasTemplate && 
                             control.INTERNAL_VisualParent is not Canvas && 
-                            (!control.IsUnderCustomLayout || control is TextBlock))
+                            control is TextBlock)
                         {
                             var domStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(control.INTERNAL_InnerDomElement);
                             Thickness padding = (Thickness)newValue;
@@ -631,12 +620,9 @@ namespace Windows.UI.Xaml.Controls
         private static void OnTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Control control = (Control)d;
-            FrameworkElement.UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
+            UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(control))
-            {
-                control.InvalidateMeasureInternal();
-            }
+            control.InvalidateMeasure();
         }
 
         /// <summary>
@@ -777,15 +763,6 @@ namespace Windows.UI.Xaml.Controls
                 UpdateValidationState();
             }
         }
-        
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-#if !BRIDGE
-            return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-#else
-            return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
-#endif
-        }
 
         /// <summary>
         /// This method is here to avoid creating the dom for a control which has a Template.
@@ -796,12 +773,7 @@ namespace Windows.UI.Xaml.Controls
         /// <returns>The "root" dom element of the FrameworkElement.</returns>
         internal object CreateDomElementForControlTemplate(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            // I think this method should in most (all?) case return two divs, as if it was a frameworkElement.
-#if !BRIDGE
-            return base.CreateDomElement(parentRef, out domElementWhereToPlaceChildren);
-#else
-            return CreateDomElement_WorkaroundBridgeInheritanceBug(parentRef, out domElementWhereToPlaceChildren);
-#endif
+            return CreateDomElementInternal(parentRef, out domElementWhereToPlaceChildren);
         }
 
         /// <summary>

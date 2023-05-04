@@ -488,32 +488,18 @@ namespace Windows.UI.Xaml
         /// <returns>The "root" dom element of the FrameworkElement.</returns>
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            //------------------
-            // It is important to create at least 2 divs so that horizontal and vertical alignments work properly (cf. "ApplyHorizontalAlignment" and "ApplyVerticalAlignment" methods)
-            //------------------
+            return CreateDomElementInternal(parentRef, out domElementWhereToPlaceChildren);
+        }
 
-            object div1;
-            var div1style = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out div1);
-            if (!this.IsUnderCustomLayout)
-            {
-                object div2 = INTERNAL_HtmlDomManager.CreateFrameworkDomElementAndAppendIt(div1, this, false);
-                domElementWhereToPlaceChildren = div2;
-
-                if (this.IsCustomLayoutRoot)
-                {
-                    div1style.position = "relative";
-                }
-            }
-            else
-            {
-                domElementWhereToPlaceChildren = div1;
-            }
+        internal object CreateDomElementInternal(object parentRef, out object domElementWhereToPlaceChildren)
+        {
+            object div1 = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            domElementWhereToPlaceChildren = div1;
             return div1;
         }
 
-        //BRIDGETODO
-        // Bridge bug : when we use virtual, override & out/base in a function, bridge doesn't compile
-        // so delete this class when the bug is resolved
+        [Obsolete(Helper.ObsoleteMemberMessage)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public object CreateDomElement_WorkaroundBridgeInheritanceBug(object parentRef, out object domElementWhereToPlaceChildren)
         {
             //------------------
@@ -598,19 +584,6 @@ namespace Windows.UI.Xaml
 #endif
         {
             
-        }
-
-        // Note: the returned Size is unused for now.
-        internal override sealed Size MeasureCore()
-        {
-            if (!this.ApplyTemplate())
-            {
-                if (this.TemplateChild != null)
-                {
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(this.TemplateChild, this, 0);
-                }
-            }
-            return new Size();
         }
 
         //
@@ -1246,8 +1219,6 @@ namespace Windows.UI.Xaml
             {
                 UpdateThemeStyleProperty();
             }
-
-            InvalidateMeasureInternal();
         }
 
         // Extracts the required flag and returns

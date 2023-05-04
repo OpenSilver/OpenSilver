@@ -694,40 +694,20 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
     window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
 }
 
-document.setVisualBounds = function (id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
-    var element = document.getElementById(id);
+document.setVisualBounds = function (id, left, top, width, height, clip, clipLeft, clipTop, clipWidth, clipHeight) {
+    const element = document.getElementById(id);
     if (element) {
-        element.style.left = left + "px";
-        element.style.top = top + "px";
-        element.style.width = width + "px";
-        element.style.height = height + "px";
-
-        if (bSetAbsolutePosition) {
-            element.style.position = "absolute";
-        }
-        if (bSetZeroMargin) {
-            element.style.margin = "0";
-        }
-        if (bSetZeroPadding) {
-            element.style.padding = "0";
-        }
-    }
-}
-
-document.setPosition = function (id, left, top, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
-    var element = document.getElementById(id);
-    if (element) {
-        element.style.left = left + "px";
-        element.style.top = top + "px";
-
-        if (bSetAbsolutePosition) {
-            element.style.position = "absolute";
-        }
-        if (bSetZeroMargin) {
-            element.style.margin = "0";
-        }
-        if (bSetZeroPadding) {
-            element.style.padding = "0";
+        element.style.left = left + 'px';
+        element.style.top = top + 'px';
+        element.style.width = width + 'px';
+        element.style.height = height + 'px';
+        element.style.margin = '0';
+        element.style.padding = '0';
+        element.style.position = 'absolute';
+        if (clip) {
+            element.style.clipPath = `polygon(${clipLeft}px ${clipTop}px, ${clipWidth}px ${clipTop}px, ${clipWidth}px ${clipHeight}px, ${clipLeft}px ${clipHeight}px)`;
+        } else {
+            element.style.clipPath = '';
         }
     }
 }

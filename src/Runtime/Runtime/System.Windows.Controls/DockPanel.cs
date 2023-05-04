@@ -1,30 +1,16 @@
-﻿
+﻿// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
 
-/*===================================================================================
-* 
-*   Copyright (c) Userware/OpenSilver.net
-*      
-*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
-*   licensed under the MIT license: https://opensource.org/licenses/MIT
-*   
-*   As stated in the MIT license, "the above copyright notice and this permission
-*   notice shall be included in all copies or substantial portions of the Software."
-*  
-\*====================================================================================*/
-
-
-using CSHTML5.Internal;
-using OpenSilver.Internal.Controls;
 using System;
-using System.Collections;
-using System.Diagnostics;
-using System.Linq;
+using System.Globalization;
 
 #if MIGRATION
 using System.Windows.Media;
 #else
-using Windows.UI.Xaml.Media;
 using Windows.Foundation;
+using Windows.UI.Xaml.Media;
 #endif
 
 #if MIGRATION
@@ -34,389 +20,268 @@ namespace Windows.UI.Xaml.Controls
 #endif
 {
     /// <summary>
-    /// Defines an area where you can arrange child elements either horizontally
-    /// or vertically, relative to each other.
+    /// Arranges child elements around the edges of the panel. Optionally, 
+    /// last added child element can occupy the remaining space.
     /// </summary>
-    public partial class DockPanel : Panel
+    /// <QualityBand>Stable</QualityBand>
+    public class DockPanel : Panel
     {
-        GridNotLogical _grid;
-
-        internal override int VisualChildrenCount
-        {
-            get
-            {
-                return _grid == null ? 0 : 1;
-            }
-        }
-
-        internal override UIElement GetVisualChild(int index)
-        {
-            if (_grid == null || index != 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-
-            return _grid;
-        }
-
-        protected override UIElementCollection CreateUIElementCollection(FrameworkElement logicalParent)
-        {
-            return new UIElementCollection(null, logicalParent);
-        }
-
-        ///// <summary>
-        ///// Initializes a new instance of the DockPanel class.
-        ///// </summary>
-        //public DockPanel();
+        /// <summary>
+        /// A value indicating whether a dependency property change handler
+        /// should ignore the next change notification.  This is used to reset
+        /// the value of properties without performing any of the actions in
+        /// their change handlers.
+        /// </summary>
+        private static bool _ignorePropertyChange;
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the last child element within
-        /// a DockPanel stretches to fill the remaining available
+        /// Gets or sets a value indicating whether the last child element
+        /// added to a <see cref="DockPanel" /> resizes to fill the remaining 
         /// space.
         /// </summary>
+        /// <value>
+        /// True if the last element added resizes to fill the remaining space,
+        /// false to indicate the last element does not resize. The default is
+        /// true.
+        /// </value>
         public bool LastChildFill
         {
             get { return (bool)GetValue(LastChildFillProperty); }
             set { SetValue(LastChildFillProperty, value); }
         }
-        /// <summary>
-        /// Identifies the DockPanel.LastChildFill dependency
-        /// property.
-        /// </summary>
-        public static readonly DependencyProperty LastChildFillProperty =
-            DependencyProperty.Register("LastChildFill", typeof(bool), typeof(DockPanel),
-                new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         /// <summary>
-        /// Gets the value of the DockPanel.Dock attached property
-        /// for a specified System.Windows.UIElement.
+        /// Identifies the <see cref="LastChildFill" /> dependency property.
         /// </summary>
-        /// <param name="element">The element from which the property value is read.</param>
-        /// <returns>The DockPanel.Dock property value for the element.</returns>
-        public static Dock GetDock(DependencyObject element)
+        public static readonly DependencyProperty LastChildFillProperty =
+            DependencyProperty.Register(
+                nameof(LastChildFill),
+                typeof(bool),
+                typeof(DockPanel),
+                new PropertyMetadata(true, OnLastChildFillPropertyChanged));
+
+        /// <summary>
+        /// LastChildFillProperty property changed handler.
+        /// </summary>
+        /// <param name="d">DockPanel that changed its LastChildFill.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnLastChildFillPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            DockPanel source = d as DockPanel;
+            source.InvalidateArrange();
+        }
+
+        /// <summary>
+        /// Gets the value of the <see cref="Dock" /> attached property for 
+        /// the specified element.
+        /// </summary>
+        /// <param name="element">
+        /// The element from which the property value is read.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Dock" /> property value for the element.
+        /// </returns>
+        public static Dock GetDock(UIElement element)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException("element");
+            }
             return (Dock)element.GetValue(DockProperty);
         }
 
         /// <summary>
-        /// Sets the value of the DockPanel.Dock attached property
-        /// to a specified element.
+        /// Sets the value of the <see cref="Dock" /> attached property for 
+        /// the specified element to the specified dock value.
         /// </summary>
-        /// <param name="element">The element to which the attached property is written.</param>
-        /// <param name="dock">The needed Dock value.</param>
-        public static void SetDock(DependencyObject element, Dock dock)
+        /// <param name="element">
+        /// The element to which the attached property is assigned.
+        /// </param>
+        /// <param name="dock">
+        /// The dock value to assign to the specified element.
+        /// </param>
+        public static void SetDock(UIElement element, Dock dock)
         {
+            if (element == null)
+            {
+                throw new ArgumentNullException("element");
+            }
             element.SetValue(DockProperty, dock);
         }
 
         /// <summary>
-        /// Identifies the DockPanel.Dock attached property.
+        /// Identifies the <see cref="Dock" /> attached property.
         /// </summary>
         public static readonly DependencyProperty DockProperty =
-            DependencyProperty.RegisterAttached("Dock", typeof(Dock), typeof(DockPanel), new PropertyMetadata(Dock.Left)); //this is the likely default value since Dock.Left is 0.
+            DependencyProperty.RegisterAttached(
+                "Dock",
+                typeof(Dock),
+                typeof(DockPanel),
+                new PropertyMetadata(Dock.Left, OnDockPropertyChanged));
 
-        internal protected override void INTERNAL_OnAttachedToVisualTree()
+        /// <summary>
+        /// DockProperty property changed handler.
+        /// </summary>
+        /// <param name="d">UIElement that changed its Dock.</param>
+        /// <param name="e">Event arguments.</param>
+        private static void OnDockPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (_grid == null)
+            // Ignore the change if requested
+            if (_ignorePropertyChange)
             {
-                _grid = new GridNotLogical();
-            }
-
-            AddVisualChild(_grid);
-
-            base.INTERNAL_OnAttachedToVisualTree();
-        }
-
-        protected internal override void INTERNAL_OnDetachedFromVisualTree()
-        {
-            if (_grid != null)
-            {
-                RemoveVisualChild(_grid);
-            }
-
-            base.INTERNAL_OnDetachedFromVisualTree();
-        }
-
-        private void MakeUIStructure()
-        {
-            //we go through the children and determine the rows, columns and positions in the grid:
-            if (this.HasChildren)
-            {
-                int amountOfRows = 1; // = 1 for the remaining space
-                int amountOfColumns = 1; // = 1 for the remaining space
-                Dock lastChildDock = Dock.Left; //We only need it to know the amount of rows and columns and to know which row and column are the "remaining space" (sized at star) in the case where LastChildFill is true.
-
-                //first pass: we count the amount of rows and columns.
-                foreach (UIElement child in Children)
-                {
-                    //get the Dock value of the child:
-                    Dock dock = DockPanel.GetDock(child);
-
-                    if (dock == Dock.Left || dock == Dock.Right)
-                    {
-                        ++amountOfColumns;
-                    }
-                    else
-                    {
-                        ++amountOfRows;
-                    }
-                }
-                if (LastChildFill) //if the last child fills the remaining space, we "remove" the row/column we "added" for this child.
-                {
-                    lastChildDock = GetDock(Children[Children.Count - 1]);
-                    if (lastChildDock == Dock.Right || lastChildDock == Dock.Left)
-                    {
-                        --amountOfColumns;
-                    }
-                    else
-                    {
-                        --amountOfRows;
-                    }
-                }
-
-                //second pass: we determine the Grid.Row, Grid.Column, Grid.RowSpan and Grid.ColumnsSpan for each child.
-                int amountOfRightPlaced = 0;
-                int amountOfLeftPlaced = 0;
-                int amountOfTopPlaced = 0;
-                int amountOfBottomPlaced = 0;
-
-                foreach (UIElement child in Children)
-                {
-                    //get the Dock value of the child:
-                    Dock dock = DockPanel.GetDock(child);
-
-                    switch (dock)
-                    {
-                        case Dock.Left:
-                            Grid.SetRow(child, amountOfTopPlaced);
-                            Grid.SetColumn(child, amountOfLeftPlaced);
-                            Grid.SetRowSpan(child, amountOfRows - amountOfTopPlaced - amountOfBottomPlaced);
-                            Grid.SetColumnSpan(child, 1);
-                            ++amountOfLeftPlaced;
-                            break;
-                        case Dock.Top:
-                            Grid.SetRow(child, amountOfTopPlaced);
-                            Grid.SetColumn(child, amountOfLeftPlaced);
-                            Grid.SetRowSpan(child, 1);
-                            Grid.SetColumnSpan(child, amountOfColumns - amountOfLeftPlaced - amountOfRightPlaced);
-                            ++amountOfTopPlaced;
-                            break;
-                        case Dock.Right:
-                            Grid.SetRow(child, amountOfTopPlaced);
-                            Grid.SetColumn(child, amountOfColumns - amountOfRightPlaced - 1);
-                            Grid.SetRowSpan(child, amountOfRows - amountOfTopPlaced - amountOfBottomPlaced);
-                            Grid.SetColumnSpan(child, 1);
-                            ++amountOfRightPlaced;
-                            break;
-                        case Dock.Bottom:
-                            Grid.SetRow(child, amountOfRows - amountOfBottomPlaced - 1);
-                            Grid.SetColumn(child, amountOfLeftPlaced);
-                            Grid.SetRowSpan(child, 1);
-                            Grid.SetColumnSpan(child, amountOfColumns - amountOfLeftPlaced - amountOfRightPlaced);
-                            ++amountOfBottomPlaced;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                //we remove the grid because we will change its structure A LOT, and we want to avoid redrawing everything on each change:
-                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(_grid, this);
-
-                ColumnDefinitionCollection columnsDefinitions = _grid.ColumnDefinitions;
-                columnsDefinitions.Clear();
-                for (int i = 0; i < amountOfColumns; ++i)
-                {
-                    columnsDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
-                }
-                RowDefinitionCollection rowsDefinitions = _grid.RowDefinitions;
-                rowsDefinitions.Clear();
-                for (int i = 0; i < amountOfRows; ++i)
-                {
-                    rowsDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-                }
-
-                if (!LastChildFill)
-                {
-                    columnsDefinitions.ElementAt(amountOfLeftPlaced).Width = new GridLength(1, GridUnitType.Star);
-                    rowsDefinitions.ElementAt(amountOfTopPlaced).Height = new GridLength(1, GridUnitType.Star);
-                }
-                else
-                {
-                    //the position of the "remaining space" depends on the last child's dock:
-                    if (lastChildDock == Dock.Left)
-                    {
-                        columnsDefinitions.ElementAt(amountOfLeftPlaced - 1).Width = new GridLength(1, GridUnitType.Star); //minus 1 because the column index of the last child placed left is also the column index of the "remaining space".
-                    }
-                    else
-                    {
-                        columnsDefinitions.ElementAt(amountOfLeftPlaced).Width = new GridLength(1, GridUnitType.Star);
-                    }
-
-                    if (lastChildDock == Dock.Top)
-                    {
-                        rowsDefinitions.ElementAt(amountOfTopPlaced - 1).Height = new GridLength(1, GridUnitType.Star); //minus 1 because the column index of the last child placed left is also the column index of the "remaining space".
-                    }
-                    else
-                    {
-                        rowsDefinitions.ElementAt(amountOfTopPlaced).Height = new GridLength(1, GridUnitType.Star); //minus 1 because the column index of the last child placed left is also the column index of the "remaining space".
-                    }
-                }
-                //the changes on the grid's structure are over so we can put it back.
-                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_grid, this);
-            }
-        }
-
-        internal override void OnChildrenAdded(UIElement newChild, int index)
-        {
-            this.MakeUIStructure();
-            this._grid.Children.Insert(index, newChild);
-        }
-
-        internal override void OnChildrenRemoved(UIElement oldChild, int index)
-        {
-            this._grid.Children.RemoveAt(index);
-        }
-
-        internal override void OnChildrenReplaced(UIElement oldChild, UIElement newChild, int index)
-        {
-            if (oldChild == newChild)
-            {
+                _ignorePropertyChange = false;
                 return;
             }
 
-            Debug.Assert(oldChild == this._grid.Children[index]);
+            UIElement element = (UIElement)d;
+            Dock value = (Dock)e.NewValue;
 
-            this.MakeUIStructure();
-            this._grid.Children[index] = newChild;
-        }
-
-        internal override void OnChildrenReset()
-        {
-            this._grid.Children.Clear();
-
-            this.MakeUIStructure();
-
-            if (this.HasChildren)
+            // Validate the Dock property
+            if ((value != Dock.Left) &&
+                (value != Dock.Top) &&
+                (value != Dock.Right) &&
+                (value != Dock.Bottom))
             {
-                foreach (UIElement child in this.Children)
-                {
-                    this._grid.Children.Add(child);
-                }
+                // Reset the property to its original state before throwing
+                _ignorePropertyChange = true;
+                element.SetValue(DockProperty, (Dock)e.OldValue);
+
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Invalid Dock value '{0}'.",
+                    value);
+                throw new ArgumentException(message, "value");
+            }
+
+            // Cause the DockPanel to update its layout when a child changes
+            DockPanel panel = VisualTreeHelper.GetParent(element) as DockPanel;
+            if (panel != null)
+            {
+                panel.InvalidateMeasure();
             }
         }
 
-#if false
-        internal override void ManageChildrenChanged(IList oldChildren, IList newChildren)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DockPanel" /> class.
+        /// </summary>
+        public DockPanel()
         {
-            if (oldChildren != null)
-            {
-                foreach (UIElement oldChild in oldChildren)
-                {
-                    this._grid.Children.Remove(oldChild);
-                }
-            }
-            this.MakeUIStructure();
-
-            if (newChildren != null)
-            {
-                foreach (UIElement newChild in newChildren)
-                {
-                    this._grid.Children.Add(newChild);
-                }
-            }
         }
-#endif
-        private static Orientation GetDockOrientation(Dock dock)
-        {
-            return dock == Dock.Left || dock == Dock.Right ? Orientation.Horizontal : Orientation.Vertical;
-        }
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            double remainingWidth = availableSize.Width;
-            double remainingHeight = availableSize.Height;
 
-            UIElement[] childrens = Children.ToArray();
-            foreach (UIElement child in childrens)
+        /// <summary>
+        /// Measures the child elements of a <see cref="DockPanel" /> in preparation
+        /// for arranging them during the <see cref="ArrangeOverride(Size)" /> pass.
+        /// </summary>
+        /// <param name="constraint">
+        /// The area available to the <see cref="DockPanel" />.
+        /// </param>
+        /// <returns>
+        /// The desired size of the <see cref="DockPanel" />.
+        /// </returns>
+        protected override Size MeasureOverride(Size constraint)
+        {
+            double usedWidth = 0.0;
+            double usedHeight = 0.0;
+            double maximumWidth = 0.0;
+            double maximumHeight = 0.0;
+
+            // Measure each of the Children
+            foreach (UIElement element in Children)
             {
-                child.Measure(new Size(remainingWidth, remainingHeight));
+                // Get the child's desired size
+                Size remainingSize = new Size(
+                    Math.Max(0.0, constraint.Width - usedWidth),
+                    Math.Max(0.0, constraint.Height - usedHeight));
+                element.Measure(remainingSize);
+                Size desiredSize = element.DesiredSize;
 
-                if (GetDockOrientation(GetDock(child)) == Orientation.Horizontal)
+                // Decrease the remaining space for the rest of the children
+                switch (GetDock(element))
                 {
-                    remainingWidth = (remainingWidth - child.DesiredSize.Width).Max(0);
-                }
-                else
-                {
-                    remainingHeight = (remainingHeight - child.DesiredSize.Height).Max(0);
+                    case Dock.Left:
+                    case Dock.Right:
+                        maximumHeight = Math.Max(maximumHeight, usedHeight + desiredSize.Height);
+                        usedWidth += desiredSize.Width;
+                        break;
+                    case Dock.Top:
+                    case Dock.Bottom:
+                        maximumWidth = Math.Max(maximumWidth, usedWidth + desiredSize.Width);
+                        usedHeight += desiredSize.Height;
+                        break;
                 }
             }
 
-            double childrenWidth = 0;
-            double childrenHeight = 0;
-
-            for (int i = Children.Count - 1; i >= 0; i--)
-            {
-                UIElement child = Children[i];
-
-                if (GetDockOrientation(GetDock(child)) == Orientation.Horizontal)
-                {
-                    childrenWidth += child.DesiredSize.Width;
-                    childrenHeight = Math.Max(childrenHeight, child.DesiredSize.Height);
-                }
-                else
-                {
-                    childrenHeight += child.DesiredSize.Height;
-                    childrenWidth = Math.Max(childrenWidth, child.DesiredSize.Width);
-                }
-            }
-
-            return new Size(childrenWidth, childrenHeight);
+            maximumWidth = Math.Max(maximumWidth, usedWidth);
+            maximumHeight = Math.Max(maximumHeight, usedHeight);
+            return new Size(maximumWidth, maximumHeight);
         }
-        protected override Size ArrangeOverride(Size finalSize)
+
+        /// <summary>
+        /// Arranges the child elements of the <see cref="DockPanel" /> control.
+        /// </summary>
+        /// <param name="arrangeSize">
+        /// The area in the parent element that the <see cref="DockPanel" /> 
+        /// should use to arrange its child elements.
+        /// </param>
+        /// <returns>
+        /// The actual size of the <see cref="DockPanel" /> after the child
+        /// elements are arranged. The actual size should always equal
+        /// <paramref name="arrangeSize" />.
+        /// </returns>
+        protected override Size ArrangeOverride(Size arrangeSize)
         {
-            double remainingWidth = finalSize.Width;
-            double remainingHeight = finalSize.Height;
+            double left = 0.0;
+            double top = 0.0;
+            double right = 0.0;
+            double bottom = 0.0;
 
-            double left = 0;
-            double top = 0;
-
-            for (int i = 0; i < Children.Count; i++)
+            // Arrange each of the Children
+            UIElementCollection children = Children;
+            int dockedCount = children.Count - (LastChildFill ? 1 : 0);
+            int index = 0;
+            foreach (UIElement element in children)
             {
-                UIElement child = Children[i];
-                Dock childDock = GetDock(child);
-                Orientation childDockOrientation = GetDockOrientation(childDock);
+                // Determine the remaining space left to arrange the element
+                Rect remainingRect = new Rect(
+                    left,
+                    top,
+                    Math.Max(0.0, arrangeSize.Width - left - right),
+                    Math.Max(0.0, arrangeSize.Height - top - bottom));
 
-                bool childFill = LastChildFill && i == Children.Count - 1;
-
-                double cellWidth = childDockOrientation == Orientation.Vertical || childFill ? remainingWidth : child.DesiredSize.Width;
-                double cellHeight = childDockOrientation == Orientation.Horizontal || childFill ? remainingHeight : child.DesiredSize.Height;
-
-                double cellLeft = childDock == Dock.Right ? remainingWidth - cellWidth : 0;
-                double cellTop = childDock == Dock.Bottom ? remainingHeight - cellHeight : 0;
-
-                child.Arrange(new Rect(left + cellLeft, top + cellTop, cellWidth.Max(0), cellHeight.Max(0)));
-
-                if (childDockOrientation == Orientation.Horizontal)
+                // Trim the remaining Rect to the docked size of the element
+                // (unless the element should fill the remaining space because
+                // of LastChildFill)
+                if (index < dockedCount)
                 {
-                    remainingWidth -= cellWidth;
-
-                    if (childDock == Dock.Left)
+                    Size desiredSize = element.DesiredSize;
+                    switch (GetDock(element))
                     {
-                        left += cellWidth;
+                        case Dock.Left:
+                            left += desiredSize.Width;
+                            remainingRect.Width = desiredSize.Width;
+                            break;
+                        case Dock.Top:
+                            top += desiredSize.Height;
+                            remainingRect.Height = desiredSize.Height;
+                            break;
+                        case Dock.Right:
+                            right += desiredSize.Width;
+                            remainingRect.X = Math.Max(0.0, arrangeSize.Width - right);
+                            remainingRect.Width = desiredSize.Width;
+                            break;
+                        case Dock.Bottom:
+                            bottom += desiredSize.Height;
+                            remainingRect.Y = Math.Max(0.0, arrangeSize.Height - bottom);
+                            remainingRect.Height = desiredSize.Height;
+                            break;
                     }
                 }
-                else
-                {
-                    remainingHeight -= cellHeight;
 
-                    if (childDock == Dock.Top)
-                    {
-                        top += cellHeight;
-                    }
-                }
+                element.Arrange(remainingRect);
+                index++;
             }
 
-            return finalSize;
+            return arrangeSize;
         }
     }
 }

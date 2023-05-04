@@ -153,6 +153,8 @@ namespace Windows.UI.Xaml.Controls
             border.AddVisualChild(newChild);
 
             INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChild, border);
+
+            border.InvalidateMeasure();
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
@@ -343,27 +345,8 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Padding),
                 typeof(Thickness),
                 typeof(Border),
-                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
-                {
-                    MethodToUpdateDom = Padding_MethodToUpdateDom
-                },
+                new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure),
                 IsThicknessValid);
-
-        private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
-        {
-            var border = (Border)d;
-
-            if (!border.IsUnderCustomLayout)
-            {
-                var newPadding = (Thickness)newValue;
-                var innerDomElement = border.INTERNAL_InnerDomElement;
-                var styleOfInnerDomElement = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(innerDomElement);
-
-                // todo: if the container has a padding, add it to the margin
-                styleOfInnerDomElement.boxSizing = "border-box";
-                styleOfInnerDomElement.padding = $"{newPadding.Top.ToInvariantString()}px {newPadding.Right.ToInvariantString()}px {newPadding.Bottom.ToInvariantString()}px {newPadding.Left.ToInvariantString()}px";
-            }
-        }
 
         protected override Size MeasureOverride(Size availableSize)
         {

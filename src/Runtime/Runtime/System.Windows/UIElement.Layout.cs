@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using System.Diagnostics;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -34,13 +35,20 @@ namespace Windows.UI.Xaml
 {
     public partial class UIElement
     {
+        private Size _size;
+        private Size _desiredSize;
+
         /// <summary>
         /// Gets the final render size of a <see cref="UIElement"/>.
         /// </summary>
         /// <returns>
         /// The rendered size for this object. There is no default value.
         /// </returns>
-        public Size RenderSize { get; internal set; }
+        public Size RenderSize
+        {
+            get => IsVisible ? _size : new Size();
+            internal set => _size = value;
+        }
 
         /// <summary>
         /// Gets the size that this <see cref="UIElement"/> computed during the measure
@@ -50,21 +58,27 @@ namespace Windows.UI.Xaml
         /// The size that this <see cref="UIElement"/> computed during the measure pass
         /// of the layout process.
         /// </returns>
-        public Size DesiredSize { get; private set; }
+        public Size DesiredSize => IsVisible ? _desiredSize : new Size();
 
         /// <summary>
         /// Invalidates the measurement state (layout) for a <see cref="UIElement"/>.
         /// </summary>
         public void InvalidateMeasure()
         {
-            if (!IsMeasureValid)
+            if (!MeasureDirty && !MeasureInProgress)
             {
-                return;
+                if (!NeverMeasured)
+                {
+                    LayoutManager.Current.MeasureQueue.Add(this);
+                }
+
+                MeasureDirty = true;
             }
+        }
 
-            IsMeasureValid = false;
-
-            LayoutManager.Current.AddMeasure(this);
+        internal void InvalidateMeasureInternal()
+        {
+            MeasureDirty = true;
         }
 
         /// <summary>
@@ -74,14 +88,29 @@ namespace Windows.UI.Xaml
         /// </summary>
         public void InvalidateArrange()
         {
-            if (!IsArrangeValid)
+            if (!ArrangeDirty && !ArrangeInProgress)
             {
-                return;
+                if (!NeverArranged)
+                {
+                    LayoutManager.Current.ArrangeQueue.Add(this);
+                }
+
+                ArrangeDirty = true;
             }
+        }
 
-            IsArrangeValid = false;
+        internal void InvalidateArrangeInternal()
+        {
+            ArrangeDirty = true;
+        }
 
-            LayoutManager.Current.AddArrange(this);
+        /// <summary>
+        /// Invalidates the rendering of the element.
+        /// </summary>
+        internal void InvalidateVisual()
+        {
+            InvalidateArrange();
+            RenderingInvalidated = true;
         }
 
         /// <summary>
@@ -113,9 +142,9 @@ namespace Windows.UI.Xaml
         {
             if (INTERNAL_OuterDomElement == null)
             {
-                LayoutManager.Current.RemoveMeasure(this);
-                PreviousAvailableSize = availableSize;
-                IsMeasureValid = true;
+                if (MeasureRequest != null)
+                    LayoutManager.Current.MeasureQueue.Remove(this);
+                MeasureDirty = false;
                 return;
             }
 
@@ -126,64 +155,115 @@ namespace Windows.UI.Xaml
                     throw new InvalidOperationException(
                         "UIElement.Measure(availableSize) cannot be called with NaN size.");
 
-                bool previousMeasureValid = IsMeasureValid;
-                Size savedPreviousAvailableSize = PreviousAvailableSize;
-                PreviousAvailableSize = availableSize;
-
-                LayoutManager.Current.RemoveMeasure(this);
-
-                if (!IsVisible)
+                bool neverMeasured = NeverMeasured;
+                
+                if (neverMeasured)
                 {
-                    DesiredSize = new Size();
-                    _previousDesiredSize = Size.Empty;
-                    IsMeasureValid = true;
-                    return;
-                }
-                else if (previousMeasureValid && savedPreviousAvailableSize.IsClose(availableSize) && _previousDesiredSize != Size.Empty)
-                {
-                    IsMeasureValid = true;
-                    return;
+                    SwitchVisibilityIfNeeded(IsVisible);
                 }
 
-                Size previousDesiredSizeInMeasure = this.DesiredSize;
-                _measureInProgress = true;
+                bool isCloseToPreviousMeasure = DoubleUtil.AreClose(availableSize, PreviousAvailableSize);
+
+                if (!IsVisible || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
+                {
+                    //reset measure request.
+                    if (MeasureRequest != null)
+                    {
+                        LayoutManager.Current.MeasureQueue.Remove(this);
+                    }
+
+                    //  remember though that parent tried to measure at this size
+                    //  in case when later this element is called to measure incrementally
+                    //  it has up-to-date information stored in PreviousAvailableSize
+                    if (!isCloseToPreviousMeasure)
+                    {
+                        //this will ensure that element will be actually re-measured at the new available size
+                        //later when it becomes visible.
+                        InvalidateMeasureInternal();
+
+                        PreviousAvailableSize = availableSize;
+                    }
+
+                    return;
+                }
+                
+                if (IsMeasureValid && !neverMeasured && isCloseToPreviousMeasure)
+                {
+                    return;
+                }
+
+                NeverMeasured = false;
+                Size prevSize = _desiredSize;
+
+                //we always want to be arranged, ensure arrange request
+                InvalidateArrange();
+                
+                MeasureInProgress = true;
+
+                Size desiredSize = new Size(0, 0);
+
+                LayoutManager layoutManager = LayoutManager.Current;
+
+                bool gotException = true;
+
                 try
                 {
-                    DesiredSize = MeasureCore(availableSize);
+                    layoutManager.EnterMeasure();
+                    desiredSize = MeasureCore(availableSize);
+
+                    gotException = false;
                 }
                 finally
                 {
-                    _measureInProgress = false;
+                    MeasureInProgress = false;
+
+                    PreviousAvailableSize = availableSize;
+
+                    layoutManager.ExitMeasure();
+
+                    if (gotException)
+                    {
+                        // we don't want to reset last exception element on layoutManager if it's been already set.
+                        if (layoutManager.GetLastExceptionElement() == null)
+                        {
+                            layoutManager.SetLastExceptionElement(this);
+                        }
+                    }
                 }
 
                 //enforce that MeasureCore can not return PositiveInfinity size even if given Infinte availabel size.
                 //Note: NegativeInfinity can not be returned by definition of Size structure.
-                if (double.IsPositiveInfinity(DesiredSize.Width) || double.IsPositiveInfinity(DesiredSize.Height))
+                if (double.IsPositiveInfinity(desiredSize.Width) || double.IsPositiveInfinity(desiredSize.Height))
                     throw new InvalidOperationException(string.Format(
                         "Layout measurement override of element '{0}' should not return PositiveInfinity as its DesiredSize, even if Infinity is passed in as available size.",
                         GetType().FullName));
 
                 //enforce that MeasureCore can not return NaN size .
-                if (double.IsNaN(DesiredSize.Width) || double.IsNaN(DesiredSize.Height))
+                if (double.IsNaN(desiredSize.Width) || double.IsNaN(desiredSize.Height))
                     throw new InvalidOperationException(string.Format(
                         "Layout measurement override of element '{0}' should not return NaN values as its DesiredSize.",
                         GetType().FullName));
 
-                IsMeasureValid = true;
+                //reset measure dirtiness
+                
+                MeasureDirty = false;
 
-                if (previousDesiredSizeInMeasure != DesiredSize)
+                //reset measure request.
+                if (MeasureRequest != null)
                 {
-                    InvalidateArrange();
+                    LayoutManager.Current.MeasureQueue.Remove(this);
+                }
 
+                _desiredSize = desiredSize;
+
+                if (!MeasureDuringArrange && !DoubleUtil.AreClose(prevSize, desiredSize))
+                {
                     UIElement parent = GetLayoutParent(this);
-                    if (parent != null && !parent._measureInProgress)
+                    if (parent != null && !parent.MeasureInProgress)
                     {
                         parent.InvalidateMeasure();
                     }
                 }
-
-                PreviousAvailableSize = availableSize;
-                _previousDesiredSize = DesiredSize;
             }
         }
 
@@ -224,10 +304,9 @@ namespace Windows.UI.Xaml
         {
             if (INTERNAL_OuterDomElement == null)
             {
-                LayoutManager.Current.RemoveArrange(this);
-                PreviousFinalRect = finalRect;
-                IsArrangeValid = true;
-                IsRendered = false;
+                if (ArrangeRequest != null)
+                    LayoutManager.Current.ArrangeQueue.Remove(this);
+                ArrangeDirty = false;
                 return;
             }
 
@@ -246,54 +325,167 @@ namespace Windows.UI.Xaml
                         GetType().FullName));
                 }
 
-                bool previousArrangeValid = IsArrangeValid;
-                Rect savedPreviousFinalRect = PreviousFinalRect;
-                PreviousFinalRect = finalRect;
-                LayoutManager.Current.RemoveArrange(this);
-
-                if (!IsVisible)
+                if (!IsVisible || ReadVisualFlag(VisualFlags.IsLayoutSuspended))
                 {
-                    IsRendered = false;
-                    IsArrangeValid = true;
-                    return;
-                }
-
-                if (IsRendered && previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size))
-                {
-                    IsArrangeValid = true;
-                    return;
-                }
-
-                if (!IsMeasureValid)
-                {
-                    Size previousDesiredSizeInArrange = DesiredSize;
-                    Measure(PreviousAvailableSize);
-                    if (previousDesiredSizeInArrange != DesiredSize)
+                    //reset arrange request.
+                    if (ArrangeRequest != null)
                     {
-                        InvalidateParentMeasure();
-                        InvalidateParentArrange();
+                        LayoutManager.Current.ArrangeQueue.Remove(this);
+                    }
+
+                    //  remember though that parent tried to arrange at this rect
+                    //  in case when later this element is called to arrange incrementally
+                    //  it has up-to-date information stored in _finalRect
+                    PreviousArrangeRect = finalRect;
+
+                    return;
+                }
+
+                if (MeasureDirty || NeverMeasured)
+                {
+                    try
+                    {
+                        MeasureDuringArrange = true;
+                        //If never measured - that means "set size", arrange-only scenario
+                        //Otherwise - the parent previously measured the element at constriant
+                        //and the fact that we are arranging the measure-dirty element now means
+                        //we are not in the UpdateLayout loop but rather in manual sequence of Measure/Arrange
+                        //(like in HwndSource when new RootVisual is attached) so there are no loops and there could be
+                        //measure-dirty elements left after previous single Measure pass) - so need to use cached constraint
+                        Size previousDesiredSizeInArrange = DesiredSize;
+                        
+                        if (NeverMeasured)
+                        {
+                            Measure(finalRect.Size);
+                        }
+                        else
+                        {
+                            Measure(PreviousAvailableSize);
+                        }
+
+                        if (!DoubleUtil.AreClose(previousDesiredSizeInArrange, DesiredSize))
+                        {
+                            InvalidateParentMeasure();
+                            InvalidateParentArrange();
+                        }
+                    }
+                    finally
+                    {
+                        MeasureDuringArrange = false;
                     }
                 }
 
-                ArrangeCore(finalRect);
+                //bypass - if clean and rect is the same, no need to re-arrange
+                if (!IsArrangeValid || NeverArranged || !DoubleUtil.AreClose(finalRect, PreviousArrangeRect))
+                {
+                    bool firstArrange = NeverArranged;
+                    NeverArranged = false;
+                    ArrangeInProgress = true;
 
-                _visualBounds = GetRenderedBounds(finalRect.Size);
+                    LayoutManager layoutManager = LayoutManager.Current;
 
-                IsArrangeValid = true;
-                PreviousFinalRect = finalRect;
+                    Size oldSize = RenderSize;
+                    Point oldOffset = VisualOffset;
+                    Rect? oldLayoutClip = LayoutClip;
+                    bool sizeChanged = false;
+                    bool gotException = true;
 
-                // Render with new size & location
-                Render();
+                    try
+                    {
+                        layoutManager.EnterArrange();
 
-                LayoutManager.Current.AddUpdatedElement(this);
+                        //This has to update RenderSize
+                        ArrangeCore(finalRect);
+
+                        //to make sure Clip is tranferred to Visual
+                        LayoutClip = GetLayoutClip(finalRect.Size);
+                        
+                        // see if we need to call OnRenderSizeChanged on this element
+                        sizeChanged = MarkForSizeChangedIfNeeded(oldSize, RenderSize);
+
+                        sizeChanged |= !DoubleUtil.AreClose(oldOffset, VisualOffset) 
+                                    || !DoubleUtil.AreClose(oldLayoutClip, LayoutClip);
+
+                        gotException = false;
+                    }
+                    finally
+                    {
+                        ArrangeInProgress = false;
+                        layoutManager.ExitArrange();
+
+                        if (gotException)
+                        {
+                            // we don't want to reset last exception element on layoutManager if it's been already set.
+                            if (layoutManager.GetLastExceptionElement() == null)
+                            {
+                                layoutManager.SetLastExceptionElement(this);
+                            }
+                        }
+                    }
+
+                    PreviousArrangeRect = finalRect;
+
+                    ArrangeDirty = false;
+
+                    //reset request.
+                    if (ArrangeRequest != null)
+                    {
+                        LayoutManager.Current.ArrangeQueue.Remove(this);
+                    }
+
+                    if (sizeChanged || RenderingInvalidated || firstArrange)
+                    {
+                        // Render with new size & location
+                        Render();
+                        RenderingInvalidated = false;
+                    }
+                }
             }
         }
 
         internal virtual void ArrangeCore(Rect finalRect) { }
 
-        internal virtual Rect GetRenderedBounds(Size layoutSlotSize)
+        internal virtual Rect? GetLayoutClip(Size layoutSlotSize)
         {
-            return new Rect(VisualOffset, RenderSize);
+            return null;
+        }
+
+        /// <summary>
+        /// This is invoked after layout update before rendering if the element's RenderSize
+        /// has changed as a result of layout update.
+        /// </summary>
+        /// <param name="info">
+        /// Packaged parameters (<seealso cref="SizeChangedInfo"/>, includes old and new sizes 
+        /// and which dimension actually changes.
+        /// </param>
+        internal virtual void OnRenderSizeChanged(SizeChangedInfo info) { }
+
+        private bool MarkForSizeChangedIfNeeded(Size oldSize, Size newSize)
+        {
+            //already marked for SizeChanged, simply update the newSize
+            bool widthChanged = !DoubleUtil.AreClose(oldSize.Width, newSize.Width);
+            bool heightChanged = !DoubleUtil.AreClose(oldSize.Height, newSize.Height);
+
+            SizeChangedInfo info = SizeChangedInfo;
+
+            if (info != null)
+            {
+                info.Update(widthChanged, heightChanged);
+                return true;
+            }
+            else if (widthChanged || heightChanged)
+            {
+                info = new SizeChangedInfo(this, oldSize, widthChanged, heightChanged);
+                SizeChangedInfo = info;
+                LayoutManager.Current.AddToSizeChangedChain(info);
+
+                return true;
+            }
+
+            //this result is used to determine if we need to call OnRender after Arrange
+            //OnRender is called for 2 reasons - someone called InvalidateVisual - then OnRender is called
+            //on next Arrange, or the size changed.
+            return false;
         }
 
         /// <summary>
@@ -305,61 +497,6 @@ namespace Windows.UI.Xaml
             LayoutManager.Current.UpdateLayout();
         }
 
-        internal void UpdateCustomLayout(Size newSize)
-        {
-            _layoutLastSize = newSize;
-            if (_layoutProcessing)
-                return;
-
-            _layoutProcessing = true;
-            Dispatcher.BeginInvoke(BeginUpdateCustomLayout);
-        }
-
-        private void BeginUpdateCustomLayout()
-        {
-            Size savedLastSize = _layoutLastSize;
-            Size availableSize = _layoutLastSize;
-            FrameworkElement fe = this as FrameworkElement;
-            if (fe != null)
-            {
-                if (fe.IsAutoWidthOnCustomLayoutInternal)
-                    availableSize.Width = double.PositiveInfinity;
-                if (fe.IsAutoHeightOnCustomLayoutInternal)
-                    availableSize.Height = double.PositiveInfinity;
-            }
-            if (_layoutMeasuredSize == availableSize)
-            {
-                _layoutProcessing = false;
-                return;
-            }
-
-            Measure(availableSize);
-            _layoutMeasuredSize = availableSize;
-
-            if (savedLastSize != _layoutLastSize)
-            {
-                BeginUpdateCustomLayout();
-                return;
-            }
-            if (fe != null)
-            {
-                if (fe.IsAutoWidthOnCustomLayoutInternal)
-                    availableSize.Width = this.DesiredSize.Width;
-
-                if (fe.IsAutoHeightOnCustomLayoutInternal)
-                    availableSize.Height = this.DesiredSize.Height;
-            }
-
-            Arrange(new Rect(availableSize));
-            if (savedLastSize != _layoutLastSize)
-            {
-                BeginUpdateCustomLayout();
-                return;
-            }
-
-            _layoutProcessing = false;
-        }
-
         internal void InvalidateParentMeasure() => GetLayoutParent(this)?.InvalidateMeasure();
 
         internal void InvalidateParentArrange() => GetLayoutParent(this)?.InvalidateArrange();
@@ -367,114 +504,193 @@ namespace Windows.UI.Xaml
         internal static UIElement GetLayoutParent(UIElement element)
             => VisualTreeHelper.GetParent(element) switch
             {
-                GridNotLogical gnl => GetLayoutParent(gnl),
+                PopupRoot => null,
                 UIElement uie => uie,
                 null when element is FrameworkElement fe && fe.Parent is Popup popup => popup.PopupRoot?.Content,
                 _ => null,
             };
 
-        internal void ClearMeasureAndArrangeValidation()
-        {
-            if (!IsCustomLayoutRoot)
-            {
-                IsArrangeValid = false;
-                IsMeasureValid = false;
-            }
-            IsRendered = false;
-            RenderedVisualBounds = Rect.Empty;
-            _previousDesiredSize = Size.Empty;
-        }
-
         private void Render()
         {
-            if (IsCustomLayoutRoot)
+            if (!IsLayoutRoot)
             {
-                IsRendered = true;
-                if (RenderedVisualBounds != _visualBounds)
+                INTERNAL_HtmlDomManager.SetVisualBounds(
+                    INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement),
+                    VisualOffset, RenderSize, LayoutClip);
+            }
+        }
+
+        private static void ResetLayoutProperties(UIElement e)
+        {
+            e.TreeLevel = 0;
+            e.NeverMeasured = true;
+            e.NeverArranged = true;
+            e.PreviousArrangeRect = new Rect();
+            e.PreviousAvailableSize = new Size();
+            e.VisualOffset = new Point();
+            e.LayoutClip = null;
+            e._desiredSize = new Size();
+            e.RenderSize = new Size();
+        }
+
+        /// <summary>
+        /// Recursively propagates IsLayoutSuspended flag down to the whole v's sub tree.
+        /// </summary>
+        internal static void PropagateSuspendLayout(UIElement v)
+        {
+            //the subtree is already suspended - happens when already suspended tree is further disassembled
+            //no need to walk down in this case
+            if (v.ReadVisualFlag(VisualFlags.IsLayoutSuspended)) return;
+
+            //  Assert that a UIElement has not being
+            //  removed from the visual tree while updating layout.
+            Debug.Assert(!v.MeasureInProgress && !v.ArrangeInProgress);
+
+            v.WriteVisualFlag(VisualFlags.IsLayoutSuspended, true);
+
+            ResetLayoutProperties(v);
+            
+            int count = v.VisualChildrenCount;
+
+            for (int i = 0; i < count; i++)
+            {
+                UIElement cv = v.GetVisualChild(i);
+                if (cv != null)
                 {
-                    Size renderedSize = _visualBounds.Size;
-                    FrameworkElement fe = this as FrameworkElement;
-
-                    if (RenderedVisualBounds.Width != renderedSize.Width && fe.IsAutoWidthOnCustomLayoutInternal)
-                    {
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement).width =
-                            $"{renderedSize.Width.ToInvariantString()}px";
-                    }
-
-                    if (RenderedVisualBounds.Height != renderedSize.Height && fe.IsAutoHeightOnCustomLayoutInternal)
-                    {
-                        INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement).height =
-                            $"{renderedSize.Height.ToInvariantString()}px";
-                    }
-
-                    RenderedVisualBounds = _visualBounds;
+                    PropagateSuspendLayout(cv);
                 }
-                return;
+            }
+        }
+
+        /// <summary>
+        /// Recursively resets IsLayoutSuspended flag on all visuals of the whole v's sub tree.
+        /// For UIElements also re-inserts the UIElement into Measure and / or Arrange update queues
+        /// if necessary.
+        /// </summary>
+        internal static void PropagateResumeLayout(UIElement parent, UIElement v)
+        {
+            //the subtree is already active - happens when new elements are added to the active tree
+            //elements are created layout-active so they don't need to be specifically unsuspended
+            //no need to walk down in this case
+            //if(!v.CheckFlagsAnd(VisualFlags.IsLayoutSuspended)) return;
+
+            //that can be true only on top of recursion, if suspended v is being connected to suspended parent.
+            bool parentIsSuspended = parent == null ? false : parent.ReadVisualFlag(VisualFlags.IsLayoutSuspended);
+            uint parentTreeLevel = parent == null ? 0 : parent.TreeLevel;
+
+            if (parentIsSuspended) return;
+
+            v.WriteVisualFlag(VisualFlags.IsLayoutSuspended, false);
+            v.TreeLevel = parentTreeLevel + 1;
+
+            //  re-insert UIElement into the update queues
+
+            Debug.Assert(!v.MeasureInProgress && !v.ArrangeInProgress);
+
+            bool requireMeasureUpdate = v.MeasureDirty && !v.NeverMeasured && (v.MeasureRequest == null);
+            bool requireArrangeUpdate = v.ArrangeDirty && !v.NeverArranged && (v.ArrangeRequest == null);
+
+            LayoutManager contextLayoutManager = LayoutManager.Current;
+
+            if (requireMeasureUpdate)
+            {
+                contextLayoutManager.MeasureQueue.Add(v);
             }
 
-            if (this is not Window && this is not PopupRoot)
+            if (requireArrangeUpdate)
             {
-                var uiStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement);
-                if (RenderedVisualBounds != _visualBounds)
-                {
-                    RenderedVisualBounds = _visualBounds;
+                contextLayoutManager.ArrangeQueue.Add(v);
+            }
 
-                    if (!IsRendered)
-                    {
-                        INTERNAL_HtmlDomManager.SetVisualBounds(uiStyle, _visualBounds, true, false, false);
-                        IsRendered = true;
-                    }
-                    else
-                    {
-                        INTERNAL_HtmlDomManager.SetVisualBounds(uiStyle, _visualBounds, false, false, false);
-                    }
+            int count = v.VisualChildrenCount;
+
+            for (int i = 0; i < count; i++)
+            {
+                UIElement cv = v.GetVisualChild(i);
+                if (cv != null)
+                {
+                    PropagateResumeLayout(v, cv);
                 }
             }
         }
 
         internal Point VisualOffset { get; set; }
 
-        internal Rect RenderedVisualBounds { get; private set; }
+        internal Rect? LayoutClip { get; private set; }
 
-        internal Rect PreviousFinalRect { get; private set; }
+        internal Rect PreviousArrangeRect { get; private set; }
 
         internal Size PreviousAvailableSize { get; private set; }
 
-        internal bool IsMeasureValid { get; private set; }
+        internal LayoutManager.LayoutQueue.Request MeasureRequest;
+        internal LayoutManager.LayoutQueue.Request ArrangeRequest;
 
-        internal bool IsArrangeValid { get; private set; }
+        internal SizeChangedInfo SizeChangedInfo;
 
-        internal bool IsRendered { get; private set; }
+        internal bool IsMeasureValid => !MeasureDirty;
+
+        internal bool IsArrangeValid => !ArrangeDirty;
+
+        private bool RenderingInvalidated
+        {
+            get { return ReadFlag(CoreFlags.RenderingInvalidated); }
+            set { WriteFlag(CoreFlags.RenderingInvalidated, value); }
+        }
+
+        internal bool ClipToBoundsCache
+        {
+            get { return ReadFlag(CoreFlags.ClipToBoundsCache); }
+            set { WriteFlag(CoreFlags.ClipToBoundsCache, value); }
+        }
+
+        internal bool MeasureDirty
+        {
+            get { return ReadFlag(CoreFlags.MeasureDirty); }
+            set { WriteFlag(CoreFlags.MeasureDirty, value); }
+        }
+
+        internal bool ArrangeDirty
+        {
+            get { return ReadFlag(CoreFlags.ArrangeDirty); }
+            set { WriteFlag(CoreFlags.ArrangeDirty, value); }
+        }
+
+        internal bool MeasureInProgress
+        {
+            get { return ReadFlag(CoreFlags.MeasureInProgress); }
+            set { WriteFlag(CoreFlags.MeasureInProgress, value); }
+        }
+
+        internal bool ArrangeInProgress
+        {
+            get { return ReadFlag(CoreFlags.ArrangeInProgress); }
+            set { WriteFlag(CoreFlags.ArrangeInProgress, value); }
+        }
+
+        internal bool NeverMeasured
+        {
+            get { return ReadFlag(CoreFlags.NeverMeasured); }
+            set { WriteFlag(CoreFlags.NeverMeasured, value); }
+        }
+
+        internal bool NeverArranged
+        {
+            get { return ReadFlag(CoreFlags.NeverArranged); }
+            set { WriteFlag(CoreFlags.NeverArranged, value); }
+        }
+
+        internal bool MeasureDuringArrange
+        {
+            get { return ReadFlag(CoreFlags.MeasureDuringArrange); }
+            set { WriteFlag(CoreFlags.MeasureDuringArrange, value); }
+        }
+
+        internal uint TreeLevel { get; set; }
 
         internal bool IsFirstRendering { get; set; }
 
         internal bool KeepHiddenInFirstRender { get; set; }
 
-        internal int VisualLevel
-        {
-            get
-            {
-                if (_visualLevel == -1)
-                {
-                    _visualLevel = (VisualTreeHelper.GetParent(this) as UIElement)?.VisualLevel + 1 ?? 0;
-                }
-
-                return _visualLevel;
-            }
-        }
-
-        internal bool UseCustomLayout { get; set; }
-
-        internal bool IsCustomLayoutRoot => UseCustomLayout && !IsUnderCustomLayout;
-
-        internal bool IsUnderCustomLayout => GetLayoutParent(this)?.UseCustomLayout ?? false;
-
-        private Rect _visualBounds;
-        private Size _previousDesiredSize;
-        private Size _layoutMeasuredSize;
-        private Size _layoutLastSize;
-        private bool _layoutProcessing;
-        private bool _measureInProgress;
-        private int _visualLevel;
+        internal bool IsLayoutRoot => this is Window || this is PopupRoot;
     }
 }

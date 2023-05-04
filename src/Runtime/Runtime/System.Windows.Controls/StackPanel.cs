@@ -66,70 +66,7 @@ namespace Windows.UI.Xaml.Controls
                 nameof(Orientation),
                 typeof(Orientation),
                 typeof(StackPanel),
-                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange)
-                {
-                    MethodToUpdateDom2 = StackPanelHelper.OnOrientationChanged,
-                });
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            return StackPanelHelper.CreateDomElement(this, Orientation, parentRef, out domElementWhereToPlaceChildren);
-        }
-
-        public override object CreateDomChildWrapper(object parentRef, out object domElementWhereToPlaceChild, int index)
-        {
-            return StackPanelHelper.CreateDomChildWrapper(this, Orientation, parentRef, out domElementWhereToPlaceChild, index);
-        }
-
-        internal override bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Width))
-            {
-                return false;
-            }
-
-            if (Orientation == Orientation.Horizontal)
-            {
-                return true;
-            }
-
-            if (child.HorizontalAlignment != HorizontalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoWidth(this);
-            }
-
-            return false;
-        }
-
-        internal override bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Height))
-            {
-                return false;
-            }
-
-            if (Orientation == Orientation.Vertical)
-            {
-                return true;
-            }
-
-            if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoHeight(this);
-            }
-
-            return false;
-        }
+                new FrameworkPropertyMetadata(Orientation.Vertical, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsArrange));
 
         protected override Size MeasureOverride(Size constraint)
         {

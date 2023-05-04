@@ -207,7 +207,6 @@ namespace Windows.UI.Xaml.Controls
         [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public DataGridRow()
         {
-            CustomLayout = true;
             this.MinHeight = DATAGRIDROW_defaultMinHeight;
 
             this.Index = -1;

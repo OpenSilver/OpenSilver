@@ -216,7 +216,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public DataGridRowHeader()
         {
-            CustomLayout = true;
 #if MIGRATION
             this.AddHandler(FrameworkElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(DataGridRowHeader_MouseLeftButtonDown), true);
             this.MouseEnter += new MouseEventHandler(DataGridRowHeader_MouseEnter);

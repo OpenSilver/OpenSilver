@@ -120,55 +120,30 @@ namespace CSHTML5.Internal
             }
             else
             {
-                if (shape.IsUnderCustomLayout == false)
+                shapeActualSize = shape.RenderSize;
+
+                if (!frameworkElementWidthWasSpecified)
                 {
-                    //We apply the size defined earlier (size either by the Width and/or Height of the Shape (when they are set) or by the width and/or height of its content):
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
-                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
-
-                    canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px"; // The "sizeToApply" is the size that the shape would take if it was not constrained by the parent framework element.
-                    canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
-
-                    shapeActualSize = shape.INTERNAL_GetActualWidthAndHeight(); //Note: in case that the framework element is constrained, it won't take the size of its canvas2d content, so we then resize the canvas2d content so that the shape stretches.
-
-                    if (!frameworkElementWidthWasSpecified)
-                    {
-                        canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset);
-                    }
-                    if (!frameworkElementHeightWasSpecified)
-                    {
-                        canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset);
-                    }
+                    canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset);
                 }
                 else
                 {
-                    shapeActualSize = shape.RenderSize;
+                    shapeActualSize.Width = frameworkElementWidth;
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
+                    canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px";
+                }
 
-                    if (!frameworkElementWidthWasSpecified)
-                    {
-                        canvasStyle.width = shapeActualSize.Width.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", shapeActualSize.Width + offset);
-                    }
-                    else
-                    {
-                        shapeActualSize.Width = frameworkElementWidth;
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "width", sizeToApply.Width);
-                        canvasStyle.width = sizeToApply.Width.ToInvariantString() + "px";
-                    }
-
-                    if (!frameworkElementHeightWasSpecified)
-                    {
-                        canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset);
-                    }
-                    else
-                    {
-                        shapeActualSize.Height = frameworkElementHeight;
-                        INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
-                        canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
-                    }
+                if (!frameworkElementHeightWasSpecified)
+                {
+                    canvasStyle.height = shapeActualSize.Height.ToInvariantString() + "px";
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", shapeActualSize.Height + offset);
+                }
+                else
+                {
+                    shapeActualSize.Height = frameworkElementHeight;
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(canvasDomElement, "height", sizeToApply.Height);
+                    canvasStyle.height = sizeToApply.Height.ToInvariantString() + "px";
                 }
             }
         }

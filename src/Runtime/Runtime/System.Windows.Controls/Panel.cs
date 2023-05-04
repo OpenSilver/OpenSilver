@@ -477,7 +477,6 @@ namespace Windows.UI.Xaml.Controls
 
                 if (affectsLayout)
                 {
-                    // todo
                     InvalidateMeasure();
                 }
             }
@@ -647,7 +646,14 @@ namespace Windows.UI.Xaml.Controls
                     {
                         return; // in some cases Children collection can be changed during attach process
                     }
-                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newChildren[i], this, i);
+
+                    UIElement child = newChildren[i];
+                    INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(child, this, i);
+
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                    child.InvalidateMeasure();
+                    child.InvalidateArrange();
                 }
 
                 int remaining = newChildren.Count - to;

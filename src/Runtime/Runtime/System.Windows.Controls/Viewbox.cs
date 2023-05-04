@@ -50,7 +50,6 @@ namespace Windows.UI.Xaml.Controls
             // Set default style:
             this.DefaultStyleKey = typeof(Viewbox);
 
-            this.Loaded += OnLoaded;
             this.SizeChanged += OnSizeChanged;
 
             // Load the default template
@@ -199,87 +198,8 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            if (!IsLoaded)
-            {
-                return;
-            }
-
-            Dispatcher.BeginInvoke(() => // (This fixes the issue in the MatrixView in the STAR application, where the Viewbox scale was incorrect until the window was resized. Note that when doing step-by-step debugging it worked properly)
-            {
-                if (Content is FrameworkElement)
-                {
-                    UpdateScale(Content as FrameworkElement);
-                }
-            });
-        }
-
-        protected override void OnContentChanged(object oldContent, object newContent)
-        {
-            if (IsLoaded && newContent is FrameworkElement)
-            {
-                UpdateScale(newContent as FrameworkElement);
-            }
-            base.OnContentChanged(oldContent, newContent);
-        }
-
         protected virtual void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (IsLoaded && Content is FrameworkElement)
-            {
-                UpdateScale(Content as FrameworkElement);
-            }
-        }
-
-        public void InvalidateMeasure()
-        {
-            if (IsLoaded && Content is FrameworkElement)
-            {
-                UpdateScale(Content as FrameworkElement);
-            }
-        }
-
-        private void UpdateScale(FrameworkElement content)
-        {
-            if (UseCustomLayout)
-            {
-                return;
-            }
-
-            if (Scale != null && RootCanvas != null)
-            {
-                Size contentSize = content.INTERNAL_GetActualWidthAndHeight();
-
-                Size actualSize = this.INTERNAL_GetActualWidthAndHeight();
-                double availableSizeX = actualSize.Width;
-                double availableSizeY = actualSize.Height;
-
-                // If the Viewbox has a size equal to 0, it likely means that its size is not given by the parent. Therefore we should set the size of the Viewbox to be the same as the size of the child:
-                if (availableSizeX == 0)
-                    availableSizeX = double.PositiveInfinity;
-                if (availableSizeY == 0)
-                    availableSizeY = double.PositiveInfinity;
-
-                bool isConstrainedWidth = availableSizeX != double.PositiveInfinity;
-                bool isConstrainedHeight = availableSizeY != double.PositiveInfinity;
-
-                Size availableSize = new Size(availableSizeX, availableSizeY);
-                Size scale = ComputeScaleFactor(availableSize, contentSize, Stretch, StretchDirection);
-
-                Scale.ScaleX = scale.Width;
-                Scale.ScaleY = scale.Height;
-
-                if (isConstrainedWidth)
-                    RootCanvas.Width = double.NaN;
-                else
-                    RootCanvas.Width = contentSize.Width * scale.Width;
-
-                if (isConstrainedHeight)
-                    RootCanvas.Height = double.NaN;
-                else
-                    RootCanvas.Height = contentSize.Height * scale.Height;
-            }
         }
 
         /// <summary>
