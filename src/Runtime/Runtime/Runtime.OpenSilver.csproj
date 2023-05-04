@@ -227,7 +227,6 @@
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextFormatParser.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
-		<Compile Include="System.Windows.Controls\StackPanelHelper.cs" />
 		<Compile Include="System.Windows.Controls\TextBox.Navigation.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewItemCheckBox.cs" />
 		<Compile Include="System.Windows.Controls\ListTimePickerPopupAutomationPeer.cs" />
@@ -266,7 +265,6 @@
 		<Compile Include="System.Windows.Controls\InkPresenter.cs" />
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
-		<Compile Include="System.Windows.Controls\WrapPanelHelper.cs" />
 		<Compile Include="System.Windows.Documents\TextElementProperties.cs" />
 		<Compile Include="System.Windows.input\KeyboardNavigation.cs" />
 		<Compile Include="System.Windows.input\TraversalRequest.cs" />
@@ -363,6 +361,7 @@
 		<Compile Include="System.Windows.Media.Animation\RepeatBehaviorConverter.cs" />
 		<Compile Include="System.Windows\RoutedEventHandlerInfo.cs" />
 		<Compile Include="System.Windows\RouteItem.cs" />
+		<Compile Include="System.Windows\SizeChangedInfo.cs" />
 		<Compile Include="System.Windows\SizeConverter.cs" />
 		<Compile Include="System.Windows\StyleHelper.cs" />
 		<Compile Include="System.Windows\TextDecorationCollectionConverter.cs" />
@@ -412,7 +411,7 @@
 		<Compile Include="System.Windows.Controls\ScrollExtensions.cs" />
 		<Compile Include="System.Windows.Controls\TreeView.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewItem.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ScrollViewerExtensions.cs" />
+		<Compile Include="System.Windows.Controls\ScrollViewerExtensions.cs" />
 		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerParagraph.cs" />
 		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerRichTextBlock.cs" />
 		<Compile Include="System.Windows.Documents\INTERNAL_TextContainerSection.cs" />
@@ -444,8 +443,6 @@
 		<Compile Include="System.Windows.Controls\ExpandDirection.cs" />
 		<Compile Include="System.Windows.Controls\IGeneratorHost.cs" />
 		<Compile Include="System.Windows.Controls\RangeObservableCollection.cs" />
-		<Compile Include="System.Windows.Controls\TileView.cs" />
-		<Compile Include="System.Windows.Controls\TileViewItem.cs" />
 		<Compile Include="System.Windows.Controls\TimePickerPopupTemplate.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\BusyIndicator.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Calendar.cs" />
@@ -454,7 +451,6 @@
 		<Compile Include="System.Windows.Controls\ContentChangedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ContentChangedEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\DatePicker.cs" />
-		<Compile Include="System.Windows.Controls\WORKINPROGRESS\Grid.cs" />
 		<Compile Include="System.Windows.Controls\HeaderedItemsControl.cs" />
 		<Compile Include="System.Windows.Controls\ITimeFormat.cs" />
 		<Compile Include="System.Windows.Controls\IDefinitionBase.cs" />
@@ -596,7 +592,7 @@
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IItemContainerGenerator.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IRecyclingItemContainerGenerator.cs" />
 		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\IScrollInfo.cs" />
-		<Compile Include="System.Windows.Controls.Primitives\WORKINPROGRESS\LayoutInformation.cs" />
+		<Compile Include="System.Windows.Controls.Primitives\LayoutInformation.cs" />
 		<Compile Include="System.Windows.Data\CollectionViewGroup.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Block.cs" />
     <Compile Include="System.Windows.Input\InputManager.cs" />
@@ -652,7 +648,6 @@
 		<Compile Include="Core\Other\INTERNAL_DispatcherHelpers.cs" />
 		<Compile Include="Core\Other\INTERNAL_FontsHelper.cs" />
 		<Compile Include="Core\Other\INTERNAL_ShapesDrawHelpers.cs" />
-		<Compile Include="Core\Other\INTERNAL_SizeComparisonHelpers.cs" />
 		<Compile Include="Core\Other\INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.cs" />
 		<Compile Include="Core\Other\INTERNAL_XamlResourcesHandler.cs" />
 		<Compile Include="Core\Other\ISet2_1.cs" />
@@ -872,8 +867,6 @@
 		<Compile Include="System.Windows.Controls\Expander.cs" />
 		<Compile Include="System.Windows.Controls\ExtendedRoutedEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\Grid.cs" />
-		<Compile Include="System.Windows.Controls\Grid_CSSVersion.cs" />
-		<Compile Include="System.Windows.Controls\Grid_InternalHelpers.cs" />
 		<Compile Include="System.Windows.Controls\HeaderedContentControl.cs" />
 		<Compile Include="System.Windows.Controls\HyperlinkButton.cs" />
 		<Compile Include="System.Windows.Controls\Image.cs" />
@@ -1252,14 +1245,6 @@
 			<SubType>Designer</SubType>
 		</Content>
 		<Content Include="DefaultStyles\INTERNAL_DefaultViewboxStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultTileViewStyle.xaml">
-			<Generator>MSBuild:Compile</Generator>
-			<SubType>Designer</SubType>
-		</Content>
-		<Content Include="DefaultStyles\INTERNAL_DefaultTileViewItemStyle.xaml">
 			<Generator>MSBuild:Compile</Generator>
 			<SubType>Designer</SubType>
 		</Content>

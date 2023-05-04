@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml.Controls
             return div;
         }
 
-        protected override Size MeasureOverride(Size availableSize) => INTERNAL_GetActualWidthAndHeight();
+        protected override Size MeasureOverride(Size availableSize) => GetBoundingClientSize();
 
         internal sealed override void AddEventListeners()
         {

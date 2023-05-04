@@ -239,11 +239,6 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return GetDomElementStyleForModification(element.INTERNAL_OuterDomElement);
         }
 
-        internal static INTERNAL_HtmlDomStyleReference GetFrameworkElementBoxSizingStyleForModification(UIElement element)
-        {
-            return GetDomElementStyleForModification(element.INTERNAL_AdditionalOutsideDivForMargins);
-        }
-
         public static INTERNAL_HtmlDomStyleReference GetDomElementStyleForModification(object domElementRef)
             => ((INTERNAL_HtmlDomElementReference)domElementRef).Style;
 
@@ -936,24 +931,31 @@ parentElement.appendChild(child);";
             return OpenSilver.Interop.IsNull(jsObject) || OpenSilver.Interop.IsUndefined(jsObject);
         }
 
-        internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
+        internal static void SetVisualBounds(INTERNAL_HtmlDomStyleReference style, Point offset, Size size, Rect? clip)
         {
-            string left = $"{visualBounds.Left.ToInvariantString("0.##")}";
-            string top = $"{visualBounds.Top.ToInvariantString("0.##")}";
-            string width = $"{visualBounds.Width.ToInvariantString("0.##")}";
-            string height = $"{visualBounds.Height.ToInvariantString("0.##")}";
+            string left = Math.Round(offset.X, 2).ToInvariantString();
+            string top = Math.Round(offset.Y, 2).ToInvariantString();
+            string width = Math.Round(size.Width, 2).ToInvariantString();
+            string height = Math.Round(size.Height, 2).ToInvariantString();
+            
+            string javaScriptCodeToExecute;
+            
+            if (clip.HasValue)
+            {
+                Rect clipRect = clip.Value;
+                string clipLeft = Math.Round(clipRect.Left, 2).ToInvariantString();
+                string clipTop = Math.Round(clipRect.Top, 2).ToInvariantString();
+                string clipWidth = Math.Round(clipRect.Width, 2).ToInvariantString();
+                string clipHeight = Math.Round(clipRect.Height, 2).ToInvariantString();
 
-            string javaScriptCodeToExecute = $@"document.setVisualBounds(""{style.Uid}"",{left},{top},{width},{height},{(bSetPositionAbsolute ? "1": "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
-
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
-        }
-
-        internal static void SetPosition(INTERNAL_HtmlDomStyleReference style, Rect visualBounds, bool bSetPositionAbsolute, bool bSetZeroMargin, bool bSetZeroPadding)
-        {
-            string left = $"{visualBounds.Left.ToInvariantString("0.##")}";
-            string top = $"{visualBounds.Top.ToInvariantString("0.##")}";
-
-            string javaScriptCodeToExecute = $@"document.setPosition(""{style.Uid}"",{left},{top},{(bSetPositionAbsolute ? "1" : "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
+                javaScriptCodeToExecute =
+                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},true,{clipLeft},{clipTop},{clipWidth},{clipHeight});";
+            }
+            else
+            {
+                javaScriptCodeToExecute =
+                    $"document.setVisualBounds('{style.Uid}',{left},{top},{width},{height},false);";
+            }
 
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }

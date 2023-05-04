@@ -75,7 +75,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 Value = (inst, value) => value.ToInvariantString() + "px",
                                 Name = new List<string> { "left" },
-                                DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                                DomElement = uielement.INTERNAL_OuterDomElement,
                                 ApplyAlsoWhenThereIsAControlTemplate = true
                             };
                         }
@@ -102,7 +102,7 @@ namespace Windows.UI.Xaml.Controls
                             {
                                 Value = (inst, value) => value.ToInvariantString() + "px",
                                 Name = new List<string> { "top" },
-                                DomElement = uielement.INTERNAL_AdditionalOutsideDivForMargins,
+                                DomElement = uielement.INTERNAL_OuterDomElement,
                                 ApplyAlsoWhenThereIsAControlTemplate = true
                             };
                         }
@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml.Controls
                     {
                         Value = (inst, value) => value.ToInvariantString(),
                         Name = new List<string> { "zIndex" },
-                        DomElement = ((UIElement)instance).INTERNAL_AdditionalOutsideDivForMargins,
+                        DomElement = ((UIElement)instance).INTERNAL_OuterDomElement,
                         ApplyAlsoWhenThereIsAControlTemplate = true
                     }
                 });
@@ -249,16 +249,6 @@ namespace Windows.UI.Xaml.Controls
             return new Size();
         }
 
-        internal override bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            return double.IsNaN(child.Width);
-        }
-
-        internal override bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            return double.IsNaN(child.Height);
-        }
-
         protected override Size ArrangeOverride(Size finalSize)
         {
             UIElement[] childrens = Children.ToArray();
@@ -271,6 +261,18 @@ namespace Windows.UI.Xaml.Controls
             }
 
             return finalSize;
+        }
+
+        internal override Rect? GetLayoutClip(Size layoutSlotSize)
+        {
+            if (ClipToBounds)
+            {
+                return new Rect(RenderSize);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

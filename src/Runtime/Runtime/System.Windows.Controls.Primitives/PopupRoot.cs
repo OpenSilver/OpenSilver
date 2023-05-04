@@ -72,15 +72,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
             INTERNAL_LinkedPopup = popup;
         }
 
-        internal void SetLayoutSize()
-        {
-            if (!UseCustomLayout) return;
-
-            InvalidateMeasure();
-            Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            Arrange(new Rect(new Point(), DesiredSize));
-        }
-
         /// <summary>
         /// Gets or sets the visual root of a popup
         /// </summary>
@@ -103,11 +94,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
         private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PopupRoot popupRoot = (PopupRoot)d;
-            popupRoot.TemplateChild = null;
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(popupRoot))
+            
+            if (e.OldValue is UIElement oldContent)
             {
-                popupRoot.InvalidateMeasureInternal();
+                PropagateSuspendLayout(oldContent);
+                INTERNAL_VisualTreeManager.DetachVisualChildIfNotNull(oldContent, popupRoot);
+                oldContent.UpdateIsVisible();
             }
+
+            if (e.NewValue is UIElement newContent)
+            {
+                PropagateResumeLayout(popupRoot, newContent);
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(newContent, popupRoot);
+                newContent.UpdateIsVisible();
+            }
+
+            popupRoot.SetLayoutSize();
         }
 
 #if MIGRATION
@@ -179,56 +181,14 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-        protected override Size MeasureOverride(Size availableSize)
+        private void SetLayoutSize()
         {
-            int count = VisualChildrenCount;
-            if (count > 0 && INTERNAL_ParentWindow != null)
+            if (Content is UIElement content)
             {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
-                {
-                    child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                    return child.DesiredSize;
-                }
-            }
-            return availableSize;
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            int count = VisualChildrenCount;
-            if (count > 0 && INTERNAL_ParentWindow != null)
-            {
-                UIElement child = GetVisualChild(0);
-                if (child != null)
-                {
-                    child.Arrange(new Rect(finalSize));
-                }
-            }
-            return finalSize;
-        }
-
-        internal override FrameworkTemplate TemplateCache
-        {
-            get => DefaultTemplate;
-            set { }
-        }
-
-        internal override FrameworkTemplate TemplateInternal => DefaultTemplate;
-
-        private static UseContentTemplate DefaultTemplate { get; } = new UseContentTemplate();
-
-        private sealed class UseContentTemplate : FrameworkTemplate
-        {
-            public UseContentTemplate()
-            {
-                Seal();
-            }
-
-            internal override bool BuildVisualTree(IInternalFrameworkElement container)
-            {
-                container.TemplateChild = ((PopupRoot)container).Content as FrameworkElement;
-                return false;
+                content.InvalidateMeasure();
+                content.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                content.Arrange(new Rect(new Point(), content.DesiredSize));
+                content.UpdateLayout();
             }
         }
     }

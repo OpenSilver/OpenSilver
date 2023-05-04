@@ -12,6 +12,8 @@
 \*====================================================================================*/
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -31,92 +33,33 @@ namespace Windows.UI.Xaml
     public partial class FrameworkElement
     {
         /// <summary>
-        /// Identifies the <see cref="CustomLayout"/> dependency 
-        /// property.
+        /// Identifies the <see cref="CustomLayout"/> dependency property.
         /// </summary>
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty CustomLayoutProperty =
             DependencyProperty.Register(
                 nameof(CustomLayout),
                 typeof(bool),
                 typeof(FrameworkElement),
-                new PropertyMetadata(false, OnCustomLayoutChanged, CoerceCustomLayout));
+                new PropertyMetadata(true));
 
         /// <summary>
         /// Enable or disable measure/arrange layout system in a sub part
         /// </summary>
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool CustomLayout
         {
             get => (bool)GetValue(CustomLayoutProperty);
             set => SetValue(CustomLayoutProperty, value);
         }
 
-        private static void OnCustomLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-            fe.UseCustomLayout = (bool)e.NewValue;
-            
-            if (fe.UseCustomLayout && fe.IsCustomLayoutRoot)
-            {
-                fe.LayoutRootSizeChanged += new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
-            }
-            else
-            {
-                fe.LayoutRootSizeChanged -= new SizeChangedEventHandler(OnCustomLayoutRootSizeChanged);
-            }
-
-            fe.InvalidateForceInheritPropertyOnChildren(e.Property);
-        }
-
-        private static object CoerceCustomLayout(DependencyObject d, object baseValue)
-        {
-            FrameworkElement fe = (FrameworkElement)d;
-
-            // We must be true if our parent is true, but we can be
-            // either true or false if our parent is false.
-            //
-            // Another way of saying this is that we can only be false
-            // if our parent is false, but we can always be true.
-            if (!(bool)baseValue)
-            {
-                DependencyObject parent = GetLayoutParent(fe);
-                if (parent == null || !(bool)parent.GetValue(CustomLayoutProperty))
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        private static void OnCustomLayoutRootSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            FrameworkElement fe = (FrameworkElement)sender;
-
-            if (!fe.IsCustomLayoutRoot)
-                return;
-
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                double width = Math.Max(0, e.NewSize.Width - fe.Margin.Left - fe.Margin.Right);
-                double height = Math.Max(0, e.NewSize.Height - fe.Margin.Top - fe.Margin.Bottom);
-
-                fe.UpdateCustomLayout(new Size(width, height));
-            }
-            else
-            {
-                fe.UpdateCustomLayout(e.NewSize);
-            }
-        }
-
         /// <summary>
         /// Identifies the <see cref="IsAutoWidthOnCustomLayout"/> dependency property.
         /// </summary>
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty IsAutoWidthOnCustomLayoutProperty =
             DependencyProperty.Register(
                 nameof(IsAutoWidthOnCustomLayout),
@@ -127,53 +70,19 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets or sets the Auto Width to the root of CustomLayout
         /// </summary>
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool? IsAutoWidthOnCustomLayout
         {
             get => (bool?)GetValue(IsAutoWidthOnCustomLayoutProperty);
             set => SetValue(IsAutoWidthOnCustomLayoutProperty, value);
         }
 
-        internal bool IsAutoWidthOnCustomLayoutInternal
-        {
-            get
-            {
-                if (IsAutoWidthOnCustomLayout.HasValue)
-                {
-                    return IsAutoWidthOnCustomLayout.Value;
-                }
-
-                if (VisualTreeHelper.GetParent(this) is FrameworkElement parent)
-                {
-                    return parent.CheckIsAutoWidth(this);
-                }
-
-                return false;
-            }
-        }
-
-        internal virtual bool CheckIsAutoWidth(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Width))
-            {
-                return false;
-            }
-
-            if (child.HorizontalAlignment != HorizontalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoWidth(this);
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Identifies the <see cref="IsAutoHeightOnCustomLayout"/> dependency property.
         /// </summary>
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly DependencyProperty IsAutoHeightOnCustomLayoutProperty =
             DependencyProperty.Register(
                 nameof(IsAutoHeightOnCustomLayout),
@@ -184,53 +93,23 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Gets or sets the Auto Height to the root of CustomLayout
         /// </summary>
+        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool? IsAutoHeightOnCustomLayout
         {
             get => (bool?)GetValue(IsAutoHeightOnCustomLayoutProperty);
             set => SetValue(IsAutoHeightOnCustomLayoutProperty, value);
         }
 
-        internal bool IsAutoHeightOnCustomLayoutInternal
-        {
-            get
-            {
-                if (IsAutoHeightOnCustomLayout.HasValue)
-                {
-                    return IsAutoHeightOnCustomLayout.Value;
-                }
-
-                if (VisualTreeHelper.GetParent(this) is FrameworkElement parent)
-                {
-                    return parent.CheckIsAutoHeight(this);
-                }
-
-                return false;
-            }
-        }
-
-        internal virtual bool CheckIsAutoHeight(FrameworkElement child)
-        {
-            if (!double.IsNaN(child.Height))
-            {
-                return false;
-            }
-
-            if (child.VerticalAlignment != VerticalAlignment.Stretch)
-            {
-                return true;
-            }
-
-            if (VisualTreeHelper.GetParent(child) is FrameworkElement parent)
-            {
-                return parent.CheckIsAutoHeight(this);
-            }
-
-            return false;
-        }
-
         internal sealed override Size MeasureCore(Size availableSize)
         {
-            bool isLayoutRoot = IsCustomLayoutRoot;
+            //build the visual tree from styles first
+            if (!ApplyTemplate() && TemplateChild is not null)
+            {
+                INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(TemplateChild, this, 0);
+            }
+
+            bool isLayoutRoot = IsLayoutRoot;
 
             Thickness margin = Margin;
             double marginWidth = isLayoutRoot ? 0 : margin.Left + margin.Right;
@@ -361,7 +240,7 @@ namespace Windows.UI.Xaml
             // that child will get in its ArrangeOverride.
             Size arrangeSize = finalRect.Size;
 
-            bool isLayoutRoot = IsCustomLayoutRoot;
+            bool isLayoutRoot = IsLayoutRoot;
 
             Thickness margin = Margin;
             double marginWidth = isLayoutRoot ? 0 : margin.Left + margin.Right;
@@ -468,15 +347,94 @@ namespace Windows.UI.Xaml
 
             SetLayoutOffset(offset, oldRenderSize);
 
-            // Call SizeChanged event handlers
-            if (!isLayoutRoot)
-                HandleSizeChanged(RenderSize);
-
             if (IsFirstRendering)
             {
                 IsFirstRendering = false;
                 INTERNAL_HtmlDomManager.GetDomElementStyleForModification(INTERNAL_OuterDomElement).visibility = "visible";
             }
+        }
+
+        internal override Rect? GetLayoutClip(Size layoutSlotSize)
+        {
+            if (NeedsClipBounds || ClipToBounds)
+            {
+                // see if  MaxWidth/MaxHeight limit the element
+                MinMax mm = new MinMax(this);
+
+                //this is in element's local rendering coord system
+                Size inkSize = RenderSize;
+
+                double maxWidthClip = double.IsPositiveInfinity(mm.maxWidth) ? inkSize.Width : mm.maxWidth;
+                double maxHeightClip = double.IsPositiveInfinity(mm.maxHeight) ? inkSize.Height : mm.maxHeight;
+
+                //need to clip because the computed sizes exceed MaxWidth/MaxHeight/Width/Height
+                bool needToClipLocally =
+                     ClipToBounds //need to clip at bounds even if inkSize is less then maxSize
+                  || DoubleUtil.LessThan(maxWidthClip, inkSize.Width)
+                  || DoubleUtil.LessThan(maxHeightClip, inkSize.Height);
+
+                //now lets say we already clipped by MaxWidth/MaxHeight, lets see if further clipping is needed
+                inkSize.Width = Math.Min(inkSize.Width, mm.maxWidth);
+                inkSize.Height = Math.Min(inkSize.Height, mm.maxHeight);
+
+                //now see if layout slot should clip the element
+                Thickness margin = Margin;
+                double marginWidth = margin.Left + margin.Right;
+                double marginHeight = margin.Top + margin.Bottom;
+
+                Size clippingSize = new Size(Math.Max(0, layoutSlotSize.Width - marginWidth),
+                                             Math.Max(0, layoutSlotSize.Height - marginHeight));
+
+                bool needToClipSlot =
+                    ClipToBounds //forces clip at layout slot bounds even if reported sizes are ok
+                 || DoubleUtil.LessThan(clippingSize.Width, inkSize.Width)
+                 || DoubleUtil.LessThan(clippingSize.Height, inkSize.Height);
+
+                if (needToClipSlot)
+                {
+                    Point offset = VisualOffset;
+
+                    double left, top, width, height;
+                    if (offset.X < 0)
+                    {
+                        left = -offset.X;
+                        width = clippingSize.Width - offset.X;
+                    }
+                    else
+                    {
+                        left = 0;
+                        width = clippingSize.Width;
+                    }
+                    if (offset.Y < 0)
+                    {
+                        top = -offset.Y;
+                        height = clippingSize.Height - offset.Y;
+                    }
+                    else
+                    {
+                        top = 0;
+                        height = clippingSize.Height;
+                    }
+
+                    Rect slotRect = new Rect(left, top, width, height);
+
+                    if (needToClipLocally) //intersect 2 rects
+                    {
+                        slotRect.Intersect(new Rect(0, 0, maxWidthClip, maxHeightClip));
+                    }
+
+                    return slotRect;
+                }
+
+                if (needToClipLocally)
+                {
+                    return new Rect(0, 0, maxWidthClip, maxHeightClip);
+                }
+
+                return null;
+            }
+
+            return base.GetLayoutClip(layoutSlotSize);
         }
 
         /// <summary>
@@ -495,42 +453,136 @@ namespace Windows.UI.Xaml
         /// <summary>
         /// Occurs when the layout of the Silverlight visual tree changes.
         /// </summary>
-        public event EventHandler LayoutUpdated;
-
-        protected override void OnLayoutUpdated()
+        public event EventHandler LayoutUpdated
         {
-            LayoutUpdated?.Invoke(this, EventArgs.Empty);
+            add
+            {
+                LayoutEventList.ListItem item = GetLayoutUpdatedHandler(value);
+
+                if (item == null)
+                {
+                    //set a weak ref in LM
+                    item = LayoutManager.Current.LayoutEvents.Add(value);
+                    AddLayoutUpdatedHandler(value, item);
+                }
+            }
+            remove
+            {
+                LayoutEventList.ListItem item = GetLayoutUpdatedHandler(value);
+
+                if (item != null)
+                {
+                    RemoveLayoutUpdatedHandler(value);
+                    //remove a weak ref from LM
+                    LayoutManager.Current.LayoutEvents.Remove(item);
+                }
+            }
         }
 
-        internal sealed override Rect GetRenderedBounds(Size layoutSlotSize)
+        private static readonly DependencyProperty LayoutUpdatedListItemsField =
+            DependencyProperty.Register(
+                "_LayoutUpdatedListItems",
+                typeof(object),
+                typeof(FrameworkElement),
+                null);
+
+        private static readonly DependencyProperty LayoutUpdatedHandlersField =
+            DependencyProperty.Register(
+                "_LayoutUpdatedHandlers",
+                typeof(EventHandler),
+                typeof(FrameworkElement),
+                null);
+
+        private void AddLayoutUpdatedHandler(EventHandler handler, LayoutEventList.ListItem item)
         {
-            if (NeedsClipBounds)
+            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
+
+            if (cachedLayoutUpdatedItems == null)
             {
-                // see if  MaxWidth/MaxHeight limit the element
-                MinMax mm = new MinMax(this);
-
-                //this is in element's local rendering coord system
-                Size inkSize = RenderSize;
-
-                //now lets say we already clipped by MaxWidth/MaxHeight, lets see if further clipping is needed
-                inkSize.Width = Math.Min(inkSize.Width, mm.maxWidth);
-                inkSize.Height = Math.Min(inkSize.Height, mm.maxHeight);
-
-                //now see if layout slot should clip the element
-                Thickness margin = Margin;
-                double marginWidth = margin.Left + margin.Right;
-                double marginHeight = margin.Top + margin.Bottom;
-
-                Size clippingSize = new Size(Math.Max(0, layoutSlotSize.Width - marginWidth),
-                                             Math.Max(0, layoutSlotSize.Height - marginHeight));
-
-                inkSize.Width = Math.Min(clippingSize.Width, inkSize.Width);
-                inkSize.Height = Math.Min(clippingSize.Height, inkSize.Height);
-
-                return new Rect(VisualOffset, inkSize);
+                SetValue(LayoutUpdatedListItemsField, item);
+                SetValue(LayoutUpdatedHandlersField, handler);
             }
+            else
+            {
+                EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
+                if (cachedLayoutUpdatedHandler != null)
+                {
+                    //second unique handler is coming in.
+                    //allocate a datastructure
+                    var list = new Dictionary<EventHandler, object>(2)
+                    {
+                        //add previously cached handler
+                        { cachedLayoutUpdatedHandler, cachedLayoutUpdatedItems },
 
-            return base.GetRenderedBounds(layoutSlotSize);
+                        //add new handler
+                        { handler, item }
+                    };
+
+                    ClearValue(LayoutUpdatedHandlersField);
+                    SetValue(LayoutUpdatedListItemsField, list);
+                }
+                else //already have a list
+                {
+                    var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                    list.Add(handler, item);
+                }
+            }
+        }
+
+        private LayoutEventList.ListItem GetLayoutUpdatedHandler(EventHandler d)
+        {
+            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
+
+            if (cachedLayoutUpdatedItems == null)
+            {
+                return null;
+            }
+            else
+            {
+                EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
+                if (cachedLayoutUpdatedHandler != null)
+                {
+                    if (cachedLayoutUpdatedHandler == d) return (LayoutEventList.ListItem)cachedLayoutUpdatedItems;
+                }
+                else //already have a list
+                {
+                    var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                    LayoutEventList.ListItem item = (LayoutEventList.ListItem)list[d];
+                    return item;
+                }
+                return null;
+            }
+        }
+
+        private void RemoveLayoutUpdatedHandler(EventHandler d)
+        {
+            object cachedLayoutUpdatedItems = GetValue(LayoutUpdatedListItemsField);
+            EventHandler cachedLayoutUpdatedHandler = (EventHandler)GetValue(LayoutUpdatedHandlersField);
+
+            if (cachedLayoutUpdatedHandler != null) //single handler
+            {
+                if (cachedLayoutUpdatedHandler == d)
+                {
+                    ClearValue(LayoutUpdatedListItemsField);
+                    ClearValue(LayoutUpdatedHandlersField);
+                }
+            }
+            else //there is an ArrayList allocated
+            {
+                var list = (Dictionary<EventHandler, object>)cachedLayoutUpdatedItems;
+                list.Remove(d);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when either the <see cref="ActualHeight"/> or the <see cref="ActualWidth"/>
+        /// properties change value on a <see cref="FrameworkElement"/>.
+        /// </summary>
+        public event SizeChangedEventHandler SizeChanged;
+
+        internal sealed override void OnRenderSizeChanged(SizeChangedInfo info)
+        {
+            SizeChanged?.Invoke(this, new SizeChangedEventArgs(info.PreviousSize, info.NewSize));
         }
 
         private Point ComputeAlignmentOffset(Size clientSize, Size inkSize)
@@ -593,12 +645,7 @@ namespace Windows.UI.Xaml
         /// </summary>
         private void SetLayoutOffset(Point offset, Size oldRenderSize)
         {
-            Point oldOffset = VisualOffset;
-            if (!DoubleUtil.AreClose(oldOffset.X, offset.X) ||
-               !DoubleUtil.AreClose(oldOffset.Y, offset.Y))
-            {
-                VisualOffset = offset;
-            }
+            VisualOffset = offset;
         }
 
         private bool NeedsClipBounds
