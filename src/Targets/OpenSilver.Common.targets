@@ -36,6 +36,13 @@
   </ItemGroup>
 
   <!--============================================================
+  Configure the Up-To-Date checker to check xaml files - https://github.com/dotnet/project-system/blob/main/docs/up-to-date-check.md
+  ============================================================-->
+  <ItemGroup>
+    <UpToDateCheckInput Include="**\*.xaml"/>
+  </ItemGroup>
+
+  <!--============================================================
   Add the tasks "CSharpXamlForHtml5BeforeCompile" and "CSharpXamlForHtml5BeforeBuild" to the build process:
   ============================================================-->
   <PropertyGroup>
