@@ -61,7 +61,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         internal static UIElement GetElementById(string id)
         {
-            if (_store.TryGetValue(id, out WeakReference<UIElement> weakRef)
+            if (_store.TryGetValue(id ?? string.Empty, out WeakReference<UIElement> weakRef)
                 && weakRef.TryGetTarget(out UIElement uie))
             {
                 return uie;

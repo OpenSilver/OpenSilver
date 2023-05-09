@@ -162,7 +162,8 @@ document.getActualWidthAndHeight = function (element) {
 document.createElementSafe = function (tagName, id, parentElement, index) {
     const newElement = document.createElement(tagName);
 
-    newElement.setAttribute("id", id);
+    newElement.setAttribute('id', id);
+    newElement.setAttribute('xamlid', id);
 
     if (typeof parentElement == 'string') {
         parentElement = document.getElementById(parentElement);
@@ -204,6 +205,7 @@ document.createPopupRootElement = function (id, rootElement, pointerEvents) {
 
     const popupRoot = document.createElement('div');
     popupRoot.setAttribute('id', id);
+    popupRoot.setAttribute('xamlid', id);
     popupRoot.style.position = 'absolute';
     popupRoot.style.width = '100%';
     popupRoot.style.height = '100%';
@@ -417,6 +419,18 @@ document.createInputManager = function (root, callback) {
             _modifiers |= MODIFIERKEYS.WINDOWS;
     };
 
+    function getClosestElementId(element) {
+        while (element) {
+            if (element.hasAttribute('xamlid')) {
+                return element.getAttribute('xamlid');
+            }
+
+            element = element.parentElement;
+        }
+
+        return '';
+    };
+
     function initDom(root) {
 
         // Make sure the root div is keyboard focusable, so that we can tab into the app.
@@ -441,10 +455,10 @@ document.createInputManager = function (root, callback) {
                 if (target !== null) {
                     switch (e.button) {
                         case 0:
-                            callback(target.id, EVENTS.MOUSE_LEFT_UP, e);
+                            callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
                             break;
                         case 2:
-                            callback(target.id, EVENTS.MOUSE_RIGHT_UP, e);
+                            callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
                             break;
                     }
                 }
@@ -455,7 +469,7 @@ document.createInputManager = function (root, callback) {
             if (!e.isHandled) {
                 const target = _mouseCapture;
                 if (target !== null) {
-                    callback(target.id, EVENTS.MOUSE_MOVE, e);
+                    callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
                 }
             }
         });
@@ -479,7 +493,7 @@ document.createInputManager = function (root, callback) {
             _modifiers = MODIFIERKEYS.NONE;
         });
 
-        root.addEventListener('focusin', function (e) { callback(e.target.id, EVENTS.FOCUS, e); });
+        root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
     };
 
     initDom(root);
@@ -492,7 +506,7 @@ document.createInputManager = function (root, callback) {
             view.addEventListener('mousedown', function (e) {
                 if (!e.isHandled) {
                     e.isHandled = true;
-                    let id = (_mouseCapture === null || this === _mouseCapture) ? this.id : '';
+                    let id = (_mouseCapture === null || this === _mouseCapture) ? getClosestElementId(this) : '';
                     switch (e.button) {
                         case 0:
                             callback(id, EVENTS.MOUSE_LEFT_DOWN, e);
@@ -510,10 +524,10 @@ document.createInputManager = function (root, callback) {
                     const target = _mouseCapture || this;
                     switch (e.button) {
                         case 0:
-                            callback(target.id, EVENTS.MOUSE_LEFT_UP, e);
+                            callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
                             break;
                         case 2:
-                            callback(target.id, EVENTS.MOUSE_RIGHT_UP, e);
+                            callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
                             break;
                     }
                 }
@@ -523,26 +537,26 @@ document.createInputManager = function (root, callback) {
                 if (!e.isHandled) {
                     e.isHandled = true;
                     const target = _mouseCapture || this;
-                    callback(target.id, EVENTS.MOUSE_MOVE, e);
+                    callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
                 }
             });
 
             view.addEventListener('wheel', function (e) {
                 if (!e.isHandled) {
                     e.isHandled = true;
-                    callback(this.id, EVENTS.WHEEL, e);
+                    callback(getClosestElementId(this), EVENTS.WHEEL, e);
                 }
             });
 
             view.addEventListener('mouseenter', function (e) {
                 if (_mouseCapture === null || this === _mouseCapture) {
-                    callback(this.id, EVENTS.MOUSE_ENTER, e);
+                    callback(getClosestElementId(this), EVENTS.MOUSE_ENTER, e);
                 }
             });
 
             view.addEventListener('mouseleave', function (e) {
                 if (_mouseCapture === null || this === _mouseCapture) {
-                    callback(this.id, EVENTS.MOUSE_LEAVE, e);
+                    callback(getClosestElementId(this), EVENTS.MOUSE_LEAVE, e);
                 }
             });
 
@@ -550,14 +564,14 @@ document.createInputManager = function (root, callback) {
                 view.addEventListener('touchstart', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.TOUCH_START, e);
+                        callback(getClosestElementId(this), EVENTS.TOUCH_START, e);
                     }
                 }, { passive: true });
 
                 view.addEventListener('touchend', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.TOUCH_END, e);
+                        callback(getClosestElementId(this), EVENTS.TOUCH_END, e);
                         e.preventDefault();
                     }
                 });
@@ -565,7 +579,7 @@ document.createInputManager = function (root, callback) {
                 view.addEventListener('touchmove', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.TOUCH_MOVE, e);
+                        callback(getClosestElementId(this), EVENTS.TOUCH_MOVE, e);
                     }
                 }, { passive: true });
             }
@@ -574,14 +588,14 @@ document.createInputManager = function (root, callback) {
                 view.addEventListener('keypress', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.KEYPRESS, e);
+                        callback(getClosestElementId(this), EVENTS.KEYPRESS, e);
                     }
                 });
 
                 view.addEventListener('input', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.INPUT, e);
+                        callback(getClosestElementId(this), EVENTS.INPUT, e);
                     }
                 });
 
@@ -589,7 +603,7 @@ document.createInputManager = function (root, callback) {
                     if (!e.isHandled) {
                         e.isHandled = true;
                         setModifiers(e);
-                        callback(this.id, EVENTS.KEYDOWN, e);
+                        callback(getClosestElementId(this), EVENTS.KEYDOWN, e);
                     }
                 });
 
@@ -597,7 +611,7 @@ document.createInputManager = function (root, callback) {
                     if (!e.isHandled) {
                         e.isHandled = true;
                         setModifiers(e);
-                        callback(this.id, EVENTS.KEYUP, e);
+                        callback(getClosestElementId(this), EVENTS.KEYUP, e);
                     }
                 });
             }
