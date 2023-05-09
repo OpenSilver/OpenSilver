@@ -91,7 +91,13 @@ namespace CSHTML5.Internal
         public void closePath() { InvokeMethod("closePath"); }
         public void createLinearGradient(double x0, double y0, double x1, double y1) { InvokeMethod("createLinearGradient", x0, y0, x1, y1); }
 
-        public void arc(params object[] args) { InvokeMethod("arc", args); }
+        public void arc(double centerX, double centerY, double radius, double startAngle, double endAngle, bool counterClockwise = false)
+        {
+            OpenSilver.Interop.ExecuteJavaScriptFastAsync(@$"
+document.getElementById('{_id}').getContext('2d').arc({centerX.ToInvariantString()}, {centerY.ToInvariantString()}, {radius.ToInvariantString()}, 
+{startAngle.ToInvariantString()}, {endAngle.ToInvariantString()}, {INTERNAL_HtmlDomManager.ConvertToStringToUseInJavaScriptCode(counterClockwise)});");
+        }
+
         public void ellipse(params object[] args) { InvokeMethod("ellipse", args); }
         public void rect(double x, double y, double width, double height) { InvokeMethod("rect", x, y, width, height); }
 
