@@ -48,7 +48,7 @@ namespace Windows.UI.Xaml.Media
         #region Rotation
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.RotationX" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.RotationX" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationXProperty =
@@ -72,7 +72,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.RotationY" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.RotationY" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationYProperty =
@@ -96,7 +96,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.RotationZ" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.RotationZ" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty RotationZProperty =
@@ -124,7 +124,7 @@ namespace Windows.UI.Xaml.Media
         #region CenterOfRotation
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.CenterOfRotationX" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.CenterOfRotationX" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationXProperty =
@@ -153,7 +153,7 @@ namespace Windows.UI.Xaml.Media
 
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.CenterOfRotationY" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.CenterOfRotationY" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationYProperty =
@@ -182,7 +182,7 @@ namespace Windows.UI.Xaml.Media
 
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.CenterOfRotationZ" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.CenterOfRotationZ" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CenterOfRotationZProperty =
@@ -213,7 +213,7 @@ namespace Windows.UI.Xaml.Media
         #region Local Offset
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.LocalOffsetX" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.LocalOffsetX" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetXProperty =
@@ -234,7 +234,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.LocalOffsetY" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.LocalOffsetY" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetYProperty =
@@ -255,7 +255,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.LocalOffsetZ" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.LocalOffsetZ" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty LocalOffsetZProperty =
@@ -280,7 +280,7 @@ namespace Windows.UI.Xaml.Media
         #region Global Offset
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.GlobalOffsetX" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.GlobalOffsetX" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetXProperty =
@@ -301,7 +301,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.GlobalOffsetY" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.GlobalOffsetY" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetYProperty =
@@ -322,7 +322,7 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        /// Identifies the <see cref="PlaneProjection.GlobalOffsetZ" /> dependency property.
+        /// Identifies the <see cref="PlaneProjection.GlobalOffsetZ" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty GlobalOffsetZProperty =
@@ -347,7 +347,7 @@ namespace Windows.UI.Xaml.Media
         #region Projection Matrix
 
         /// <summary>
-        ///  Identifies the <see cref="PlaneProjection.ProjectionMatrix" /> dependency property.
+        ///  Identifies the <see cref="PlaneProjection.ProjectionMatrix" /> dependency property.
         /// </summary>
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty ProjectionMatrixProperty =
