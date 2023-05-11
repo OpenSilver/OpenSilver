@@ -317,11 +317,6 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        internal override void RestoreDefaultCore()
-        {
-            _appliedKeyFramesCount = 0;
-        }
-
         protected override Duration GetNaturalDurationCore()
         {
             return new Duration(LargestTimeSpanKeyTime);

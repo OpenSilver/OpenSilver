@@ -52,14 +52,8 @@ namespace Windows.UI.Xaml.Media.Animation
 
         internal override void IterateOnce(IterationParameters parameters, bool isLastLoop)
         {
-            if (!_isInitialized)
-            {
-                Initialize(parameters);
-            }
-            else
-            {
-                RestoreDefault();
-            }
+            Initialize(parameters);
+            
             // This is a workaround to tell the property the effective value should be the animated value.
             SetInitialAnimationValue();
             base.IterateOnce(parameters, isLastLoop);
@@ -79,17 +73,6 @@ namespace Windows.UI.Xaml.Media.Animation
         internal virtual void Apply(IterationParameters parameters, bool isLastLoop)
         {
             // Needs to be overriden
-        }
-
-        private void RestoreDefault()
-        {
-            _cancelledAnimation = false;
-            RestoreDefaultCore();
-        }
-
-        internal virtual void RestoreDefaultCore()
-        {
-
         }
 
         internal void Initialize(IterationParameters parameters)
