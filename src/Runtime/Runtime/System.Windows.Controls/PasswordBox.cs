@@ -230,6 +230,42 @@ namespace Windows.UI.Xaml.Controls
             UpdateVisualStates();
         }
 
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+
+            if (e.Handled)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            Focus();
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerReleased(PointerRoutedEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonUp(e);
+#else
+            base.OnPointerReleased(e);
+#endif
+
+            e.Handled = true;
+        }
+
         /// <summary>
         /// Builds the visual tree for the <see cref="PasswordBox" /> 
         /// control when a new template is applied.
