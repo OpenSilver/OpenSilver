@@ -1179,22 +1179,9 @@ namespace Windows.UI.Xaml
         /// </returns>
         internal Size GetBoundingClientSize()
         {
-            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && INTERNAL_OuterDomElement != null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
-                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(INTERNAL_OuterDomElement);
-                string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
-                    $"(function() {{ var v = {sElement}.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) }})()");
-                int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
-                if (sepIndex > -1)
-                {
-                    string widthStr = concatenated.Substring(0, sepIndex);
-                    string heightStr = concatenated.Substring(sepIndex + 1);
-                    if (double.TryParse(widthStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double width)
-                        && double.TryParse(heightStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double height))
-                    {
-                        return new Size(width, height);
-                    }
-                }
+                return INTERNAL_HtmlDomManager.GetBoundingClientSize(INTERNAL_OuterDomElement);
             }
 
             return new Size();

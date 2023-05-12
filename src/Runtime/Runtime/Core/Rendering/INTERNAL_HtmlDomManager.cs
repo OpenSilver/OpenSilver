@@ -19,6 +19,7 @@ using System.Text;
 using OpenSilver.Internal;
 using System.Linq;
 using System.Diagnostics;
+using System.Globalization;
 
 #if MIGRATION
 using System.Windows;
@@ -958,6 +959,29 @@ parentElement.appendChild(child);";
             string javaScriptCodeToExecute = $@"document.setPosition(""{style.Uid}"",{left},{top},{(bSetPositionAbsolute ? "1" : "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
+        }
+
+        internal static Size GetBoundingClientSize(object domRef)
+        {
+            if (domRef is not null)
+            {
+                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domRef);
+                string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
+                    $"(function() {{ var v = {sElement}.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) }})()");
+                int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                if (sepIndex > -1)
+                {
+                    string widthStr = concatenated.Substring(0, sepIndex);
+                    string heightStr = concatenated.Substring(sepIndex + 1);
+                    if (double.TryParse(widthStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double width)
+                        && double.TryParse(heightStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double height))
+                    {
+                        return new Size(width, height);
+                    }
+                }
+            }
+
+            return new Size();
         }
     }
 }
