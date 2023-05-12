@@ -12,8 +12,6 @@
 \*====================================================================================*/
 
 using System;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Controls;
@@ -56,12 +54,6 @@ namespace Windows.UI.Xaml.Controls
         {
             base.INTERNAL_OnAttachedToVisualTree();
 
-            // the following methods were ignored before because _contentEditableDiv was not defined due
-            // to the fact that we waited for the template to be made so we would know where to put it.
-            // as a consequence, we call them here:
-            OnAfterApplyHorizontalAlignmentAndWidth();
-            OnAfterApplyVerticalAlignmentAndWidth();
-
             // Note about tabbing: In WPF and SL, the elements in the template other than the input
             // field can have focus but the input field will get any keypress not handled by them.
             // For example, you can set the focus on a button included in the template by clicking on
@@ -94,42 +86,24 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        protected override void OnAfterApplyHorizontalAlignmentAndWidth()
-        {
-            // It is important that the "ContentEditable" div has the same CSS size properties as the outer div, so that the overflow and scrolling work properly:
-            if (_contentEditableDiv != null) //this can be true in the case where a template has been defined, in which case we wait for the template to be created before adding the text area.
-            {
-                var contentEditableStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv);
-                contentEditableStyle.width = Host.TextWrapping == TextWrapping.Wrap ? "100%" : "max-content";
-            }
-        }
-
-        protected override void OnAfterApplyVerticalAlignmentAndWidth()
-        {
-            // It is important that the "ContentEditable" div has the same CSS size properties as the outer div, so that the overflow and scrolling work properly:
-            if (_contentEditableDiv != null) //this can be true in the case where a template has been defined, in which case we wait for the template to be created before adding the text area.
-            {
-                var contentEditableStyle = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv);
-                contentEditableStyle.height = "max-content";
-            }
-        }
-
         internal sealed override void AddEventListeners()
         {
             InputManager.Current.AddEventListeners(this, true);
         }
 
-        internal sealed override UIElement KeyboardTarget => Host;
-
-        internal override object GetDomElementToSetContentString()
+        internal bool OnKeyDownNative(object jsEventArgs)
         {
-            if (_contentEditableDiv != null)
+            if (_contentEditableDiv is not null)
             {
-                return _contentEditableDiv;
+                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                string sArgs = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArgs);
+                return OpenSilver.Interop.ExecuteJavaScriptBoolean($"document.textboxHelpers.onKeyDownNative({sElement}, {sArgs});");
             }
-                
-            return base.GetDomElementToSetContentString();
+
+            return false;
         }
+
+        internal sealed override UIElement KeyboardTarget => Host;
 
         internal override bool EnablePointerEventsCore => true;
 
@@ -178,43 +152,54 @@ element.setAttribute(""data-acceptsreturn"", ""{acceptsReturn.ToString().ToLower
 
         internal void OnTextWrappingChanged(TextWrapping textWrapping)
         {
-            if (_contentEditableDiv != null)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv != null)
             {
-                ApplyTextWrapping(
+                TextBlock.ApplyTextWrapping(
                     INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv),
                     textWrapping);
             }
-        }
-
-        private static void ApplyTextWrapping(INTERNAL_HtmlDomStyleReference cssStyle, TextWrapping textWrapping)
-        {
-            TextBlock.ApplyTextWrapping(cssStyle, textWrapping);
-            cssStyle.width = textWrapping == TextWrapping.Wrap ? "100%" : "max-content";
         }
 
         internal void OnMaxLengthChanged(int maxLength)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv != null)
             {
-                //--- SIMULATOR ONLY: ---
-                // Set the "data-maxlength" property (that we have made up) so that the "keydown" JavaScript event can retrieve this value:
-                INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
-var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)_contentEditableDiv).UniqueIdentifier}"");
-element.setAttribute(""data-maxlength"", ""{maxLength}"");");
+                if (maxLength > 0)
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_contentEditableDiv, "maxlength", maxLength);
+                }
+                else
+                {
+                    INTERNAL_HtmlDomManager.RemoveAttribute(_contentEditableDiv, "maxlength");
+                }
             }
         }
 
 #if MIGRATION
         internal void OnTextDecorationsChanged(TextDecorationCollection tdc)
         {
-            string cssValue = tdc?.ToHtmlString() ?? string.Empty;
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).textDecoration = cssValue;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+            {
+                ApplyTextDecorations(INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv), tdc);
+            }
+        }
+
+        private static void ApplyTextDecorations(INTERNAL_HtmlDomStyleReference cssStyle, TextDecorationCollection tdc)
+        {
+            cssStyle.textDecoration = tdc?.ToHtmlString() ?? string.Empty;
         }
 #else
         internal void OnTextDecorationsChanged(TextDecorations? tdc)
         {
-            string cssValue = TextDecorationsToHtmlString(tdc);
-            INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv).textDecoration = cssValue;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+            {
+                ApplyTextDecorations(INTERNAL_HtmlDomManager.GetDomElementStyleForModification(_contentEditableDiv), tdc);
+            }
+        }
+
+        private static void ApplyTextDecorations(INTERNAL_HtmlDomStyleReference cssStyle, TextDecorations? tdc)
+        {
+            cssStyle.textDecoration = TextDecorationsToHtmlString(tdc);
         }
 
         private static string TextDecorationsToHtmlString(TextDecorations? tdc)
@@ -245,15 +230,14 @@ element.setAttribute(""data-maxlength"", ""{maxLength}"");");
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv != null)
             {
-                string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $"{sDiv}.setAttribute(\"contentEditable\", \"{(!isReadOnly).ToString().ToLower()}\");"
-                );
-
-                //--- SIMULATOR ONLY: ---
-                OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
-var element = document.getElementByIdSafe(""{((INTERNAL_HtmlDomElementReference)_contentEditableDiv).UniqueIdentifier}"");
-element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");");
+                if (isReadOnly)
+                {
+                    INTERNAL_HtmlDomManager.SetDomElementAttribute(_contentEditableDiv, "readonly", "''");
+                }
+                else
+                {
+                    INTERNAL_HtmlDomManager.RemoveAttribute(_contentEditableDiv, "readonly");
+                }
             }
         }
 
@@ -265,107 +249,126 @@ element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
             }
         }
 
-        internal void NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out int caretIndex)
+        internal int SelectionStart
         {
-            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            get
             {
-                selectionStartIndex = 0;
-                selectionLength = 0;
-                caretIndex = 0;
-                return;
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+                {
+                    string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                    return OpenSilver.Interop.ExecuteJavaScriptInt32($"{sElement}.selectionStart;");
+                }
+
+                return 0;
             }
-
-            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
-            GlobalIndexes globalIndexes = JsonSerializer.Deserialize<GlobalIndexes>(
-                OpenSilver.Interop.ExecuteJavaScriptString($"document.getTextBoxSelection({sDiv});"));
-
-            caretIndex = globalIndexes.IsCaretFound ? globalIndexes.CaretIndex : 0;
-            selectionStartIndex = globalIndexes.IsStartFound ? globalIndexes.StartIndex : 0;
-            int selectionLastIndex = globalIndexes.IsEndFound ? globalIndexes.EndIndex : (globalIndexes.IsStartFound ? globalIndexes.StartIndex : 0);
-            selectionLength = selectionLastIndex - selectionStartIndex;
+            set
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+                {
+                    string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.selectionStart = {value.ToInvariantString()};");
+                }
+            }
         }
 
-        private struct GlobalIndexes
+        internal int SelectionLength
         {
-            [JsonPropertyName("caretIndex")]
-            public int CaretIndex { get; set; }
+            get
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+                {
+                    string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                    return OpenSilver.Interop.ExecuteJavaScriptInt32($"{sElement}.selectionEnd - {sElement}.selectionStart;");
+                }
 
-            [JsonPropertyName("startIndex")]
-            public int StartIndex { get; set; }
-
-            [JsonPropertyName("endIndex")]
-            public int EndIndex { get; set; }
-
-            [JsonPropertyName("isCaretFound")]
-            public bool IsCaretFound { get; set; }
-
-            [JsonPropertyName("isStartFound")]
-            public bool IsStartFound { get; set; }
-
-            [JsonPropertyName("isEndFound")]
-            public bool IsEndFound { get; set; }
+                return 0;
+            }
+            set
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+                {
+                    string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.selectionEnd = {sElement}.selectionStart + {value.ToInvariantString()};");
+                }
+            }
         }
 
-        internal void NEW_SET_SELECTION(int startIndex, int endIndex)
+        internal string SelectedText
         {
-            if (Input.FocusManager.GetFocusedElement() != this.Host)
-                return;
+            get
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+                {
+                    string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                    return OpenSilver.Interop.ExecuteJavaScriptString(
+                        $"{sElement}.value.substring({sElement}.selectionStart, {sElement}.selectionEnd);") ?? string.Empty;
+                }
 
-            if (_contentEditableDiv == null || !INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
-                return;
+                return string.Empty;
+            }
+            set
+            {
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+                {
+                    string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                    string sText = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(value);
+                    OpenSilver.Interop.ExecuteJavaScriptVoid(
+                        $"{sElement}.setRangeText({sText}, {sElement}.selectionStart, {sElement}.selectionEnd, 'end');");
+                    Host.UpdateTextProperty(GetText());
+                }
+            }
+        }
 
-            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($@"
-var sel = window.getSelection()
-var nodesAndOffsets = {{}}; //this will hold the nodes and offsets useful to set the range's start and end.
-document.getRangeStartAndEnd({sDiv}, true, 0, {startIndex.ToInvariantString()}, {endIndex.ToInvariantString()}, nodesAndOffsets, false, false)
-sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffset'], nodesAndOffsets['endParent'], nodesAndOffsets['endOffset'])
-");
+        internal void SetSelectionRange(int start, int end)
+        {
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+            {
+                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                OpenSilver.Interop.ExecuteJavaScriptVoid(
+                    $"{sElement}.setSelectionRange({start.ToInvariantString()}, {end.ToInvariantString()});");
+            }
         }
 
         private object AddContentEditableDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            bool isReadOnly = Host.IsReadOnly;
+            var contentEditableDiv = INTERNAL_HtmlDomManager.CreateTextBoxViewDomElementAndAppendIt(parentRef, this);
+            var contentEditableDivStyle = contentEditableDiv.Style;
 
-            var contentEditableDivStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle("div", parentRef, this, out object contentEditableDiv);
             _contentEditableDiv = contentEditableDiv;
 
-            contentEditableDivStyle.height = "max-content";
+            // Apply Host.TextDecorations
+            ApplyTextDecorations(contentEditableDivStyle, Host.TextDecorations);
 
             // Apply Host.TextWrapping
-            ApplyTextWrapping(contentEditableDivStyle, Host.TextWrapping);
-            contentEditableDivStyle.outline = "none";
-            contentEditableDivStyle.background = "solid transparent";
-            contentEditableDivStyle.cursor = "text";
+            TextBlock.ApplyTextWrapping(contentEditableDivStyle, Host.TextWrapping);
+
+            // Apply Host.TextAlignment
+            UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);
+
+            if (Host.IsReadOnly)
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(_contentEditableDiv, "readonly", "''");
+            }
+
+            int maxlength = Host.MaxLength;
+            if (maxlength > 0)
+            {
+                INTERNAL_HtmlDomManager.SetDomElementAttribute(_contentEditableDiv, "maxlength", maxlength);
+            }
 
             // Disable spell check
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "spellcheck", Host.IsSpellCheckEnabled);
 
-            // disable native tab navigation
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "tabindex", "-1");
-
-            // Apply TextAlignment
-            UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);
-
-            string isContentEditable = (!isReadOnly).ToString().ToLower();
-            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "contentEditable", isContentEditable);
-
-            contentEditableDivStyle.minWidth = "max(14px, 100%)";
-            contentEditableDivStyle.minHeight = $"max({(Math.Floor(Host.FontSize * 1.5 * 1000) / 1000).ToInvariantString()}px, 100%)";
-
             domElementWhereToPlaceChildren = contentEditableDiv;
 
             // ---- SIMULATOR ----
-            string uid = ((INTERNAL_HtmlDomElementReference)contentEditableDiv).UniqueIdentifier;
+            string uid = contentEditableDiv.UniqueIdentifier;
 
             // Set the "data-accepts-return" property (that we have invented) so that the "KeyDown" and "Paste" JavaScript events can retrieve this value:
-            // also set the "data-maxlength" and the "data-isreadonly" 
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
-var element = document.getElementByIdSafe(""{uid}"");
-element.setAttribute(""data-acceptsreturn"", ""{this.Host.AcceptsReturn.ToString().ToLower()}"");
-element.setAttribute(""data-maxlength"", ""{this.Host.MaxLength}"");
-element.setAttribute(""data-isreadonly"",""{isReadOnly.ToString().ToLower()}"");
-element.setAttribute(""data-acceptstab"", ""{this.Host.AcceptsTab.ToString().ToLower()}"");");
+var element = document.getElementByIdSafe('{uid}');
+element.setAttribute('data-acceptsreturn', '{Host.AcceptsReturn.ToString().ToLower()}');
+element.setAttribute('data-acceptstab', '{Host.AcceptsTab.ToString().ToLower()}');");
 
             if (OpenSilver.Interop.IsRunningInTheSimulator)
             {
@@ -376,7 +379,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
     var element_InsideEventHandler = document.getElementByIdSafe(""{uid}""); // For some reason we need to get again the reference to the element.
     var acceptsReturn = element_InsideEventHandler.getAttribute(""data-acceptsreturn"");
-    var maxLength = element_InsideEventHandler.getAttribute(""data-maxlength"");
+    var maxLength = element_InsideEventHandler.getAttribute(""maxlength"");
     var acceptsTab = element_InsideEventHandler.getAttribute(""data-acceptstab"");
 
     if (e.keyCode == 13)
@@ -392,7 +395,7 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
 
     if((isAddingTabulation || e.keyCode == 13 || e.keyCode == 32 || e.keyCode > 47) && maxLength != 0)
     {{
-        var text = getTextAreaInnerText(element_InsideEventHandler);
+        var text = element_InsideEventHandler.value;
         if (!acceptsReturn) {{
             text = text.replace(""\n"", """").replace(""\r"", """");
         }}
@@ -435,95 +438,50 @@ element_OutsideEventHandler.addEventListener('keydown', function(e) {{
             sel.addRange(range);
         }}
 
-        instance.TextAreaValueChanged(); //todo: test this.
         e.preventDefault();
             return false;
     }}
 }}, false);");//comma added on purpose because we need to get maxLength somehow (see how we did for acceptsReturn).
             }
 
-            //-----------------------
-            // Enforce only Plain Text + prevent line breaks if "AcceptsReturn" is false. This is required because in a ContentEditable div, the user can paste rich text. Furthermore, on IE, pressing Enter will insert a new paragraph.
-            //-----------------------
-
-            // The simulator uses Chrome, so we can set "ContentEditable" to plain-text only:
-            // We still need to prevent prevent line breaks in the pasted text if "AcceptsReturn" is false:
-            INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript($@"
-var element_OutsideEventHandler = document.getElementByIdSafe(""{uid}"");
-element_OutsideEventHandler.addEventListener('paste', function(e) {{
-    var element_InsideEventHandler = document.getElementByIdSafe(""{uid}""); // For some reason we need to get again the reference to the element.
-    var isReadOnly= element_InsideEventHandler.getAttribute(""data-isreadonly"");
-    if(isReadOnly !=""true"")
-    {{
-        var acceptsReturn = element_InsideEventHandler.getAttribute(""data-acceptsreturn"");
-        var maxLength = element_InsideEventHandler.getAttribute(""data-maxlength"");
-        element_InsideEventHandler.setAttribute(""contentEditable"", ""PLAINTEXT-ONLY"");
-        if (acceptsReturn != ""true""){{
-            e.preventDefault();
-            var content = (e.originalEvent || e).clipboardData.getData('text/plain');
-           if(content !== undefined){{
-                content = content.replace(/\n/g, '').replace(/\r/g, '');
-            }}
-            if(maxLength != 0) {{
-                var text = getTextAreaInnerText(element_InsideEventHandler);
-                //var text = element_InsideEventHandler.innerText;
-                if (!acceptsReturn) {{
-                    text = text.replace(""\n"", """").replace(""\r"", """");
-                }}
-
-                var correctionDueToNewLines = 0;
-                var textBoxTextLength = text.length + correctionDueToNewLines;
-                var lengthComparison = maxLength - (content.length + textBoxTextLength);
-                if(lengthComparison < 0) {{
-                    content = content.substr(0, content.length+lengthComparison);
-                }}
-            }}
-            document.execCommand('insertText', false, content);
-        
-        }}
-    }}
-}}, false);");
-
             return contentEditableDiv;
         }
 
         internal string GetText()
         {
-            return INTERNAL_HtmlDomManager.GetTextBoxText(INTERNAL_InnerDomElement) ?? string.Empty;
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
+            {
+                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                return OpenSilver.Interop.ExecuteJavaScriptString($"{sElement}.value;") ?? string.Empty;
+            }
+
+            return string.Empty;
         }
 
         private void UpdateDomText(string text)
         {
-            if (INTERNAL_OuterDomElement != null &&
-                Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier))
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this) && _contentEditableDiv is not null)
             {
-                if (_contentEditableDiv == null)
-                    return;
+                string sElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_contentEditableDiv);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"{sElement}.value = \"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(text)}\";");
 
-                INTERNAL_HtmlDomManager.SetContentString(this, text);
-                return;
+                // This is the case when the text is changed by typing.
+                InvalidateMeasure();
             }
-
-            if (_contentEditableDiv == null)
-                return;
-
-            INTERNAL_HtmlDomManager.SetContentString(this, Host.Text);
-
-            // This is the case when the text is changed by typing.
-            InvalidateMeasure();
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)INTERNAL_OuterDomElement).UniqueIdentifier;
-            Size TextSize = Application.Current.TextMeasurementService.MeasureTextBlock(
+            Size textSize = Application.Current.TextMeasurementService.MeasureTextBlock(
                 uniqueIdentifier,
                 Host.TextWrapping == TextWrapping.NoWrap ? "pre" : "pre-wrap",
                 Host.TextWrapping == TextWrapping.NoWrap ? string.Empty : "break-word",
                 Margin,
                 availableSize.Width,
                 "M");
-            return TextSize;
+            return textSize;
         }
     }
 }

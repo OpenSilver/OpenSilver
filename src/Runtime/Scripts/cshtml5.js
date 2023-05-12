@@ -718,7 +718,11 @@ document.measureTextBlock = function (uid, whiteSpace, overflowWrap, padding, ma
     if (element && elToMeasure) {
         var computedStyle = getComputedStyle(elToMeasure);
 
-        element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
+        if (elToMeasure instanceof HTMLTextAreaElement) {
+            element.innerHTML = elToMeasure.value.length == 0 ? emptyVal : elToMeasure.value;
+        } else {
+            element.innerHTML = elToMeasure.innerHTML.length == 0 ? emptyVal : elToMeasure.innerHTML;
+        }
 
         element.style.fontSize = computedStyle.fontSize;
         element.style.fontWeight = computedStyle.fontWeight;
@@ -802,300 +806,6 @@ var defineStringEndsWith = function () {
 }
 defineStringEndsWith();
 
-//gets the text inside a textArea as it actually is (domElement.innerText returns an incorrect result).
-getTextAreaInnerText = function (domElement, forceNewLineFirst) {
-    //logic here:   - br prepares a new line and we only add it to the text if there is more to add afterwards.
-    //              - text means text
-    //              - div want their own line so new line before if none, new line after.
-    //                  no new line before if first element, no new line after if last element.
-    var resultString = "";
-    var currentNode = domElement.childNodes[0];
-    while (currentNode != undefined) {
-        if (currentNode.nodeType == Node.TEXT_NODE) {
-            if (currentNode.textContent != "") { //Note: we added this test because IE sometimes adds an empty text node which should not count for anything as far as I know.
-                if (forceNewLineFirst) {
-                    resultString += "\n";
-                }
-                var textToAdd = currentNode.textContent;
-                if (textToAdd.endsWith("\n")) {
-                    //We need this because Edge sometimes decides to add the newline '\n' in the Text instead of adding a dom element (when pressing enter at the end of a line?) and
-                    //  when it does this, it adds an additional '\n' because why not... So we remove that additional one.
-                    //Note: It adds a total of one '\n' so if you go to the end of the TextArea and press enter five times, there will be six '\n' in the TextNode.
-                    if (currentNode.nextSibling == undefined) {
-                        //Only if currentNode.nextSibling is undefined, because apparently, it only adds one '\n' too much when it is the last node.
-                        textToAdd = textToAdd.substring(0, textToAdd.length - 1);
-                    }
-                    //We also replace the '\n' with "\r\n":
-                    textToAdd = textToAdd.replace(new RegExp("\n", 'g'), "\n");
-                }
-                resultString += textToAdd;
-                forceNewLineFirst = false;
-            }
-        }
-        else {
-            var nodeName = currentNode.nodeName;
-            if (nodeName == "BR") {
-                if (forceNewLineFirst) {
-                    resultString += "\n";
-                }
-                forceNewLineFirst = true;
-            }
-            else //we consider it's a <div> or a <p>:
-            {
-                if (forceNewLineFirst) {
-                    resultString += "\n";
-                    forceNewLineFirst = false;
-                }
-                if (currentNode.previousSibling != undefined && !resultString.endsWith("\n")) {
-                    //The element is not the first in its parent and there is no new line to put it, so we add one:
-                    resultString += "\n";
-                }
-
-                resultString += getTextAreaInnerText(currentNode, forceNewLineFirst);
-                if (currentNode.nextSibling != undefined) {
-                    //the element is not the last in its parent and there is no new line to put the following so we add one:
-                    forceNewLineFirst = true;
-                    //resultString += "\r\n";
-                }
-            }
-        }
-        currentNode = currentNode.nextSibling;
-    }
-    return resultString;
-}
-
-document.getTextBoxSelection = (function () {
-    //this counts the amount of characters before the ones (start and end) defined by the range object.
-    // it does so by defining:
-    //      -globalIndexes.startIndex and globalIndexes.endIndex: the indexes as in c# of the positions defined by the range
-    //      -globalIndexes.isStartFound and globalIndexes.isEndFound: a boolean stating whether the index has been found yet ot not (used within this method to know when to stop changing the indexes).
-    function getRangeGlobalStartAndEndIndexes(currentParent, isFirstChild, charactersWentThrough, selection, range, globalIndexes) {
-        //we go down the tree until we find multiple children or until there is no children left:
-        while (currentParent.hasChildNodes()) {
-            //a div/p/br tag means a new line if it is not the first child of its parent:
-            if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-                charactersWentThrough += 1; //corresponds to counting the characters for the new line (that are not otherwise included in the count)
-                isFirstChild = true;
-            }
-            //we stop as soon as we find an element that has more than one childNode, so we can go through all the children afterwards.
-            if (currentParent.childNodes.length > 1) {
-                break;
-            }
-            currentParent = currentParent.childNodes[0];
-        }
-        if (currentParent.hasChildNodes()) { //this being true means that we stopped in the previous loop because it had multiple children. We need to go through them for the count of characters:
-            var i = 0;
-            var amountOfChildren = currentParent.childNodes.length;
-            //recursively go through the children:
-            for (i = 0; i < amountOfChildren; ++i) {
-                var temp = currentParent.childNodes[i];
-                charactersWentThrough = getRangeGlobalStartAndEndIndexes(temp, i == 0, charactersWentThrough, selection, range, globalIndexes);
-                if (globalIndexes.isCaretFound && globalIndexes.isStartFound && globalIndexes.isEndFound) {
-                    break;
-                }
-            }
-        } else {
-            //we stopped because we are at the end of a branch in the tree view --> count the characters in the line:
-            //if the end of the branch is a new line, count it:
-            if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-                charactersWentThrough += 1;
-            }
-            else {
-                if (currentParent.length) {
-                    //we get the basic informations about the text:
-                    var textContent = currentParent.textContent;
-                    var wholeLength = textContent.length;
-                    if (currentParent === selection.focusNode) {
-                        globalIndexes.caretIndex = charactersWentThrough + selection.focusOffset;
-                        globalIndexes.isCaretFound = true;
-                    }
-                    if (currentParent === range.startContainer) {
-                        globalIndexes.startIndex = charactersWentThrough + range.startOffset;
-                        globalIndexes.isStartFound = true;
-                    }
-                    if (currentParent === range.endContainer) {
-                        globalIndexes.endIndex = charactersWentThrough + range.endOffset;
-                        globalIndexes.isEndFound = true;
-                    }
-                    charactersWentThrough += wholeLength; //move forward in the count of characters.
-                } else {
-                    if (currentParent.tagName === 'BR') {
-                        if (currentParent.parentElement === selection.focusNode) {
-                            globalIndexes.caretIndex = charactersWentThrough;
-                            globalIndexes.isCaretFound = true;
-                        }
-                        if (currentParent.parentElement === range.startContainer) {
-                            globalIndexes.startIndex = charactersWentThrough;
-                            globalIndexes.isStartFound = true;
-                        }
-                        if (currentParent.parentElement === range.endContainer) {
-                            globalIndexes.endIndex = charactersWentThrough;
-                            globalIndexes.isEndFound = true;
-                        }
-                    }
-                }
-            }
-            return charactersWentThrough;
-        }
-    }
-
-    return function (element) {
-        const sel = window.getSelection();
-        const gi = {};
-        if (sel.rangeCount === 0) {
-            gi.caretIndex = 0;
-            gi.startIndex = 0;
-            gi.endIndex = 0;
-        } else {
-            getRangeGlobalStartAndEndIndexes(element, true, 0, sel, sel.getRangeAt(0), gi);
-        }
-        return JSON.stringify(gi);
-    }
-})();
-
-//this method goes through every branch of the visual tree starting from the given element and counts the characters until the given indexes are met.
-//It then fills nodesAndOffsets with the nodes and offsets to apply on the range defined in the calling method.
-document.getRangeStartAndEnd = function getRangeStartAndEnd(currentParent, isFirstChild, charactersWentThrough, startLimitIndex, endLimitIndex, nodesAndOffsets, isStartFound, isEndFound) {
-    //we go down the tree until we find multiple children or until there is no children left:
-    while (currentParent.hasChildNodes()) {
-        //a div/p/br tag means a new line if it is not the first child of its parent:
-        if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-            charactersWentThrough += 2;
-            isFirstChild = true;
-        }
-        if (currentParent.childNodes.length > 1) {
-            break;
-        }
-        currentParent = currentParent.childNodes[0];
-    }
-    if (currentParent.hasChildNodes()) {
-        //this being true means that the currentParent has multiple children through which we need to go to count the characters.
-        //We therefore recursively call this same method on them and update the count of characters went through:
-        var i = 0;
-        var amountOfChildren = currentParent.childNodes.length;
-
-        for (i = 0; i < amountOfChildren; ++i) {
-            var temp = currentParent.childNodes[i];
-            charactersWentThrough = getRangeStartAndEnd(temp, i == 0, charactersWentThrough, startLimitIndex, endLimitIndex, nodesAndOffsets, isStartFound, isEndFound);
-            if ((!(temp.tagName == 'BR')) && charactersWentThrough >= startLimitIndex) {
-                isStartFound = true;
-            }
-            if ((!(temp.tagName == 'BR')) && charactersWentThrough >= endLimitIndex) {
-                isEndFound = true;
-            }
-            if (isStartFound && isEndFound) {
-                break;
-            }
-        }
-    }
-    else {
-        //handle new lines at the end of the branches:
-        if (!isFirstChild && (currentParent.tagName == 'DIV' || currentParent.tagName == 'P' || currentParent.tagName == 'BR')) {
-            charactersWentThrough += 2;
-        }
-        else {
-            if (currentParent.length) {
-                var textContent = currentParent.textContent;
-                var splittedText = textContent.split("\n");
-                var wholeLength = currentParent.length; //this will be the length of the whole text in this dom element, including possible compensation for the amount of characters used for a new line.
-                var newLineCompensation = 0;
-                if (splittedText.length > 1) {
-                    var firstText = splittedText[0];
-                    if (firstText[firstText.length - 1] != "\r") {
-                        wholeLength += splittedText.length - 1; //for n lines, n-1 new lines
-                        newLineCompensation = 1; //if newLine can be different than 0 or 1, change the places where commented to do so.
-                    }
-                }
-                if (!isStartFound) {
-                    if (charactersWentThrough + wholeLength > startLimitIndex) { //read this as "if we reach the given index in the text of this dom element"
-                        //here, we need the offset in the text, while compensating the possible new lines (basically, if the new line in the text is represented as only '\n', consider -1 on the offset to put in the range for each new line met before reaching the offset).
-                        var startOffset;
-                        if (newLineCompensation != 0) {
-                            var i = 0;
-                            var remainingOffset = startLimitIndex - charactersWentThrough; //this is the offset considering each new line as 2 characters.
-                            var charactersWentThroughInThisLine = 0;
-                            //the following loop's only purpose is to get the amount of new lines before the remaining offset.
-                            for (i = 0; i < splittedText.length; ++i) {
-                                if (charactersWentThroughInThisLine + splittedText[i].length >= remainingOffset) {
-                                    break;
-                                }
-                                //advance through the text while including 2 characters for each new line to keep things constant with the definition of remainingOffset:
-                                charactersWentThroughInThisLine += splittedText[i].length + 1 + newLineCompensation; //note: it's OK to not include the newLineCompensation in the "if" above since we would want to go to the next line anyway.
-                            }
-                            startOffset = remainingOffset - i; //line to change if newLineCompensation can be different than 1 (i * newLineCompensation).
-                            if (charactersWentThroughInThisLine - remainingOffset == 1) {
-                                ++startOffset; //this means we were between '\r' and '\n'
-                            }
-                        }
-                        else {
-                            //no need for compensation on the offset to put in the range since new lines are already 2 characters.
-                            startOffset = startLimitIndex - charactersWentThrough;
-                        }
-                        if (startOffset < 0) {
-                            startOffset = 0; //case where the index lead to a position between '\r' and '\n' in a new line
-                        }
-                        nodesAndOffsets['startOffset'] = startOffset;
-                    }
-                    else {
-                        nodesAndOffsets['startOffset'] = currentParent.length; //case where the index given is bigger than the length of the text.
-                    }
-                    nodesAndOffsets['startParent'] = currentParent;
-                }
-                if (!isEndFound) {
-                    if (charactersWentThrough + wholeLength > endLimitIndex) {
-                        var endOffset;
-                        if (newLineCompensation != 0) {
-                            var i = 0;
-                            var remainingOffset = endLimitIndex - charactersWentThrough; //this is the offset considering each new line as 2 characters.
-                            var charactersWentThroughInThisLine = 0;
-                            for (i = 0; i < splittedText.length; ++i) {
-                                if (charactersWentThroughInThisLine + splittedText[i].length >= remainingOffset) {
-                                    break;
-                                }
-                                charactersWentThroughInThisLine += splittedText[i].length + 1 + newLineCompensation; //note: it's OK to not include the newLineCompensation in the "if" above since we would want to go to the next line anyway.
-                            }
-                            endOffset = remainingOffset - i; //line to change if newLineCompensation can be different than 1 (i * newLineCompensation).
-                            if (charactersWentThroughInThisLine - remainingOffset == 1) {
-                                ++endOffset; //this means we were between '\r' and '\n'
-                            }
-                        }
-                        else {
-                            endOffset = endLimitIndex - charactersWentThrough;
-                        }
-                        if (endOffset < 0) {
-                            endOffset = 0;
-                        }
-                        nodesAndOffsets['endOffset'] = endOffset;
-                    }
-                    else {
-                        nodesAndOffsets['endOffset'] = currentParent.length; //case where the index given is bigger than the length of the text.
-                    }
-                    nodesAndOffsets['endParent'] = currentParent;
-                }
-                return charactersWentThrough + wholeLength;
-            }
-            else {
-                //case where the element is basically empty
-                nodesAndOffsets['startParent'] = currentParent;
-                nodesAndOffsets['startOffset'] = 0;
-                nodesAndOffsets['endParent'] = currentParent;
-                nodesAndOffsets['endOffset'] = 0;
-            }
-        }
-    }
-    return charactersWentThrough;
-}
-
-document.doesElementInheritDisplayNone = function getRangeStartAndEnd(domElement) {
-    // This method will check if the element or one of its ancestors has "display:none".
-    while (domElement && domElement.style) {
-        if (domElement.style.display == 'none')
-            return true;
-        domElement = domElement.parentNode;
-    }
-    return false;
-}
-
 document.checkForDivsThatAbsorbEvents = function checkForDivsThatAbsorbEvents(jsEventArgs) {
     var currentElement = jsEventArgs.target;
     var endElement = jsEventArgs.currentTarget;
@@ -1105,30 +815,6 @@ document.checkForDivsThatAbsorbEvents = function checkForDivsThatAbsorbEvents(js
         currentElement = currentElement.parentNode;
     }
     return false;
-}
-
-document.getTextLengthIncludingNewLineCompensation = function (instance) {
-    var cshtml5Asm;
-    if (document.isSLMigration)
-        cshtml5Asm = JSIL.GetAssembly('SLMigration.CSharpXamlForHtml5');
-    else
-        cshtml5Asm = JSIL.GetAssembly('CSharpXamlForHtml5');
-    var htmlDomManager = function () {
-        return (htmlDomManager = JSIL.Memoize(cshtml5Asm.CSHTML5.Internal.INTERNAL_HtmlDomManager))();
-    };
-    var text = htmlDomManager()['GetTextBoxText'](instance);
-    if (!instance['get_AcceptsReturn']()) {
-        text = (System.String.Replace(System.String.Replace(text, "\n", ""), "\r", ""));
-    }
-    var correctionDueToNewLines = text.split("\n").length;
-    --correctionDueToNewLines; //for n lines, we have n-1 ""\r\n""
-    if (window.chrome && correctionDueToNewLines != 0) {
-        --correctionDueToNewLines; //on chrome, we have a \n right at the end for some reason.
-    }
-    else if (window.IE_VERSION) {
-        correctionDueToNewLines *= 2; //IE already has 2 characters for new lines but they are doubled: we have ""\r\n\r\n"" instead of ""\r\n"".
-    }
-    return text.length + correctionDueToNewLines;
 }
 
 document.functionToCompareWordForFilter = function (wordToCompare) {
@@ -1426,6 +1112,155 @@ const isTouchDevice = () => {
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0));
 }
+
+document.textboxHelpers = (function () {
+    function getSelectionLength(view) {
+        return view.selectionEnd - view.selectionStart;
+    };
+
+    function getCaretPosition(view) {
+        return view.selectionDirection === 'forward' ? view.selectionEnd : view.selectionStart;
+    };
+
+    function isNewLineChar(c) {
+        return c === '\n' || c === '\r';
+    };
+
+    function navigateInDirection(view, e) {
+        if (!e.shiftKey && !e.ctrlKey && getSelectionLength(view) > 0) {
+            return true;
+        }
+
+        switch (e.key) {
+            case 'ArrowLeft':
+            case 'ArrowUp':
+                return getCaretPosition(view) > 0;
+            case 'ArrowRight':
+            case 'ArrowDown':
+                return getCaretPosition(view) < view.value.length;
+            default:
+                return false;
+        }
+    };
+
+    function navigateByPage(view, e) {
+        // In Chrome, navigation with PageUp and PageDown does not work when overflow is set to 'hidden',
+        // so we manually update the cursor position here.
+
+        if (e.ctrlKey) {
+            return false;
+        }
+
+        if (e.key === 'PageDown') {
+            if (getCaretPosition(view) < view.value.length || (!e.shiftKey && getSelectionLength(view) > 0)) {
+                const start = e.shiftKey ? (view.selectionDirection === 'forward' ? view.selectionStart : view.selectionEnd) : view.value.length;
+                const end = view.value.length;
+                view.setSelectionRange(start, end, 'forward');
+                return true;
+            }
+        } else {
+            if (getCaretPosition(view) > 0 || (!e.shiftKey && getSelectionLength(view) > 0)) {
+                const start = 0;
+                const end = e.shiftKey ? (view.selectionDirection === 'forward' ? view.selectionStart : view.selectionEnd) : 0;
+                view.setSelectionRange(start, end, 'backward');
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    function navigateToStart(view, e) {
+        if (!e.shiftKey && getSelectionLength(view) > 0) {
+            return true;
+        }
+
+        const caretIndex = getCaretPosition(view); 
+        return caretIndex > 0 && (e.ctrlKey || !isNewLineChar(view.value[caretIndex - 1]));
+    };
+
+    function navigateToEnd(view, e) {
+        if (!e.shiftKey && getSelectionLength(view) > 0) {
+            return true;
+        }
+
+        const caretIndex = getCaretPosition(view); 
+        return caretIndex < view.value.length && (e.ctrlKey || !isNewLineChar(view.value[caretIndex]));
+    };
+
+    function handleTab(view, e) {
+        if (view.getAttribute('data-acceptstab') === 'true' &&
+            (getSelectionLength(view) > 0 || view.maxLength < 0 || view.value.length < view.maxLength)) {
+            e.preventDefault();
+            view.setRangeText('\t', view.selectionStart, view.selectionEnd, 'end');
+            return true;
+        }
+
+        return false;
+    };
+
+    return {
+        createView: function (id, parentId) {
+            const view = document.createElementSafe('textarea', id, parentId, -1);
+            view.style.fontSize = "inherit";
+            view.style.fontFamily = "inherit";
+            view.style.resize = "none";
+            view.style.outline = "none";
+            view.style.border = "none";
+            view.style.boxSizing = "border-box";
+            view.style.background = "solid transparent";
+            view.style.cursor = "text";
+            view.style.overflow = "hidden";
+            view.style.tabSize = '4';
+
+            view.setAttribute('tabindex', -1);
+
+            view.addEventListener('paste', function (e) {
+                if (this.getAttribute('data-acceptsreturn') === 'false') {
+                    e.preventDefault();
+                    let content = (e.originalEvent || e).clipboardData.getData('text/plain');
+                    if (content !== undefined) {
+                        content = content.replace(/\n/g, '').replace(/\r/g, '');
+                    }
+                    document.execCommand('insertText', false, content);
+                }
+            }, false);
+        },
+        onKeyDownNative: function (view, e) {
+            switch (e.key.toLowerCase()) {
+                case 'arrowleft':
+                case 'arrowright':
+                case 'arrowdown':
+                case 'arrowup':
+                    return navigateInDirection(view, e);
+                case 'pagedown':
+                case 'pageup':
+                    return navigateByPage(view, e);
+                case 'home':
+                    return navigateToStart(view, e);
+                case 'end':
+                    return navigateToEnd(view, e);
+                case 'delete':
+                    return getCaretPosition(view) < view.value.length || getSelectionLength(view) > 0;
+                case 'backspace':
+                    return getCaretPosition(view) > 0 || getSelectionLength(view) > 0;
+                case 'c':
+                case 'x':
+                    return e.ctrlKey && getSelectionLength(view) > 0;
+                case 'a':
+                    return e.ctrlKey && getSelectionLength(view) < view.value.length;
+                case 'v':
+                case 'y':
+                case 'z':
+                    return e.ctrlKey;
+                case 'tab':
+                    return handleTab(view, e);
+                default:
+                    return false;
+            }
+        },
+    };
+})();
 
 document.velocityHelpers = (function () {
     const cache = {};
