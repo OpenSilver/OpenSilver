@@ -15,7 +15,8 @@ for /f "delims== tokens=1,2" %%G in (version_info.txt) do set %%G=%%H
 set config=Release
 set repoPath=%~dp0..
 set sourceBase=%repoPath%\src\Compiler
-set destDir=%repoPath%\src\packages\OpenSilver.%STABLE_VERSION%\tools
+set destDirSL=%repoPath%\src\packages\OpenSilver.%STABLE_VERSION%
+set destDirUWP=%repoPath%\src\packages\OpenSilver.UWPCompatible.%STABLE_VERSION%
 
 taskkill /f /im "msbuild.exe" >NUL
 
@@ -38,11 +39,19 @@ CALL :copyDll Compiler.Common OpenSilver.Compiler.Common
 CALL :copyDll Compiler.ProgressDialog OpenSilver.Compiler.ProgressDialog
 CALL :copyDll Compiler.TypeScriptDefToCSharp OpenSilver.Compiler.TypeScriptDefToCSharp
 CALL :copyDll Compiler.ResourcesExtractor OpenSilver.Compiler.Resources
-copy %repoPath%\src\Targets\OpenSilver.targets %repoPath%\src\packages\OpenSilver.%STABLE_VERSION%\build >NUL
-copy %repoPath%\src\Targets\OpenSilver.Common.targets %repoPath%\src\packages\OpenSilver.%STABLE_VERSION%\build >NUL
+CALL :copyDll Compiler Mono.Cecil
+CALL :copyDll Compiler Mono.Cecil.Mdb
+CALL :copyDll Compiler Mono.Cecil.Pdb
+CALL :copyDll Compiler Mono.Cecil.Rocks
+copy %repoPath%\src\Targets\OpenSilver.targets %destDirSL%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirSL%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.targets %destDirUWP%\build >NUL
+copy %repoPath%\src\Targets\OpenSilver.Common.targets %destDirUWP%\build >NUL
 
 EXIT /B 0
 :copyDll
-del %destDir%\%~2.dll >NUL
-copy %sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll %destDir% >NUL
+del %destDirSL%\tools\%~2.dll >NUL
+copy %sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll %destDirSL%\tools >NUL
+del %destDirUWP%\tools\%~2.dll >NUL
+copy %sourceBase%\%~1\bin\OpenSilver\%config%\net461\%~2.dll %destDirUWP%\tools >NUL
 EXIT /B 0
