@@ -15,7 +15,6 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Markup;
-using CSHTML5.Internal;
 using OpenSilver.Internal.Controls;
 
 #if MIGRATION
@@ -66,7 +65,6 @@ namespace Windows.UI.Xaml.Controls
 
         private bool _isProcessingInput;
         private bool _isFocused;
-        private int? _selectionIdxCache;
         private ScrollViewer _scrollViewer;
         private FrameworkElement _contentElement;
         private ITextBoxViewHost<TextBoxView> _textViewHost;
@@ -174,15 +172,9 @@ namespace Windows.UI.Xaml.Controls
                 // Clear the flag to allow changing the Text during TextChanged
                 tb._isProcessingInput = false;
             }
-            else if (tb._textViewHost != null)
+            else
             {
-                tb._textViewHost.View.OnTextChanged((string)e.NewValue);
-            }
-
-            if (tb._selectionIdxCache.HasValue)
-            {
-                tb._textViewHost.View.NEW_SET_SELECTION(tb._selectionIdxCache.Value, tb._selectionIdxCache.Value);
-                tb._selectionIdxCache = null;
+                tb._textViewHost?.View.OnTextChanged((string)e.NewValue);
             }
 
             tb.OnTextChanged(new TextChangedEventArgs() { OriginalSource = tb });
@@ -492,42 +484,24 @@ namespace Windows.UI.Xaml.Controls
         
         public string SelectedText
         {
-            get
-            {
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out _);
-                    return Text.Substring(selectionStartIndex, selectionLength);
-                }
-
-                return string.Empty;
-            }
+            get => _textViewHost?.View.SelectedText ?? string.Empty;
             set
             {
-                if (_textViewHost != null)
+                if (value is null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out int selectionLength, out _);
-                    string text = Text.Substring(0, selectionStartIndex) + value + Text.Substring(selectionStartIndex + selectionLength);
-                    _selectionIdxCache = selectionStartIndex + value.Length;
-                    Text = text;
-                    _selectionIdxCache = null;
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                if (_textViewHost is not null)
+                {
+                    _textViewHost.View.SelectedText = value;
                 }
             }
         }
 
-
         public int SelectionStart
         {
-            get
-            {
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_GET_SELECTION(out int selectionStartIndex, out _, out _);
-                    return selectionStartIndex;
-                }
-
-                return 0;
-            }
+            get => _textViewHost?.View.SelectionStart ?? 0;
             set
             {
                 if (value < 0)
@@ -535,22 +509,16 @@ namespace Windows.UI.Xaml.Controls
                     throw new ArgumentOutOfRangeException("SelectionStart cannot be lower than 0");
                 }
 
-                _textViewHost?.View.NEW_SET_SELECTION(value, value + SelectionLength);
+                if (_textViewHost is not null)
+                {
+                    _textViewHost.View.SelectionStart = value;
+                }
             }
         }
 
         public int SelectionLength
         {
-            get
-            {
-                if (_textViewHost != null)
-                {
-                    _textViewHost.View.NEW_GET_SELECTION(out _, out int selectionLength, out _);
-                    return selectionLength;
-                }
-
-                return 0;
-            }
+            get => _textViewHost?.View.SelectionLength ?? 0;
             set
             {
                 if (value < 0)
@@ -558,22 +526,10 @@ namespace Windows.UI.Xaml.Controls
                     throw new ArgumentOutOfRangeException("SelectionLength cannot be lower than 0");
                 }
 
-                _textViewHost?.View.NEW_SET_SELECTION(SelectionStart, SelectionStart + value);
-            }
-        }
-
-        // It needs to get caret position for selection with Shift key
-        internal int CaretPosition
-        {
-            get
-            {
-                if (_textViewHost != null)
+                if (_textViewHost is not null)
                 {
-                    _textViewHost.View.NEW_GET_SELECTION(out _, out _, out int caretIndex);
-                    return caretIndex;
+                    _textViewHost.View.SelectionLength = value;
                 }
-
-                return 0;
             }
         }
 
@@ -588,10 +544,7 @@ namespace Windows.UI.Xaml.Controls
         /// <param name="eventArgs">The arguments for the event.</param>
         protected virtual void OnTextChanged(TextChangedEventArgs eventArgs)
         {
-            if (TextChanged != null)
-            {
-                TextChanged(this, eventArgs);
-            }
+            TextChanged?.Invoke(this, eventArgs);
         }
 
         /// <summary>
@@ -710,7 +663,13 @@ namespace Windows.UI.Xaml.Controls
 
             base.OnKeyDown(e);
 
-            HandleKeyDown(e);
+            if (_textViewHost is null) return;
+
+            if (_textViewHost.View.OnKeyDownNative(e.UIEventArg))
+            {
+                e.Handled = true;
+                e.Cancellable = false;
+            }
         }
 
         protected override void OnTextInput(TextCompositionEventArgs e)
@@ -734,7 +693,7 @@ namespace Windows.UI.Xaml.Controls
             e.Handled = true;
         }
 
-        internal sealed override void OnTextInputInternal()
+        internal void UpdateTextProperty(string text)
         {
             if (_textViewHost != null)
             {
@@ -742,7 +701,7 @@ namespace Windows.UI.Xaml.Controls
                 try
                 {
                     _textViewHost.View.InvalidateMeasure();
-                    SetCurrentValue(TextProperty, _textViewHost.View.GetText());
+                    SetCurrentValue(TextProperty, text);
                 }
                 finally
                 {
@@ -768,25 +727,23 @@ namespace Windows.UI.Xaml.Controls
         /// <summary>
         /// Selects all text in the text box.
         /// </summary>
-        public void SelectAll()
-        {
-            Select(0, this.Text.Length);
-        }
+        public void SelectAll() => Select(0, int.MaxValue);
 
         public void Select(int start, int length)
         {
             if (start < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(start));
-            if (start + length < 0)
+            }
+
+            if (length < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(length));
-            _textViewHost?.View.NEW_SET_SELECTION(start, start + length);
+            }
+
+            _textViewHost?.View.SetSelectionRange(start, start + length);
         }
 
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            return base.MeasureOverride(availableSize);
-        }
-    
         internal override void UpdateVisualStates()
         {
             if (!IsEnabled)
