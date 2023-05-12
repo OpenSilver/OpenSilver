@@ -111,6 +111,7 @@ namespace CSHTML5.Internal
         public string paddingInlineEnd { set { SetStylePropertyValue("paddingInlineEnd", value); } }
         public string position { set { SetStylePropertyValue("position", value); } }
         public string pointerEvents { set { SetStylePropertyValue("pointerEvents", value); } }
+        public string resize { set { SetStylePropertyValue("resize", value); } }
         public string tableLayout { set { SetStylePropertyValue("tableLayout", value); } }
         public string textAlign { set { SetStylePropertyValue("textAlign", value); } }
         public string textDecoration { set { SetStylePropertyValue("textDecoration", value); } }

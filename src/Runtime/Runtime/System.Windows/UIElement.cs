@@ -315,10 +315,6 @@ namespace Windows.UI.Xaml
             
             WriteVisualFlag(VisualFlags.IsUIElement, true);
         }
-        internal virtual object GetDomElementToSetContentString()
-        {
-            return INTERNAL_InnerDomElement;
-        }
 
 #region ClipToBounds
 
