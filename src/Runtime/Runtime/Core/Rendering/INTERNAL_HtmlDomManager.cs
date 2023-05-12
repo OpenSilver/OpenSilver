@@ -23,11 +23,13 @@ using System.Globalization;
 
 #if MIGRATION
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Documents;
 #endif
@@ -148,7 +150,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         public static void SetContentString(UIElement element, string content, bool removeTextWrapping = false)
         {
-            object domElement = element.GetDomElementToSetContentString();
+            object domElement = element.INTERNAL_InnerDomElement;
 
             string uniqueIdentifier = ((INTERNAL_HtmlDomElementReference)domElement).UniqueIdentifier;
             string javaScriptCodeToExecute = $@"document.setContentString(""{ uniqueIdentifier}"",""{EscapeStringForUseInJavaScript(content)}"",{removeTextWrapping.ToString().ToLower()})";
@@ -175,7 +177,8 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
         public static string GetTextBoxText(object domElementRef)
         {
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
-            return OpenSilver.Interop.ExecuteJavaScriptString($"getTextAreaInnerText({sElement})");
+            return OpenSilver.Interop.ExecuteJavaScriptString(
+                $"if ({sElement} instanceof HTMLTextAreaElement) {sElement}.value; else {sElement}.innerText;");
         }
 
         public static object AddOptionToNativeComboBox(
@@ -576,6 +579,33 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             AddToGlobalStore(uniqueIdentifier, associatedUIElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
+        }
+
+        internal static INTERNAL_HtmlDomElementReference CreateTextBoxViewDomElementAndAppendIt(
+            object parentRef,
+            TextBoxView textBoxView)
+        {
+            Debug.Assert(parentRef is not null);
+            Debug.Assert(textBoxView is not null);
+
+            string uid = NewId();
+
+            var parent = parentRef as INTERNAL_HtmlDomElementReference;
+            if (parent is not null)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $"document.textboxHelpers.createView('{uid}', '{parent.UniqueIdentifier}');");
+            }
+            else
+            {
+                string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
+                OpenSilver.Interop.ExecuteJavaScriptFastAsync(
+                    $@"document.textboxHelpers.createView('{uid}', {sParentRef})");
+            }
+
+            AddToGlobalStore(uid, textBoxView);
+
+            return new INTERNAL_HtmlDomElementReference(uid, parent);
         }
 
         public static object CreateDomElementAndInsertIt(string domElementTag, object parentRef, UIElement associatedUIElement, int insertionIndex, string relativePosition) //associatedUIElement is the UIElement of which the current dom element is a part.

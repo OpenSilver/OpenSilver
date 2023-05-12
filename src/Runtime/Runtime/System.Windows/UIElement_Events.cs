@@ -1070,7 +1070,5 @@ namespace Windows.UI.Xaml
 
             RaiseEvent(e);
         }
-
-        internal virtual void OnTextInputInternal() { }
     }
 }

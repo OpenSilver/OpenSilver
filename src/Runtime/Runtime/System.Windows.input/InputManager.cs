@@ -53,11 +53,10 @@ internal sealed class InputManager
         FOCUS = 10,
         BLUR = 11,
         KEYPRESS = 12,
-        INPUT = 13,
-        TOUCH_START = 14,
-        TOUCH_END = 15,
-        TOUCH_MOVE = 16,
-        WINDOW_BLUR = 17,
+        TOUCH_START = 13,
+        TOUCH_END = 14,
+        TOUCH_MOVE = 15,
+        WINDOW_BLUR = 16,
     }
 
     private enum MouseButton
@@ -301,10 +300,6 @@ internal sealed class InputManager
 
             case EVENTS.KEYPRESS:
                 ProcessOnKeyPress(uie, jsEventArg);
-                break;
-
-            case EVENTS.INPUT:
-                ProcessOnInput(uie, jsEventArg);
                 break;
 
             case EVENTS.TOUCH_END:
@@ -580,11 +575,6 @@ internal sealed class InputManager
             OpenSilver.Interop.ExecuteJavaScriptVoid(
                 $"{CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(jsEventArg)}.preventDefault()");
         }
-    }
-
-    private void ProcessOnInput(UIElement uie, object jsEventArg)
-    {
-        uie.KeyboardTarget?.OnTextInputInternal();
     }
 
     private void ProcessPointerEvent(UIElement uie, object jsEventArg, RoutedEvent routedEvent)

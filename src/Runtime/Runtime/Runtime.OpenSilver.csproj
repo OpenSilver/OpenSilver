@@ -229,7 +229,6 @@
 		<Compile Include="System.Windows.Controls\RichTextBox\RichTextFormatParser.cs" />
 		<Compile Include="System.Windows.Controls\RoutedPropertyChangingEventHandler.cs" />
 		<Compile Include="System.Windows.Controls\SelectedItemCollection.cs" />
-		<Compile Include="System.Windows.Controls\TextBox.Navigation.cs" />
 		<Compile Include="System.Windows.Controls\TreeViewItemCheckBox.cs" />
 		<Compile Include="System.Windows.Controls\ListTimePickerPopupAutomationPeer.cs" />
 		<Compile Include="System.Windows.Automation.Peers\PickerAutomationPeer.cs" />
