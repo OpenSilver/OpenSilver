@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Media;
 using CSHTML5.Internal;
 using OpenSilver.Internal.Data;
 using OpenSilver.Internal;
@@ -278,6 +277,7 @@ namespace Windows.UI.Xaml
             INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
         }
         #endregion
+
 
         /// <summary>
         /// Returns the current effective value of a dependency property from a DependencyObject.
