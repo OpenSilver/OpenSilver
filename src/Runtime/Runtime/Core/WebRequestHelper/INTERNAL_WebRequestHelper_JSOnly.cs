@@ -391,20 +391,19 @@ namespace System
             }
             else if ((currentStatus == 0 && !GetIsFileProtocol()) && (currentReadyState == 4 || currentReadyState == 1)) //Note: we check whether the file protocol is file: because apparently, browsers return 0 as the status on a successful call.
             {
-                errorMessage = "An error occured. Please make sure that the target Url is available.";
+                errorMessage = "An error occurred. Please make sure that the target Url is available.";
             }
             else if (currentReadyState == 1 && !e.Cancelled)
             {
-                errorMessage = "An Error occured. Cross-Site Http Request might not be allowed at the target Url. If you own the domain of the Url, consider adding the header \"Access-Control-Allow-Origin\" to enable requests to be done at this Url.";
+                errorMessage = "An Error occurred. Cross-Site Http Request might not be allowed at the target Url. If you own the domain of the Url, consider adding the header \"Access-Control-Allow-Origin\" to enable requests to be done at this Url.";
             }
             else if (currentReadyState != 4)
             {
-                errorMessage = "An Error has occured while submitting your request.";
+                errorMessage = "An Error has occurred while submitting your request.";
             }
             if(errorMessage != null)
             {
-	            Exception exception = new Exception("An Error has occured while submitting your request.");
-                e.Error = exception;
+                e.Error = new Exception(errorMessage);
             }
             e.Result = GetResult((object)_xmlHttpRequest);
         }
