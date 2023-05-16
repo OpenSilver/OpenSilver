@@ -279,22 +279,6 @@ namespace Windows.UI.Xaml
         }
         #endregion
 
-        ~DependencyObject()
-        {
-            // the idea -> remove this object from any references held by brushes
-            var weakThis = new WeakDependencyObjectWrapper(this);
-            foreach (var dp in INTERNAL_PropertyStorageDictionary.Keys)
-                if (GetValue(dp) is IHasAccessToPropertiesWhereItIsUsed2 hasAccess)
-                {
-                    hasAccess.PropertiesWhereUsed.Remove(weakThis);
-                }
-            foreach (var dp in INTERNAL_AllInheritedProperties.Keys)
-                if (GetValue(dp) is IHasAccessToPropertiesWhereItIsUsed2 hasAccess)
-                {
-                    hasAccess.PropertiesWhereUsed.Remove(weakThis);
-                }
-        }
-
         /// <summary>
         /// Returns the current effective value of a dependency property from a DependencyObject.
         /// </summary>
