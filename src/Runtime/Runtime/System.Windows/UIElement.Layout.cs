@@ -249,18 +249,17 @@ namespace Windows.UI.Xaml
                 bool previousArrangeValid = IsArrangeValid;
                 Rect savedPreviousFinalRect = PreviousFinalRect;
                 PreviousFinalRect = finalRect;
+                IsArrangeValid = true;
                 LayoutManager.Current.RemoveArrange(this);
 
                 if (!IsVisible)
                 {
                     IsRendered = false;
-                    IsArrangeValid = true;
                     return;
                 }
 
                 if (IsRendered && previousArrangeValid && finalRect.Location.IsClose(savedPreviousFinalRect.Location) && finalRect.Size.IsClose(savedPreviousFinalRect.Size))
                 {
-                    IsArrangeValid = true;
                     return;
                 }
 
@@ -279,7 +278,6 @@ namespace Windows.UI.Xaml
 
                 _visualBounds = GetRenderedBounds(finalRect.Size);
 
-                IsArrangeValid = true;
                 PreviousFinalRect = finalRect;
 
                 // Render with new size & location
