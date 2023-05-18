@@ -13,6 +13,7 @@
 
 using System.Windows.Markup;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows;
@@ -28,6 +29,7 @@ namespace CSHTML5.Native.Html.Controls
     {
         private object _jsDiv;
         private string _htmlContent;
+        private IResizeObserverAdapter _resizeObserver;
 
         internal sealed override bool EnablePointerEventsCore => true;
 
@@ -41,12 +43,23 @@ namespace CSHTML5.Native.Html.Controls
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
+
+            _resizeObserver = ResizeObserverFactory.Create();
+            _resizeObserver.Observe(_jsDiv, OnHtmlContentResized);
+
             ApplyHtmlContent();
         }
 
         protected internal override void INTERNAL_OnDetachedFromVisualTree()
         {
             base.INTERNAL_OnDetachedFromVisualTree();
+
+            if (_resizeObserver is not null)
+            {
+                _resizeObserver.Unobserve(_jsDiv);
+                _resizeObserver = null;
+            }
+
             _jsDiv = null;
         }
 
@@ -104,5 +117,7 @@ namespace CSHTML5.Native.Html.Controls
             OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.innerHTML = {sContent}");
             InvalidateMeasure();
         }
+
+        private void OnHtmlContentResized(Size size) => InvalidateMeasure();
     }
 }
