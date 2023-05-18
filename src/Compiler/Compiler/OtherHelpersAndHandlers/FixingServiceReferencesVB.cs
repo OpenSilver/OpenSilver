@@ -303,10 +303,12 @@ namespace OpenSilver.Compiler
             }
 
             string functionDefinition = lines[0];
-
+            string implementsDefinition = "";
             if (functionDefinition.Contains("Implements"))
             {
-                functionDefinition = functionDefinition.Substring(0, functionDefinition.IndexOf("Implements")).Trim();
+                int index = functionDefinition.IndexOf("Implements");
+                implementsDefinition = functionDefinition.Substring(index + 11);
+                functionDefinition = functionDefinition.Substring(0, index).Trim();
             }
 
             string pattern = @"(Function|Sub)\s+(?<METHOD_NAME>\w+)\((?<METHOD_PARAMETERS_DEFINITIONS>.*?)\)(\s+As\s+(?<RETURN_TYPE>[\w\.\(\)\s]+))?$";
@@ -318,6 +320,12 @@ namespace OpenSilver.Compiler
                 string returnType = match.Groups["RETURN_TYPE"].Value;
                 string methodParametersDefinitions = match.Groups["METHOD_PARAMETERS_DEFINITIONS"].Value;
                 string methodName = match.Groups["METHOD_NAME"].Value;
+
+                if (implementsDefinition.Length > 0)
+                {
+                    string[] splits = implementsDefinition.Split(".".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    methodName = splits[splits.Length - 1];
+                }
 
                 string methodBodyToReplace = string.Join("\r\n", lines, 1, lines.Length - 2);
                 Match matchBody = regex.Match(methodBodyToReplace);
@@ -531,12 +539,6 @@ namespace OpenSilver.Compiler
 
         private static string GetMethodName(string method, MethodType methodType)
         {
-            if (method.Contains("_"))
-            {
-                string[] splits = method.Split("_".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                method = splits[splits.Length - 1];
-            }
-
             switch (methodType)
             {
                 case MethodType.AsyncBegin:

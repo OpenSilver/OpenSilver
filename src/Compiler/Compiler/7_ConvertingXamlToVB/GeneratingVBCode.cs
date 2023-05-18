@@ -374,7 +374,7 @@ End Class
         private const string IXamlComponentLoaderClass = "Global.OpenSilver.Internal.Xaml.IXamlComponentLoader";
         private const string IComponentConnectorClass = "Global.OpenSilver.Internal.Xaml.IComponentConnector";
         private const string XamlContextClass = "Global.OpenSilver.Internal.Xaml.Context.XamlContext";
-        private const string IMarkupExtensionClass = "Global.System.Xaml.IMarkupExtension<object>";
+        private const string IMarkupExtensionClass = "Global.System.Xaml.IMarkupExtension(Of Object)";
 
         public static bool IsDataTemplate(XElement element) => IsXElementOfType(element, "DataTemplate");
 
