@@ -440,16 +440,11 @@ namespace OpenSilver.Compiler
             
             var sb = new StringBuilder();
 
-            sb.Append($"New {destinationType}()");
+            sb.Append($"New {destinationType}() From ");
             sb.Append("{");
-
+            
             if (split != null && split.Length > 0)
-            {
-                foreach (string d in split)
-                {
-                    sb.Append(d).Append(", ");
-                }
-            }
+                sb.Append(String.Join(",", split));
 
             sb.Append("}");
 

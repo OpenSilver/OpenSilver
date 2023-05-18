@@ -1129,7 +1129,7 @@ namespace OpenSilver.Compiler
 
                                         //todo: make this more readable by cutting it into parts ?
                                         parameters.StringBuilder.AppendLine(
-                                            string.Format(@"Object {0} = CType({1},{10}).ProvideValue(New Global.System.ServiceProvider({2}, {3}))
+                                            string.Format(@"Dim {0} = CType({1},{10}).ProvideValue(New Global.System.ServiceProvider({2}, {3}))
 If TypeOf {0} Is {4} Then
     Global.{9}.BindingOperations.SetBinding({7}, {8}, CType({0}, {4}))
 Else
