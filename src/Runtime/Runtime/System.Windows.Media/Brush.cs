@@ -16,9 +16,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Threading;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
-using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -42,6 +43,19 @@ namespace Windows.UI.Xaml.Media
         IHasAccessToPropertiesWhereItIsUsed
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        private static readonly BrushHolder _holder = new();
+        private readonly int _id;
+        
+        protected Brush()
+        {
+            _id = _holder.Add(this);
+        }
+
+        ~Brush()
+        {
+            _holder.Remove(_id);
+        }
+
         internal static Brush Parse(string source)
         {
             return new SolidColorBrush(Color.INTERNAL_ConvertFromString(source));
@@ -201,19 +215,6 @@ namespace Windows.UI.Xaml.Media
         }
         #endregion
 
-        private int _id;
-        internal int Id => _id;
-        public Brush()
-        {
-            _id = _holder.GetNextId();
-            _holder.Add(this);
-        }
-        ~Brush()
-        {
-            _holder.Remove(this);
-        }
-        private static BrushHolder _holder = new BrushHolder();
-
         // if true, log PropertiesWhereUsed updates (how many dead weak references we removed)
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool LogBrushDeadWeakReferencesUpdates { get; set; } = false;
@@ -221,82 +222,90 @@ namespace Windows.UI.Xaml.Media
         // if = 0, don't update at all (so you can test before/after scenarios)
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static int UpdateBrushWeakReferencesSecs { get; set; } = 30;
-    }
 
-    internal class BrushHolder
-    {
-        private Dictionary<int, WeakReference<Brush>> _brushes = new Dictionary<int, WeakReference<Brush>>();
-        private int _nextId;
-
-        public int GetNextId() => ++_nextId;
-
-        public BrushHolder()
+        private sealed class BrushHolder
         {
-            UpdatePropertiesWhereUsedForever();
-        }
+            private readonly Dictionary<int, WeakReference<IHasAccessToPropertiesWhereItIsUsed2>> _brushes = new();
+            private int _nextId;
 
-        public void Add(Brush brush)
-        {
-            _brushes.Add(brush.Id, new WeakReference<Brush>(brush));
-        }
-
-        public void Remove(Brush brush)
-        {
-            bool removed = _brushes.Remove(brush.Id);
-            if (!removed)
-                Log($"ERROR: can't find brush {brush.GetType().ToString()}");
-        }
-
-        private async void UpdatePropertiesWhereUsedForever()
-        {
-            // ... just in case you set Brush.UpdateBrushWeakReferencesSecs, so that it'll take effect from the get-go
-            await Task.Delay(1000);
-
-            while (true)
+            public BrushHolder()
             {
-                if (Brush.UpdateBrushWeakReferencesSecs <= 0)
-                    break;
-                await Task.Delay(Brush.UpdateBrushWeakReferencesSecs * 1000);
-                UpdatePropertiesWhereUsed();
+                UpdatePropertiesWhereUsedForever();
             }
-        }
 
-
-        private void UpdatePropertiesWhereUsed()
-        {
-            var disposedRefCount = 0;
-            var fullCount = 0;
-            foreach (var brushRef in _brushes.Values)
+            public int Add(Brush brush)
             {
-                if (brushRef.TryGetTarget(out var brush))
-                {
-                    var properties = (brush as IHasAccessToPropertiesWhereItIsUsed2).PropertiesWhereUsed;
-                    var toRemove = properties.Keys.Where(p => !p.TryGetDependencyObject(out var ignore)).ToList();
+                int id = Interlocked.Increment(ref _nextId);
+                _brushes.Add(id, new WeakReference<IHasAccessToPropertiesWhereItIsUsed2>(brush));
+                return id;
+            }
 
-                    if (Brush.LogBrushDeadWeakReferencesUpdates)
+            public void Remove(int id) => _brushes.Remove(id);
+
+            private async void UpdatePropertiesWhereUsedForever()
+            {
+                // ... just in case you set Brush.UpdateBrushWeakReferencesSecs, so that it'll take effect from the get-go
+                await Task.Delay(1000);
+
+                while (true)
+                {
+                    if (UpdateBrushWeakReferencesSecs <= 0) break;
+
+                    await Task.Delay(UpdateBrushWeakReferencesSecs * 1000);
+                    UpdatePropertiesWhereUsed();
+                }
+            }
+
+            private void UpdatePropertiesWhereUsed()
+            {
+                int disposedRefCount = 0;
+                int fullCount = 0;
+                foreach (var brushRef in _brushes.Values)
+                {
+                    if (!brushRef.TryGetTarget(out var brush))
                     {
-                        fullCount += properties.Sum(p => p.Value.Count);
-                        disposedRefCount += toRemove.Sum(p => properties[p].Count);
+                        // If the weak reference is dead, it means the brush finalizer has not
+                        // been called yet.
+                        continue;
                     }
 
-                    foreach (var prop in toRemove)
-                        properties.Remove(prop);
-                    toRemove.Clear();
-                } else
-                    Log($"ERROR can't find brush (update) - {brushRef}");
+                    foreach (var listener in brush.PropertiesWhereUsed.ToArray())
+                    {
+                        if (!listener.Key.TryGetDependencyObject(out _))
+                        {
+                            brush.PropertiesWhereUsed.Remove(listener.Key);
+                            if (LogBrushDeadWeakReferencesUpdates)
+                            {
+                                disposedRefCount += listener.Value.Count;
+                            }
+
+                            continue;
+                        }
+
+                        if (LogBrushDeadWeakReferencesUpdates)
+                        {
+                            fullCount += listener.Value.Count;
+                        }
+                    }
+                }
+
+                if (LogBrushDeadWeakReferencesUpdates)
+                {
+                    Log($"*** Brushes : {_brushes.Count}, disposed={disposedRefCount}/{fullCount} ({(100d * disposedRefCount / fullCount):F2}%)");
+                }
             }
 
-            if (Brush.LogBrushDeadWeakReferencesUpdates)
-                Log($"*** Brushes : {_brushes.Count}, disposed={disposedRefCount}/{fullCount} ({(100d * (double)disposedRefCount/(double)fullCount):F2}%)");
-        }
-
-
-        private void Log(string msg)
-        {
-            if (OpenSilver.Interop.IsRunningInTheSimulator)
-                Trace.WriteLine(msg);
-            else 
-                Console.WriteLine(msg);
+            private static void Log(string msg)
+            {
+                if (OpenSilver.Interop.IsRunningInTheSimulator)
+                {
+                    Trace.WriteLine(msg);
+                }
+                else
+                {
+                    Console.WriteLine(msg);
+                }
+            }
         }
     }
 }
