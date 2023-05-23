@@ -13,8 +13,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Threading;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -40,6 +43,19 @@ namespace Windows.UI.Xaml.Media
         IHasAccessToPropertiesWhereItIsUsed
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        private static readonly BrushHolder _holder = new();
+        private readonly int _id;
+        
+        protected Brush()
+        {
+            _id = _holder.Add(this);
+        }
+
+        ~Brush()
+        {
+            _holder.Remove(_id);
+        }
+
         internal static Brush Parse(string source)
         {
             return new SolidColorBrush(Color.INTERNAL_ConvertFromString(source));
@@ -197,6 +213,99 @@ namespace Windows.UI.Xaml.Media
             get { return (Transform)GetValue(TransformProperty); }
             set { SetValue(TransformProperty, value); }
         }
-#endregion
+        #endregion
+
+        // if true, log PropertiesWhereUsed updates (how many dead weak references we removed)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static bool LogBrushDeadWeakReferencesUpdates { get; set; } = false;
+
+        // if = 0, don't update at all (so you can test before/after scenarios)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static int UpdateBrushWeakReferencesSecs { get; set; } = 30;
+
+        private sealed class BrushHolder
+        {
+            private readonly Dictionary<int, WeakReference<IHasAccessToPropertiesWhereItIsUsed2>> _brushes = new();
+            private int _nextId;
+
+            public BrushHolder()
+            {
+                UpdatePropertiesWhereUsedForever();
+            }
+
+            public int Add(Brush brush)
+            {
+                int id = Interlocked.Increment(ref _nextId);
+                _brushes.Add(id, new WeakReference<IHasAccessToPropertiesWhereItIsUsed2>(brush));
+                return id;
+            }
+
+            public void Remove(int id) => _brushes.Remove(id);
+
+            private async void UpdatePropertiesWhereUsedForever()
+            {
+                // ... just in case you set Brush.UpdateBrushWeakReferencesSecs, so that it'll take effect from the get-go
+                await Task.Delay(1000);
+
+                while (true)
+                {
+                    if (UpdateBrushWeakReferencesSecs <= 0) break;
+
+                    await Task.Delay(UpdateBrushWeakReferencesSecs * 1000);
+                    UpdatePropertiesWhereUsed();
+                }
+            }
+
+            private void UpdatePropertiesWhereUsed()
+            {
+                int disposedRefCount = 0;
+                int fullCount = 0;
+                foreach (var brushRef in _brushes.Values)
+                {
+                    if (!brushRef.TryGetTarget(out var brush))
+                    {
+                        // If the weak reference is dead, it means the brush finalizer has not
+                        // been called yet.
+                        continue;
+                    }
+
+                    foreach (var listener in brush.PropertiesWhereUsed.ToArray())
+                    {
+                        if (!listener.Key.TryGetDependencyObject(out _))
+                        {
+                            brush.PropertiesWhereUsed.Remove(listener.Key);
+                            if (LogBrushDeadWeakReferencesUpdates)
+                            {
+                                disposedRefCount += listener.Value.Count;
+                            }
+
+                            continue;
+                        }
+
+                        if (LogBrushDeadWeakReferencesUpdates)
+                        {
+                            fullCount += listener.Value.Count;
+                        }
+                    }
+                }
+
+                if (LogBrushDeadWeakReferencesUpdates)
+                {
+                    Log($"*** Brushes : {_brushes.Count}, disposed={disposedRefCount}/{fullCount} ({(100d * disposedRefCount / fullCount):F2}%)");
+                }
+            }
+
+            private static void Log(string msg)
+            {
+                if (OpenSilver.Interop.IsRunningInTheSimulator)
+                {
+                    Trace.WriteLine(msg);
+                }
+                else
+                {
+                    Console.WriteLine(msg);
+                }
+            }
+        }
     }
 }
