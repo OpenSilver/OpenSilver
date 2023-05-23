@@ -104,7 +104,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         {
             PopupRoot popupRoot = (PopupRoot)d;
             popupRoot.TemplateChild = null;
-            if (popupRoot.IsConnectedToLiveTree)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(popupRoot))
             {
                 popupRoot.InvalidateMeasureInternal();
             }

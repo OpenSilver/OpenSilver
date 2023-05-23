@@ -11,6 +11,7 @@
 *  
 \*====================================================================================*/
 
+using CSHTML5.Internal;
 using System;
 using System.Diagnostics;
 
@@ -524,7 +525,7 @@ internal sealed class KeyboardNavigation
         return control.IsTabStop
             && control.IsEnabled
             && control.IsVisible
-            && control.IsConnectedToLiveTree;
+            && INTERNAL_VisualTreeManager.IsElementInVisualTree(control);
     }
 
     private bool IsGroup(DependencyObject e)

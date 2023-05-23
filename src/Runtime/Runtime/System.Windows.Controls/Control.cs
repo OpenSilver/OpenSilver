@@ -639,7 +639,7 @@ namespace Windows.UI.Xaml.Controls
             Control control = (Control)d;
             FrameworkElement.UpdateTemplateCache(control, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (control.IsConnectedToLiveTree)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(control))
             {
                 control.InvalidateMeasureInternal();
             }

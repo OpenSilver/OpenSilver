@@ -178,7 +178,7 @@ namespace Windows.UI.Xaml.Shapes
             }
         }
 
-        override internal protected void Redraw()
+        protected internal override void Redraw()
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {

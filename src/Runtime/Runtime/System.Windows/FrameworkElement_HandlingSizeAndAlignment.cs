@@ -947,7 +947,7 @@ namespace Windows.UI.Xaml
 
         internal static void Margin_MethodToUpdateDom(DependencyObject d, object newValue)
         {
-            var fe = (FrameworkElement)d;            
+            var fe = (FrameworkElement)d;
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(fe) && !fe.IsUnderCustomLayout)
             {
                 var margin = (Thickness)newValue;
@@ -1193,7 +1193,7 @@ namespace Windows.UI.Xaml
                         return 0d;
                     }
                 }
-                
+
                 return 0d;
             }
         }
@@ -1222,7 +1222,7 @@ namespace Windows.UI.Xaml
                         return 0d;
                     }
                 }
-                
+
                 return 0d;
             }
         }

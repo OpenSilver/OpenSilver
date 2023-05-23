@@ -82,6 +82,8 @@ namespace Windows.UI.Xaml
 
         internal bool IsConnectedToLiveTree { get; set; }
 
+        internal bool IsUnloading { get; set; }
+
         internal bool LoadingIsPending { get; set; }
 
 #region Visual Parent
@@ -770,7 +772,7 @@ namespace Windows.UI.Xaml
                 }
                 else
                 {
-                    constraintAllowsVisible = uie.IsConnectedToLiveTree;
+                    constraintAllowsVisible = INTERNAL_VisualTreeManager.IsElementInVisualTree(uie);
                 }
 
                 if (!constraintAllowsVisible)
@@ -1125,7 +1127,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public GeneralTransform TransformToVisual(UIElement visual)
         {
-            if (!IsConnectedToLiveTree)
+            if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {
                 throw new ArgumentException();
             }
@@ -1138,7 +1140,7 @@ namespace Windows.UI.Xaml
             object outerDivOfReferenceVisual;
             if (visual != null)
             {
-                if (!visual.IsConnectedToLiveTree)
+                if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(visual))
                 {
                     throw new ArgumentException(nameof(visual));
                 }

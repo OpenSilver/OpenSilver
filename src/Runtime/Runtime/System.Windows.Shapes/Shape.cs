@@ -128,7 +128,7 @@ namespace Windows.UI.Xaml.Shapes
                 typeof(Shape),
                 new FrameworkPropertyMetadata(Stretch.None, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, Stretch_Changed));
 
-        internal protected static void Stretch_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        protected internal static void Stretch_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //note: Stretch is actually more implemented in the Redraw method of the classes that inherit from shape (Line, Ellipse, Path, Rectangle)
 
@@ -401,17 +401,17 @@ namespace Windows.UI.Xaml.Shapes
 
         #region Protected Methods
 
-        internal protected virtual void Redraw()
+        protected internal virtual void Redraw()
         {
             _redrawWhenBecomeVisible = false;
         }
 
-        internal protected virtual void ManageStrokeChanged()
+        protected internal virtual void ManageStrokeChanged()
         {
             ScheduleRedraw();
         }
 
-        internal protected virtual void ManageStrokeThicknessChanged()
+        protected internal virtual void ManageStrokeThicknessChanged()
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {

@@ -155,7 +155,7 @@ namespace CSHTML5.Internal
                         parent.INTERNAL_VisualChildrenInformation.Remove(child);
 
                         //Detach Element  
-                        DetachVisualChidren(child);
+                        DetachVisualChildren(child);
 
                         INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
 
@@ -190,7 +190,7 @@ namespace CSHTML5.Internal
                         }
                         else
                         {
-                            DetachVisualChidren(child);
+                            DetachVisualChildren(child);
                         }
                     }
                     else
@@ -207,30 +207,41 @@ namespace CSHTML5.Internal
 #endif
         }
 
-        private static void DetachVisualChidren(UIElement element)
+        private static void DetachVisualChildren(UIElement element)
         {
-            var queue = new Queue<UIElement>();
-            queue.Enqueue(element);
+            var markAsUnloadingQueue = new Queue<UIElement>();
+            var detachQueue = new Queue<UIElement>();
 
-            while (queue.Count > 0)
+            markAsUnloadingQueue.Enqueue(element);
+
+            while (markAsUnloadingQueue.Any())
             {
-                var e = queue.Dequeue();
+                var e = markAsUnloadingQueue.Dequeue();
+                e.IsUnloading = true;
                 if (e.INTERNAL_VisualChildrenInformation != null)
                 {
                     foreach (var pair in e.INTERNAL_VisualChildrenInformation)
                     {
-                        queue.Enqueue(pair.Key);
+                        markAsUnloadingQueue.Enqueue(pair.Key);
                     }
                 }
 
+                detachQueue.Enqueue(e);
+            }
+
+            while (detachQueue.Any())
+            {
+                var e = detachQueue.Dequeue();
                 DetachElement(e);
             }
         }
 
         private static void DetachElement(UIElement element)
         {
+            element.IsUnloading = true;
             if (element.IsConnectedToLiveTree)
             {
+                element.IsConnectedToLiveTree = false;
                 if (element.IsPointerOver)
                 {
                     element.RaiseMouseLeave();
@@ -271,7 +282,6 @@ namespace CSHTML5.Internal
             }
 
             // Reset all visual-tree related information:
-            element.IsConnectedToLiveTree = false;
             element.LoadingIsPending = false;
             element.INTERNAL_OuterDomElement = null;
             element.INTERNAL_InnerDomElement = null;
@@ -279,6 +289,7 @@ namespace CSHTML5.Internal
             element.INTERNAL_AdditionalOutsideDivForMargins = null;
             element.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
+            element.IsUnloading = false;
         }
 
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
@@ -805,8 +816,7 @@ if(nextSibling != undefined) {
             Performance.Counter("VisualTreeManager: Raise Loaded event", t11);
 #endif
         }
-
-        public static bool IsElementInVisualTree(UIElement child) => child.IsConnectedToLiveTree;
+        public static bool IsElementInVisualTree(UIElement element) => element.IsConnectedToLiveTree && !element.IsUnloading;
 
         static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(DependencyObject dependencyObject)
         {
