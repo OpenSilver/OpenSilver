@@ -13,10 +13,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
+using System.ComponentModel;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -197,6 +199,104 @@ namespace Windows.UI.Xaml.Media
             get { return (Transform)GetValue(TransformProperty); }
             set { SetValue(TransformProperty, value); }
         }
-#endregion
+        #endregion
+
+        private int _id;
+        internal int Id => _id;
+        public Brush()
+        {
+            _id = _holder.GetNextId();
+            _holder.Add(this);
+        }
+        ~Brush()
+        {
+            _holder.Remove(this);
+        }
+        private static BrushHolder _holder = new BrushHolder();
+
+        // if true, log PropertiesWhereUsed updates (how many dead weak references we removed)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static bool LogBrushDeadWeakReferencesUpdates { get; set; } = false;
+
+        // if = 0, don't update at all (so you can test before/after scenarios)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static int UpdateBrushWeakReferencesSecs { get; set; } = 30;
+    }
+
+    internal class BrushHolder
+    {
+        private Dictionary<int, WeakReference<Brush>> _brushes = new Dictionary<int, WeakReference<Brush>>();
+        private int _nextId;
+
+        public int GetNextId() => ++_nextId;
+
+        public BrushHolder()
+        {
+            UpdatePropertiesWhereUsedForever();
+        }
+
+        public void Add(Brush brush)
+        {
+            _brushes.Add(brush.Id, new WeakReference<Brush>(brush));
+        }
+
+        public void Remove(Brush brush)
+        {
+            bool removed = _brushes.Remove(brush.Id);
+            if (!removed)
+                Log($"ERROR: can't find brush {brush.GetType().ToString()}");
+        }
+
+        private async void UpdatePropertiesWhereUsedForever()
+        {
+            // ... just in case you set Brush.UpdateBrushWeakReferencesSecs, so that it'll take effect from the get-go
+            await Task.Delay(1000);
+
+            while (true)
+            {
+                if (Brush.UpdateBrushWeakReferencesSecs <= 0)
+                    break;
+                await Task.Delay(Brush.UpdateBrushWeakReferencesSecs * 1000);
+                UpdatePropertiesWhereUsed();
+            }
+        }
+
+
+        private void UpdatePropertiesWhereUsed()
+        {
+            var disposedRefCount = 0;
+            var fullCount = 0;
+            foreach (var brushRef in _brushes.Values)
+            {
+                if (brushRef.TryGetTarget(out var brush))
+                {
+                    var properties = (brush as IHasAccessToPropertiesWhereItIsUsed2).PropertiesWhereUsed;
+                    var toRemove = properties.Keys.Where(p => !p.TryGetDependencyObject(out var ignore)).ToList();
+
+                    if (Brush.LogBrushDeadWeakReferencesUpdates)
+                    {
+                        fullCount += properties.Sum(p => p.Value.Count);
+                        disposedRefCount += toRemove.Sum(p => properties[p].Count);
+                    }
+
+                    foreach (var prop in toRemove)
+                        properties.Remove(prop);
+                    toRemove.Clear();
+                } else
+                    Log($"ERROR can't find brush (update) - {brushRef}");
+            }
+
+            if (Brush.LogBrushDeadWeakReferencesUpdates)
+                Log($"*** Brushes : {_brushes.Count}, disposed={disposedRefCount}/{fullCount} ({(100d * (double)disposedRefCount/(double)fullCount):F2}%)");
+        }
+
+
+        private void Log(string msg)
+        {
+            if (OpenSilver.Interop.IsRunningInTheSimulator)
+                Trace.WriteLine(msg);
+            else 
+                Console.WriteLine(msg);
+        }
     }
 }
