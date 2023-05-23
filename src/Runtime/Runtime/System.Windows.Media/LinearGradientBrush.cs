@@ -435,14 +435,7 @@ namespace Windows.UI.Xaml.Media
                 }
             }
 
-            double angle = alpha * 180 / Math.PI;
-
-            if (!OpenSilver.Interop.IsRunningInTheSimulator)
-            {
-                // In the browsers, the angle goes in the opposite direction of that of the Simulator,
-                // and 0 degrees is not in the same position so we fix it:
-                angle = 360 - angle + 90;
-            }
+            double angle = 360 - alpha * 180 / Math.PI + 90;
 
             string gradientType = this.SpreadMethod == GradientSpreadMethod.Repeat ? "repeating-linear-gradient" : "linear-gradient";
             string baseString = gradientType + "(" + angle.ToInvariantString() + "deg, " + gradientStopsString + ")";
