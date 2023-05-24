@@ -339,6 +339,7 @@
 		<Compile Include="System.Windows.Media.Animation\KeyTimeConverter.cs" />
 		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
+		<Compile Include="System.Windows\IControl.cs" />
 		<Compile Include="System.Windows\IFrameworkElement.cs" />
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />
 		<Compile Include="System.Windows\IPanel.cs" />
