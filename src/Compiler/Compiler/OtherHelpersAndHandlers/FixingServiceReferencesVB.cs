@@ -296,13 +296,32 @@ namespace OpenSilver.Compiler
 
         private static bool FixBlock(ref string block, string interfaceType, /*int indexOfBeginningOfBlock,*/string inputText, Regex regex, string detectedToken, string endpointCode, string soapVersion)
         {
-            string[] lines = block.Trim().Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            string[] lines = block.Trim().Split(new[] { "\r\n", "\n"}, StringSplitOptions.None);
             if (lines.Length < 2)
             {
                 return false;
             }
 
-            string functionDefinition = lines[0];
+            int definitionLineCount = 0;
+            string functionDefinition = "";
+            while (true)
+            {
+                if (definitionLineCount > 0)
+                    functionDefinition += lines[definitionLineCount].Trim();
+                else
+                    functionDefinition += lines[definitionLineCount];
+
+                definitionLineCount++;
+
+                // It can have multiple lines for variables.
+                if (functionDefinition.EndsWith("_"))
+                {
+                    functionDefinition = functionDefinition.Remove(functionDefinition.Length - 1);
+                }
+                else
+                    break;
+            }
+
             string implementsDefinition = "";
             if (functionDefinition.Contains("Implements"))
             {
@@ -327,7 +346,7 @@ namespace OpenSilver.Compiler
                     methodName = splits[splits.Length - 1];
                 }
 
-                string methodBodyToReplace = string.Join("\r\n", lines, 1, lines.Length - 2);
+                string methodBodyToReplace = string.Join("\r\n", lines, definitionLineCount, lines.Length - definitionLineCount - 1);
                 Match matchBody = regex.Match(methodBodyToReplace);
                 string requestParameterName = matchBody.Groups["REQUEST_PARAMETER_NAME"].Value;
 
