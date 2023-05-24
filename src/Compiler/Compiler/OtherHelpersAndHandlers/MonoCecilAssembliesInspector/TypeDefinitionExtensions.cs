@@ -28,7 +28,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         /// <param name="parentType"></param>
         /// <returns></returns>
         public static bool IsSubclassOf(this TypeDefinition childType, TypeDefinition parentType) =>
-           childType.MetadataToken != parentType.MetadataToken
+           !Equals(childType, parentType)
            && childType.EnumerateBaseClasses().Any(b => Equals(b, parentType));
 
         /// <summary>
