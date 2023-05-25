@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <Style TargetType="BusyIndicator">
-        <Setter Property="BusyContent"
+        <Setter Property="BusyContent" 
                 Value="Please wait..." />
         <Setter Property="IsTabStop"
                 Value="False" />
@@ -17,8 +17,6 @@
                 </Style>
             </Setter.Value>
         </Setter>
-        <!-- #if WORKINPROGRESS -->
-        <!--
         <Setter Property="ProgressBarStyle">
             <Setter.Value>
                 <Style TargetType="ProgressBar">
@@ -26,22 +24,20 @@
                             Value="True" />
                     <Setter Property="Height"
                             Value="15" />
-                    <Setter Property="Margin"
+                    <Setter Property="Margin" 
                             Value="8,0,8,8" />
                 </Style>
             </Setter.Value>
         </Setter>
-        -->
-        <!-- #endif -->
-        <Setter Property="DisplayAfter"
+        <Setter Property="DisplayAfter" 
                 Value="00:00:00.1" />
-        <Setter Property="HorizontalAlignment"
+        <Setter Property="HorizontalAlignment" 
                 Value="Stretch" />
-        <Setter Property="VerticalAlignment"
+        <Setter Property="VerticalAlignment" 
                 Value="Stretch" />
-        <Setter Property="HorizontalContentAlignment"
+        <Setter Property="HorizontalContentAlignment" 
                 Value="Stretch" />
-        <Setter Property="VerticalContentAlignment"
+        <Setter Property="VerticalContentAlignment" 
                 Value="Stretch" />
         <Setter Property="Template">
             <Setter.Value>
@@ -51,9 +47,9 @@
                             <VisualStateGroup x:Name="VisibilityStates">
                                 <VisualState x:Name="Hidden">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                                       Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="busycontent"
+                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" 
+                                                                       Duration="00:00:00.001" 
+                                                                       Storyboard.TargetName="busycontent" 
                                                                        Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="00:00:00">
                                                 <DiscreteObjectKeyFrame.Value>
@@ -61,9 +57,9 @@
                                                 </DiscreteObjectKeyFrame.Value>
                                             </DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                                       Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="overlay"
+                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" 
+                                                                       Duration="00:00:00.001" 
+                                                                       Storyboard.TargetName="overlay" 
                                                                        Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="00:00:00">
                                                 <DiscreteObjectKeyFrame.Value>
@@ -75,9 +71,9 @@
                                 </VisualState>
                                 <VisualState x:Name="Visible">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                                       Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="busycontent"
+                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" 
+                                                                       Duration="00:00:00.001" 
+                                                                       Storyboard.TargetName="busycontent" 
                                                                        Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="00:00:00">
                                                 <DiscreteObjectKeyFrame.Value>
@@ -86,8 +82,8 @@
                                             </DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                                       Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="overlay"
+                                                                       Duration="00:00:00.001" 
+                                                                       Storyboard.TargetName="overlay" 
                                                                        Storyboard.TargetProperty="(UIElement.Visibility)">
                                             <DiscreteObjectKeyFrame KeyTime="00:00:00">
                                                 <DiscreteObjectKeyFrame.Value>
@@ -101,9 +97,9 @@
                             <VisualStateGroup x:Name="BusyStatusStates">
                                 <VisualState x:Name="Idle">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                                       Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="content"
+                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" 
+                                                                       Duration="00:00:00.001" 
+                                                                       Storyboard.TargetName="content" 
                                                                        Storyboard.TargetProperty="(Control.IsEnabled)">
                                             <DiscreteObjectKeyFrame KeyTime="00:00:00">
                                                 <DiscreteObjectKeyFrame.Value>
@@ -115,9 +111,9 @@
                                 </VisualState>
                                 <VisualState x:Name="Busy">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00"
+                                        <ObjectAnimationUsingKeyFrames BeginTime="00:00:00" 
                                                                        Duration="00:00:00.001"
-                                                                       Storyboard.TargetName="content"
+                                                                       Storyboard.TargetName="content" 
                                                                        Storyboard.TargetProperty="(Control.IsEnabled)">
                                             <DiscreteObjectKeyFrame KeyTime="00:00:00">
                                                 <DiscreteObjectKeyFrame.Value>
@@ -130,44 +126,39 @@
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <ContentControl x:Name="content"
-                                        Content="{TemplateBinding Content}"
-                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Rectangle x:Name="overlay"
-                                   Style="{TemplateBinding OverlayStyle}" />
-                        <!-- #if WORKINPROGRESS -->
-                        <!--
+                            Style="{TemplateBinding OverlayStyle}" />
                         <ContentPresenter x:Name="busycontent">
-                        -->
-                        <!-- #endif -->
-                        <Border x:Name="busycontent">
                             <Grid HorizontalAlignment="Center"
-                                  VerticalAlignment="Center">
+                                VerticalAlignment="Center">
                                 <Border Background="White"
-                                        BorderThickness="1"
-                                        CornerRadius="2">
+                                    BorderThickness="1"
+                                    CornerRadius="2">
                                     <Border.BorderBrush>
-                                        <LinearGradientBrush StartPoint="0.5,0"
+                                        <LinearGradientBrush StartPoint="0.5,0" 
                                                              EndPoint="0.5,1">
-                                            <GradientStop Color="#FFA3AEB9"
+                                            <GradientStop Color="#FFA3AEB9" 
                                                           Offset="0" />
-                                            <GradientStop Color="#FF8399A9"
+                                            <GradientStop Color="#FF8399A9" 
                                                           Offset="0.375" />
                                             <GradientStop Color="#FF718597"
                                                           Offset="0.375" />
-                                            <GradientStop Color="#FF617584"
+                                            <GradientStop Color="#FF617584" 
                                                           Offset="1" />
                                         </LinearGradientBrush>
                                     </Border.BorderBrush>
                                     <Border CornerRadius="1.5"
-                                            Margin="1">
+                                        Margin="1">
                                         <Border.Background>
-                                            <LinearGradientBrush StartPoint="0.5,0"
+                                            <LinearGradientBrush StartPoint="0.5,0" 
                                                                  EndPoint="0.5,1">
-                                                <GradientStop Color="#FFF6F8F9"
+                                                <GradientStop Color="#FFF6F8F9" 
                                                               Offset="0.02" />
-                                                <GradientStop Color="#FFB8B8B8"
+                                                <GradientStop Color="#FFB8B8B8" 
                                                               Offset="0.996" />
                                             </LinearGradientBrush>
                                         </Border.Background>
@@ -177,24 +168,15 @@
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
                                             <ContentPresenter Content="{TemplateBinding BusyContent}"
-                                                              ContentTemplate="{TemplateBinding BusyContentTemplate}"
-                                                              Margin="8" />
-                                            <!-- #if WORKINPROGRESS -->
-                                            <!--
+                                                ContentTemplate="{TemplateBinding BusyContentTemplate}"
+                                                Margin="8" />
                                             <ProgressBar Grid.Row="1"
-                                                         Style="{TemplateBinding ProgressBarStyle}" />
-                                            -->
-                                            <!-- #endif -->
+                                                Style="{TemplateBinding ProgressBarStyle}" />
                                         </Grid>
                                     </Border>
                                 </Border>
                             </Grid>
-                        </Border>
-                        <!-- #if WORKINPROGRESS -->
-                        <!--
                         </ContentPresenter>
-                        -->
-                        <!-- #endif -->
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
