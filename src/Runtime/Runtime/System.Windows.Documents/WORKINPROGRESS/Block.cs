@@ -21,7 +21,7 @@ namespace Windows.UI.Xaml.Documents
 	/// An abstract class that provides a base for all block-level content elements.
 	/// </summary>
     [OpenSilver.NotImplemented]
-	public abstract partial class Block : TextElement
+	public abstract class Block : TextElement
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Block" /> class. 

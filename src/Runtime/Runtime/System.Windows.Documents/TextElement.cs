@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,7 +11,7 @@
 *  
 \*====================================================================================*/
 
-using OpenSilver.Internal;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -31,7 +30,7 @@ namespace Windows.UI.Xaml.Documents
     /// TextElement supports common API for classes involved in the XAML text object model,
     /// such as properties that control text size, font families and so on.
     /// </summary>
-    public abstract partial class TextElement : Control
+    public abstract class TextElement : Control
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextElement"/> class.
@@ -43,11 +42,16 @@ namespace Windows.UI.Xaml.Documents
             IsTabStop = false;
         }
 
+        internal virtual string TagName => "span";
+
         internal sealed override void AddEventListeners() { }
 
         internal sealed override UIElement MouseTarget => null;
 
         internal sealed override UIElement KeyboardTarget => null;
+
+        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
+            => domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateTextElementDomElementAndAppendIt(parentRef, this);
 
         [OpenSilver.NotImplemented]
         public static readonly DependencyProperty CharacterSpacingProperty = 
@@ -60,8 +64,8 @@ namespace Windows.UI.Xaml.Documents
         [OpenSilver.NotImplemented]
         public int CharacterSpacing
         {
-            get { return (int)this.GetValue(CharacterSpacingProperty); }
-            set { this.SetValue(CharacterSpacingProperty, value); }
+            get { return (int)GetValue(CharacterSpacingProperty); }
+            set { SetValue(CharacterSpacingProperty, value); }
         }
     }
 }

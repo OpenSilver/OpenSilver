@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -25,8 +24,8 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides an inline content element that enables UIElement types to be embedded in the content of a (Rich)TextBlock.
     /// </summary>
-    [ContentProperty("Child")]
-    public sealed partial class InlineUIContainer : Inline
+    [ContentProperty(nameof(Child))]
+    public sealed class InlineUIContainer : Inline
     {
         private UIElement _child;
 

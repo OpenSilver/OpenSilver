@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System.Windows.Markup;
-#if !MIGRATION
 using System;
-#endif
-
+using System.Windows.Markup;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -29,8 +24,8 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Groups other Inline flow content elements.
     /// </summary>
-    [ContentProperty("Inlines")]
-    public partial class Span : Inline
+    [ContentProperty(nameof(Inlines))]
+    public class Span : Inline
     {
         internal override int VisualChildrenCount
         {
@@ -52,20 +47,13 @@ namespace Windows.UI.Xaml.Documents
         /// </summary>
         public Span()
         {
-            this.Inlines = new InlineCollection(this);
+            Inlines = new InlineCollection(this);
         }
 
         /// <summary>
         ///Gets an InlineCollection containing the top-level inline elements that include the contents of Span.
         /// </summary>
         public InlineCollection Inlines { get; }
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            var span = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("span", parentRef, this);
-            domElementWhereToPlaceChildren = span;
-            return span;
-        }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {

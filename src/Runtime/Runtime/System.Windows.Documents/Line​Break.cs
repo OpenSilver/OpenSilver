@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,14 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 #if MIGRATION
 namespace System.Windows.Documents
 #else
@@ -27,15 +18,11 @@ namespace Windows.UI.Xaml.Documents
 #endif
 {
     /// <summary>
-    /// Represents an inline element that causes a new line to begin in content when rendered in a text container.
+    /// Represents an inline element that causes a new line to begin in 
+    /// content when rendered in a text container.
     /// </summary>
-    public sealed partial class LineBreak : Inline
+    public sealed class LineBreak : Inline
     {
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            var linebreak = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("br", parentRef, this);
-            domElementWhereToPlaceChildren = linebreak;
-            return linebreak;
-        }
+        internal override string TagName => "br";
     }
 }

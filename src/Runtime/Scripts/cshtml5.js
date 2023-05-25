@@ -257,13 +257,19 @@ document.createFrameworkElement = function (id, parentElement, enablePointerEven
     }
 }
 
-document.createRunElement = function (id, parentElement) {
-    const newElement = document.createElementSafe('span', id, parentElement, -1);
+document.createTextElement = function (id, tagName, parent) {
+    if (typeof parent === 'string') parent = document.getElementById(parent);
+    if (parent === null) return null;
 
-    if (newElement) {
-        newElement.style['textDecoration'] = 'inherit';
+    const textElement = document.createElement(tagName);
+    textElement.setAttribute('id', id);
+
+    if (index < 0 || index >= parent.children.length) {
+        parent.appendChild(textElement);
+    } else {
+        parent.insertBefore(textElement, parent.children[index]);
     }
-}
+};
 
 document.createShapeOuterElement = function (id, parentElement) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
@@ -494,6 +500,43 @@ document.createInputManager = function (root, callback) {
         });
 
         root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
+
+        root.addEventListener('mousemove', function (e) {
+            e.isHandled = true;
+            const target = _mouseCapture || e.target;
+            callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
+        });
+
+        root.addEventListener('wheel', function (e) {
+            e.isHandled = true;
+            callback(getClosestElementId(e.target), EVENTS.WHEEL, e);
+        });
+
+        root.addEventListener('mousedown', function (e) {
+            e.isHandled = true;
+            let id = (_mouseCapture === null || e.target === _mouseCapture) ? getClosestElementId(e.target) : '';
+            switch (e.button) {
+                case 0:
+                    callback(id, EVENTS.MOUSE_LEFT_DOWN, e);
+                    break;
+                case 2:
+                    callback(id, EVENTS.MOUSE_RIGHT_DOWN, e);
+                    break;
+            }
+        });
+
+        root.addEventListener('mouseup', function (e) {
+            e.isHandled = true;
+            const target = _mouseCapture || e.target;
+            switch (e.button) {
+                case 0:
+                    callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
+                    break;
+                case 2:
+                    callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
+                    break;
+            }
+        });
     };
 
     initDom(root);
@@ -502,51 +545,6 @@ document.createInputManager = function (root, callback) {
         addListeners: function (element, isFocusable) {
             const view = typeof element === 'string' ? document.getElementById(element) : element;
             if (!view) return;
-
-            view.addEventListener('mousedown', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    let id = (_mouseCapture === null || this === _mouseCapture) ? getClosestElementId(this) : '';
-                    switch (e.button) {
-                        case 0:
-                            callback(id, EVENTS.MOUSE_LEFT_DOWN, e);
-                            break;
-                        case 2:
-                            callback(id, EVENTS.MOUSE_RIGHT_DOWN, e);
-                            break;
-                    }
-                }
-            });
-
-            view.addEventListener('mouseup', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    const target = _mouseCapture || this;
-                    switch (e.button) {
-                        case 0:
-                            callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
-                            break;
-                        case 2:
-                            callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
-                            break;
-                    }
-                }
-            });
-
-            view.addEventListener('mousemove', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    const target = _mouseCapture || this;
-                    callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
-                }
-            });
-
-            view.addEventListener('wheel', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    callback(getClosestElementId(this), EVENTS.WHEEL, e);
-                }
-            });
 
             view.addEventListener('mouseenter', function (e) {
                 if (_mouseCapture === null || this === _mouseCapture) {

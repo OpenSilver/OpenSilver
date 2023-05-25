@@ -458,7 +458,6 @@
 		<Compile Include="System.Windows.Data\ListCollectionView.cs" />
 		<Compile Include="PagedCollectionView\PropertyGroupDescription.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\BlockCollection.cs" />
-		<Compile Include="System.Windows.Documents\WORKINPROGRESS\Hyperlink.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\InlineUIContainer.cs" />
 		<Compile Include="System.Windows.Documents\WORKINPROGRESS\LogicalDirection.cs" />
 		<Compile Include="System.Windows.Documents\Paragraph.cs" />

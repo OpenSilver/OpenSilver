@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,13 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Windows.Browser;
 using System.Windows.Input;
+
 #if MIGRATION
 using System.Windows.Media;
 #else
-
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 #endif
@@ -34,7 +31,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides an inline-level content element that provides facilities for hosting hyperlinks.
     /// </summary>
-    public sealed partial class Hyperlink : Span
+    public sealed class Hyperlink : Span
     {
         Uri _uri;
 
@@ -55,6 +52,8 @@ namespace Windows.UI.Xaml.Documents
 #endif
         }
 
+        internal override string TagName => "a";
+
         /// <summary>
         /// Occurs when the left mouse button is clicked on a Hyperlink.
         /// </summary>
@@ -71,7 +70,7 @@ namespace Windows.UI.Xaml.Documents
         }
 
 #if MIGRATION
-        void Hyperlink_MouseLeftButtonDown(object sender, Input.MouseButtonEventArgs e)
+        void Hyperlink_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 #else
         void Hyperlink_PointerPressed(object sender, PointerRoutedEventArgs e)
 #endif
@@ -88,11 +87,7 @@ namespace Windows.UI.Xaml.Documents
                 HtmlPage.Window.Navigate(_uri, "_blank");
         }
 
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            var a = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("a", parentRef, this);
-            domElementWhereToPlaceChildren = a;
-            return a;
-        }
+        [OpenSilver.NotImplemented]
+        public string TargetName { get; set; }
     }
 }

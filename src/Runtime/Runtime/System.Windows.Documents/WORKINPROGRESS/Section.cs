@@ -11,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -24,9 +24,9 @@ namespace Windows.UI.Xaml.Documents
 	/// A block-level element used for grouping other <see cref="Block"/>
 	/// elements.
 	/// </summary>
-	[ContentProperty("Blocks")]
+	[ContentProperty(nameof(Blocks))]
     [OpenSilver.NotImplemented]
-	public sealed partial class Section : Block
+	public sealed class Section : Block
 	{
 		/// <summary>
 		/// Gets a <see cref="BlockCollection"/> containing the top-level <see cref="Block"/>
@@ -52,6 +52,8 @@ namespace Windows.UI.Xaml.Documents
 			Blocks = new BlockCollection(this, false);
         }
 
+		internal override string TagName => "section";
+		
 		protected internal override void INTERNAL_OnAttachedToVisualTree()
 		{
 			base.INTERNAL_OnAttachedToVisualTree();

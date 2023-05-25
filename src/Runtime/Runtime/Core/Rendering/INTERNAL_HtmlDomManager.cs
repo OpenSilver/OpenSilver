@@ -24,10 +24,12 @@ using System.Globalization;
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Documents;
 #endif
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
@@ -524,29 +526,24 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateRunDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
+        internal static object CreateTextElementDomElementAndAppendIt(object parentRef, TextElement textElement)
         {
-#if PERFSTAT
-            Performance.Counter("CreateRunDomElementAndAppendIt", t0);
-#endif
             string uniqueIdentifier = NewId();
 
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createRunElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
+                    $"document.createTextElement('{uniqueIdentifier}', '{textElement.TagName}', '{parent.UniqueIdentifier}');");
             }
             else
             {
                 string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createRunElement(""{uniqueIdentifier}"", {sParentRef})");
+                    $"document.createTextElement('{uniqueIdentifier}', '{textElement.TagName}', {sParentRef})");
             }
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            AddToGlobalStore(uniqueIdentifier, textElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }

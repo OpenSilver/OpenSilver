@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,7 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
-#else
+#if !MIGRATION
 using Windows.UI.Text;
 #endif
 
@@ -27,7 +24,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides an inline-level content element that causes content to render with a bold font weight.
     /// </summary>
-    public sealed partial class Italic : Span
+    public sealed class Italic : Span
     {
         /// <summary>
         /// Initializes a new instance of the Italic class.

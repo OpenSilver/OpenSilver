@@ -11,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -23,7 +23,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides a block-level content element that is used to group content into a paragraph.
     /// </summary>
-    [ContentProperty("Inlines")]
+    [ContentProperty(nameof(Inlines))]
     public sealed class Paragraph : Block
     {
         /// <summary>
@@ -33,6 +33,8 @@ namespace Windows.UI.Xaml.Documents
         {
             this.Inlines = new InlineCollection(this);
         }
+
+        internal override string TagName => "p";
 
         /// <summary>
         /// Gets an <see cref="InlineCollection"/> containing the top-level <see cref="Inline"/>
