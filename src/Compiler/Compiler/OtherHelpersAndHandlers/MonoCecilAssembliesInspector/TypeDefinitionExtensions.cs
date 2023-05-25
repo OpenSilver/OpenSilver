@@ -28,8 +28,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         /// <param name="parentType"></param>
         /// <returns></returns>
         public static bool IsSubclassOf(this TypeDefinition childType, TypeDefinition parentType) =>
-           childType.MetadataToken != parentType.MetadataToken
-           && childType.EnumerateBaseClasses().Any(b => Equals(b, parentType));
+           childType.EnumerateBaseClasses(skipSelf: true).Any(b => Equals(b, parentType));
 
         /// <summary>
         /// Returns true if childType directly or indirectly implements parentInterface.
@@ -106,11 +105,27 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         /// </summary>
         /// <param name="classType"></param>
         /// <returns></returns>
-        public static IEnumerable<TypeDefinition> EnumerateBaseClasses(this TypeDefinition classType)
+        public static IEnumerable<TypeDefinition> EnumerateBaseClasses(this TypeDefinition classType, bool skipSelf = false)
         {
-            for (var typeDefinition = classType; typeDefinition != null; typeDefinition = typeDefinition.BaseType?.ResolveOrThrow())
+            if (classType == null)
             {
-                yield return typeDefinition;
+                yield break;
+            }
+
+            TypeDefinition td = classType;
+            if (skipSelf)
+            {
+                if (classType.BaseType == null)
+                {
+                    yield break;
+                }
+
+                td = classType.BaseType.ResolveOrThrow();
+            }
+
+            for (; td != null; td = td.BaseType?.ResolveOrThrow())
+            {
+                yield return td;
             }
         }
 
