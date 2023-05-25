@@ -28,8 +28,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         /// <param name="parentType"></param>
         /// <returns></returns>
         public static bool IsSubclassOf(this TypeDefinition childType, TypeDefinition parentType) =>
-           !Equals(childType, parentType)
-           && childType.EnumerateBaseClasses(skipSelf: true).Any(b => Equals(b, parentType));
+           childType.EnumerateBaseClasses(skipSelf: true).Any(b => Equals(b, parentType));
 
         /// <summary>
         /// Returns true if childType directly or indirectly implements parentInterface.
@@ -108,7 +107,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         /// <returns></returns>
         public static IEnumerable<TypeDefinition> EnumerateBaseClasses(this TypeDefinition classType, bool skipSelf = false)
         {
-            for (var typeDefinition = skipSelf ? classType.BaseType?.ResolveOrThrow() : classType; 
+            for (var typeDefinition = skipSelf ? classType?.BaseType?.ResolveOrThrow() : classType; 
                 typeDefinition != null; typeDefinition = typeDefinition.BaseType?.ResolveOrThrow())
             {
                 yield return typeDefinition;
