@@ -14,6 +14,8 @@ public interface IFrameworkElement : IUIElement
     DependencyObject Parent { get; }
 
     object FindName(string name);
+
+    public ResourceDictionary Resources { get; set; }
 }
 
 internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement, ITemplatableElement
@@ -47,4 +49,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
     void SetTemplateChild(IInternalFrameworkElement templateChild);
 
     DependencyObject AsDependencyObject();
+
+    bool Internal_HasResources { get; }
 }

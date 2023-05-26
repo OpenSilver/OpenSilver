@@ -430,6 +430,8 @@ namespace Windows.UI.Xaml
             }
         }
 
+        bool IInternalFrameworkElement.Internal_HasResources => HasResources;
+
         /// <summary>
         /// Gets the locally defined resource dictionary. In XAML, you can establish
         /// resource items as child object elements of a frameworkElement.Resources property
