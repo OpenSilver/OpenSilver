@@ -191,7 +191,7 @@ namespace Windows.UI.Xaml
 
         private static void AddHandler(IInternalFrameworkElement fe, RoutedEvent routedEvent, RoutedEventHandler handler)
         {
-            if (fe.IsLoadedEvent(routedEvent))
+            if (routedEvent == fe.LoadedEvent)
             {
                 fe.Loaded += handler;
             }
@@ -203,7 +203,7 @@ namespace Windows.UI.Xaml
 
         private static void RemoveHandler(IInternalFrameworkElement fe, RoutedEvent routedEvent, RoutedEventHandler handler)
         {
-            if (fe.IsLoadedEvent(routedEvent))
+            if (routedEvent == fe.LoadedEvent)
             {
                 fe.Loaded -= handler;
             }

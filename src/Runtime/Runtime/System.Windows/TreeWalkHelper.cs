@@ -136,7 +136,7 @@ namespace Windows.UI.Xaml
         internal static bool HasChildren(IInternalFrameworkElement fe)
         {
             // See if we have logical or visual children, in which case this is a real tree invalidation.
-            return fe != null && (fe.HasLogicalChildren || fe.GetHasVisualChildren());
+            return fe != null && (fe.HasLogicalChildren || fe.HasVisualChildren);
         }
 
         #endregion PrivateMethods

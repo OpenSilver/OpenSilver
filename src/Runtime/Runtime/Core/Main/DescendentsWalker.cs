@@ -121,10 +121,10 @@ namespace OpenSilver.Internal
 
             try
             {
-                int count = v.GetVisualChildrenCount();
+                int count = v.VisualChildrenCount;
                 for (int i = 0; i < count; i++)
                 {
-                    var childVisual = v.Internal_GetVisualChild(i);
+                    var childVisual = v.GetVisualChild(i);
                     if (childVisual != null)
                     {
                         bool visitedViaVisualTree = true;
@@ -206,7 +206,7 @@ namespace OpenSilver.Internal
                 // Optimized variant of WalkLogicalChildren
                 if (hasLogicalChildren)
                 {
-                    IEnumerator logicalChildren = feParent.GetLogicalChildren();
+                    IEnumerator logicalChildren = feParent.LogicalChildren;
                     if (logicalChildren != null)
                     {
                         while (logicalChildren.MoveNext())
@@ -247,7 +247,7 @@ namespace OpenSilver.Internal
         {
             if (hasLogicalChildren)
             {
-                WalkLogicalChildren(feParent, feParent.GetLogicalChildren());
+                WalkLogicalChildren(feParent, feParent.LogicalChildren);
             }
 
             feParent.IsVisualChildrenIterationInProgress = true;
@@ -255,11 +255,11 @@ namespace OpenSilver.Internal
             try
             {
                 // Optimized variant of WalkVisualChildren
-                int count = feParent.GetVisualChildrenCount();
+                int count = feParent.VisualChildrenCount;
 
                 for (int i = 0; i < count; i++)
                 {
-                    var child = feParent.Internal_GetVisualChild(i);
+                    var child = feParent.GetVisualChild(i);
                     if (child != null && typeof(IFrameworkElement).IsInstanceOfType(child))
                     {
                         // For the case that both parents are identical, this node should

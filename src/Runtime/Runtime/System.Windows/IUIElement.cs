@@ -24,21 +24,19 @@ public interface IUIElement : IDependencyObject
 
 internal interface IInternalUIElement : IUIElement
 {
-    bool Internal_IsLoaded { get; }
+    bool _isLoaded { get; }
 
-    bool Internal_IsConnectedToLiveTree { get; }
+    bool IsConnectedToLiveTree { get; }
 
     bool IsVisualChildrenIterationInProgress { get; set; }
 
-    bool GetHasVisualChildren();
+    bool HasVisualChildren { get; }
 
-    int GetVisualChildrenCount();
+    int VisualChildrenCount { get; }
 
-    DependencyObject Internal_GetVisualChild(int index);
+    DependencyObject GetVisualChild(int index);
 
-    DependencyObject GetINTERNAL_VisualParent();
+    DependencyObject INTERNAL_VisualParent { get; set; }
 
-    void SetVisualParent(DependencyObject visualParent);
-
-    void Internal_OnVisualParentChanged(DependencyObject oldParent);
+    void OnVisualParentChanged(DependencyObject oldParent);
 }

@@ -73,7 +73,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (reference is IInternalUIElement uie)
             {
-                return uie.GetINTERNAL_VisualParent();
+                return uie.INTERNAL_VisualParent;
             }
 
             return null;
@@ -88,7 +88,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (reference is IInternalUIElement uie)
             {
-                return uie.GetVisualChildrenCount();
+                return uie.VisualChildrenCount;
             }
 
             throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");
@@ -104,7 +104,7 @@ namespace Windows.UI.Xaml.Media
         {
             if (reference is IInternalUIElement uie)
             {
-                return uie.Internal_GetVisualChild(childIndex);
+                return uie.GetVisualChild(childIndex);
             }
             
             throw new InvalidOperationException("Reference is not a valid visual DependencyObject.");

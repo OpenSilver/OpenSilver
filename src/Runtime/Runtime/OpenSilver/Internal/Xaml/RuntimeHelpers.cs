@@ -136,7 +136,7 @@ namespace OpenSilver.Internal.Xaml
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetTemplatedParent(ITemplatableElement element, ITemplatableElement templatedParent)
         {
-            element.SetTemplatedParent(templatedParent);
+            ((IInternalFrameworkElement)element).TemplatedParent = (DependencyObject)templatedParent;
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

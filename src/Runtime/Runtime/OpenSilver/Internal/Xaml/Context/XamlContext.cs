@@ -132,7 +132,7 @@ namespace OpenSilver.Internal.Xaml.Context
                 object inst = frame.Instance;
                 if (inst is IInternalFrameworkElement fe)
                 {
-                    if (fe.Internal_HasResources)
+                    if (fe.HasResources)
                     {
                         retList.Add(fe.Resources);
                     }

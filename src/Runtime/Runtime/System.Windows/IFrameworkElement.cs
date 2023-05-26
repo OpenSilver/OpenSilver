@@ -22,37 +22,37 @@ public interface IFrameworkElement : IUIElement
 
 internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement, ITemplatableElement
 {
-    event InheritedPropertyChangedEventHandler Internal_InheritedPropertyChanged;
+    event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
     bool HasLogicalChildren { get; set; }
 
     bool IsLogicalChildrenIterationInProgress { get; set; }
 
-    IEnumerator GetLogicalChildren();
+    IEnumerator LogicalChildren { get; }
 
-    bool IsLoadedEvent(RoutedEvent routedEvent);
+    RoutedEvent LoadedEvent { get; }
 
     void OnInheritedPropertyChanged(InheritablePropertyChangeInfo info);
 
-    void Internal_AddLogicalChild(object child);
+    void AddLogicalChild(object child);
 
-    void Internal_RemoveLogicalChild(object child);
+    void RemoveLogicalChild(object child);
 
     void ChangeLogicalParent(DependencyObject newParent);
 
     void SubscribeToSizeChanged();
 
-    DependencyObject GetTemplatedParent();
+    DependencyObject TemplatedParent { get; set; }
 
-    DependencyProperty GetDataContextProperty();
+    DependencyProperty DataContextProperty { get; }
 
-    DependencyProperty GetContentPresenterContentProperty();
+    DependencyProperty ContentPresenterContentProperty { get; }
 
     void SetTemplateChild(IInternalFrameworkElement templateChild);
 
     DependencyObject AsDependencyObject();
 
-    bool Internal_HasResources { get; }
+    bool HasResources { get; }
 
     bool ShouldLookupImplicitStyles { set; }
 

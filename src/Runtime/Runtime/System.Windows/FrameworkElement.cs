@@ -97,14 +97,14 @@ namespace Windows.UI.Xaml
 
         private void ConnectMentor(IInternalFrameworkElement mentor)
         {
-            mentor.Internal_InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+            mentor.InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
             
             InvalidateInheritedProperties(this, (DependencyObject)mentor);
         }
 
         private void DisconnectMentor(IInternalFrameworkElement mentor)
         {
-            mentor.Internal_InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
+            mentor.InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
 
             InvalidateInheritedProperties(this, (DependencyObject)mentor);
         }
@@ -115,9 +115,9 @@ namespace Windows.UI.Xaml
             TreeWalkHelper.InvalidateOnInheritablePropertyChange(this, e.Info, false);
         }
 
-        internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
+        event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
-        event InheritedPropertyChangedEventHandler IInternalFrameworkElement.Internal_InheritedPropertyChanged
+        event InheritedPropertyChangedEventHandler IInternalFrameworkElement.InheritedPropertyChanged
         {
             add => InheritedPropertyChanged += value;
             remove => InheritedPropertyChanged -= value;
@@ -220,7 +220,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IInternalFrameworkElement.Internal_AddLogicalChild(object child) => AddLogicalChild(child);
+        void IInternalFrameworkElement.AddLogicalChild(object child) => AddLogicalChild(child);
 
         internal void RemoveLogicalChild(object child)
         {
@@ -254,7 +254,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IInternalFrameworkElement.Internal_RemoveLogicalChild(object child) => RemoveLogicalChild(child);
+        void IInternalFrameworkElement.RemoveLogicalChild(object child) => RemoveLogicalChild(child);
 
         void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent)
         {
@@ -310,7 +310,7 @@ namespace Windows.UI.Xaml
             get { return null; }
         }
 
-        IEnumerator IInternalFrameworkElement.GetLogicalChildren() => LogicalChildren;
+        IEnumerator IInternalFrameworkElement.LogicalChildren => LogicalChildren;
 
         bool IInternalFrameworkElement.IsLogicalChildrenIterationInProgress
         {
@@ -346,12 +346,11 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void ITemplatableElement.SetTemplatedParent(ITemplatableElement templatedParent)
+        DependencyObject IInternalFrameworkElement.TemplatedParent
         {
-            TemplatedParent = (DependencyObject)templatedParent;
+            get => TemplatedParent;
+            set => TemplatedParent = value;
         }
-
-        DependencyObject IInternalFrameworkElement.GetTemplatedParent() => TemplatedParent;
 
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
@@ -430,7 +429,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        bool IInternalFrameworkElement.Internal_HasResources => HasResources;
+        bool IInternalFrameworkElement.HasResources => HasResources;
 
         /// <summary>
         /// Gets the locally defined resource dictionary. In XAML, you can establish
@@ -998,7 +997,7 @@ namespace Windows.UI.Xaml
                     Inherits = true
                 });
 
-        DependencyProperty IInternalFrameworkElement.GetDataContextProperty() => DataContextProperty;
+        DependencyProperty IInternalFrameworkElement.DataContextProperty => DataContextProperty;
 
         private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1192,6 +1191,8 @@ namespace Windows.UI.Xaml
                 typeof(RoutedEventHandler), 
                 typeof(FrameworkElement));
 
+        RoutedEvent IInternalFrameworkElement.LoadedEvent => LoadedEvent;
+
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
         /// </summary>
@@ -1199,9 +1200,7 @@ namespace Windows.UI.Xaml
 
         internal void RaiseLoadedEvent() => Loaded?.Invoke(this, new RoutedEventArgs());
 
-        void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();
-
-        bool IInternalFrameworkElement.IsLoadedEvent(RoutedEvent routedEvent) => routedEvent == LoadedEvent;
+        void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();        
 
         internal void LoadResources()
         {
@@ -1311,7 +1310,7 @@ namespace Windows.UI.Xaml
 
         private InternalFlags _flags = 0; // Stores Flags (see Flags enum)
 
-        DependencyProperty IInternalFrameworkElement.GetContentPresenterContentProperty() => ContentPresenter.ContentProperty;
+        DependencyProperty IInternalFrameworkElement.ContentPresenterContentProperty => ContentPresenter.ContentProperty;
 
         DependencyObject IInternalFrameworkElement.AsDependencyObject() => this;
     }

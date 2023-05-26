@@ -6,5 +6,4 @@ namespace Windows.UI.Xaml;
 
 public interface ITemplatableElement : IFrameworkElement
 {
-    void SetTemplatedParent(ITemplatableElement templatedParent);
 }

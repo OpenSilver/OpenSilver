@@ -356,7 +356,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this._modelParent != null)
             {
-                this._modelParent.Internal_AddLogicalChild(item);
+                this._modelParent.AddLogicalChild(item);
             }
         }
 
@@ -364,7 +364,7 @@ namespace Windows.UI.Xaml.Controls
         {
             if (this._modelParent != null)
             {
-                this._modelParent.Internal_RemoveLogicalChild(item);
+                this._modelParent.RemoveLogicalChild(item);
             }
         }
 

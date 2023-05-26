@@ -976,7 +976,7 @@ namespace Windows.UI.Xaml.Data
                     case RelativeSourceMode.TemplatedParent:
                         useMentor = true;
                         mentor = FrameworkElement.FindMentor(Target);
-                        source = mentor?.GetTemplatedParent();
+                        source = mentor?.TemplatedParent;
                         break;
 
                     case RelativeSourceMode.FindAncestor:
@@ -1010,8 +1010,8 @@ namespace Windows.UI.Xaml.Data
                     // 2. if the target is ContentPresenter and the target property
                     //      is Content, use the parent.  This enables
                     //          <ContentPresenter Content="{Binding...}"/>
-                    if (TargetProperty == targetFE.GetDataContextProperty() ||
-                        TargetProperty == targetFE.GetContentPresenterContentProperty())
+                    if (TargetProperty == targetFE.DataContextProperty ||
+                        TargetProperty == targetFE.ContentPresenterContentProperty)
                     {
                         contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
                         if (contextElement == null && !lastAttempt)
@@ -1036,8 +1036,8 @@ namespace Windows.UI.Xaml.Data
 
                 if (source is IInternalFrameworkElement sourceFE)
                 {
-                    _dataContextListener = new DependencyPropertyChangedListener((DependencyObject)sourceFE, sourceFE.GetDataContextProperty(), OnDataContextChanged);
-                    source = sourceFE.GetValue(sourceFE.GetDataContextProperty());
+                    _dataContextListener = new DependencyPropertyChangedListener((DependencyObject)sourceFE, sourceFE.DataContextProperty, OnDataContextChanged);
+                    source = sourceFE.GetValue(sourceFE.DataContextProperty);
                 }
                 else
                 {
@@ -1088,7 +1088,7 @@ namespace Windows.UI.Xaml.Data
                 {
                     // move to the next outer namescope.
                     // First try TemplatedParent of the scope owner.
-                    DependencyObject dd = fe.GetTemplatedParent();
+                    DependencyObject dd = fe.TemplatedParent;
 
                     // if that doesn't work, we could be at the top of
                     // generated content for an ItemsControl.  If so, use
@@ -1127,7 +1127,7 @@ namespace Windows.UI.Xaml.Data
                 return null;
 
             // make sure the target is in the visual tree:
-            if (!mentor.Internal_IsConnectedToLiveTree)
+            if (!mentor.IsConnectedToLiveTree)
                 return null;
 
             // get the AncestorLevel and AncestorType:
