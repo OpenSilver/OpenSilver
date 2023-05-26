@@ -11,6 +11,8 @@ public interface IFrameworkElement : IUIElement
 {
     event RoutedEventHandler Loaded;
 
+    bool IsLoaded { get; }
+
     DependencyObject Parent { get; }
 
     object FindName(string name);
@@ -51,4 +53,16 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
     DependencyObject AsDependencyObject();
 
     bool Internal_HasResources { get; }
+
+    bool ShouldLookupImplicitStyles { set; }
+
+    bool IsLoadedInResourceDictionary { get; set; }
+
+    void LoadResources();
+
+    void UnloadResources();
+
+    void RaiseLoadedEvent();
+
+    void RaiseUnloadedEvent();
 }

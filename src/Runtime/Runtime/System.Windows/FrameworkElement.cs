@@ -504,7 +504,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal bool IsLoadedInResourceDictionary { get; set; }
+        bool IInternalFrameworkElement.IsLoadedInResourceDictionary { get; set; }
 
         /// <summary>
         /// Provides a base implementation for creating the dom elements designed to represent an instance of a FrameworkElement and defines the place where its child(ren) will be added.
@@ -1199,6 +1199,8 @@ namespace Windows.UI.Xaml
 
         internal void RaiseLoadedEvent() => Loaded?.Invoke(this, new RoutedEventArgs());
 
+        void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();
+
         bool IInternalFrameworkElement.IsLoadedEvent(RoutedEvent routedEvent) => routedEvent == LoadedEvent;
 
         internal void LoadResources()
@@ -1209,12 +1211,16 @@ namespace Windows.UI.Xaml
             }
         }
 
+        void IInternalFrameworkElement.LoadResources() => LoadResources();
+
         /// <summary>
         /// Occurs when this object is no longer connected to the main object tree.
         /// </summary>
         public event RoutedEventHandler Unloaded;
 
         internal void RaiseUnloadedEvent() => Unloaded?.Invoke(this, new RoutedEventArgs());
+
+        void IInternalFrameworkElement.RaiseUnloadedEvent() => RaiseUnloadedEvent();
 
         internal void UnloadResources()
         {
@@ -1223,6 +1229,8 @@ namespace Windows.UI.Xaml
                 Resources.UnloadResources();
             }
         }
+
+        void IInternalFrameworkElement.UnloadResources() => UnloadResources();
 
 #endregion
 

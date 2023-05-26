@@ -582,7 +582,7 @@ namespace Windows.UI.Xaml
                 }
             }
 
-            if (owner is FrameworkElement fe)
+            if (owner is IInternalFrameworkElement fe)
             {
                 if (_ownerFEs == null)
                 {
@@ -634,7 +634,7 @@ namespace Windows.UI.Xaml
         // Remove an owner for this dictionary
         internal void RemoveOwner(object owner)
         {
-            if (owner is FrameworkElement fe)
+            if (owner is IInternalFrameworkElement fe)
             {
                 if (_ownerFEs != null)
                 {
@@ -674,7 +674,7 @@ namespace Windows.UI.Xaml
         // Check if the given is an owner to this dictionary
         internal bool ContainsOwner(object owner)
         {
-            if (owner is FrameworkElement fe)
+            if (owner is IInternalFrameworkElement fe)
             {
                 return _ownerFEs != null && _ownerFEs.Contains(fe);
             }
@@ -716,7 +716,7 @@ namespace Windows.UI.Xaml
                 // Invalidate all FE owners
                 if (_ownerFEs != null)
                 {
-                    foreach (FrameworkElement fe in _ownerFEs)
+                    foreach (IInternalFrameworkElement fe in _ownerFEs)
                     {
                         if (fe != null)
                         {
@@ -876,7 +876,7 @@ namespace Windows.UI.Xaml
 
                 mergedDictionary._ownerFEs ??= new WeakReferenceList(_ownerFEs.Count);
 
-                foreach (FrameworkElement fe in _ownerFEs)
+                foreach (IInternalFrameworkElement fe in _ownerFEs)
                 {
                     if (fe != null)
                     {
@@ -911,7 +911,7 @@ namespace Windows.UI.Xaml
         {
             if (_ownerFEs != null)
             {
-                foreach (FrameworkElement fe in _ownerFEs)
+                foreach (IInternalFrameworkElement fe in _ownerFEs)
                 {
                     mergedDictionary.RemoveOwner(fe);
                 }
@@ -1149,7 +1149,7 @@ namespace Windows.UI.Xaml
 
         private void LoadResource(object resource)
         {
-            if (resource is FrameworkElement feResource
+            if (resource is IInternalFrameworkElement feResource
                 && !feResource.IsLoaded && !feResource.IsLoadedInResourceDictionary)
             {
                 feResource.IsLoadedInResourceDictionary = true;
@@ -1160,7 +1160,7 @@ namespace Windows.UI.Xaml
 
         private static void UnloadResource(object resource)
         {
-            if (resource is FrameworkElement feResource && feResource.IsLoadedInResourceDictionary)
+            if (resource is IInternalFrameworkElement feResource && feResource.IsLoadedInResourceDictionary)
             {
                 feResource.IsLoadedInResourceDictionary = false;
                 feResource.RaiseUnloadedEvent();
