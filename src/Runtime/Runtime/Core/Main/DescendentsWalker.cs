@@ -124,7 +124,7 @@ namespace OpenSilver.Internal
                 int count = v.VisualChildrenCount;
                 for (int i = 0; i < count; i++)
                 {
-                    var childVisual = v.GetVisualChild(i);
+                    DependencyObject childVisual = v.GetVisualChild(i);
                     if (childVisual != null)
                     {
                         bool visitedViaVisualTree = true;

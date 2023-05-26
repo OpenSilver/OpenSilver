@@ -1200,7 +1200,7 @@ namespace Windows.UI.Xaml
 
         internal void RaiseLoadedEvent() => Loaded?.Invoke(this, new RoutedEventArgs());
 
-        void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();        
+        void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();
 
         internal void LoadResources()
         {

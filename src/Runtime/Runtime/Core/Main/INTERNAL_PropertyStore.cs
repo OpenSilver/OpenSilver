@@ -559,7 +559,7 @@ namespace CSHTML5.Internal
                 {
                     if (depObj is IInternalFrameworkElement rootElement)
                     {
-                        InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo((DependencyObject)rootElement,
+                        InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo(rootElement.AsDependencyObject(),
                             dp,
                             oldValue, oldBaseValueSource,
                             computedValue, newValueSource);
