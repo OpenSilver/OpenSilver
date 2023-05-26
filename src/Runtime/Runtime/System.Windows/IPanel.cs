@@ -4,7 +4,7 @@ namespace System.Windows;
 namespace Windows.UI.Xaml;
 #endif
 
-internal interface IPanel
+public interface IPanel : IFrameworkElement
 {
     bool IsItemsHost { get; }
 }

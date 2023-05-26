@@ -4,7 +4,7 @@ namespace System.Windows;
 namespace Windows.UI.Xaml;
 #endif
 
-public interface ITemplatableElement : IUIElement
+public interface ITemplatableElement : IFrameworkElement
 {
     void SetTemplatedParent(ITemplatableElement templatedParent);
 }

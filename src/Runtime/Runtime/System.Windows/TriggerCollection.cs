@@ -25,9 +25,9 @@ namespace Windows.UI.Xaml
     /// </summary>
     public sealed class TriggerCollection : PresentationFrameworkCollection<TriggerBase>
     {
-        private readonly IFrameworkElement _owner;
+        private readonly IInternalFrameworkElement _owner;
 
-        internal TriggerCollection(IFrameworkElement owner) : base(false) 
+        internal TriggerCollection(IInternalFrameworkElement owner) : base(false) 
         {
             Debug.Assert(owner != null);
             _owner = owner;

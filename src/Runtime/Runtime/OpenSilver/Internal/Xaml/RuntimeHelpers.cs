@@ -152,7 +152,7 @@ namespace OpenSilver.Internal.Xaml
             Debug.Assert(xamlContext != null);
             Debug.Assert(factory != null);
 
-            template.Template = new TemplateContent(xamlContext, (e, c) => (IFrameworkElement)factory(e, c));
+            template.Template = new TemplateContent(xamlContext, (e, c) => (IInternalFrameworkElement)factory(e, c));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

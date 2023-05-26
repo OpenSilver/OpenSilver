@@ -24,7 +24,7 @@ namespace Windows.UI.Xaml
     {
         #region InheritablePropertyChange
 
-        internal static void InvalidateOnInheritablePropertyChange(IFrameworkElement fe, InheritablePropertyChangeInfo info, bool skipStartNode)
+        internal static void InvalidateOnInheritablePropertyChange(IInternalFrameworkElement fe, InheritablePropertyChangeInfo info, bool skipStartNode)
         {
             if (HasChildren(fe))
             {
@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         ///     Says if the current FE has visual or logical children
         /// </summary>
-        internal static bool HasChildren(IFrameworkElement fe)
+        internal static bool HasChildren(IInternalFrameworkElement fe)
         {
             // See if we have logical or visual children, in which case this is a real tree invalidation.
             return fe != null && (fe.HasLogicalChildren || fe.GetHasVisualChildren());

@@ -4,6 +4,6 @@ namespace System.Windows;
 namespace Windows.UI.Xaml;
 #endif
 
-internal interface IControl : IFrameworkElement
+public interface IControl : IFrameworkElement
 {
 }

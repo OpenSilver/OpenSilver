@@ -7,17 +7,22 @@ namespace System.Windows;
 namespace Windows.UI.Xaml;
 #endif
 
-internal interface IFrameworkElement : IInternalUIElement, ITemplatableElement
+public interface IFrameworkElement : IUIElement
 {
     event RoutedEventHandler Loaded;
 
+    DependencyObject Parent { get; }
+
+    object FindName(string name);
+}
+
+internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement, ITemplatableElement
+{
     event InheritedPropertyChangedEventHandler Internal_InheritedPropertyChanged;
 
     bool HasLogicalChildren { get; set; }
 
     bool IsLogicalChildrenIterationInProgress { get; set; }
-
-    DependencyObject Parent { get; }
 
     IEnumerator GetLogicalChildren();
 
@@ -39,9 +44,7 @@ internal interface IFrameworkElement : IInternalUIElement, ITemplatableElement
 
     DependencyProperty GetContentPresenterContentProperty();
 
-    object FindName(string name);
-
-    void SetTemplateChild(IFrameworkElement templateChild);
+    void SetTemplateChild(IInternalFrameworkElement templateChild);
 
     DependencyObject AsDependencyObject();
 }

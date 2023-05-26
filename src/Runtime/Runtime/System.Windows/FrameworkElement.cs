@@ -45,16 +45,16 @@ namespace Windows.UI.Xaml
     /// programmatic layout. FrameworkElement also defines APIs related to data binding,
     /// object tree, and object lifetime feature areas.
     /// </summary>
-    public abstract partial class FrameworkElement : UIElement, IFrameworkElement
+    public abstract partial class FrameworkElement : UIElement, IInternalFrameworkElement
     {
         #region Inheritance Context
 
-        internal static IFrameworkElement FindMentor(DependencyObject d)
+        internal static IInternalFrameworkElement FindMentor(DependencyObject d)
         {
             // Find the nearest FE InheritanceContext
             while (d != null)
             {
-                if (d is IFrameworkElement fe)
+                if (d is IInternalFrameworkElement fe)
                 {
                     return fe;
                 }
@@ -72,12 +72,12 @@ namespace Windows.UI.Xaml
             return base.ShouldProvideInheritanceContext(target, property) || property == ResourceDictionary.ResourceKeyProperty;
         }
 
-        internal IFrameworkElement InheritedParent { get; private set; }
+        internal IInternalFrameworkElement InheritedParent { get; private set; }
 
         internal override void OnInheritanceContextChangedCore(EventArgs args)
         {
-            IFrameworkElement oldMentor = InheritedParent;
-            IFrameworkElement newMentor = FindMentor(InheritanceContext);
+            IInternalFrameworkElement oldMentor = InheritedParent;
+            IInternalFrameworkElement newMentor = FindMentor(InheritanceContext);
 
             if (oldMentor != newMentor)
             {
@@ -95,14 +95,14 @@ namespace Windows.UI.Xaml
             }
         }
 
-        private void ConnectMentor(IFrameworkElement mentor)
+        private void ConnectMentor(IInternalFrameworkElement mentor)
         {
             mentor.Internal_InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
             
             InvalidateInheritedProperties(this, (DependencyObject)mentor);
         }
 
-        private void DisconnectMentor(IFrameworkElement mentor)
+        private void DisconnectMentor(IInternalFrameworkElement mentor)
         {
             mentor.Internal_InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
 
@@ -117,7 +117,7 @@ namespace Windows.UI.Xaml
 
         internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
-        event InheritedPropertyChangedEventHandler IFrameworkElement.Internal_InheritedPropertyChanged
+        event InheritedPropertyChangedEventHandler IInternalFrameworkElement.Internal_InheritedPropertyChanged
         {
             add => InheritedPropertyChanged += value;
             remove => InheritedPropertyChanged -= value;
@@ -132,7 +132,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IFrameworkElement.OnInheritedPropertyChanged(InheritablePropertyChangeInfo info)
+        void IInternalFrameworkElement.OnInheritedPropertyChanged(InheritablePropertyChangeInfo info)
         {
             OnInheritedPropertyChanged(this, info);
         }
@@ -206,21 +206,21 @@ namespace Windows.UI.Xaml
             {
                 // It is invalid to modify the children collection that we
                 // might be iterating during a property invalidation tree walk.
-                if (((IFrameworkElement)this).IsLogicalChildrenIterationInProgress)
+                if (((IInternalFrameworkElement)this).IsLogicalChildrenIterationInProgress)
                 {
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
 
-                ((IFrameworkElement)this).HasLogicalChildren = true;
+                ((IInternalFrameworkElement)this).HasLogicalChildren = true;
 
-                if (child is IFrameworkElement fe)
+                if (child is IInternalFrameworkElement fe)
                 {
                     fe.ChangeLogicalParent(this);
                 }
             }
         }
 
-        void IFrameworkElement.Internal_AddLogicalChild(object child) => AddLogicalChild(child);
+        void IInternalFrameworkElement.Internal_AddLogicalChild(object child) => AddLogicalChild(child);
 
         internal void RemoveLogicalChild(object child)
         {
@@ -228,12 +228,12 @@ namespace Windows.UI.Xaml
             {
                 // It is invalid to modify the children collection that we
                 // might be iterating during a property invalidation tree walk.
-                if (((IFrameworkElement)this).IsLogicalChildrenIterationInProgress)
+                if (((IInternalFrameworkElement)this).IsLogicalChildrenIterationInProgress)
                 {
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
 
-                if (child is IFrameworkElement fe && fe.Parent == this)
+                if (child is IInternalFrameworkElement fe && fe.Parent == this)
                 {
                     fe.ChangeLogicalParent(null);
                 }
@@ -244,19 +244,19 @@ namespace Windows.UI.Xaml
                 // if null, there are no children.
                 if (children == null)
                 {
-                    ((IFrameworkElement)this).HasLogicalChildren = false;
+                    ((IInternalFrameworkElement)this).HasLogicalChildren = false;
                 }
                 else
                 {
                     // If we can move next, there is at least one child
-                    ((IFrameworkElement)this).HasLogicalChildren = children.MoveNext();
+                    ((IInternalFrameworkElement)this).HasLogicalChildren = children.MoveNext();
                 }
             }
         }
 
-        void IFrameworkElement.Internal_RemoveLogicalChild(object child) => RemoveLogicalChild(child);
+        void IInternalFrameworkElement.Internal_RemoveLogicalChild(object child) => RemoveLogicalChild(child);
 
-        void IFrameworkElement.ChangeLogicalParent(DependencyObject newParent)
+        void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent)
         {
             // Logical Parent must first be dropped before you are attached to a newParent
             if (Parent != null && newParent != null && Parent != newParent)
@@ -310,15 +310,15 @@ namespace Windows.UI.Xaml
             get { return null; }
         }
 
-        IEnumerator IFrameworkElement.GetLogicalChildren() => LogicalChildren;
+        IEnumerator IInternalFrameworkElement.GetLogicalChildren() => LogicalChildren;
 
-        bool IFrameworkElement.IsLogicalChildrenIterationInProgress
+        bool IInternalFrameworkElement.IsLogicalChildrenIterationInProgress
         {
             get { return ReadInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress); }
             set { WriteInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress, value); }
         }
 
-        bool IFrameworkElement.HasLogicalChildren
+        bool IInternalFrameworkElement.HasLogicalChildren
         {
             get { return ReadInternalFlag(InternalFlags.HasLogicalChildren); }
             set { WriteInternalFlag(InternalFlags.HasLogicalChildren, value); }
@@ -351,7 +351,7 @@ namespace Windows.UI.Xaml
             TemplatedParent = (DependencyObject)templatedParent;
         }
 
-        DependencyObject IFrameworkElement.GetTemplatedParent() => TemplatedParent;
+        DependencyObject IInternalFrameworkElement.GetTemplatedParent() => TemplatedParent;
 
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
@@ -372,7 +372,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IFrameworkElement.SetTemplateChild(IFrameworkElement templateChild)
+        void IInternalFrameworkElement.SetTemplateChild(IInternalFrameworkElement templateChild)
         {
             TemplateChild = (FrameworkElement)templateChild;
         }
@@ -996,7 +996,7 @@ namespace Windows.UI.Xaml
                     Inherits = true
                 });
 
-        DependencyProperty IFrameworkElement.GetDataContextProperty() => DataContextProperty;
+        DependencyProperty IInternalFrameworkElement.GetDataContextProperty() => DataContextProperty;
 
         private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -1197,7 +1197,7 @@ namespace Windows.UI.Xaml
 
         internal void RaiseLoadedEvent() => Loaded?.Invoke(this, new RoutedEventArgs());
 
-        bool IFrameworkElement.IsLoadedEvent(RoutedEvent routedEvent) => routedEvent == LoadedEvent;
+        bool IInternalFrameworkElement.IsLoadedEvent(RoutedEvent routedEvent) => routedEvent == LoadedEvent;
 
         internal void LoadResources()
         {
@@ -1301,9 +1301,9 @@ namespace Windows.UI.Xaml
 
         private InternalFlags _flags = 0; // Stores Flags (see Flags enum)
 
-        DependencyProperty IFrameworkElement.GetContentPresenterContentProperty() => ContentPresenter.ContentProperty;
+        DependencyProperty IInternalFrameworkElement.GetContentPresenterContentProperty() => ContentPresenter.ContentProperty;
 
-        DependencyObject IFrameworkElement.AsDependencyObject() => this;
+        DependencyObject IInternalFrameworkElement.AsDependencyObject() => this;
     }
 
     internal enum InternalFlags : uint

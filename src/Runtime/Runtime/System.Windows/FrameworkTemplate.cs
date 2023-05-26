@@ -48,13 +48,13 @@ namespace Windows.UI.Xaml
             set { CheckSealed(); _template = value; }
         }
 
-        internal bool ApplyTemplateContent(IFrameworkElement container)
+        internal bool ApplyTemplateContent(IInternalFrameworkElement container)
         {
             Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
 
             if (Template != null)
             {
-                IFrameworkElement visualTree = Template.LoadContent(container);
+                IInternalFrameworkElement visualTree = Template.LoadContent(container);
                 container.SetTemplateChild(visualTree);
                 
                 return visualTree != null;
@@ -65,7 +65,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal virtual bool BuildVisualTree(IFrameworkElement container)
+        internal virtual bool BuildVisualTree(IInternalFrameworkElement container)
         {
             return false;
         }
@@ -74,7 +74,7 @@ namespace Windows.UI.Xaml
         /// Creates an instance of the Template. Intented to be called for templates that have no owner, such as DataTemplates (not ControlTemplates).
         /// </summary>
         /// <returns>The instantiated template.</returns>
-        internal IFrameworkElement INTERNAL_InstantiateFrameworkTemplate()
+        internal IInternalFrameworkElement INTERNAL_InstantiateFrameworkTemplate()
         {
             if (Template != null)
             {
@@ -166,9 +166,9 @@ namespace Windows.UI.Xaml
     internal sealed class TemplateContent
     {
         private readonly XamlContext _xamlContext;
-        private readonly Func<IFrameworkElement, XamlContext, IFrameworkElement> _factory;
+        private readonly Func<IInternalFrameworkElement, XamlContext, IInternalFrameworkElement> _factory;
 
-        internal TemplateContent(XamlContext xamlContext, Func<IFrameworkElement, XamlContext, IFrameworkElement> factory)
+        internal TemplateContent(XamlContext xamlContext, Func<IInternalFrameworkElement, XamlContext, IInternalFrameworkElement> factory)
         {
             if (xamlContext == null)
             {
@@ -179,14 +179,14 @@ namespace Windows.UI.Xaml
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        internal IFrameworkElement LoadContent(IFrameworkElement owner)
+        internal IInternalFrameworkElement LoadContent(IInternalFrameworkElement owner)
         {
             XamlContext context = new XamlContext(_xamlContext)
             {
                 ExternalNameScope = new NameScope(),
             };
 
-            IFrameworkElement rootElement = _factory(owner, context);
+            IInternalFrameworkElement rootElement = _factory(owner, context);
             
             if (owner == null)
             {

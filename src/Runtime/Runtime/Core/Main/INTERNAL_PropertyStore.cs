@@ -557,7 +557,7 @@ namespace CSHTML5.Internal
                 // Propagate to children if property is inherited
                 if (metadata.Inherits)
                 {
-                    if (depObj is IFrameworkElement rootElement)
+                    if (depObj is IInternalFrameworkElement rootElement)
                     {
                         InheritablePropertyChangeInfo info = new InheritablePropertyChangeInfo((DependencyObject)rootElement,
                             dp,
@@ -743,7 +743,7 @@ namespace CSHTML5.Internal
             // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
             if (!dp.IsAttached)
             {
-                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || (depObj is IFrameworkElement fe && dp == fe.GetDataContextProperty());
+                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || (depObj is IInternalFrameworkElement fe && dp == fe.GetDataContextProperty());
             }
             return true;
         }

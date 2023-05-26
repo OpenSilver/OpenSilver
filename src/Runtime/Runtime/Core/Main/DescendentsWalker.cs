@@ -77,9 +77,9 @@ namespace OpenSilver.Internal
         {
             _recursionDepth++;
 
-            if (typeof(IFrameworkElement).IsInstanceOfType(d))
+            if (typeof(IInternalFrameworkElement).IsInstanceOfType(d))
             {
-                var fe = (IFrameworkElement)d;
+                var fe = (IInternalFrameworkElement)d;
                 bool hasLogicalChildren = fe.HasLogicalChildren;
 
                 // FrameworkElement have both a visual and a logical tree.
@@ -143,7 +143,7 @@ namespace OpenSilver.Internal
         /// of the nodes in the enumeration.
         /// </summary>
         private void WalkLogicalChildren(
-            IFrameworkElement feParent,
+            IInternalFrameworkElement feParent,
             IEnumerator logicalChildren)
         {
             feParent.IsLogicalChildrenIterationInProgress = true;
@@ -179,7 +179,7 @@ namespace OpenSilver.Internal
         /// to be smarter than the generic logical children walk.
         /// </remarks>
         private void WalkFrameworkElementVisualThenLogicalChildren(
-            IFrameworkElement feParent, bool hasLogicalChildren)
+            IInternalFrameworkElement feParent, bool hasLogicalChildren)
         {
             WalkVisualChildren(feParent);
 
@@ -212,12 +212,12 @@ namespace OpenSilver.Internal
                         while (logicalChildren.MoveNext())
                         {
                             object current = logicalChildren.Current;
-                            if (current is IFrameworkElement fe)
+                            if (current is IInternalFrameworkElement fe)
                             {
                                 // For the case that both parents are identical, this node should
                                 // have already been visited when walking through visual
                                 // children, hence we short-circuit here
-                                if (VisualTreeHelper.GetParent((DependencyObject)fe) != fe.Parent)
+                                if (VisualTreeHelper.GetParent(fe) != fe.Parent)
                                 {
                                     bool visitedViaVisualTree = false;
                                     VisitNode(fe, visitedViaVisualTree);
@@ -243,7 +243,7 @@ namespace OpenSilver.Internal
         /// to be smarter than the generic visual children walk.
         /// </remarks>
         private void WalkFrameworkElementLogicalThenVisualChildren(
-            IFrameworkElement feParent, bool hasLogicalChildren)
+            IInternalFrameworkElement feParent, bool hasLogicalChildren)
         {
             if (hasLogicalChildren)
             {

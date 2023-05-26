@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Data
         private object _bindingSource;
         private bool _isUpdateOnLostFocus; // True if this binding expression updates on LostFocus
         private bool _needsUpdate; // True if this binding expression has a pending source update
-        private IFrameworkElement _mentor;
+        private IInternalFrameworkElement _mentor;
         private ValidationError _baseValidationError;
         private List<ValidationError> _notifyDataErrors;
 
@@ -226,7 +226,7 @@ namespace Windows.UI.Xaml.Data
 
             AttachToContext(false);
 
-            if (BindingSource is IFrameworkElement fe)
+            if (BindingSource is IInternalFrameworkElement fe)
             {
                 if (ParentBinding.XamlPath == "ActualWidth" || ParentBinding.XamlPath == "ActualHeight"
                     || ParentBinding.XamlPath == "ActualSizeX" || ParentBinding.XamlPath == "ActualSizeY" || ParentBinding.XamlPath == "ActualSizeZ")
@@ -945,7 +945,7 @@ namespace Windows.UI.Xaml.Data
         private void AttachToContext(bool lastAttempt)
         {
             object source = null;
-            IFrameworkElement mentor = null;
+            IInternalFrameworkElement mentor = null;
             bool useMentor = false;
 
             if (ParentBinding.Source != null)
@@ -1000,7 +1000,7 @@ namespace Windows.UI.Xaml.Data
             }
             else
             {
-                if (Target is IFrameworkElement targetFE)
+                if (Target is IInternalFrameworkElement targetFE)
                 {
                     DependencyObject contextElement = Target;
 
@@ -1013,7 +1013,7 @@ namespace Windows.UI.Xaml.Data
                     if (TargetProperty == targetFE.GetDataContextProperty() ||
                         TargetProperty == targetFE.GetContentPresenterContentProperty())
                     {
-                        contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent((DependencyObject)targetFE);
+                        contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
                         if (contextElement == null && !lastAttempt)
                         {
                             targetFE.Loaded += new RoutedEventHandler(OnMentorLoaded);
@@ -1034,7 +1034,7 @@ namespace Windows.UI.Xaml.Data
                     _dataContextListener = null;
                 }
 
-                if (source is IFrameworkElement sourceFE)
+                if (source is IInternalFrameworkElement sourceFE)
                 {
                     _dataContextListener = new DependencyPropertyChangedListener((DependencyObject)sourceFE, sourceFE.GetDataContextProperty(), OnDataContextChanged);
                     source = sourceFE.GetValue(sourceFE.GetDataContextProperty());
@@ -1072,12 +1072,12 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        private static object FindName(IFrameworkElement mentor, string name)
+        private static object FindName(IInternalFrameworkElement mentor, string name)
         {
             object o = null;
             // todo:
-            IFrameworkElement fe = mentor is UserControl
-                ? (mentor.Parent ?? VisualTreeHelper.GetParent((DependencyObject)mentor)) as IFrameworkElement
+            IInternalFrameworkElement fe = mentor is UserControl
+                ? (mentor.Parent ?? VisualTreeHelper.GetParent(mentor)) as IInternalFrameworkElement
                 : mentor;
 
             while (o == null && fe != null)
@@ -1095,7 +1095,7 @@ namespace Windows.UI.Xaml.Data
                     // the (visual) parent - a panel.
                     if (dd == null)
                     {
-                        if ((fe.Parent ?? VisualTreeHelper.GetParent((DependencyObject)fe)) is IPanel panel && panel.IsItemsHost)
+                        if ((fe.Parent ?? VisualTreeHelper.GetParent(fe)) is IPanel panel && panel.IsItemsHost)
                         {
                             dd = (DependencyObject)panel;
                         }
@@ -1114,7 +1114,7 @@ namespace Windows.UI.Xaml.Data
             return o;
         }
 
-        private static object FindAncestor(IFrameworkElement mentor, RelativeSource relativeSource)
+        private static object FindAncestor(IInternalFrameworkElement mentor, RelativeSource relativeSource)
         {
             // todo: support bindings in style setters and then remove the following test.
             // To reproduce the issue:
@@ -1137,7 +1137,7 @@ namespace Windows.UI.Xaml.Data
                 return null;
 
             // look for the target's ancestor:
-            var currentParent = VisualTreeHelper.GetParent((DependencyObject)mentor);
+            var currentParent = VisualTreeHelper.GetParent(mentor);
             if (currentParent == null)
                 return null;
 
