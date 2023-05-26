@@ -6,21 +6,24 @@ using System;
 namespace Windows.UI.Xaml;
 #endif
 
-internal interface IDependencyObject
+public interface IDependencyObject
 {
     object GetValue(DependencyProperty dependencyProperty);
 
     void SetValue(DependencyProperty dp, object value);
+}
+
+public interface IUIElement : IDependencyObject
+{
+    event RoutedEventHandler LostFocus;
 
     void AddHandler(RoutedEvent routedEvent, Delegate handler, bool handledEventsToo);
 
     void RemoveHandler(RoutedEvent routedEvent, Delegate handler);
 }
 
-internal interface IUIElement : IDependencyObject
+internal interface IInternalUIElement : IUIElement
 {
-    event RoutedEventHandler LostFocus;
-
     bool Internal_IsLoaded { get; }
 
     bool Internal_IsConnectedToLiveTree { get; }

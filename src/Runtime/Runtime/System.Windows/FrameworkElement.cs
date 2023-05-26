@@ -346,6 +346,11 @@ namespace Windows.UI.Xaml
             }
         }
 
+        void ITemplatableElement.SetTemplatedParent(ITemplatableElement templatedParent)
+        {
+            TemplatedParent = (DependencyObject)templatedParent;
+        }
+
         DependencyObject IFrameworkElement.GetTemplatedParent() => TemplatedParent;
 
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
@@ -365,6 +370,11 @@ namespace Windows.UI.Xaml
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
                 }
             }
+        }
+
+        void IFrameworkElement.SetTemplateChild(IFrameworkElement templateChild)
+        {
+            TemplateChild = (FrameworkElement)templateChild;
         }
 
         /// <summary>
@@ -1292,6 +1302,8 @@ namespace Windows.UI.Xaml
         private InternalFlags _flags = 0; // Stores Flags (see Flags enum)
 
         DependencyProperty IFrameworkElement.GetContentPresenterContentProperty() => ContentPresenter.ContentProperty;
+
+        DependencyObject IFrameworkElement.AsDependencyObject() => this;
     }
 
     internal enum InternalFlags : uint

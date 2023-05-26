@@ -81,7 +81,7 @@ namespace Windows.UI.Xaml
         /// <returns>
         /// The root <see cref="UIElement"/> of the <see cref="DataTemplate"/>.
         /// </returns>
-        public DependencyObject LoadContent()
+        public IDependencyObject LoadContent()
         {
             return this.INTERNAL_InstantiateFrameworkTemplate();
         }

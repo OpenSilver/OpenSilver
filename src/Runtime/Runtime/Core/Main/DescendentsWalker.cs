@@ -102,7 +102,7 @@ namespace OpenSilver.Internal
             {
                 // Not a FrameworkElement.  See if it's a UIElement 
                 // and if so walk the UIElement collection
-                if (d is IUIElement v)
+                if (d is IInternalUIElement v)
                 {
                     WalkVisualChildren(v);
                 }
@@ -115,7 +115,7 @@ namespace OpenSilver.Internal
         /// Given a object of type Visual, call VisitNode on each of its
         /// Visual children.
         /// </summary>
-        private void WalkVisualChildren(IUIElement v)
+        private void WalkVisualChildren(IInternalUIElement v)
         {
             v.IsVisualChildrenIterationInProgress = true;
 

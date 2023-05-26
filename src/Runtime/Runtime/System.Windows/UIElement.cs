@@ -38,7 +38,7 @@ namespace Windows.UI.Xaml
     /// UIElement is a base class for most of the objects that have visual appearance
     /// and can process basic input in a user interface.
     /// </summary>
-    public abstract partial class UIElement : DependencyObject, IUIElement
+    public abstract partial class UIElement : DependencyObject, IInternalUIElement
     {
         static UIElement()
         {
@@ -84,7 +84,7 @@ namespace Windows.UI.Xaml
 
         internal bool IsUnloading { get; set; }
 
-        bool IUIElement.Internal_IsConnectedToLiveTree => IsConnectedToLiveTree;
+        bool IInternalUIElement.Internal_IsConnectedToLiveTree => IsConnectedToLiveTree;
 
         internal bool LoadingIsPending { get; set; }
 
@@ -103,9 +103,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        DependencyObject IUIElement.GetINTERNAL_VisualParent() => INTERNAL_VisualParent;
+        DependencyObject IInternalUIElement.GetINTERNAL_VisualParent() => INTERNAL_VisualParent;
 
-        void IUIElement.SetVisualParent(DependencyObject visualParent) => _parent = visualParent;
+        void IInternalUIElement.SetVisualParent(DependencyObject visualParent) => _parent = visualParent;
 
 #endregion Visual Parent
 
@@ -126,7 +126,7 @@ namespace Windows.UI.Xaml
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        DependencyObject IUIElement.Internal_GetVisualChild(int index) => GetVisualChild(index);
+        DependencyObject IInternalUIElement.Internal_GetVisualChild(int index) => GetVisualChild(index);
 
         /// <summary>
         /// Derived classes override this property to enable the UIElement code to enumerate
@@ -142,18 +142,18 @@ namespace Windows.UI.Xaml
             get { return 0; }
         }
 
-        int IUIElement.GetVisualChildrenCount() => VisualChildrenCount;
+        int IInternalUIElement.GetVisualChildrenCount() => VisualChildrenCount;
 
         /// <Summary>
         /// Flag to check if this visual has any children
         /// </Summary>
         internal bool HasVisualChildren { get; private set; }
 
-        bool IUIElement.GetHasVisualChildren() => HasVisualChildren;
+        bool IInternalUIElement.GetHasVisualChildren() => HasVisualChildren;
 
         // Are we in the process of iterating the visual children.
         // This flag is set during a descendents walk, for property invalidation.
-        bool IUIElement.IsVisualChildrenIterationInProgress { get; set; }
+        bool IInternalUIElement.IsVisualChildrenIterationInProgress { get; set; }
 
         /// <summary>
         /// AttachChild
@@ -162,7 +162,7 @@ namespace Windows.UI.Xaml
         /// child appeard in the children collection. The UIElement layer will then call the GetVisualChild
         /// method to find out where the child was added.
         /// </summary>
-        internal void AddVisualChild(IUIElement child)
+        internal void AddVisualChild(IInternalUIElement child)
         {
             if (child == null)
             {
@@ -190,7 +190,7 @@ namespace Windows.UI.Xaml
         /// child was removed from the children collection. The UIElement layer will then call
         /// GetChildren to find out which child has been removed.
         /// </summary>
-        internal void RemoveVisualChild(IUIElement child)
+        internal void RemoveVisualChild(IInternalUIElement child)
         {
             if (child == null || child.GetINTERNAL_VisualParent() == null)
             {
@@ -234,7 +234,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IUIElement.Internal_OnVisualParentChanged(DependencyObject oldParent) => OnVisualParentChanged(oldParent);
+        void IInternalUIElement.Internal_OnVisualParentChanged(DependencyObject oldParent) => OnVisualParentChanged(oldParent);
 
 #endregion Visual Children
 
@@ -262,7 +262,7 @@ namespace Windows.UI.Xaml
         //Note: the two following fields are only used in the PointerRoutedEventArgs class to determine how many clicks have been made on this UIElement in a short amount of time.
         public string XamlSourcePath; //this is used by the Simulator to tell where this control is defined. It is non-null only on root elements, that is, elements which class has "InitializeComponent" method. This member is public because it needs to be accessible via reflection.
         internal bool _isLoaded;
-        bool IUIElement.Internal_IsLoaded => _isLoaded;
+        bool IInternalUIElement.Internal_IsLoaded => _isLoaded;
         internal Action INTERNAL_DeferredRenderingWhenControlBecomesVisible;
         internal Action INTERNAL_DeferredLoadingWhenControlBecomesVisible;
 

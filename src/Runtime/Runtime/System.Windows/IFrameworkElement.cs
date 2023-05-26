@@ -7,7 +7,7 @@ namespace System.Windows;
 namespace Windows.UI.Xaml;
 #endif
 
-internal interface IFrameworkElement : IUIElement
+internal interface IFrameworkElement : IInternalUIElement, ITemplatableElement
 {
     event RoutedEventHandler Loaded;
 
@@ -40,4 +40,8 @@ internal interface IFrameworkElement : IUIElement
     DependencyProperty GetContentPresenterContentProperty();
 
     object FindName(string name);
+
+    void SetTemplateChild(IFrameworkElement templateChild);
+
+    DependencyObject AsDependencyObject();
 }

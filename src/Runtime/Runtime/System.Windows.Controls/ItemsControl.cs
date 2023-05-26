@@ -150,7 +150,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 Template = new TemplateContent(
                     new XamlContext(),
-                    (owner, context) => new StackPanel { TemplatedParent = owner }                    
+                    (owner, context) => new StackPanel { TemplatedParent = owner.AsDependencyObject() }                    
                 )
             };
 
@@ -868,7 +868,7 @@ namespace Windows.UI.Xaml.Controls
                     {
                         TextBlock textBlock = new TextBlock();
                         textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
-                        textBlock.TemplatedParent = control;
+                        textBlock.TemplatedParent = control.AsDependencyObject();
 
                         return textBlock;
                     }                    
@@ -994,7 +994,7 @@ namespace Windows.UI.Xaml.Controls
                     //---------------------------------------------------
 
                     // Apply the data template
-                    result = ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
+                    result = (FrameworkElement)ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
                     result.DataContext = displayElement;
                 }
                 else

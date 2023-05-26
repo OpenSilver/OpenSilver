@@ -104,7 +104,7 @@ namespace OpenSilver.Internal.Xaml
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
-            Debug.Assert(dependencyObject is FrameworkElement);
+            Debug.Assert(dependencyObject is IFrameworkElement);
 
             NameScope.SetNameScope(dependencyObject, new NameScope());
         }
@@ -134,9 +134,9 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
+        public static void SetTemplatedParent(ITemplatableElement element, ITemplatableElement templatedParent)
         {
-            element.TemplatedParent = templatedParent;
+            element.SetTemplatedParent(templatedParent);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -146,13 +146,13 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
+        public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<ITemplatableElement, XamlContext, ITemplatableElement> factory)
         {
             Debug.Assert(template != null);
             Debug.Assert(xamlContext != null);
             Debug.Assert(factory != null);
 
-            template.Template = new TemplateContent(xamlContext, factory);
+            template.Template = new TemplateContent(xamlContext, (e, c) => (IFrameworkElement)factory(e, c));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -205,7 +205,7 @@ namespace OpenSilver.Internal.Xaml
         public static void XamlContext_PopScope(XamlContext context)
         {
             Debug.Assert(context != null);
-            
+
             context.PopScope();
         }
 

@@ -71,7 +71,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The parent object of the reference object in the visual tree.</returns>
         public static DependencyObject GetParent(DependencyObject reference) //todo: the original signature takes a "DependencyObject"
         {
-            if (reference is IUIElement uie)
+            if (reference is IInternalUIElement uie)
             {
                 return uie.GetINTERNAL_VisualParent();
             }
@@ -86,7 +86,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The number of visual children for the provided source visual.</returns>
         public static int GetChildrenCount(DependencyObject reference)
         {
-            if (reference is IUIElement uie)
+            if (reference is IInternalUIElement uie)
             {
                 return uie.GetVisualChildrenCount();
             }
@@ -102,7 +102,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The child object as referenced by childIndex.</returns>
         public static DependencyObject GetChild(DependencyObject reference, int childIndex)
         {
-            if (reference is IUIElement uie)
+            if (reference is IInternalUIElement uie)
             {
                 return uie.Internal_GetVisualChild(childIndex);
             }
