@@ -20,7 +20,7 @@ public interface IFrameworkElement : IUIElement
     object FindName(string name);
 }
 
-internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement, ITemplatableElement
+internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement
 {
     event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
