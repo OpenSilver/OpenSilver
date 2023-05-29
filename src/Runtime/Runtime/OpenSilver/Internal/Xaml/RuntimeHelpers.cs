@@ -134,6 +134,12 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplatedParent(FrameworkElement element, DependencyObject templatedParent)
+        {
+            element.TemplatedParent = templatedParent;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void SetTemplatedParent(IFrameworkElement element, IFrameworkElement templatedParent)
         {
             ((IInternalFrameworkElement)element).TemplatedParent = (DependencyObject)templatedParent;
@@ -143,6 +149,16 @@ namespace OpenSilver.Internal.Xaml
         public static XamlContext Create_XamlContext()
         {
             return new XamlContext();
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
+        {
+            Debug.Assert(template != null);
+            Debug.Assert(xamlContext != null);
+            Debug.Assert(factory != null);
+
+            template.Template = new TemplateContent(xamlContext, (e, c) => factory((FrameworkElement)e, c));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
