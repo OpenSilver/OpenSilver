@@ -524,7 +524,7 @@ namespace Windows.UI.Xaml.Controls
                     }
                 }
 
-                container.SetTemplateChild(child);
+                container.TemplateChild = child;
 
                 return true;
             }
@@ -537,7 +537,7 @@ namespace Windows.UI.Xaml.Controls
                 ContentPresenter cp = (ContentPresenter)container;
                 FrameworkElement result = DefaultExpansion(cp.Content, cp);
 
-                container.SetTemplateChild(result);
+                container.TemplateChild = result;
 
                 return result != null;
             }

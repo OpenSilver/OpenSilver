@@ -371,9 +371,9 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IInternalFrameworkElement.SetTemplateChild(IInternalFrameworkElement templateChild)
+        IInternalFrameworkElement IInternalFrameworkElement.TemplateChild
         {
-            TemplateChild = (FrameworkElement)templateChild;
+            set => TemplateChild = (FrameworkElement)value;
         }
 
         /// <summary>

@@ -227,7 +227,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
             internal override bool BuildVisualTree(IInternalFrameworkElement container)
             {
-                container.SetTemplateChild(((PopupRoot)container).Content as FrameworkElement);
+                container.TemplateChild = ((PopupRoot)container).Content as FrameworkElement;
                 return false;
             }
         }

@@ -48,7 +48,7 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     DependencyProperty ContentPresenterContentProperty { get; }
 
-    void SetTemplateChild(IInternalFrameworkElement templateChild);
+    IInternalFrameworkElement TemplateChild { set; }
 
     DependencyObject AsDependencyObject();
 

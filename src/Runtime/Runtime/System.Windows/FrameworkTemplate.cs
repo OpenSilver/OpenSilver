@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml
             if (Template != null)
             {
                 IInternalFrameworkElement visualTree = Template.LoadContent(container);
-                container.SetTemplateChild(visualTree);
+                container.TemplateChild = visualTree;
                 
                 return visualTree != null;
             }
