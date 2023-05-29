@@ -99,14 +99,14 @@ namespace Windows.UI.Xaml
         {
             mentor.InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
             
-            InvalidateInheritedProperties(this, (DependencyObject)mentor);
+            InvalidateInheritedProperties(this, mentor.AsDependencyObject());
         }
 
         private void DisconnectMentor(IInternalFrameworkElement mentor)
         {
             mentor.InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
 
-            InvalidateInheritedProperties(this, (DependencyObject)mentor);
+            InvalidateInheritedProperties(this, mentor.AsDependencyObject());
         }
 
         // handle the InheritedPropertyChanged event from the mentor
@@ -115,7 +115,7 @@ namespace Windows.UI.Xaml
             TreeWalkHelper.InvalidateOnInheritablePropertyChange(this, e.Info, false);
         }
 
-        event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
+        internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
         event InheritedPropertyChangedEventHandler IInternalFrameworkElement.InheritedPropertyChanged
         {
@@ -412,7 +412,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        #region Resources
+#region Resources
 
         /// <summary>
         ///     Check if resource is not empty.

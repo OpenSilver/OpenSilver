@@ -339,7 +339,8 @@
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />
 		<Compile Include="System.Windows\IPanel.cs" />
 		<Compile Include="System.Windows\ITemplatableElement.cs" />
-		<Compile Include="System.Windows\IUIElement.cs" />		
+		<Compile Include="System.Windows\IUIElement.cs" />
+		<Compile Include="System.Windows\IUserControl.cs" />		
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
 		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />

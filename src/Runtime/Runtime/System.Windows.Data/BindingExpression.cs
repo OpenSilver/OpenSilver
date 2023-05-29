@@ -1036,7 +1036,7 @@ namespace Windows.UI.Xaml.Data
 
                 if (source is IInternalFrameworkElement sourceFE)
                 {
-                    _dataContextListener = new DependencyPropertyChangedListener((DependencyObject)sourceFE, sourceFE.DataContextProperty, OnDataContextChanged);
+                    _dataContextListener = new DependencyPropertyChangedListener(sourceFE.AsDependencyObject(), sourceFE.DataContextProperty, OnDataContextChanged);
                     source = sourceFE.GetValue(sourceFE.DataContextProperty);
                 }
                 else
@@ -1075,8 +1075,7 @@ namespace Windows.UI.Xaml.Data
         private static object FindName(IInternalFrameworkElement mentor, string name)
         {
             object o = null;
-            // todo:
-            IInternalFrameworkElement fe = mentor is UserControl
+            IInternalFrameworkElement fe = mentor is IUserControl
                 ? (mentor.Parent ?? VisualTreeHelper.GetParent(mentor)) as IInternalFrameworkElement
                 : mentor;
 
@@ -1104,7 +1103,7 @@ namespace Windows.UI.Xaml.Data
                     // Last, try inherited context
                     if (dd == null)
                     {
-                        dd = (fe as DependencyObject).InheritanceContext;
+                        dd = fe.AsDependencyObject().InheritanceContext;
                     }
 
                     fe = FrameworkElement.FindMentor(dd);

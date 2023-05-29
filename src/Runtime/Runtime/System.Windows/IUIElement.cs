@@ -34,9 +34,9 @@ internal interface IInternalUIElement : IUIElement
 
     int VisualChildrenCount { get; }
 
-    DependencyObject GetVisualChild(int index);
-
     DependencyObject INTERNAL_VisualParent { get; set; }
 
     void OnVisualParentChanged(DependencyObject oldParent);
+
+    DependencyObject GetVisualChild(int index);
 }

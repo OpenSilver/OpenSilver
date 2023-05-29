@@ -31,14 +31,14 @@ namespace Windows.UI.Xaml
                 DescendentsWalker<InheritablePropertyChangeInfo> walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
                     TreeWalkPriority.LogicalTree, InheritablePropertyChangeDelegate, info);
 
-                walker.StartWalk((DependencyObject)fe, skipStartNode);
+                walker.StartWalk(fe.AsDependencyObject(), skipStartNode);
             }
             else if (!skipStartNode)
             {
                 // Degenerate case when the current node is a leaf node and has no children.
                 // If the current node needs a notification, do so now.
                 bool visitedViaVisualTree = false;
-                OnInheritablePropertyChanged((DependencyObject)fe, info, visitedViaVisualTree);
+                OnInheritablePropertyChanged(fe.AsDependencyObject(), info, visitedViaVisualTree);
             }
         }
 

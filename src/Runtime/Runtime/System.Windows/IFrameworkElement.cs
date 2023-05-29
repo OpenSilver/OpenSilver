@@ -15,9 +15,9 @@ public interface IFrameworkElement : IUIElement
 
     DependencyObject Parent { get; }
 
-    object FindName(string name);
+    ResourceDictionary Resources { get; set; }
 
-    public ResourceDictionary Resources { get; set; }
+    object FindName(string name);
 }
 
 internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement, ITemplatableElement
@@ -28,9 +28,23 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     bool IsLogicalChildrenIterationInProgress { get; set; }
 
+    bool HasResources { get; }
+
+    bool ShouldLookupImplicitStyles { set; }
+
+    bool IsLoadedInResourceDictionary { get; set; }
+
     IEnumerator LogicalChildren { get; }
 
     RoutedEvent LoadedEvent { get; }
+
+    DependencyObject TemplatedParent { get; set; }
+
+    IInternalFrameworkElement TemplateChild { set; }
+
+    DependencyProperty DataContextProperty { get; }
+
+    DependencyProperty ContentPresenterContentProperty { get; }
 
     void OnInheritedPropertyChanged(InheritablePropertyChangeInfo info);
 
@@ -42,22 +56,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     void SubscribeToSizeChanged();
 
-    DependencyObject TemplatedParent { get; set; }
-
-    DependencyProperty DataContextProperty { get; }
-
-    DependencyProperty ContentPresenterContentProperty { get; }
-
-    IInternalFrameworkElement TemplateChild { set; }
-
-    DependencyObject AsDependencyObject();
-
-    bool HasResources { get; }
-
-    bool ShouldLookupImplicitStyles { set; }
-
-    bool IsLoadedInResourceDictionary { get; set; }
-
     void LoadResources();
 
     void UnloadResources();
@@ -65,4 +63,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
     void RaiseLoadedEvent();
 
     void RaiseUnloadedEvent();
+
+    DependencyObject AsDependencyObject();
 }
