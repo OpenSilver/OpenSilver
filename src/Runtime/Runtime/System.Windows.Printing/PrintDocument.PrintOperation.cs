@@ -170,7 +170,7 @@ namespace Windows.UI.Xaml.Printing
                 var unloadedElements = new List<UIElement>();
                 foreach (UIElement e in _elements)
                 {
-                    if (!e.IsConnectedToLiveTree)
+                    if (!INTERNAL_VisualTreeManager.IsElementInVisualTree(e))
                     {
                         unloadedElements.Add(e);
                     }

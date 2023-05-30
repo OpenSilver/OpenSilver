@@ -14,6 +14,7 @@
 using System;
 using System.Globalization;
 using CSHTML5;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -194,7 +195,7 @@ namespace Windows.UI.Xaml.Input
                 //-----------------------------------
                 return origin;
             }
-            else if (relativeTo.IsConnectedToLiveTree)
+            else if (INTERNAL_VisualTreeManager.IsElementInVisualTree(relativeTo))
             {
                 //-----------------------------------
                 // Returns the pointer coordinates relative to the "relativeTo" element:

@@ -13,6 +13,7 @@
 
 using System;
 using System.Diagnostics;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -524,7 +525,7 @@ internal sealed class KeyboardNavigation
         return control.IsTabStop
             && control.IsEnabled
             && control.IsVisible
-            && control.IsConnectedToLiveTree;
+            && INTERNAL_VisualTreeManager.IsElementInVisualTree(control);
     }
 
     private bool IsGroup(DependencyObject e)

@@ -71,11 +71,11 @@ public static partial class CSharpXamlForHtml5
         /// Sets the Html representation of the UIElement.
         /// </summary>
         /// <param name="control">The UIElement</param>
-        /// <param name="htmlReprensentation">The string that defines the html representation of the UIElement.</param>
+        /// <param name="htmlRepresentation">The string that defines the html representation of the UIElement.</param>
         [Obsolete(Helper.ObsoleteMemberMessage + " Use HtmlPresenter instead.")]
-        public static void SetHtmlRepresentation(UIElement control, string htmlReprensentation)
+        public static void SetHtmlRepresentation(UIElement control, string htmlRepresentation)
         {
-            control.INTERNAL_HtmlRepresentation = htmlReprensentation;
+            control.INTERNAL_HtmlRepresentation = htmlRepresentation;
         }
 
 #if PUBLIC_API_THAT_REQUIRES_SUPPORT_OF_DYNAMIC
