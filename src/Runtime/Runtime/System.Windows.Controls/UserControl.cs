@@ -13,10 +13,8 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Windows.Markup;
 using OpenSilver.Internal.Controls;
-using OpenSilver.Internal.Xaml.Context;
 using CSHTML5.Internal;
 
 #if MIGRATION

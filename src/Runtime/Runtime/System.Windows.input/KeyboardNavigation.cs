@@ -11,9 +11,9 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Diagnostics;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls;

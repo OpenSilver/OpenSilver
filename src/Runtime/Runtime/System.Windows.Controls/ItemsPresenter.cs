@@ -11,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;

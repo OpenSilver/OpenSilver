@@ -15,7 +15,6 @@ using System;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
 using CSHTML5.Internal;
 
 #if MIGRATION

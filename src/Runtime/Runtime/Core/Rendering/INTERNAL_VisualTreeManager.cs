@@ -209,39 +209,44 @@ namespace CSHTML5.Internal
 
         private static void DetachVisualChildren(UIElement element)
         {
-            var markAsUnloadingQueue = new Queue<UIElement>();
-            var detachQueue = new Queue<UIElement>();
+            PropagateIsUnloading(element);
 
-            markAsUnloadingQueue.Enqueue(element);
+            var queue = new Queue<UIElement>();
+            queue.Enqueue(element);
 
-            while (markAsUnloadingQueue.Any())
+            while (queue.Count > 0)
             {
-                var e = markAsUnloadingQueue.Dequeue();
-                e.IsUnloading = true;
-                if (e.INTERNAL_VisualChildrenInformation != null)
+                UIElement e = queue.Dequeue();
+                if (e.INTERNAL_VisualChildrenInformation is not null)
                 {
-                    foreach (var pair in e.INTERNAL_VisualChildrenInformation)
+                    foreach (UIElement child in e.INTERNAL_VisualChildrenInformation.Keys)
                     {
-                        markAsUnloadingQueue.Enqueue(pair.Key);
+                        queue.Enqueue(child);
                     }
                 }
 
-                detachQueue.Enqueue(e);
+                DetachElement(e);
             }
 
-            while (detachQueue.Any())
+            static void PropagateIsUnloading(UIElement element)
             {
-                var e = detachQueue.Dequeue();
-                DetachElement(e);
+                element.IsUnloading = true;
+                if (element.INTERNAL_VisualChildrenInformation is not null)
+                {
+                    foreach (UIElement child in element.INTERNAL_VisualChildrenInformation.Keys)
+                    {
+                        PropagateIsUnloading(child);
+                    }
+                }
             }
         }
 
         private static void DetachElement(UIElement element)
         {
             element.IsUnloading = true;
+
             if (element.IsConnectedToLiveTree)
             {
-                element.IsConnectedToLiveTree = false;
                 if (element.IsPointerOver)
                 {
                     element.RaiseMouseLeave();
@@ -282,6 +287,8 @@ namespace CSHTML5.Internal
             }
 
             // Reset all visual-tree related information:
+            element.IsConnectedToLiveTree = false;
+            element.IsUnloading = false;
             element.LoadingIsPending = false;
             element.INTERNAL_OuterDomElement = null;
             element.INTERNAL_InnerDomElement = null;
