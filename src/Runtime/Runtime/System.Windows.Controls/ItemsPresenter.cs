@@ -12,6 +12,7 @@
 \*====================================================================================*/
 
 using System;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -104,7 +105,7 @@ namespace Windows.UI.Xaml.Controls
             ip.ClearPanel();
             FrameworkElement.UpdateTemplateCache(ip, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (ip.IsConnectedToLiveTree)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(ip))
             {
                 ip.InvalidateMeasureInternal();
             }

@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.Windows.Browser.Internal;
+
 namespace System.Windows.Browser
 {
     /// <summary>

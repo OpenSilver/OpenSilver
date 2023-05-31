@@ -393,11 +393,6 @@ namespace Windows.UI.Xaml.Media.Animation
             _targetName = Storyboard.GetTargetName(this);
         }
         
-        internal override void RestoreDefaultCore()
-        {
-            _appliedKeyFramesCount = 0;
-        }
-
         protected override Duration GetNaturalDurationCore()
         {
             return new Duration(LargestTimeSpanKeyTime);

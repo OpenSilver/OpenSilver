@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -13,13 +12,10 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
-#if MIGRATION
-using System.Windows.Controls;
-#else
-using Windows.UI.Text;
-using Windows.UI.Xaml.Controls;
-#endif
 
+#if !MIGRATION
+using Windows.UI.Text;
+#endif
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -30,7 +26,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides a base class for inline text elements, such as Span and Run.
     /// </summary>
-    public abstract partial class Inline : TextElement
+    public abstract class Inline : TextElement
     {
         internal override bool EnablePointerEventsCore
         {

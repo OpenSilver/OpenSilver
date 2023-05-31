@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,68 +11,58 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
-using System;
 using System.Windows.Markup;
-#if !CSHTML5NETSTANDARD
-using DotNetBrowser;
-#endif
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows;
 #else
+using Windows.Foundation;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-#endif
-
-#if BRIDGE
-using Bridge;
 #endif
 
 namespace CSHTML5.Native.Html.Controls
 {
-    [ContentProperty("Html")]
+    [ContentProperty(nameof(Html))]
     public class HtmlPresenter : FrameworkElement
     {
         private object _jsDiv;
         private string _htmlContent;
 
-        internal override bool EnablePointerEventsCore
-        {
-            get { return true; }
-        }
+        internal sealed override bool EnablePointerEventsCore => true;
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {
-            _jsDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
-            domElementWhereToPlaceChildren = _jsDiv;
-            return _jsDiv;
+            object outerDiv = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", parentRef, this);
+            _jsDiv = domElementWhereToPlaceChildren = INTERNAL_HtmlDomManager.CreateDomElementAndAppendIt("div", outerDiv, this);
+            return outerDiv;
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()
         {
             base.INTERNAL_OnAttachedToVisualTree();
-
-            if (_htmlContent != null)
-            {
-                ApplyHtmlContent(_htmlContent);
-            }
+            ApplyHtmlContent();
         }
+
+        protected internal override void INTERNAL_OnDetachedFromVisualTree()
+        {
+            base.INTERNAL_OnDetachedFromVisualTree();
+            _jsDiv = null;
+        }
+
+        protected override Size MeasureOverride(Size availableSize) => MeasureArrangeHelper();
+
+        protected override Size ArrangeOverride(Size finalSize) => MeasureArrangeHelper();
 
         public string Html
         {
-            get
-            {
-                return _htmlContent;
-            }
+            get => _htmlContent;
             set
             {
                 _htmlContent = value;
-
-                if (this.IsLoaded)
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    ApplyHtmlContent(_htmlContent);
+                    ApplyHtmlContent();
                 }
             }
         }
@@ -82,9 +71,9 @@ namespace CSHTML5.Native.Html.Controls
         {
             get
             {
-                if (this.IsLoaded)
+                if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
                 {
-                    if (!IsNullOrUndefined(_jsDiv))
+                    if (_jsDiv is not null)
                     {
                         string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
                         if (OpenSilver.Interop.ExecuteJavaScriptBoolean($"{sDiv} && {sDiv}.hasChildNodes()"))
@@ -93,17 +82,27 @@ namespace CSHTML5.Native.Html.Controls
                         }
                     }
                 }
+
                 return null;
             }
         }
 
-        void ApplyHtmlContent(string htmlContent)
+        private Size MeasureArrangeHelper()
         {
-            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
-            string sContent = INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlContent);
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync($"{sDiv}.innerHTML = {sContent}");
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
+            {
+                return INTERNAL_HtmlDomManager.GetBoundingClientSize(_jsDiv);
+            }
+
+            return new Size();
         }
 
-        static bool IsNullOrUndefined(object jsObject) => jsObject == null;
+        private void ApplyHtmlContent()
+        {
+            string sDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(_jsDiv);
+            string sContent = INTERNAL_InteropImplementation.GetVariableStringForJS(_htmlContent ?? string.Empty);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sDiv}.innerHTML = {sContent}");
+            InvalidateMeasure();
+        }
     }
 }

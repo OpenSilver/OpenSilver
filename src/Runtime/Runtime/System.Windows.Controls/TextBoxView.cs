@@ -334,12 +334,15 @@ sel.setBaseAndExtent(nodesAndOffsets['startParent'], nodesAndOffsets['startOffse
 
             // Apply Host.TextWrapping
             ApplyTextWrapping(contentEditableDivStyle, Host.TextWrapping);
-            contentEditableDivStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
+            contentEditableDivStyle.outline = "none";
             contentEditableDivStyle.background = "solid transparent";
             contentEditableDivStyle.cursor = "text";
 
             // Disable spell check
             INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "spellcheck", Host.IsSpellCheckEnabled);
+
+            // disable native tab navigation
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(contentEditableDiv, "tabindex", "-1");
 
             // Apply TextAlignment
             UpdateTextAlignment(contentEditableDivStyle, Host.TextAlignment);

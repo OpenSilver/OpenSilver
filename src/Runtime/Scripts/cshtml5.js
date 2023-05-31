@@ -111,64 +111,9 @@ document.getAppParams = function () {
 
 document.ResXFiles = {};
 
-document.modifiersPressed = 0;
-
-document.refreshKeyModifiers = function (evt) {
-    var value = 0;
-    if (evt.ctrlKey) {
-        value = value | 1;
-    }
-    if (evt.altKey) {
-        value = value | 2;
-    }
-    if (evt.shiftKey) {
-        value = value | 4;
-    }
-    document.modifiersPressed = value;
-}
-
-document.onkeydown = function (evt) {
-    evt = evt || window.event;
-    document.refreshKeyModifiers(evt);
-};
-
-document.onkeyup = function (evt) {
-    evt = evt || window.event;
-    document.refreshKeyModifiers(evt);
-};
-
 document.jsObjRef = {};
 document.callbackCounterForSimulator = 0;
 document.measureTextBlockElement = null;
-
-document.reroute = function reroute(e, elem, shiftKey) {
-    shiftKey = shiftKey || false;
-    if (e.rerouted === undefined) {
-        var evt;
-        if (typeof document.dispatchEvent !== 'undefined') {
-            evt = document.createEvent('MouseEvents');
-            evt.initMouseEvent(
-                e.type				// event type
-                , e.bubbles			// can bubble?
-                , e.cancelable		// cancelable?
-                , window			// the event's abstract view (should always be window)
-                , e.detail			// mouse click count (or event "detail")
-                , e.screenX			// event's screen x coordinate
-                , e.screenY			// event's screen y coordinate
-                , e.pageX			// event's client x coordinate
-                , e.pageY			// event's client y coordinate
-                , e.ctrlKey			// whether or not CTRL was pressed during event
-                , e.altKey			// whether or not ALT was pressed during event
-                , shiftKey			// whether or not SHIFT was pressed during event
-                , e.metaKey			// whether or not the meta key was pressed during event
-                , e.button			// indicates which button (if any) caused the mouse event (1 = primary button)
-                , e.relatedTarget	// relatedTarget (only applicable for mouseover/mouseout events)
-            );
-            evt.rerouted = true;
-            elem.dispatchEvent(evt);
-        }
-    }
-}
 
 document.performanceCounters = [];
 
@@ -217,7 +162,8 @@ document.getActualWidthAndHeight = function (element) {
 document.createElementSafe = function (tagName, id, parentElement, index) {
     const newElement = document.createElement(tagName);
 
-    newElement.setAttribute("id", id);
+    newElement.setAttribute('id', id);
+    newElement.setAttribute('xamlid', id);
 
     if (typeof parentElement == 'string') {
         parentElement = document.getElementById(parentElement);
@@ -259,26 +205,13 @@ document.createPopupRootElement = function (id, rootElement, pointerEvents) {
 
     const popupRoot = document.createElement('div');
     popupRoot.setAttribute('id', id);
+    popupRoot.setAttribute('xamlid', id);
     popupRoot.style.position = 'absolute';
     popupRoot.style.width = '100%';
     popupRoot.style.height = '100%';
     popupRoot.style.overflowX = 'hidden';
     popupRoot.style.overflowY = 'hidden';
     popupRoot.style.pointerEvents = pointerEvents;
-    popupRoot.addEventListener('keydown', function (e) {
-        if (e.key === 'Tab') {
-            const focusableElements = document.querySelectorAll(`#${id} [tabindex]:not([tabindex="-1"], [tabindex=""])`);
-            if (focusableElements.length === 0) return;
-            if (!e.shiftKey && e.target === focusableElements[focusableElements.length - 1]) {
-                e.preventDefault();
-                focusableElements[0].focus();
-            } else if (e.shiftKey && e.target === focusableElements[0]) {
-                e.preventDefault();
-                focusableElements[focusableElements.length - 1].focus();
-            }
-        }
-    });
-
     rootElement.appendChild(popupRoot);
 }
 
@@ -324,13 +257,19 @@ document.createFrameworkElement = function (id, parentElement, enablePointerEven
     }
 }
 
-document.createRunElement = function (id, parentElement) {
-    const newElement = document.createElementSafe('span', id, parentElement, -1);
+document.createTextElement = function (id, tagName, parent) {
+    if (typeof parent === 'string') parent = document.getElementById(parent);
+    if (parent === null) return null;
 
-    if (newElement) {
-        newElement.style['textDecoration'] = 'inherit';
+    const textElement = document.createElement(tagName);
+    textElement.setAttribute('id', id);
+
+    if (index < 0 || index >= parent.children.length) {
+        parent.appendChild(textElement);
+    } else {
+        parent.insertBefore(textElement, parent.children[index]);
     }
-}
+};
 
 document.createShapeOuterElement = function (id, parentElement) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
@@ -430,18 +369,13 @@ document.addEventListenerSafe = function (element, method, func) {
 document.setFocus = function (element) {
     if (!element) return;
 
-    // HTML elements will not receive focus when their tabindex is null
-    // Temporarily set the tabindex to allow it to get focused
-    if (element.getAttribute('tabindex') === null) {
-        element.setAttribute('tabindex', -1);
+    setTimeout(function () {
+        element.setAttribute('tabindex', 0);
         element.focus({ preventScroll: true });
-        element.removeAttribute('tabindex');
-    } else {
-        element.focus({ preventScroll: true });
-    }
+    });
 };
 
-document.createInputManager = function (callback) {
+document.createInputManager = function (root, callback) {
     if (document.inputManager) return;
 
     // This must remain synchronyzed with the EVENTS enum defined in InputManager.cs.
@@ -463,89 +397,179 @@ document.createInputManager = function (callback) {
         INPUT: 13,
         TOUCH_START: 14,
         TOUCH_END: 15,
-        TOUCH_MOVE: 16
+        TOUCH_MOVE: 16,
+        WINDOW_BLUR: 17,
     };
 
-    document.addEventListener('mousedown', function (e) {
-        if (!e.isHandled) {
+    const MODIFIERKEYS = {
+        NONE: 0,
+        CONTROL: 1,
+        ALT: 2,
+        SHIFT: 4,
+        WINDOWS: 8,
+    };
+
+    let _modifiers = MODIFIERKEYS.NONE;
+    let _mouseCapture = null;
+    let _suppressContextMenu = false;
+
+    function setModifiers(e) {
+        _modifiers = MODIFIERKEYS.NONE;
+        if (e.ctrlKey)
+            _modifiers |= MODIFIERKEYS.CONTROL;
+        if (e.altKey)
+            _modifiers |= MODIFIERKEYS.ALT;
+        if (e.shiftKey)
+            _modifiers |= MODIFIERKEYS.SHIFT;
+        if (e.metaKey)
+            _modifiers |= MODIFIERKEYS.WINDOWS;
+    };
+
+    function getClosestElementId(element) {
+        while (element) {
+            if (element.hasAttribute('xamlid')) {
+                return element.getAttribute('xamlid');
+            }
+
+            element = element.parentElement;
+        }
+
+        return '';
+    };
+
+    function initDom(root) {
+
+        // Make sure the root div is keyboard focusable, so that we can tab into the app.
+        root.tabIndex = Math.max(root.tabIndex, 0);
+
+        document.addEventListener('mousedown', function (e) {
+            if (!e.isHandled) {
+                switch (e.button) {
+                    case 0:
+                        callback('', EVENTS.MOUSE_LEFT_DOWN, e);
+                        break;
+                    case 2:
+                        callback('', EVENTS.MOUSE_RIGHT_DOWN, e);
+                        break;
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', function (e) {
+            if (!e.isHandled) {
+                const target = _mouseCapture;
+                if (target !== null) {
+                    switch (e.button) {
+                        case 0:
+                            callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
+                            break;
+                        case 2:
+                            callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
+                            break;
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            if (!e.isHandled) {
+                const target = _mouseCapture;
+                if (target !== null) {
+                    callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
+                }
+            }
+        });
+
+        document.addEventListener('selectstart', function (e) { if (_mouseCapture !== null) e.preventDefault(); });
+
+        document.addEventListener('contextmenu', function (e) {
+            if (_suppressContextMenu ||
+                (_mouseCapture !== null && this !== _mouseCapture)) {
+                _suppressContextMenu = false;
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keydown', function (e) { setModifiers(e); });
+
+        document.addEventListener('keyup', function (e) { setModifiers(e); });        
+
+        window.addEventListener('blur', function (e) {
+            callback('', EVENTS.WINDOW_BLUR, e);
+            _modifiers = MODIFIERKEYS.NONE;
+        });
+
+        root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
+
+        root.addEventListener('mousemove', function (e) {
+            e.isHandled = true;
+            const target = _mouseCapture || e.target;
+            callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
+        });
+
+        root.addEventListener('wheel', function (e) {
+            e.isHandled = true;
+            callback(getClosestElementId(e.target), EVENTS.WHEEL, e);
+        });
+
+        root.addEventListener('mousedown', function (e) {
+            e.isHandled = true;
+            let id = (_mouseCapture === null || e.target === _mouseCapture) ? getClosestElementId(e.target) : '';
             switch (e.button) {
                 case 0:
-                    callback('', EVENTS.MOUSE_LEFT_DOWN);
+                    callback(id, EVENTS.MOUSE_LEFT_DOWN, e);
                     break;
                 case 2:
-                    callback('', EVENTS.MOUSE_RIGHT_DOWN);
+                    callback(id, EVENTS.MOUSE_RIGHT_DOWN, e);
                     break;
             }
-        }
-    });
+        });
+
+        root.addEventListener('mouseup', function (e) {
+            e.isHandled = true;
+            const target = _mouseCapture || e.target;
+            switch (e.button) {
+                case 0:
+                    callback(getClosestElementId(target), EVENTS.MOUSE_LEFT_UP, e);
+                    break;
+                case 2:
+                    callback(getClosestElementId(target), EVENTS.MOUSE_RIGHT_UP, e);
+                    break;
+            }
+        });
+    };
+
+    initDom(root);
 
     document.inputManager = {
         addListeners: function (element, isFocusable) {
             const view = typeof element === 'string' ? document.getElementById(element) : element;
             if (!view) return;
 
-            view.addEventListener('mousedown', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    switch (e.button) {
-                        case 0:
-                            callback(this.id, EVENTS.MOUSE_LEFT_DOWN, e);
-                            break;
-                        case 2:
-                            callback(this.id, EVENTS.MOUSE_RIGHT_DOWN, e);
-                            break;
-                    }
-                }
-            });
-
-            view.addEventListener('mouseup', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    switch (e.button) {
-                        case 0:
-                            callback(this.id, EVENTS.MOUSE_LEFT_UP, e);
-                            break;
-                        case 2:
-                            callback(this.id, EVENTS.MOUSE_RIGHT_UP, e);
-                            break;
-                    }
-                }
-            });
-
-            view.addEventListener('mousemove', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    callback(this.id, EVENTS.MOUSE_MOVE, e);
-                }
-            });
-
-            view.addEventListener('wheel', function (e) {
-                if (!e.isHandled) {
-                    e.isHandled = true;
-                    callback(this.id, EVENTS.WHEEL, e);
-                }
-            });
-
             view.addEventListener('mouseenter', function (e) {
-                callback(this.id, EVENTS.MOUSE_ENTER, e);
+                if (_mouseCapture === null || this === _mouseCapture) {
+                    callback(getClosestElementId(this), EVENTS.MOUSE_ENTER, e);
+                }
             });
 
             view.addEventListener('mouseleave', function (e) {
-                callback(this.id, EVENTS.MOUSE_LEAVE, e);
+                if (_mouseCapture === null || this === _mouseCapture) {
+                    callback(getClosestElementId(this), EVENTS.MOUSE_LEAVE, e);
+                }
             });
 
             if (isTouchDevice()) {
                 view.addEventListener('touchstart', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.TOUCH_START, e);
+                        callback(getClosestElementId(this), EVENTS.TOUCH_START, e);
                     }
                 }, { passive: true });
 
                 view.addEventListener('touchend', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.TOUCH_END, e);
+                        callback(getClosestElementId(this), EVENTS.TOUCH_END, e);
                         e.preventDefault();
                     }
                 });
@@ -553,7 +577,7 @@ document.createInputManager = function (callback) {
                 view.addEventListener('touchmove', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.TOUCH_MOVE, e);
+                        callback(getClosestElementId(this), EVENTS.TOUCH_MOVE, e);
                     }
                 }, { passive: true });
             }
@@ -562,39 +586,45 @@ document.createInputManager = function (callback) {
                 view.addEventListener('keypress', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.KEYPRESS, e);
+                        callback(getClosestElementId(this), EVENTS.KEYPRESS, e);
                     }
                 });
 
                 view.addEventListener('input', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.INPUT, e);
+                        callback(getClosestElementId(this), EVENTS.INPUT, e);
                     }
                 });
 
                 view.addEventListener('keydown', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.KEYDOWN, e);
+                        setModifiers(e);
+                        callback(getClosestElementId(this), EVENTS.KEYDOWN, e);
                     }
                 });
 
                 view.addEventListener('keyup', function (e) {
                     if (!e.isHandled) {
                         e.isHandled = true;
-                        callback(this.id, EVENTS.KEYUP, e);
+                        setModifiers(e);
+                        callback(getClosestElementId(this), EVENTS.KEYUP, e);
                     }
                 });
-
-                view.addEventListener('focus', function (e) {
-                    callback(this.id, EVENTS.FOCUS, e);
-                });
-
-                view.addEventListener('blur', function (e) {
-                    callback(this.id, EVENTS.BLUR, e);
-                });
             }
+        },
+        getModifiers: function () {
+            return _modifiers;
+        },
+        captureMouse: function (element) {
+            _mouseCapture = element;
+        },
+        releaseMouseCapture: function () {
+            _mouseCapture = null;
+        },
+        suppressContextMenu: function (value) {
+            _suppressContextMenu = value;
         },
     };
 };
@@ -639,74 +669,6 @@ document.errorCallback = function (error, IndexOfNextUnmodifiedJSCallInList) {
     argsArr[1] = IndexOfNextUnmodifiedJSCallInList;
     document.jsObjRef[idWhereErrorCallbackArgsAreStored] = argsArr;
     window.onCallBack.OnCallbackFromJavaScriptError(idWhereErrorCallbackArgsAreStored);
-}
-
-document.rerouteMouseEvents = function (id) {
-    document.onmouseup = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmouseover = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmousedown = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmouseout = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onmousemove = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onclick = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.oncontextmenu = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.ondblclick = function (e) {
-        if (e.doNotReroute == undefined) {
-            var element = document.getElementById(id);
-            if (element) {
-                document.reroute(e, element);
-            }
-        }
-    }
-    document.onselectstart = function (e) { return false; }
 }
 
 document.setVisualBounds = function (id, left, top, width, height, bSetAbsolutePosition, bSetZeroMargin, bSetZeroPadding) {
@@ -1508,7 +1470,7 @@ document.velocityHelpers = (function () {
 })();
 
 document.browserService = (function () {
-    const TYPES = {
+    const JSTYPE = {
         ERROR: -1,
         VOID: 0,
         STRING: 1,
@@ -1522,9 +1484,122 @@ document.browserService = (function () {
         HTMLWINDOW: 9,
     };
 
+    const INTEROP_RESULT = {
+        ERROR: 0,
+        VOID: 1,
+        OBJECT: 2,
+        MEMBER: 3,
+    };
+
     let _id = 0;
     const _idToObj = new Map();
     const _objToId = new Map();
+
+    let _isInitialized = false;
+    let _getMemberCallback = null;
+    let _setPropertyCallback = null;
+    let _invokeMethodCallback = null;
+    let _addEventListenerCallback = null;
+
+    function checkInitialized() {
+        if (!_isInitialized) {
+            throw new Error('browserService has not been initialized yet.');
+        }
+    };
+
+    function createManagedObject(id, isDelegate) {
+        const o = isDelegate ? function () { } : {};
+        o.id = id;
+        Object.defineProperty(o, 'id', { writable: false });
+
+        const handler = {
+            get: function (target, prop, receiver) {
+                switch (prop) {
+                    case 'addEventListener':
+                        return function (event, handler) {
+                            const r = addDotNetEventListener(target, event, JSON.stringify(conv(handler)));
+                            switch (r.type) {
+                                case INTEROP_RESULT.ERROR:
+                                    throw new Error(r.value);
+                            }
+                        };
+                    case 'removeEventListener':
+                        return function (event, handler) {
+                            const r = removeDotNetEventListener(target, event, JSON.stringify(conv(handler)));
+                            switch (r.type) {
+                                case INTEROP_RESULT.ERROR:
+                                    throw new Error(r.value);
+                            }
+                        };
+                    default:
+                        const r = getDotNetMember(target, prop);
+                        switch (r.type) {
+                            case INTEROP_RESULT.ERROR:
+                                throw new Error(r.value);
+                            case INTEROP_RESULT.OBJECT:
+                                return r.value;
+                            case INTEROP_RESULT.MEMBER:
+                                return function (...args) {
+                                    const r = invokeDotNetMethod(target, prop, JSON.stringify(args.map(function (x) { return conv(x); })));
+                                    switch (r.type) {
+                                        case INTEROP_RESULT.ERROR:
+                                            throw new Error(r.value);
+                                        case INTEROP_RESULT.OBJECT:
+                                            return r.value;
+                                    }
+                                };
+                        }
+                }
+            },
+            set: function (target, prop, value, receiver) {
+                const r = setDotNetProperty(target, prop, JSON.stringify(conv(value)));
+                switch (r.type) {
+                    case INTEROP_RESULT.ERROR:
+                        throw new Error(r.value);
+                }
+                return true;
+            },
+        };
+
+        if (isDelegate) {
+            handler.apply = function (target, thisArg, argumentsList) {
+                const r = invokeDotNetMethod(target, '', JSON.stringify(argumentsList.map(function (x) { return conv(x); })));
+                switch (r.type) {
+                    case INTEROP_RESULT.ERROR:
+                        throw new Error(r.value);
+                    case INTEROP_RESULT.OBJECT:
+                        return r.value;
+                }
+            };
+        }
+
+        return new Proxy(o, handler);
+    };
+
+    function getDotNetMember(managedObject, name) {
+        const str_result = _getMemberCallback(managedObject.id, name);
+        return eval(str_result);
+    };
+
+    function invokeDotNetMethod(managedObject, name, args) {
+        const str_result = _invokeMethodCallback(managedObject.id, name, args);
+        return eval(str_result);
+    };
+
+    function setDotNetProperty(managedObject, name, value) {
+        const str_result = _setPropertyCallback(managedObject.id, name, value);
+        return eval(str_result);
+    };
+
+    function addDotNetEventListener(managedObject, event, handler) {
+        const str_result = _addEventListenerCallback(managedObject.id, event, handler, true);
+        return eval(str_result);
+    };
+
+    function removeDotNetEventListener(managedObject, event, handler) {
+        const str_result = _addEventListenerCallback(managedObject.id, event, handler, false);
+        return eval(str_result);
+    };
 
     function getOrCreateId(obj) {
         if (!_objToId.has(obj)) {
@@ -1537,43 +1612,53 @@ document.browserService = (function () {
     };
 
     function isDOMCollection(v) {
-        return v instanceof HTMLCollection ||
-               v instanceof NodeList;
+        return v instanceof HTMLCollection || v instanceof NodeList;
     };
 
     function conv(v) {
         if (v instanceof Document) {
-            return { Type: TYPES.HTMLDOCUMENT };
+            return { Type: JSTYPE.HTMLDOCUMENT };
         } else if (v instanceof Window) {
-            return { Type: TYPES.HTMLWINDOW };
+            return { Type: JSTYPE.HTMLWINDOW };
         } else if (v instanceof HTMLElement) {
-            return { Type: TYPES.HTMLELEMENT, Value: getOrCreateId(v) };
+            return { Type: JSTYPE.HTMLELEMENT, Value: getOrCreateId(v) };
         } else if (isDOMCollection(v)) {
-            return { Type: TYPES.HTMLCOLLECTION, Value: getOrCreateId(v) };
+            return { Type: JSTYPE.HTMLCOLLECTION, Value: getOrCreateId(v) };
         } else if (typeof v === 'number') {
             if (Number.isInteger(v))
-                return { Type: TYPES.INTEGER, Value: v.toString() };
+                return { Type: JSTYPE.INTEGER, Value: v.toString() };
             else
-                return { Type: TYPES.DOUBLE, Value: v.toString() };
+                return { Type: JSTYPE.DOUBLE, Value: v.toString() };
         } else if (typeof v === 'string') {
-            return { Type: TYPES.STRING, Value: v };
+            return { Type: JSTYPE.STRING, Value: v };
         } else if (typeof v === 'boolean') {
-            return { Type: TYPES.BOOLEAN, Value: v.toStrin_dependentListMapg() };
+            return { Type: JSTYPE.BOOLEAN, Value: v.toString() };
         } else if (v === null || v === undefined) {
-            return { Type: TYPES.VOID };
+            return { Type: JSTYPE.VOID };
         } else if (typeof v === 'object' || typeof v === 'function') {
-            return { Type: TYPES.OBJECT, Value: getOrCreateId(v) };
+            return { Type: JSTYPE.OBJECT, Value: getOrCreateId(v) };
         } else {
-            return { Type: TYPES.ERROR, Value: 'An unexpected error occurred' };
+            return { Type: JSTYPE.ERROR, Value: 'An unexpected error occurred' };
         }
     };
 
     function error(message) {
-        return { Type: TYPES.ERROR, Value: message };
+        return { Type: JSTYPE.ERROR, Value: message };
     };
 
     return {
+        initialize: function (getMemberCallback, setPropertyCallback, invokeMethodCallback, addEventListenerCallback) {
+            if (_isInitialized) {
+                throw new Error('browserService can only be initialized once.');
+            }
+            _isInitialized = true;
+            _getMemberCallback = getMemberCallback;
+            _setPropertyCallback = setPropertyCallback;
+            _invokeMethodCallback = invokeMethodCallback;
+            _addEventListenerCallback = addEventListenerCallback;
+        },
         invoke: function (instance, name, ...args) {
+            checkInitialized();
             const m = instance[name];
             if (m) {
                 try {
@@ -1587,6 +1672,7 @@ document.browserService = (function () {
             }
         },
         invokeSelf: function (f, ...args) {
+            checkInitialized();
             if (typeof f === 'function') {
                 try {
                     const r = f.call(null, ...args);
@@ -1599,6 +1685,7 @@ document.browserService = (function () {
             }
         },
         getProperty: function (instance, name) {
+            checkInitialized();
             try {
                 return JSON.stringify(conv(instance[name]));
             } catch (err) {
@@ -1606,6 +1693,7 @@ document.browserService = (function () {
             }
         },
         setProperty: function (instance, name, value) {
+            checkInitialized();
             try {
                 instance[name] = value;
                 return JSON.stringify(conv(undefined));
@@ -1614,14 +1702,24 @@ document.browserService = (function () {
             }
         },
         getObject: function (id) {
+            checkInitialized();
             return _idToObj.get(id);
         },
         releaseObject: function (id) {
+            checkInitialized();
             if (_idToObj.has(id)) {
                 const o = _idToObj.get(id);
                 _objToId.delete(o);
                 _idToObj.delete(id);
             }
+        },
+        registerManagedObject: function (isDelegate) {
+            checkInitialized();
+            const id = (_id++).toString();
+            const managedObject = createManagedObject(id, isDelegate);
+            _objToId.set(managedObject, id);
+            _idToObj.set(id, managedObject);
+            return id;
         },
     };
 })();

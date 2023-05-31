@@ -160,7 +160,7 @@ namespace Windows.UI.Xaml.Controls
             domElementWhereToPlaceChildren = passwordField; // Note: this value is used by the Padding_Changed method to set the padding of the PasswordBox.
 
             passwordFieldStyle.border = "transparent"; // This removes the border. We do not need it since we are templated
-            passwordFieldStyle.outline = "solid transparent"; // Note: this is to avoind having the weird border when it has the focus. I could have used outlineWidth = "0px" but or some reason, this causes the caret to not work when there is no text.
+            passwordFieldStyle.outline = "none";
             passwordFieldStyle.backgroundColor = "transparent";
             passwordFieldStyle.fontFamily = "inherit"; // Not inherited by default for "input" DOM elements
             passwordFieldStyle.fontSize = "inherit"; // Not inherited by default for "input" DOM elements
@@ -169,6 +169,9 @@ namespace Windows.UI.Xaml.Controls
             passwordFieldStyle.height = "100%";
 
             INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "type", "password");
+
+            // disable native tab navigation
+            INTERNAL_HtmlDomManager.SetDomElementAttribute(passwordField, "tabindex", "-1");
 
             return passwordField;
         }

@@ -29,8 +29,8 @@ After creating the project, you may then want to update the NuGet package to ref
 
 3. **Run the restoration .BAT:** Execute the .BAT file "**restore-packages-opensilver.bat**" located at the root of this repository.
 
-4. (First time only) **Update the OpenSilver compiler assemblies:** OpenSilver has a dependency on an older version of OpenSilver to convert xaml files to C#, which is retrieved by the restore batch file (from Step No. **3.**). 
-Due to continous updates, this restored version can sometimes have outdated OpenSilver compiler assemblies which might cause unexpected compilation or runtime errors. To fix this, you should rebuild the **Compiler.OpenSilver** project and replace the assemblies **"OpenSilver.Compiler.dll"**, **"OpenSilver.Compiler.Common.dll"** in the folder **"src/packages/OpenSilver.<version>/tools/"** (or **"src/packages/OpenSilver.UWPCompatible.<version>/tools/"** if you are working with the **UWP** configuration).
+4. **Update the OpenSilver compiler assemblies:** OpenSilver has a dependency on an older version of OpenSilver to convert xaml files to C#, which is retrieved by the restore batch file (from Step No. **3.**). 
+Due to continous updates, this restored version can sometimes have outdated OpenSilver compiler assemblies which might cause unexpected compilation or runtime errors. To fix this, run the "**update-compiler.bat**" script located in the "build" folder.
 
 5. **Delete bin/obj:** Make sure to remove the "bin" and "obj" folders, if any. They can cause issues when building using the ".bat" files.
 

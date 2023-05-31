@@ -48,6 +48,20 @@ namespace System
             return false;
         });
 
+        private readonly Lazy<bool> _enableHTMLAccess = new Lazy<bool>(() =>
+        {
+            const string EnableHTMLAccessName = "EnableHTMLAccess";
+
+            Application app = Application.Current;
+            if (app != null && app.AppParams.TryGetValue(EnableHTMLAccessName, out string str)
+                && bool.TryParse(str.Trim(), out bool enableHTMLAccess))
+            {
+                return enableHTMLAccess;
+            }
+
+            return true;
+        });
+
         public Settings()
         {
             // Default values:
@@ -217,7 +231,7 @@ namespace System
         /// </returns>
         [OpenSilver.NotImplemented]
         public bool EnableGPUAcceleration { get; }
-        
+
         /// <summary>
         /// Gets a value that indicates whether the Silverlight plug-in allows hosted content
         /// or its runtime to access the HTML DOM.
@@ -225,8 +239,7 @@ namespace System
         /// <returns>
         /// true if hosted content can access the browser DOM; otherwise, false.
         /// </returns>
-        [OpenSilver.NotImplemented]
-        public bool EnableHTMLAccess { get; }
+        public bool EnableHTMLAccess => _enableHTMLAccess.Value;
 
         /// <summary>
         /// Gets or sets a value that indicates whether to show the areas of the Silverlight

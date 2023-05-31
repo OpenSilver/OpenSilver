@@ -798,7 +798,7 @@ namespace Windows.UI.Xaml
             element.ManageIsEnabled((bool)newValue);
         }
 
-        internal protected virtual void ManageIsEnabled(bool isEnabled)
+        protected internal virtual void ManageIsEnabled(bool isEnabled)
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {

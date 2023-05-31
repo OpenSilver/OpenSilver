@@ -26,12 +26,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Core;
 #endif
 
@@ -207,7 +209,7 @@ public class MemoryLeakTest
         CreateDependencyObject(c);
         MemoryLeaksHelper.Collect();
 
-        Assert.IsTrue(c.IsCollected);            
+        Assert.IsTrue(c.IsCollected);
     }
 
     [TestMethod]
@@ -352,6 +354,40 @@ public class MemoryLeakTest
         var c = new GCTracker();
         var effect = new BlurEffect();
         CreateElementAndApplyEffect(c, effect);
+        MemoryLeaksHelper.Collect();
+
+        Assert.IsTrue(c.IsCollected);
+    }
+
+    [TestMethod]
+    public void ForeverStoryboard_Should_Not_Keep_Target_Alive()
+    {
+        static void CreateElementAndStoryboard(GCTracker tracker)
+        {
+            var element = new MyControl();
+            MemoryLeaksHelper.SetTracker(element, tracker);
+
+            var opacityAnimation = new DoubleAnimation
+            {
+                From = 1.0,
+                To = 0.0,
+                Duration = new Duration(TimeSpan.FromSeconds(1))
+            };
+
+            var storyboard = new Storyboard
+            {
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+            storyboard.Children.Add(opacityAnimation);
+
+            Storyboard.SetTarget(opacityAnimation, element);
+            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath("Opacity"));
+
+            storyboard.Begin();
+        }
+
+        var c = new GCTracker();
+        CreateElementAndStoryboard(c);
         MemoryLeaksHelper.Collect();
 
         Assert.IsTrue(c.IsCollected);

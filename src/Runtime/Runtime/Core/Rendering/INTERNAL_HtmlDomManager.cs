@@ -19,14 +19,17 @@ using System.Text;
 using OpenSilver.Internal;
 using System.Linq;
 using System.Diagnostics;
+using System.Globalization;
 
 #if MIGRATION
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 #else
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Documents;
 #endif
 
 namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure to change the dynamic call from the Simulator as well.
@@ -61,7 +64,7 @@ namespace CSHTML5.Internal // IMPORTANT: if you change this namespace, make sure
 
         internal static UIElement GetElementById(string id)
         {
-            if (_store.TryGetValue(id, out WeakReference<UIElement> weakRef)
+            if (_store.TryGetValue(id ?? string.Empty, out WeakReference<UIElement> weakRef)
                 && weakRef.TryGetTarget(out UIElement uie))
             {
                 return uie;
@@ -355,6 +358,12 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
                 INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
         }
 
+        internal static void RemoveAttribute(object domElement, string attributeName)
+        {
+            string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElement);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"{sElement}.removeAttribute('{attributeName}');");
+        }
+
         public static object GetDomElementAttribute(object domElementRef, string attributeName)
         {
             string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domElementRef);
@@ -517,29 +526,24 @@ setTimeout(function(){{ var element2 = document.getElementById(""{uniqueIdentifi
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
 
-        internal static object CreateRunDomElementAndAppendIt(
-            object parentRef,
-            UIElement associatedUIElement)
+        internal static object CreateTextElementDomElementAndAppendIt(object parentRef, TextElement textElement)
         {
-#if PERFSTAT
-            Performance.Counter("CreateRunDomElementAndAppendIt", t0);
-#endif
             string uniqueIdentifier = NewId();
 
             var parent = parentRef as INTERNAL_HtmlDomElementReference;
             if (parent != null)
             {
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createRunElement(""{uniqueIdentifier}"", ""{parent.UniqueIdentifier}"")");
+                    $"document.createTextElement('{uniqueIdentifier}', '{textElement.TagName}', '{parent.UniqueIdentifier}');");
             }
             else
             {
                 string sParentRef = INTERNAL_InteropImplementation.GetVariableStringForJS(parentRef);
                 OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                    $@"document.createRunElement(""{uniqueIdentifier}"", {sParentRef})");
+                    $"document.createTextElement('{uniqueIdentifier}', '{textElement.TagName}', {sParentRef})");
             }
 
-            AddToGlobalStore(uniqueIdentifier, associatedUIElement);
+            AddToGlobalStore(uniqueIdentifier, textElement);
 
             return new INTERNAL_HtmlDomElementReference(uniqueIdentifier, parent);
         }
@@ -768,8 +772,7 @@ parentElement.appendChild(child);";
                     default:
                         if (c < ' ')
                         {
-                            t = "000" + string.Format("X", c);
-                            sb.Append("\\u" + t.Substring(t.Length - 4));
+                            sb.Append($"\\u{(int)c:x4}");
                         }
                         else
                         {
@@ -953,6 +956,29 @@ parentElement.appendChild(child);";
             string javaScriptCodeToExecute = $@"document.setPosition(""{style.Uid}"",{left},{top},{(bSetPositionAbsolute ? "1" : "0")},{(bSetZeroMargin ? "1" : "0")},{(bSetZeroPadding ? "1" : "0")})";
 
             INTERNAL_ExecuteJavaScript.QueueExecuteJavaScript(javaScriptCodeToExecute);
+        }
+
+        internal static Size GetBoundingClientSize(object domRef)
+        {
+            if (domRef is not null)
+            {
+                string sElement = INTERNAL_InteropImplementation.GetVariableStringForJS(domRef);
+                string concatenated = OpenSilver.Interop.ExecuteJavaScriptString(
+                    $"(function() {{ var v = {sElement}.getBoundingClientRect(); return v.width.toFixed(3) + '|' + v.height.toFixed(3) }})()");
+                int sepIndex = concatenated != null ? concatenated.IndexOf('|') : -1;
+                if (sepIndex > -1)
+                {
+                    string widthStr = concatenated.Substring(0, sepIndex);
+                    string heightStr = concatenated.Substring(sepIndex + 1);
+                    if (double.TryParse(widthStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double width)
+                        && double.TryParse(heightStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double height))
+                    {
+                        return new Size(width, height);
+                    }
+                }
+            }
+
+            return new Size();
         }
     }
 }

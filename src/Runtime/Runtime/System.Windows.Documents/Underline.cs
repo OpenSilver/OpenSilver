@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,12 +11,6 @@
 *  
 \*====================================================================================*/
 
-
-#if MIGRATION
-#else
-using Windows.UI.Text;
-#endif
-
 #if MIGRATION
 namespace System.Windows.Documents
 #else
@@ -27,7 +20,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides an inline-level content element that causes content to render with a bold font weight.
     /// </summary>
-    public sealed partial class Underline : Span
+    public sealed class Underline : Span
     {
         /// <summary>
         /// Initializes a new instance of the Underline class.
@@ -35,9 +28,9 @@ namespace Windows.UI.Xaml.Documents
         public Underline()
         {
 #if MIGRATION
-            this.TextDecorations = System.Windows.TextDecorations.Underline;
+            TextDecorations = Windows.TextDecorations.Underline;
 #else
-            this.TextDecorations = Windows.UI.Text.TextDecorations.Underline;
+            TextDecorations = Windows.UI.Text.TextDecorations.Underline;
 #endif
         }
     }

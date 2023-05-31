@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,15 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Markup;
+using CSHTML5.Internal;
 
 #if MIGRATION
 namespace System.Windows.Documents
@@ -31,8 +24,8 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Represents a discrete section of formatted or unformatted text.
     /// </summary>
-    [ContentProperty("Text")]
-    public sealed partial class Run : Inline
+    [ContentProperty(nameof(Text))]
+    public sealed class Run : Inline
     {
         /// <summary>
         /// Get or Set the Text property
@@ -51,7 +44,7 @@ namespace Windows.UI.Xaml.Documents
                 nameof(Text), 
                 typeof(string), 
                 typeof(Run),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure, OnTextPropertyChanged));
+                new PropertyMetadata(string.Empty, OnTextPropertyChanged));
 
         private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -60,13 +53,6 @@ namespace Windows.UI.Xaml.Documents
             {
                 INTERNAL_HtmlDomManager.SetContentString(run, (string)e.NewValue);
             }
-        }
-
-        public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
-        {
-            var span = INTERNAL_HtmlDomManager.CreateRunDomElementAndAppendIt(parentRef, this);
-            domElementWhereToPlaceChildren = span;
-            return span;
         }
 
         protected internal override void INTERNAL_OnAttachedToVisualTree()

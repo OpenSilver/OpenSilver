@@ -17,13 +17,15 @@ using CSHTML5.Internal;
 #if MIGRATION
 using System.Windows.Controls;
 #else
+using System.Windows.Input;
 using Windows.Foundation;
-using Windows.System;
 using Windows.UI.Xaml.Controls;
 using MouseEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 using MouseWheelEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
+using ModifierKeys = Windows.System.VirtualKeyModifiers;
+using INTERNAL_VirtualKeysHelpers = Windows.System.INTERNAL_VirtualKeysHelpers;
 #endif
 
 #if MIGRATION
@@ -55,6 +57,7 @@ internal sealed class InputManager
         TOUCH_START = 14,
         TOUCH_END = 15,
         TOUCH_MOVE = 16,
+        WINDOW_BLUR = 17,
     }
 
     private enum MouseButton
@@ -92,8 +95,10 @@ internal sealed class InputManager
 
         if (Current == null)
         {
+            string sRootElement = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(
+                INTERNAL_HtmlDomManager.GetApplicationRootDomElement());
             string sHandler = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(_handler);
-            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sHandler});");
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.createInputManager({sRootElement}, {sHandler});");
         }
     }
 
@@ -101,6 +106,36 @@ internal sealed class InputManager
     /// Return the input manager associated with the current context.
     /// </summary>
     public static InputManager Current { get; } = new InputManager();
+
+    internal ModifierKeys GetKeyboardModifiers()
+    {
+        return (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("document.inputManager.getModifiers();", false);
+    }
+
+    internal bool CaptureMouse(UIElement uie)
+    {
+        if (Pointer.INTERNAL_captured is null)
+        {
+            Pointer.INTERNAL_captured = uie;
+
+            string sDiv = CSHTML5.INTERNAL_InteropImplementation.GetVariableStringForJS(uie.INTERNAL_OuterDomElement);
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.captureMouse({sDiv});");
+
+            return true;
+        }
+
+        return Pointer.INTERNAL_captured == uie;
+    }
+
+    internal void ReleaseMouseCapture(UIElement uie)
+    {
+        if (Pointer.INTERNAL_captured is not null)
+        {
+            Pointer.INTERNAL_captured = null;
+            OpenSilver.Interop.ExecuteJavaScriptVoid($"document.inputManager.releaseMouseCapture();");
+            uie.OnLostMouseCapturedInternal(new MouseEventArgs());
+        }
+    }
 
     internal void AddEventListeners(UIElement uie, bool isFocusable)
     {
@@ -141,6 +176,50 @@ internal sealed class InputManager
             case EVENTS.MOUSE_RIGHT_DOWN:
                 RefreshClickCount(null, MouseButton.Right, Environment.TickCount, new Point());
                 break;
+
+            case EVENTS.FOCUS:
+                OnFocus();
+                break;
+
+            case EVENTS.WINDOW_BLUR:
+                OnWindowBlur(jsEventArg);
+                break;
+        }
+    }
+
+    private void OnFocus()
+    {
+        if (FocusManager.GetFocusedElement() is UIElement focusedElement)
+        {
+            // Focus moved back to the application (most likely to the opensilver-root div).
+            // Reposition focus to the element that has logical focus.
+            INTERNAL_HtmlDomManager.SetFocus(focusedElement);
+        }
+        else
+        {
+            DependencyObject rootVisual = Application.Current?.RootVisual;
+            if (rootVisual is not null)
+            {
+                KeyboardNavigation.Current.Navigate(
+                    rootVisual,
+                    new TraversalRequest(
+                        ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift) ?
+                        FocusNavigationDirection.Last :
+                        FocusNavigationDirection.First));
+            }
+        }
+    }
+
+    private void OnWindowBlur(object jsEventArg)
+    {
+        if (FocusManager.GetFocusedElement() is UIElement focusedElement)
+        {
+            focusedElement.RaiseEvent(new RoutedEventArgs
+            {
+                RoutedEvent = UIElement.LostFocusEvent,
+                OriginalSource = focusedElement,
+                UIEventArg = jsEventArg,
+            });
         }
     }
 
@@ -192,10 +271,6 @@ internal sealed class InputManager
 
             case EVENTS.FOCUS:
                 ProcessOnFocus(uie, jsEventArg);
-                break;
-
-            case EVENTS.BLUR:
-                ProcessOnBlur(uie, jsEventArg);
                 break;
 
             case EVENTS.KEYPRESS:
@@ -285,7 +360,7 @@ internal sealed class InputManager
         UIElement mouseTarget = uie.MouseTarget;
         if (mouseTarget is not null)
         {
-            ProcessMouseButtonEvent(
+            bool handled = ProcessMouseButtonEvent(
                 mouseTarget,
                 jsEventArg,
                 UIElement.MouseRightButtonDownEvent,
@@ -293,6 +368,11 @@ internal sealed class InputManager
                 Environment.TickCount,
                 refreshClickCount: true,
                 closeToolTips: true);
+
+            if (handled)
+            {
+                OpenSilver.Interop.ExecuteJavaScriptVoid("document.inputManager.suppressContextMenu(true);");
+            }
         }
 #endif
     }
@@ -318,11 +398,8 @@ internal sealed class InputManager
             };
 #endif
 
-            if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-            {
-                e.FillEventArgs(mouseTarget, jsEventArg);
-                mouseTarget.RaiseEvent(e);
-            }
+            e.FillEventArgs(mouseTarget, jsEventArg);
+            mouseTarget.RaiseEvent(e);
 
             mouseTarget.Dispatcher.BeginInvoke(() =>
             {
@@ -352,17 +429,14 @@ internal sealed class InputManager
                 UIEventArg = jsEventArg,
             };
 
-            if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-            {
-                e.FillEventArgs(mouseTarget, jsEventArg);
+            e.FillEventArgs(mouseTarget, jsEventArg);
 
 #if MIGRATION
-                // fill the Mouse Wheel delta:
-                e.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
+            // fill the Mouse Wheel delta:
+            e.Delta = MouseWheelEventArgs.GetPointerWheelDelta(jsEventArg);
 #endif
 
-                mouseTarget.RaiseEvent(e);
-            }
+            mouseTarget.RaiseEvent(e);
         }
     }
 
@@ -417,13 +491,14 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
             Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
+            KeyModifiers = Keyboard.Modifiers,
         };
-
-        e.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
 
         ToolTipService.OnKeyDown(e);
 
         keyboardTarget.RaiseEvent(e);
+
+        KeyboardNavigation.Current.ProcessInput(e);
 
         if (e.Handled && e.Cancellable)
         {
@@ -451,41 +526,21 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
             PlatformKeyCode = keyCode,
             Key = INTERNAL_VirtualKeysHelpers.GetKeyFromKeyCode(keyCode),
+            KeyModifiers = Keyboard.Modifiers,
         };
-
-        e.AddKeyModifiersAndUpdateDocumentValue(jsEventArg);
 
         keyboardTarget.RaiseEvent(e);
     }
 
     private void ProcessOnFocus(UIElement uie, object jsEventArg)
     {
-        UIElement keyboardTarget = uie.KeyboardTarget;
-        if (keyboardTarget is not null)
-        {
-            FocusManager.SetFocusedElement(keyboardTarget.INTERNAL_ParentWindow, keyboardTarget);
+        UIElement newFocus = uie.KeyboardTarget;
 
-            keyboardTarget.RaiseEvent(new RoutedEventArgs
-            {
-                RoutedEvent = UIElement.GotFocusEvent,
-                OriginalSource = keyboardTarget,
-                UIEventArg = jsEventArg
-            });
-        }
-    }
-
-    private void ProcessOnBlur(UIElement uie, object jsEventArg)
-    {
-        UIElement keyboardTarget = uie.KeyboardTarget;
-        if (keyboardTarget is not null)
+        newFocus?.RaiseEvent(new RoutedEventArgs
         {
-            keyboardTarget.RaiseEvent(new RoutedEventArgs
-            {
-                RoutedEvent = UIElement.LostFocusEvent,
-                OriginalSource = keyboardTarget,
-                UIEventArg = jsEventArg
-            });
-        }
+            RoutedEvent = UIElement.GotFocusEvent,
+            OriginalSource = newFocus,
+        });
     }
 
     private void ProcessOnKeyPress(UIElement uie, object jsEventArg)
@@ -529,11 +584,8 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
         };
 
-        if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-        {
-            e.FillEventArgs(uie, jsEventArg);
-            uie.RaiseEvent(e);
-        }
+        e.FillEventArgs(uie, jsEventArg);
+        uie.RaiseEvent(e);
     }
 
     private void ProcessOnTouchEndEvent(
@@ -558,7 +610,7 @@ internal sealed class InputManager
         uie.RaiseEvent(e);
     }
 
-    private void ProcessMouseButtonEvent(
+    private bool ProcessMouseButtonEvent(
         UIElement uie,
         object jsEventArg,
         RoutedEvent routedEvent,
@@ -574,22 +626,21 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
         };
 
-        if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
+        e.FillEventArgs(uie, jsEventArg);
+
+        if (refreshClickCount)
         {
-            e.FillEventArgs(uie, jsEventArg);
-
-            if (refreshClickCount)
-            {
-                e.ClickCount = RefreshClickCount(uie, button, timeStamp, e.GetPosition(null));
-            }
-
-            if (closeToolTips)
-            {
-                ToolTipService.OnMouseButtonDown(e);
-            }
-
-            uie.RaiseEvent(e);
+            e.ClickCount = RefreshClickCount(uie, button, timeStamp, e.GetPosition(null));
         }
+
+        if (closeToolTips)
+        {
+            ToolTipService.OnMouseButtonDown(e);
+        }
+
+        uie.RaiseEvent(e);
+
+        return e.Handled;
     }
 
     private void ProcessOnTapped(UIElement uie, object jsEventArg)
@@ -601,11 +652,8 @@ internal sealed class InputManager
             UIEventArg = jsEventArg,
         };
 
-        if (e.CheckIfEventShouldBeTreated(uie, jsEventArg))
-        {
-            e.FillEventArgs(uie, jsEventArg);
-            uie.RaiseEvent(e);
-        }
+        e.FillEventArgs(uie, jsEventArg);
+        uie.RaiseEvent(e);
     }
 
     private int RefreshClickCount(UIElement target, MouseButton button, int timeStamp, Point ptClient)

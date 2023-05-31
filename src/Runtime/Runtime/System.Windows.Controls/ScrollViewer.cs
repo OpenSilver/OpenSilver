@@ -22,6 +22,7 @@ using System.Windows.Controls.Primitives;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using MouseButtonEventArgs = Windows.UI.Xaml.Input.PointerRoutedEventArgs;
 using KeyEventArgs = Windows.UI.Xaml.Input.KeyRoutedEventArgs;
 using Key = Windows.System.VirtualKey;
 using ModifierKeys = Windows.System.VirtualKeyModifiers;
@@ -1007,6 +1008,24 @@ namespace Windows.UI.Xaml.Controls
             finally
             {
 
+            }
+        }
+
+#if MIGRATION
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+#else
+        protected override void OnPointerPressed(MouseButtonEventArgs e)
+#endif
+        {
+#if MIGRATION
+            base.OnMouseLeftButtonDown(e);
+#else
+            base.OnPointerPressed(e);
+#endif
+
+            if (!e.Handled && Focus())
+            {
+                e.Handled = true;
             }
         }
 

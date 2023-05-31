@@ -13,10 +13,13 @@
 
 using System;
 using System.Diagnostics;
+using CSHTML5.Internal;
 
 #if MIGRATION
+using System.Windows.Controls;
 using System.Windows.Media;
 #else
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 #endif
 
@@ -39,12 +42,12 @@ namespace Windows.UI.Xaml.Input
                 "FocusedElement",
                 typeof(UIElement),
                 typeof(FocusManager),
-                new PropertyMetadata((object)null));
+                new PropertyMetadata(OnFocusedElementChanged));
 
         /// <summary>
         /// Queries the Silverlight focus system to determine which object has focus.
         /// </summary>
-        /// <returns>The object that currently has focus. Typically, this is a <see cref="Controls.Control" /> class.</returns>
+        /// <returns>The object that currently has focus. Typically, this is a <see cref="Control" /> class.</returns>
 		public static object GetFocusedElement()
         {
             return Window.Current?.GetValue(FocusedElementProperty);
@@ -64,10 +67,40 @@ namespace Windows.UI.Xaml.Input
         /// Set FocusedElement property for element.
         /// </summary>
         /// <param name="scope"></param>
-        /// <param name="focusedElement"></param>
-        internal static void SetFocusedElement(DependencyObject scope, UIElement focusedElement)
+        /// <param name="newFocus"></param>
+        internal static void SetFocusedElement(DependencyObject scope, UIElement newFocus)
         {
-            scope.SetValue(FocusedElementProperty, focusedElement);
+            scope.SetValue(FocusedElementProperty, newFocus);
+        }
+
+        private static void OnFocusedElementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue is UIElement oldFocus)
+            {
+                ClearTabIndex(oldFocus);
+                oldFocus.RaiseEvent(new RoutedEventArgs
+                {
+                    RoutedEvent = UIElement.LostFocusEvent,
+                    OriginalSource = oldFocus,
+                });
+            }
+
+            static void ClearTabIndex(UIElement uie)
+            {
+                if (uie.GetFocusTarget() is { } domElement)
+                {
+                    switch (uie)
+                    {
+                        case TextBox or PasswordBox:
+                            INTERNAL_HtmlDomManager.SetDomElementAttribute(domElement, "tabindex", "-1");
+                            break;
+
+                        default:
+                            INTERNAL_HtmlDomManager.RemoveAttribute(domElement, "tabindex");
+                            break;
+                    }
+                }
+            }
         }
 
         internal static bool HasFocus(UIElement uie, bool useLogicalTree = false)

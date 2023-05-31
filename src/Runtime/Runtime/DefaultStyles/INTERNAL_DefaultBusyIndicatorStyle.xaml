@@ -1,4 +1,11 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<!--
+// (c) Copyright Microsoft Corporation.
+// This source is subject to the Microsoft Public License (Ms-PL).
+// Please see http://go.microsoft.com/fwlink/?LinkID=131993 for details.
+// All other rights reserved.
+-->
+
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
@@ -17,8 +24,6 @@
                 </Style>
             </Setter.Value>
         </Setter>
-        <!-- #if WORKINPROGRESS -->
-        <!--
         <Setter Property="ProgressBarStyle">
             <Setter.Value>
                 <Style TargetType="ProgressBar">
@@ -31,8 +36,6 @@
                 </Style>
             </Setter.Value>
         </Setter>
-        -->
-        <!-- #endif -->
         <Setter Property="DisplayAfter"
                 Value="00:00:00.1" />
         <Setter Property="HorizontalAlignment"
@@ -136,12 +139,7 @@
                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                         <Rectangle x:Name="overlay"
                                    Style="{TemplateBinding OverlayStyle}" />
-                        <!-- #if WORKINPROGRESS -->
-                        <!--
                         <ContentPresenter x:Name="busycontent">
-                        -->
-                        <!-- #endif -->
-                        <Border x:Name="busycontent">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
                                 <Border Background="White"
@@ -179,22 +177,13 @@
                                             <ContentPresenter Content="{TemplateBinding BusyContent}"
                                                               ContentTemplate="{TemplateBinding BusyContentTemplate}"
                                                               Margin="8" />
-                                            <!-- #if WORKINPROGRESS -->
-                                            <!--
                                             <ProgressBar Grid.Row="1"
                                                          Style="{TemplateBinding ProgressBarStyle}" />
-                                            -->
-                                            <!-- #endif -->
                                         </Grid>
                                     </Border>
                                 </Border>
                             </Grid>
-                        </Border>
-                        <!-- #if WORKINPROGRESS -->
-                        <!--
                         </ContentPresenter>
-                        -->
-                        <!-- #endif -->
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

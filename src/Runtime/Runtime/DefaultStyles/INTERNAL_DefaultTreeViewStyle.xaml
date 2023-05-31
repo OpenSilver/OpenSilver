@@ -111,10 +111,8 @@
                 Value="#FF000000" />
         <Setter Property="IsTabStop"
                 Value="True" />
-        <!-- #if WORKINPROGRESS -->
-        <!-- <Setter Property="TabNavigation"
-                     Value="Once" /> -->
-        <!-- #endif -->
+        <Setter Property="TabNavigation"
+                Value="Once" /> 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TreeView">
@@ -173,10 +171,8 @@
                                               Background="{x:Null}"
                                               BorderBrush="Transparent"
                                               BorderThickness="0"
-                                              IsTabStop="False">
-                                    <!-- #if WORKINPROGRESS -->
-                                    <!-- TabNavigation="Once" -->
-                                    <!-- #endif -->
+                                              IsTabStop="True"
+                                              TabNavigation="Once">
                                     <ItemsPresenter x:Name="ItemsHost"
                                                     Margin="5" />
                                 </ScrollViewer>
@@ -192,12 +188,10 @@
                             <ToolTipService.ToolTip>
                                 <ToolTip x:Name="ValidationToolTip"
                                          Template="{StaticResource CommonValidationToolTipTemplate}"
+                                         Placement="Right"
+                                         PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                          DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                          IsHitTestVisible="True" />
-                                <!-- #if WORKINPROGRESS -->
-                                <!-- Placement="Right"
-                                     PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" -->
-                                <!-- #endif -->
                             </ToolTipService.ToolTip>
                             <Grid Width="10"
                                   Height="10"

@@ -14,6 +14,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Browser.Internal;
 
 namespace System.Windows.Browser
 {

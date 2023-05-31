@@ -19,15 +19,11 @@ namespace System.Windows.Browser
     /// <see cref="HtmlPage.RegisterCreateableType(string, Type)"/> method.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-    [OpenSilver.NotImplemented]
     public sealed class ScriptableTypeAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptableTypeAttribute"/> class.
         /// </summary>
-        public ScriptableTypeAttribute()
-        {
-
-        }
+        public ScriptableTypeAttribute() { }
     }
 }

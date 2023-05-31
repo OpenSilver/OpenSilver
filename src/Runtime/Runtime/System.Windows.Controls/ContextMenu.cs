@@ -38,16 +38,6 @@ namespace Windows.UI.Xaml.Controls
     public class ContextMenu : MenuBase
     {
         /// <summary>
-        /// Stores a reference to the current root visual.
-        /// </summary>
-        private static FrameworkElement _rootVisual;
-
-        /// <summary>
-        /// Stores the last known mouse position (via MouseMove).
-        /// </summary>
-        private static Point _mousePosition;
-
-        /// <summary>
         /// Stores a reference to the object that owns the ContextMenu.
         /// </summary>
         private DependencyObject _owner;
@@ -195,7 +185,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 if (newValue)
                 {
-                    OpenPopup(_mousePosition);
+                    OpenPopup(new Point());
                 }
                 else
                 {
@@ -310,16 +300,6 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Handles the RootVisual's MouseMove event to track the last mouse position.
-        /// </summary>
-        /// <param name="sender">Source of the event.</param>
-        /// <param name="e">Event arguments.</param>
-        private static void HandleRootVisualMouseMove(object sender, MouseEventArgs e)
-        {
-            _mousePosition = e.GetPosition(null);
-        }
-
-        /// <summary>
         /// Handles the MouseRightButtonDown event for the owning element.
         /// </summary>
         /// <param name="sender">Source of the event.</param>
@@ -328,27 +308,6 @@ namespace Windows.UI.Xaml.Controls
         {
             OpenPopup(e.GetPosition(null));
             e.Handled = true;
-        }
-
-        /// <summary>
-        /// Initialize the _rootVisual property (if possible and not already done).
-        /// </summary>
-        private static void InitializeRootVisual()
-        {
-            if (null == _rootVisual && Application.Current != null)
-            {
-                // Try to capture the Application's RootVisual
-                _rootVisual = Application.Current.RootVisual as FrameworkElement;
-                if (null != _rootVisual)
-                {
-                    // Ideally, this would use AddHandler(MouseMoveEvent), but MouseMoveEvent doesn't exist
-#if MIGRATION
-                    _rootVisual.MouseMove += new MouseEventHandler(HandleRootVisualMouseMove);
-#else
-                    _rootVisual.PointerMoved += new MouseEventHandler(HandleRootVisualMouseMove);
-#endif
-                }
-            }
         }
 
         /// <summary>
@@ -422,7 +381,7 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         private void UpdateContextMenuPlacement()
         {
-            if ((null != _rootVisual) && (null != _overlay))
+            if ((null != PopupService.RootVisual) && (null != _overlay))
             {
                 // Start with the current Popup alignment point
                 double x = _popupAlignmentPoint.X;
@@ -431,8 +390,8 @@ namespace Windows.UI.Xaml.Controls
                 x += HorizontalOffset;
                 y += VerticalOffset;
                 // Try not to let it stick out too far to the right/bottom
-                x = Math.Min(x, _rootVisual.ActualWidth - ActualWidth);
-                y = Math.Min(y, _rootVisual.ActualHeight - ActualHeight);
+                x = Math.Min(x, PopupService.RootVisual.ActualWidth - ActualWidth);
+                y = Math.Min(y, PopupService.RootVisual.ActualHeight - ActualHeight);
                 // Do not let it stick out too far to the left/top
                 x = Math.Max(x, 0);
                 y = Math.Max(y, 0);
@@ -440,8 +399,8 @@ namespace Windows.UI.Xaml.Controls
                 Canvas.SetLeft(this, x);
                 Canvas.SetTop(this, y);
                 // Size the overlay to match the new container
-                _overlay.Width = _rootVisual.ActualWidth;
-                _overlay.Height = _rootVisual.ActualHeight;
+                _overlay.Width = PopupService.RootVisual.ActualWidth;
+                _overlay.Height = PopupService.RootVisual.ActualHeight;
             }
         }
 
@@ -452,8 +411,6 @@ namespace Windows.UI.Xaml.Controls
         private void OpenPopup(Point position)
         {
             _popupAlignmentPoint = position;
-
-            InitializeRootVisual();
 
             _overlay = new Canvas { Background = new SolidColorBrush(Colors.Transparent) };
 #if MIGRATION
@@ -468,15 +425,15 @@ namespace Windows.UI.Xaml.Controls
             _popup = new Popup { Child = _overlay };
 
             SizeChanged += new SizeChangedEventHandler(HandleContextMenuOrRootVisualSizeChanged);
-            if (null != _rootVisual)
+            if (null != PopupService.RootVisual)
             {
-                _rootVisual.SizeChanged += new SizeChangedEventHandler(HandleContextMenuOrRootVisualSizeChanged);
+                PopupService.RootVisual.SizeChanged += new SizeChangedEventHandler(HandleContextMenuOrRootVisualSizeChanged);
             }
             UpdateContextMenuPlacement();
 
             if (ReadLocalValue(DataContextProperty) == DependencyProperty.UnsetValue)
             {
-                DependencyObject dataContextSource = Owner ?? _rootVisual;
+                DependencyObject dataContextSource = Owner ?? PopupService.RootVisual;
                 SetBinding(DataContextProperty, new Binding("DataContext") { Source = dataContextSource });
             }
 
@@ -515,9 +472,9 @@ namespace Windows.UI.Xaml.Controls
                 _overlay = null;
             }
             SizeChanged -= new SizeChangedEventHandler(HandleContextMenuOrRootVisualSizeChanged);
-            if (null != _rootVisual)
+            if (null != PopupService.RootVisual)
             {
-                _rootVisual.SizeChanged -= new SizeChangedEventHandler(HandleContextMenuOrRootVisualSizeChanged);
+                PopupService.RootVisual.SizeChanged -= new SizeChangedEventHandler(HandleContextMenuOrRootVisualSizeChanged);
             }
 
             // Update IsOpen

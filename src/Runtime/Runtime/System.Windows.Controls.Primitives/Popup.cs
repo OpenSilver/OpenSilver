@@ -653,7 +653,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
             {
                 PopupService.PositionsWatcher.RemoveControlToWatch(ctw);
                 _controlToWatch = null;
-                Reposition();
+                IsOpen = false;
                 return;
             }
             

@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System;
 using System.Windows.Input;
+using System.Linq;
 
 
 #if MIGRATION
@@ -928,7 +929,10 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 mousePositionHeaders.X = rightEdge - 1;
             }
 
-            foreach (DataGridColumn column in this.OwningGrid.ColumnsInternal.GetDisplayedColumns())
+            var displayedColumns = this.OwningGrid.ColumnsInternal.GetDisplayedColumns();
+            var visibleColumnsWithHeader = displayedColumns?.Where(u => u.IsVisible && !string.IsNullOrWhiteSpace(u.Header?.ToString()));
+
+            foreach (DataGridColumn column in visibleColumnsWithHeader)
             {
                 Point mousePosition = this.OwningGrid.ColumnHeaders.Translate(column.HeaderCell, mousePositionHeaders);
                 double columnMiddle = column.HeaderCell.ActualWidth / 2;

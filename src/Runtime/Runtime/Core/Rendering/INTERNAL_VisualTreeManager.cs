@@ -155,7 +155,7 @@ namespace CSHTML5.Internal
                         parent.INTERNAL_VisualChildrenInformation.Remove(child);
 
                         //Detach Element  
-                        DetachVisualChidren(child);
+                        DetachVisualChildren(child);
 
                         INTERNAL_WorkaroundIE11IssuesWithScrollViewerInsideGrid.RefreshLayoutIfIE();
 
@@ -190,7 +190,7 @@ namespace CSHTML5.Internal
                         }
                         else
                         {
-                            DetachVisualChidren(child);
+                            DetachVisualChildren(child);
                         }
                     }
                     else
@@ -207,33 +207,54 @@ namespace CSHTML5.Internal
 #endif
         }
 
-        private static void DetachVisualChidren(UIElement element)
+        private static void DetachVisualChildren(UIElement element)
         {
+            PropagateIsUnloading(element);
+
             var queue = new Queue<UIElement>();
             queue.Enqueue(element);
 
             while (queue.Count > 0)
             {
-                var e = queue.Dequeue();
-                if (e.INTERNAL_VisualChildrenInformation != null)
+                UIElement e = queue.Dequeue();
+                if (e.INTERNAL_VisualChildrenInformation is not null)
                 {
-                    foreach (var pair in e.INTERNAL_VisualChildrenInformation)
+                    foreach (UIElement child in e.INTERNAL_VisualChildrenInformation.Keys)
                     {
-                        queue.Enqueue(pair.Key);
+                        queue.Enqueue(child);
                     }
                 }
 
                 DetachElement(e);
             }
+
+            static void PropagateIsUnloading(UIElement element)
+            {
+                element.IsUnloading = true;
+                if (element.INTERNAL_VisualChildrenInformation is not null)
+                {
+                    foreach (UIElement child in element.INTERNAL_VisualChildrenInformation.Keys)
+                    {
+                        PropagateIsUnloading(child);
+                    }
+                }
+            }
         }
 
         private static void DetachElement(UIElement element)
         {
+            element.IsUnloading = true;
+
             if (element.IsConnectedToLiveTree)
             {
                 if (element.IsPointerOver)
                 {
                     element.RaiseMouseLeave();
+                }
+
+                if (FocusManager.GetFocusedElement() == element)
+                {
+                    KeyboardNavigation.UpdateFocusedElement(null);
                 }
 
                 // Call the "OnDetached" of the element. This is particularly useful for elements to
@@ -267,6 +288,7 @@ namespace CSHTML5.Internal
 
             // Reset all visual-tree related information:
             element.IsConnectedToLiveTree = false;
+            element.IsUnloading = false;
             element.LoadingIsPending = false;
             element.INTERNAL_OuterDomElement = null;
             element.INTERNAL_InnerDomElement = null;
@@ -274,6 +296,7 @@ namespace CSHTML5.Internal
             element.INTERNAL_AdditionalOutsideDivForMargins = null;
             element.INTERNAL_DeferredRenderingWhenControlBecomesVisible = null;
             element.INTERNAL_DeferredLoadingWhenControlBecomesVisible = null;
+            element.IsUnloading = false;
         }
 
         public static void MoveVisualChildInSameParent(UIElement child, UIElement parent, int newIndex, int oldIndex)
@@ -751,19 +774,9 @@ if(nextSibling != undefined) {
                 RenderElementsAndRaiseChangedEventOnAllDependencyProperties(child);
             }
 
-            //--------------------------------------------------------
-            // HANDLE TABINDEX:
-            //--------------------------------------------------------
-
-            // For GotFocus and LostFocus to work, the DIV specified by UIElement.GetFocusTarget() needs to have the "tabIndex"
-            // attribute set. Therefore we need to always set it (unless IsTabStop is False) to its current value (default is
-            // Int32.MaxValue). At the time when this code was written, there was no way to automatically call the "OnChanged"
-            // on a dependency property if no value was set.
-
-            if (isChildAControl && child is not TextBlock)
+            if (isChildAControl && child is not TextBlock && child is not TextElement)
             {
-                Control c = (Control)child;
-                c.UpdateTabIndex(c.IsTabStop, c.TabIndex);
+                ((Control)child).UpdateSystemFocusVisuals();
             }
 
             //--------------------------------------------------------
@@ -810,8 +823,7 @@ if(nextSibling != undefined) {
             Performance.Counter("VisualTreeManager: Raise Loaded event", t11);
 #endif
         }
-
-        public static bool IsElementInVisualTree(UIElement child) => child.IsConnectedToLiveTree;
+        public static bool IsElementInVisualTree(UIElement element) => element.IsConnectedToLiveTree && !element.IsUnloading;
 
         static void RenderElementsAndRaiseChangedEventOnAllDependencyProperties(DependencyObject dependencyObject)
         {

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -11,7 +10,6 @@
 *   notice shall be included in all copies or substantial portions of the Software."
 *  
 \*====================================================================================*/
-
 
 #if MIGRATION
 #else
@@ -27,7 +25,7 @@ namespace Windows.UI.Xaml.Documents
     /// <summary>
     /// Provides an inline-level content element that causes content to render with a bold font weight.
     /// </summary>
-    public sealed partial class Bold : Span
+    public sealed class Bold : Span
     {
         /// <summary>
         /// Initializes a new instance of the Bold class.

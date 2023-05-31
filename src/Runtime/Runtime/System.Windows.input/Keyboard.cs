@@ -18,28 +18,21 @@ using System.Windows.Controls;
 #else
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using ModifierKeys = Windows.System.VirtualKeyModifiers;
 #endif
 
-namespace System.Windows.Input
+namespace System.Windows.Input;
+
+/// <summary>
+/// Represents the keyboard device.
+/// </summary>
+public static class Keyboard
 {
     /// <summary>
-    /// Represents the keyboard device.
+    /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
     /// </summary>
-    public static class Keyboard
-    {
-        /// <summary>
-        /// Gets the set of <see cref="ModifierKeys"/> that are currently pressed.
-        /// </summary>
-        public static ModifierKeys Modifiers
-            => (ModifierKeys)OpenSilver.Interop.ExecuteJavaScriptInt32("document.modifiersPressed", false);
+    public static ModifierKeys Modifiers => InputManager.Current.GetKeyboardModifiers();
 
-        internal static bool IsFocusable(Control control)
-            => IsSubTreeFocusable(control) && IsKeyboardFocusable(control);
-
-        internal static bool IsKeyboardFocusable(Control control) => control.IsTabStop;
-
-        internal static bool IsSubTreeFocusable(UIElement uie)
-            => uie.IsConnectedToLiveTree && uie.IsVisible && (uie is not FrameworkElement fe || fe.IsEnabled);
-    }
+    internal static bool IsFocusable(Control control) => KeyboardNavigation.Current.IsTabStop(control);
 }

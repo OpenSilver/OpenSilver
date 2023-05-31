@@ -12,20 +12,9 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DotNetForHtml5.Core;
+using System.Threading;
 
 #if MIGRATION
 namespace System.Windows.Threading
@@ -62,46 +51,37 @@ namespace Windows.UI.Xaml
     ///     _dispatcherTimer.Stop();
     /// </code>
     /// </example>
-    public partial class DispatcherTimer
+    public class DispatcherTimer
     {
-#if CSHTML5NETSTANDARD
-        global::System.Threading.Timer _timer;
-#else
-        object _timer; //Note: "timer" is of type "object" because otherwise JSIL is unable to do the "JSReplacement" of the "StopTimer" method.
-#endif
+        private Timer _timer;
 
         /// <summary>
         /// Initializes a new instance of the DispatcherTimer class.
         /// </summary>
         public DispatcherTimer() { }
 
-        TimeSpan _interval = new TimeSpan();
+        private TimeSpan _interval;
         /// <summary>
         /// Gets or sets the amount of time between timer ticks.
         /// </summary>
         public TimeSpan Interval
         {
-            get { return _interval; }
+            get => _interval;
             set
             {
                 _interval = value;
 
                 // Restart the timer if the Interval has been modified while the timer was running:
-                if (_timer != null)
-                {
-                    Stop();
-                    Start();
-                }
+                if (_timer == null) return;
+                Stop();
+                Start();
             }
         }
 
         /// <summary>
         /// Gets a value that indicates whether the timer is running.
         /// </summary>
-        public bool IsEnabled
-        {
-            get { return _timer != null; }
-        }
+        public bool IsEnabled => _timer != null;
 
         /// <summary>
         /// Occurs when the timer interval has elapsed.
@@ -116,10 +96,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         protected void OnTick()
         {
-            if (Tick != null)
-            {
-                Tick(this, new EventArgs());
-            }
+            if (_timer == null) { return; }
+
+            Tick?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -127,13 +106,33 @@ namespace Windows.UI.Xaml
         /// </summary>
         public void Start()
         {
-            if (_timer == null)
-            {
-                long intervalInMilliseconds = (long)_interval.TotalMilliseconds; //(long)(_interval.TotalSeconds * 1000);
-                if (intervalInMilliseconds == 0)
-                    intervalInMilliseconds = 1; // Note: this appears to be the default bahavior of other XAML platforms.
-                _timer = StartTimer(OnTick, intervalInMilliseconds);
-            }
+            if (_timer != null) return;
+            var intervalInMilliseconds = (long)_interval.TotalMilliseconds;
+            if (intervalInMilliseconds == 0)
+                intervalInMilliseconds = 1; // Note: this appears to be the default behavior of other XAML platforms.
+
+            _timer = new Timer(
+                delegate
+                {
+                    if (INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround)
+                    {
+                        INTERNAL_Simulator.WebControlDispatcherBeginInvoke(() =>
+                        {
+                            //It is important to do this check on the UI thread
+                            if (_timer == null)
+                            {
+                                return;
+                            }
+                            OnTick();
+                        });
+                        return;
+                    }
+
+                    OnTick();
+                },
+                null,
+                intervalInMilliseconds,
+                intervalInMilliseconds);
         }
 
         /// <summary>
@@ -141,71 +140,9 @@ namespace Windows.UI.Xaml
         /// </summary>
         public void Stop()
         {
-            if (_timer != null)
-            {
-                StopTimer(_timer);
-                _timer = null;
-            }
-        }
-
-#if !BRIDGE
-        [JSReplacement("setInterval($action,$intervalInMilliseconds)")]
-#else
-        [Template("setInterval({action},{intervalInMilliseconds})")]
-#endif
-        static
-#if CSHTML5NETSTANDARD
-        global::System.Threading.Timer
-#else
-        object
-#endif
-        StartTimer(Action action, long intervalInMilliseconds)
-        {
-#if !CSHTML5NETSTANDARD
-            object dispatcherTimer = INTERNAL_Simulator.SimulatorProxy.StartDispatcherTimer(action, intervalInMilliseconds);
-            return dispatcherTimer;
-#else
-            global::System.Threading.Timer timer = new global::System.Threading.Timer(
-                delegate (object state)
-                { 
-                    action(); 
-                },
-                null,
-                intervalInMilliseconds,
-                intervalInMilliseconds);
-            return timer;
-#endif
-            //            global::System.Threading.Timer timer = new global::System.Threading.Timer(
-            //                delegate(object state)
-            //                {
-            //#if !CSHTML5NETSTANDARD
-            //                    INTERNAL_Simulator.WebControl.Dispatcher.BeginInvoke((Action)(() =>
-            //                    {
-            //#endif
-            //                        action();
-            //#if !CSHTML5NETSTANDARD
-            //                    }));
-            //#endif
-            //                },
-            //                null,
-            //                intervalInMilliseconds,
-            //                intervalInMilliseconds);
-            //            return timer;
-        }
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("clearInterval($timer)")]
-#else
-        [Template("clearInterval({timer})")]
-
-#endif
-        static void StopTimer(object timer) //Note: "timer" is of type "object" because otherwise JSIL is unable to do the "JSReplacement" of the "StopTimer" method.
-        {
-#if !CSHTML5NETSTANDARD
-            INTERNAL_Simulator.SimulatorProxy.StopDispatcherTimer(timer);
-#else
-            ((global::System.Threading.Timer)timer).Dispose();
-#endif
+            if (_timer == null) return;
+            _timer.Dispose();
+            _timer = null;
         }
     }
 }

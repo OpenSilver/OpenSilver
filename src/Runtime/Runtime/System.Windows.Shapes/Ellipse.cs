@@ -60,7 +60,7 @@ namespace Windows.UI.Xaml.Shapes
         //    ScheduleRedraw();
         //}
 
-        override internal protected void Redraw()
+        protected internal override void Redraw()
         {
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(this))
             {

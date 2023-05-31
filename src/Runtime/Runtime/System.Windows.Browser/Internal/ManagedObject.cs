@@ -1,5 +1,4 @@
-﻿
-/*===================================================================================
+﻿/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -11,18 +10,15 @@
 *  
 \*====================================================================================*/
 
-#if MIGRATION
-namespace System.Windows.Documents
-#else
-namespace Windows.UI.Xaml.Documents
-#endif
+namespace System.Windows.Browser.Internal;
+
+internal sealed class ManagedObject : ScriptObject
 {
-    /// <summary>
-    /// Represents an inline element that causes a new line to begin in 
-    /// content when rendered in a text container.
-    /// </summary>
-    public sealed class LineBreak : Inline
+    internal ManagedObject(IJSObjectRef jsRef, object obj)
+        : base(jsRef, obj)
     {
-        internal override string TagName => "br";
+        Invoker = new ManagedObjectInvoker(this);
     }
+
+    internal ManagedObjectInvoker Invoker { get; }
 }

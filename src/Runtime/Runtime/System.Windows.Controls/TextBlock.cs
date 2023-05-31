@@ -247,13 +247,6 @@ namespace Windows.UI.Xaml.Controls
             }
         }
 
-        internal sealed override void UpdateTabIndexCore(bool isTabStop, int tabIndex)
-        {
-            // we don't do anything since TextBlock is not supposed to be a Control in the first place
-            // and it is not supposed to be counted in tabbing
-            return;
-        }
-
         public static readonly DependencyProperty TextTrimmingProperty =
             DependencyProperty.Register(
                 "TextTrimming",

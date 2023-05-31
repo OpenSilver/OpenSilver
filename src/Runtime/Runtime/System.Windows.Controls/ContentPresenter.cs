@@ -15,7 +15,7 @@ using System;
 using System.Windows.Markup;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Data;
@@ -127,7 +127,7 @@ namespace Windows.UI.Xaml.Controls
                 ctrl.UpdateDataContext();
             }
 
-            if (ctrl.IsConnectedToLiveTree)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(ctrl))
             {
                 ctrl.InvalidateMeasureInternal();
             }
@@ -165,7 +165,7 @@ namespace Windows.UI.Xaml.Controls
             // if ContentTemplate is really changing, remove the old template
             ctrl.Template = null;
 
-            if (ctrl.IsConnectedToLiveTree)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(ctrl))
             {
                 ctrl.InvalidateMeasureInternal();
             }
@@ -196,7 +196,7 @@ namespace Windows.UI.Xaml.Controls
             ContentPresenter cp = (ContentPresenter)d;
             UpdateTemplateCache(cp, (FrameworkTemplate)e.OldValue, (FrameworkTemplate)e.NewValue, TemplateProperty);
 
-            if (cp.IsConnectedToLiveTree)
+            if (INTERNAL_VisualTreeManager.IsElementInVisualTree(cp))
             {
                 cp.InvalidateMeasureInternal();
             }

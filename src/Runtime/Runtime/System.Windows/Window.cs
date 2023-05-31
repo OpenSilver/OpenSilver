@@ -149,23 +149,6 @@ namespace Windows.UI.Xaml
             windowRootDivStyle.overflowX = "hidden";
             windowRootDivStyle.overflowY = "hidden";
 
-            string sRootDiv = INTERNAL_InteropImplementation.GetVariableStringForJS(windowRootDiv);
-            string rootDivId = ((INTERNAL_HtmlDomElementReference)windowRootDiv).UniqueIdentifier;
-            OpenSilver.Interop.ExecuteJavaScriptFastAsync(
-                @$"{sRootDiv}.addEventListener('keydown', function (e) {{
-    if (e.key === 'Tab') {{
-        const focusableElements = document.querySelectorAll('#{rootDivId} [tabindex]:not([tabindex=""-1""], [tabindex=""""])');
-        if (focusableElements.length === 0) return;
-        if (!e.shiftKey && e.target === focusableElements[focusableElements.length - 1]) {{
-            e.preventDefault();
-            focusableElements[0].focus();
-        }} else if (e.shiftKey && e.target === focusableElements[0]) {{
-            e.preventDefault();
-            focusableElements[focusableElements.length - 1].focus();
-        }}
-    }}
-}});");
-
             INTERNAL_OuterDomElement = windowRootDiv;
             INTERNAL_InnerDomElement = windowRootDiv;
 
