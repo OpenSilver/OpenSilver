@@ -181,6 +181,11 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
         var nextSibling = parentElement.children[index];
         parentElement.insertBefore(newElement, nextSibling);
     }
+
+    Object.defineProperty(newElement, 'dump', {
+        get() { return document.dumpProperties(id, ''); }
+    });
+
     return newElement;
 }
 
