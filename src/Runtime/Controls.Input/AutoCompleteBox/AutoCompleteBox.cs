@@ -2577,7 +2577,6 @@ namespace Windows.UI.Xaml.Controls
                 case VirtualKey.Enter:
 #endif
                     OnAdapterSelectionComplete(this, new RoutedEventArgs());
-                    e.Handled = true;
                     break;
 
                 // Until tabbing sets focus to next element outside of ACB (instead of to the first
