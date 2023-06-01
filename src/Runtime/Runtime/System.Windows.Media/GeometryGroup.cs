@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -22,16 +21,18 @@ using Windows.UI.Xaml.Shapes;
 using Windows.Foundation;
 #endif
 
-
 #if MIGRATION
 namespace System.Windows.Media
 #else
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    [ContentProperty("Children")]
+    /// <summary>
+    /// Represents a composite geometry, composed of other <see cref="Geometry"/> objects.
+    /// </summary>
+    [ContentProperty(nameof(Children))]
     [OpenSilver.NotImplemented]
-    public sealed partial class GeometryGroup : Geometry
+    public sealed class GeometryGroup : Geometry
     {
         internal protected override void DefineInCanvas(
             Path path, 
@@ -84,8 +85,12 @@ namespace Windows.UI.Xaml.Media
         }
 
         /// <summary>
-        ///     Children - GeometryCollection.  Default value is new FreezableDefaultValueFactory(GeometryCollection.Empty).
+        /// Gets or sets the <see cref="GeometryCollection"/> that contains the objects
+        /// that define this <see cref="GeometryGroup"/>.
         /// </summary>
+        /// <returns>
+        /// A collection containing the children of this <see cref="GeometryGroup"/>.
+        /// </returns>
         public GeometryCollection Children
         {
             get
@@ -104,6 +109,9 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="Children"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty ChildrenProperty = 
             DependencyProperty.Register(
                 nameof(Children), 
@@ -112,8 +120,13 @@ namespace Windows.UI.Xaml.Media
                 null);
 
         /// <summary>
-        ///     FillRule - FillRule.  Default value is FillRule.EvenOdd.
+        /// Gets or sets how the intersecting areas of the objects contained in this <see cref="GeometryGroup"/> 
+        /// are combined.
         /// </summary>
+        /// <returns>
+        /// One of the enumeration values that specifies how the intersecting areas are combined
+        /// to form the resulting area. The default is <see cref="FillRule.EvenOdd"/>.
+        /// </returns>
         public FillRule FillRule
         {
             get
@@ -126,11 +139,33 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
+        /// <summary>
+        /// Identifies the <see cref="FillRule"/> dependency property.
+        /// </summary>
         public static readonly DependencyProperty FillRuleProperty = 
             DependencyProperty.Register(
                 nameof(FillRule), 
                 typeof(FillRule), 
                 typeof(GeometryGroup), 
-                null);
+                new PropertyMetadata(FillRule.EvenOdd));
+
+        internal override Rect BoundsInternal
+        {
+            get
+            {
+                Rect boundsRect = Rect.Empty;
+
+                GeometryCollection children = (GeometryCollection)GetValue(ChildrenProperty);
+                if (children != null && children.Count > 0)
+                {
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        boundsRect.Union(children[i].Bounds);
+                    }
+                }
+
+                return boundsRect;
+            }
+        }
     }
 }

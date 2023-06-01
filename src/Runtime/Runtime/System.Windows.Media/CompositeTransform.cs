@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,10 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using CSHTML5.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -30,7 +28,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Applies multiple transform operations to an object.
     /// </summary>
-    public sealed partial class CompositeTransform : Transform
+    public sealed class CompositeTransform : Transform
     {
         /// <summary>
         /// Gets or sets the x-axis scale factor. You can use this property to stretch
@@ -360,6 +358,50 @@ namespace Windows.UI.Xaml.Media
             ((CompositeTransform)d).RaiseTransformChanged();
         }
 
+        /// <summary>
+        /// Identifies the <see cref="CenterX"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty CenterXProperty =
+            DependencyProperty.Register(
+                nameof(CenterX),
+                typeof(double),
+                typeof(CompositeTransform),
+                new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Gets or sets the x-coordinate of the center point for all transforms specified
+        /// by the <see cref="CompositeTransform"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double CenterX
+        {
+            get => (double)GetValue(CenterXProperty);
+            set => SetValue(CenterXProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="CenterY"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty CenterYProperty =
+            DependencyProperty.Register(
+                nameof(CenterY),
+                typeof(double),
+                typeof(CompositeTransform),
+                new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Gets or sets the y-coordinate of the center point for all transforms specified
+        /// by the <see cref="CompositeTransform"/>.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double CenterY
+        {
+            get => (double)GetValue(CenterYProperty);
+            set => SetValue(CenterYProperty, value);
+        }
+
         private void ApplyCSSChanges(double scaleX, double scaleY, double skewX, double skewY, double rotation, double translateX, double translateY)
         {
             //-------------
@@ -463,8 +505,8 @@ namespace Windows.UI.Xaml.Media
         {
             get
             {
-                double centerX = this.CenterX;
-                double centerY = this.CenterY;
+                double centerX = CenterX;
+                double centerY = CenterY;
                 bool hasCenter = centerX != 0 || centerY != 0;
 
                 // 1. Scale
@@ -493,5 +535,11 @@ namespace Windows.UI.Xaml.Media
                 return transform;
             }
         }
+
+        internal override bool IsIdentity =>
+            ScaleX == 1 && ScaleY == 1 &&
+            SkewX == 0 && SkewY == 0 &&
+            Rotation == 0 &&
+            TranslateX == 0 && TranslateY == 0;
     }
 }

@@ -479,11 +479,9 @@
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\QuinticEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SineEase.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\SplinePointKeyFrame.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\CompositeTransform.cs" />
 		<Compile Include="System.Windows.Media.Animation\EasingColorKeyFrame.cs" />
 		<Compile Include="System.Windows.Media.Animation\WORKINPROGRESS\LinearColorKeyFrame.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\MultiScaleTileSource.cs" />
-		<Compile Include="System.Windows.Media\WORKINPROGRESS\SkewTransform.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextFormattingMode.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextHintingMode.cs" />
 		<Compile Include="System.Windows.Media\WORKINPROGRESS\TextOptions.cs" />

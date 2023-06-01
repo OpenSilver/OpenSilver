@@ -14,7 +14,6 @@
 using System;
 using System.Windows.Markup;
 using CSHTML5.Internal;
-using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -27,7 +26,7 @@ namespace Windows.UI.Xaml.Media
     /// objects.
     /// </summary>
     [ContentProperty(nameof(Children))]
-    public sealed partial class TransformGroup : Transform
+    public sealed class TransformGroup : Transform
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TransformGroup"/> class.
@@ -106,6 +105,28 @@ namespace Windows.UI.Xaml.Media
                 }
 
                 return transform;
+            }
+        }
+
+        internal override bool IsIdentity
+        {
+            get
+            {
+                TransformCollection children = (TransformCollection)GetValue(ChildrenProperty);
+                if (children == null || children.Count == 0)
+                {
+                    return true;
+                }
+
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (!children[i].IsIdentity)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
 

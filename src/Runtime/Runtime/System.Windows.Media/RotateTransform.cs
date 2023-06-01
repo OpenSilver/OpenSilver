@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,10 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using CSHTML5.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -31,7 +29,7 @@ namespace Windows.UI.Xaml.Media
     /// Rotates an object clockwise about a specified point in a two-dimensional
     /// x-y coordinate system.
     /// </summary>
-    public sealed partial class RotateTransform : Transform
+    public sealed class RotateTransform : Transform
     {
         double _appliedCssAngle;
         object _domElementToWhichTheCssWasApplied;
@@ -126,6 +124,8 @@ namespace Windows.UI.Xaml.Media
                 return m;
             }
         }
+
+        internal override bool IsIdentity => Angle == 0;
 
         /// <summary>
         /// Gets or sets the x-coordinate of the rotation center point.

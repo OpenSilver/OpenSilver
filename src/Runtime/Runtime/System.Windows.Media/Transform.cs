@@ -26,7 +26,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Defines functionality that enables transformations in a two-dimensional plane.
     /// </summary>
-    public abstract partial class Transform : GeneralTransform
+    public abstract class Transform : GeneralTransform
     {
         internal Transform() { }
 
@@ -34,6 +34,14 @@ namespace Windows.UI.Xaml.Media
         /// Return the current transformation value.
         ///</summary>
         internal abstract Matrix ValueInternal { get; }
+
+        ///<summary>
+        /// Returns true if transformation if the transformation is definitely an identity.  There are cases where it will
+        /// return false because of computational error or presence of animations (And we're interpolating through a
+        /// transient identity) -- this is intentional.  This property is used internally only.  If you need to check the
+        /// current matrix value for identity, use Transform.Value.Identity.
+        ///</summary>
+        internal abstract bool IsIdentity { get; }
 
         /// <summary>
         /// Attempts to transform the specified point and returns a value that indicates

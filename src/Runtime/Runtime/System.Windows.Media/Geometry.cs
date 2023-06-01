@@ -31,7 +31,7 @@ namespace Windows.UI.Xaml.Media
     /// objects can be used for clipping regions and as geometry definitions for
     /// rendering two-dimensional graphical data as a Path.
     /// </summary>
-    public abstract partial class Geometry : DependencyObject
+    public abstract class Geometry : DependencyObject
     {
         /// <summary>
         /// Gets an empty geometry object.
@@ -82,8 +82,8 @@ namespace Windows.UI.Xaml.Media
         
         public Transform Transform
         {
-            get { return (Transform)this.GetValue(TransformProperty); }
-            set { this.SetValue(TransformProperty, value); }
+            get => (Transform)GetValue(TransformProperty);
+            set => SetValue(TransformProperty, value);
         }
 
         private static void OnTransformPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -98,7 +98,16 @@ namespace Windows.UI.Xaml.Media
             }
         }
 
+        /// <summary>
+        /// Gets a <see cref="Rect"/> that specifies the axis-aligned bounding box of the
+        /// <see cref="Geometry"/>.
+        /// </summary>
+        /// <returns>
+        /// The axis-aligned bounding box of the <see cref="Geometry"/>.
+        /// </returns>
         [OpenSilver.NotImplemented]
-        public Rect Bounds { get; private set; }
+        public Rect Bounds => BoundsInternal;
+
+        internal virtual Rect BoundsInternal => Rect.Empty;
     }
 }

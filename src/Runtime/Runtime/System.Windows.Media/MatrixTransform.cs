@@ -13,7 +13,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using CSHTML5.Internal;
 using OpenSilver.Internal;
 
@@ -90,7 +89,9 @@ namespace Windows.UI.Xaml.Media
             ((MatrixTransform)d).RaiseTransformChanged();
         }
 
-        internal override Matrix ValueInternal => this.Matrix;
+        internal override Matrix ValueInternal => Matrix;
+
+        internal override bool IsIdentity => Matrix.IsIdentity;
 
         private void ApplyCSSChanges(Matrix matrix)
         {

@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using CSHTML5.Internal;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -31,7 +30,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents the geometry of a line.
     /// </summary>
-    public sealed partial class LineGeometry : Geometry
+    public sealed class LineGeometry : Geometry
     {
         // <summary>
         // Initializes a new instance of the LineGeometry class that has no length.
@@ -150,6 +149,23 @@ namespace Windows.UI.Xaml.Media
 
             ctx.moveTo(StartPoint.X, StartPoint.Y);
             ctx.lineTo(EndPoint.X, EndPoint.Y);
+        }
+
+        internal override Rect BoundsInternal
+        {
+            get
+            {
+                Rect rect = new Rect(StartPoint, EndPoint);
+
+                Transform transform = Transform;
+
+                if (transform != null && !transform.IsIdentity)
+                {
+                    rect = transform.TransformBounds(rect);
+                }
+
+                return rect;
+            }
         }
     }
 }

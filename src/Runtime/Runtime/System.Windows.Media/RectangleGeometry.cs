@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -28,7 +27,7 @@ namespace System.Windows.Media
 namespace Windows.UI.Xaml.Media
 #endif
 {
-    public sealed partial class RectangleGeometry : Geometry
+    public sealed class RectangleGeometry : Geometry
     {
         internal protected override void DefineInCanvas(Path path, 
                                                         object canvasDomElement, 
@@ -133,5 +132,31 @@ namespace Windows.UI.Xaml.Media
                 typeof(double),
                 typeof(RectangleGeometry),
                 new PropertyMetadata(0d));
+
+        internal override Rect BoundsInternal
+        {
+            get
+            {
+                Rect boundsRect;
+
+                Rect currentRect = Rect;
+                Transform transform = Transform;
+
+                if (currentRect.IsEmpty)
+                {
+                    boundsRect = Rect.Empty;
+                }
+                else if (transform == null || transform.IsIdentity)
+                {
+                    boundsRect = currentRect;
+                }
+                else
+                {
+                    boundsRect = transform.TransformBounds(currentRect);
+                }
+
+                return boundsRect;
+            }
+        }
     }
 }

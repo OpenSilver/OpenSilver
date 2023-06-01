@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,8 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System.Collections.Generic;
+using CSHTML5.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -29,7 +27,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Translates (moves) an object in the two-dimensional x-y coordinate system.
     /// </summary>
-    public sealed partial class TranslateTransform : Transform
+    public sealed class TranslateTransform : Transform
     {
         double _appliedCssX;
         double _appliedCssY;
@@ -189,5 +187,7 @@ namespace Windows.UI.Xaml.Media
                 return matrix;
             }
         }
+
+        internal override bool IsIdentity => X == 0 && Y == 0;
     }
 }

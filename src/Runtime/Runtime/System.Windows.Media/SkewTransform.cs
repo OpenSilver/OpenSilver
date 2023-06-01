@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,10 +11,9 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
 using System.Collections.Generic;
+using CSHTML5.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -30,7 +28,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents a two-dimensional skew.
     /// </summary>
-    public sealed partial class SkewTransform : Transform
+    public sealed class SkewTransform : Transform
     {
         double _appliedCssAngleX;
         double _appliedCssAngleY;
@@ -131,6 +129,50 @@ namespace Windows.UI.Xaml.Media
             ((SkewTransform)d).RaiseTransformChanged();
         }
 
+        /// <summary>
+        /// Identifies the <see cref="CenterX"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty CenterXProperty =
+            DependencyProperty.Register(
+                nameof(CenterX),
+                typeof(double),
+                typeof(SkewTransform),
+                new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Gets or sets the x-coordinate of the transform center.
+        /// The default is 0.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double CenterX
+        {
+            get => (double)GetValue(CenterXProperty);
+            set => SetValue(CenterXProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="CenterY"/> dependency property.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public static readonly DependencyProperty CenterYProperty =
+            DependencyProperty.Register(
+                nameof(CenterY),
+                typeof(double),
+                typeof(SkewTransform),
+                new PropertyMetadata(0.0));
+
+        /// <summary>
+        /// Gets or sets the y-coordinate of the transform center.
+        /// The default is 0.
+        /// </summary>
+        [OpenSilver.NotImplemented]
+        public double CenterY
+        {
+            get => (double)GetValue(CenterYProperty);
+            set => SetValue(CenterYProperty, value);
+        }
+
         private void ApplyCSSChanges(double angleX, double angleY)
         {
             CSSEquivalent angleXcssEquivalent = AngleXProperty.GetTypeMetaData(typeof(SkewTransform)).GetCSSEquivalent(this);
@@ -210,5 +252,7 @@ namespace Windows.UI.Xaml.Media
                 return matrix;
             }
         }
+
+        internal override bool IsIdentity => AngleX == 0 && AngleY == 0;
     }
 }

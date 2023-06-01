@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,8 +11,8 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
+using CSHTML5.Internal;
 
 #if !MIGRATION
 using Windows.Foundation;
@@ -28,7 +27,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents the geometry of a circle or ellipse.
     /// </summary>
-    public sealed partial class EllipseGeometry : Geometry
+    public sealed class EllipseGeometry : Geometry
     {
         /// <summary>
         /// Initializes a new instance of the EllipseGeometry class.
@@ -157,6 +156,29 @@ namespace Windows.UI.Xaml.Media
                 0d,
                 0d,
                 2 * Math.PI);
+        }
+
+        internal override Rect BoundsInternal
+        {
+            get
+            {
+                // Note: Transform is not supported. This will only be valid
+                // if Transform is null or is the Identity transform.
+
+                Rect boundsRect;
+
+                Point currentCenter = Center;
+                double currentRadiusX = RadiusX;
+                double currentRadiusY = RadiusY;
+
+                boundsRect = new Rect(
+                    currentCenter.X - Math.Abs(currentRadiusX),
+                    currentCenter.Y - Math.Abs(currentRadiusY),
+                    2.0 * Math.Abs(currentRadiusX),
+                    2.0 * Math.Abs(currentRadiusY));
+
+                return boundsRect;
+            }
         }
     }
 }
