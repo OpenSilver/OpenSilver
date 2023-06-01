@@ -412,6 +412,7 @@ document.createInputManager = function (root, callback) {
     let _modifiers = MODIFIERKEYS.NONE;
     let _mouseCapture = null;
     let _suppressContextMenu = false;
+    let _lastTouchEndTimeStamp = 0;
 
     function setModifiers(e) {
         _modifiers = MODIFIERKEYS.NONE;
@@ -435,6 +436,10 @@ document.createInputManager = function (root, callback) {
         }
 
         return '';
+    };
+
+    function shouldIgnoreMouseEvent(e) {
+        return e.timeStamp - _lastTouchEndTimeStamp < 500;
     };
 
     function initDom(root) {
@@ -502,6 +507,8 @@ document.createInputManager = function (root, callback) {
         root.addEventListener('focusin', function (e) { callback(getClosestElementId(e.target), EVENTS.FOCUS, e); });
 
         root.addEventListener('mousemove', function (e) {
+            if (shouldIgnoreMouseEvent(e)) return;
+
             e.isHandled = true;
             const target = _mouseCapture || e.target;
             callback(getClosestElementId(target), EVENTS.MOUSE_MOVE, e);
@@ -513,6 +520,8 @@ document.createInputManager = function (root, callback) {
         });
 
         root.addEventListener('mousedown', function (e) {
+            if (shouldIgnoreMouseEvent(e)) return;
+
             e.isHandled = true;
             let id = (_mouseCapture === null || e.target === _mouseCapture) ? getClosestElementId(e.target) : '';
             switch (e.button) {
@@ -526,6 +535,8 @@ document.createInputManager = function (root, callback) {
         });
 
         root.addEventListener('mouseup', function (e) {
+            if (shouldIgnoreMouseEvent(e)) return;
+
             e.isHandled = true;
             const target = _mouseCapture || e.target;
             switch (e.button) {
@@ -570,7 +581,7 @@ document.createInputManager = function (root, callback) {
                     if (!e.isHandled) {
                         e.isHandled = true;
                         callback(getClosestElementId(this), EVENTS.TOUCH_END, e);
-                        e.preventDefault();
+                        _lastTouchEndTimeStamp = e.timeStamp;
                     }
                 });
 
