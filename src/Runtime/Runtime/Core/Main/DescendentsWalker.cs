@@ -301,10 +301,14 @@ namespace OpenSilver.Internal
         {
             if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
             {
+                // For the case when the collection contains the node
+                // being visted, we do not need to visit it again. Also
+                // this node will not be visited another time because
+                // any node can be reached at most two times, once
+                // via its visual parent and once via its logical parent
+
                 if (_nodes.Remove(fe))
                 {
-                    // the idea: we can only visit a node at most 2 times:
-                    // via logical tree and via visual tree
                     return;
                 }
 
