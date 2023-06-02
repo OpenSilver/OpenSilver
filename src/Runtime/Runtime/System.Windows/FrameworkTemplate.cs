@@ -48,13 +48,13 @@ namespace Windows.UI.Xaml
             set { CheckSealed(); _template = value; }
         }
 
-        internal bool ApplyTemplateContent(FrameworkElement container)
+        internal bool ApplyTemplateContent(IInternalFrameworkElement container)
         {
             Debug.Assert(container != null, "Must have a non-null TemplatedParent.");
 
             if (Template != null)
             {
-                FrameworkElement visualTree = Template.LoadContent(container);
+                IInternalFrameworkElement visualTree = Template.LoadContent(container);
                 container.TemplateChild = visualTree;
                 
                 return visualTree != null;
@@ -65,7 +65,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        internal virtual bool BuildVisualTree(FrameworkElement container)
+        internal virtual bool BuildVisualTree(IInternalFrameworkElement container)
         {
             return false;
         }
@@ -74,7 +74,7 @@ namespace Windows.UI.Xaml
         /// Creates an instance of the Template. Intented to be called for templates that have no owner, such as DataTemplates (not ControlTemplates).
         /// </summary>
         /// <returns>The instantiated template.</returns>
-        internal FrameworkElement INTERNAL_InstantiateFrameworkTemplate()
+        internal IInternalFrameworkElement INTERNAL_InstantiateFrameworkTemplate()
         {
             if (Template != null)
             {
@@ -95,9 +95,9 @@ namespace Windows.UI.Xaml
         // The following property is used during the "InsertImplicitNodes" step of the compilation,
         // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public UIElement ContentPropertyUsefulOnlyDuringTheCompilation
+        public IUIElement ContentPropertyUsefulOnlyDuringTheCompilation
         {
-            get { return (UIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
+            get { return (IUIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
             set { SetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
         }
 
@@ -105,7 +105,7 @@ namespace Windows.UI.Xaml
         public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
             DependencyProperty.Register(
                 nameof(ContentPropertyUsefulOnlyDuringTheCompilation), 
-                typeof(UIElement), 
+                typeof(IUIElement), 
                 typeof(FrameworkTemplate), 
                 null);
         
@@ -142,7 +142,7 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkTemplate),
                 null);
 
-        internal static INameScope GetTemplateNameScope(FrameworkElement fe)
+        internal static INameScope GetTemplateNameScope(IInternalFrameworkElement fe)
         {
             if (fe is null)
             {
@@ -152,7 +152,7 @@ namespace Windows.UI.Xaml
             return (INameScope)fe.GetValue(TemplateNameScopeProperty);
         }
 
-        internal static void SetTemplateNameScope(FrameworkElement fe, INameScope namescope)
+        internal static void SetTemplateNameScope(IInternalFrameworkElement fe, INameScope namescope)
         {
             if (fe is null)
             {
@@ -166,9 +166,9 @@ namespace Windows.UI.Xaml
     internal sealed class TemplateContent
     {
         private readonly XamlContext _xamlContext;
-        private readonly Func<FrameworkElement, XamlContext, FrameworkElement> _factory;
+        private readonly Func<IInternalFrameworkElement, XamlContext, IInternalFrameworkElement> _factory;
 
-        internal TemplateContent(XamlContext xamlContext, Func<FrameworkElement, XamlContext, FrameworkElement> factory)
+        internal TemplateContent(XamlContext xamlContext, Func<IInternalFrameworkElement, XamlContext, IInternalFrameworkElement> factory)
         {
             if (xamlContext == null)
             {
@@ -179,14 +179,14 @@ namespace Windows.UI.Xaml
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        internal FrameworkElement LoadContent(FrameworkElement owner)
+        internal IInternalFrameworkElement LoadContent(IInternalFrameworkElement owner)
         {
             XamlContext context = new XamlContext(_xamlContext)
             {
                 ExternalNameScope = new NameScope(),
             };
 
-            FrameworkElement rootElement = _factory(owner, context);
+            IInternalFrameworkElement rootElement = _factory(owner, context);
             
             if (owner == null)
             {

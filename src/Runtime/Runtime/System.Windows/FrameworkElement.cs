@@ -49,14 +49,12 @@ namespace Windows.UI.Xaml
     {
         #region Inheritance Context
 
-        internal static FrameworkElement FindMentor(DependencyObject d)
+        internal static IInternalFrameworkElement FindMentor(DependencyObject d)
         {
             // Find the nearest FE InheritanceContext
             while (d != null)
             {
-                FrameworkElement fe = d as FrameworkElement;
-
-                if (fe != null)
+                if (d is IInternalFrameworkElement fe)
                 {
                     return fe;
                 }
@@ -74,12 +72,12 @@ namespace Windows.UI.Xaml
             return base.ShouldProvideInheritanceContext(target, property) || property == ResourceDictionary.ResourceKeyProperty;
         }
 
-        internal FrameworkElement InheritedParent { get; private set; }
+        internal IInternalFrameworkElement InheritedParent { get; private set; }
 
         internal override void OnInheritanceContextChangedCore(EventArgs args)
         {
-            FrameworkElement oldMentor = InheritedParent;
-            FrameworkElement newMentor = FindMentor(InheritanceContext);
+            IInternalFrameworkElement oldMentor = InheritedParent;
+            IInternalFrameworkElement newMentor = FindMentor(InheritanceContext);
 
             if (oldMentor != newMentor)
             {
@@ -97,18 +95,18 @@ namespace Windows.UI.Xaml
             }
         }
 
-        private void ConnectMentor(FrameworkElement mentor)
+        private void ConnectMentor(IInternalFrameworkElement mentor)
         {
             mentor.InheritedPropertyChanged += new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
             
-            InvalidateInheritedProperties(this, mentor);
+            InvalidateInheritedProperties(this, mentor.AsDependencyObject());
         }
 
-        private void DisconnectMentor(FrameworkElement mentor)
+        private void DisconnectMentor(IInternalFrameworkElement mentor)
         {
             mentor.InheritedPropertyChanged -= new InheritedPropertyChangedEventHandler(OnMentorInheritedPropertyChanged);
 
-            InvalidateInheritedProperties(this, mentor);
+            InvalidateInheritedProperties(this, mentor.AsDependencyObject());
         }
 
         // handle the InheritedPropertyChanged event from the mentor
@@ -204,8 +202,7 @@ namespace Windows.UI.Xaml
 
                 HasLogicalChildren = true;
 
-                FrameworkElement fe = child as FrameworkElement;
-                if (fe != null)
+                if (child is IInternalFrameworkElement fe)
                 {
                     fe.ChangeLogicalParent(this);
                 }
@@ -223,7 +220,7 @@ namespace Windows.UI.Xaml
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
 
-                if (child is FrameworkElement fe && fe.Parent == this)
+                if (child is IInternalFrameworkElement fe && fe.Parent == this)
                 {
                     fe.ChangeLogicalParent(null);
                 }

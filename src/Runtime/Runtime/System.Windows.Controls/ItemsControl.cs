@@ -150,7 +150,7 @@ namespace Windows.UI.Xaml.Controls
             {
                 Template = new TemplateContent(
                     new XamlContext(),
-                    (owner, context) => new StackPanel { TemplatedParent = owner }                    
+                    (owner, context) => new StackPanel { TemplatedParent = owner.AsDependencyObject() }                    
                 )
             };
 
@@ -868,7 +868,7 @@ namespace Windows.UI.Xaml.Controls
                     {
                         TextBlock textBlock = new TextBlock();
                         textBlock.SetBinding(TextBlock.TextProperty, new Binding(displayMemberPath ?? string.Empty));
-                        textBlock.TemplatedParent = control;
+                        textBlock.TemplatedParent = control.AsDependencyObject();
 
                         return textBlock;
                     }                    
@@ -974,45 +974,6 @@ namespace Windows.UI.Xaml.Controls
             // This is intented to be overridden by the controls that have 
             // a "SelectedItem" to make sure that the item is de-selected 
             // in case that the element is removed.
-        }
-
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        protected FrameworkElement GenerateFrameworkElementToRenderTheItem(object item)
-        {
-            //---------------------------------------------------
-            // if the item is a FrameworkElement, return itself
-            //---------------------------------------------------
-            FrameworkElement result = item as FrameworkElement;
-            if (result == null)
-            {
-                object displayElement = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, this.DisplayMemberPath);
-                if (this.ItemTemplate != null)
-                {
-                    //---------------------------------------------------
-                    // An ItemTemplate was specified, so we instantiate 
-                    // it and return it
-                    //---------------------------------------------------
-
-                    // Apply the data template
-                    result = ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
-                    result.DataContext = displayElement;
-                }
-                else
-                {
-                    //---------------------------------------------------
-                    // Otherwise we simply call "ToString()" to display 
-                    // the item as a string inside a TextBlock
-                    //---------------------------------------------------
-
-                    ContentPresenter container = new ContentPresenter();
-                    Binding b = new Binding(this.DisplayMemberPath);
-                    container.SetBinding(ContentPresenter.ContentProperty, b);
-                    container.DataContext = item;
-                    result = container;
-                }
-            }
-            this.PrepareContainerForItemOverride(result, item);
-            return result;
         }
 
         /// <summary>

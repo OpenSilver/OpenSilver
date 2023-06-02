@@ -83,9 +83,9 @@ namespace OpenSilver.Internal.Xaml.Context
                     {
                         if (SavedDepth > 0)
                         {
-                            return new TemplateNameResolver((FrameworkElement)_stack.GetFrame(SavedDepth + 1).Instance);
+                            return new TemplateNameResolver((IInternalFrameworkElement)_stack.GetFrame(SavedDepth + 1).Instance);
                         }
-                        else if (RootInstance is FrameworkElement rootObject)
+                        else if (RootInstance is IInternalFrameworkElement rootObject)
                         {
                             return new XamlNameResolver(rootObject);
                         }
@@ -130,7 +130,7 @@ namespace OpenSilver.Internal.Xaml.Context
             while (frame.Depth >= 1)
             {
                 object inst = frame.Instance;
-                if (inst is FrameworkElement fe)
+                if (inst is IInternalFrameworkElement fe)
                 {
                     if (fe.HasResources)
                     {

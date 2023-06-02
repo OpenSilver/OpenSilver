@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// and arrange child objects in a UI page.
     /// </summary>
     [ContentProperty("Children")]
-    public abstract partial class Panel : FrameworkElement
+    public abstract partial class Panel : FrameworkElement, IPanel
     {
         private UIElementCollection _uiElementCollection;
         private ItemContainerGenerator _itemContainerGenerator;

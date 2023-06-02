@@ -63,17 +63,31 @@ namespace Windows.UI.Xaml.Media
             return root;
         }
 
+        /// <summary>
+        /// Returns an object's parent object in the visual tree.
+        /// </summary>
+        /// <param name="reference">The object for which to get the parent object.</param>
+        /// <returns>The parent object of the reference object in the visual tree.</returns>
+        public static DependencyObject GetParent(DependencyObject reference)
+        {
+            if (reference is IInternalUIElement uie)
+            {
+                return uie.VisualParent;
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Returns an object's parent object in the visual tree.
         /// </summary>
         /// <param name="reference">The object for which to get the parent object.</param>
         /// <returns>The parent object of the reference object in the visual tree.</returns>
-        public static DependencyObject GetParent(DependencyObject reference) //todo: the original signature takes a "DependencyObject"
+        public static DependencyObject GetParent(IDependencyObject reference)
         {
-            if (reference is UIElement uie)
+            if (reference is IInternalUIElement uie)
             {
-                return uie.INTERNAL_VisualParent;
+                return uie.VisualParent;
             }
 
             return null;
@@ -86,7 +100,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The number of visual children for the provided source visual.</returns>
         public static int GetChildrenCount(DependencyObject reference)
         {
-            if (reference is UIElement uie)
+            if (reference is IInternalUIElement uie)
             {
                 return uie.VisualChildrenCount;
             }
@@ -102,7 +116,7 @@ namespace Windows.UI.Xaml.Media
         /// <returns>The child object as referenced by childIndex.</returns>
         public static DependencyObject GetChild(DependencyObject reference, int childIndex)
         {
-            if (reference is UIElement uie)
+            if (reference is IInternalUIElement uie)
             {
                 return uie.GetVisualChild(childIndex);
             }

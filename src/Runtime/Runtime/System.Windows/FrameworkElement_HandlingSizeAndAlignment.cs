@@ -1242,7 +1242,7 @@ namespace Windows.UI.Xaml
                 null);
 
         bool _isSubsribedToSizeChanged = false;
-        internal void SubsribeToSizeChanged()
+        internal void SubscribeToSizeChanged()
         {
             if (!_isSubsribedToSizeChanged)
             {

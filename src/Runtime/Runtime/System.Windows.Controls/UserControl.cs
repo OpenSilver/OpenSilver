@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     /// existing controls and provides its own logic.
     /// </summary>
     [ContentProperty("Content")]
-    public partial class UserControl : Control
+    public partial class UserControl : Control, IUserControl
     {
         /// <summary> 
         /// Returns enumerator to logical children.
@@ -127,7 +127,7 @@ namespace Windows.UI.Xaml.Controls
                 Seal();
             }
 
-            internal override bool BuildVisualTree(FrameworkElement container)
+            internal override bool BuildVisualTree(IInternalFrameworkElement container)
             {
                 container.TemplateChild = ((UserControl)container).Content as FrameworkElement;
                 return false;

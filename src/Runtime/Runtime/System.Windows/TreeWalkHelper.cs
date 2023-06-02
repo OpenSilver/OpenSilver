@@ -24,21 +24,21 @@ namespace Windows.UI.Xaml
     {
         #region InheritablePropertyChange
 
-        internal static void InvalidateOnInheritablePropertyChange(FrameworkElement fe, InheritablePropertyChangeInfo info, bool skipStartNode)
+        internal static void InvalidateOnInheritablePropertyChange(IInternalFrameworkElement fe, InheritablePropertyChangeInfo info, bool skipStartNode)
         {
             if (HasChildren(fe))
             {
                 DescendentsWalker<InheritablePropertyChangeInfo> walker = new DescendentsWalker<InheritablePropertyChangeInfo>(
                     TreeWalkPriority.LogicalTree, InheritablePropertyChangeDelegate, info);
 
-                walker.StartWalk(fe, skipStartNode);
+                walker.StartWalk(fe.AsDependencyObject(), skipStartNode);
             }
             else if (!skipStartNode)
             {
                 // Degenerate case when the current node is a leaf node and has no children.
                 // If the current node needs a notification, do so now.
                 bool visitedViaVisualTree = false;
-                OnInheritablePropertyChanged(fe, info, visitedViaVisualTree);
+                OnInheritablePropertyChanged(fe.AsDependencyObject(), info, visitedViaVisualTree);
             }
         }
 
@@ -68,9 +68,9 @@ namespace Windows.UI.Xaml
                 // only then do we need to Invalidate the property
                 if (BaseValueSourceInternal.Inherited >= oldValueSource)
                 {
-                    if (visitedViaVisualTree && typeof(FrameworkElement).IsInstanceOfType(d))
+                    if (visitedViaVisualTree && typeof(IInternalFrameworkElement).IsInstanceOfType(d))
                     {
-                        DependencyObject logicalParent = ((FrameworkElement)d).Parent;
+                        DependencyObject logicalParent = ((IInternalFrameworkElement)d).Parent;
                         if (logicalParent != null)
                         {
                             DependencyObject visualParent = VisualTreeHelper.GetParent(d);
@@ -133,7 +133,7 @@ namespace Windows.UI.Xaml
         /// <summary>
         ///     Says if the current FE has visual or logical children
         /// </summary>
-        internal static bool HasChildren(FrameworkElement fe)
+        internal static bool HasChildren(IInternalFrameworkElement fe)
         {
             // See if we have logical or visual children, in which case this is a real tree invalidation.
             return fe != null && (fe.HasLogicalChildren || fe.HasVisualChildren);

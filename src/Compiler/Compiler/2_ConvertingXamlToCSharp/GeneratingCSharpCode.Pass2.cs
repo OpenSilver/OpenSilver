@@ -124,7 +124,7 @@ namespace OpenSilver.Compiler
                 {
                     StringBuilder builder = new StringBuilder();
 
-                    builder.AppendLine($"private static global::{_metadata.SystemWindowsNS}.FrameworkElement {MethodName}(global::{_metadata.SystemWindowsNS}.FrameworkElement {TemplateOwner}, {XamlContextClass} {XamlContext})")
+                    builder.AppendLine($"private static global::{_metadata.SystemWindowsNS}.IFrameworkElement {MethodName}(global::{_metadata.SystemWindowsNS}.IFrameworkElement {TemplateOwner}, {XamlContextClass} {XamlContext})")
                         .AppendLine("{")
                         .Append(StringBuilder.ToString());
                     builder.AppendLine($"return {Root};")
@@ -213,7 +213,7 @@ namespace OpenSilver.Compiler
                 parameters.PushScope(
                     new RootScope(GetUniqueName(_reader.Document.Root),
                         _reflectionOnSeparateAppDomain.IsAssignableFrom(
-                            _settings.Metadata.SystemWindowsNS, "FrameworkElement",
+                            _settings.Metadata.SystemWindowsNS, "IFrameworkElement",
                             _reader.Document.Root.Name.NamespaceName, _reader.Document.Root.Name.LocalName)
                     )
                 );
@@ -437,7 +437,7 @@ namespace OpenSilver.Compiler
                 // Set templated parent if any
                 if (parameters.CurrentScope is FrameworkTemplateScope scope)
                 {
-                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "FrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
+                    if (_reflectionOnSeparateAppDomain.IsAssignableFrom(_settings.Metadata.SystemWindowsNS, "IFrameworkElement", element.Name.NamespaceName, element.Name.LocalName))
                     {
                         parameters.StringBuilder.AppendLine($"{RuntimeHelperClass}.SetTemplatedParent({elementUniqueNameOrThisKeyword}, {scope.TemplateOwner});");
                     }

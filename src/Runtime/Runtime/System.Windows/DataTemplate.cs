@@ -83,7 +83,7 @@ namespace Windows.UI.Xaml
         /// </returns>
         public DependencyObject LoadContent()
         {
-            return this.INTERNAL_InstantiateFrameworkTemplate();
+            return INTERNAL_InstantiateFrameworkTemplate() as DependencyObject;
         }
     }
 }

@@ -41,6 +41,6 @@ namespace Windows.UI.Xaml
         ///     This variant is called when the Trigger lives on an element, as
         /// opposed to Style, so it is given only the reference to the element.
         /// </remarks>
-        internal abstract void Invoke(FrameworkElement fe);
+        internal abstract void Invoke(IFrameworkElement fe);
     }
 }

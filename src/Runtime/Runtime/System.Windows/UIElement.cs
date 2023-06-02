@@ -88,18 +88,10 @@ namespace Windows.UI.Xaml
 
 #region Visual Parent
 
-        private DependencyObject _parent;
-
         /// <summary>
         /// Returns the parent of this UIElement.
         /// </summary>
-        internal DependencyObject INTERNAL_VisualParent
-        {
-            get
-            {
-                return _parent;
-            }
-        }
+        internal DependencyObject INTERNAL_VisualParent { get; private set; }
 
 #endregion Visual Parent
 
@@ -150,14 +142,14 @@ namespace Windows.UI.Xaml
         /// child appeard in the children collection. The UIElement layer will then call the GetVisualChild
         /// method to find out where the child was added.
         /// </summary>
-        internal void AddVisualChild(UIElement child)
+        internal void AddVisualChild(IInternalUIElement child)
         {
             if (child == null)
             {
                 return;
             }
 
-            if (child._parent != null)
+            if (child.VisualParent != null)
             {
                 throw new ArgumentException("Must disconnect specified child from current parent UIElement before attaching to new parent UIElement.");
             }
@@ -166,7 +158,7 @@ namespace Windows.UI.Xaml
 
             // Set the parent pointer.
 
-            child._parent = this;
+            child.VisualParent = this;
 
             child.OnVisualParentChanged(null);
         }
@@ -178,14 +170,14 @@ namespace Windows.UI.Xaml
         /// child was removed from the children collection. The UIElement layer will then call
         /// GetChildren to find out which child has been removed.
         /// </summary>
-        internal void RemoveVisualChild(UIElement child)
+        internal void RemoveVisualChild(IInternalUIElement child)
         {
-            if (child == null || child._parent == null)
+            if (child == null || child.VisualParent == null)
             {
                 return;
             }
 
-            if (child._parent != this)
+            if (child.VisualParent != this)
             {
                 throw new ArgumentException("Specified UIElement is not a child of this UIElement.");
             }
@@ -197,7 +189,7 @@ namespace Windows.UI.Xaml
 
             // Set the parent pointer to null.
 
-            child._parent = null;
+            child.VisualParent = null;
 
             child.OnVisualParentChanged(this);
         }
@@ -209,9 +201,9 @@ namespace Windows.UI.Xaml
         internal virtual void OnVisualParentChanged(DependencyObject oldParent)
         {
             // Synchronize ForceInherit properties
-            if (_parent != null)
+            if (INTERNAL_VisualParent != null)
             {
-                SynchronizeForceInheritProperties(this, _parent);
+                SynchronizeForceInheritProperties(this, INTERNAL_VisualParent);
             }
             else
             {

@@ -55,7 +55,7 @@ namespace OpenSilver.Internal
 
             if (!skipStartNode)
             {
-                if (typeof(FrameworkElement).IsInstanceOfType(_startNode))
+                if (typeof(IFrameworkElement).IsInstanceOfType(_startNode))
                 {
                     // Callback for the root of the subtree
                     continueWalk = _callback(_startNode, _data, _priority == TreeWalkPriority.VisualTree);
@@ -77,9 +77,9 @@ namespace OpenSilver.Internal
         {
             _recursionDepth++;
 
-            if (typeof(FrameworkElement).IsInstanceOfType(d))
+            if (typeof(IInternalFrameworkElement).IsInstanceOfType(d))
             {
-                FrameworkElement fe = (FrameworkElement)d;
+                var fe = (IInternalFrameworkElement)d;
                 bool hasLogicalChildren = fe.HasLogicalChildren;
 
                 // FrameworkElement have both a visual and a logical tree.
@@ -102,8 +102,7 @@ namespace OpenSilver.Internal
             {
                 // Not a FrameworkElement.  See if it's a UIElement 
                 // and if so walk the UIElement collection
-                UIElement v = d as UIElement;
-                if (v != null)
+                if (d is IInternalUIElement v)
                 {
                     WalkVisualChildren(v);
                 }
@@ -116,7 +115,7 @@ namespace OpenSilver.Internal
         /// Given a object of type Visual, call VisitNode on each of its
         /// Visual children.
         /// </summary>
-        private void WalkVisualChildren(UIElement v)
+        private void WalkVisualChildren(IInternalUIElement v)
         {
             v.IsVisualChildrenIterationInProgress = true;
 
@@ -144,7 +143,7 @@ namespace OpenSilver.Internal
         /// of the nodes in the enumeration.
         /// </summary>
         private void WalkLogicalChildren(
-            FrameworkElement feParent,
+            IInternalFrameworkElement feParent,
             IEnumerator logicalChildren)
         {
             feParent.IsLogicalChildrenIterationInProgress = true;
@@ -180,7 +179,7 @@ namespace OpenSilver.Internal
         /// to be smarter than the generic logical children walk.
         /// </remarks>
         private void WalkFrameworkElementVisualThenLogicalChildren(
-            FrameworkElement feParent, bool hasLogicalChildren)
+            IInternalFrameworkElement feParent, bool hasLogicalChildren)
         {
             WalkVisualChildren(feParent);
 
@@ -213,8 +212,7 @@ namespace OpenSilver.Internal
                         while (logicalChildren.MoveNext())
                         {
                             object current = logicalChildren.Current;
-                            FrameworkElement fe = current as FrameworkElement;
-                            if (fe != null)
+                            if (current is IInternalFrameworkElement fe)
                             {
                                 // For the case that both parents are identical, this node should
                                 // have already been visited when walking through visual
@@ -245,7 +243,7 @@ namespace OpenSilver.Internal
         /// to be smarter than the generic visual children walk.
         /// </remarks>
         private void WalkFrameworkElementLogicalThenVisualChildren(
-            FrameworkElement feParent, bool hasLogicalChildren)
+            IInternalFrameworkElement feParent, bool hasLogicalChildren)
         {
             if (hasLogicalChildren)
             {
@@ -261,13 +259,13 @@ namespace OpenSilver.Internal
 
                 for (int i = 0; i < count; i++)
                 {
-                    UIElement child = feParent.GetVisualChild(i);
-                    if (child != null && typeof(FrameworkElement).IsInstanceOfType(child))
+                    var child = feParent.GetVisualChild(i);
+                    if (child != null && typeof(IFrameworkElement).IsInstanceOfType(child))
                     {
                         // For the case that both parents are identical, this node should
                         // have already been visited when walking through logical
                         // children, hence we short-circuit here
-                        if (VisualTreeHelper.GetParent(child) != ((FrameworkElement)child).Parent)
+                        if (VisualTreeHelper.GetParent(child) != ((IInternalFrameworkElement)child).Parent)
                         {
                             bool visitedViaVisualTree = true;
                             VisitNode(child, visitedViaVisualTree);
@@ -297,7 +295,7 @@ namespace OpenSilver.Internal
 #endif // WPF
         }
 
-        private void VisitNode(FrameworkElement fe, bool visitedViaVisualTree)
+        private void VisitNode(IInternalFrameworkElement fe, bool visitedViaVisualTree)
         {
             if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
             {
@@ -307,7 +305,7 @@ namespace OpenSilver.Internal
                 // any node can be reached at most two times, once
                 // via its visual parent and once via its logical parent
 
-                if (_nodes.Remove(fe))
+                if (_nodes.Remove(fe.AsDependencyObject()))
                 {
                     return;
                 }
@@ -321,10 +319,10 @@ namespace OpenSilver.Internal
                 DependencyObject logicalParent = fe.Parent;
                 if (dependencyObjectParent != null && logicalParent != null && dependencyObjectParent != logicalParent)
                 {
-                    _nodes.Add(fe);
+                    _nodes.Add(fe.AsDependencyObject());
                 }
 
-                _VisitNode(fe, visitedViaVisualTree);
+                _VisitNode(fe.AsDependencyObject(), visitedViaVisualTree);
             }
             else
             {
@@ -338,9 +336,9 @@ namespace OpenSilver.Internal
         {
             if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
             {
-                if (typeof(FrameworkElement).IsInstanceOfType(d))
+                if (typeof(IInternalFrameworkElement).IsInstanceOfType(d))
                 {
-                    VisitNode(d as FrameworkElement, visitedViaVisualTree);
+                    VisitNode((IInternalFrameworkElement)d, visitedViaVisualTree);
                 }
                 else
                 {

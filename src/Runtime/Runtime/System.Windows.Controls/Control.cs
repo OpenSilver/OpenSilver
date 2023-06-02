@@ -43,7 +43,7 @@ namespace Windows.UI.Xaml.Controls
     /// Represents the base class for UI elements that use a ControlTemplate to define
     /// their appearance.
     /// </summary>
-    public partial class Control : FrameworkElement
+    public partial class Control : FrameworkElement, IInternalControl
     {
         //COMMENT 26.03.2020:
         // ERROR DESCRIPTION:

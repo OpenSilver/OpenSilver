@@ -35,14 +35,14 @@ namespace Windows.UI.Xaml
     /// </summary>
     public class TemplateBindingExpression : Expression
     {
-        private readonly Control _source;
+        private readonly IInternalControl _source;
         private readonly DependencyProperty _sourceProperty;
         private DependencyObject _target;
         private DependencyProperty _targetProperty;
         private DependencyPropertyChangedListener _listener;
         private bool _skipTypeCheck;
 
-        internal TemplateBindingExpression(Control templatedParent, DependencyProperty sourceDP)
+        internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP)
         {
             _source = templatedParent ?? throw new ArgumentNullException(nameof(templatedParent));
             _sourceProperty = sourceDP ?? throw new ArgumentNullException(nameof(sourceDP));
@@ -79,7 +79,7 @@ namespace Windows.UI.Xaml
             _targetProperty = dp;
 
             _skipTypeCheck = _targetProperty.PropertyType.IsAssignableFrom(_sourceProperty.PropertyType);
-            _listener = new DependencyPropertyChangedListener(_source, _sourceProperty, OnPropertyChanged);
+            _listener = new DependencyPropertyChangedListener((DependencyObject)_source, _sourceProperty, OnPropertyChanged);
         }
 
         internal override void OnDetach(DependencyObject d, DependencyProperty dp)

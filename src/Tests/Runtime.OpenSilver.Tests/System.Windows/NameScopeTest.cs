@@ -294,12 +294,12 @@ namespace Windows.UI.Xaml.Tests
                                 Border name4 = new Border 
                                 { 
                                     Name = "name4",
-                                    TemplatedParent = owner,
+                                    TemplatedParent = owner.AsDependencyObject(),
                                 };
                                 Border name5 = new Border
                                 {
                                     Name = "name5",
-                                    TemplatedParent = owner,
+                                    TemplatedParent = owner.AsDependencyObject(),
                                 };
                                 name4.Child = name5;
                                 RuntimeHelpers.XamlContext_RegisterName(context, "name4", name4);
@@ -336,17 +336,17 @@ namespace Windows.UI.Xaml.Tests
                                 Border name8 = new Border
                                 {
                                     Name = "name8",
-                                    TemplatedParent = owner,
+                                    TemplatedParent = owner.AsDependencyObject(),
                                 };
                                 UserControl2 name9 = new UserControl2
                                 {
                                     Name = "name9",
-                                    TemplatedParent = owner,
+                                    TemplatedParent = owner.AsDependencyObject(),
                                 };
                                 ContentControl name10 = new ContentControl
                                 {
                                     Name = "name10",
-                                    TemplatedParent = owner,
+                                    TemplatedParent = owner.AsDependencyObject(),
                                 };
                                 name9.Children.Add(name10);
                                 name8.Child = name9;
@@ -372,7 +372,7 @@ namespace Windows.UI.Xaml.Tests
                             Border border = new Border
                             {
                                 Name = "border",
-                                TemplatedParent = owner,
+                                TemplatedParent = owner.AsDependencyObject(),
                             };
 
                             RuntimeHelpers.XamlContext_RegisterName(context, "border", border);

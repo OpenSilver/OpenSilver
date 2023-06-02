@@ -104,7 +104,7 @@ namespace OpenSilver.Internal.Xaml
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void InitializeNameScope(DependencyObject dependencyObject)
         {
-            Debug.Assert(dependencyObject is FrameworkElement);
+            Debug.Assert(dependencyObject is IFrameworkElement);
 
             NameScope.SetNameScope(dependencyObject, new NameScope());
         }
@@ -140,6 +140,12 @@ namespace OpenSilver.Internal.Xaml
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplatedParent(IFrameworkElement element, IFrameworkElement templatedParent)
+        {
+            ((IInternalFrameworkElement)element).TemplatedParent = (DependencyObject)templatedParent;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static XamlContext Create_XamlContext()
         {
             return new XamlContext();
@@ -152,7 +158,17 @@ namespace OpenSilver.Internal.Xaml
             Debug.Assert(xamlContext != null);
             Debug.Assert(factory != null);
 
-            template.Template = new TemplateContent(xamlContext, factory);
+            template.Template = new TemplateContent(xamlContext, (e, c) => factory((FrameworkElement)e, c));
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void SetTemplateContent(FrameworkTemplate template, XamlContext xamlContext, Func<IFrameworkElement, XamlContext, IFrameworkElement> factory)
+        {
+            Debug.Assert(template != null);
+            Debug.Assert(xamlContext != null);
+            Debug.Assert(factory != null);
+
+            template.Template = new TemplateContent(xamlContext, (e, c) => (IInternalFrameworkElement)factory(e, c));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -205,7 +221,7 @@ namespace OpenSilver.Internal.Xaml
         public static void XamlContext_PopScope(XamlContext context)
         {
             Debug.Assert(context != null);
-            
+
             context.PopScope();
         }
 
