@@ -301,35 +301,26 @@ namespace OpenSilver.Internal
         {
             if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
             {
-                // For the case when the collection contains the node
-                // being visted, we do not need to visit it again. Also
-                // this node will not be visited another time because
-                // any node can be reached at most two times, once
-                // via its visual parent and once via its logical parent
-
-                int index = _nodes.IndexOf(fe);
-
-                // If index is not -1, then fe was in the list, remove it
-                if (index != -1)
+                if (_nodes.Remove(fe))
                 {
-                    _nodes.RemoveAt(index);
+                    // the idea: we can only visit a node at most 2 times:
+                    // via logical tree and via visual tree
+                    return;
                 }
-                else
+
+                // A node will be visited a second time only if it has
+                // different non-null logical and visual parents.
+                // Hence that is the only case that we need to
+                // remember this node, to avoid duplicate callback for it
+
+                DependencyObject dependencyObjectParent = VisualTreeHelper.GetParent(fe);
+                DependencyObject logicalParent = fe.Parent;
+                if (dependencyObjectParent != null && logicalParent != null && dependencyObjectParent != logicalParent)
                 {
-                    // A node will be visited a second time only if it has
-                    // different non-null logical and visual parents.
-                    // Hence that is the only case that we need to
-                    // remember this node, to avoid duplicate callback for it
-
-                    DependencyObject dependencyObjectParent = VisualTreeHelper.GetParent(fe);
-                    DependencyObject logicalParent = fe.Parent;
-                    if (dependencyObjectParent != null && logicalParent != null && dependencyObjectParent != logicalParent)
-                    {
-                        _nodes.Add(fe);
-                    }
-
-                    _VisitNode(fe, visitedViaVisualTree);
+                    _nodes.Add(fe);
                 }
+
+                _VisitNode(fe, visitedViaVisualTree);
             }
             else
             {
