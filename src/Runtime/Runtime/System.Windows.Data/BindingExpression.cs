@@ -221,7 +221,7 @@ namespace Windows.UI.Xaml.Data
                  d is PasswordBox && dp == PasswordBox.PasswordProperty);
             if (_isUpdateOnLostFocus)
             {
-                ((IFrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
+                ((IInternalFrameworkElement)Target).LostFocus += new RoutedEventHandler(OnTargetLostFocus);
             }
 
             AttachToContext(false);
@@ -295,7 +295,7 @@ namespace Windows.UI.Xaml.Data
             if (_isUpdateOnLostFocus)
             {
                 _isUpdateOnLostFocus = false;
-                ((IFrameworkElement)Target).LostFocus -= new RoutedEventHandler(OnTargetLostFocus);
+                ((IInternalFrameworkElement)Target).LostFocus -= new RoutedEventHandler(OnTargetLostFocus);
             }
 
             DetachMentor();
@@ -570,7 +570,6 @@ namespace Windows.UI.Xaml.Data
                     int j;
                     for (j = toRemove.Count - 1; j >= 0; --j)
                     {
-                        // todo:
                         if (ItemsControl.EqualsEx(toRemove[j].ErrorContent, errorContent))
                         {
                             // this error appears on both lists - remove it from toRemove
@@ -938,7 +937,7 @@ namespace Windows.UI.Xaml.Data
                 return;
             }
 
-            ((IFrameworkElement)sender).Loaded -= new RoutedEventHandler(OnMentorLoaded);
+            ((IInternalFrameworkElement)sender).Loaded -= new RoutedEventHandler(OnMentorLoaded);
             OnSourceAvailable(true);
         }
 

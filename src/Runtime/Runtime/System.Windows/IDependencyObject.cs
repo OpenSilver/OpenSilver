@@ -14,16 +14,19 @@
 using System.ComponentModel;
 
 #if MIGRATION
-namespace System.Windows.Controls;
+namespace System.Windows;
 #else
-namespace Windows.UI.Xaml.Controls;
+namespace Windows.UI.Xaml;
 #endif
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public interface IControl : IFrameworkElement
+public interface IDependencyObject
 {
 }
 
-interface IInternalControl : IControl, IInternalFrameworkElement
+internal interface IInternalDependencyObject : IDependencyObject
 {
+    object GetValue(DependencyProperty dp);
+
+    void SetValue(DependencyProperty dp, object value);
 }

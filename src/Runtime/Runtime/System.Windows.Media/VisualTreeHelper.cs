@@ -63,17 +63,31 @@ namespace Windows.UI.Xaml.Media
             return root;
         }
 
+        /// <summary>
+        /// Returns an object's parent object in the visual tree.
+        /// </summary>
+        /// <param name="reference">The object for which to get the parent object.</param>
+        /// <returns>The parent object of the reference object in the visual tree.</returns>
+        public static DependencyObject GetParent(DependencyObject reference)
+        {
+            if (reference is IInternalUIElement uie)
+            {
+                return uie.VisualParent;
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Returns an object's parent object in the visual tree.
         /// </summary>
         /// <param name="reference">The object for which to get the parent object.</param>
         /// <returns>The parent object of the reference object in the visual tree.</returns>
-        public static DependencyObject GetParent(IDependencyObject reference) //todo: the original signature takes a "DependencyObject"
+        public static DependencyObject GetParent(IDependencyObject reference)
         {
             if (reference is IInternalUIElement uie)
             {
-                return uie.INTERNAL_VisualParent;
+                return uie.VisualParent;
             }
 
             return null;

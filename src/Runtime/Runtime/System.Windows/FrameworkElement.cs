@@ -45,7 +45,7 @@ namespace Windows.UI.Xaml
     /// programmatic layout. FrameworkElement also defines APIs related to data binding,
     /// object tree, and object lifetime feature areas.
     /// </summary>
-    public abstract partial class FrameworkElement : UIElement, IInternalFrameworkElement
+    public abstract partial class FrameworkElement : UIElement
     {
         #region Inheritance Context
 
@@ -117,12 +117,6 @@ namespace Windows.UI.Xaml
 
         internal event InheritedPropertyChangedEventHandler InheritedPropertyChanged;
 
-        event InheritedPropertyChangedEventHandler IInternalFrameworkElement.InheritedPropertyChanged
-        {
-            add => InheritedPropertyChanged += value;
-            remove => InheritedPropertyChanged -= value;
-        }
-
         internal static void OnInheritedPropertyChanged(FrameworkElement fe, InheritablePropertyChangeInfo info)
         {
             var handler = fe.InheritedPropertyChanged;
@@ -130,11 +124,6 @@ namespace Windows.UI.Xaml
             {
                 handler(fe, new InheritedPropertyChangedEventArgs(ref info));
             }
-        }
-
-        void IInternalFrameworkElement.OnInheritedPropertyChanged(InheritablePropertyChangeInfo info)
-        {
-            OnInheritedPropertyChanged(this, info);
         }
 
         #endregion Inheritance Context
@@ -206,12 +195,12 @@ namespace Windows.UI.Xaml
             {
                 // It is invalid to modify the children collection that we
                 // might be iterating during a property invalidation tree walk.
-                if (((IInternalFrameworkElement)this).IsLogicalChildrenIterationInProgress)
+                if (IsLogicalChildrenIterationInProgress)
                 {
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
 
-                ((IInternalFrameworkElement)this).HasLogicalChildren = true;
+                HasLogicalChildren = true;
 
                 if (child is IInternalFrameworkElement fe)
                 {
@@ -220,15 +209,13 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IInternalFrameworkElement.AddLogicalChild(object child) => AddLogicalChild(child);
-
         internal void RemoveLogicalChild(object child)
         {
             if (child != null)
             {
                 // It is invalid to modify the children collection that we
                 // might be iterating during a property invalidation tree walk.
-                if (((IInternalFrameworkElement)this).IsLogicalChildrenIterationInProgress)
+                if (IsLogicalChildrenIterationInProgress)
                 {
                     throw new InvalidOperationException("Cannot modify the logical children for this node at this time because a tree walk is in progress.");
                 }
@@ -244,19 +231,17 @@ namespace Windows.UI.Xaml
                 // if null, there are no children.
                 if (children == null)
                 {
-                    ((IInternalFrameworkElement)this).HasLogicalChildren = false;
+                    HasLogicalChildren = false;
                 }
                 else
                 {
                     // If we can move next, there is at least one child
-                    ((IInternalFrameworkElement)this).HasLogicalChildren = children.MoveNext();
+                    HasLogicalChildren = children.MoveNext();
                 }
             }
         }
 
-        void IInternalFrameworkElement.RemoveLogicalChild(object child) => RemoveLogicalChild(child);
-
-        void IInternalFrameworkElement.ChangeLogicalParent(DependencyObject newParent)
+        internal void ChangeLogicalParent(DependencyObject newParent)
         {
             // Logical Parent must first be dropped before you are attached to a newParent
             if (Parent != null && newParent != null && Parent != newParent)
@@ -310,15 +295,13 @@ namespace Windows.UI.Xaml
             get { return null; }
         }
 
-        IEnumerator IInternalFrameworkElement.LogicalChildren => LogicalChildren;
-
-        bool IInternalFrameworkElement.IsLogicalChildrenIterationInProgress
+        internal bool IsLogicalChildrenIterationInProgress
         {
             get { return ReadInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress); }
             set { WriteInternalFlag(InternalFlags.IsLogicalChildrenIterationInProgress, value); }
         }
 
-        bool IInternalFrameworkElement.HasLogicalChildren
+        internal bool HasLogicalChildren
         {
             get { return ReadInternalFlag(InternalFlags.HasLogicalChildren); }
             set { WriteInternalFlag(InternalFlags.HasLogicalChildren, value); }
@@ -346,12 +329,6 @@ namespace Windows.UI.Xaml
             }
         }
 
-        DependencyObject IInternalFrameworkElement.TemplatedParent
-        {
-            get => TemplatedParent;
-            set => TemplatedParent = value;
-        }
-
         private FrameworkElement _templateChild; // Non-null if this FE has a child that was created as part of a template.
 
         // Note: TemplateChild is an UIElement in WPF.
@@ -369,11 +346,6 @@ namespace Windows.UI.Xaml
                     INTERNAL_VisualTreeManager.AttachVisualChildIfNotAlreadyAttached(_templateChild, this, 0);
                 }
             }
-        }
-
-        IInternalFrameworkElement IInternalFrameworkElement.TemplateChild
-        {
-            set => TemplateChild = (FrameworkElement)value;
         }
 
         /// <summary>
@@ -428,8 +400,6 @@ namespace Windows.UI.Xaml
                         ((resources.Count > 0) || (resources.MergedDictionaries.Count > 0)));
             }
         }
-
-        bool IInternalFrameworkElement.HasResources => HasResources;
 
         /// <summary>
         /// Gets the locally defined resource dictionary. In XAML, you can establish
@@ -503,7 +473,7 @@ namespace Windows.UI.Xaml
             }
         }
 
-        bool IInternalFrameworkElement.IsLoadedInResourceDictionary { get; set; }
+        internal bool IsLoadedInResourceDictionary { get; set; }
 
         /// <summary>
         /// Provides a base implementation for creating the dom elements designed to represent an instance of a FrameworkElement and defines the place where its child(ren) will be added.
@@ -997,8 +967,6 @@ namespace Windows.UI.Xaml
                     Inherits = true
                 });
 
-        DependencyProperty IInternalFrameworkElement.DataContextProperty => DataContextProperty;
-
         private static void OnDataContextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((FrameworkElement)d).RaiseDataContextChangedEvent(e);
@@ -1191,16 +1159,12 @@ namespace Windows.UI.Xaml
                 typeof(RoutedEventHandler), 
                 typeof(FrameworkElement));
 
-        RoutedEvent IInternalFrameworkElement.LoadedEvent => LoadedEvent;
-
         /// <summary>
         /// Occurs when a FrameworkElement has been constructed and added to the object tree.
         /// </summary>
         public event RoutedEventHandler Loaded;
 
         internal void RaiseLoadedEvent() => Loaded?.Invoke(this, new RoutedEventArgs());
-
-        void IInternalFrameworkElement.RaiseLoadedEvent() => RaiseLoadedEvent();
 
         internal void LoadResources()
         {
@@ -1210,16 +1174,12 @@ namespace Windows.UI.Xaml
             }
         }
 
-        void IInternalFrameworkElement.LoadResources() => LoadResources();
-
         /// <summary>
         /// Occurs when this object is no longer connected to the main object tree.
         /// </summary>
         public event RoutedEventHandler Unloaded;
 
         internal void RaiseUnloadedEvent() => Unloaded?.Invoke(this, new RoutedEventArgs());
-
-        void IInternalFrameworkElement.RaiseUnloadedEvent() => RaiseUnloadedEvent();
 
         internal void UnloadResources()
         {
@@ -1228,8 +1188,6 @@ namespace Windows.UI.Xaml
                 Resources.UnloadResources();
             }
         }
-
-        void IInternalFrameworkElement.UnloadResources() => UnloadResources();
 
 #endregion
 
@@ -1309,10 +1267,6 @@ namespace Windows.UI.Xaml
         }
 
         private InternalFlags _flags = 0; // Stores Flags (see Flags enum)
-
-        DependencyProperty IInternalFrameworkElement.ContentPresenterContentProperty => ContentPresenter.ContentProperty;
-
-        DependencyObject IInternalFrameworkElement.AsDependencyObject() => this;
     }
 
     internal enum InternalFlags : uint

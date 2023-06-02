@@ -142,7 +142,7 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkTemplate),
                 null);
 
-        internal static INameScope GetTemplateNameScope(IFrameworkElement fe)
+        internal static INameScope GetTemplateNameScope(IInternalFrameworkElement fe)
         {
             if (fe is null)
             {
@@ -152,7 +152,7 @@ namespace Windows.UI.Xaml
             return (INameScope)fe.GetValue(TemplateNameScopeProperty);
         }
 
-        internal static void SetTemplateNameScope(IFrameworkElement fe, INameScope namescope)
+        internal static void SetTemplateNameScope(IInternalFrameworkElement fe, INameScope namescope)
         {
             if (fe is null)
             {

@@ -68,9 +68,9 @@ namespace Windows.UI.Xaml
                 // only then do we need to Invalidate the property
                 if (BaseValueSourceInternal.Inherited >= oldValueSource)
                 {
-                    if (visitedViaVisualTree && typeof(IFrameworkElement).IsInstanceOfType(d))
+                    if (visitedViaVisualTree && typeof(IInternalFrameworkElement).IsInstanceOfType(d))
                     {
-                        DependencyObject logicalParent = ((IFrameworkElement)d).Parent;
+                        DependencyObject logicalParent = ((IInternalFrameworkElement)d).Parent;
                         if (logicalParent != null)
                         {
                             DependencyObject visualParent = VisualTreeHelper.GetParent(d);

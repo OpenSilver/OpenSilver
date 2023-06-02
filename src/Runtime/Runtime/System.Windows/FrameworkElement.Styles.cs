@@ -291,11 +291,6 @@ namespace Windows.UI.Xaml
             set { WriteInternalFlag(InternalFlags.ShouldLookupImplicitStyles, value); }
         }
 
-        bool IInternalFrameworkElement.ShouldLookupImplicitStyles
-        {
-            set => ShouldLookupImplicitStyles = value;
-        }
-
         // Note: this is used to be able to tell whether the style applied on 
         // the FrameworkElement is an ImplicitStyle, which means that it must 
         // be removed from the element when it is detached from the visual tree.

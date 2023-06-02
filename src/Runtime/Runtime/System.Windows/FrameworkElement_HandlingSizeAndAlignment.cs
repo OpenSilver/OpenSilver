@@ -1241,10 +1241,10 @@ namespace Windows.UI.Xaml
                 typeof(FrameworkElement),
                 null);
 
-        bool _isSubscribedToSizeChanged = false;
-        void IInternalFrameworkElement.SubscribeToSizeChanged()
+        bool _isSubsribedToSizeChanged = false;
+        internal void SubscribeToSizeChanged()
         {
-            if (!_isSubscribedToSizeChanged)
+            if (!_isSubsribedToSizeChanged)
             {
                 SizeChanged += (s, e) =>
                 {
@@ -1258,7 +1258,7 @@ namespace Windows.UI.Xaml
                         SetValue(ActualHeightProperty, e.NewSize.Height);
                     }
                 };
-                _isSubscribedToSizeChanged = true;
+                _isSubsribedToSizeChanged = true;
             }
         }
 

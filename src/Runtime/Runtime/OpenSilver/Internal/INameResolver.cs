@@ -48,9 +48,10 @@ namespace OpenSilver.Internal
         {
             if (_templateRootRef.TryGetTarget(out IInternalFrameworkElement templateRoot))
             {
-                if (templateRoot.TemplatedParent != null)
+                if (templateRoot.TemplatedParent != null &&
+                    templateRoot.TemplatedParent is IInternalFrameworkElement templatedParent)
                 {
-                    return FrameworkTemplate.GetTemplateNameScope(templateRoot.TemplatedParent as IFrameworkElement);
+                    return FrameworkTemplate.GetTemplateNameScope(templatedParent);
                 }
                 else
                 {
@@ -64,23 +65,23 @@ namespace OpenSilver.Internal
 
     internal sealed class XamlNameResolver : INameResolver
     {
-        private readonly WeakReference<IFrameworkElement> _namescopeOwnerRef;
+        private readonly WeakReference<IInternalFrameworkElement> _namescopeOwnerRef;
 
-        public XamlNameResolver(IFrameworkElement namescopeOwner)
+        public XamlNameResolver(IInternalFrameworkElement namescopeOwner)
         {
             if (namescopeOwner is null)
             {
                 throw new ArgumentNullException(nameof(namescopeOwner));
             }
 
-            _namescopeOwnerRef = new WeakReference<IFrameworkElement>(namescopeOwner);
+            _namescopeOwnerRef = new WeakReference<IInternalFrameworkElement>(namescopeOwner);
         }
 
         object INameResolver.Resolve(string name) => GetNameScope()?.FindName(name);
 
         private INameScope GetNameScope()
         {
-            if (_namescopeOwnerRef.TryGetTarget(out IFrameworkElement namescopeOwner))
+            if (_namescopeOwnerRef.TryGetTarget(out IInternalFrameworkElement namescopeOwner))
             {
                 return NameScope.GetNameScope(namescopeOwner);
             }

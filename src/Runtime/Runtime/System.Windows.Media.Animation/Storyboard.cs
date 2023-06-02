@@ -400,7 +400,7 @@ namespace Windows.UI.Xaml.Media.Animation
             }
         }
 
-        private static DependencyObject ResolveTargetName(string targetName, IFrameworkElement fe, INameResolver nameResolver)
+        private static DependencyObject ResolveTargetName(string targetName, IInternalFrameworkElement fe, INameResolver nameResolver)
         {
             object namedObject;
             DependencyObject targetObject;

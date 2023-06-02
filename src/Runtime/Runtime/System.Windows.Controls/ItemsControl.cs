@@ -976,45 +976,6 @@ namespace Windows.UI.Xaml.Controls
             // in case that the element is removed.
         }
 
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        protected FrameworkElement GenerateFrameworkElementToRenderTheItem(object item)
-        {
-            //---------------------------------------------------
-            // if the item is a FrameworkElement, return itself
-            //---------------------------------------------------
-            FrameworkElement result = item as FrameworkElement;
-            if (result == null)
-            {
-                object displayElement = PropertyPathHelper.AccessValueByApplyingPropertyPathIfAny(item, this.DisplayMemberPath);
-                if (this.ItemTemplate != null)
-                {
-                    //---------------------------------------------------
-                    // An ItemTemplate was specified, so we instantiate 
-                    // it and return it
-                    //---------------------------------------------------
-
-                    // Apply the data template
-                    result = (FrameworkElement)ItemTemplate.INTERNAL_InstantiateFrameworkTemplate();
-                    result.DataContext = displayElement;
-                }
-                else
-                {
-                    //---------------------------------------------------
-                    // Otherwise we simply call "ToString()" to display 
-                    // the item as a string inside a TextBlock
-                    //---------------------------------------------------
-
-                    ContentPresenter container = new ContentPresenter();
-                    Binding b = new Binding(this.DisplayMemberPath);
-                    container.SetBinding(ContentPresenter.ContentProperty, b);
-                    container.DataContext = item;
-                    result = container;
-                }
-            }
-            this.PrepareContainerForItemOverride(result, item);
-            return result;
-        }
-
         /// <summary>
         /// Create or identify the element used to display the given item.
         /// </summary>

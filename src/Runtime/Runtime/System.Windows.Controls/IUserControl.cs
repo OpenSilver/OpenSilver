@@ -20,10 +20,6 @@ namespace Windows.UI.Xaml.Controls;
 #endif
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public interface IControl : IFrameworkElement
-{
-}
-
-interface IInternalControl : IControl, IInternalFrameworkElement
+internal interface IUserControl
 {
 }

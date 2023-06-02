@@ -697,7 +697,7 @@ namespace CSHTML5.Internal
             {
                 ApplyCssChanges(oldValue, newValue, metadata, depObj); // Note: this we need to call regardless of whether the element is in the visual tree. In fact, for example, the SolidColorBrush.Color property can be used by multiple UIElements, some of which may be in the visual tree and others not.
 
-                if (depObj is IInternalUIElement uiElement && uiElement._isLoaded)
+                if (depObj is IInternalUIElement uiElement && uiElement.IsLoaded)
                 {
                     // Note: this we call only if the element is in the visual tree.
                     metadata.MethodToUpdateDom?.Invoke(depObj, newValue); 

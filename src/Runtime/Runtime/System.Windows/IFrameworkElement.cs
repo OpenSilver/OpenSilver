@@ -1,5 +1,19 @@
-﻿using OpenSilver.Internal;
+﻿
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System.Collections;
+using System.ComponentModel;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows;
@@ -7,17 +21,9 @@ namespace System.Windows;
 namespace Windows.UI.Xaml;
 #endif
 
+[EditorBrowsable(EditorBrowsableState.Never)]
 public interface IFrameworkElement : IUIElement
 {
-    event RoutedEventHandler Loaded;
-
-    bool IsLoaded { get; }
-
-    DependencyObject Parent { get; }
-
-    ResourceDictionary Resources { get; set; }
-
-    object FindName(string name);
 }
 
 internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIElement
@@ -30,7 +36,7 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     bool HasResources { get; }
 
-    bool ShouldLookupImplicitStyles { set; }
+    bool ShouldLookupImplicitStyles { get; set; }
 
     bool IsLoadedInResourceDictionary { get; set; }
 
@@ -40,11 +46,19 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     DependencyObject TemplatedParent { get; set; }
 
-    IInternalFrameworkElement TemplateChild { set; }
+    IInternalFrameworkElement TemplateChild { get; set; }
 
     DependencyProperty DataContextProperty { get; }
 
     DependencyProperty ContentPresenterContentProperty { get; }
+    
+    DependencyObject Parent { get; }
+
+    ResourceDictionary Resources { get; set; }
+
+    event RoutedEventHandler Loaded;
+
+    object FindName(string name);
 
     void OnInheritedPropertyChanged(InheritablePropertyChangeInfo info);
 

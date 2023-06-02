@@ -42,7 +42,7 @@ namespace OpenSilver.Internal
             {
                 DependencyObject logicalParent = null;
 
-                if (ancestor is IFrameworkElement fe)
+                if (ancestor is IInternalFrameworkElement fe)
                 {
                     logicalParent = fe.Parent;
                     // FrameworkElement

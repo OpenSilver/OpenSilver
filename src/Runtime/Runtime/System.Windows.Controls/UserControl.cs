@@ -35,7 +35,7 @@ namespace Windows.UI.Xaml.Controls
     /// existing controls and provides its own logic.
     /// </summary>
     [ContentProperty("Content")]
-    public partial class UserControl : Control
+    public partial class UserControl : Control, IUserControl
     {
         /// <summary> 
         /// Returns enumerator to logical children.

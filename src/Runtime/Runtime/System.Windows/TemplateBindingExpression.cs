@@ -35,14 +35,14 @@ namespace Windows.UI.Xaml
     /// </summary>
     public class TemplateBindingExpression : Expression
     {
-        private readonly IControl _source;
+        private readonly IInternalControl _source;
         private readonly DependencyProperty _sourceProperty;
         private DependencyObject _target;
         private DependencyProperty _targetProperty;
         private DependencyPropertyChangedListener _listener;
         private bool _skipTypeCheck;
 
-        internal TemplateBindingExpression(IControl templatedParent, DependencyProperty sourceDP)
+        internal TemplateBindingExpression(IInternalControl templatedParent, DependencyProperty sourceDP)
         {
             _source = templatedParent ?? throw new ArgumentNullException(nameof(templatedParent));
             _sourceProperty = sourceDP ?? throw new ArgumentNullException(nameof(sourceDP));

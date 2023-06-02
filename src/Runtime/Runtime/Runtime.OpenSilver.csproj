@@ -326,6 +326,7 @@
 		<Compile Include="System.Windows\FontStyleConverter.cs" />
 		<Compile Include="System.Windows\FontWeightConverter.cs" />
 		<Compile Include="System.Windows.Media\GeometryConverter.cs" />
+		<Compile Include="System.Windows\FrameworkElement.Interfaces.cs" />
 		<Compile Include="System.Windows\FrameworkElement.Layout.cs" />
 		<Compile Include="System.Windows\FrameworkElement.Styles.cs" />
 		<Compile Include="System.Windows\GridLengthConverter.cs" />
@@ -335,11 +336,12 @@
 		<Compile Include="System.Windows.Media\MatrixConverter.cs" />
 		<Compile Include="System.Windows.Media\PointCollectionConverter.cs" />
 		<Compile Include="System.Windows\IControl.cs" />
+		<Compile Include="System.Windows\IDependencyObject.cs" />
 		<Compile Include="System.Windows\IFrameworkElement.cs" />
 		<Compile Include="System.Windows\InheritanceBehavior.cs" />
-		<Compile Include="System.Windows\IPanel.cs" />
+		<Compile Include="System.Windows.Controls\IPanel.cs" />
 		<Compile Include="System.Windows\IUIElement.cs" />
-		<Compile Include="System.Windows\IUserControl.cs" />		
+		<Compile Include="System.Windows.Controls\IUserControl.cs" />		
 		<Compile Include="System.Windows\LayoutCycleException.cs" />
 		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />
@@ -382,6 +384,7 @@
 		<Compile Include="System.Windows\RoutedPropertyChangingEventArgs.cs" />
 		<Compile Include="System.Windows.Controls\CleanUpVirtualizedItemEventHandler.cs" />
 		<Compile Include="System.Windows\UIElement.Automation.cs" />
+		<Compile Include="System.Windows\UIElement.Interfaces.cs" />
 		<Compile Include="System.Windows\UIElement.Layout.cs" />
 		<Compile Include="System.Windows\WORKINPROGRESS\Analytics.cs" />
 		<Compile Include="System.Windows.Automation.Peers\ExpanderAutomationPeer.cs" />

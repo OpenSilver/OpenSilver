@@ -11,19 +11,13 @@
 *  
 \*====================================================================================*/
 
-using System.ComponentModel;
-
 #if MIGRATION
 namespace System.Windows.Controls;
 #else
 namespace Windows.UI.Xaml.Controls;
 #endif
 
-[EditorBrowsable(EditorBrowsableState.Never)]
-public interface IControl : IFrameworkElement
+internal interface IPanel
 {
-}
-
-interface IInternalControl : IControl, IInternalFrameworkElement
-{
+    bool IsItemsHost { get; }
 }
