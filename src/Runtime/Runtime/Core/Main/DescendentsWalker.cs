@@ -295,7 +295,7 @@ namespace OpenSilver.Internal
 #endif // WPF
         }
 
-        private void VisitNode(IFrameworkElement fe, bool visitedViaVisualTree)
+        private void VisitNode(IInternalFrameworkElement fe, bool visitedViaVisualTree)
         {
             if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
             {
@@ -305,7 +305,7 @@ namespace OpenSilver.Internal
                 // any node can be reached at most two times, once
                 // via its visual parent and once via its logical parent
 
-                if (_nodes.Remove(fe))
+                if (_nodes.Remove(fe.AsDependencyObject()))
                 {
                     return;
                 }
@@ -319,10 +319,10 @@ namespace OpenSilver.Internal
                 DependencyObject logicalParent = fe.Parent;
                 if (dependencyObjectParent != null && logicalParent != null && dependencyObjectParent != logicalParent)
                 {
-                    _nodes.Add(fe);
+                    _nodes.Add(fe.AsDependencyObject());
                 }
 
-                _VisitNode(fe, visitedViaVisualTree);
+                _VisitNode(fe.AsDependencyObject(), visitedViaVisualTree);
             }
             else
             {
@@ -336,9 +336,9 @@ namespace OpenSilver.Internal
         {
             if (_recursionDepth <= 4096 /* ContextLayoutManager.s_LayoutRecursionLimit */)
             {
-                if (typeof(IFrameworkElement).IsInstanceOfType(d))
+                if (typeof(IInternalFrameworkElement).IsInstanceOfType(d))
                 {
-                    VisitNode(d as IFrameworkElement, visitedViaVisualTree);
+                    VisitNode(d as IInternalFrameworkElement, visitedViaVisualTree);
                 }
                 else
                 {
