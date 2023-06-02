@@ -95,9 +95,9 @@ namespace Windows.UI.Xaml
         // The following property is used during the "InsertImplicitNodes" step of the compilation,
         // in conjunction with the "ContentProperty" attribute. The property is never used at runtime.
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public UIElement ContentPropertyUsefulOnlyDuringTheCompilation
+        public IUIElement ContentPropertyUsefulOnlyDuringTheCompilation
         {
-            get { return (UIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
+            get { return (IUIElement)GetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty); }
             set { SetValue(ContentPropertyUsefulOnlyDuringTheCompilationProperty, value); }
         }
 
@@ -105,7 +105,7 @@ namespace Windows.UI.Xaml
         public static readonly DependencyProperty ContentPropertyUsefulOnlyDuringTheCompilationProperty =
             DependencyProperty.Register(
                 nameof(ContentPropertyUsefulOnlyDuringTheCompilation), 
-                typeof(UIElement), 
+                typeof(IUIElement), 
                 typeof(FrameworkTemplate), 
                 null);
         
