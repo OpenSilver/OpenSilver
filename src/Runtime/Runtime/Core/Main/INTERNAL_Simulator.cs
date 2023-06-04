@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenSilver;
 
 namespace DotNetForHtml5.Core
 {
@@ -95,6 +96,9 @@ namespace DotNetForHtml5.Core
                     }
                     else
                     {
+                        if (!Interop.IsRunningInTheSimulator)
+                            Console.WriteLine("WARNING: Please derive UnmarshalledJavaScriptExecutionHandler from IWebAssemblyExecutionHandler");
+
                         jsRuntime = new JSRuntimeWrapper(value);
                         INTERNAL_ExecuteJavaScript.JavaScriptRuntime = new PendingJavascriptSimulator(value);
                     }
