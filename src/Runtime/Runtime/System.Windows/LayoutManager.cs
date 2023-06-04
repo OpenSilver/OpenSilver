@@ -117,9 +117,9 @@ namespace Windows.UI.Xaml
             if (updateLayoutOperation == null || updateLayoutOperation.Status == DispatcherOperationStatus.Completed)
             {
 #if MIGRATION
-                updateLayoutOperation = Dispatcher.INTERNAL_GetCurrentDispatcher().InvokeAsync(UpdateLayout, DispatcherPriority.Render);
+                updateLayoutOperation = Dispatcher.CurrentDispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.Render);
 #else
-                updateLayoutOperation = CoreDispatcher.INTERNAL_GetCurrentDispatcher().InvokeAsync(UpdateLayout, DispatcherPriority.Render);
+                updateLayoutOperation = CoreDispatcher.CurrentDispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.Render);
 #endif
             }
         }

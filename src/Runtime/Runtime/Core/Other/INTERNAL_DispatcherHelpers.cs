@@ -59,7 +59,7 @@ namespace CSHTML5.Internal
 
                 if (_dispatcher == null)
                 {
-                    _dispatcher = Dispatcher.INTERNAL_GetCurrentDispatcher();
+                    _dispatcher = Dispatcher.CurrentDispatcher;
                 }
             }
 

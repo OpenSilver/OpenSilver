@@ -76,7 +76,7 @@ namespace System.Windows.Browser
         /// The dispatcher associated with the user interface (UI) thread.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
-        public Dispatcher Dispatcher => Dispatcher.INTERNAL_GetCurrentDispatcher();
+        public Dispatcher Dispatcher => Dispatcher.CurrentDispatcher;
 
         /// <summary>
         /// Gets the underlying managed object reference of the <see cref="ScriptObject"/>.
@@ -95,7 +95,7 @@ namespace System.Windows.Browser
         /// thread.
         /// </returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool CheckAccess() => Dispatcher.INTERNAL_GetCurrentDispatcher().CheckAccess();
+        public bool CheckAccess() => Dispatcher.CurrentDispatcher.CheckAccess();
 
         /// <summary>
         /// Converts the current scriptable object to a specified type.

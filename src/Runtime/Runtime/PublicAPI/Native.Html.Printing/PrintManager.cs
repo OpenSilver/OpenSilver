@@ -190,7 +190,7 @@ namespace CSHTML5.Native.Html.Printing
 #else
                         CoreDispatcher
 #endif
-                        .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
+                        .CurrentDispatcher.BeginInvoke(() =>
                         {
                             // Print the element:
                             PrintManager.Print(element);

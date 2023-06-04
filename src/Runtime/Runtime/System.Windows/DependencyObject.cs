@@ -692,9 +692,9 @@ namespace Windows.UI.Xaml
             get
             {
 #if MIGRATION
-                return Dispatcher.INTERNAL_GetCurrentDispatcher();
+                return Dispatcher.CurrentDispatcher;
 #else
-                return CoreDispatcher.INTERNAL_GetCurrentDispatcher();
+                return CoreDispatcher.CurrentDispatcher;
 #endif
             }
         }

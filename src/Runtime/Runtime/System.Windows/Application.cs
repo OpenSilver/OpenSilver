@@ -138,7 +138,7 @@ namespace Windows.UI.Xaml
 #else
             CoreDispatcher
 #endif
-                .INTERNAL_GetCurrentDispatcher().BeginInvoke(() =>
+                .CurrentDispatcher.BeginInvoke(() =>
             {
                 StartAppServices();
 

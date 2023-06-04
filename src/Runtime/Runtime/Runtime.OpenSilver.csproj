@@ -124,7 +124,7 @@
 		<Compile Include="PublicAPI\Interop\OnCallBackImpl.cs" />
 		<Compile Include="PublicAPI\Interop\OnCallbackSimulator.cs" />
 		<Compile Include="PublicAPI\Native.Html.Controls\NativeComboBox.cs" />
-		<Compile Include="System.Collections.Generic\WORKINPROGRESS\PriorityQueue.cs" />
+		<Compile Include="System.Collections.Generic\PriorityQueue.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\CompositionHost.cs" />
 		<Compile Include="System.ComponentModel.Composition.Hosting\WORKINPROGRESS\DeploymentCatalog.cs" />
 		<Compile Include="System.ComponentModel.Composition\WORKINPROGRESS\CompositionInitializer.cs" />
@@ -312,6 +312,8 @@
 		<Compile Include="System.Windows.Printing\PrintDocument.cs" />
 		<Compile Include="System.Windows.Printing\PrintDocument.PrintOperation.cs" />
 		<Compile Include="System.Windows.Printing\PrintPageEventArgs.cs" />
+		<Compile Include="System.Windows.Threading\DispatcherPriority.cs" />
+		<Compile Include="System.Windows.Threading\DispatcherOperationStatus.cs" />
 		<Compile Include="System.Windows\CornerRadiusConverter.cs" />
 		<Compile Include="System.Windows.input\CursorConverter.cs" />
 		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
@@ -414,8 +416,6 @@
 		<Compile Include="System.Windows\WORKINPROGRESS\WebRequestCreator.cs" />
 		<Compile Include="System.Windows\IntExtensions.cs" />
 		<Compile Include="System.Windows\LayoutManager.cs" />
-		<Compile Include="System.Windows\EventHandlerExtensions.cs" />
-		<Compile Include="System.Windows\Disposable.cs" />
 		<Compile Include="System.Windows\PointExtensions.cs" />
 		<Compile Include="System.Windows\DoubleExtensions.cs" />
 		<Compile Include="System.Windows.Automation.Peers\RangeBaseAutomationPeer.cs" />
@@ -797,8 +797,8 @@
 		<Compile Include="System.Windows.Input\VirtualKey.cs" />
 		<Compile Include="System.Windows.Input\VirtualKeyModifiers.cs" />
 		<Compile Include="System.Windows.Threading\CoreDispatcher.cs" />
-		<Compile Include="System.Windows.Threading\WindowSizeChangedEventArgs.cs" />
-		<Compile Include="System.Windows.Threading\WORKINPROGRESS\DispatcherOperation.cs" />
+		<Compile Include="System.Windows\WindowSizeChangedEventArgs.cs" />
+		<Compile Include="System.Windows.Threading\DispatcherOperation.cs" />
 		<Compile Include="Windows.UI.Input\PointerPoint.cs" />
 		<Compile Include="System.Windows\FontStyles.cs" />
 		<Compile Include="System.Windows\FontWeight.cs" />

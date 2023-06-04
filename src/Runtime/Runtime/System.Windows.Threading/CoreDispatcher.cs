@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,270 +11,203 @@
 *  
 \*====================================================================================*/
 
-
-#if !BRIDGE
-using JSIL.Meta;
-#else
-using Bridge;
-#endif
-
-using CSHTML5.Internal;
-using DotNetForHtml5.Core;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using DotNetForHtml5.Core;
+
 #if !MIGRATION
 using Windows.Foundation;
+using Dispatcher = Windows.UI.Core.CoreDispatcher;
 #endif
 
 #if MIGRATION
-namespace System.Windows.Threading
+namespace System.Windows.Threading;
 #else
-namespace Windows.UI.Core
+namespace Windows.UI.Core;
+#endif
+
+/// <summary>
+/// Provides services for managing the queue of work items for a thread.
+/// </summary>
+#if MIGRATION
+public class Dispatcher
+#else
+public class CoreDispatcher
 #endif
 {
-    public enum DispatcherPriority
+    private static Dispatcher _currentDispatcher;
+
+    private readonly PriorityQueue<DispatcherOperation> _queue;
+    private readonly IDisposable _disableProcessingToken;
+    private int _disableProcessingRequests;
+    private bool _isProcessQueueScheduled;
+
+#if MIGRATION
+    public Dispatcher()
+#else
+    public CoreDispatcher()
+#endif
     {
-        Invalid = -1,
-        Inactive = 0,
-        SystemIdle = 1,
-        ApplicationIdle = 2,
-        ContextIdle = 3,
-        Background = 4,
-        Input = 5,
-        Loaded = 6,
-        Render = 7,
-        DataBind = 8,
-        Normal = 9,
-        Send = 10,
+        _queue = new PriorityQueue<DispatcherOperation>((int)DispatcherPriority.Send - (int)DispatcherPriority.Invalid);
+        _disableProcessingToken = new DispatcherProcessingDisabled(this);
+    }
+
+    internal static Dispatcher CurrentDispatcher => _currentDispatcher ??= new Dispatcher();
+
+    /// <summary>
+    /// Executes the specified delegate asynchronously on the thread the <see cref="Dispatcher"/>
+    /// is associated with.
+    /// </summary>
+    /// <param name="a">
+    /// A delegate to a method that takes no arguments and does not return a value, which
+    /// is pushed onto the <see cref="Dispatcher"/> event queue.
+    /// </param>
+    /// <returns>
+    /// An object, which is returned immediately after <see cref="BeginInvoke(Action)"/> is 
+    /// called, that represents the operation that has been posted to the <see cref="Dispatcher"/>
+    /// queue.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="a"/> is null.
+    /// </exception>
+    public DispatcherOperation BeginInvoke(Action a)
+    {
+        if (a == null)
+        {
+            throw new ArgumentNullException(nameof(a));
+        }
+
+        return InvokeAsync(a, DispatcherPriority.Normal);
     }
 
     /// <summary>
-    /// Provides the core event message dispatcher. Instances of this type are responsible
-    /// for processing the window messages and dispatching the events to the client.
+    /// Executes the specified delegate asynchronously with the specified array of arguments
+    /// on the thread the <see cref="Dispatcher"/> is associated with.
     /// </summary>
-#if MIGRATION
-    public partial class Dispatcher
-#else
-    public partial class CoreDispatcher
-#endif
+    /// <param name="d">
+    /// A delegate to a method that takes multiple arguments, which is pushed onto the
+    /// <see cref="Dispatcher"/> event queue.
+    /// </param>
+    /// <param name="args">
+    /// An array of objects to pass as arguments to the specified method.
+    /// </param>
+    /// <returns>
+    /// An object, which is returned immediately after <see cref="BeginInvoke(Delegate, object[])"/>
+    /// is called, that represents the operation that has been posted to the <see cref="Dispatcher"/>
+    /// queue.
+    /// </returns>
+    public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
     {
-#if MIGRATION
-        static Dispatcher _currentDispatcher;
-#else
-        static CoreDispatcher _currentDispatcher;
-#endif
+        return BeginInvoke(() => d.DynamicInvoke(args));
+    }
 
-#if MIGRATION
-        internal static Dispatcher INTERNAL_GetCurrentDispatcher()
-#else
-        internal static CoreDispatcher INTERNAL_GetCurrentDispatcher()
-#endif
+    /// <summary>
+    /// Determines whether the calling thread is the thread associated with this <see cref="Dispatcher"/>.
+    /// </summary>
+    /// <returns>
+    /// true if the calling thread is the thread associated with this <see cref="Dispatcher"/>; otherwise, false.
+    /// </returns>
+    public bool CheckAccess()
+    {
+        return !OpenSilver.Interop.IsRunningInTheSimulator || INTERNAL_Simulator.WebControlDispatcherCheckAccess();
+    }
+
+    public DispatcherOperation InvokeAsync(Action a, DispatcherPriority priority = DispatcherPriority.Normal)
+    {
+        return EnqueueOperation(a, priority);
+    }
+
+    public IDisposable DisableProcessing()
+    {
+        _disableProcessingRequests++;
+        return _disableProcessingToken;
+    }
+
+    private void EnableProcessing()
+    {
+        if (--_disableProcessingRequests == 0)
         {
-            if (_currentDispatcher == null)
+            ScheduleProcessQueue();
+        }
+    }
+
+    private void ScheduleProcessQueue()
+    {
+        if (_isProcessQueueScheduled) return;
+
+        _isProcessQueueScheduled = true;
+
+        if (!OpenSilver.Interop.IsRunningInTheSimulator)
+        {
+            Task.Run(ProcessQueueAsync);
+        }
+        else
+        {
+            INTERNAL_Simulator.WebControlDispatcherBeginInvoke(() => _ = ProcessQueueAsync());
+        }
+    }
+
+    private async Task ProcessQueueAsync()
+    {
+        while (TryDequeue(out DispatcherOperation operation))
+        {
+            await Task.Delay(1);
+
+            if (operation.Status == DispatcherOperationStatus.Pending)
             {
-#if MIGRATION
-                _currentDispatcher = new Dispatcher();
-#else
-                _currentDispatcher = new CoreDispatcher();
-#endif
-            }
-            return _currentDispatcher;
-        }
-
-        //todo: this does not exactly correspond to the actual method --> add args to BeginInvoke?
-        // Summary:
-        //     Executes the specified delegate asynchronously with the specified arguments
-        //     on the thread that the System.Windows.Threading.Dispatcher was created on.
-        //
-        // Parameters:
-        //   method:
-        //     The delegate to a method that takes parameters specified in args, which is
-        //     pushed onto the System.Windows.Threading.Dispatcher event queue.
-        //
-        //   args:
-        //     An array of objects to pass as arguments to the given method. Can be null.
-        //
-        // Returns:
-        //     An object, which is returned immediately after Overload:System.Windows.Threading.Dispatcher.BeginInvoke
-        //     is called, that can be used to interact with the delegate as it is pending
-        //     execution in the event queue.
-        /// <summary>
-        /// Executes the specified delegate asynchronously on the thread that the System.Windows.Threading.Dispatcher was created on.
-        /// </summary>
-        /// <param name="method">
-        /// The delegate to a method, which is
-        /// pushed onto the System.Windows.Threading.Dispatcher event queue.
-        /// </param>
-        public DispatcherOperation BeginInvoke(Action method)
-        {
-            if (method == null)
-                throw new ArgumentNullException("method");
-            DispatcherOperation dispatcherOperation = new DispatcherOperation();
-            BeginInvokeInternal(method);
-            return dispatcherOperation;
-        }
-
-#if !BRIDGE
-        [JSIL.Meta.JSReplacement("setTimeout(function(){$method();},1);")]
-#else
-        [Template("setTimeout(function(){ {method}(); },1)")]
-#endif
-        static void BeginInvokeInternal(Action method)
-        {
-#if CSHTML5NETSTANDARD
-            //Console.WriteLine("ON BEGININVOKE CALLED");
-            if (!INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround)
-            {
-                // While running unit tests, we do not call Cshtml5Initializer.Initialize.
-                // We just run the code synchronously in that case.
-                if (INTERNAL_Simulator.WebAssemblyExecutionHandler == null)
-                {
-                    method();
-                    return;
-                }
-
-                Task.Run(async () =>
-                {
-                    await Task.Delay(1);
-                    try
-                    {
-                        method();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Error.WriteLine("DEBUG: CoreDispatcher: BeginIvokeInternal: Method excution failed: " +
-                                                e);
-                    }
-                });
-            }
-            else
-            {
-#endif
-            //Simulator only. We call the JavaScript "setTimeout" to queue the action on the thread, and then we call Dispatcher.BeginInvoke(...) to ensure that it runs in the UI thread.
-            //CSHTML5.Interop.ExecuteJavaScriptAsync("setTimeout($0, 1)",
-            //    (Action)(() =>
-            //    {
-            INTERNAL_Simulator.WebControlDispatcherBeginInvoke(method);
-            //}));
-#if CSHTML5NETSTANDARD
-            }
-#endif
-            // Note: the implementation below was commented because it led to issues when drawing the Shape controls: sometimes some Shape controls did not render in the Simulator because the method passed "Dispatcher.Begin()" was called too early.
-            /*
-            global::System.Threading.Timer timer = new global::System.Threading.Timer(
-                delegate(object state)
-                {
-                    INTERNAL_Simulator.WebControl.Dispatcher.BeginInvoke((Action)(() =>
-                    {
-                        method();
-                    }));
-                },
-                null,
-                1,
-                global::System.Threading.Timeout.Infinite);
-             */
-        }
-
-        private PriorityQueue<DispatcherOperation> queue;
-        private int disableProcessingRequests;
-        private IDisposable disableProcessingToken;
-        private bool isProcessQueueScheduled;
-
-#if MIGRATION
-        public Dispatcher()
-#else
-        public CoreDispatcher()
-#endif
-        {
-            queue = new PriorityQueue<DispatcherOperation>((int)DispatcherPriority.Send + 1);
-            disableProcessingToken = new Disposable(EnableProcessing);
-        }
-        public IDisposable DisableProcessing()
-        {
-            disableProcessingRequests++;
-            return disableProcessingToken;
-        }
-
-        private void EnableProcessing()
-        {
-            disableProcessingRequests--;
-
-            if (disableProcessingRequests == 0)
-            {
-                ProcessQueueAsync();
-            }
-        }
-        public DispatcherOperation InvokeAsync(Action callback, DispatcherPriority priority = DispatcherPriority.Normal)
-        {
-            DispatcherOperation dispatcherOperation = new DispatcherOperation(callback, priority);
-            InvokeAsync(dispatcherOperation);
-            return dispatcherOperation;
-        }
-        private void InvokeAsync(DispatcherOperation operation)
-        {
-            queue.Enqueue((int)operation.Priority, operation);
-            ProcessQueueAsync();
-        }
-        private void ProcessQueueAsync()
-        {
-            if (isProcessQueueScheduled)
-            {
-                return;
-            }
-
-            isProcessQueueScheduled = true;
-            Action action = () =>
-            {
-                isProcessQueueScheduled = false;
-
-                DispatcherOperation operation;
-                if (!TryDequeue(out operation))
-                {
-                    return;
-                }
-
-                if (operation.Status == DispatcherOperationStatus.Pending)
+                try
                 {
                     operation.Invoke();
-                    ProcessQueueAsync();
                 }
-            };
-            BeginInvoke(action);
-        }
-        private bool TryDequeue(out DispatcherOperation operation)
-        {
-            while (disableProcessingRequests == 0 && queue.TryPeek(out operation) && operation.Priority != DispatcherPriority.Inactive)
-            {
-                queue.Dequeue();
-
-                if (operation.Status != DispatcherOperationStatus.Pending)
+                catch (Exception ex)
                 {
-                    continue;
+                    Console.Error.WriteLine("Dispatcher: Method excution failed: " + ex);
                 }
-
-                return true;
             }
-
-            operation = null;
-            return false;
         }
 
-        public DispatcherOperation BeginInvoke(Delegate d, params object[] args)
+        _isProcessQueueScheduled = false;
+    }
+
+    private DispatcherOperation EnqueueOperation(Action a, DispatcherPriority priority)
+    {
+        var operation = new DispatcherOperation(a, priority);
+        _queue.Enqueue((int)operation.Priority + 1, operation);
+        ScheduleProcessQueue();
+
+        return operation;
+    }
+
+    private bool TryDequeue(out DispatcherOperation operation)
+    {
+        while (_disableProcessingRequests == 0 && _queue.MaxPriority - 1 > (int)DispatcherPriority.Inactive)
         {
-            return BeginInvoke(() =>
-            {
-                d.DynamicInvoke(args);
-            });
+            operation = _queue.Dequeue();
+
+            if (operation.Status != DispatcherOperationStatus.Pending) continue;
+
+            return true;
         }
 
-        public bool CheckAccess()
+        operation = null;
+        return false;
+    }
+
+    private sealed class DispatcherProcessingDisabled : IDisposable
+    {
+        private readonly Dispatcher _dispatcher;
+
+        public DispatcherProcessingDisabled(Dispatcher dispatcher)
         {
-#if OPENSILVER
-            return INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround ? INTERNAL_Simulator.WebControlDispatcherCheckAccess() : true; 
-#else
-            return CSHTML5.Interop.IsRunningInTheSimulator ? INTERNAL_Simulator.WebControlDispatcherCheckAccess() : true;
-#endif
+            Debug.Assert(dispatcher != null);
+            _dispatcher = dispatcher;
+        }
+
+        public void Dispose()
+        {
+            _dispatcher.EnableProcessing();
         }
     }
 }

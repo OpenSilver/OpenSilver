@@ -70,9 +70,9 @@ public class MemoryLeakTest
             var resetEvent = new ManualResetEvent(false);
             var trackableCallback = new ItemWithTrackableCallback(c, resetEvent);
 #if MIGRATION
-            Dispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(trackableCallback.Callback);
+            Dispatcher.CurrentDispatcher.BeginInvoke(trackableCallback.Callback);
 #else
-            CoreDispatcher.INTERNAL_GetCurrentDispatcher().BeginInvoke(trackableCallback.Callback);
+            CoreDispatcher.CurrentDispatcher.BeginInvoke(trackableCallback.Callback);
 #endif
             resetEvent.WaitOne(5000);
         }
