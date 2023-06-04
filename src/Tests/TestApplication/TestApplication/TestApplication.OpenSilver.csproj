@@ -30,6 +30,7 @@
     <Compile Include="Tests\Events\XTextBox.cs" />
     <Compile Include="Tests\InkPresenterTest.xaml.cs" />
     <Compile Include="Tests\OpenFileDialogTest.xaml.cs" />
+    <Compile Include="Tests\PopupWindowTest.xaml.cs" />
     <Compile Include="Tests\PrintDocumentTest.xaml.cs" />
     <Compile Include="Registry\ITreeItem.cs" />
     <Compile Include="Registry\Test.cs" />
@@ -641,6 +642,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\OpenFileDialogTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tests\PopupWindowTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tests\PrintDocumentTest.xaml">

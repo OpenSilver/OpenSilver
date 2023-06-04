@@ -50,6 +50,14 @@ namespace System.Windows.Browser
         [OpenSilver.NotImplemented]
         public static HtmlWindow PopupWindow(Uri navigateToUri, string target, HtmlPopupWindowOptions options)
         {
+            if (options != null)
+            {
+                Window.Navigate(navigateToUri, target, options.ToFeaturesString());
+            }
+            else
+            {
+                Window.Navigate(navigateToUri, target);
+            }
             return null;
         }
 

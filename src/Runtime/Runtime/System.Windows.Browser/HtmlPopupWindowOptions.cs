@@ -11,6 +11,8 @@
 *  
 \*====================================================================================*/
 
+using System.Text;
+
 namespace System.Windows.Browser
 {
     /// <summary>
@@ -131,5 +133,24 @@ namespace System.Windows.Browser
         /// The width is set to a value that is less than zero.
         /// </exception>
         public int Width { get; set; }
+
+        internal string ToFeaturesString()
+        {
+            var stringBuilder = new StringBuilder(50);
+            stringBuilder.Append("width=").Append(this.Width);
+            stringBuilder.Append(",height=").Append(this.Height);
+            stringBuilder.Append(",left=").Append(this.Left);
+            stringBuilder.Append(",top=").Append(this.Top);
+            stringBuilder.Append(",directories=").Append(this.BoolToYesNo(this.Directories));
+            stringBuilder.Append(",location=").Append(this.BoolToYesNo(this.Location));
+            stringBuilder.Append(",menubar=").Append(this.BoolToYesNo(this.Menubar));
+            stringBuilder.Append(",resizeable=").Append(this.BoolToYesNo(this.Resizeable));
+            stringBuilder.Append(",scrollbars=").Append(this.BoolToYesNo(this.Scrollbars));
+            stringBuilder.Append(",status=").Append(this.BoolToYesNo(this.Status));
+            stringBuilder.Append(",toolbar=").Append(this.BoolToYesNo(this.Toolbar));
+            return stringBuilder.ToString();
+        }
+
+        private string BoolToYesNo(bool b) => !b ? "no" : "yes";
     }
 }
