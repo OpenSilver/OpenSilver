@@ -122,11 +122,10 @@ window.callJS = function (javaScriptToExecute) {
     var resultType = typeof result;
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
        return result;
-    }
-    else if (result == null) {
+    } else if (result == null) {
         return null;
     } else {     
-            return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
+        return result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")";
     }
 };
 
@@ -144,10 +143,7 @@ window.callJSUnmarshalled = function (javaScriptToExecute) {
     }
 };
 
-
-
 window.callJSUnmarshalled_v2 = function (javaScriptToExecute, referenceId, wantsResult) {
-
     javaScriptToExecute = BINDING.conv_string(javaScriptToExecute);
     var result = eval(javaScriptToExecute);
 
@@ -160,14 +156,12 @@ window.callJSUnmarshalled_v2 = function (javaScriptToExecute, referenceId, wants
     var resultType = typeof result;
     if (resultType == 'string' || resultType == 'number' || resultType == 'boolean') {
         return BINDING.js_to_mono_obj(result);
-    }
-    else if (result == null) {
+    } else if (result == null) {
         return null;
     } else {
         return BINDING.js_to_mono_obj(result + " [NOT USABLE DIRECTLY IN C#] (" + resultType + ")");
     }
 };
-
 
 // IMPORTANT: this doesn't return anything (this just executes the pending async JS)
 window.callJSUnmarshalledHeap = (function () {
@@ -178,6 +172,3 @@ window.callJSUnmarshalledHeap = (function () {
         eval(javaScriptToExecute);
     };
 })();
-
-
-

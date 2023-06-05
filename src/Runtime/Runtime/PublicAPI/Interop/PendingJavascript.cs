@@ -44,23 +44,19 @@ namespace CSHTML5.Internal
 
         public PendingJavascript(int bufferSize, IWebAssemblyExecutionHandler webAssemblyExecutionHandler)
         {
+            if (webAssemblyExecutionHandler == null)
+            {
+                throw new ArgumentNullException(nameof(webAssemblyExecutionHandler));
+            }
+
+            CheckWasmExecutionHandler(webAssemblyExecutionHandler);
+
             if (bufferSize <= 0)
             {
                 throw new ArgumentException("Buffer size can not be less or equal to 0");
             }
 
             _webAssemblyExecutionHandler = webAssemblyExecutionHandler ?? throw new ArgumentNullException(nameof(webAssemblyExecutionHandler));
-
-            // breaking change for projects using 1.2.* pre-releases of OpenSilver:
-            //
-            // in order to fix https://github.com/OpenSilver/OpenSilver/issues/758, I had to rename the callJSUnmarshalled JS function
-            // there was no way to differentiate between a legacy call to callJSUnmarshalled and an existing call to it
-            //
-            // the new version of the function has 2 extra args, but when called from C#, the extra args would have default values, not 'undeclared'
-            var methodName = webAssemblyExecutionHandler.GetType().GetField("MethodName", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static).GetValue(null).ToString();
-            if (methodName != "callJSUnmarshalled_v2")
-                throw new ArgumentException("Please change UnmarshalledJavaScriptExecutionHandler.MethodName to 'callJSUnmarshalled_v2'");
-
             _buffer = new byte[bufferSize];
         }
 
@@ -105,6 +101,28 @@ namespace CSHTML5.Internal
             return wantsResult ? result : null;
         }
 
+        private static void CheckWasmExecutionHandler(IWebAssemblyExecutionHandler wasmExecutionHandler)
+        {
+            // breaking change for projects using 1.2.* pre-releases of OpenSilver:
+            //
+            // in order to fix https://github.com/OpenSilver/OpenSilver/issues/758, I had to rename the callJSUnmarshalled JS function
+            // there was no way to differentiate between a legacy call to callJSUnmarshalled and an existing call to it
+            //
+            // the new version of the function has 2 extra args, but when called from C#, the extra args would have default values, not 'undeclared'
+            FieldInfo field = wasmExecutionHandler.GetType()
+                .GetField("MethodName", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+
+            if (field == null)
+            {
+                // Allow null for unit tests
+                return;
+            }
+
+            if (field.GetValue(null).ToString() != CallJSMethodNameSync)
+            {
+                throw new ArgumentException($"Change UnmarshalledJavaScriptExecutionHandler.MethodName to '{CallJSMethodNameSync}'");
+            }
+        }
     }
 
     internal sealed class PendingJavascriptSimulator : IPendingJavascript
