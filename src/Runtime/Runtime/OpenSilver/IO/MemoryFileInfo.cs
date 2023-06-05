@@ -54,5 +54,14 @@ namespace OpenSilver.IO
 
         [NotImplemented]
         public virtual string FullName => Name;
+
+        public virtual long Length
+        {
+            get
+            {
+                if (_content != null) { return _content.Length; }
+                return 0;
+            }
+        }
     }
 }
