@@ -1,4 +1,5 @@
-﻿/*===================================================================================
+﻿
+/*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
 *      
@@ -10,12 +11,12 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CSHTML5.Internal;
+using Microsoft.JSInterop;
 
 namespace OpenSilver;
 
@@ -35,6 +36,8 @@ public static class DumpHelper
     /// <exception cref="ArgumentNullException">Provided object is null</exception>
     public static IDictionary<string, object> GetPropertiesAndValues(object obj, params string[] names)
     {
+        AssertDEBUG();
+
         if (obj is null)
         {
             throw new ArgumentNullException(nameof(obj));
@@ -86,13 +89,17 @@ public static class DumpHelper
     /// Null or empty value means all public properties are return.
     /// </param>
     [JSInvokable]
-    public static Dictionary<string, string> DumpProperties(string elementId, params string[] names)
+    public static IDictionary<string, string> DumpProperties(string elementId, params string[] names)
     {
-        var element = INTERNAL_HtmlDomManager.GetElementById(elementId);
-        if (element == null) return null;
-        var dictionary = GetPropertiesAndValues(element, names);
+        AssertDEBUG();
 
-        return dictionary.ToDictionary(x => x.Key, x => x.Value?.ToString());
+        if (INTERNAL_HtmlDomManager.GetElementById(elementId) is { } element)
+        {
+            return GetPropertiesAndValues(element, names)
+                .ToDictionary(x => x.Key, x => x.Value?.ToString());
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -105,12 +112,20 @@ public static class DumpHelper
     /// </param>
     public static void PrintProperties(object element, params string[] names)
     {
-        var dictionary = GetPropertiesAndValues(element, names);
+        AssertDEBUG();
 
         Console.WriteLine($"=== {element} Properties ===");
-        foreach (var item in dictionary)
+
+        foreach (var item in GetPropertiesAndValues(element, names))
         {
             Console.WriteLine($"{item.Key}: {item.Value}");
         }
+    }
+
+    private static void AssertDEBUG()
+    {
+#if !DEBUG
+        throw new InvalidOperationException();
+#endif
     }
 }
