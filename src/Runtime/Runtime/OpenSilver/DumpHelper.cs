@@ -32,7 +32,7 @@ public static class DumpHelper
     /// Null or empty value means all public properties are return.
     /// </param>
     /// <exception cref="ArgumentNullException">Provided object is null</exception>
-    public static Dictionary<string, object> GetPropertiesAndValues(object obj, string names = null)
+    public static IDictionary<string, object> GetPropertiesAndValues(object obj, params string[] names)
     {
         if (obj is null)
         {
@@ -42,24 +42,38 @@ public static class DumpHelper
         Type type = obj.GetType();
         var properties = new List<PropertyInfo>();
 
-        if (string.IsNullOrEmpty(names))
+        if (names == null || names.Length == 0)
         {
             properties.AddRange(type.GetProperties());
         }
         else
         {
-            var propertyNames = names.Split(',');
-            foreach (var name in propertyNames)
+            foreach (var name in names)
             {
-                var property = type.GetProperty(name);
-                if (property != null)
+                try
                 {
-                    properties.Add(property);
+                    var property = type.GetProperty(name);
+                    if (property != null)
+                    {
+                        properties.Add(property);
+                    }
                 }
+                catch (AmbiguousMatchException) { }
             }
         }
 
-        return properties.OrderBy(x => x.Name).ToDictionary(x => x.Name, x => x.GetValue(obj));
+        var d = new SortedDictionary<string, object>();
+        foreach (PropertyInfo prop in properties)
+        {
+            if (d.ContainsKey(prop.Name) || prop.GetIndexParameters().Length > 0)
+            {
+                continue;
+            }
+            
+            d[prop.Name] = prop.GetValue(obj);
+        }
+        
+        return d;
     }
 
     /// <summary>
@@ -70,9 +84,11 @@ public static class DumpHelper
     /// Names of properties, provided as string of names separated by comma (,).
     /// Null or empty value means all public properties are return.
     /// </param>
-    public static Dictionary<string, string> DumpProperties(string elementId, string names = null)
+    [JSInvokable]
+    public static Dictionary<string, string> DumpProperties(string elementId, params string[] names)
     {
         var element = INTERNAL_HtmlDomManager.GetElementById(elementId);
+        if (element == null) return null;
         var dictionary = GetPropertiesAndValues(element, names);
 
         return dictionary.ToDictionary(x => x.Key, x => x.Value?.ToString());
@@ -86,7 +102,7 @@ public static class DumpHelper
     /// Names of properties, provided as string of names separated by comma (,).
     /// Null or empty value means all public properties are return.
     /// </param>
-    public static void PrintProperties(object element, string names = null)
+    public static void PrintProperties(object element, params string[] names)
     {
         var dictionary = GetPropertiesAndValues(element, names);
 

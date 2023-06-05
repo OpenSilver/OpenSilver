@@ -150,8 +150,6 @@ namespace Windows.UI.Xaml
                 this.OnLaunched(new LaunchActivatedEventArgs());
             });
 
-            OpenSilver.Interop.ExecuteJavaScriptVoidAsync(
-                "document.dumpProperties = function(id, names) { return $0(id, names); }", (Func<string, string, object>)OpenSilver.DumpHelper.DumpProperties);
         }
 
         public IList ApplicationLifetimeObjects
