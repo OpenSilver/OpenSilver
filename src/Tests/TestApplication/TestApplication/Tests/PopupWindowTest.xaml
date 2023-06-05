@@ -1,0 +1,12 @@
+﻿<sdk:Page x:Class="TestApplication.OpenSilver.Tests.PopupWindowTest"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:local="clr-namespace:TestApplication.OpenSilver.Tests"
+          xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Button Content="opensilver.net" Click="OpenSilver_Click" />
+            <Button Content="opensilver.net" Click="OpenSilver1_Click" />
+        </StackPanel>
+    </StackPanel>
+</sdk:Page>

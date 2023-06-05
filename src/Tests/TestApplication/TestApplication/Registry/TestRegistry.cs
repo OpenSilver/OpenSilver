@@ -141,6 +141,7 @@ namespace TestApplication
             Tests.Add(dragDropTargets);
 
             Tests.Add(new Test("OpenFileDialog", "OpenFileDialog"));
+            Tests.Add(new Test("PopupWindow", "PopupWindow"));
         }
     }
 }
