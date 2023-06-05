@@ -181,8 +181,20 @@ document.createElementSafe = function (tagName, id, parentElement, index) {
         var nextSibling = parentElement.children[index];
         parentElement.insertBefore(newElement, nextSibling);
     }
+
+    Object.defineProperty(newElement, 'dump', {
+        get() { return document.dumpProperties(id); }
+    });
+
     return newElement;
 }
+
+document.dumpProperties = function (id, ...names) {
+    if (DotNet && DotNet.invokeMethod) {
+        return DotNet.invokeMethod('OpenSilver', 'DumpProperties', id, names);
+    }
+    return null;
+};
 
 document.createTextBlockElement = function (id, parentElement, wrap) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
