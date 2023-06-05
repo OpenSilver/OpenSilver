@@ -11,6 +11,7 @@
 \*====================================================================================*/
 
 using CSHTML5.Internal;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,10 +70,10 @@ public static class DumpHelper
             {
                 continue;
             }
-            
+
             d[prop.Name] = prop.GetValue(obj);
         }
-        
+
         return d;
     }
 

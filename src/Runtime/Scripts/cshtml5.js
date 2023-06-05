@@ -195,6 +195,7 @@ document.dumpProperties = function (id, ...names) {
     }
     return null;
 };
+
 document.createTextBlockElement = function (id, parentElement, wrap) {
     const newElement = document.createElementSafe('div', id, parentElement, -1);
 
