@@ -6,7 +6,7 @@ namespace TestApplication.OpenSilver.Browser.Interop
 {
     public class UnmarshalledJavaScriptExecutionHandler : IWebAssemblyExecutionHandler
     {
-        private const string MethodName = "callJSUnmarshalled";
+        private const string MethodName = "callJSUnmarshalled_v2";
         private readonly WebAssemblyJSRuntime _runtime;
 
         public UnmarshalledJavaScriptExecutionHandler(IJSRuntime runtime)

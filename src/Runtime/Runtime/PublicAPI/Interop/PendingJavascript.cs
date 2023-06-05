@@ -13,9 +13,11 @@
 
 using DotNetForHtml5;
 using DotNetForHtml5.Core;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 namespace CSHTML5.Internal
@@ -32,7 +34,7 @@ namespace CSHTML5.Internal
     internal sealed class PendingJavascript : IPendingJavascript
     {
         private const string CallJSMethodNameAsync = "callJSUnmarshalledHeap";
-        private const string CallJSMethodNameSync = "callJSUnmarshalled";
+        private const string CallJSMethodNameSync = "callJSUnmarshalled_v2";
 
         private static readonly Encoding DefaultEncoding = Encoding.Unicode;
         private static readonly byte[] Delimiter = DefaultEncoding.GetBytes(";\n");
@@ -42,6 +44,13 @@ namespace CSHTML5.Internal
 
         public PendingJavascript(int bufferSize, IWebAssemblyExecutionHandler webAssemblyExecutionHandler)
         {
+            if (webAssemblyExecutionHandler == null)
+            {
+                throw new ArgumentNullException(nameof(webAssemblyExecutionHandler));
+            }
+
+            CheckWasmExecutionHandler(webAssemblyExecutionHandler);
+
             if (bufferSize <= 0)
             {
                 throw new ArgumentException("Buffer size can not be less or equal to 0");
@@ -92,6 +101,28 @@ namespace CSHTML5.Internal
             return wantsResult ? result : null;
         }
 
+        private static void CheckWasmExecutionHandler(IWebAssemblyExecutionHandler wasmExecutionHandler)
+        {
+            // breaking change for projects using 1.2.* pre-releases of OpenSilver:
+            //
+            // in order to fix https://github.com/OpenSilver/OpenSilver/issues/758, I had to rename the callJSUnmarshalled JS function
+            // there was no way to differentiate between a legacy call to callJSUnmarshalled and an existing call to it
+            //
+            // the new version of the function has 2 extra args, but when called from C#, the extra args would have default values, not 'undeclared'
+            FieldInfo field = wasmExecutionHandler.GetType()
+                .GetField("MethodName", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+
+            if (field == null)
+            {
+                // Allow null for unit tests
+                return;
+            }
+
+            if (field.GetValue(null).ToString() != CallJSMethodNameSync)
+            {
+                throw new ArgumentException($"Change UnmarshalledJavaScriptExecutionHandler.MethodName to '{CallJSMethodNameSync}'");
+            }
+        }
     }
 
     internal sealed class PendingJavascriptSimulator : IPendingJavascript
