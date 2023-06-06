@@ -11,14 +11,19 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
-using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using CSHTML5.Internal;
+using Microsoft.JSInterop;
+
+#if MIGRATION
 using System.Windows;
+#else
+using Windows.UI.Xaml;
+#endif
 
 namespace OpenSilver;
 
@@ -27,8 +32,6 @@ namespace OpenSilver;
 /// </summary>
 public static class DumpHelper
 {
-    private static readonly bool _isDebugging = Application.Current.GetType().Assembly.GetCustomAttribute<DebuggableAttribute>()?.IsJITTrackingEnabled == true;
-
     /// <summary>
     /// Retrieves a dictionary of properties and corresponding values of the provided object.
     /// </summary>
@@ -128,11 +131,31 @@ public static class DumpHelper
 
     private static void AssertDEBUG()
     {
-        bool inDebug = Debugger.IsAttached || _isDebugging;
+        bool inDebug = Debugger.IsAttached || IsDebug();
 
         if (!inDebug)
         {
             throw new InvalidOperationException();
         }
     }
+
+    private static bool IsDebug()
+    {
+        if (_isDebugging.HasValue)
+        {
+            return _isDebugging.Value;
+        }
+
+        Application app = Application.Current;
+        if (app is not null)
+        {
+            DebuggableAttribute attr = app.GetType().Assembly.GetCustomAttribute<DebuggableAttribute>();
+            _isDebugging = attr != null && attr.IsJITTrackingEnabled;
+            return _isDebugging.Value;
+        }
+
+        return false;
+    }
+
+    private static bool? _isDebugging;
 }
