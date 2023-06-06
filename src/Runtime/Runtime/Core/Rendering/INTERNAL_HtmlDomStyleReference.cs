@@ -153,6 +153,8 @@ namespace CSHTML5.Internal
         public string filter { set { SetStylePropertyValue("filter", value); } }
         public string fontFamily { set { SetStylePropertyValue("fontFamily", value); } }
         public string fontSize { set { SetStylePropertyValue("fontSize", value); } }
+        public string fontStyle { set { SetStylePropertyValue("fontStyle", value); } }
+        public string fontWeight { set { SetStylePropertyValue("fontWeight", value); } }
         public string gridColumnEnd { set { SetStylePropertyValue("gridColumnEnd", value); } }
         public string gridColumnStart { set { SetStylePropertyValue("gridColumnStart", value); } }
         public string gridRowEnd { set { SetStylePropertyValue("gridRowEnd", value); } }

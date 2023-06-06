@@ -193,7 +193,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.FontWeight"/> dependency property.
+        /// Identifies the <see cref="FontWeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontWeightProperty =
             DependencyProperty.Register(
@@ -203,12 +203,12 @@ namespace Windows.UI.Xaml.Controls
                 new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
                     Inherits = true,
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        Value = (inst, value) => ((FontWeight)value).ToOpenTypeWeight().ToInvariantString(),
-                        Name = new List<string> { "fontWeight" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    }
+                        var c = (Control)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(c.INTERNAL_OuterDomElement);
+                        style.fontWeight = ((FontWeight)newValue).ToOpenTypeWeight().ToInvariantString();
+                    },
                 });
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.FontStyle"/> dependency property.
+        /// Identifies the <see cref="FontStyle"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontStyleProperty =
             DependencyProperty.Register(
@@ -234,15 +234,14 @@ namespace Windows.UI.Xaml.Controls
 #else
                     FontStyle.Normal
 #endif
-                    , FrameworkPropertyMetadataOptions.AffectsMeasure
-                    )
+                    , FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        Value = (inst, value) => ((FontStyle)value).ToString().ToLower(),
-                        Name = new List<string> { "fontStyle" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    }
+                        var c = (Control)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(c.INTERNAL_OuterDomElement);
+                        style.fontStyle = ((FontStyle)newValue).ToString().ToLower();
+                    },
                 });
 
         //-----------------------
@@ -306,7 +305,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.FontFamily"/> dependency property.
+        /// Identifies the <see cref="FontFamily"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontFamilyProperty =
             DependencyProperty.Register(
@@ -315,14 +314,14 @@ namespace Windows.UI.Xaml.Controls
                 typeof(Control),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
-                    GetCSSEquivalent = (instance) => new CSSEquivalent
+                    MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
-                        Value = (inst, value) => (value is FontFamily) ?
-                            INTERNAL_FontsHelper.LoadFont(((FontFamily)value).Source, (UIElement)instance) :
-                            string.Empty,
-                        Name = new List<string> { "fontFamily" },
-                        ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)
-                    }
+                        var c = (Control)d;
+                        var style = INTERNAL_HtmlDomManager.GetDomElementStyleForModification(c.INTERNAL_OuterDomElement);
+                        style.fontFamily = newValue is FontFamily ff ?
+                            INTERNAL_FontsHelper.LoadFont(ff.Source, c) :
+                            string.Empty;
+                    },
                 });
 
         //-----------------------
