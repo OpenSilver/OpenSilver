@@ -11,12 +11,14 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using CSHTML5.Internal;
 using Microsoft.JSInterop;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
 
 namespace OpenSilver;
 
@@ -25,6 +27,8 @@ namespace OpenSilver;
 /// </summary>
 public static class DumpHelper
 {
+    private static readonly bool _isDebugging = Application.Current.GetType().Assembly.GetCustomAttribute<DebuggableAttribute>()?.IsJITTrackingEnabled == true;
+
     /// <summary>
     /// Retrieves a dictionary of properties and corresponding values of the provided object.
     /// </summary>
@@ -124,8 +128,11 @@ public static class DumpHelper
 
     private static void AssertDEBUG()
     {
-#if !DEBUG
-        throw new InvalidOperationException();
-#endif
+        bool inDebug = Debugger.IsAttached || _isDebugging;
+
+        if (!inDebug)
+        {
+            throw new InvalidOperationException();
+        }
     }
 }
