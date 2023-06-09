@@ -509,7 +509,7 @@ document.createInputManager = function (root, callback) {
 
         document.addEventListener('keydown', function (e) { setModifiers(e); });
 
-        document.addEventListener('keyup', function (e) { setModifiers(e); });        
+        document.addEventListener('keyup', function (e) { setModifiers(e); });
 
         window.addEventListener('blur', function (e) {
             callback('', EVENTS.WINDOW_BLUR, e);
@@ -570,12 +570,16 @@ document.createInputManager = function (root, callback) {
             if (!view) return;
 
             view.addEventListener('mouseenter', function (e) {
+                if (e instanceof CustomEvent)
+                    return;
                 if (_mouseCapture === null || this === _mouseCapture) {
                     callback(getClosestElementId(this), EVENTS.MOUSE_ENTER, e);
                 }
             });
 
             view.addEventListener('mouseleave', function (e) {
+                if (e instanceof CustomEvent)
+                    return;
                 if (_mouseCapture === null || this === _mouseCapture) {
                     callback(getClosestElementId(this), EVENTS.MOUSE_LEAVE, e);
                 }
