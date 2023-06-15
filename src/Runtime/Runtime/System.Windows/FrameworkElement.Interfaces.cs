@@ -71,10 +71,6 @@ public partial class FrameworkElement : IInternalFrameworkElement
         set => TemplateChild = (FrameworkElement)value;
     }
 
-    DependencyProperty IInternalFrameworkElement.DataContextProperty => DataContextProperty;
-
-    DependencyProperty IInternalFrameworkElement.ContentPresenterContentProperty => ContentPresenter.ContentProperty;
-
     DependencyObject IInternalFrameworkElement.Parent => Parent;
 
     ResourceDictionary IInternalFrameworkElement.Resources

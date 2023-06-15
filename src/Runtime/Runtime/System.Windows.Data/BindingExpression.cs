@@ -996,8 +996,8 @@ namespace Windows.UI.Xaml.Data
                     // 2. if the target is ContentPresenter and the target property
                     //      is Content, use the parent.  This enables
                     //          <ContentPresenter Content="{Binding...}"/>
-                    if (TargetProperty == targetFE.DataContextProperty ||
-                        TargetProperty == targetFE.ContentPresenterContentProperty)
+                    if (TargetProperty == FrameworkElement.DataContextProperty ||
+                        TargetProperty == ContentPresenter.ContentProperty)
                     {
                         contextElement = targetFE.Parent ?? VisualTreeHelper.GetParent(targetFE);
                         if (contextElement == null && !lastAttempt)
@@ -1022,8 +1022,12 @@ namespace Windows.UI.Xaml.Data
 
                 if (source is IInternalFrameworkElement sourceFE)
                 {
-                    _dataContextListener = new DependencyPropertyChangedListener(sourceFE.AsDependencyObject(), sourceFE.DataContextProperty, OnDataContextChanged);
-                    source = sourceFE.GetValue(sourceFE.DataContextProperty);
+                    _dataContextListener = new DependencyPropertyChangedListener(
+                        sourceFE.AsDependencyObject(),
+                        FrameworkElement.DataContextProperty,
+                        OnDataContextChanged);
+                    
+                    source = sourceFE.GetValue(FrameworkElement.DataContextProperty);
                 }
                 else
                 {

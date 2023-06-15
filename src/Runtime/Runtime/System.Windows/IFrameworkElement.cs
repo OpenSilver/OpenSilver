@@ -48,10 +48,6 @@ internal interface IInternalFrameworkElement : IFrameworkElement, IInternalUIEle
 
     IInternalFrameworkElement TemplateChild { get; set; }
 
-    DependencyProperty DataContextProperty { get; }
-
-    DependencyProperty ContentPresenterContentProperty { get; }
-    
     DependencyObject Parent { get; }
 
     ResourceDictionary Resources { get; set; }
