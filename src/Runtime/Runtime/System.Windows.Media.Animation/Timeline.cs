@@ -44,10 +44,9 @@ namespace Windows.UI.Xaml.Media.Animation
                 return propertyPath.DependencyProperty;
             }
 
-            return INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
-                target.GetType(),
-                propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName
-            );
+            return DependencyProperty.FromName(
+                propertyPath.SVI[propertyPath.SVI.Length - 1].propertyName,
+                target.GetType());
         }
 
         // Returns:

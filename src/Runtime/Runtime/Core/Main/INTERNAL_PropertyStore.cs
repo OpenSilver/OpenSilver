@@ -59,9 +59,9 @@ namespace CSHTML5.Internal
                 // CREATE A NEW STORAGE:
                 //----------------------
 
-                metadata ??= dependencyProperty.GetMetadata(dependencyObject.GetType());
+                metadata ??= dependencyProperty.GetMetadata(dependencyObject.DependencyObjectType);
 
-                storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.DefaultValue);
+                storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
 
                 dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
 
@@ -104,25 +104,18 @@ namespace CSHTML5.Internal
 
             if (createIfNotFoud)
             {
-                metadata ??= dependencyProperty.GetMetadata(dependencyObject.GetType());
+                metadata ??= dependencyProperty.GetMetadata(dependencyObject.DependencyObjectType);
 
                 Debug.Assert(metadata != null && metadata.Inherits,
                     $"{dependencyProperty.Name} is not an inherited property.");
 
                 // Create the storage:
-                storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.DefaultValue);
+                storage = INTERNAL_PropertyStorage.CreateDefaultValueEntry(metadata.GetDefaultValue(dependencyObject, dependencyProperty));
 
                 //-----------------------
                 // CHECK IF THE PROPERTY BELONGS TO THE OBJECT (OR TO ONE OF ITS ANCESTORS):
                 //-----------------------
-                //below: we check if the property is useful to the current DependencyObject, in which case we set it as its inheritedValue in "PropertyStorageDictionary"
-                if (dependencyProperty.OwnerType.IsAssignableFrom(dependencyObject.GetType()))
-                {
-                    //-----------------------
-                    // ADD THE STORAGE TO "INTERNAL_PropertyStorageDictionary"
-                    //-----------------------
-                    dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
-                }
+                dependencyObject.INTERNAL_PropertyStorageDictionary.Add(dependencyProperty, storage);
                 dependencyObject.INTERNAL_AllInheritedProperties.Add(dependencyProperty, storage);
             }
 
@@ -143,6 +136,8 @@ namespace CSHTML5.Internal
                 return;
             }
 
+            ValidateValue(dp, newValue);
+            
             if (!coerceWithCurrentValue)
             {
                 object newLocalValue = newValue;
@@ -291,6 +286,13 @@ namespace CSHTML5.Internal
             PropertyMetadata metadata,
             object value)
         {
+            bool clearValue = value == DependencyProperty.UnsetValue;
+
+            if (!clearValue)
+            {
+                ValidateValue(dp, value);
+            }
+
             if (storage.Entry.IsExpression || storage.Entry.IsExpressionFromStyle)
             {
                 if (storage.Entry.ModifiedValue.BaseValue is Expression currentExpr)
@@ -309,7 +311,7 @@ namespace CSHTML5.Internal
                 BaseValueSourceInternal.Animated,
                 false, // coerceWithCurrentValue
                 false, // coerceValue
-                value == DependencyProperty.UnsetValue, // clearValue
+                clearValue, // clearValue
                 true); // propagateChanges
         }
 
@@ -318,6 +320,8 @@ namespace CSHTML5.Internal
         #region Private Methods
 
         private static void ComputeEffectiveValue(INTERNAL_PropertyStorage storage,
+            DependencyObject owner,
+            DependencyProperty dp,
             PropertyMetadata metadata,
             out object effectiveValue,
             out BaseValueSourceInternal kind)
@@ -351,7 +355,7 @@ namespace CSHTML5.Internal
             }
             else // Property default value
             {
-                effectiveValue = metadata.DefaultValue;
+                effectiveValue = metadata.GetDefaultValue(owner, dp);
                 kind = BaseValueSourceInternal.Default;
             }
         }
@@ -407,7 +411,7 @@ namespace CSHTML5.Internal
             }
             else
             {
-                ComputeEffectiveValue(storage, metadata, out effectiveValue, out effectiveValueKind);
+                ComputeEffectiveValue(storage, depObj, dp, metadata, out effectiveValue, out effectiveValueKind);
 
                 // Check for early exit if effective value is not impacted (if we are doing 
                 // a coerce operation, we have to go through the update process)
@@ -439,9 +443,7 @@ namespace CSHTML5.Internal
             {
                 if (effectiveValue is not Expression newExpr)
                 {
-                    computedValue = dp.PropertyType == typeof(string)
-                                    ? effectiveValue?.ToString()
-                                    : effectiveValue;
+                    computedValue = dp.IsStringType ? effectiveValue?.ToString() : effectiveValue;
                     newEntry.Value = computedValue;
                 }
                 else
@@ -467,11 +469,11 @@ namespace CSHTML5.Internal
 
                     if (effectiveValueKind == BaseValueSourceInternal.Local)
                     {
-                        newEntry.SetExpressionValue(metadata.DefaultValue, newExpr);
+                        newEntry.SetExpressionValue(null, newExpr);
                     }
                     else
                     {
-                        newEntry.SetExpressionFromStyleValue(metadata.DefaultValue, newExpr);
+                        newEntry.SetExpressionFromStyleValue(null, newExpr);
                     }
 
                     // 1- 'isNewBinding == true' means that we are attaching a new Expression.
@@ -482,9 +484,7 @@ namespace CSHTML5.Internal
                     // situations), hence the following line :
                     computedValue = isNewBinding || newValue is Expression ? newExpr.GetValue(depObj, dp)
                                                                            : newValue;
-                    computedValue = dp.PropertyType == typeof(string)
-                                    ? computedValue?.ToString()
-                                    : computedValue;
+                    computedValue = dp.IsStringType ? computedValue?.ToString() : computedValue;
                     newEntry.ModifiedValue.ExpressionValue = computedValue;
                 }
             }
@@ -546,13 +546,10 @@ namespace CSHTML5.Internal
             storage.Entry = newEntry;
 
             bool valueChanged;
-            if (valueChanged = (storage.INTERNAL_IsVisualValueDirty || !ArePropertiesEqual(oldValue, computedValue, dp.PropertyType)))
+            if (valueChanged = (storage.INTERNAL_IsVisualValueDirty || !Equals(dp, oldValue, computedValue)))
             {
                 // Raise the PropertyChanged event
-                if (!metadata.Inherits || ShouldRaisePropertyChanged(depObj, dp))
-                {
-                    OnPropertyChanged(depObj, dp, metadata, oldValue, computedValue);
-                }
+                OnPropertyChanged(depObj, dp, metadata, oldValue, computedValue);
 
                 // Propagate to children if property is inherited
                 if (metadata.Inherits)
@@ -605,7 +602,7 @@ namespace CSHTML5.Internal
         {
             newValue = coerceWithCurrentValue ? newValue : metadata.CoerceValueCallback(target, newValue);
 
-            if (!ArePropertiesEqual(newValue, baseValue, dp.PropertyType))
+            if (!Equals(dp, newValue, baseValue))
             {
                 // returning DependencyProperty.UnsetValue from a Coercion callback means "don't do the set" ...
                 // or "use previous value"
@@ -725,27 +722,13 @@ namespace CSHTML5.Internal
             depObj.OnPropertyChanged(args);
         }
 
-        private static bool ArePropertiesEqual(object obj1, object obj2, Type type)
+        private static bool Equals(DependencyProperty dp, object obj1, object obj2)
         {
-            // Note: In Silverlight (and WPF), a DependencyProperty callback is only called if one of the following condition is met :
-            // - The Property type is a value type or a string and the old and new value are not equal (by value)
-            // - The Property type is a reference and the old value and new value are not the same object
-            // - The Property is the DataContext DependencyProperty (in this case the event 'DataContextChanged' is always raised) (Not handled in this method)
-            if (type.IsValueType || type == typeof(string))
+            if (dp.IsValueType || dp.IsStringType)
             {
-                return object.Equals(obj1, obj2);
+                return Equals(obj1, obj2);
             }
-            return object.ReferenceEquals(obj1, obj2);
-        }
-
-        private static bool ShouldRaisePropertyChanged(DependencyObject depObj, DependencyProperty dp)
-        {
-            // Note: we only want to call "OnPropertyChanged" when the property is used by the current DependencyObject or if it is the DataContext property.
-            if (!dp.IsAttached)
-            {
-                return dp.OwnerType.IsAssignableFrom(depObj.GetType()) || (depObj is IInternalFrameworkElement fe && dp == fe.DataContextProperty);
-            }
-            return true;
+            return ReferenceEquals(obj1, obj2);
         }
 
 #endregion
@@ -821,6 +804,17 @@ namespace CSHTML5.Internal
                 false, // coerceValue
                 newValue == DependencyProperty.UnsetValue, // clearValue
                 true); // propagateChanges
+        }
+
+        private static void ValidateValue(DependencyProperty dp, object value)
+        {
+            bool isValidValue = dp.IsValidValue(value) || value is Expression;
+
+            if (!isValidValue)
+            {
+                throw new ArgumentException(
+                    string.Format("'{0}' is not a valid value for property '{1}'.", value, dp.Name));
+            }
         }
 
         internal static void ApplyCssChanges(object oldValue, object newValue, PropertyMetadata typeMetadata, DependencyObject sender)

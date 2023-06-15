@@ -51,7 +51,10 @@
 		<Compile Include="Core\Main\EffectiveValueEntry.cs" />
 		<Compile Include="Core\Main\EmptyEnumerator.cs" />
 		<Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
-		<Compile Include="Core\Main\INTERNAL_NamedObject.cs" />
+		<Compile Include="OpenSilver\Internal\DefaultValueFactory.cs" />
+		<Compile Include="OpenSilver\Internal\DependencyObjectType.cs" />
+		<Compile Include="OpenSilver\Internal\NamedObject.cs" />
+		<Compile Include="OpenSilver\Internal\ValidateValueCallback.cs" />
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />
 		<Compile Include="Core\Main\WeakReferenceList.cs" />
 		<Compile Include="Core\Main\WeakReferenceListEnumerator.cs" />
@@ -103,6 +106,7 @@
 		<Compile Include="OpenSilver\Internal\Xaml\ServiceProviderContext.cs" />
 		<Compile Include="OpenSilver\IO\MemoryFileInfo.cs" />
 		<Compile Include="OpenSilver\NotImplementedAttribute.cs" />
+		<Compile Include="OpenSilver\Utility\FrugalMap.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupInternal.cs" />
 		<Compile Include="PagedCollectionView\CollectionViewGroupRoot.cs" />
 		<Compile Include="PagedCollectionView\IPagedCollectionView.cs" />
@@ -260,6 +264,7 @@
 		<Compile Include="System.Windows.Controls\MatchedTextInfo.cs" />
 		<Compile Include="System.Windows.Controls\WORKINPROGRESS\ObservableObjectCollection.cs" />
 		<Compile Include="System.Windows.Controls\WrapPanelHelper.cs" />
+		<Compile Include="System.Windows.Documents\TextElementProperties.cs" />
 		<Compile Include="System.Windows.input\KeyboardNavigation.cs" />
 		<Compile Include="System.Windows.input\TraversalRequest.cs" />
 		<Compile Include="System.Windows.Markup\DependencyPropertyConverter.cs" />
@@ -320,6 +325,7 @@
 		<Compile Include="System.Windows.Media\DoubleCollectionConverter.cs" />
 		<Compile Include="System.Windows\DataObject.SL.cs" />
 		<Compile Include="System.Windows\DataTemplateKey.cs" />
+		<Compile Include="System.Windows\DependencyPropertyKey.cs" />
 		<Compile Include="System.Windows\DurationConverter.cs" />
 		<Compile Include="System.Windows.Media\FontFamilyConverter.cs" />
 		<Compile Include="System.Windows\EventHandlersStore.cs" />
@@ -349,6 +355,7 @@
 		<Compile Include="System.Windows\LengthConverter.cs" />
 		<Compile Include="System.Windows\PointConverter.cs" />
 		<Compile Include="System.Windows\PropertyPathConverter.cs" />
+		<Compile Include="System.Windows\ReadOnlyPropertyMetadata.cs" />
 		<Compile Include="System.Windows\RectConverter.cs" />
 		<Compile Include="System.Windows.Media.Animation\RepeatBehaviorConverter.cs" />
 		<Compile Include="System.Windows\RoutedEventHandlerInfo.cs" />
@@ -635,8 +642,6 @@
 		<Compile Include="Core\Main\INTERNAL_PropertyStore.cs" />
 		<Compile Include="Core\Main\INTERNAL_Simulator.cs" />
 		<Compile Include="Core\Main\INTERNAL_ExecuteJavaScript.cs" />
-		<Compile Include="Core\Main\INTERNAL_TypeToDependencyPropertiesThatRequirePropertyChanged.cs" />
-		<Compile Include="Core\Main\INTERNAL_TypeToStringToDependencyProperty.cs" />
 		<Compile Include="Core\Main\INTERNAL_UriHelper.cs" />
 		<Compile Include="Core\Main\NamespacesDocumentation.cs" />
 		<Compile Include="Core\Main\TypeFromStringConverters.cs" />

@@ -24,9 +24,11 @@ using System.ComponentModel;
 #if MIGRATION
 using System.Windows.Media;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Controls.Primitives;
 #else
 using Windows.UI.Text;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Input;
 using Windows.Foundation;
@@ -70,8 +72,7 @@ namespace Windows.UI.Xaml.Controls
         {
             // Initialize the _templateCache to the default value for TemplateProperty.
             // If the default value is non-null then wire it to the current instance.
-            PropertyMetadata metadata = TemplateProperty.GetMetadata(this.GetType());
-            ControlTemplate defaultValue = (ControlTemplate)metadata.DefaultValue;
+            ControlTemplate defaultValue = (ControlTemplate)TemplateProperty.GetDefaultValue(this);
             if (defaultValue != null)
             {
                 OnTemplateChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, TemplateProperty));
@@ -196,13 +197,10 @@ namespace Windows.UI.Xaml.Controls
         /// Identifies the <see cref="FontWeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontWeightProperty =
-            DependencyProperty.Register(
-                nameof(FontWeight), 
-                typeof(FontWeight), 
+            TextElementProperties.FontWeightProperty.AddOwner(
                 typeof(Control),
-                new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure)
+                new FrameworkPropertyMetadata(FontWeights.Normal, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits)
                 {
-                    Inherits = true,
                     MethodToUpdateDom2 = static (d, oldValue, newValue) =>
                     {
                         var c = (Control)d;
@@ -338,23 +336,20 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Control.FontSize"/> dependency property.
+        /// Identifies the <see cref="FontSize"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register(
-                nameof(FontSize), 
-                typeof(double), 
+            TextElementProperties.FontSizeProperty.AddOwner(
                 typeof(Control),
-                new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure)
-                { 
-                    Inherits = true,
+                new FrameworkPropertyMetadata(11d, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.Inherits)
+                {
                     GetCSSEquivalent = (instance) => new CSSEquivalent
                     {
                         Value = (inst, value) =>
                         {
                             // Note: We multiply by 1000 and then divide by 1000 so as to only keep 3 
                             // decimals at the most.
-                            return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString() + "px"; 
+                            return (Math.Floor(Convert.ToDouble(value) * 1000) / 1000).ToInvariantString() + "px";
                         },
                         Name = new List<string> { "fontSize" },
                         ApplyAlsoWhenThereIsAControlTemplate = true // (See comment where this property is defined)

@@ -175,7 +175,7 @@ namespace OpenSilver.Internal.Data
             {
                 Type type = _resolvedType ?? Source.GetType();
 
-                DependencyProperty dependencyProperty = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(type, _propertyName);
+                DependencyProperty dependencyProperty = DependencyProperty.FromName(_propertyName, type);
 
                 if (dependencyProperty != null)
                 {

@@ -865,7 +865,7 @@ if(nextSibling != undefined) {
                 var t1 = Performance.now();
 #endif
 
-                PropertyMetadata propertyMetadata = property.GetTypeMetaData(dependencyObject.GetType());
+                PropertyMetadata propertyMetadata = property.GetMetadata(dependencyObject.DependencyObjectType);
 
                 if (propertyMetadata != null)
                 {

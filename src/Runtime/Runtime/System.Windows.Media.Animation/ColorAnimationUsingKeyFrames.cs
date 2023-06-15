@@ -50,7 +50,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </returns>
         public ColorKeyFrameCollection KeyFrames
         {
-            get => _keyFrames ?? (_keyFrames = new ColorKeyFrameCollection(this));
+            get => _keyFrames ??= new ColorKeyFrameCollection(this);
             [EditorBrowsable(EditorBrowsableState.Never)]
             set => _keyFrames = value;
         }
@@ -374,7 +374,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             Completed -= ApplyLastKeyFrame;
             InitializeKeyFramesSet();
-            _propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
+            _propertyMetadata = _propDp.GetMetadata(_propertyContainer.DependencyObjectType);
 
             if (!IsZeroDuration(ResolveDuration()))
             {
@@ -416,11 +416,12 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             if (_isInitialized)
             {
-                DependencyProperty dp = CSHTML5.Internal.INTERNAL_TypeToStringsToDependencyProperties
-                        .GetPropertyInTypeOrItsBaseTypes(_propertyContainer.GetType(), _targetProperty.SVI[_targetProperty.SVI.Length - 1].propertyName);
+                DependencyProperty dp = DependencyProperty.FromName(
+                    _targetProperty.SVI[_targetProperty.SVI.Length - 1].propertyName,
+                    _propertyContainer.GetType());
 
                 // - Get the propertyMetadata from the property
-                PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
+                PropertyMetadata propertyMetadata = dp.GetMetadata(_propertyContainer.DependencyObjectType);
                 // - Get the cssPropertyName from the PropertyMetadata
 
                 //we make a specific name for this animation:

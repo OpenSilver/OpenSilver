@@ -190,7 +190,7 @@ namespace Windows.UI.Xaml
 
         private static DependencyProperty DependencyPropertyFromName(string name, Type ownerType)
         {
-            DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(ownerType, name);
+            DependencyProperty dp = DependencyProperty.FromName(name, ownerType);
 
             return dp ?? throw new InvalidOperationException($"No DependencyProperty named '{name}' could be found in '{ownerType}'.");
         }

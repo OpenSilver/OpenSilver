@@ -149,9 +149,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentException(string.Format("Must have non-null value for '{0}'.", "Setter.Property"));
             }
 
-            bool isObjectType = dp.PropertyType == typeof(object);
-
-            if (isObjectType || !DependencyProperty.IsValueTypeValid(value, dp.PropertyType))
+            if (dp.IsObjectType || !dp.IsValidValue(value))
             {
                 switch (value)
                 {
@@ -165,7 +163,7 @@ namespace Windows.UI.Xaml
                         break;
 
                     default:
-                        if (!isObjectType)
+                        if (!dp.IsObjectType)
                             throw new ArgumentException(
                                 $"'{value}' is not a valid value for the '{dp.OwnerType}.{dp.Name}' property on a Setter.");
                         break;

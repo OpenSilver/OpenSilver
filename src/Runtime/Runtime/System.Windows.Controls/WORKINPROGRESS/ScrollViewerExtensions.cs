@@ -82,7 +82,7 @@ namespace Windows.UI.Xaml.Controls
                 "IsMouseWheelScrollingEnabled",
                 typeof(bool),
                 typeof(ScrollViewerExtensions),
-                new PropertyMetadata(false, OnIsMouseWheelScrollingEnabledPropertyChanged) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.Always });
+                new PropertyMetadata(false, OnIsMouseWheelScrollingEnabledPropertyChanged) { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
 
         /// <summary>
         /// IsMouseWheelScrollingEnabledProperty property changed handler.

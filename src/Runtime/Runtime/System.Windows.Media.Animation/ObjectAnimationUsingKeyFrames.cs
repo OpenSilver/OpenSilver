@@ -56,7 +56,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// Gets the collection of ObjectKeyFrame objects that define the animation.
         /// </summary>
         public ObjectKeyFrameCollection KeyFrames
-            => _keyFrames ?? (_keyFrames = new ObjectKeyFrameCollection(this));
+            => _keyFrames ??= new ObjectKeyFrameCollection(this);
 
         /// <summary>
         /// Returns the largest time span specified key time from all of the key frames.

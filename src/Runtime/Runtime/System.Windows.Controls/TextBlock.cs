@@ -343,7 +343,7 @@ namespace Windows.UI.Xaml.Controls
             if (this.INTERNAL_OuterDomElement == null || Application.Current.TextMeasurementService.IsTextMeasureDivID(((INTERNAL_HtmlDomElementReference)this.INTERNAL_OuterDomElement).UniqueIdentifier))
                 return;
 
-            FrameworkPropertyMetadata metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
+            FrameworkPropertyMetadata metadata = e.Property.GetMetadata(DependencyObjectType) as FrameworkPropertyMetadata;
 
             if (metadata != null)
             {

@@ -16,7 +16,6 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections;
-using CSHTML5.Internal;
 using OpenSilver.Internal;
 using OpenSilver.Internal.Data;
 
@@ -46,8 +45,6 @@ namespace Windows.UI.Xaml.Data
         //  - ParentBinding.Converter
         //  - ParentBinding.ConverterLanguage
         //  - ParentBinding.ConverterParameter
-
-        private static readonly Type NullableType = typeof(Nullable<>);
 
         internal bool IsUpdating;
         private bool _isAttaching;
@@ -182,7 +179,7 @@ namespace Windows.UI.Xaml.Data
                 value = ApplyStringFormat(value);
             }
 
-            value = ConvertValueImplicitly(value, TargetProperty.PropertyType);
+            value = ConvertValueImplicitly(value, TargetProperty);
 
             if (value == DependencyProperty.UnsetValue)
             {
@@ -700,7 +697,7 @@ namespace Windows.UI.Xaml.Data
                         return;
                 }
 
-                if (!IsValidValue(convertedValue, expectedType))
+                if (!DependencyProperty.IsValidType(convertedValue, expectedType))
                 {
                     IsUpdating = true;
 
@@ -811,26 +808,16 @@ namespace Windows.UI.Xaml.Data
             }
         }
 
-        private object ConvertValueImplicitly(object value, Type targetType)
+        private object ConvertValueImplicitly(object value, DependencyProperty dp)
         {
-            if (IsValidValue(value, targetType))
+            if (dp.IsValidType(value))
             {
                 return value;
             }
 
-            return UseDynamicConverter(value, targetType);
+            return UseDynamicConverter(value, dp.PropertyType);
         }
-
-        private static bool IsValidValue(object value, Type type)
-        {
-            if (value == null)
-            {
-                return !type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition() == NullableType);
-            }
-
-            return type.IsAssignableFrom(value.GetType());
-        }
-
+        
         private object UseDynamicConverter(object value, Type targetType)
         {
             object convertedValue;
@@ -873,7 +860,7 @@ namespace Windows.UI.Xaml.Data
 
             if (ParentBinding.FallbackValue != null)
             {
-                value = ConvertValueImplicitly(ParentBinding.FallbackValue, TargetProperty.PropertyType);
+                value = ConvertValueImplicitly(ParentBinding.FallbackValue, TargetProperty);
             }
 
             if (value == DependencyProperty.UnsetValue)
@@ -906,7 +893,7 @@ namespace Windows.UI.Xaml.Data
             return result;
         }
 
-        private object GetDefaultValue() => TargetProperty.GetMetadata(Target.GetType()).DefaultValue;
+        private object GetDefaultValue() => TargetProperty.GetDefaultValue(Target);
 
         private static void HandleException(Exception ex)
         {

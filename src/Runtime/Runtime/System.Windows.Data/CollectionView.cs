@@ -1,7 +1,5 @@
 ﻿// Copyright (C) 2003 by Microsoft Corporation.  All rights reserved.
 
-using CSHTML5.Internal;
-using OpenSilver.Internal.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +9,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Threading;
+using OpenSilver.Internal;
+using OpenSilver.Internal.Data;
 
 #if MIGRATION
 using System.Windows.Controls;
@@ -1802,11 +1802,11 @@ namespace Windows.UI.Xaml.Data
         CollectionViewFlags _flags = CollectionViewFlags.ShouldProcessCollectionChanged |
                                      CollectionViewFlags.NeedsRefresh;
         bool _currentElementWasRemovedOrReplaced;
-        static object _newItemPlaceholder = new INTERNAL_NamedObject("NewItemPlaceholder");
+        static object _newItemPlaceholder = new NamedObject("NewItemPlaceholder");
         object _syncObject = new object();
         int _timestamp;
         static readonly string IEnumerableT = typeof(IEnumerable<>).Name;
-        internal static readonly object NoNewItem = new INTERNAL_NamedObject("NoNewItem");
+        internal static readonly object NoNewItem = new NamedObject("NoNewItem");
 
         // since there's nothing in the uncancelable event args that is mutable,
         // just create one instance to be used universally.

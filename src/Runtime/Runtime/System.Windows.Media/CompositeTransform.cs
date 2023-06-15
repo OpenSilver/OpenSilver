@@ -415,7 +415,7 @@ namespace Windows.UI.Xaml.Media
             //-------------
 
             //TranslateX:
-            CSSEquivalent translateXcssEquivalent = TranslateXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
+            CSSEquivalent translateXcssEquivalent = TranslateXProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (translateXcssEquivalent != null)
             {
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
@@ -425,7 +425,7 @@ namespace Windows.UI.Xaml.Media
             }
 
             //TranslateY:
-            CSSEquivalent translateYcssEquivalent = TranslateYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
+            CSSEquivalent translateYcssEquivalent = TranslateYProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (translateYcssEquivalent != null)
             {
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
@@ -435,7 +435,7 @@ namespace Windows.UI.Xaml.Media
             }
 
             //Rotation:
-            CSSEquivalent rotationcssEquivalent = RotationProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
+            CSSEquivalent rotationcssEquivalent = RotationProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (rotationcssEquivalent != null)
             {
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
@@ -445,7 +445,7 @@ namespace Windows.UI.Xaml.Media
             }
 
             //SkewX:
-            CSSEquivalent skewXcssEquivalent = SkewXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
+            CSSEquivalent skewXcssEquivalent = SkewXProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (skewXcssEquivalent != null)
             {
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
@@ -455,7 +455,7 @@ namespace Windows.UI.Xaml.Media
             }
 
             //SkewY:
-            CSSEquivalent skewYcssEquivalent = SkewYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
+            CSSEquivalent skewYcssEquivalent = SkewYProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (skewYcssEquivalent != null)
             {
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
@@ -465,7 +465,7 @@ namespace Windows.UI.Xaml.Media
             }
 
             //ScaleX:
-            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
+            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (scaleXcssEquivalent != null)
             {
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(
@@ -475,7 +475,7 @@ namespace Windows.UI.Xaml.Media
             }
 
             //ScaleY:
-            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(CompositeTransform)).GetCSSEquivalent(this);
+            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (scaleYcssEquivalent != null)
             {
                 INTERNAL_HtmlDomManager.SetDomElementStylePropertyUsingVelocity(

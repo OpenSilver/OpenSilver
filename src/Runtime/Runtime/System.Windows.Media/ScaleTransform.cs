@@ -129,7 +129,7 @@ namespace Windows.UI.Xaml.Media
 
         private void ApplyCSSChanges(double scaleX, double scaleY)
         {
-            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
+            CSSEquivalent scaleXcssEquivalent = ScaleXProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (scaleXcssEquivalent != null)
             {
                 object domElementX = scaleXcssEquivalent.DomElement;
@@ -145,7 +145,7 @@ namespace Windows.UI.Xaml.Media
                 }
             }
 
-            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetTypeMetaData(typeof(ScaleTransform)).GetCSSEquivalent(this);
+            CSSEquivalent scaleYcssEquivalent = ScaleYProperty.GetMetadata(DependencyObjectType).GetCSSEquivalent(this);
             if (scaleYcssEquivalent != null)
             {
                 object domElementY = scaleYcssEquivalent.DomElement;

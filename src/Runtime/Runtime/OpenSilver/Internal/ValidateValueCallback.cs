@@ -11,22 +11,16 @@
 *  
 \*====================================================================================*/
 
-using System;
-using System.ComponentModel;
-using OpenSilver.Internal;
-
 #if MIGRATION
-namespace System.Windows
+using System.Windows;
 #else
-namespace Windows.UI.Xaml
+using Windows.UI.Xaml;
 #endif
-{
-    public enum WhenToCallPropertyChangedEnum
-    {
-        Never = 0,
-        IfPropertyIsSet = 1,
-        [Obsolete(Helper.ObsoleteMemberMessage)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        Always = 2,
-    }
-}
+
+namespace OpenSilver.Internal;
+
+/// <summary>
+/// Represents a method used as a callback that validates the effective value of a
+/// <see cref="DependencyProperty"/>.
+/// </summary>
+internal delegate bool ValidateValueCallback(object value);

@@ -23,7 +23,7 @@ namespace Windows.UI.Xaml
     /// <summary>
     /// Provides data for a PropertyChangedCallback implementation.
     /// </summary>
-    public sealed partial class DependencyPropertyChangedEventArgs : IDependencyPropertyChangedEventArgs
+    public sealed class DependencyPropertyChangedEventArgs : IDependencyPropertyChangedEventArgs
     {
         /// <summary>
         /// Gets the value of the property before the change.

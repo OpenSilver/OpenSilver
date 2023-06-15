@@ -55,7 +55,7 @@ namespace Windows.UI.Xaml.Media.Animation
         /// </summary>
         public DoubleKeyFrameCollection KeyFrames
         {
-            get => _keyFrames ?? (_keyFrames = new DoubleKeyFrameCollection(this));
+            get => _keyFrames ??= new DoubleKeyFrameCollection(this);
             [EditorBrowsable(EditorBrowsableState.Never)]
             set => _keyFrames = value;
         }
@@ -309,7 +309,7 @@ namespace Windows.UI.Xaml.Media.Animation
         {
             Completed -= ApplyLastKeyFrame;            
             InitializeKeyFramesSet();
-            _propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
+            _propertyMetadata = _propDp.GetMetadata(_propertyContainer.DependencyObjectType);
 
             if (!IsZeroDuration(ResolveDuration()))
             {

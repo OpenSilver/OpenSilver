@@ -162,7 +162,7 @@ namespace Windows.UI.Xaml.Media
                         result.Add(ProcessCSSEquivalent(
                             new CSSEquivalent
                             {
-                                CallbackMethod = dependencyProperty.GetMetadata(uiElement.GetType()).PropertyChangedCallback,
+                                CallbackMethod = dependencyProperty.GetMetadata(uiElement.DependencyObjectType).PropertyChangedCallback,
                                 DependencyProperty = dependencyProperty
                             },
                             uiElement,

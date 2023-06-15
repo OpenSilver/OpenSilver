@@ -46,8 +46,7 @@ namespace Windows.UI.Xaml
                 {
                     string propertyName = DependencyPropertyName ?? Path;
                     Type type = DependencyPropertyOwnerType ?? source.GetType();
-                    DependencyProperty dp = INTERNAL_TypeToStringsToDependencyProperties.GetPropertyInTypeOrItsBaseTypes(
-                        type, propertyName);
+                    DependencyProperty dp = DependencyProperty.FromName(propertyName, type);
 
                     if (dp != null)
                     {

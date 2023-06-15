@@ -267,11 +267,11 @@ namespace Windows.UI.Xaml
             InvalidateInheritedProperties(this, parent);
         }
 
-        internal static void InvalidateInheritedProperties(UIElement uie, DependencyObject newParent)
+        internal static void InvalidateInheritedProperties(FrameworkElement fe, DependencyObject newParent)
         {
             if (newParent == null)
             {
-                uie.ResetInheritedProperties();
+                fe.ResetInheritedProperties();
             }
             else
             {
@@ -280,9 +280,15 @@ namespace Windows.UI.Xaml
                     DependencyProperty dp = kvp.Key;
                     INTERNAL_PropertyStorage storage = kvp.Value;
 
-                    uie.SetInheritedValue(dp,
-                        INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
-                        true);
+                    PropertyMetadata metadata = dp.GetMetadata(fe.DependencyObjectType);
+                    if (TreeWalkHelper.IsInheritanceNode(metadata))
+                    {
+                        fe.SetInheritedValue(
+                            dp,
+                            metadata,
+                            INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry),
+                            true);
+                    }
                 }
             }
         }
@@ -370,8 +376,7 @@ namespace Windows.UI.Xaml
         {
             // Initialize the _styleCache to the default value for StyleProperty.
             // If the default value is non-null then wire it to the current instance.
-            PropertyMetadata metadata = StyleProperty.GetMetadata(this.GetType());
-            Style defaultValue = (Style)metadata.DefaultValue;
+            Style defaultValue = (Style)StyleProperty.GetDefaultValue(this);
             if (defaultValue != null)
             {
                 OnStyleChanged(this, new DependencyPropertyChangedEventArgs(null, defaultValue, StyleProperty));
@@ -452,7 +457,7 @@ namespace Windows.UI.Xaml
                     HasStyleInvalidated = false;
 
                     if (HasImplicitStyleFromResources == true &&
-                        (oldValue.Contains(GetType()) || Style == StyleProperty.GetMetadata(GetType()).DefaultValue))
+                        (oldValue.Contains(GetType()) || Style == StyleProperty.GetDefaultValue(this)))
                     {
                         UpdateStyleProperty();
                     }
@@ -1088,7 +1093,7 @@ namespace Windows.UI.Xaml
                 return;
             }
 
-            var metadata = e.Property.GetMetadata(GetType()) as FrameworkPropertyMetadata;
+            var metadata = e.Property.GetMetadata(DependencyObjectType) as FrameworkPropertyMetadata;
             
             if (metadata != null)
             {

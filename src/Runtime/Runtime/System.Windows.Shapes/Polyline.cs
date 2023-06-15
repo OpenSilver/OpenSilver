@@ -1,5 +1,19 @@
-using CSHTML5.Internal;
+
+/*===================================================================================
+* 
+*   Copyright (c) Userware/OpenSilver.net
+*      
+*   This file is part of the OpenSilver Runtime (https://opensilver.net), which is
+*   licensed under the MIT license: https://opensource.org/licenses/MIT
+*   
+*   As stated in the MIT license, "the above copyright notice and this permission
+*   notice shall be included in all copies or substantial portions of the Software."
+*  
+\*====================================================================================*/
+
 using System;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media;
@@ -17,11 +31,11 @@ namespace Windows.UI.Xaml.Shapes
     /// <summary>
     /// Draws a series of connected straight lines.
     /// </summary>
-    public sealed partial class Polyline : Shape
+    public sealed class Polyline : Shape
     {
         static Polyline()
         {
-            StretchProperty.OverrideMetadata(typeof(Polyline), new PropertyMetadata(Stretch.Fill, Stretch_Changed));
+            StretchProperty.OverrideMetadata(typeof(Polyline), new FrameworkPropertyMetadata(Stretch.Fill));
         }
 
         /// <summary>
@@ -33,6 +47,7 @@ namespace Windows.UI.Xaml.Shapes
                 typeof(FillRule),
                 typeof(Polyline),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
         /// <summary>
         /// Identifies the <see cref="Points"/> dependency property.
         /// </summary>

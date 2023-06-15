@@ -54,12 +54,13 @@ namespace Windows.UI.Xaml
             Debug.Assert(d != null, "Must have non-null current node");
 
             DependencyProperty dp = info.Property;
-            bool inheritanceNode = IsInheritanceNode(d, dp);
+            PropertyMetadata metadata = dp.GetMetadata(d.DependencyObjectType);
+            bool inheritanceNode = IsInheritanceNode(metadata);
 
             if (inheritanceNode)
             {
                 BaseValueSourceInternal oldValueSource = BaseValueSourceInternal.Default;
-                if (INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d, dp, null, false, out INTERNAL_PropertyStorage storage))
+                if (INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d, dp, metadata, false, out INTERNAL_PropertyStorage storage))
                 {
                     oldValueSource = storage.Entry.BaseValueSourceInternal;
                 }
@@ -81,7 +82,7 @@ namespace Windows.UI.Xaml
                         }
                     }
 
-                    return d.SetInheritedValue(dp, info.NewValue, false);
+                    return d.SetInheritedValue(dp, metadata, info.NewValue, false);
                 }
                 else
                 {
@@ -90,7 +91,7 @@ namespace Windows.UI.Xaml
                         // get the storage if we didn't to it ealier.
                         INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(d,
                             dp,
-                            dp.GetMetadata(d.GetType()),
+                            metadata,
                             true,
                             out storage);
                     }
@@ -111,19 +112,9 @@ namespace Windows.UI.Xaml
         ///     Determine if the current DependencyObject is a candidate for
         ///     producing inheritable values
         /// </summary>
-        private static bool IsInheritanceNode(
-            DependencyObject d,
-            DependencyProperty dp)
+        internal static bool IsInheritanceNode(PropertyMetadata metadata)
         {
-            PropertyMetadata metadata = dp.GetMetadata(d.GetType());
-            if (metadata != null)
-            {
-                if (metadata.Inherits)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return metadata is not null && metadata.Inherits;
         }
 
         #endregion InheritablePropertyChange

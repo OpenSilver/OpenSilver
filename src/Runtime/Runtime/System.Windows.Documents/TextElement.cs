@@ -59,7 +59,7 @@ namespace Windows.UI.Xaml.Documents
                 nameof(CharacterSpacing), 
                 typeof(int), 
                 typeof(TextElement), 
-                new FrameworkPropertyMetadata(FrameworkPropertyMetadataOptions.AffectsMeasure));
+                null);
 
         [OpenSilver.NotImplemented]
         public int CharacterSpacing

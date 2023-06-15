@@ -47,8 +47,12 @@ namespace Windows.UI.Xaml.Shapes
     {
         static Rectangle()
         {
-            Shape.StretchProperty.OverrideMetadata(typeof(Rectangle), new PropertyMetadata(Stretch.Fill, Shape.Stretch_Changed)
-            { CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet });
+            StretchProperty.OverrideMetadata(
+                typeof(Rectangle),
+                new FrameworkPropertyMetadata(Stretch.Fill)
+                {
+                    CallPropertyChangedWhenLoadedIntoVisualTree = WhenToCallPropertyChangedEnum.IfPropertyIsSet,
+                });
         }
 
         #region former implementation

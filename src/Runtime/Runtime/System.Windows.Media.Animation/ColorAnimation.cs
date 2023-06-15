@@ -120,7 +120,7 @@ namespace Windows.UI.Xaml.Media.Animation
             if (to.HasValue)
             {
                 // - Get the propertyMetadata from the property
-                PropertyMetadata propertyMetadata = _propDp.GetTypeMetaData(_propertyContainer.GetType());
+                PropertyMetadata propertyMetadata = _propDp.GetMetadata(_propertyContainer.DependencyObjectType);
                 // - Get the cssPropertyName from the PropertyMetadata
 
                 //we make a specific name for this animation:
@@ -334,11 +334,12 @@ namespace Windows.UI.Xaml.Media.Animation
                 //todo: find out why we put the test on target and put it back? (I removed it because it kept ScaleTransform from working properly)
                 if (To != null)// && target is FrameworkElement)
                 {
-                    DependencyProperty dp = CSHTML5.Internal.INTERNAL_TypeToStringsToDependencyProperties
-                        .GetPropertyInTypeOrItsBaseTypes(_propertyContainer.GetType(), _targetProperty.SVI[_targetProperty.SVI.Length - 1].propertyName);
+                    DependencyProperty dp = DependencyProperty.FromName(
+                        _targetProperty.SVI[_targetProperty.SVI.Length - 1].propertyName,
+                        _propertyContainer.GetType());
 
                     // - Get the propertyMetadata from the property
-                    PropertyMetadata propertyMetadata = dp.GetTypeMetaData(_propertyContainer.GetType());
+                    PropertyMetadata propertyMetadata = dp.GetMetadata(_propertyContainer.DependencyObjectType);
                     // - Get the cssPropertyName from the PropertyMetadata
 
                     //we make a specific name for this animation:

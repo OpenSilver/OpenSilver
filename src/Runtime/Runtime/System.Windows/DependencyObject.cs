@@ -51,7 +51,7 @@ namespace Windows.UI.Xaml
         internal DependencyObject InheritanceContext
         {
             get => _contextStorage?.GetContext();
-            set => (_contextStorage ?? (_contextStorage = new ContextStorage())).SetContext(value);
+            set => (_contextStorage ??= new ContextStorage()).SetContext(value);
         }
 
         private sealed class ContextStorage
@@ -90,7 +90,7 @@ namespace Windows.UI.Xaml
         {
             // We never provide an inherited context for a FrameworkElement because the DataContext takes
             // priority over inherited context.
-            return !(target is FrameworkElement);
+            return target is not FrameworkElement;
         }
 
         // Note: the DependencyProperty parameter is here simply to keep the logic defined in the WPF 
@@ -268,13 +268,20 @@ namespace Windows.UI.Xaml
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_PropertyStorageDictionary { get; } // Contains all the properties that are either not in INTERNAL_AllInheritedProperties or in INTERNAL_UsefulInheritedProperties
         internal Dictionary<DependencyProperty, INTERNAL_PropertyStorage> INTERNAL_AllInheritedProperties { get; } // Here so that when we attach a child, the child gets all the properties that are in there (this allows the inherited properties to go all the way down even for properties that are not contained in the children)
 
+        private DependencyObjectType _dType;
+
+        /// <summary>
+        /// Returns the DType that represents the CLR type of this instance
+        /// </summary>
+        internal DependencyObjectType DependencyObjectType
+            => _dType ??= DependencyObjectType.FromSystemTypeInternal(GetType());
 
         #region Constructor
         public DependencyObject()
         {
             CanBeInheritanceContext = true;
-            INTERNAL_PropertyStorageDictionary = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
-            INTERNAL_AllInheritedProperties = new Dictionary<DependencyProperty, INTERNAL_PropertyStorage>();
+            INTERNAL_PropertyStorageDictionary = new(DependencyPropertyComparer.Default);
+            INTERNAL_AllInheritedProperties = new(DependencyPropertyComparer.Default);
         }
         #endregion
 
@@ -297,16 +304,37 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dependencyProperty));
             }
 
+            PropertyMetadata metadata = null;
+
+            if (dependencyProperty.ReadOnly)
+            {
+                metadata = dependencyProperty.GetMetadata(DependencyObjectType);
+
+                GetReadOnlyValueCallback getValueCallback = metadata.GetReadOnlyValueCallback;
+                if (getValueCallback != null)
+                {
+                    return getValueCallback(this);
+                }
+            }
+
             if (INTERNAL_PropertyStore.TryGetStorage(this,
                 dependencyProperty,
-                null,
+                metadata,
                 false,
                 out INTERNAL_PropertyStorage storage))
             {
                 return INTERNAL_PropertyStore.GetEffectiveValue(storage.Entry);
             }
 
-            return dependencyProperty.GetMetadata(GetType()).DefaultValue;
+            if (!dependencyProperty.IsDefaultValueChanged &&
+                !dependencyProperty.IsPotentiallyUsingDefaultValueFactory)
+            {
+                return dependencyProperty.DefaultMetadata.DefaultValue;
+            }
+
+            metadata ??= dependencyProperty.GetMetadata(DependencyObjectType);
+
+            return metadata.GetDefaultValue(this, dependencyProperty);
         }
 
         /// <summary>
@@ -332,7 +360,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            PropertyMetadata metadata = dp.GetMetadata(GetType());
+            PropertyMetadata metadata = SetupPropertyChange(dp);
 
             INTERNAL_PropertyStore.TryGetStorage(this,
                 dp,
@@ -351,23 +379,7 @@ namespace Windows.UI.Xaml
         [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue instead.")]
         public void CoerceCurrentValue(DependencyProperty dependencyProperty, PropertyMetadata propertyMetadata)
         {
-            if (dependencyProperty == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyProperty));
-            }
-
-            PropertyMetadata metadata = dependencyProperty.GetMetadata(GetType());
-
-            INTERNAL_PropertyStore.TryGetStorage(this,
-                dependencyProperty,
-                metadata,
-                true,
-                out INTERNAL_PropertyStorage storage);
-            
-            INTERNAL_PropertyStore.CoerceValueCommon(storage,
-                this,
-                dependencyProperty,
-                metadata);
+            CoerceValue(dependencyProperty);
         }
 
         /// <summary>
@@ -443,7 +455,7 @@ namespace Windows.UI.Xaml
                 return storage.AnimatedValue;
             }
 
-            return dependencyProperty.GetMetadata(GetType()).DefaultValue;
+            return dependencyProperty.GetDefaultValue(this);
         }
 
         public void SetVisualStateValue(DependencyProperty dependencyProperty, object value)
@@ -453,7 +465,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dependencyProperty));
             }
 
-            PropertyMetadata metadata = dependencyProperty.GetMetadata(GetType());
+            PropertyMetadata metadata = SetupPropertyChange(dependencyProperty);
 
             INTERNAL_PropertyStore.TryGetStorage(this,
                 dependencyProperty,
@@ -475,7 +487,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dependencyProperty));
             }
 
-            PropertyMetadata metadata = dependencyProperty.GetMetadata(GetType());
+            PropertyMetadata metadata = SetupPropertyChange(dependencyProperty);
 
             INTERNAL_PropertyStore.TryGetStorage(this,
                 dependencyProperty,
@@ -506,7 +518,7 @@ namespace Windows.UI.Xaml
                 return storage.AnimatedValue;
             }
 
-            return dependencyProperty.GetMetadata(GetType()).DefaultValue;
+            return dependencyProperty.GetDefaultValue(this);
         }
 
         public void SetValue(DependencyProperty dp, object value)
@@ -516,7 +528,30 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            PropertyMetadata metadata = dp.GetMetadata(GetType());
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            INTERNAL_PropertyStore.TryGetStorage(this,
+                dp,
+                metadata,
+                true,
+                out INTERNAL_PropertyStorage storage);
+
+            INTERNAL_PropertyStore.SetValueCommon(storage,
+                this,
+                dp,
+                metadata,
+                value,
+                false);
+        }
+
+        internal void SetValue(DependencyPropertyKey key, object value)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
 
             INTERNAL_PropertyStore.TryGetStorage(this,
                 dp,
@@ -540,16 +575,18 @@ namespace Windows.UI.Xaml
         {
             Debug.Assert(dp != null);
 
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
             if (INTERNAL_PropertyStore.TryGetStorage(this,
                 dp,
-                null,
+                metadata,
                 value != DependencyProperty.UnsetValue,
                 out INTERNAL_PropertyStorage storage))
             {
                 INTERNAL_PropertyStore.SetLocalStyleValue(storage,
                     this,
                     dp,
-                    dp.GetMetadata(GetType()),
+                    metadata,
                     value);
             }
         }
@@ -558,16 +595,18 @@ namespace Windows.UI.Xaml
         {
             Debug.Assert(dp != null);
 
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
             if (INTERNAL_PropertyStore.TryGetStorage(this,
                 dp,
-                null,
+                metadata,
                 value != DependencyProperty.UnsetValue,
                 out INTERNAL_PropertyStorage storage))
             {
                 INTERNAL_PropertyStore.SetThemeStyleValue(storage,
                     this,
                     dp,
-                    dp.GetMetadata(GetType()),
+                    metadata,
                     value);
             }
         }
@@ -582,7 +621,7 @@ namespace Windows.UI.Xaml
 
             if (INTERNAL_PropertyStore.TryGetStorage(this,
                 dp,
-                dp.GetMetadata(GetType()),
+                dp.GetMetadata(DependencyObjectType),
                 true,
                 out INTERNAL_PropertyStorage storage))
             {
@@ -594,18 +633,14 @@ namespace Windows.UI.Xaml
         /// Sets the inherited value of a dependency property on a DependencyObject. Do not use this method.
         /// </summary>
         /// <param name="dp">The identifier of the dependency property to set.</param>
+        /// <param name="metadata"></param>
         /// <param name="value">The new local value.</param>
         /// <param name="recursively">Specifies if the inherited value must be applied to the children of this DependencyObject.</param>
         /// <returns>true if this property's value changed, false otherwise.</returns>
-        internal bool SetInheritedValue(DependencyProperty dp, object value, bool recursively)
+        internal bool SetInheritedValue(DependencyProperty dp, PropertyMetadata metadata, object value, bool recursively)
         {
-            Debug.Assert(dp != null);
-
-            //-----------------------
-            // CALL "SET INHERITED VALUE" ON THE STORAGE:
-            //-----------------------
-
-            PropertyMetadata metadata = dp.GetMetadata(GetType()); 
+            Debug.Assert(dp is not null);
+            Debug.Assert(metadata is not null);
 
             INTERNAL_PropertyStore.TryGetInheritedPropertyStorage(this,
                 dp,
@@ -628,11 +663,6 @@ namespace Windows.UI.Xaml
         [Obsolete(Helper.ObsoleteMemberMessage + " Use CoerceValue.")]
         public void Coerce(DependencyProperty dependencyProperty)
         {
-            if (dependencyProperty == null)
-            {
-                throw new ArgumentNullException(nameof(dependencyProperty));
-            }
-
             CoerceValue(dependencyProperty);
         }
 
@@ -643,7 +673,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            PropertyMetadata metadata = dp.GetMetadata(GetType());
+            PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
 
             INTERNAL_PropertyStore.TryGetStorage(this,
                 dp,
@@ -667,7 +697,7 @@ namespace Windows.UI.Xaml
                 INTERNAL_PropertyStore.SetInheritedValue(storage,
                     this,
                     dp,
-                    dp.GetMetadata(GetType()),
+                    dp.GetMetadata(DependencyObjectType),
                     DependencyProperty.UnsetValue,
                     false); // recursively
 
@@ -706,7 +736,7 @@ namespace Windows.UI.Xaml
         {
             Debug.Assert(dp != null);
 
-            PropertyMetadata metadata = dp.GetMetadata(GetType());
+            PropertyMetadata metadata = SetupPropertyChange(dp);
 
             INTERNAL_PropertyStore.TryGetStorage(this,
                 dp,
@@ -746,9 +776,26 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, null, false, out INTERNAL_PropertyStorage storage))
+            PropertyMetadata metadata = SetupPropertyChange(dp);
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, metadata, false, out INTERNAL_PropertyStorage storage))
             {
-                INTERNAL_PropertyStore.ClearValueCommon(storage, this, dp, dp.GetMetadata(GetType()));
+                INTERNAL_PropertyStore.ClearValueCommon(storage, this, dp, metadata);
+            }
+        }
+
+        internal void ClearValue(DependencyPropertyKey key)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
+            PropertyMetadata metadata = SetupPropertyChange(key, out DependencyProperty dp);
+
+            if (INTERNAL_PropertyStore.TryGetStorage(this, dp, metadata, false, out INTERNAL_PropertyStorage storage))
+            {
+                INTERNAL_PropertyStore.ClearValueCommon(storage, this, dp, metadata);
             }
         }
 
@@ -818,6 +865,41 @@ namespace Windows.UI.Xaml
                     dependents.Clear();
                 }
             }
+        }
+
+        /// <summary>
+        /// Called by SetValue or ClearValue to verify that the property
+        /// can be changed.
+        /// </summary>
+        private PropertyMetadata SetupPropertyChange(DependencyProperty dp)
+        {
+            Debug.Assert(dp != null);
+
+            if (dp.ReadOnly)
+            {
+                throw new InvalidOperationException(
+                    string.Format("'{0}' property was registered as read-only and cannot be modified without an authorization key.", dp.Name));
+            }
+
+            // Get type-specific metadata for this property
+            return dp.GetMetadata(DependencyObjectType);
+        }
+
+        /// <summary>
+        /// Called by SetValue or ClearValue to verify that the property
+        /// can be changed.
+        /// </summary>
+        private PropertyMetadata SetupPropertyChange(DependencyPropertyKey key, out DependencyProperty dp)
+        {
+            Debug.Assert(key != null);
+            
+            dp = key.DependencyProperty;
+            Debug.Assert(dp != null);
+
+            dp.VerifyReadOnlyKey(key);
+
+            // Get type-specific metadata for this property
+            return dp.GetMetadata(DependencyObjectType);
         }
     }
 }
