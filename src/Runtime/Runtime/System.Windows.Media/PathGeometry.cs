@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -15,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a complex shape that may be composed of arcs, curves, ellipses,
     /// lines, and rectangles.
     /// </summary>
-    [ContentProperty("Figures")]
+    [ContentProperty(nameof(Figures))]
     public sealed partial class PathGeometry : Geometry
     {
         #region Constructors
@@ -75,31 +75,32 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public PathFigureCollection Figures
         {
-            get
-            {
-                PathFigureCollection collection = (PathFigureCollection)GetValue(FiguresProperty);
-                if (collection == null)
-                {
-                    collection = new PathFigureCollection();
-                    SetValue(FiguresProperty, collection);
-                }
-                return collection;
-            }
+            get { return (PathFigureCollection)GetValue(FiguresProperty); }
             set { SetValue(FiguresProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the <see cref="PathGeometry.Figures"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Figures"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty FiguresProperty =
             DependencyProperty.Register(
                 nameof(Figures), 
                 typeof(PathFigureCollection), 
                 typeof(PathGeometry), 
-                new PropertyMetadata(null, Figures_Changed));
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<PathFigure>(
+                        static () => new PathFigureCollection(),
+                        static (d, dp) =>
+                        {
+                            Geometry g = (Geometry)d;
+                            var collection = new PathFigureCollection();
+                            collection.SetParentPath(g.ParentPath);
+                            return collection;
+                        }),
+                    OnFiguresChanged,
+                    CoerceFigures));
 
-        private static void Figures_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnFiguresChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PathGeometry geometry = (PathGeometry)d;
             if (null != e.OldValue)
@@ -115,6 +116,11 @@ namespace Windows.UI.Xaml.Media
 
                 geometry.ParentPath.ScheduleRedraw();
             }
+        }
+
+        private static object CoerceFigures(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new PathFigureCollection();
         }
 
         /// <summary>

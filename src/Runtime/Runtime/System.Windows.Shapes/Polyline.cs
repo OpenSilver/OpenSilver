@@ -56,7 +56,19 @@ namespace Windows.UI.Xaml.Shapes
                 nameof(Points),
                 typeof(PointCollection),
                 typeof(Polyline),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnPointsChanged));
+                new FrameworkPropertyMetadata(
+                    new PFCDefaultValueFactory<Point>(
+                        static () => new PointCollection(),
+                        static (d, dp) =>
+                        {
+                            Polyline p = (Polyline)d;
+                            var collection = new PointCollection();
+                            collection.SetParentShape(p);
+                            return collection;
+                        }),
+                    FrameworkPropertyMetadataOptions.AffectsRender,
+                    OnPointsChanged,
+                    CoercePoints));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Polyline"/> class.
@@ -92,38 +104,24 @@ namespace Windows.UI.Xaml.Shapes
         /// </returns>
         public PointCollection Points
         {
-            get
-            {
-                PointCollection points = (PointCollection)GetValue(PointsProperty);
-
-                if (points == null)
-                {
-                    points = new PointCollection();
-                    _suspendRendering = true;
-                    this.SetValue(PointsProperty, points);
-                    _suspendRendering = false;
-                }
-
-                return points;
-            }
-            set
-            {
-                this.SetValue(PointsProperty, value);
-            }
+            get { return (PointCollection)GetValue(PointsProperty); }
+            set { SetValue(PointsProperty, value); }
         }
 
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var line = (Polyline)d;
-            if (line == null) return;
 
-            if (e.OldValue != null && e.OldValue is PointCollection)
-                ((PointCollection)(e.OldValue)).SetParentShape(null);
+            if (e.OldValue is PointCollection oldCollection)
+            {
+                oldCollection.SetParentShape(null);
+            }
 
-            if (e.NewValue != null && e.NewValue is PointCollection)
-                ((PointCollection)(e.NewValue)).SetParentShape(line);
-
-
+            if (e.NewValue is PointCollection newCollection)
+            {
+                newCollection.SetParentShape(line);
+            }
+            
             if (INTERNAL_VisualTreeManager.IsElementInVisualTree(line))
             {
                 line.InvalidateMeasure();
@@ -131,6 +129,10 @@ namespace Windows.UI.Xaml.Shapes
             }
         }
 
+        private static object CoercePoints(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new PointCollection();
+        }
 
         public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)
         {

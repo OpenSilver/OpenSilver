@@ -13,8 +13,8 @@
 
 using System;
 using System.Collections.Specialized;
-using CSHTML5.Internal;
 using System.Text;
+using CSHTML5.Internal;
 using OpenSilver.Internal;
 
 #if MIGRATION
@@ -46,7 +46,6 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public InkPresenter()
         {
-            Strokes = new StrokeCollection();
             Loaded += InkPresenter_Loaded;
         }
 
@@ -105,17 +104,8 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
         /// </returns>
         public StrokeCollection Strokes
         {
-            get
-            {
-                var strokes = (StrokeCollection)GetValue(StrokesProperty);
-                if (strokes == null)
-                {
-                    strokes = new StrokeCollection();
-                    SetValue(StrokesProperty, strokes);
-                }
-                return strokes;
-            }
-            set { SetValue(StrokesProperty, value); }
+            get => (StrokeCollection)GetValue(StrokesProperty);
+            set => SetValue(StrokesProperty, value);
         }
 
         /// <summary>
@@ -126,11 +116,27 @@ ctx.clearRect(0, 0, cvs.width, cvs.height); }})({sCanvas});");
                 nameof(Strokes),
                 typeof(StrokeCollection),
                 typeof(InkPresenter),
-                new PropertyMetadata(OnStrokePropertyChanged));
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<Stroke>(
+                        static () => new StrokeCollection(),
+                        static (d, dp) =>
+                        {
+                            InkPresenter ink = (InkPresenter)d;
+                            var collection = new StrokeCollection();
+                            collection.CollectionChanged += ink.OnStrokeCollectionChanged;
+                            return collection;
+                        }),
+                    OnStrokesChanged,
+                    CoerceStrokes));
 
-        private static void OnStrokePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnStrokesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((InkPresenter)d).HandleStrokesPropertyChanged(e);
+        }
+
+        private static object CoerceStrokes(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new StrokeCollection();
         }
 
         private void HandleStrokesPropertyChanged(DependencyPropertyChangedEventArgs e)

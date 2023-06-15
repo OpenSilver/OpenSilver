@@ -14,6 +14,7 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Media.Animation;
@@ -50,7 +51,17 @@ namespace Windows.UI.Xaml
                 nameof(Actions),
                 typeof(TriggerActionCollection),
                 typeof(EventTrigger),
-                null);
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<TriggerAction>(
+                        static () => new TriggerActionCollection(),
+                        static (d, dp) => new TriggerActionCollection()),
+                    null,
+                    CoerceActions));
+
+        private static object CoerceActions(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new TriggerActionCollection();
+        }
 
         /// <summary>
         /// Gets the collection of <see cref="BeginStoryboard"/> objects
@@ -59,20 +70,7 @@ namespace Windows.UI.Xaml
         /// <returns>
         /// The existing <see cref="TriggerActionCollection"/>.
         /// </returns>
-        public TriggerActionCollection Actions
-        {
-            get 
-            {
-                TriggerActionCollection actions = (TriggerActionCollection)GetValue(ActionsProperty);
-                if (actions == null)
-                {
-                    actions = new TriggerActionCollection();
-                    SetValue(ActionsProperty, actions);
-                }
-
-                return actions;
-            }
-        }
+        public TriggerActionCollection Actions => (TriggerActionCollection)GetValue(ActionsProperty);
 
         /// <summary>
         /// Identifies the <see cref="RoutedEvent"/> dependency property.

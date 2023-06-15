@@ -27,48 +27,71 @@ namespace Windows.UI.Xaml
     {
         private readonly IInternalFrameworkElement _owner;
 
-        internal TriggerCollection(IInternalFrameworkElement owner) : base(false) 
+        internal TriggerCollection() : base(false) { }
+
+        internal TriggerCollection(IInternalFrameworkElement owner)
+            : base(false)
         {
-            Debug.Assert(owner != null);
+            Debug.Assert(owner is not null);
             _owner = owner;
         }
 
         internal override void AddOverride(TriggerBase value)
         {
-            this.AddDependencyObjectInternal(value);
-            EventTrigger.ProcessOneTrigger(_owner, value);
+            AddDependencyObjectInternal(value);
+            
+            if (_owner != null)
+            {
+                EventTrigger.ProcessOneTrigger(_owner, value);
+            }
         }
 
         internal override void ClearOverride()
         {
-            EventTrigger.DisconnectAllTriggers(_owner);
-            this.ClearDependencyObjectInternal();
+            if (_owner != null)
+            {
+                EventTrigger.DisconnectAllTriggers(_owner);
+            }
+            
+            ClearDependencyObjectInternal();
         }
 
         internal override void InsertOverride(int index, TriggerBase value)
         {
-            this.InsertDependencyObjectInternal(index, value);
-            EventTrigger.ProcessOneTrigger(_owner, value);
+            InsertDependencyObjectInternal(index, value);
+
+            if (_owner != null)
+            {
+                EventTrigger.ProcessOneTrigger(_owner, value);
+            }
         }
 
         internal override void RemoveAtOverride(int index)
         {
             TriggerBase trigger = this[index];
-            this.RemoveAtDependencyObjectInternal(index);
-            EventTrigger.DisconnectOneTrigger(_owner, trigger);
+            RemoveAtDependencyObjectInternal(index);
+
+            if (_owner != null)
+            {
+                EventTrigger.DisconnectOneTrigger(_owner, trigger);
+            }
         }
 
         internal override TriggerBase GetItemOverride(int index)
         {
-            return this.GetItemInternal(index);
+            return GetItemInternal(index);
         }
 
         internal override void SetItemOverride(int index, TriggerBase value)
         {
             TriggerBase oldTrigger = this[index];
-            this.SetItemDependencyObjectInternal(index, value);
-            EventTrigger.DisconnectOneTrigger(_owner, oldTrigger);
-            EventTrigger.ProcessOneTrigger(_owner, value);
+            SetItemDependencyObjectInternal(index, value);
+            
+            if (_owner != null)
+            {
+                EventTrigger.DisconnectOneTrigger(_owner, oldTrigger);
+                EventTrigger.ProcessOneTrigger(_owner, value);
+            }
         }
     }
 }

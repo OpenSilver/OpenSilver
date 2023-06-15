@@ -42,26 +42,36 @@ namespace Windows.UI.Xaml.Shapes
 										new PropertyMetadata(FillRule.EvenOdd));
 
 		/// <summary>
-		/// Identifies the <see cref="Polygon.Points"/> dependency property.
+		/// Identifies the <see cref="Points"/> dependency property.
 		/// </summary>
 		public static readonly DependencyProperty PointsProperty =
-			DependencyProperty.Register(nameof(Points),
-										typeof(PointCollection),
-										typeof(Polygon),
-										new PropertyMetadata(null, Points_Changed));
+			DependencyProperty.Register(
+				nameof(Points),
+				typeof(PointCollection),
+				typeof(Polygon),
+				new PropertyMetadata(
+					new PFCDefaultValueFactory<Point>(
+						static () => new PointCollection(),
+						static (d, dp) => new PointCollection()),
+					OnPointsChanged,
+					CoercePoints));
 
-		private static void Points_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			Polygon p = (Polygon)d;
 			p.ScheduleRedraw();
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Polygon"/> class.
-		/// </summary>
-		public Polygon()
+		private static object CoercePoints(DependencyObject d, object baseValue)
 		{
-			this.Points = new PointCollection();
+			return baseValue ?? new PointCollection();
+		}
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Polygon"/> class.
+        /// </summary>
+        public Polygon()
+		{
 		}
 
 		/// <summary>
@@ -86,23 +96,8 @@ namespace Windows.UI.Xaml.Shapes
 		/// </returns>
 		public PointCollection Points
 		{
-			get 
-			{
-				var value = (PointCollection)GetValue(PointsProperty);
-				if (value == null)
-                {
-					value = new PointCollection();
-					_suspendRendering = true;
-					SetValue(PointsProperty, value);
-					_suspendRendering = false;
-				}
-
-				return value;
-			}
-			set 
-			{ 
-				SetValue(PointsProperty, value); 
-			}
+			get { return (PointCollection)GetValue(PointsProperty); }
+			set { SetValue(PointsProperty, value); }
 		}
 
 		public override object CreateDomElement(object parentRef, out object domElementWhereToPlaceChildren)

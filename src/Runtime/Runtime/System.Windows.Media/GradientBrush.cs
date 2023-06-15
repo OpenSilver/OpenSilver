@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,13 +11,9 @@
 *  
 \*====================================================================================*/
 
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -31,7 +26,7 @@ namespace Windows.UI.Xaml.Media
     /// Classes that derive from GradientBrush describe different ways of interpreting
     /// gradient stops.
     /// </summary>
-    [ContentProperty("GradientStops")]
+    [ContentProperty(nameof(GradientStops))]
     public partial class GradientBrush : Brush
     {
         //// Returns:
@@ -60,20 +55,8 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public GradientStopCollection GradientStops
         {
-            get
-            {
-                GradientStopCollection collection = (GradientStopCollection)GetValue(GradientStopsProperty);
-                if (collection == null)
-                {
-                    collection = new GradientStopCollection();
-                    SetValue(GradientStopsProperty, collection);
-                }
-                return collection;
-            }
-            set
-            {
-                SetValue(GradientStopsProperty, value);
-            }
+            get { return (GradientStopCollection)GetValue(GradientStopsProperty); }
+            set { SetValue(GradientStopsProperty, value); }
         }
 
         /// <summary>
@@ -81,10 +64,21 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public static readonly DependencyProperty GradientStopsProperty =
             DependencyProperty.Register(
-                "GradientStops",
+                nameof(GradientStops),
                 typeof(GradientStopCollection),
                 typeof(GradientBrush),
-                new PropertyMetadata(null, OnGradientStopsChanged));
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<GradientStop>(
+                        static () => new GradientStopCollection(),
+                        static (d, dp) =>
+                        {
+                            GradientBrush gb = (GradientBrush)d;
+                            var collection = new GradientStopCollection();
+                            collection.SetParentBrush(gb);
+                            return collection;
+                        }),
+                    OnGradientStopsChanged,
+                    CoerceGradientStops));
 
         private static void OnGradientStopsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -97,6 +91,11 @@ namespace Windows.UI.Xaml.Media
             {
                 ((GradientStopCollection)e.NewValue).SetParentBrush(gradientBrush);
             }
+        }
+
+        private static object CoerceGradientStops(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new GradientStopCollection();
         }
 
         /// <summary>

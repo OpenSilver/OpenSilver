@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,10 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Windows.Markup;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -33,7 +33,7 @@ namespace Windows.UI.Xaml.Media
     /// Represents a subsection of a geometry, a single connected series of two-dimensional
     /// geometric segments.
     /// </summary>
-    [ContentProperty("Segments")]
+    [ContentProperty(nameof(Segments))]
     public sealed partial class PathFigure : DependencyObject
     {
         #region Data
@@ -123,31 +123,32 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public PathSegmentCollection Segments
         {
-            get
-            {
-                PathSegmentCollection collection = (PathSegmentCollection)GetValue(SegmentsProperty);
-                if (collection == null)
-                {
-                    collection = new PathSegmentCollection();
-                    SetValue(SegmentsProperty, collection);
-                }
-                return collection;
-            }
+            get { return (PathSegmentCollection)GetValue(SegmentsProperty); }
             set { SetValue(SegmentsProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the <see cref="PathFigure.Segments" /> dependency 
-        /// property.
+        /// Identifies the <see cref="Segments" /> dependency property.
         /// </summary>
         public static readonly DependencyProperty SegmentsProperty =
             DependencyProperty.Register(
                 nameof(Segments), 
                 typeof(PathSegmentCollection), 
                 typeof(PathFigure), 
-                new PropertyMetadata(null, Segments_Changed));
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<PathSegment>(
+                        static () => new PathSegmentCollection(),
+                        static (d, dp) =>
+                        {
+                            PathFigure pf = (PathFigure)d;
+                            var collection = new PathSegmentCollection();
+                            collection.SetParentPath(pf._parentPath);
+                            return collection;
+                        }),
+                    OnSegmentsChanged,
+                    CoerceSegments));
 
-        private static void Segments_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnSegmentsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PathFigure figure = (PathFigure)d;
             if (null != e.OldValue)
@@ -163,6 +164,11 @@ namespace Windows.UI.Xaml.Media
 
                 figure._parentPath.ScheduleRedraw();
             }
+        }
+
+        private static object CoerceSegments(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new PathSegmentCollection();
         }
 
         /// <summary>

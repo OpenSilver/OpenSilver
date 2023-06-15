@@ -69,6 +69,7 @@
 		<Compile Include="OpenSilver\Internal\Helper.cs" />
 		<Compile Include="OpenSilver\Internal\INameResolver.cs" />
 		<Compile Include="OpenSilver\Internal\InheritedPropertyChangedEventArgs.cs" />
+		<Compile Include="OpenSilver\Internal\PFCDefaultValueFactory.cs" />
 		<Compile Include="OpenSilver\Internal\ReferenceIDGenerator.cs" />
 		<Compile Include="OpenSilver\Internal\ResizeObserver.cs" />
 		<Compile Include="OpenSilver\Internal\StringBuilderFactory.cs" />

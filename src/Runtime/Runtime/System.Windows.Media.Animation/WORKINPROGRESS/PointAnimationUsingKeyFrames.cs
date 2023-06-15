@@ -31,16 +31,6 @@ namespace Windows.UI.Xaml.Media.Animation
         /// the animation. The default is an empty collection.
         /// </returns>
         [OpenSilver.NotImplemented]
-        public PointKeyFrameCollection KeyFrames
-        {
-            get 
-            {  
-                if (this._keyFrames == null)
-                {
-                    this._keyFrames = new PointKeyFrameCollection();
-                }
-                return this._keyFrames;
-            }
-        }
+        public PointKeyFrameCollection KeyFrames => _keyFrames ??= new PointKeyFrameCollection();
     }
 }

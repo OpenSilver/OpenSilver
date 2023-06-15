@@ -13,6 +13,7 @@
 
 using System;
 using System.Windows.Markup;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -93,20 +94,8 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public GeometryCollection Children
         {
-            get
-            {
-                GeometryCollection value = (GeometryCollection)GetValue(ChildrenProperty);
-                if (value == null)
-                {
-                    value = new GeometryCollection();
-                    SetValue(ChildrenProperty, value);
-                }
-                return value;
-            }
-            set
-            {
-                SetValue(ChildrenProperty, value);
-            }
+            get { return (GeometryCollection)GetValue(ChildrenProperty); }
+            set { SetValue(ChildrenProperty, value); }
         }
 
         /// <summary>
@@ -117,7 +106,17 @@ namespace Windows.UI.Xaml.Media
                 nameof(Children), 
                 typeof(GeometryCollection), 
                 typeof(GeometryGroup), 
-                null);
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<Geometry>(
+                        static () => new GeometryCollection(),
+                        static (d, dp) => new GeometryCollection()),
+                    null,
+                    CoerceChildren));
+
+        private static object CoerceChildren(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new GeometryCollection();
+        }
 
         /// <summary>
         /// Gets or sets how the intersecting areas of the objects contained in this <see cref="GeometryGroup"/> 

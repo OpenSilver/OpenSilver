@@ -14,6 +14,7 @@
 using System;
 using System.Windows.Markup;
 using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 namespace System.Windows.Media
@@ -45,16 +46,7 @@ namespace Windows.UI.Xaml.Media
         /// </returns>
         public TransformCollection Children
         {
-            get
-            {
-                var collection = (TransformCollection)GetValue(ChildrenProperty);
-                if (collection == null)
-                {
-                    collection = new TransformCollection();
-                    SetValue(ChildrenProperty, collection);
-                }
-                return collection;
-            }
+            get { return (TransformCollection)GetValue(ChildrenProperty); }
             set { SetValue(ChildrenProperty, value); }
         }
 
@@ -66,7 +58,18 @@ namespace Windows.UI.Xaml.Media
                 nameof(Children), 
                 typeof(TransformCollection), 
                 typeof(TransformGroup), 
-                new PropertyMetadata(null, OnChildrenChanged));
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<Transform>(
+                        static () => new TransformCollection(),
+                        static (d, dp) =>
+                        {
+                            TransformGroup tg = (TransformGroup)d;
+                            var collection = new TransformCollection();
+                            collection.SetParentTransform(tg);
+                            return collection;
+                        }),
+                    OnChildrenChanged,
+                    CoerceChildren));
 
         private static void OnChildrenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -76,6 +79,11 @@ namespace Windows.UI.Xaml.Media
             
             oldValue?.SetParentTransform(null);
             newValue?.SetParentTransform(transformGroup);
+        }
+
+        private static object CoerceChildren(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new TransformCollection();
         }
 
         /// <summary>

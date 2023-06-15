@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,9 +11,10 @@
 *  
 \*====================================================================================*/
 
-using CSHTML5.Internal;
 using System;
 using System.Windows.Markup;
+using CSHTML5.Internal;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Shapes;
@@ -32,7 +32,7 @@ namespace Windows.UI.Xaml.Media
     /// <summary>
     /// Represents one or more cubic Bezier curves.
     /// </summary>
-    [ContentProperty("Points")]
+    [ContentProperty(nameof(Points))]
     public sealed partial class PolyBezierSegment : PathSegment
     {
         #region Constructor
@@ -54,31 +54,26 @@ namespace Windows.UI.Xaml.Media
         /// </summary>
         public PointCollection Points
         {
-            get
-            {
-                PointCollection points = (PointCollection)GetValue(PointsProperty);
-                if (points == null)
-                {
-                    points = new PointCollection();
-                    SetValue(PointsProperty, points);
-                }
-                return points;
-            }
+            get { return (PointCollection)GetValue(PointsProperty); }
             set { SetValue(PointsProperty, value); }
         }
 
         /// <summary>
-        /// Identifies the <see cref="PolyBezierSegment.Points"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Points"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register(
                 nameof(Points), 
                 typeof(PointCollection), 
                 typeof(PolyBezierSegment), 
-                new PropertyMetadata(null, Points_Changed));
+                new PropertyMetadata(
+                    new PFCDefaultValueFactory<Point>(
+                        static () => new PointCollection(),
+                        static (d, dp) => new PointCollection()),
+                    OnPointsChanged,
+                    CoercePoints));
 
-        private static void Points_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             //todo: find a way to know when the points changed in the collection
             PolyBezierSegment segment = (PolyBezierSegment)d;
@@ -86,6 +81,11 @@ namespace Windows.UI.Xaml.Media
             {
                 segment.ParentPath.ScheduleRedraw();
             }
+        }
+
+        private static object CoercePoints(DependencyObject d, object baseValue)
+        {
+            return baseValue ?? new PointCollection();
         }
 
         #endregion
