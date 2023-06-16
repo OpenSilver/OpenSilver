@@ -65,15 +65,17 @@ namespace Windows.UI.Xaml.Data
         //  Public Properties
         //
 
+        private static readonly DependencyPropertyKey ViewPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(View),
+                typeof(ICollectionView),
+                typeof(CollectionViewSource),
+                new PropertyMetadata((ICollectionView)null));
+
         /// <summary>
-        ///     Identifies the <see cref="CollectionViewSource.View"/> dependency property.
+        /// Identifies the <see cref="View"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty ViewProperty
-            = DependencyProperty.Register(
-                    "View",
-                    typeof(ICollectionView),
-                    typeof(CollectionViewSource),
-                    new PropertyMetadata((ICollectionView)null));
+        public static readonly DependencyProperty ViewProperty = ViewPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets the view object that is currently associated with this instance of <see cref="CollectionViewSource"/>.
@@ -387,7 +389,7 @@ namespace Windows.UI.Xaml.Data
             }
 
             // update the View property
-            SetValue(ViewProperty, view);
+            SetValue(ViewPropertyKey, view);
         }
 
         private ViewRecord GetViewRecord(object source)

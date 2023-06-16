@@ -60,15 +60,17 @@ namespace System.Windows
             }
         }
 
-        /// <summary>
-        /// Identifies the <see cref="EntryPointAssembly"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty EntryPointAssemblyProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey EntryPointAssemblyPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(EntryPointAssembly),
                 typeof(string),
                 typeof(Deployment),
                 null);
+
+        /// <summary>
+        /// Identifies the <see cref="EntryPointAssembly"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty EntryPointAssemblyProperty = EntryPointAssemblyPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a string name that identifies which part in the <see cref="Deployment"/>
@@ -81,15 +83,17 @@ namespace System.Windows
         /// </returns>
         public string EntryPointAssembly => (string)GetValue(EntryPointAssemblyProperty);
 
-        /// <summary>
-        /// Identifies the <see cref="EntryPointType"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty EntryPointTypeProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey EntryPointTypePropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(EntryPointType),
                 typeof(string),
                 typeof(Deployment),
                 null);
+
+        /// <summary>
+        /// Identifies the <see cref="EntryPointType"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty EntryPointTypeProperty = EntryPointTypePropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a string that identifies the namespace and type name of the class that contains
@@ -108,12 +112,8 @@ namespace System.Windows
             {
                 Type appType = app.GetType();
 
-#if NETSTANDARD
-                deployment.SetValue(EntryPointAssemblyProperty, appType.Assembly.GetName().Name);
-#elif BRIDGE
-                deployment.SetValue(EntryPointAssemblyProperty, string.Concat(appType.Assembly.FullName.TakeWhile(c => c != ',')));
-#endif
-                deployment.SetValue(EntryPointTypeProperty, appType.FullName);
+                deployment.SetValue(EntryPointAssemblyPropertyKey, appType.Assembly.GetName().Name);
+                deployment.SetValue(EntryPointTypePropertyKey, appType.FullName);
 
                 _current = deployment;
             }

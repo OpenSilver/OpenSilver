@@ -60,15 +60,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public event DragCompletedEventHandler DragCompleted;
 
-        /// <summary>
-        /// Identifies the <see cref="IsDragging"/> dependency property.
-        /// </summary> 
-        public static readonly DependencyProperty IsDraggingProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey IsDraggingPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(IsDragging),
                 typeof(bool),
                 typeof(Thumb),
                 new PropertyMetadata(OnIsDraggingPropertyChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsDragging"/> dependency property.
+        /// </summary> 
+        public static readonly DependencyProperty IsDraggingProperty = IsDraggingPropertyKey.DependencyProperty;
 
         /// <summary> 
         /// Gets whether the <see cref="Thumb"/> control has focus and
@@ -81,7 +83,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public bool IsDragging
         {
             get { return (bool)GetValue(IsDraggingProperty); }
-            private set { SetValue(IsDraggingProperty, value); }
+            private set { SetValue(IsDraggingPropertyKey, value); }
         }
 
         private static void OnIsDraggingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -94,15 +96,17 @@ namespace Windows.UI.Xaml.Controls.Primitives
             UpdateVisualState();
         }
 
-        /// <summary>
-        /// Gets the identifier for the <see cref="IsFocused"/> dependency property. 
-        /// </summary> 
-        public static readonly DependencyProperty IsFocusedProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey IsFocusedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(IsFocused),
                 typeof(bool),
                 typeof(Thumb),
                 null);
+
+        /// <summary>
+        /// Gets the identifier for the <see cref="IsFocused"/> dependency property. 
+        /// </summary> 
+        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets whether the thumb has focus.
@@ -113,7 +117,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
         public bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
-            private set { SetValue(IsFocusedProperty, value); }
+            private set { SetValue(IsFocusedPropertyKey, value); }
         }
 
         /// <summary> 

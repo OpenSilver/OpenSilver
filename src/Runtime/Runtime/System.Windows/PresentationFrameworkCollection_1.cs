@@ -54,22 +54,24 @@ namespace Windows.UI.Xaml
             this.UpdateCountProperty();
         }
 
-        /// <summary>
-        /// Identifies the <see cref="Count"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty CountProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey CountPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(Count),
                 typeof(int),
                 typeof(PresentationFrameworkCollection<T>),
                 new PropertyMetadata(0));
 
         /// <summary>
+        /// Identifies the <see cref="Count"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CountProperty = CountPropertyKey.DependencyProperty;
+
+        /// <summary>
         /// Gets the number of elements contained in the <see cref="PresentationFrameworkCollection{T}"/>.
         /// </summary>
         public int Count
         {
-            get { return (int)this.GetValue(CountProperty); }
+            get { return this.CountInternal; }
         }
 
         /// <summary>
@@ -617,7 +619,7 @@ namespace Windows.UI.Xaml
 
         internal void UpdateCountProperty()
         {
-            this.SetValue(CountProperty, this.CountInternal);
+            this.SetValue(CountPropertyKey, this.CountInternal);
         }
 
         internal event NotifyCollectionChangedEventHandler CollectionChanged;

@@ -164,18 +164,20 @@ namespace Windows.UI.Xaml.Controls
         public bool IsFocused
         {
             get { return (bool)GetValue(IsFocusedProperty); }
-            internal set { SetValue(IsFocusedProperty, value); }
+            internal set { SetValue(IsFocusedPropertyKey, value); }
         }
 
-        /// <summary>
-        /// Identifies the <see cref="IsFocused"/> dependency property.
-        /// </summary> 
-        public static readonly DependencyProperty IsFocusedProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey IsFocusedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(IsFocused),
                 typeof(bool),
                 typeof(Slider),
                 new PropertyMetadata(OnIsFocusedPropertyChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsFocused"/> dependency property.
+        /// </summary> 
+        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
 
         /// <summary>
         /// IsFocusedProperty property changed handler. 

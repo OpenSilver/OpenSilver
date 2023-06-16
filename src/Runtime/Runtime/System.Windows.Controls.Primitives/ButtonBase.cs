@@ -1,5 +1,4 @@
 ﻿
-
 /*===================================================================================
 * 
 *   Copyright (c) Userware/OpenSilver.net
@@ -12,17 +11,11 @@
 *  
 \*====================================================================================*/
 
-
-using CSHTML5.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using OpenSilver.Internal;
 
 #if MIGRATION
-using System.Windows;
 using System.Windows.Automation.Provider;
 using System.Windows.Threading;
 #else
@@ -41,7 +34,7 @@ namespace Windows.UI.Xaml.Controls.Primitives
     /// Represents the base class for all button controls, such as Button, RepeatButton,
     /// and HyperlinkButton.
     /// </summary>
-    public partial class ButtonBase : ContentControl
+    public class ButtonBase : ContentControl
     {
         // We need to keep a strong reference to the handler otherwise it can be
         // garbage collected to early if the command used by this button implements
@@ -359,15 +352,21 @@ namespace Windows.UI.Xaml.Controls.Primitives
         /// </summary>
         public bool IsPressed
         {
-            get { return (bool)GetValue(IsPressedProperty); }
-            protected set { SetValue(IsPressedProperty, value); }
+            get => (bool)GetValue(IsPressedProperty);
+            protected set => SetValue(IsPressedPropertyKey, value);
         }
 
+        private static readonly DependencyPropertyKey IsPressedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsPressed),
+                typeof(bool),
+                typeof(ButtonBase),
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsPressedChanged));
+
         /// <summary>
-        /// Identifies the IsPressed dependency property.
+        /// Identifies the <see cref="IsPressed"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsPressedProperty =
-            DependencyProperty.Register("IsPressed", typeof(bool), typeof(ButtonBase), new PropertyMetadata(false, OnIsPressedChanged));
+        public static readonly DependencyProperty IsPressedProperty = IsPressedPropertyKey.DependencyProperty;
 
         private static void OnIsPressedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -495,22 +494,25 @@ namespace Windows.UI.Xaml.Controls.Primitives
 
 #endif
 
+        private static readonly DependencyPropertyKey IsMouseOverPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsMouseOver),
+                typeof(bool),
+                typeof(ButtonBase),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
         /// <summary>
-        /// Identifies the <see cref="ButtonBase.IsMouseOver"/> dependency property.
+        /// Identifies the <see cref="IsMouseOver"/> dependency property.
         /// </summary>
-        public static readonly DependencyProperty IsMouseOverProperty =
-            DependencyProperty.Register("IsMouseOver",
-                                        typeof(bool),
-                                        typeof(ButtonBase),
-                                        new PropertyMetadata(false));
+        public static readonly DependencyProperty IsMouseOverProperty = IsMouseOverPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value indicating whether the mouse pointer is located over this button control.
         /// </summary>
         public bool IsMouseOver
         {
-            get { return (bool)GetValue(IsMouseOverProperty); }
-            internal set { SetValue(IsMouseOverProperty, value); }
+            get => (bool)GetValue(IsMouseOverProperty);
+            internal set => SetValue(IsMouseOverPropertyKey, value);
         }
 
 #if MIGRATION
@@ -565,22 +567,25 @@ namespace Windows.UI.Xaml.Controls.Primitives
             }
         }
 
-        /// <summary>
-        /// Identifies the <see cref="ButtonBase.IsFocused"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IsFocusedProperty =
-            DependencyProperty.Register("IsFocused",
-                                        typeof(bool),
-                                        typeof(ButtonBase),
-                                        new PropertyMetadata(false));
+        private static readonly DependencyPropertyKey IsFocusedPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                nameof(IsFocused),
+                typeof(bool),
+                typeof(ButtonBase),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
 
+        /// <summary>
+        /// Identifies the <see cref="IsFocused"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsFocusedProperty = IsFocusedPropertyKey.DependencyProperty;
+            
         /// <summary>
         /// Gets a value that determines whether the button has focus.
         /// </summary>
         public bool IsFocused
         {
             get => (bool)GetValue(IsFocusedProperty);
-            private set => SetValue(IsFocusedProperty, value);
+            private set => SetValue(IsFocusedPropertyKey, value);
         }
 
         /// <inheritdoc />

@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Specialized;
 using CSHTML5.Internals.Controls;
+using OpenSilver.Internal;
 
 #if MIGRATION
 using System.Windows.Controls.Primitives;
@@ -48,16 +49,18 @@ namespace Windows.UI.Xaml.Controls
                 typeof(VirtualizingStackPanel), 
                 new PropertyMetadata(VirtualizationMode.Recycling));
 
+        private static readonly DependencyPropertyKey IsVirtualizingPropertyKey =
+            DependencyProperty.RegisterAttachedReadOnly(
+                "IsVirtualizing",
+                typeof(bool),
+                typeof(VirtualizingStackPanel),
+                new PropertyMetadata(BooleanBoxes.FalseBox));
+
         /// <summary>
         /// A value that indicates whether the <see cref="VirtualizingStackPanel"/>
         /// is using virtualization.
         /// </summary>
-        public static readonly DependencyProperty IsVirtualizingProperty =
-            DependencyProperty.RegisterAttached(
-                "IsVirtualizing", 
-                typeof(bool), 
-                typeof(VirtualizingStackPanel), 
-                new PropertyMetadata(false));
+        public static readonly DependencyProperty IsVirtualizingProperty = IsVirtualizingPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Identifies the <see cref="Orientation"/> dependency
@@ -113,7 +116,7 @@ namespace Windows.UI.Xaml.Controls
         public static bool GetIsVirtualizing(DependencyObject o)
         {
             if (o == null)
-                throw new ArgumentNullException("o");
+                throw new ArgumentNullException(nameof(o));
 
             return (bool)o.GetValue(IsVirtualizingProperty);
         }
@@ -121,9 +124,9 @@ namespace Windows.UI.Xaml.Controls
         internal static void SetIsVirtualizing(DependencyObject o, bool value)
         {
             if (o == null)
-                throw new ArgumentNullException("o");
+                throw new ArgumentNullException(nameof(o));
 
-            o.SetValue(VirtualizingStackPanel.IsVirtualizingProperty, value);
+            o.SetValue(IsVirtualizingPropertyKey, value);
         }
 
         /// <summary>

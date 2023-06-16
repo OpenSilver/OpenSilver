@@ -674,15 +674,17 @@ namespace Windows.UI.Xaml.Controls
             return base.GetTemplateChild(childName);
         }
 
-        /// <summary>
-        /// Identifies the <see cref="Panel.IsItemsHost"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty IsItemsHostProperty =
-            DependencyProperty.Register(
+        private static readonly DependencyPropertyKey IsItemsHostPropertyKey =
+            DependencyProperty.RegisterReadOnly(
                 nameof(IsItemsHost),
                 typeof(bool),
                 typeof(Panel),
-                new PropertyMetadata(false, OnIsItemsHostChanged));
+                new PropertyMetadata(BooleanBoxes.FalseBox, OnIsItemsHostChanged));
+
+        /// <summary>
+        /// Identifies the <see cref="IsItemsHost"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty IsItemsHostProperty = IsItemsHostPropertyKey.DependencyProperty;
 
         /// <summary>
         /// Gets a value that indicates whether this <see cref="Panel"/> is a container
@@ -690,8 +692,8 @@ namespace Windows.UI.Xaml.Controls
         /// </summary>
         public bool IsItemsHost
         {
-            get { return (bool)this.GetValue(IsItemsHostProperty); }
-            internal set { this.SetValue(IsItemsHostProperty, value); }
+            get { return (bool)GetValue(IsItemsHostProperty); }
+            internal set { SetValue(IsItemsHostPropertyKey, value); }
         }
 
         private static void OnIsItemsHostChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
