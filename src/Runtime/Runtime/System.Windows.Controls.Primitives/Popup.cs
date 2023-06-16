@@ -116,11 +116,22 @@ namespace Windows.UI.Xaml.Controls.Primitives
                 nameof(Placement), 
                 typeof(PlacementMode), 
                 typeof(Popup),
-                new PropertyMetadata(PlacementMode.Right, OnPlacementChanged));
+                new PropertyMetadata(PlacementMode.Right, OnPlacementChanged),
+                IsValidPlacementMode);
 
         private static void OnPlacementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((Popup)d).Reposition();
+        }
+
+        private static bool IsValidPlacementMode(object o)
+        {
+            PlacementMode value = (PlacementMode)o;
+            return value == PlacementMode.Bottom
+                || value == PlacementMode.Mouse
+                || value == PlacementMode.Right
+                || value == PlacementMode.Left
+                || value == PlacementMode.Top;
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

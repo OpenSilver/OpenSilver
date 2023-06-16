@@ -628,15 +628,14 @@ namespace Windows.UI.Xaml
         }
 
         /// <summary>
-        /// Identifies the <see cref="UIElement.Visibility"/> dependency 
-        /// property.
+        /// Identifies the <see cref="Visibility"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty VisibilityProperty =
             DependencyProperty.Register(
                 nameof(Visibility),
                 typeof(Visibility),
                 typeof(UIElement),
-                new PropertyMetadata(Visibility.Visible, Visibility_Changed));
+                new PropertyMetadata(VisibilityBoxes.VisibleBox, Visibility_Changed, CoerceVisibility));
 
         private string _previousValueOfDisplayCssProperty = "block";
 
@@ -659,6 +658,12 @@ namespace Windows.UI.Xaml
 
             // The IsVisible property depends on this property.
             uie.UpdateIsVisible();
+        }
+
+        private static object CoerceVisibility(DependencyObject d, object baseValue)
+        {
+            Visibility visibility = (Visibility)baseValue;
+            return VisibilityBoxes.Box(visibility);
         }
 
         internal static void INTERNAL_ApplyVisibility(UIElement uiElement, Visibility newValue)

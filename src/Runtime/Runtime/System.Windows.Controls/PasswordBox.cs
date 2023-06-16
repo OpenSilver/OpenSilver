@@ -104,7 +104,8 @@ namespace Windows.UI.Xaml.Controls
                 nameof(MaxLength),
                 typeof(int),
                 typeof(PasswordBox),
-                new PropertyMetadata(0, OnMaxLengthChanged));
+                new PropertyMetadata(0, OnMaxLengthChanged),
+                MaxLengthValidateValue);
 
         private static void OnMaxLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -113,6 +114,11 @@ namespace Windows.UI.Xaml.Controls
             {
                 pwb._textViewHost.View.OnMaxLengthChanged((int)e.NewValue);
             }
+        }
+
+        private static bool MaxLengthValidateValue(object value)
+        {
+            return ((int)value) >= 0;
         }
 
         /// <summary>

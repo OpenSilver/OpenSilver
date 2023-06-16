@@ -53,6 +53,7 @@
 		<Compile Include="Core\Main\InheritablePropertyChangeInfo.cs" />
 		<Compile Include="OpenSilver\Internal\DefaultValueFactory.cs" />
 		<Compile Include="OpenSilver\Internal\DependencyObjectType.cs" />
+		<Compile Include="OpenSilver\Internal\KnownBoxes.cs" />
 		<Compile Include="OpenSilver\Internal\NamedObject.cs" />
 		<Compile Include="OpenSilver\Internal\ValidateValueCallback.cs" />
 		<Compile Include="Core\Main\PrePostDescendentsWalker.cs" />

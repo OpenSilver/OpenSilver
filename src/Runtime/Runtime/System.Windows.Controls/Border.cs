@@ -272,7 +272,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Border.BorderThickness"/> dependency property.
+        /// Identifies the <see cref="BorderThickness"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty BorderThicknessProperty =
             DependencyProperty.Register(
@@ -282,7 +282,8 @@ namespace Windows.UI.Xaml.Controls
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
                     MethodToUpdateDom = BorderThickness_MethodToUpdateDom
-                });
+                },
+                IsThicknessValid);
 
         private static void BorderThickness_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -314,7 +315,8 @@ namespace Windows.UI.Xaml.Controls
                 new PropertyMetadata(new CornerRadius())
                 {
                     MethodToUpdateDom = CornerRadius_MethodToUpdateDom
-                });
+                },
+                IsCornerRadiusValid);
 
         private static void CornerRadius_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -334,7 +336,7 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the <see cref="Border.Padding"/> dependency property.
+        /// Identifies the <see cref="Padding"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty PaddingProperty =
             DependencyProperty.Register(
@@ -344,7 +346,8 @@ namespace Windows.UI.Xaml.Controls
                 new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure)
                 {
                     MethodToUpdateDom = Padding_MethodToUpdateDom
-                });
+                },
+                IsThicknessValid);
 
         private static void Padding_MethodToUpdateDom(DependencyObject d, object newValue)
         {
@@ -386,6 +389,18 @@ namespace Windows.UI.Xaml.Controls
             }
 
             return finalSize;
+        }
+
+        private static bool IsThicknessValid(object value)
+        {
+            Thickness t = (Thickness)value;
+            return Thickness.IsValid(t, false, false, false, false);
+        }
+
+        private static bool IsCornerRadiusValid(object value)
+        {
+            CornerRadius cr = (CornerRadius)value;
+            return CornerRadius.IsValid(cr, false, false, false, false);
         }
     }
 }

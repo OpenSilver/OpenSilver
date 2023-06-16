@@ -37,7 +37,6 @@ namespace Windows.UI.Xaml.Controls
         internal Grid Parent;
         public RowDefinition()
         {
-            MinHeight = 0;
             _effectiveMinSize = 0;
             _effectiveUnitType = GridUnitType.Auto;
             _measureArrangeSize = 0;
@@ -164,14 +163,15 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the MaxHeight dependency property.
+        /// Identifies the <see cref="MaxHeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxHeightProperty =
             DependencyProperty.Register(
                 nameof(MaxHeight), 
                 typeof(double), 
                 typeof(RowDefinition),
-                new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed));
+                new PropertyMetadata(double.PositiveInfinity, MaxHeight_Changed),
+                FrameworkElement.IsMaxWidthHeightValid);
 
         private static void MaxHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -188,14 +188,15 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the MinHeight dependency property.
+        /// Identifies the <see cref="MinHeight"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MinHeightProperty =
             DependencyProperty.Register(
                 nameof(MinHeight), 
                 typeof(double), 
                 typeof(RowDefinition),
-                new PropertyMetadata(double.PositiveInfinity, MinHeight_Changed));
+                new PropertyMetadata(0d, MinHeight_Changed),
+                FrameworkElement.IsMinWidthHeightValid);
 
         private static void MinHeight_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

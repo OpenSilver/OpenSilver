@@ -169,5 +169,69 @@ namespace Windows.UI.Xaml
         /// false.
         /// </returns>
         public static bool operator !=(Thickness t1, Thickness t2) => !(t1 == t2);
+
+        /// <summary>
+        /// Verifies if this Thickness contains only valid values
+        /// The set of validity checks is passed as parameters.
+        /// </summary>
+        /// <param name="thickness">the thickness</param>
+        /// <param name='allowNegative'>allows negative values</param>
+        /// <param name='allowNaN'>allows <see cref="double.NaN"/></param>
+        /// <param name='allowPositiveInfinity'>allows <see cref="double.PositiveInfinity"/></param>
+        /// <param name='allowNegativeInfinity'>allows <see cref="double.NegativeInfinity"/></param>
+        /// <returns>Whether or not the thickness complies to the range specified</returns>
+        internal static bool IsValid(
+            Thickness thickness,
+            bool allowNegative,
+            bool allowNaN,
+            bool allowPositiveInfinity,
+            bool allowNegativeInfinity)
+        {
+            if (!allowNegative)
+            {
+                if (thickness.Left < 0d ||
+                    thickness.Right < 0d ||
+                    thickness.Top < 0d ||
+                    thickness.Bottom < 0d)
+                {
+                    return false;
+                }
+            }
+
+            if (!allowNaN)
+            {
+                if (double.IsNaN(thickness.Left) ||
+                    double.IsNaN(thickness.Right) ||
+                    double.IsNaN(thickness.Top) ||
+                    double.IsNaN(thickness.Bottom))
+                {
+                    return false;
+                }
+            }
+
+            if (!allowPositiveInfinity)
+            {
+                if (double.IsPositiveInfinity(thickness.Left) ||
+                    double.IsPositiveInfinity(thickness.Right) ||
+                    double.IsPositiveInfinity(thickness.Top) ||
+                    double.IsPositiveInfinity(thickness.Bottom))
+                {
+                    return false;
+                }
+            }
+
+            if (!allowNegativeInfinity)
+            {
+                if (double.IsNegativeInfinity(thickness.Left) ||
+                    double.IsNegativeInfinity(thickness.Right) ||
+                    double.IsNegativeInfinity(thickness.Top) ||
+                    double.IsNegativeInfinity(thickness.Bottom))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

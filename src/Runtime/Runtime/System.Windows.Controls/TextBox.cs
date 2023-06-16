@@ -351,14 +351,15 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the MaxLength dependency property.
+        /// Identifies the <see cref="MaxLength"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxLengthProperty =
             DependencyProperty.Register(
                 nameof(MaxLength),
                 typeof(int),
                 typeof(TextBox),
-                new PropertyMetadata(0, OnMaxLengthChanged));
+                new PropertyMetadata(0, OnMaxLengthChanged),
+                MaxLengthValidateValue);
 
         private static void OnMaxLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -367,6 +368,11 @@ namespace Windows.UI.Xaml.Controls
             {
                 tb._textViewHost.View.OnMaxLengthChanged((int)e.NewValue);
             }
+        }
+
+        private static bool MaxLengthValidateValue(object value)
+        {
+            return ((int)value) >= 0;
         }
 
 #if MIGRATION

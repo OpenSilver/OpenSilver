@@ -179,5 +179,59 @@ namespace Windows.UI.Xaml
         /// true if the two instances of <see cref="CornerRadius"/> are not equal; otherwise, false.
         /// </returns>
         public static bool operator !=(CornerRadius cr1, CornerRadius cr2) => !(cr1 == cr2);
+
+        internal static bool IsValid(
+            CornerRadius cr,
+            bool allowNegative,
+            bool allowNaN,
+            bool allowPositiveInfinity,
+            bool allowNegativeInfinity)
+        {
+            if (!allowNegative)
+            {
+                if (cr.TopLeft < 0d ||
+                    cr.TopRight < 0d ||
+                    cr.BottomLeft < 0d ||
+                    cr.BottomRight < 0d)
+                {
+                    return false;
+                }
+            }
+
+            if (!allowNaN)
+            {
+                if (double.IsNaN(cr.TopLeft) ||
+                    double.IsNaN(cr.TopRight) ||
+                    double.IsNaN(cr.BottomLeft) ||
+                    double.IsNaN(cr.BottomRight))
+                {
+                    return false;
+                }
+            }
+
+            if (!allowPositiveInfinity)
+            {
+                if (double.IsPositiveInfinity(cr.TopLeft) ||
+                    double.IsPositiveInfinity(cr.TopRight) ||
+                    double.IsPositiveInfinity(cr.BottomLeft) ||
+                    double.IsPositiveInfinity(cr.BottomRight))
+                {
+                    return false;
+                }
+            }
+
+            if (!allowNegativeInfinity)
+            {
+                if (double.IsNegativeInfinity(cr.TopLeft) ||
+                    double.IsNegativeInfinity(cr.TopRight) ||
+                    double.IsNegativeInfinity(cr.BottomLeft) ||
+                    double.IsNegativeInfinity(cr.BottomRight))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

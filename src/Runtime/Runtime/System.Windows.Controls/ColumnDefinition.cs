@@ -37,7 +37,6 @@ namespace Windows.UI.Xaml.Controls
         internal Grid Parent;
         public ColumnDefinition()
         {
-            MinWidth = 0;
             _effectiveMinSize = 0;
             _effectiveUnitType = GridUnitType.Auto;
             _measureArrangeSize = 0;
@@ -165,14 +164,15 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the MaxWidth dependency property.
+        /// Identifies the <see cref="MaxWidth"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MaxWidthProperty =
             DependencyProperty.Register(
                 nameof(MaxWidth), 
                 typeof(double), 
                 typeof(ColumnDefinition),
-                new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed));
+                new PropertyMetadata(double.PositiveInfinity, MaxWidth_Changed),
+                FrameworkElement.IsMaxWidthHeightValid);
 
         private static void MaxWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -189,14 +189,15 @@ namespace Windows.UI.Xaml.Controls
         }
 
         /// <summary>
-        /// Identifies the MinWidth dependency property.
+        /// Identifies the <see cref="MinWidth"/> dependency property.
         /// </summary>
         public static readonly DependencyProperty MinWidthProperty =
             DependencyProperty.Register(
                 nameof(MinWidth), 
                 typeof(double), 
                 typeof(ColumnDefinition),
-                new PropertyMetadata(double.PositiveInfinity, MinWidth_Changed));
+                new PropertyMetadata(0d, MinWidth_Changed),
+                FrameworkElement.IsMinWidthHeightValid);
 
         private static void MinWidth_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
