@@ -188,7 +188,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 var propertyDefinition = resolved.Properties.FirstOrDefault(p => p.Name == propertyName);
                 if (propertyDefinition != null) return propertyDefinition;
 
-                ownerElementType = resolved.BaseType;
+                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
             }
 
             return null;
@@ -206,7 +206,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     (!publicOnly || p.IsPublic));
                 if (fieldDefinition != null) return fieldDefinition;
 
-                ownerElementType = resolved.BaseType;
+                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
             }
 
             return null;
@@ -223,7 +223,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                 {
                     return methodInfo;
                 }
-                ownerElementType = resolved.BaseType;
+                ownerElementType = resolved.BaseType?.PopulateGeneric(elementType, ownerElementType);
             }
 
             return null;
@@ -419,25 +419,6 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             returnValueAssemblyName = typeDef.ResolveOrThrow().Module.Assembly.Name.Name;
             isTypeString = typeDef.IsString();
             isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
-        }
-
-        public string GetEventHandlerType(string eventName, string namespaceName, string typeName, string assemblyName)
-        {
-            var type = FindType(namespaceName, typeName, assemblyName);
-            var typeIterator = type;
-            while (typeIterator != null)
-            {
-                var eventInfo = typeIterator.Events.FirstOrDefault(n => n.Name == eventName);
-                if (eventInfo != null)
-                {
-                    var eventType = eventInfo.EventType.PopulateGeneric(type, typeIterator);
-                    return eventType.GetTypeNameIncludingGenericArguments(true);
-                }
-
-                typeIterator = typeIterator.BaseType?.ResolveOrThrow();
-            }
-
-            throw new XamlParseException($"'{type}' does not contain an event named '{eventName}'.");
         }
 
         public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName,
@@ -700,7 +681,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
                     isTypeEnum = returnType.ResolveOrThrow().IsEnum;
                     return;
                 }
-                currentType = resolved.BaseType;
+                currentType = resolved.BaseType?.PopulateGeneric(elementType, currentType);
             }
             throw new XamlParseException("Method \"" + methodName + "\" not found in type \"" + elementType + "\".");
         }

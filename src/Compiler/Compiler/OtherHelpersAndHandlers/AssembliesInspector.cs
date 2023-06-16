@@ -122,8 +122,5 @@ namespace OpenSilver.Compiler
 
         public string GetField(string fieldName, string namespaceName, string typeName, string assemblyName)
             => _monoCecilVersion.GetField(fieldName, namespaceName, typeName, assemblyName);
-
-        public string GetEventHandlerType(string eventName, string namespaceName, string typeName, string assemblyName)
-            => _monoCecilVersion.GetEventHandlerType(eventName, namespaceName, typeName, assemblyName);
     }
 }

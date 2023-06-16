@@ -25,21 +25,19 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
 
         public static bool IsString(this TypeReference typeRef) => typeRef == typeRef.Module.TypeSystem.String;
 
-        public static TypeReference ResolveGenericParameter(this TypeReference typeRef, TypeReference elementType)
+        public static TypeReference ResolveGenericParameter(this GenericParameter genericParameter, TypeReference elementType)
         {
-            var genericParameter = typeRef as GenericParameter;
-            if (genericParameter == null)
-            {
-                throw new ArgumentException("Type Reference must be a GenericParameter");
-            }
-
             var genericType = genericParameter.DeclaringType.GetGenericInstanceType(elementType);
-
             return genericType.GenericArguments[genericParameter.Position];
         }
 
         public static GenericInstanceType GetGenericInstanceType(this TypeReference typeRef, TypeReference elementType)
         {
+            if (typeRef is GenericInstanceType generic)
+            {
+                return generic;
+            }
+
             elementType = elementType.ResolveOrThrow().BaseType;
             var typeDef = typeRef.ResolveOrThrow();
             while (elementType != null && typeDef != elementType.ResolveOrThrow())
@@ -54,7 +52,7 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
         {
             if (typeRef.IsGenericParameter)
             {
-                return typeRef.ResolveGenericParameter(rootElementType);
+                return ((GenericParameter)typeRef).ResolveGenericParameter(rootElementType);
             }
 
             if (typeRef is GenericInstanceType instance)

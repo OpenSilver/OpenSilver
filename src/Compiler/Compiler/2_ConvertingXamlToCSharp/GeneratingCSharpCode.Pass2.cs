@@ -542,15 +542,11 @@ namespace OpenSilver.Compiler
                                             // C# EVENT
                                             //------------
 
-                                            string eventHandlerType = _reflectionOnSeparateAppDomain.GetEventHandlerType(
-                                                memberName, namespaceName, localTypeName, assemblyNameIfAny
-                                            );
-
                                             parameters.StringBuilder.AppendLine(
                                                 string.Format("{0}.XamlContext_SetConnectionId({1}, {2}, {3});",
                                                     RuntimeHelperClass,
                                                     parameters.CurrentXamlContext,
-                                                    parameters.ComponentConnector.Connect(elementTypeInCSharp, attributeLocalName, eventHandlerType, attributeValue),
+                                                    parameters.ComponentConnector.Connect(elementTypeInCSharp, attributeLocalName, attributeValue),
                                                     elementUniqueNameOrThisKeyword)
                                             );
 

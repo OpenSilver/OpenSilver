@@ -37,14 +37,13 @@ namespace OpenSilver.Compiler
 
             private readonly List<ComponentConnectorEntry> _entries = new List<ComponentConnectorEntry>();
 
-            public int Connect(string componentType, string eventName, string handlerType, string handlerName)
+            public int Connect(string componentType, string eventName, string handlerName)
             {
                 int componentId = _entries.Count;
                 _entries.Add(new ComponentConnectorEntry
                 {
                     componentType = componentType,
                     eventName = eventName,
-                    handlerType = handlerType,
                     handlerName = handlerName
                 });
 
@@ -85,7 +84,6 @@ namespace OpenSilver.Compiler
             {
                 public string componentType;
                 public string eventName;
-                public string handlerType;
                 public string handlerName;
             }
         }
