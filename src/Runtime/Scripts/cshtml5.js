@@ -657,21 +657,21 @@ document.eventCallback = function (callbackId, args, sync) {
     const idWhereCallbackArgsAreStored = "callback_args_" + document.callbackCounterForSimulator++;
     document.jsObjRef[idWhereCallbackArgsAreStored] = argsArray;
     if (sync) {
-        const v = window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, true);
+        const v = window.onCallBack.OnCallbackFromJavaScriptWithResult(callbackId, idWhereCallbackArgsAreStored, argsArray);
         delete document.jsObjRef[idWhereCallbackArgsAreStored];
         return v;
     } else {
         setTimeout(
             function () {
-                window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray, false);
+                window.onCallBack.OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, argsArray);
             }, 1);
     }
 }
 
-document.getCallbackFunc = function (callbackId, sync, sliceArguments) {
+document.getCallbackFunc = function (callbackId, sync) {
     return function () {
         return document.eventCallback(callbackId,
-            (sliceArguments) ? Array.prototype.slice.call(arguments) : arguments,
+            Array.prototype.slice.call(arguments),
             sync);
     };
 }

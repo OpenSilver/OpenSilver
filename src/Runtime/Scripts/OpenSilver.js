@@ -63,7 +63,8 @@ window.getOSFilesLoadedPromise = () => { return Promise.allSettled(promises); };
 
 window.onCallBack = (function () {
     const opensilver = "OpenSilver";
-    const opensilver_js_callback = "OnCallbackFromJavaScriptBrowser";
+    const opensilver_js_callback_with_result = "OnCallbackFromJavaScriptWithResult";
+    const opensilver_js_callback = "OnCallbackFromJavaScript";
     const opensilver_js_error_callback = "OnCallbackFromJavaScriptError";
 
     function prepareCallbackArgs(args) {
@@ -103,12 +104,15 @@ window.onCallBack = (function () {
     }
 
     return {
-        OnCallbackFromJavaScript: function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject, returnValue) {
+        OnCallbackFromJavaScriptWithResult: function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) {
             let formattedArgs = prepareCallbackArgs(callbackArgsObject);
-            const res = DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs, returnValue || false);
-            if (returnValue) {
-                return res;
-            }
+            const res = DotNet.invokeMethod(opensilver, opensilver_js_callback_with_result, callbackId, idWhereCallbackArgsAreStored, formattedArgs);
+            return res;
+        },
+
+        OnCallbackFromJavaScript: function (callbackId, idWhereCallbackArgsAreStored, callbackArgsObject) {
+            let formattedArgs = prepareCallbackArgs(callbackArgsObject);
+            DotNet.invokeMethod(opensilver, opensilver_js_callback, callbackId, idWhereCallbackArgsAreStored, formattedArgs);
         },
 
         OnCallbackFromJavaScriptError: function (idWhereCallbackArgsAreStored) {
