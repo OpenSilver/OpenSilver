@@ -611,26 +611,28 @@ namespace Windows.UI.Xaml
 
         private struct MinMax
         {
+            private static double NotNan(double d, double defaultIfNan)
+            {
+                return double.IsNaN(d) ? defaultIfNan : d;
+            }
             internal MinMax(FrameworkElement e)
             {
-                maxHeight = e.MaxHeight;
-                minHeight = e.MinHeight;
-                double l = e.Height;
+                maxHeight = NotNan(e.MaxHeight, double.PositiveInfinity) ;
+                minHeight = NotNan(e.MinHeight, 0) ;
 
-                double height = (double.IsNaN(l) ? double.PositiveInfinity : l);
+                double height = NotNan(e.Height, double.PositiveInfinity);
                 maxHeight = Math.Max(Math.Min(height, maxHeight), minHeight);
 
-                height = (double.IsNaN(l) ? 0 : l);
+                height =  NotNan(e.Height, 0);
                 minHeight = Math.Max(Math.Min(maxHeight, height), minHeight);
 
-                maxWidth = e.MaxWidth;
-                minWidth = e.MinWidth;
-                l = e.Width;
+                maxWidth = NotNan(e.MaxWidth, double.PositiveInfinity) ;
+                minWidth = NotNan(e.MinWidth, 0) ;
 
-                double width = (double.IsNaN(l) ? double.PositiveInfinity : l);
+                double width = NotNan(e.Width, double.PositiveInfinity);
                 maxWidth = Math.Max(Math.Min(width, maxWidth), minWidth);
 
-                width = (double.IsNaN(l) ? 0 : l);
+                width =  NotNan(e.Width, 0);
                 minWidth = Math.Max(Math.Min(maxWidth, width), minWidth);
             }
 
