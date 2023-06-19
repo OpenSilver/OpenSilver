@@ -15,23 +15,24 @@
 
 
 
-using System;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows.Controls;
-using System.Linq;
 using System.Windows;
 using System.Collections;
-using System.Windows.Shapes;
-using OpenSilver;
+using DotNetForHtml5.EmulatorWithoutJavascript;
 
-namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
+namespace OpenSilver.Simulator.XamlInspection
 {
     internal static class XamlInspectionHelper
     {
-        public static bool TryInitializeTreeView(TreeView treeView, Assembly entryPointAssembly, out int NbTreeViewElement)
+        private static MethodInfo _FindElementInHostInfo;
+        private static MethodInfo _GetVisualParent;
+        private static Dictionary<object, TreeNode> _XamlSourcePathNodes;
+
+        public static bool TryInitializeTreeView(TreeView treeView)
         {
-            NbTreeViewElement = 0;
+            _XamlSourcePathNodes = new Dictionary<object, TreeNode>();
             IEnumerable treeRootElements = GetVisualTreeRootElements();
             if (treeRootElements != null)
             {
@@ -39,7 +40,7 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
 
                 foreach (object treeRootElement in treeRootElements)
                 {
-                    treeView.Items.Add(RecursivelyAddElementsToTree(treeRootElement, false, ref NbTreeViewElement));
+                    treeView.Items.Add(RecursivelyAddElementsToTree(treeRootElement, false, null, 6, true));
                 }
 
                 return true;
@@ -48,41 +49,108 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 return false;
         }
 
-        static TreeNode RecursivelyAddElementsToTree(dynamic uiElement, bool alreadyInsertedANodeForXamlSourcePath, ref int NbTreeViewElement)
+        public static TreeNode RecursivelyAddElementsToTree(dynamic uiElement, bool alreadyInsertedANodeForXamlSourcePath, TreeNode parentNode, int maxTreeLevel, bool includeEntryElement)
         {
             // If the element is a XAML root element (that is, if its "XamlSourcePath" property has been filled), we add a node to the tree that tells us in which XAML file the element is defined:
             string xamlSourcePathOrNull = alreadyInsertedANodeForXamlSourcePath ? null : GetXamlSourcePathOrNullFromElement(uiElement); ;
-            bool isNodeForXamlSourcePath = !string.IsNullOrEmpty(xamlSourcePathOrNull);
+            bool isNodeForXamlSourcePath = !string.IsNullOrEmpty(xamlSourcePathOrNull) && includeEntryElement;
+            var currMaxLevel = maxTreeLevel;
 
             TreeNode treeNode;
             if (isNodeForXamlSourcePath)
             {
                 string fileName = GetFileNameFromPath(xamlSourcePathOrNull);
                 // Create the tree node for displaying the XAML source path:
-                treeNode = new TreeNode()
+                if (includeEntryElement)
                 {
-                    Title = xamlSourcePathOrNull, //"---- File: " + fileName + " ----",
-                    IsNodeForXamlSourcePath = isNodeForXamlSourcePath,
-                    //XamlSourcePathOrNull = (xamlSourcePathOrNull != fileName ? "(" + fileName + ")" : null),
-                    Children = new ObservableCollection<TreeNode>(),
-                };
-
+                    treeNode = new TreeNode()
+                    {
+                        Title = xamlSourcePathOrNull, //"---- File: " + fileName + " ----",
+                        IsNodeForXamlSourcePath = isNodeForXamlSourcePath,
+                        //XamlSourcePathOrNull = (xamlSourcePathOrNull != fileName ? "(" + fileName + ")" : null),
+                        Children = new ObservableCollection<TreeNode>(),
+                        Parent = parentNode
+                    };
+                }
+                else
+                {
+                    treeNode = parentNode;
+                }
+                _XamlSourcePathNodes.Add(uiElement, treeNode);
                 // Call itself and set "alreadyInsertedANodeForXamlSourcePath" to true:
-                treeNode.Children.Add(RecursivelyAddElementsToTree(uiElement, true, ref NbTreeViewElement));
+                treeNode.AreChildrenLoaded = true;
+                treeNode.Children.Add(RecursivelyAddElementsToTree(uiElement, true, treeNode, maxTreeLevel == -1 ? -1 : currMaxLevel - 1, true));
             }
             else
             {
                 // Create the tree node for displaying the element:
-                treeNode = new TreeNode()
+                if (includeEntryElement)
                 {
-                    Element = (object)uiElement,
-                    Title = GetTitleFromElement(uiElement),
-                    Name = GetNameOrNullFromElement(uiElement),
-                    Children = new ObservableCollection<TreeNode>()
-                };
-
+                    treeNode = new TreeNode()
+                    {
+                        Element = (object)uiElement,
+                        Title = GetTitleFromElement(uiElement),
+                        Name = GetNameOrNullFromElement(uiElement),
+                        Children = new ObservableCollection<TreeNode>(),
+                        Parent = parentNode
+                    };
+                }
+                else
+                {
+                    treeNode = parentNode;
+                }
+                treeNode.AreChildrenLoaded = true;
                 // Handle the children recursively:
                 IDictionary visualChildrenInformation = uiElement.INTERNAL_VisualChildrenInformation as IDictionary;
+                if (visualChildrenInformation != null)
+                {
+                    if (currMaxLevel > 0 || maxTreeLevel == -1)
+                    {
+                        if (maxTreeLevel != -1) currMaxLevel--;
+                        foreach (dynamic item in visualChildrenInformation.Values) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
+                        {
+                            var childElement = item.INTERNAL_UIElement;
+                            if (childElement != null)
+                            {
+                                if (treeNode.Title == "Window" && (GetTitleFromElement(childElement) == "TextBlock" || GetTitleFromElement(childElement) == "TextBox"))
+                                    return treeNode;
+
+                                TreeNode childNode;
+
+                                if (_XamlSourcePathNodes.ContainsKey(childElement))
+                                    childNode = (_XamlSourcePathNodes[childElement] as TreeNode).Children.SingleOrDefault(nd => nd.Element == childElement);
+                                else
+                                    childNode = treeNode.Children.SingleOrDefault(nd => nd.Element == childElement);
+
+                                if (childNode == null)
+                                    treeNode.Children.Add(RecursivelyAddElementsToTree(childElement, isNodeForXamlSourcePath, treeNode, currMaxLevel, true));
+                                else
+                                    RecursivelyAddElementsToTree(childElement, isNodeForXamlSourcePath, childNode, currMaxLevel, false);
+
+                            }
+                        }
+                    }
+                    else
+                        treeNode.AreChildrenLoaded = false;
+                }
+            }
+            return treeNode;
+        }
+
+        public static TreeNode AddElementBranchToTree(List<dynamic> elementBranch, TreeNode parentNode)
+        {
+            //elementBranch arg is a branch starting from lowest leaf and going up
+
+            TreeNode lastLeafNode = null;
+
+            var leafNode = parentNode;
+
+            for (int i = elementBranch.Count - 1; i > 0; i--)
+            {
+                parentNode.AreChildrenLoaded = true;
+                var parentElement = elementBranch[i];
+
+                IDictionary visualChildrenInformation = parentElement.INTERNAL_VisualChildrenInformation as IDictionary;
                 if (visualChildrenInformation != null)
                 {
                     foreach (dynamic item in visualChildrenInformation.Values) // This corresponds to elements of type "INTERNAL_VisualChildInformation" in the "Core" assembly.
@@ -90,13 +158,28 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                         var childElement = item.INTERNAL_UIElement;
                         if (childElement != null)
                         {
-                            treeNode.Children.Add(RecursivelyAddElementsToTree(childElement, isNodeForXamlSourcePath, ref NbTreeViewElement));
+                            var treeNode = new TreeNode()
+                            {
+                                Element = (object)childElement,
+                                Title = GetTitleFromElement(childElement),
+                                Name = GetNameOrNullFromElement(childElement),
+                                Children = new ObservableCollection<TreeNode>(),
+                                Parent = parentNode,
+                                AreChildrenLoaded = childElement.INTERNAL_VisualChildrenInformation == null || (childElement.INTERNAL_VisualChildrenInformation as IDictionary).Count == 0
+                            };
+                            parentNode.Children.Add(treeNode);
+                            if (childElement.Equals(elementBranch[i - 1]))
+                                leafNode = treeNode;
+                            if (i == 1 && childElement.Equals(elementBranch[0]))
+                                lastLeafNode = treeNode;
                         }
                     }
+                    parentNode = leafNode;
                 }
             }
-            NbTreeViewElement++;
-            return treeNode;
+
+            //lastLeafNode.AreChildrenLoaded = elementBranch.First().INTERNAL_VisualChildrenInformation == null || (elementBranch.First().INTERNAL_VisualChildrenInformation as IDictionary).Count == 0;
+            return lastLeafNode;
         }
 
         static string GetFileNameFromPath(string path)
@@ -191,15 +274,16 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
         static IEnumerable GetVisualTreeRootElements()
         {
             // Find the "Core" assembly among the loaded assemblies:
-            Assembly coreAssembly =
-                (from a in AppDomain.CurrentDomain.GetAssemblies()
-                 where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
-                 select a).FirstOrDefault();
-            if (coreAssembly != null)
+            //Assembly coreAssembly =
+            //    (from a in AppDomain.CurrentDomain.GetAssemblies()
+            //     where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
+            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
+            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
+            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
+            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
+            //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR
+            //     select a).FirstOrDefault();
+            if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
             {
                 // Find the type "INTERNAL_PopupsManager" in Core:
                 Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "DotNetForHtml5.Core" && type.Name == "INTERNAL_PopupsManager") select type).FirstOrDefault();
@@ -227,130 +311,159 @@ namespace DotNetForHtml5.EmulatorWithoutJavascript.XamlInspection
                 return null;
         }
 
-        public static object GetElementAtSpecifiedCoordinates(Point coordinates)
+        static object GetVisualParent(object uiElement)
         {
-            // Find the "Core" assembly among the loaded assemblies:
-            Assembly coreAssembly =
-                (from a in AppDomain.CurrentDomain.GetAssemblies()
-                 where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
-                 || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
-                 select a).FirstOrDefault();
-            if (coreAssembly != null)
+            if (_GetVisualParent == null)
             {
-                // Find the type "VisualTreeHelper" in Core:
-                Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "CSHTML5.Internal" && type.Name == "INTERNAL_HtmlDomManager") select type).FirstOrDefault();
-                if (manager != null)
-                {
-                    // Call the "GetAllRootUIElements" method:
-                    var methodInfo = manager.GetMethod("FindElementInHostCoordinates_UsedBySimulatorToo", BindingFlags.Public | BindingFlags.Static);
-                    if (methodInfo != null)
-                    {
-                        double dpiAwareX = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(coordinates.X, invert: true);
-                        double dpiAwareY = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(coordinates.Y, invert: true);
+                // Find the "Core" assembly among the loaded assemblies:
+                //Assembly coreAssembly =
+                //    (from a in AppDomain.CurrentDomain.GetAssemblies()
+                //     where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR
+                //     select a).FirstOrDefault();
 
-                        var element = methodInfo.Invoke(null, new object[] { dpiAwareX, dpiAwareY });
-                        return element;
-                    }
-                    else
-                        return null;
+                if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
+                {
+                    var visualTreeHelperType = coreAssembly.GetType("System.Windows.Media.VisualTreeHelper");
+                    _GetVisualParent = visualTreeHelperType
+                        .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                        .Where(method =>
+                        {
+                            if (method.Name == "GetParent")
+                            {
+                                var parameters = method.GetParameters();
+                                if (parameters.Length == 1 &&
+                                    parameters[0].ParameterType.Name == nameof(DependencyObject))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        })
+                        .Single();
                 }
-                else
-                    return null;
+            }
+            return _GetVisualParent.Invoke(null, new object[] { uiElement });
+        }
+
+        public static object GetVisualElementAtPoint(Point coordinates)
+        {
+            if (_FindElementInHostInfo == null)
+            {
+                // Find the "Core" assembly among the loaded assemblies:
+                //Assembly coreAssembly =
+                //    (from a in AppDomain.CurrentDomain.GetAssemblies()
+                //     where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BRIDGE
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BRIDGE
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_USING_BLAZOR
+                //     || a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY_SLMIGRATION_USING_BLAZOR
+                //     select a).FirstOrDefault();
+                if (ReflectionInUserAssembliesHelper.TryGetCoreAssembly(out Assembly coreAssembly))
+                {
+                    Type manager = (from type in coreAssembly.GetTypes() where (type.Namespace == "CSHTML5.Internal" && type.Name == "INTERNAL_HtmlDomManager") select type).FirstOrDefault();
+                    _FindElementInHostInfo = manager.GetMethod("FindElementInHostCoordinates_UsedBySimulatorToo", BindingFlags.Public | BindingFlags.Static);
+                }
+            }
+
+            if (_FindElementInHostInfo != null)
+            {
+                //With WebView2 we get a dpi aware values so commenting these:
+                //double dpiAwareX = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(coordinates.X, invert: true);
+                //double dpiAwareY = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(coordinates.Y, invert: true);
+
+                var element = _FindElementInHostInfo.Invoke(null, new object[] { coordinates.X, coordinates.Y });
+                return element;
             }
             else
                 return null;
         }
 
-        public static void HighlightElement(object userUIElementThatWeWantToHighlight, Rectangle rectangleUsedToHighlight, DotNetBrowser.Browser browser)
+        public static void HighlightElementUsingJS(object uiElement, int highlightClr)
         {
-            bool wasElementHighlighted = false;
-
-            if (userUIElementThatWeWantToHighlight != null)
+            if (uiElement != null)
             {
-                try
+                string uniqueIdentifier = ((dynamic)((dynamic)uiElement).INTERNAL_OuterDomElement).UniqueIdentifier.ToString();
+                uniqueIdentifier = uniqueIdentifier != null ? $"'{uniqueIdentifier}'" : "null";
+                SimulatorProxy.OpenSilverRuntimeDispatcher.BeginInvoke(() =>
                 {
-                    // Get the coordinates of the element in HTML:
-                    string uniqueIdentifier = ((dynamic)((dynamic)userUIElementThatWeWantToHighlight).INTERNAL_OuterDomElement).UniqueIdentifier.ToString();
-                    if (uniqueIdentifier != null)
-                    {
-                        string coordinates = browser.ExecuteJavaScriptAndReturnValue(string.Format(
-    @"var div = document.getElementByIdSafe('{0}');
-                              var rect = div.getBoundingClientRect();
-                              var result = rect.top + ';' + rect.right + ';' + rect.bottom + ';' + rect.left;
-                              result;
-                              ", uniqueIdentifier)).ToString();
-
-                        string[] coordinatesArray = coordinates.Replace(',', '.').Split(';');
-                        double top = double.Parse(coordinatesArray[0]);
-                        double right = double.Parse(coordinatesArray[1]);
-                        double bottom = double.Parse(coordinatesArray[2]);
-                        double left = double.Parse(coordinatesArray[3]);
-
-                        // Take into account the screen DPI:
-                        double dpiAwareTop = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(top, invert: false);
-                        double dpiAwareRight = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(right, invert: false);
-                        double dpiAwareBottom = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(bottom, invert: false);
-                        double dpiAwareLeft = ScreenCoordinatesHelper.ConvertWidthOrNaNToDpiAwareWidthOrNaN(left, invert: false);
-
-                        Canvas.SetLeft(rectangleUsedToHighlight, dpiAwareLeft);
-                        Canvas.SetTop(rectangleUsedToHighlight, dpiAwareTop);
-                        rectangleUsedToHighlight.Width = (dpiAwareRight > dpiAwareLeft ? (dpiAwareRight - dpiAwareLeft) : 0);
-                        rectangleUsedToHighlight.Height = (dpiAwareBottom > dpiAwareTop ? (dpiAwareBottom - dpiAwareTop) : 0);
-                        rectangleUsedToHighlight.Visibility = Visibility.Visible;
-
-                        // Remember the highlighted element reference:
-                        rectangleUsedToHighlight.Tag = userUIElementThatWeWantToHighlight;
-
-                        wasElementHighlighted = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
-                }
-            }
-
-            // Remove highlight if error or empty:
-            if (!wasElementHighlighted)
-            {
-                rectangleUsedToHighlight.Width = double.NaN;
-                rectangleUsedToHighlight.Height = double.NaN;
-                rectangleUsedToHighlight.Visibility = Visibility.Collapsed;
+                    SimulatorProxy.JavaScriptExecutionHandler.ExecuteJavaScript($"XamlInspectorHighlightElement({uniqueIdentifier}, {highlightClr})");
+                });
             }
         }
 
-        /*
-        static dynamic GetVisualTreeRootElement()
+        public static void StartInspection()
         {
-            // Find the "Core" assembly among the loaded assemblies:
-            Assembly coreAssembly = (from a in AppDomain.CurrentDomain.GetAssemblies() where a.GetName().Name == Constants.NAME_OF_CORE_ASSEMBLY select a).FirstOrDefault();
-            if (coreAssembly != null)
+            SimulatorProxy.OpenSilverRuntimeDispatcher.BeginInvoke(() =>
             {
-                // Find the "Window" type:
-                Type windowType = (from type in coreAssembly.GetTypes() where (type.Namespace == "Windows.UI.Xaml" && type.Name == "Window") select type).FirstOrDefault();
-                if (windowType != null)
+                SimulatorProxy.JavaScriptExecutionHandler.ExecuteJavaScript("startXamlInspection()");
+            });
+
+        }
+
+        public static void StopInspection()
+        {
+            SimulatorProxy.OpenSilverRuntimeDispatcher.BeginInvoke(() =>
+            {
+                SimulatorProxy.JavaScriptExecutionHandler.ExecuteJavaScript("stopXamlInspection()");
+            });
+        }
+
+        private static async Task<object> GetElementAtPoint(int x, int y)
+        {
+            var element = await SimulatorProxy.OpenSilverRuntimeDispatcher.InvokeAsync(() =>
+            {
+                return XamlInspectionHelper.GetVisualElementAtPoint(new Point(x, y));
+            });
+
+            return element;
+        }
+
+        public static async void HighlightElementAtPoint(int x, int y)
+        {
+            XamlInspectionHelper.HighlightElementUsingJS(await GetElementAtPoint(x, y), 1);
+        }
+
+        public static async void SelectElementAtPoint(int x, int y)
+        {
+            var element = await GetElementAtPoint(x, y);
+            XamlInspectionHelper.HighlightElementUsingJS(element, 2);
+
+            if (element != null)
+            {
+                var rootNode = MainWindow.Instance.XamlInspectionTreeViewInstance.XamlTree.Items.GetItemAt(0) as TreeNode;
+
+                var elementNode = MainWindow.Instance.XamlInspectionTreeViewInstance.FindElementNode(element, rootNode);
+
+                if (elementNode == null)
                 {
-                    // Get the current window:
-                    var propertyInfo = windowType.GetProperty("Current", BindingFlags.Public | BindingFlags.Static);
-                    if (propertyInfo != null)
+                    var elementTreeBranch = new List<dynamic>();
+                    elementTreeBranch.Add(element);
+                    var firstLoadedNode = elementNode;
+                    while (firstLoadedNode == null)
                     {
-                        var window = propertyInfo.GetValue(null, null);
-                        return window;
+                        var parentElement = GetVisualParent(element);
+                        elementTreeBranch.Add(parentElement);
+                        firstLoadedNode = MainWindow.Instance.XamlInspectionTreeViewInstance.FindElementNode(parentElement, rootNode);
+                        element = parentElement;
                     }
-                    else
-                        return null;
+                    elementNode = XamlInspectionHelper.AddElementBranchToTree(elementTreeBranch, firstLoadedNode);
                 }
-                else
-                    return null;
+
+                MainWindow.Instance.XamlInspectionTreeViewInstance.SelectTreeItem(elementNode);
+                MainWindow.Instance.XamlInspectionTreeViewInstance.ExpandToNode(null, elementNode);
             }
             else
             {
-                return null;
+                MessageBox.Show("No item was selected by the XAML Visual Tree inspector.");
             }
         }
-        */
+
     }
 }
