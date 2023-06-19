@@ -421,6 +421,25 @@ namespace OpenSilver.Compiler.OtherHelpersAndHandlers.MonoCecilAssembliesInspect
             isTypeEnum = typeDef.ResolveOrThrow().IsEnum;
         }
 
+        public string GetEventHandlerType(string eventName, string namespaceName, string typeName, string assemblyName)
+        {
+            var type = FindType(namespaceName, typeName, assemblyName);
+            var typeIterator = type;
+            while (typeIterator != null)
+            {
+                var eventInfo = typeIterator.Events.FirstOrDefault(n => n.Name == eventName);
+                if (eventInfo != null)
+                {
+                    var eventType = eventInfo.EventType.PopulateGeneric(type, typeIterator);
+                    return eventType.GetTypeNameIncludingGenericArguments(true);
+                }
+
+                typeIterator = typeIterator.BaseType?.ResolveOrThrow();
+            }
+
+            throw new XamlParseException($"'{type}' does not contain an event named '{eventName}'.");
+        }
+        
         public bool IsElementAMarkupExtension(string elementNameSpace, string elementLocalName,
             string assemblyNameIfAny)
         {
