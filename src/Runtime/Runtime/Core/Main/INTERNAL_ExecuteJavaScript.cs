@@ -65,10 +65,7 @@ namespace CSHTML5.Internal
         public static string WrapReferenceIdInJavascriptCall(string javascript, int referenceId)
         {
             // Change the JS code to call ShowErrorMessage in case of error:
-
-            // FIXME: uncomment after PR724 is approved
-            //string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
-            string errorCallBackId = referenceId.ToString();
+            string errorCallBackId = _javascriptCallsStore.Add(javascript).ToString();
 
             javascript = $"document.callScriptSafe(\"{referenceId}\",\"{INTERNAL_HtmlDomManager.EscapeStringForUseInJavaScript(javascript)}\",{errorCallBackId})";
             return javascript;

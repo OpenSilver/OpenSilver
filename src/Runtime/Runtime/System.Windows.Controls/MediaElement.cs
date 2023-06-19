@@ -51,7 +51,6 @@ namespace Windows.UI.Xaml.Controls
         static readonly List<string> SupportedVideoTypes = new List<string>() { "mp4", "ogv", "webm", "3gp" }; // IMPORTANT: if you change this list, remember to also change the error messages in this class.
         static readonly List<string> SupportedAudioTypes = new List<string>() { "mp3", "ogg" };  // IMPORTANT: if you change this list, remember to also change the error messages in this class. //todo: not sure if ogg is actually only for audio or not. If not, find a way to know which one it currently is.
         object _mediaElement = null;
-        dynamic _mediaElement_ForAudioOnly_ForSimulatorOnly = null;
 
         string _nameOfAssemblyThatSetTheSourceUri; // Useful to convert relative URI to absolute URI.
 
@@ -74,14 +73,7 @@ namespace Windows.UI.Xaml.Controls
         private static void AutoPlay_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (MediaElement)d;
-            if (control._mediaElement_ForAudioOnly_ForSimulatorOnly == null)
-            {
-                control.ManageDomBoolProperty_Changed(HTML_AUTOPLAY_PROPERTY_NAME, (bool)e.NewValue);
-            }
-            else //do nothing ? (because AutoPlay doesn't exist in wpf so we use Loaded of the wpf's MediaElement then Play)
-            {
-                //control._mediaElement_ForAudioOnly_ForSimulatorOnly.AutoPlay = control.AutoPlay;
-            }
+            control.ManageDomBoolProperty_Changed(HTML_AUTOPLAY_PROPERTY_NAME, (bool)e.NewValue);
         }
 
         ///// <summary>
@@ -143,14 +135,7 @@ namespace Windows.UI.Xaml.Controls
         private static void IsLooping_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (MediaElement)d;
-            if (control._mediaElement_ForAudioOnly_ForSimulatorOnly == null)
-            {
-                control.ManageDomBoolProperty_Changed(HTML_ISLOOPING_PROPERTY_NAME, (bool)e.NewValue);
-            }
-            else
-            {
-                control._mediaElement_ForAudioOnly_ForSimulatorOnly.IsLooping = control.IsLooping;
-            }
+            control.ManageDomBoolProperty_Changed(HTML_ISLOOPING_PROPERTY_NAME, (bool)e.NewValue);
         }
 
         /// <summary>
@@ -171,14 +156,7 @@ namespace Windows.UI.Xaml.Controls
         private static void IsMuted_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (MediaElement)d;
-            if (control._mediaElement_ForAudioOnly_ForSimulatorOnly == null)
-            {
-                control.ManageDomBoolProperty_Changed(HTML_ISMUTED_PROPERTY_NAME, (bool)e.NewValue);
-            }
-            else
-            {
-                control._mediaElement_ForAudioOnly_ForSimulatorOnly.IsMuted = control.IsMuted;
-            }
+            control.ManageDomBoolProperty_Changed(HTML_ISMUTED_PROPERTY_NAME, (bool)e.NewValue);
         }
 
 
@@ -287,40 +265,20 @@ namespace Windows.UI.Xaml.Controls
                         {
                             INTERNAL_HtmlDomManager.RemoveFromDom(control._mediaElement); //note: there can be only one child element.
                         }
-#if OPENSILVER
-                        if (!INTERNAL_InteropImplementation.IsRunningInTheSimulator_WorkAround() || tagString == "video")
-#else
-                        if (CSharpXamlForHtml5.Environment.IsRunningInJavaScript || tagString == "video")
-#endif
+
+                        object outerDiv = control.INTERNAL_OuterDomElement;
+
+                        var elementStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle(tagString, outerDiv, control, out object element);
+
+                        control._mediaElement = element;
+
+                        if (tagString == "video")
                         {
-                            object element = null;
-                            object outerDiv = control.INTERNAL_OuterDomElement;
-                            var elementStyle = INTERNAL_HtmlDomManager.CreateDomElementAppendItAndGetStyle(tagString, outerDiv, control, out element);
-
-                            control._mediaElement_ForAudioOnly_ForSimulatorOnly = null;
-
-                            control._mediaElement = element;
-
-                            if (tagString == "video")
-                            {
-                                elementStyle.width = "100%";
-                                elementStyle.height = "100%";
-                            }
-
-                            control.Refresh(); //we refresh all the values of the element in the visual tree
+                            elementStyle.width = "100%";
+                            elementStyle.height = "100%";
                         }
-                        else //when we are in the simulator, we don't want to use the <audio> tag, we will use a wpf one instead (because awesomium doesn't support .mp3 for example)
-                        {
-#if !CSHTML5NETSTANDARD
-                            if (control._mediaElement_ForAudioOnly_ForSimulatorOnly == null)
-                            {
-                                control._mediaElement_ForAudioOnly_ForSimulatorOnly = INTERNAL_Simulator.WpfMediaElementFactory.Create((Action)control.SimulatorMediaElement_Loaded, (Action)control.SimulatorMediaElement_MediaEnded);
-                            }
-                            control._mediaElement_ForAudioOnly_ForSimulatorOnly.Source = new Uri(valueForHtml5SourceProperty);
-                            control.Refresh_SimulatorOnly();
-#endif
-                            return;
-                        }
+
+                        control.Refresh(); //we refresh all the values of the element in the visual tree
                     }
 
                     // Update the "src" property of the <video> or <audio> tag
@@ -369,10 +327,6 @@ namespace Windows.UI.Xaml.Controls
                 if (_mediaElement != null)
                 {
                     INTERNAL_HtmlDomManager.SetDomElementProperty(_mediaElement, "volume", Volume);
-                }
-                else if (_mediaElement_ForAudioOnly_ForSimulatorOnly != null)
-                {
-                    _mediaElement_ForAudioOnly_ForSimulatorOnly.Pause();
                 }
             }
         }
@@ -443,10 +397,6 @@ namespace Windows.UI.Xaml.Controls
                 {
                     INTERNAL_HtmlDomManager.CallDomMethod(_mediaElement, "pause");
                 }
-                else if (_mediaElement_ForAudioOnly_ForSimulatorOnly != null)
-                {
-                    _mediaElement_ForAudioOnly_ForSimulatorOnly.Pause();
-                }
             }
         }
 
@@ -460,10 +410,6 @@ namespace Windows.UI.Xaml.Controls
                 if (_mediaElement != null)
                 {
                     INTERNAL_HtmlDomManager.CallDomMethod(_mediaElement, "play");
-                }
-                else if (_mediaElement_ForAudioOnly_ForSimulatorOnly != null)
-                {
-                    _mediaElement_ForAudioOnly_ForSimulatorOnly.Play();
                 }
             }
         }
@@ -537,31 +483,6 @@ namespace Windows.UI.Xaml.Controls
                 {
                     INTERNAL_HtmlDomManager.RemoveDomElementAttribute(_mediaElement, htmlPropertyName, forceSimulatorExecuteImmediately: true);
                 }
-            }
-        }
-
-        void Refresh_SimulatorOnly()
-        {
-            _mediaElement_ForAudioOnly_ForSimulatorOnly.IsMuted = IsMuted;
-            _mediaElement_ForAudioOnly_ForSimulatorOnly.Volume = Volume;
-        }
-
-        private void SimulatorMediaElement_Loaded()
-        {
-            //Todo: throw the Loaded event
-            if (AutoPlay)
-            {
-                _mediaElement_ForAudioOnly_ForSimulatorOnly.Play();
-            }
-        }
-
-        private void SimulatorMediaElement_MediaEnded()
-        {
-            //todo: throw the MediaEnded event
-            if (IsLooping)
-            {
-                _mediaElement_ForAudioOnly_ForSimulatorOnly.Stop();
-                _mediaElement_ForAudioOnly_ForSimulatorOnly.Play();
             }
         }
 

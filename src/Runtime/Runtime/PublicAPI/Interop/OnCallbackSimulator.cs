@@ -12,11 +12,14 @@
 \*====================================================================================*/
 
 using System;
+using System.Runtime.InteropServices;
 using DotNetForHtml5.Core;
 
 namespace CSHTML5.Internal
 {
-    internal sealed class OnCallbackSimulator
+    [ClassInterface(ClassInterfaceType.AutoDispatch)]
+    [ComVisible(true)]
+    public class OnCallbackSimulator
     {
         public OnCallbackSimulator()
         {
@@ -29,20 +32,29 @@ namespace CSHTML5.Internal
         }
 
         // This method can be removed later. Now it is used for easier migration from old cshtml5.js to new one
-        public object OnCallbackFromJavaScript(
+        public void OnCallbackFromJavaScript(
             int callbackId,
             string idWhereCallbackArgsAreStored,
             object callbackArgsObject)
         {
-            return OnCallbackFromJavaScript(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
-                false);
+            OnCallbackFromJavaScriptImpl(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
+                needResult: false);
         }
 
-        public object OnCallbackFromJavaScript(
+        public object OnCallbackFromJavaScriptWithResult(
+            int callbackId,
+            string idWhereCallbackArgsAreStored,
+            object callbackArgsObject)
+        {
+            return OnCallbackFromJavaScriptImpl(callbackId, idWhereCallbackArgsAreStored, callbackArgsObject,
+                needResult: true);
+        }
+
+        private object OnCallbackFromJavaScriptImpl(
             int callbackId,
             string idWhereCallbackArgsAreStored,
             object callbackArgsObject,
-            bool returnValue)
+            bool needResult)
         {
             object result = null;
             var actionExecuted = false;
@@ -55,7 +67,7 @@ namespace CSHTML5.Internal
                         callbackId,
                         idWhereCallbackArgsAreStored,
                         callbackArgsObject);
-                    
+
                     actionExecuted = true;
                 }
                 catch (Exception ex)
@@ -67,11 +79,10 @@ namespace CSHTML5.Internal
                 INTERNAL_ExecuteJavaScript.ExecutePendingJavaScriptCode();
             }
 
-            // Go back to the UI thread because DotNetBrowser calls the callback from the socket background thread:
-            if (returnValue)
+            if (needResult)
             {
                 var timeout = TimeSpan.FromSeconds(30);
-                INTERNAL_Simulator.WebControlDispatcherInvoke(InvokeCallback, timeout);
+                INTERNAL_Simulator.OpenSilverDispatcherInvoke(InvokeCallback, timeout);
                 if (!actionExecuted)
                 {
                     throw GenerateDeadlockException(timeout);
@@ -79,10 +90,10 @@ namespace CSHTML5.Internal
             }
             else
             {
-                INTERNAL_Simulator.WebControlDispatcherBeginInvoke(InvokeCallback);
+                INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(InvokeCallback);
             }
 
-            return returnValue ? result : null;
+            return result;
         }
 
         private static void CheckIsRunningInTheSimulator()

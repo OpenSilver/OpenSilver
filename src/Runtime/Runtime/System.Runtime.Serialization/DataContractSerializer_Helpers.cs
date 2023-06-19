@@ -32,9 +32,6 @@ using System.Xml.Serialization;
 using System.Collections;
 using CSHTML5.Internal;
 using DotNetForHtml5.Core;
-#if !CSHTML5NETSTANDARD
-using DotNetBrowser;
-#endif
 
 namespace System.Runtime.Serialization
 {

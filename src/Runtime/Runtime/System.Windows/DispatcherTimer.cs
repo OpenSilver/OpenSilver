@@ -116,7 +116,7 @@ namespace Windows.UI.Xaml
                 {
                     if (INTERNAL_Simulator.IsRunningInTheSimulator_WorkAround)
                     {
-                        INTERNAL_Simulator.WebControlDispatcherBeginInvoke(() =>
+                        INTERNAL_Simulator.OpenSilverDispatcherBeginInvoke(() =>
                         {
                             //It is important to do this check on the UI thread
                             if (_timer == null)
