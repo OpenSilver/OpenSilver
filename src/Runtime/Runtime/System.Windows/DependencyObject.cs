@@ -776,7 +776,7 @@ namespace Windows.UI.Xaml
                 throw new ArgumentNullException(nameof(dp));
             }
 
-            PropertyMetadata metadata = SetupPropertyChange(dp);
+            PropertyMetadata metadata = dp.GetMetadata(DependencyObjectType);
 
             if (INTERNAL_PropertyStore.TryGetStorage(this, dp, metadata, false, out INTERNAL_PropertyStorage storage))
             {
